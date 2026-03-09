@@ -1,0 +1,23 @@
+{%- comment -%}
+  Snippet: rating
+  Usage: {% render 'rating', rating: product.metafields.reviews.rating, count: product.metafields.reviews.rating_count %}
+{%- endcomment -%}
+
+{%- if rating -%}
+  <div class="rating" role="img" aria-label="{{ rating }} out of 5 stars">
+    {%- assign rating_value = rating | round: 1 -%}
+    {%- for i in (1..5) -%}
+      {%- assign half_star = i | minus: 0.5 -%}
+      {%- if rating_value >= i -%}
+        {% render 'icon', name: 'star' %}
+      {%- elsif rating_value >= half_star -%}
+        {% render 'icon', name: 'star-half' %}
+      {%- else -%}
+        {% render 'icon', name: 'star-empty' %}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if count -%}
+      <span class="rating__count">({{ count }})</span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

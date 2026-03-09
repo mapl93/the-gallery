@@ -1,0 +1,22 @@
+{%- comment -%}
+  Snippet: price
+  Usage: {% render 'price', product: product %}
+{%- endcomment -%}
+
+<div class="price">
+  {%- if product.compare_at_price > product.price -%}
+    <span class="price__compare">{{ product.compare_at_price | money }}</span>
+    <span class="price__current price__current--sale">{{ product.price | money }}</span>
+  {%- else -%}
+    <span class="price__current">{{ product.price | money }}</span>
+  {%- endif -%}
+  {%- if product.selected_or_first_available_variant.unit_price -%}
+    <span class="price__unit">
+      {{ product.selected_or_first_available_variant.unit_price | money }}
+      / {{ product.selected_or_first_available_variant.unit_price_measurement.reference_unit }}
+    </span>
+  {%- endif -%}
+  {%- unless product.available -%}
+    <span class="badge badge--error">Sold Out</span>
+  {%- endunless -%}
+</div>

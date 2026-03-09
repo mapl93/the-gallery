@@ -1,0 +1,51 @@
+<section class="artist-profile">
+  <div class="artist-profile__portrait">
+    {% if section.settings.portrait %}
+      {{ section.settings.portrait | image_url: width: 800 | image_tag:
+         alt: section.settings.name, loading: 'lazy',
+         widths: '400,600,800', sizes: '(min-width: 768px) 50vw, 100vw' }}
+    {% endif %}
+  </div>
+
+  <div class="artist-profile__content">
+    <span class="artist-profile__label">The Maker</span>
+    <h2 class="artist-profile__name">{{ section.settings.name }}</h2>
+
+    {% if section.settings.location %}
+      <p class="artist-profile__location">
+        {% render 'icon', name: 'map-pin', size: 16 %}
+        {{ section.settings.location }}
+      </p>
+    {% endif %}
+
+    <div class="artist-profile__bio">{{ section.settings.bio }}</div>
+
+    {% if section.settings.philosophy %}
+      <blockquote class="artist-profile__philosophy">
+        {{ section.settings.philosophy }}
+      </blockquote>
+    {% endif %}
+
+    {% if section.settings.cta_url %}
+      <a href="{{ section.settings.cta_url }}" class="btn btn--outline">
+        {{ section.settings.cta_text | default: 'View their work' }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Artist Profile",
+  "settings": [
+    { "type": "image_picker", "id": "portrait", "label": "Portrait" },
+    { "type": "text", "id": "name", "label": "Name" },
+    { "type": "text", "id": "location", "label": "Location" },
+    { "type": "richtext", "id": "bio", "label": "Biography" },
+    { "type": "textarea", "id": "philosophy", "label": "Philosophy quote" },
+    { "type": "url", "id": "cta_url", "label": "CTA link" },
+    { "type": "text", "id": "cta_text", "label": "CTA text" }
+  ],
+  "presets": [{ "name": "Artist Profile" }]
+}
+{% endschema %}

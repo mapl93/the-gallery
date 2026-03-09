@@ -1,0 +1,39 @@
+<section class="collection-story {% if section.settings.reverse %}collection-story--reversed{% endif %}">
+  <div class="collection-story__media">
+    {% if section.settings.image %}
+      {{ section.settings.image | image_url: width: 960 | image_tag:
+         alt: section.settings.title, loading: 'lazy',
+         widths: '480,720,960', sizes: '(min-width: 768px) 50vw, 100vw' }}
+    {% endif %}
+  </div>
+  <div class="collection-story__content">
+    <span class="collection-story__label">{{ section.settings.label | default: 'The Story' }}</span>
+    <h2 class="collection-story__title">{{ section.settings.title }}</h2>
+    <div class="collection-story__text">{{ section.settings.text }}</div>
+    {% if section.settings.quote %}
+      <blockquote class="collection-story__inspiration">{{ section.settings.quote }}</blockquote>
+    {% endif %}
+    {% if section.settings.cta_url %}
+      <a href="{{ section.settings.cta_url }}" class="btn btn--outline">
+        {{ section.settings.cta_text | default: 'Explore Collection' }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection Story",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "label", "label": "Label", "default": "The Story" },
+    { "type": "text", "id": "title", "label": "Heading" },
+    { "type": "richtext", "id": "text", "label": "Body text" },
+    { "type": "textarea", "id": "quote", "label": "Inspiration quote" },
+    { "type": "url", "id": "cta_url", "label": "CTA link" },
+    { "type": "text", "id": "cta_text", "label": "CTA text" },
+    { "type": "checkbox", "id": "reverse", "label": "Reverse layout", "default": false }
+  ],
+  "presets": [{ "name": "Collection Story" }]
+}
+{% endschema %}

@@ -1,0 +1,61 @@
+{%- comment -%}
+  Snippet: cart-drawer
+  Usage: {% render 'cart-drawer' %}
+{%- endcomment -%}
+
+<div class="drawer-overlay" data-cart-overlay></div>
+<aside class="drawer" data-cart-drawer aria-label="Shopping cart">
+  <div class="drawer__header">
+    <h2 class="modal__title">Cart ({{ cart.item_count }})</h2>
+    <button class="btn btn--outline btn--icon-only"
+            aria-label="Close cart" data-cart-close>
+      {% render 'icon', name: 'x' %}
+    </button>
+  </div>
+
+  <div class="drawer__body">
+    {% if cart.item_count == 0 %}
+      {% render 'empty-state', icon: 'shopping-bag',
+         title: 'Your cart is empty',
+         message: 'Discover our handcrafted pieces.',
+         cta_text: 'Shop Now', cta_url: '/collections/all' %}
+    {% else %}
+      {% for item in cart.items %}
+        <div class="cart-item" data-cart-item="{{ item.key }}">
+          <a href="{{ item.url }}">
+            {{ item.image | image_url: width: 160 | image_tag:
+               class: 'cart-item__image', alt: item.title, loading: 'lazy' }}
+          </a>
+          <div class="cart-item__details">
+            <a class="cart-item__title" href="{{ item.url }}">{{ item.product.title }}</a>
+            {% unless item.variant.title == 'Default Title' %}
+              <p class="cart-item__variant">{{ item.variant.title }}</p>
+            {% endunless %}
+            <div class="cart-item__actions">
+              {% render 'quantity-selector', item: item %}
+              <span class="price__current">{{ item.final_line_price | money }}</span>
+            </div>
+            <button class="cart-item__remove" data-remove="{{ item.key }}">
+              Remove
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  {% if cart.item_count > 0 %}
+  <div class="drawer__footer">
+    <div class="cart-summary">
+      <div class="cart-summary__row cart-summary__total">
+        <span>Total</span>
+        <span>{{ cart.total_price | money }}</span>
+      </div>
+    </div>
+    <p style="font-size: calc(var(--typo-body-size) * 0.75); color: var(--color-text-secondary); margin: 8px 0;">
+      Shipping calculated at checkout
+    </p>
+    <a href="/checkout" class="btn btn--primary btn--full">Checkout</a>
+  </div>
+  {% endif %}
+</aside>

@@ -1,0 +1,204 @@
+{%- comment -%}
+  Section: Coming Soon
+  Split-screen editorial layout.
+  Left: title, subtitle, body, social links.
+  Right: newsletter signup form.
+  Logo pinned top-right.
+{%- endcomment -%}
+
+<div class="coming-soon">
+  {%- if section.settings.background_image != blank -%}
+    <img
+      class="coming-soon__bg"
+      src="{{ section.settings.background_image | image_url: width: 1920 }}"
+      alt=""
+      width="1920"
+      height="1080"
+      loading="eager"
+      fetchpriority="high"
+    >
+  {%- endif -%}
+
+  {%- comment -%} Logo — top left {%- endcomment -%}
+  <div class="coming-soon__logo-bar">
+    {%- render 'logo', variant: section.settings.logo_variant, width: 280, class: 'coming-soon__logo', loading: 'eager' -%}
+  </div>
+
+  {%- comment -%} Main content wrapper (max-width centered) {%- endcomment -%}
+  <div class="coming-soon__inner">
+
+  {%- comment -%} Left column: editorial content {%- endcomment -%}
+  <div class="coming-soon__left">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="coming-soon__heading">{{ section.settings.heading }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.subtitle != blank -%}
+      <p class="coming-soon__subtitle">{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.body != blank -%}
+      <div class="coming-soon__body">{{ section.settings.body }}</div>
+    {%- endif -%}
+
+    {%- comment -%} Social / contact links {%- endcomment -%}
+    {%- if section.settings.instagram_url != blank or section.settings.email != blank -%}
+      <div class="coming-soon__social">
+        {%- if section.settings.instagram_url != blank -%}
+          <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram" class="coming-soon__social-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.email != blank -%}
+          <a href="mailto:{{ section.settings.email }}" aria-label="Email" class="coming-soon__social-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Right column: newsletter form {%- endcomment -%}
+  {%- if section.settings.show_newsletter -%}
+    <div class="coming-soon__right">
+      {%- if section.settings.form_heading != blank -%}
+        <p class="coming-soon__form-header">{{ section.settings.form_heading }}</p>
+      {%- endif -%}
+      {%- if section.settings.form_subtext != blank -%}
+        <p class="coming-soon__form-subtext">{{ section.settings.form_subtext }}</p>
+      {%- endif -%}
+
+      <div class="coming-soon__newsletter">
+        {% form 'customer', id: 'coming-soon-newsletter' %}
+          <input type="hidden" name="contact[tags]" value="coming-soon,newsletter">
+
+          {%- if form.posted_successfully? -%}
+            <p class="coming-soon__success">{{ 'coming_soon.newsletter_success' | t }}</p>
+          {%- else -%}
+            <div class="coming-soon__form">
+              <input
+                type="email"
+                name="contact[email]"
+                placeholder="{{ 'coming_soon.newsletter_placeholder' | t }}"
+                required
+                autocomplete="email"
+                aria-label="{{ 'coming_soon.newsletter_placeholder' | t }}"
+                class="coming-soon__input"
+              >
+              <button type="submit" class="coming-soon__submit">
+                {{ 'coming_soon.newsletter_submit' | t }}
+              </button>
+            </div>
+            {%- if form.errors -%}
+              <p class="coming-soon__error">{{ form.errors.messages['email'] }}</p>
+            {%- endif -%}
+          {%- endif -%}
+        {% endform %}
+      </div>
+    </div>
+  {%- endif -%}
+
+  </div>{%- comment -%} end .coming-soon__inner {%- endcomment -%}
+
+  {%- comment -%} Footer {%- endcomment -%}
+  <p class="coming-soon__footer">
+    &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+  </p>
+</div>
+
+{% schema %}
+{
+  "name": "Coming Soon",
+  "tag": "section",
+  "class": "section-coming-soon",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Branding"
+    },
+    {
+      "type": "select",
+      "id": "logo_variant",
+      "label": "Logo variant",
+      "info": "Logos are configured in Theme settings → Logo.",
+      "options": [
+        { "value": "short", "label": "Short" },
+        { "value": "long", "label": "Long" },
+        { "value": "wordmark", "label": "Wordmark" },
+        { "value": "easter_egg", "label": "Easter egg" }
+      ],
+      "default": "long"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "Full-screen background. A dark overlay is applied automatically."
+    },
+    {
+      "type": "header",
+      "content": "Content (left column)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop Now Closed."
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Spring Collection - Sold Out!"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Body text",
+      "default": "<p>Thank you for your support & visiting this page. The shop will remain closed while I focus on making new work.</p><p>Subscribers to my newsletter will receive a preview link a few days before the shop goes live, along with <strong>30 minutes of early access</strong>.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Social & Contact"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Contact email",
+      "info": "Shown as a mail icon link."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter (right column)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter signup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "form_heading",
+      "label": "Form heading",
+      "default": "Stay in the loop"
+    },
+    {
+      "type": "text",
+      "id": "form_subtext",
+      "label": "Form subtext",
+      "default": "Be the first to know about restocks, markets, and new work."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Coming Soon"
+    }
+  ]
+}
+{% endschema %}

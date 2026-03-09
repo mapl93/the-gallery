@@ -1,0 +1,101 @@
+{%- comment -%}
+  Section: Editorial Media
+  Flexible full-width or split layout for editorial content.
+{%- endcomment -%}
+
+{%- assign layout = section.settings.layout | default: 'split' -%}
+
+<section class="editorial-media editorial-media--{{ layout }} section-spacing">
+  {%- if layout == 'full' -%}
+    {%- if section.settings.image != blank -%}
+      <img
+        class="editorial-media__image"
+        src="{{ section.settings.image | image_url: width: 1920 }}"
+        alt="{{ section.settings.image.alt | escape }}"
+        width="1920"
+        height="1080"
+        loading="lazy"
+      >
+    {%- endif -%}
+
+  {%- elsif layout == 'split' -%}
+    {%- if section.settings.image != blank -%}
+      <div>
+        <img
+          class="editorial-media__image"
+          src="{{ section.settings.image | image_url: width: 960 }}"
+          alt="{{ section.settings.image.alt | escape }}"
+          width="960"
+          height="720"
+          loading="lazy"
+        >
+      </div>
+    {%- endif -%}
+
+    <div class="editorial-media__content container">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="h2">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="body-lg text-secondary" style="margin-top: var(--stack-md);">
+          {{ section.settings.text }}
+        </div>
+      {%- endif -%}
+      {%- if section.settings.button_text != blank -%}
+        <div style="margin-top: var(--stack-lg);">
+          {% render 'button', label: section.settings.button_text, variant: 'outline', url: section.settings.button_link %}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Editorial Media",
+  "tag": "section",
+  "class": "section-editorial-media",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "full", "label": "Full width image" },
+        { "value": "split", "label": "50/50 split" }
+      ],
+      "default": "split"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Media"
+    }
+  ]
+}
+{% endschema %}

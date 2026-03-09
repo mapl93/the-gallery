@@ -1,0 +1,53 @@
+<section class="testimonials">
+  <h2 class="testimonials__title">{{ section.settings.title | default: 'What Collectors Say' }}</h2>
+  <div class="testimonials__grid">
+    {% for block in section.blocks %}
+      <div class="testimonial" {{ block.shopify_attributes }}>
+        <p class="testimonial__quote">{{ block.settings.quote }}</p>
+        <div class="testimonial__author">
+          {% if block.settings.avatar %}
+            <div class="avatar">
+              {{ block.settings.avatar | image_url: width: 96 | image_tag:
+                 alt: block.settings.name, loading: 'lazy' }}
+            </div>
+          {% endif %}
+          <div>
+            <p class="testimonial__name">{{ block.settings.name }}</p>
+            {% if block.settings.detail %}
+              <p class="testimonial__detail">{{ block.settings.detail }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "What Collectors Say" }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote" },
+        { "type": "text", "id": "name", "label": "Author name" },
+        { "type": "text", "id": "detail", "label": "Detail (e.g. location)" },
+        { "type": "image_picker", "id": "avatar", "label": "Avatar" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Testimonials",
+    "blocks": [
+      { "type": "testimonial", "settings": { "quote": "The craftsmanship is extraordinary.", "name": "Sarah M." } },
+      { "type": "testimonial", "settings": { "quote": "Each piece feels like it has a soul.", "name": "James K." } },
+      { "type": "testimonial", "settings": { "quote": "A true gallery experience.", "name": "Ana L." } }
+    ]
+  }]
+}
+{% endschema %}

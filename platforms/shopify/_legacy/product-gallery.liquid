@@ -1,0 +1,44 @@
+{%- comment -%}
+  Section: Product Gallery (Stacked layout — V1)
+  Used on the product template to show product images in a stacked vertical layout.
+{%- endcomment -%}
+
+<div class="product-gallery-stacked">
+  {%- for image in product.images -%}
+    <img
+      class="product-gallery-stacked__image"
+      src="{{ image | image_url: width: 1200 }}"
+      alt="{{ image.alt | escape }}"
+      width="1200"
+      height="1200"
+      loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+      {%- if forloop.first %} fetchpriority="high"{% endif -%}
+    >
+  {%- endfor -%}
+
+  {%- if product.images.size == 0 -%}
+    <div class="product-gallery-stacked__image" style="display:flex;align-items:center;justify-content:center;">
+      {{ 'product-1' | placeholder_svg_tag }}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Product Gallery",
+  "tag": "div",
+  "class": "section-product-gallery",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Gallery layout",
+      "options": [
+        { "value": "stacked", "label": "Stacked" },
+        { "value": "grid", "label": "Grid" }
+      ],
+      "default": "stacked"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,48 @@
+<section class="process-timeline">
+  <h2 class="process-timeline__title">{{ section.settings.title | default: 'From Earth to Art' }}</h2>
+  <div class="process-timeline__track">
+    {% for block in section.blocks %}
+      <div class="process-step" {{ block.shopify_attributes }}>
+        <span class="process-step__number">{{ forloop.index }}</span>
+        {% if block.settings.image %}
+          <div class="process-step__image">
+            {{ block.settings.image | image_url: width: 520 | image_tag:
+               alt: block.settings.title, loading: 'lazy', widths: '260,520' }}
+          </div>
+        {% endif %}
+        <h3 class="process-step__title">{{ block.settings.title }}</h3>
+        <p class="process-step__description">{{ block.settings.description }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Process Timeline",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "From Earth to Art" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "description", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Process Timeline",
+    "blocks": [
+      { "type": "step", "settings": { "title": "Clay Preparation" } },
+      { "type": "step", "settings": { "title": "Wheel Throwing" } },
+      { "type": "step", "settings": { "title": "Bisque Firing" } },
+      { "type": "step", "settings": { "title": "Glazing" } },
+      { "type": "step", "settings": { "title": "Final Kiln Firing" } }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,42 @@
+{%- comment -%}
+  Snippet: variant-selector
+  Usage: {% render 'variant-selector', product: product %}
+{%- endcomment -%}
+
+<div class="variant-selector">
+  {% for option in product.options_with_values %}
+    <fieldset class="variant-selector__group">
+      <legend class="variant-selector__label">
+        {{ option.name }}: <span data-selected-value="{{ option.name }}">{{ option.selected_value }}</span>
+      </legend>
+
+      {% if option.name == 'Glaze' or option.name == 'Color' %}
+        <div class="variant-swatches" role="radiogroup">
+          {% for value in option.values %}
+            <label class="variant-swatch"
+                   aria-label="{{ value }}" title="{{ value }}">
+              <input type="radio" name="{{ option.name }}"
+                     value="{{ value }}"
+                     {% if value == option.selected_value %}checked{% endif %}>
+              <span class="variant-swatch__color"
+                    style="background-color: {{ value | handleize | append: '-color' | default: '#ccc' }};">
+              </span>
+              <span class="variant-swatch__ring"></span>
+            </label>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="variant-pills" role="radiogroup">
+          {% for value in option.values %}
+            <label class="variant-pill">
+              <input type="radio" name="{{ option.name }}"
+                     value="{{ value }}"
+                     {% if value == option.selected_value %}checked{% endif %}>
+              {{ value }}
+            </label>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </fieldset>
+  {% endfor %}
+</div>

@@ -1,0 +1,37 @@
+{%- comment -%}
+  Snippet: product-gallery
+  Usage: {% render 'product-gallery', product: product %}
+{%- endcomment -%}
+
+<div class="product-gallery" data-product-gallery>
+  <div class="product-gallery__main" data-gallery-main>
+    {{ product.selected_or_first_available_variant.featured_image
+       | default: product.featured_image
+       | image_url: width: 1200
+       | image_tag: class: 'product-gallery__main-image',
+         alt: product.title, loading: 'eager',
+         widths: '400,600,800,1000,1200',
+         sizes: '(min-width: 768px) 50vw, 100vw' }}
+  </div>
+
+  {% if product.images.size > 1 %}
+    <div class="product-gallery__thumbs" role="listbox" aria-label="Product images">
+      {% for image in product.images %}
+        <button class="product-gallery__thumb" role="option"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                data-gallery-thumb="{{ forloop.index0 }}">
+          {{ image | image_url: width: 160 | image_tag:
+             alt: image.alt | default: product.title, loading: 'lazy' }}
+        </button>
+      {% endfor %}
+    </div>
+
+    <div class="product-gallery__dots" role="tablist">
+      {% for image in product.images %}
+        <button class="product-gallery__dot"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-label="Image {{ forloop.index }}"></button>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>

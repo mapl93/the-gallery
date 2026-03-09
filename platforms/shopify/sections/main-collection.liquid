@@ -1,0 +1,90 @@
+{%- comment -%}
+  Section: Main Collection
+  Renders collection hero, filters, product grid, and pagination.
+{%- endcomment -%}
+
+{%- paginate collection.products by section.settings.products_per_page -%}
+
+{%- comment -%} Filters Bar {%- endcomment -%}
+<div class="filters">
+  <div class="filters__bar" style="padding: 0 var(--space-layout-container);">
+    <div class="filters__active">
+      {% for filter in collection.filters %}
+        {% for value in filter.active_values %}
+          <span class="tag">
+            {{ value.label }}
+            <a class="tag__remove" href="{{ value.url_to_remove }}"
+               aria-label="Remove {{ value.label }}">
+              {% render 'icon', name: 'x', size: 14 %}
+            </a>
+          </span>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+    <div class="select filters__sort">
+      <label class="visually-hidden" for="sort-by">Sort by</label>
+      <select class="select__field" id="sort-by" data-sort-select>
+        {% for option in collection.sort_options %}
+          <option value="{{ option.value }}"
+            {% if option.value == collection.sort_by %}selected{% endif %}>
+            {{ option.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Product Grid {%- endcomment -%}
+<div class="collection-grid">
+  {%- for product in collection.products -%}
+    {% render 'product-card', product: product %}
+  {%- endfor -%}
+</div>
+
+{%- comment -%} Pagination {%- endcomment -%}
+{% if paginate.pages > 1 %}
+<nav class="pagination" aria-label="Pagination">
+  {% if paginate.previous %}
+    <a class="pagination__link" href="{{ paginate.previous.url }}" aria-label="Previous page">
+      {% render 'icon', name: 'chevron-left', size: 16 %}
+    </a>
+  {% endif %}
+
+  {% for part in paginate.parts %}
+    {% if part.is_link %}
+      <a class="pagination__link" href="{{ part.url }}">{{ part.title }}</a>
+    {% elsif part.title == paginate.current_page %}
+      <span class="pagination__current" aria-current="page">{{ part.title }}</span>
+    {% else %}
+      <span class="pagination__ellipsis">&hellip;</span>
+    {% endif %}
+  {% endfor %}
+
+  {% if paginate.next %}
+    <a class="pagination__link" href="{{ paginate.next.url }}" aria-label="Next page">
+      {% render 'icon', name: 'chevron-right', size: 16 %}
+    </a>
+  {% endif %}
+</nav>
+{% endif %}
+
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Collection Page",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 24,
+      "step": 4,
+      "default": 12
+    }
+  ]
+}
+{% endschema %}

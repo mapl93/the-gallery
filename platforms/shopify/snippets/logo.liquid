@@ -1,0 +1,42 @@
+{%- comment -%}
+  Snippet: Logo
+  Renders a global logo variant as an <img>, or the store name as text fallback.
+
+  Params:
+    variant  – "short" | "long" | "wordmark" | "easter_egg" (default: "short")
+    width    – max image width in px (default: 200)
+    class    – extra CSS class on the <img> / <span>
+    loading  – "eager" | "lazy" (default: "eager")
+{%- endcomment -%}
+
+{%- liquid
+  assign _variant = variant | default: 'short'
+  assign _width   = width   | default: 200
+  assign _loading = loading | default: 'eager'
+
+  case _variant
+    when 'short'
+      assign _image = settings.logo_short
+    when 'long'
+      assign _image = settings.logo_long
+    when 'wordmark'
+      assign _image = settings.logo_wordmark
+    when 'easter_egg'
+      assign _image = settings.logo_easter_egg
+    else
+      assign _image = settings.logo_short
+  endcase
+-%}
+
+{%- if _image != blank -%}
+  <img
+    src="{{ _image | image_url: width: _width }}"
+    alt="{{ shop.name }}"
+    width="{{ _width }}"
+    height="{{ _width | divided_by: _image.aspect_ratio | round }}"
+    loading="{{ _loading }}"
+    {%- if class %} class="{{ class }}"{% endif %}
+  >
+{%- else -%}
+  <span{% if class %} class="{{ class }}"{% endif %}>{{ shop.name }}</span>
+{%- endif -%}

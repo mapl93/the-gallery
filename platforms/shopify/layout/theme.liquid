@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>
+    {%- if page_title -%}
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    {%- else -%}
+      {{ shop.name }}
+    {%- endif -%}
+  </title>
+
+  {%- if page_description -%}
+    <meta name="description" content="{{ page_description | escape }}">
+  {%- endif -%}
+
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+  {%- endif -%}
+
+  {%- comment -%} Typography — Shopify font system {%- endcomment -%}
+  {% style %}
+    {{ settings.font_body | font_face: font_display: 'swap' }}
+    {{ settings.font_body | font_modify: 'weight', '500' | font_face: font_display: 'swap' }}
+    {{ settings.font_body | font_modify: 'weight', '600' | font_face: font_display: 'swap' }}
+    {{ settings.font_body | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+    {{ settings.font_heading | font_face: font_display: 'swap' }}
+    {{ settings.font_heading | font_modify: 'weight', '500' | font_face: font_display: 'swap' }}
+    {{ settings.font_heading | font_modify: 'weight', '600' | font_face: font_display: 'swap' }}
+    {{ settings.font_heading | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+    {{ settings.font_heading | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+  {% endstyle %}
+
+  {%- comment -%} Design System CSS — layered by category {%- endcomment -%}
+  {{ 'base.css' | asset_url | stylesheet_tag }}
+  {{ 'primitives.css' | asset_url | stylesheet_tag }}
+  {{ 'layout-primitives.css' | asset_url | stylesheet_tag }}
+  {{ 'global.css' | asset_url | stylesheet_tag }}
+  {{ 'product.css' | asset_url | stylesheet_tag }}
+  {{ 'collection.css' | asset_url | stylesheet_tag }}
+  {{ 'storytelling.css' | asset_url | stylesheet_tag }}
+  {{ 'marketing.css' | asset_url | stylesheet_tag }}
+  {{ 'coming-soon.css' | asset_url | stylesheet_tag }}
+
+  {%- comment -%} Override font-family CSS vars with Shopify font settings {%- endcomment -%}
+  {% style %}
+    :root {
+      --font-family-body: {{ settings.font_body.family }}, {{ settings.font_body.fallback_families }};
+      --font-family-heading: {{ settings.font_body.family }}, {{ settings.font_body.fallback_families }};
+      --font-family-accent: {{ settings.font_body.family }}, {{ settings.font_body.fallback_families }};
+      --font-family-article: {{ settings.font_heading.family }}, {{ settings.font_heading.fallback_families }};
+    }
+  {% endstyle %}
+
+  {{ content_for_header }}
+
+  <script>
+    // Detect saved theme preference
+    (function() {
+      var saved = localStorage.getItem('tg-theme');
+      if (saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body class="template-{{ template.name }}{% if template.suffix %} template-{{ template.name }}-{{ template.suffix }}{% endif %}">
+
+  <a href="#main-content" class="skip-link">
+    {{ 'accessibility.skip_to_content' | t }}
+  </a>
+
+  {%- if settings.coming_soon_enabled -%}
+    {% section 'coming-soon' %}
+  {%- else -%}
+    {% section 'announcement-bar' %}
+    {% section 'header' %}
+
+    {%- comment -%} Global overlays {%- endcomment -%}
+    {% render 'mobile-menu' %}
+    {% render 'search-overlay' %}
+    {% render 'cart-drawer' %}
+
+    <main id="main-content" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% section 'footer' %}
+  {%- endif -%}
+
+  {%- comment -%} Minimal JS — progressive enhancement {%- endcomment -%}
+  <script src="{{ 'theme.js' | asset_url }}" defer></script>
+</body>
+</html>

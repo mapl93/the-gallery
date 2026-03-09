@@ -1,0 +1,103 @@
+{%- comment -%}
+  Section: Main Cart
+  Full cart page with line items, quantities, and checkout.
+{%- endcomment -%}
+
+<section class="section">
+  <div class="container">
+    <h1 style="font-family: var(--font-family-heading); font-size: var(--typo-h1-size); margin-bottom: var(--space-layout-section-gap);">
+      Your Cart
+    </h1>
+
+    {%- if cart.item_count > 0 -%}
+      {% form 'cart', cart %}
+        <div class="cart-page">
+          {%- comment -%} Cart Items {%- endcomment -%}
+          <div class="cart-page__items">
+            {%- for item in cart.items -%}
+              <div class="cart-item">
+                <a href="{{ item.url }}">
+                  {%- if item.image != blank -%}
+                    {{ item.image | image_url: width: 160 | image_tag:
+                       class: 'cart-item__image', alt: item.title, loading: 'lazy' }}
+                  {%- endif -%}
+                </a>
+                <div class="cart-item__details">
+                  <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
+                  {%- if item.variant.title != 'Default Title' -%}
+                    <p class="cart-item__variant">{{ item.variant.title }}</p>
+                  {%- endif -%}
+
+                  <div class="cart-item__actions">
+                    {% render 'quantity-selector', item: item %}
+                    <span class="price__current">{{ item.final_line_price | money }}</span>
+                  </div>
+
+                  <button class="cart-item__remove" type="button"
+                          onclick="this.closest('.cart-item').querySelector('input').value='0'; this.closest('form').submit();">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+
+          {%- comment -%} Cart Summary {%- endcomment -%}
+          <div class="cart-page__summary">
+            <div class="cart-summary">
+              <div class="cart-summary__row cart-summary__total">
+                <span>Subtotal</span>
+                <span>{{ cart.total_price | money }}</span>
+              </div>
+            </div>
+
+            <p style="font-size: calc(var(--typo-body-size) * 0.75); color: var(--color-text-secondary); margin: 8px 0;">
+              Shipping calculated at checkout
+            </p>
+
+            <button type="submit" name="update" class="btn btn--secondary btn--full" style="margin-top: 12px;">
+              Update Cart
+            </button>
+
+            <button type="submit" name="checkout" class="btn btn--primary btn--full" style="margin-top: 8px;">
+              Checkout
+            </button>
+          </div>
+        </div>
+      {% endform %}
+    {%- else -%}
+      {% render 'empty-state',
+         icon: 'shopping-bag',
+         title: 'Your cart is empty',
+         message: 'Discover our handcrafted pieces.',
+         cta_text: 'Continue Shopping',
+         cta_url: '/collections/all' %}
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .cart-page {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-layout-grid-gap);
+  }
+  @media (min-width: 1024px) {
+    .cart-page { grid-template-columns: 2fr 1fr; }
+  }
+  .cart-page__summary {
+    background: var(--color-surface-secondary);
+    padding: var(--space-layout-element-gap);
+    border-radius: var(--radius-lg);
+    align-self: start;
+    position: sticky;
+    top: 100px;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Cart Page",
+  "settings": []
+}
+{% endschema %}

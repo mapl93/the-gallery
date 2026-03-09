@@ -1,0 +1,57 @@
+<header class="header" role="banner">
+  <a class="header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name }}">
+    {%- render 'logo', variant: section.settings.logo_variant, width: 200, loading: 'eager' -%}
+  </a>
+
+  <nav class="header__nav" aria-label="Main navigation">
+    {% for link in linklists[section.settings.menu].links %}
+      <a class="header__nav-link" href="{{ link.url }}"
+         {% if link.active %}aria-current="page"{% endif %}>
+        {{ link.title }}
+      </a>
+    {% endfor %}
+  </nav>
+
+  <div class="header__actions">
+    <button class="btn btn--outline btn--icon-only"
+            aria-label="Search" data-search-toggle>
+      {% render 'icon', name: 'search' %}
+    </button>
+
+    <a href="{{ routes.cart_url }}" class="btn btn--outline btn--icon-only"
+       aria-label="Cart ({{ cart.item_count }} items)"
+       data-cart-toggle style="position: relative;">
+      {% render 'icon', name: 'shopping-bag' %}
+      {% if cart.item_count > 0 %}
+        <span class="header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+      {% endif %}
+    </a>
+
+    <button class="btn btn--outline btn--icon-only header__hamburger"
+            aria-label="Menu" aria-expanded="false" data-mobile-menu-toggle>
+      {% render 'icon', name: 'menu' %}
+    </button>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "select",
+      "id": "logo_variant",
+      "label": "Logo variant",
+      "info": "Logos are configured in Theme settings → Logo.",
+      "options": [
+        { "value": "short", "label": "Short" },
+        { "value": "long", "label": "Long" },
+        { "value": "wordmark", "label": "Wordmark" },
+        { "value": "easter_egg", "label": "Easter egg" }
+      ],
+      "default": "short"
+    },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" }
+  ]
+}
+{% endschema %}

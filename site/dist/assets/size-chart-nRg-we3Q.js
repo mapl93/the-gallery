@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function a(r){const t={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...r.components},{Callout:n,Do:o,DoDont:s,Dont:d,Preview:l,PropTable:c}=t;return n||i("Callout"),o||i("Do"),s||i("DoDont"),d||i("Dont"),l||i("Preview"),c||i("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(t.h2,{children:"Overview"}),`
+`,e.jsx(t.p,{children:"Size chart modal/drawer with unit toggle and measurement table."}),`
+`,e.jsx(l,{html:'<div class="size-chart"><button class="size-chart__trigger"><svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="4" width="14" height="8" fill="none" stroke="currentColor"/></svg> Size Guide</button><div class="size-chart__drawer is-open" style="position:relative;opacity:1;visibility:visible;"><div class="size-chart__panel" style="position:relative;transform:none;"><h3>Size Guide</h3><table class="docs-token-table"><thead><tr><th>Size</th><th>Chest</th><th>Length</th></tr></thead><tbody><tr><td>S</td><td>36"</td><td>27"</td></tr><tr><td>M</td><td>38"</td><td>28"</td></tr><tr><td>L</td><td>40"</td><td>29"</td></tr></tbody></table></div></div></div>',label:"Size Chart",interaction:{selector:".size-chart__drawer",toggle:"is-open",triggerLabel:"Open Size Chart",startVisible:!0}}),`
+`,e.jsx(t.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(s,{children:[e.jsx(o,{children:"Optimize product images for web — use WebP format and responsive srcset."}),e.jsx(d,{children:"Don't overload product components with too many badges or CTAs — keep it clean."})]}),`
+`,e.jsx(t.h2,{children:"Accessibility"}),`
+`,e.jsx(n,{type:"tip",children:e.jsx(t.p,{children:"Product components are designed to work together. The product page combines gallery, info, form, and related products."})}),`
+`,e.jsxs(t.ul,{children:[`
+`,e.jsx(t.li,{children:"Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens."}),`
+`]}),`
+`,e.jsx(t.h2,{children:"API Reference"}),`
+`,e.jsx(c,{children:e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(t.code,{children:".size-chart"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base size chart styles"})]})})]})}function p(r={}){const{wrapper:t}=r.components||{};return t?e.jsx(t,{...r,children:e.jsx(a,{...r})}):a(r)}function i(r,t){throw new Error("Expected component `"+r+"` to be defined: you likely forgot to import, pass, or provide it.")}export{p as default};

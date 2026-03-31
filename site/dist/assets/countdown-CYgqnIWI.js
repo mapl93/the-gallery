@@ -1,0 +1,19 @@
+import{j as n}from"./index-Dg0DyNZX.js";function r(e){const s={code:"code",h2:"h2",h3:"h3",li:"li",p:"p",ul:"ul",...e.components},{Callout:a,Do:c,DoDont:d,Dont:l,Preview:t,PropTable:i}=s;return a||o("Callout"),c||o("Do"),d||o("DoDont"),l||o("Dont"),t||o("Preview"),i||o("PropTable"),n.jsxs(n.Fragment,{children:[n.jsx(s.h2,{children:"Overview"}),`
+`,n.jsx(s.p,{children:"Sale/event countdown with days, hours, minutes, seconds. Inline and card variants."}),`
+`,n.jsx(t,{html:'<div class="countdown" style="display:flex;gap:12px;"><div class="countdown__segment"><span class="countdown__number">02</span><span class="countdown__label">Days</span></div><span class="countdown__separator">:</span><div class="countdown__segment"><span class="countdown__number">14</span><span class="countdown__label">Hours</span></div><span class="countdown__separator">:</span><div class="countdown__segment"><span class="countdown__number">38</span><span class="countdown__label">Min</span></div></div>',label:"Countdown Timer"}),`
+`,n.jsx(s.h2,{children:"Variants"}),`
+`,n.jsx(s.h3,{children:"Default"}),`
+`,n.jsx(t,{html:'<div class="countdown" style="display:flex;gap:12px;"><div class="countdown__segment"><span class="countdown__number">05</span><span class="countdown__label">Days</span></div><span class="countdown__separator">:</span><div class="countdown__segment"><span class="countdown__number">12</span><span class="countdown__label">Hours</span></div></div>',label:"Default"}),`
+`,n.jsx(s.h3,{children:"Inline"}),`
+`,n.jsx(t,{html:'<div class="countdown countdown--inline" style="display:flex;gap:8px;"><div class="countdown__segment"><span class="countdown__number">05</span><span class="countdown__label">d</span></div><div class="countdown__segment"><span class="countdown__number">12</span><span class="countdown__label">h</span></div></div>',label:"Inline"}),`
+`,n.jsx(s.h3,{children:"Cards"}),`
+`,n.jsx(t,{html:'<div class="countdown countdown--cards" style="display:flex;gap:12px;"><div class="countdown__segment"><span class="countdown__number">05</span><span class="countdown__label">Days</span></div><div class="countdown__segment"><span class="countdown__number">12</span><span class="countdown__label">Hours</span></div></div>',label:"Cards"}),`
+`,n.jsx(s.h2,{children:"Usage Guidelines"}),`
+`,n.jsxs(d,{children:[n.jsx(c,{children:"A/B test marketing components (hero copy, CTA placement, popup timing) to optimize conversion."}),n.jsx(l,{children:"Don't show too many marketing elements at once — popups + banners + badges = fatigue."})]}),`
+`,n.jsx(s.h2,{children:"Accessibility"}),`
+`,n.jsx(a,{type:"info",children:n.jsx(s.p,{children:"Marketing components often need JavaScript for interactions (countdown timers, popup triggers, etc.)."})}),`
+`,n.jsxs(s.ul,{children:[`
+`,n.jsx(s.li,{children:"Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens."}),`
+`]}),`
+`,n.jsx(s.h2,{children:"API Reference"}),`
+`,n.jsxs(i,{children:[n.jsxs("tr",{children:[n.jsx("td",{children:n.jsx(s.code,{children:".countdown"})}),n.jsx("td",{children:"class"}),n.jsx("td",{children:"—"}),n.jsx("td",{children:"Base countdown timer styles"})]}),n.jsxs("tr",{children:[n.jsx("td",{children:n.jsx(s.code,{children:".countdown--inline"})}),n.jsx("td",{children:"modifier"}),n.jsx("td",{children:"—"}),n.jsx("td",{children:"Inline variant"})]}),n.jsxs("tr",{children:[n.jsx("td",{children:n.jsx(s.code,{children:".countdown--cards"})}),n.jsx("td",{children:"modifier"}),n.jsx("td",{children:"—"}),n.jsx("td",{children:"Cards variant"})]})]})]})}function u(e={}){const{wrapper:s}=e.components||{};return s?n.jsx(s,{...e,children:n.jsx(r,{...e})}):r(e)}function o(e,s){throw new Error("Expected component `"+e+"` to be defined: you likely forgot to import, pass, or provide it.")}export{u as default};

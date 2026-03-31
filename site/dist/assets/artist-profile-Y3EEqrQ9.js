@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function d(i){const t={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...i.components},{Callout:s,Do:n,DoDont:o,Dont:l,Preview:a,PropTable:c}=t;return s||r("Callout"),n||r("Do"),o||r("DoDont"),l||r("Dont"),a||r("Preview"),c||r("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(t.h2,{children:"Overview"}),`
+`,e.jsx(t.p,{children:"Editorial artist bio with portrait and philosophy quote."}),`
+`,e.jsx(a,{html:'<div class="artist-profile" style="display:grid;grid-template-columns:200px 1fr;gap:24px;max-width:600px;"><div class="artist-profile__portrait" style="aspect-ratio:1;overflow:hidden;border-radius:8px;"><img src="https://placehold.co/200x200/f5f0eb/1a1a1a?text=Artist" alt="" style="width:100%;height:100%;object-fit:cover;" /></div><div class="artist-profile__content"><span class="artist-profile__label">Featured Artist</span><h2 class="artist-profile__name">María García</h2><span class="artist-profile__location">Buenos Aires, Argentina</span><p class="artist-profile__bio">Ceramic artist specializing in hand-thrown stoneware with traditional glazing techniques.</p></div></div>',label:"Artist Profile"}),`
+`,e.jsx(t.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(o,{children:[e.jsx(n,{children:"Use high-quality images and thoughtful copy — storytelling components are editorial by nature."}),e.jsx(l,{children:"Don't use storytelling blocks for product-heavy pages — they're designed for brand narrative."})]}),`
+`,e.jsx(t.h2,{children:"Accessibility"}),`
+`,e.jsx(s,{type:"tip",children:e.jsx(t.p,{children:"These components are unique to The Gallery's editorial focus. They work best with curated content."})}),`
+`,e.jsxs(t.ul,{children:[`
+`,e.jsxs(t.li,{children:["Associate every input with a ",e.jsx(t.code,{children:"<label>"})," using matching ",e.jsx(t.code,{children:"for"}),"/",e.jsx(t.code,{children:"id"})," attributes."]}),`
+`]}),`
+`,e.jsx(t.h2,{children:"API Reference"}),`
+`,e.jsx(c,{children:e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(t.code,{children:".artist-profile"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base artist profile styles"})]})})]})}function p(i={}){const{wrapper:t}=i.components||{};return t?e.jsx(t,{...i,children:e.jsx(d,{...i})}):d(i)}function r(i,t){throw new Error("Expected component `"+i+"` to be defined: you likely forgot to import, pass, or provide it.")}export{p as default};

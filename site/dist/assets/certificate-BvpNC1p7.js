@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function c(i){const t={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...i.components},{Callout:a,Do:r,DoDont:s,Dont:d,Preview:l,PropTable:n}=t;return a||o("Callout"),r||o("Do"),s||o("DoDont"),d||o("Dont"),l||o("Preview"),n||o("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(t.h2,{children:"Overview"}),`
+`,e.jsx(t.p,{children:"Certificate card with piece details, signature, and QR code."}),`
+`,e.jsx(l,{html:'<div class="coa" style="max-width:400px;padding:24px;border:1px solid var(--color-border-default);border-radius:8px;"><div class="coa__header"><h3 class="coa__title">Certificate of Authenticity</h3><span class="coa__artist">María García</span></div><div class="coa__divider" style="border-top:1px solid var(--color-border-default);margin:16px 0;"></div><div class="coa__details"><dl style="display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;"><dt class="coa__detail-label">Edition</dt><dd class="coa__detail-value">#42 of 100</dd><dt class="coa__detail-label">Material</dt><dd class="coa__detail-value">Stoneware</dd><dt class="coa__detail-label">Year</dt><dd class="coa__detail-value">2026</dd></dl></div></div>',label:"Certificate of Authenticity"}),`
+`,e.jsx(t.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(s,{children:[e.jsx(r,{children:"Use high-quality images and thoughtful copy — storytelling components are editorial by nature."}),e.jsx(d,{children:"Don't use storytelling blocks for product-heavy pages — they're designed for brand narrative."})]}),`
+`,e.jsx(t.h2,{children:"Accessibility"}),`
+`,e.jsx(a,{type:"tip",children:e.jsx(t.p,{children:"These components are unique to The Gallery's editorial focus. They work best with curated content."})}),`
+`,e.jsxs(t.ul,{children:[`
+`,e.jsx(t.li,{children:"Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens."}),`
+`]}),`
+`,e.jsx(t.h2,{children:"API Reference"}),`
+`,e.jsx(n,{children:e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(t.code,{children:".coa"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base certificate of authenticity styles"})]})})]})}function x(i={}){const{wrapper:t}=i.components||{};return t?e.jsx(t,{...i,children:e.jsx(c,{...i})}):c(i)}function o(i,t){throw new Error("Expected component `"+i+"` to be defined: you likely forgot to import, pass, or provide it.")}export{x as default};

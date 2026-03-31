@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function d(i){const t={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...i.components},{Callout:n,Do:o,DoDont:l,Dont:s,Preview:c,PropTable:h}=t;return n||r("Callout"),o||r("Do"),l||r("DoDont"),s||r("Dont"),c||r("Preview"),h||r("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(t.h2,{children:"Overview"}),`
+`,e.jsx(t.p,{children:"Toggle between grid and list view for collection pages."}),`
+`,e.jsx(c,{html:'<div class="view-toggle"><button class="view-toggle__btn is-active" aria-pressed="true" aria-label="Grid"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" fill="currentColor" rx="1"/><rect x="10" y="1" width="7" height="7" fill="currentColor" rx="1"/><rect x="1" y="10" width="7" height="7" fill="currentColor" rx="1"/><rect x="10" y="10" width="7" height="7" fill="currentColor" rx="1"/></svg></button><button class="view-toggle__btn" aria-pressed="false" aria-label="List"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="2" width="16" height="3" fill="currentColor" rx="1"/><rect x="1" y="7.5" width="16" height="3" fill="currentColor" rx="1"/><rect x="1" y="13" width="16" height="3" fill="currentColor" rx="1"/></svg></button></div>',label:"Grid / List View Toggle"}),`
+`,e.jsx(t.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(l,{children:[e.jsx(o,{children:"Use the collection grid with product cards for consistent spacing and responsive behavior."}),e.jsx(s,{children:"Don't mix collection grid with manual floats or absolute positioning."})]}),`
+`,e.jsx(t.h2,{children:"Accessibility"}),`
+`,e.jsx(n,{type:"info",children:e.jsx(t.p,{children:"Collection components handle responsive breakpoints automatically via CSS Grid."})}),`
+`,e.jsxs(t.ul,{children:[`
+`,e.jsx(t.li,{children:"Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens."}),`
+`]}),`
+`,e.jsx(t.h2,{children:"API Reference"}),`
+`,e.jsx(h,{children:e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(t.code,{children:".view-toggle"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base grid / list view toggle styles"})]})})]})}function x(i={}){const{wrapper:t}=i.components||{};return t?e.jsx(t,{...i,children:e.jsx(d,{...i})}):d(i)}function r(i,t){throw new Error("Expected component `"+i+"` to be defined: you likely forgot to import, pass, or provide it.")}export{x as default};

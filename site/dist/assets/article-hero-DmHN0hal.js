@@ -1,0 +1,17 @@
+import{j as e}from"./index-Dg0DyNZX.js";function a(t){const i={code:"code",h2:"h2",h3:"h3",li:"li",p:"p",ul:"ul",...t.components},{Callout:s,Do:n,DoDont:c,Dont:d,Preview:r,PropTable:o}=i;return s||l("Callout"),n||l("Do"),c||l("DoDont"),d||l("Dont"),r||l("Preview"),o||l("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(i.h2,{children:"Overview"}),`
+`,e.jsx(i.p,{children:"Article header with full-width image, split, or text-only variants."}),`
+`,e.jsx(r,{html:'<div class="article-hero article-hero--image" style="position:relative;min-height:250px;"><div class="article-hero__bg"><img src="https://placehold.co/800x300/f5f0eb/1a1a1a?text=Hero" alt="" style="width:100%;height:100%;object-fit:cover;" /></div><div class="article-hero__overlay"></div><div class="article-hero__content" style="position:relative;padding:32px;"><span class="article-hero__category">Studio Life</span><h1 class="article-hero__title" style="font-size:1.75rem;">Behind the Kiln: A Day in the Studio</h1><div class="article-hero__meta">March 20, 2026</div></div></div>',label:"Article Hero"}),`
+`,e.jsx(i.h2,{children:"Variants"}),`
+`,e.jsx(i.h3,{children:"Full"}),`
+`,e.jsx(r,{html:'<div class="article-hero article-hero--image" style="position:relative;min-height:200px;background:#f5f0eb;padding:32px;"><h1 class="article-hero__title">Full Image Hero</h1></div>',label:"Full"}),`
+`,e.jsx(i.h3,{children:"Split"}),`
+`,e.jsx(r,{html:'<div class="article-hero article-hero--split" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="article-hero__media"><img src="https://placehold.co/300x200/f5f0eb/1a1a1a?text=Split" alt="" style="width:100%;" /></div><div class="article-hero__content" style="padding:16px;"><h1 class="article-hero__title">Split Hero</h1></div></div>',label:"Split"}),`
+`,e.jsx(i.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(c,{children:[e.jsx(n,{children:"Use the article body/prose component for rich text — it handles typography, images, and spacing."}),e.jsx(d,{children:"Don't manually style article content with inline styles — let the prose class handle it."})]}),`
+`,e.jsx(i.h2,{children:"Accessibility"}),`
+`,e.jsx(s,{type:"info",children:e.jsx(i.p,{children:"Blog components support Shopify's article template system. Use metafields for custom article data."})}),`
+`,e.jsxs(i.ul,{children:[`
+`,e.jsxs(i.li,{children:["All images must have descriptive ",e.jsx(i.code,{children:"alt"})," text."]}),`
+`]}),`
+`,e.jsx(i.h2,{children:"API Reference"}),`
+`,e.jsxs(o,{children:[e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(i.code,{children:".article-hero"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base article hero styles"})]}),e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(i.code,{children:".article-hero--full"})}),e.jsx("td",{children:"modifier"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Full variant"})]}),e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(i.code,{children:".article-hero--split"})}),e.jsx("td",{children:"modifier"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Split variant"})]}),e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(i.code,{children:".article-hero--text-only"})}),e.jsx("td",{children:"modifier"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Text only variant"})]})]})]})}function x(t={}){const{wrapper:i}=t.components||{};return i?e.jsx(i,{...t,children:e.jsx(a,{...t})}):a(t)}function l(t,i){throw new Error("Expected component `"+t+"` to be defined: you likely forgot to import, pass, or provide it.")}export{x as default};

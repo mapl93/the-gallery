@@ -1,0 +1,76 @@
+## Overview
+
+A dialog overlay with header, body, and footer sections. The modal traps focus and provides a backdrop for critical interactions like confirmations, forms, or detail views.
+
+<Preview
+  html='<div class="modal-overlay" aria-hidden="false" style="position:relative;min-height:300px;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><div class="modal" style="position:relative;"><div class="modal__header"><h2 class="modal__title">Confirm Order</h2></div><div class="modal__body" style="padding:16px;"><p>Are you sure you want to place this order for <strong>$240.00</strong>?</p></div><div class="modal__footer" style="padding:16px;display:flex;gap:8px;justify-content:flex-end;"><button class="btn btn--outline">Cancel</button><button class="btn">Confirm</button></div></div></div>'
+  label="Modal"
+  interaction={{ selector: '.modal-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Modal', startVisible: true }}
+/>
+
+## Anatomy
+
+The modal is composed of three optional sections:
+
+| Element            | Class             | Purpose                        |
+|--------------------|-------------------|--------------------------------|
+| Overlay            | `.modal-overlay`  | Darkened backdrop, click to dismiss |
+| Container          | `.modal`          | The dialog box itself          |
+| Header             | `.modal__header`  | Title row                      |
+| Body               | `.modal__body`    | Main content area              |
+| Footer             | `.modal__footer`  | Action buttons (confirm/cancel)|
+
+## Usage Guidelines
+
+<DoDont>
+  <Do>Use modals for focused tasks that require a decision — confirmations, short forms, important alerts.</Do>
+  <Dont>Don't use modals for long content or multi-step flows. Use a dedicated page or drawer instead.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Always include a visible close mechanism — a cancel button, X icon, or backdrop click.</Do>
+  <Dont>Don't trap users in a modal with no way out. Every modal must be dismissible.</Dont>
+</DoDont>
+
+## Accessibility
+
+<Callout type="warning">
+  Modals **must** trap keyboard focus while open. The user should not be able to tab to elements behind the overlay.
+</Callout>
+
+- Set `aria-hidden="false"` on the overlay when open, `"true"` when closed.
+- Use `role="dialog"` and `aria-modal="true"` on the `.modal` element.
+- Add `aria-labelledby` pointing to the modal title's `id`.
+- Return focus to the trigger element when the modal closes.
+- Close on `Escape` key press.
+
+```html
+<div class="modal-overlay" aria-hidden="false">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__header">
+      <h2 class="modal__title" id="modal-title">Title</h2>
+    </div>
+    <div class="modal__body">…</div>
+    <div class="modal__footer">
+      <button class="btn btn--outline">Cancel</button>
+      <button class="btn">Confirm</button>
+    </div>
+  </div>
+</div>
+```
+
+## API Reference
+
+<PropTable>
+  <tr><td>`.modal-overlay`</td><td>class</td><td>—</td><td>Full-screen backdrop with overlay opacity</td></tr>
+  <tr><td>`.modal`</td><td>class</td><td>—</td><td>Dialog container with shadow and radius</td></tr>
+  <tr><td>`.modal__header`</td><td>class</td><td>—</td><td>Header section with title</td></tr>
+  <tr><td>`.modal__title`</td><td>class</td><td>—</td><td>Title text styling</td></tr>
+  <tr><td>`.modal__body`</td><td>class</td><td>—</td><td>Main content area</td></tr>
+  <tr><td>`.modal__footer`</td><td>class</td><td>—</td><td>Footer with action buttons</td></tr>
+  <tr><td>`aria-hidden`</td><td>attribute</td><td>`true`</td><td>Controls overlay visibility</td></tr>
+</PropTable>
+
+<Callout type="tip">
+  Pair the modal with the `button` component for consistent action styling in the footer.
+</Callout>

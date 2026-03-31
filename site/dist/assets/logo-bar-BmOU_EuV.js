@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function a(t){const n={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...t.components},{Callout:s,Do:o,DoDont:r,Dont:c,Preview:d,PropTable:l}=n;return s||i("Callout"),o||i("Do"),r||i("DoDont"),c||i("Dont"),d||i("Preview"),l||i("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(n.h2,{children:"Overview"}),`
+`,e.jsx(n.p,{children:"As-featured-in logo row. Static and marquee variants."}),`
+`,e.jsx(d,{html:'<div class="logo-bar" style="display:flex;justify-content:center;gap:32px;align-items:center;padding:24px;"><span style="font-size:18px;opacity:0.5;font-weight:600;">Brand A</span><span style="font-size:18px;opacity:0.5;font-weight:600;">Brand B</span><span style="font-size:18px;opacity:0.5;font-weight:600;">Brand C</span><span style="font-size:18px;opacity:0.5;font-weight:600;">Brand D</span></div>',label:"Logo Bar / Trust Bar"}),`
+`,e.jsx(n.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(r,{children:[e.jsx(o,{children:"Use section components for page builder blocks — they're designed to be reorderable in Shopify's theme editor."}),e.jsx(c,{children:"Don't hard-code section content — use Shopify schema settings for customizability."})]}),`
+`,e.jsx(n.h2,{children:"Accessibility"}),`
+`,e.jsx(s,{type:"info",children:e.jsx(n.p,{children:"Sections map to Shopify's section architecture. Each one can have its own schema settings."})}),`
+`,e.jsxs(n.ul,{children:[`
+`,e.jsx(n.li,{children:"Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens."}),`
+`]}),`
+`,e.jsx(n.h2,{children:"API Reference"}),`
+`,e.jsxs(l,{children:[e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(n.code,{children:".logo-bar"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base logo bar / trust bar styles"})]}),e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(n.code,{children:".logo-bar--static"})}),e.jsx("td",{children:"modifier"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Static variant"})]}),e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(n.code,{children:".logo-bar--marquee"})}),e.jsx("td",{children:"modifier"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Marquee variant"})]})]})]})}function x(t={}){const{wrapper:n}=t.components||{};return n?e.jsx(n,{...t,children:e.jsx(a,{...t})}):a(t)}function i(t,n){throw new Error("Expected component `"+t+"` to be defined: you likely forgot to import, pass, or provide it.")}export{x as default};

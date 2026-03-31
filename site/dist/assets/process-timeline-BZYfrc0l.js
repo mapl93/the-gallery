@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function a(t){const s={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...t.components},{Callout:n,Do:r,DoDont:l,Dont:o,Preview:c,PropTable:p}=s;return n||i("Callout"),r||i("Do"),l||i("DoDont"),o||i("Dont"),c||i("Preview"),p||i("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(s.h2,{children:"Overview"}),`
+`,e.jsx(s.p,{children:"Horizontal scrollable process steps with numbers and images."}),`
+`,e.jsx(c,{html:`<div class="process-timeline" style="max-width:600px;"><h2 class="process-timeline__title">Our Process</h2><div class="process-timeline__track" style="display:flex;gap:24px;"><div class="process-step"><span class="process-step__number">1</span><h4 class="process-step__title">Shaping</h4><p class="process-step__description">Hand-thrown on the potter's wheel.</p></div><div class="process-step"><span class="process-step__number">2</span><h4 class="process-step__title">Glazing</h4><p class="process-step__description">Custom glazes applied by hand.</p></div><div class="process-step"><span class="process-step__number">3</span><h4 class="process-step__title">Firing</h4><p class="process-step__description">Kiln-fired for durability.</p></div></div></div>`,label:"Process Timeline"}),`
+`,e.jsx(s.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(l,{children:[e.jsx(r,{children:"Use high-quality images and thoughtful copy — storytelling components are editorial by nature."}),e.jsx(o,{children:"Don't use storytelling blocks for product-heavy pages — they're designed for brand narrative."})]}),`
+`,e.jsx(s.h2,{children:"Accessibility"}),`
+`,e.jsx(n,{type:"tip",children:e.jsx(s.p,{children:"These components are unique to The Gallery's editorial focus. They work best with curated content."})}),`
+`,e.jsxs(s.ul,{children:[`
+`,e.jsxs(s.li,{children:["All images must have descriptive ",e.jsx(s.code,{children:"alt"})," text."]}),`
+`]}),`
+`,e.jsx(s.h2,{children:"API Reference"}),`
+`,e.jsx(p,{children:e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(s.code,{children:".process-timeline"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base process timeline styles"})]})})]})}function h(t={}){const{wrapper:s}=t.components||{};return s?e.jsx(s,{...t,children:e.jsx(a,{...t})}):a(t)}function i(t,s){throw new Error("Expected component `"+t+"` to be defined: you likely forgot to import, pass, or provide it.")}export{h as default};

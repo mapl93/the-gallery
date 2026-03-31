@@ -1,0 +1,12 @@
+import{j as e}from"./index-Dg0DyNZX.js";function d(s){const l={code:"code",h2:"h2",li:"li",p:"p",ul:"ul",...s.components},{Callout:n,Do:o,DoDont:a,Dont:t,Preview:i,PropTable:r}=l;return n||c("Callout"),o||c("Do"),a||c("DoDont"),t||c("Dont"),i||c("Preview"),r||c("PropTable"),e.jsxs(e.Fragment,{children:[e.jsx(l.h2,{children:"Overview"}),`
+`,e.jsx(l.p,{children:"Color swatch grid for product variant selection."}),`
+`,e.jsx(i,{html:'<div class="color-picker" style="display:flex;gap:8px;"><label class="color-swatch"><input class="color-swatch__input" type="radio" name="color" checked /><span class="color-swatch__fill" style="background:#c4a882;"></span><span class="color-swatch__label">Sand</span></label><label class="color-swatch"><input class="color-swatch__input" type="radio" name="color" /><span class="color-swatch__fill" style="background:#5a7d6f;"></span><span class="color-swatch__label">Sage</span></label><label class="color-swatch"><input class="color-swatch__input" type="radio" name="color" /><span class="color-swatch__fill" style="background:#2c3e50;"></span><span class="color-swatch__label">Slate</span></label></div>',label:"Color Picker / Swatch"}),`
+`,e.jsx(l.h2,{children:"Usage Guidelines"}),`
+`,e.jsxs(a,{children:[e.jsx(o,{children:"Always pair form inputs with visible labels for accessibility."}),e.jsx(t,{children:"Don't rely on placeholder text as the only label — it disappears on input."})]}),`
+`,e.jsx(l.h2,{children:"Accessibility"}),`
+`,e.jsx(n,{type:"tip",children:e.jsxs(l.p,{children:["Use the ",e.jsx(l.code,{children:"field-wrapper"})," component to ensure consistent spacing and label alignment across all form fields."]})}),`
+`,e.jsxs(l.ul,{children:[`
+`,e.jsxs(l.li,{children:["Associate every input with a ",e.jsx(l.code,{children:"<label>"})," using matching ",e.jsx(l.code,{children:"for"}),"/",e.jsx(l.code,{children:"id"})," attributes."]}),`
+`]}),`
+`,e.jsx(l.h2,{children:"API Reference"}),`
+`,e.jsx(r,{children:e.jsxs("tr",{children:[e.jsx("td",{children:e.jsx(l.code,{children:".color-picker"})}),e.jsx("td",{children:"class"}),e.jsx("td",{children:"—"}),e.jsx("td",{children:"Base color picker / swatch styles"})]})})]})}function p(s={}){const{wrapper:l}=s.components||{};return l?e.jsx(l,{...s,children:e.jsx(d,{...s})}):d(s)}function c(s,l){throw new Error("Expected component `"+s+"` to be defined: you likely forgot to import, pass, or provide it.")}export{p as default};

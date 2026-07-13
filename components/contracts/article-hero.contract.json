@@ -1,0 +1,69 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "article-hero",
+  "name": "Article Hero",
+  "registryId": "L2",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Article header with full-width image, split, or text-only variants.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/article-hero",
+    "css": { "file": "components/css/blog.css", "selector": ".article-hero" },
+    "docs": "site/src/content/components/article-hero.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".article-hero", "className": ".article-hero", "required": true, "description": "Article hero container." },
+    { "name": "backgroundMedia", "selector": ".article-hero__bg", "className": ".article-hero__bg", "required": false, "description": "Full-image variant background media." },
+    { "name": "overlay", "selector": ".article-hero__overlay", "className": ".article-hero__overlay", "required": false, "description": "Optional contrast overlay for the full-image variant." },
+    { "name": "splitMedia", "selector": ".article-hero__media", "className": ".article-hero__media", "required": false, "description": "Media region for the split variant." },
+    { "name": "content", "selector": ".article-hero__content", "className": ".article-hero__content", "required": true, "description": "Article heading and metadata wrapper." },
+    { "name": "category", "selector": ".article-hero__category", "className": ".article-hero__category", "required": false, "description": "Optional article category label." },
+    { "name": "title", "selector": ".article-hero__title", "className": ".article-hero__title", "required": true, "description": "Article title heading." },
+    { "name": "metadata", "selector": ".article-hero__meta", "className": ".article-hero__meta", "required": false, "description": "Optional target-formatted article metadata." }
+  ],
+  "variants": [
+    { "name": "full", "className": ".article-hero--image", "default": true, "description": "Full-width image hero with overlaid content." },
+    { "name": "split", "className": ".article-hero--split", "default": false, "description": "Responsive split media and content hero." },
+    { "name": "text-only", "className": ".article-hero--text", "default": false, "description": "Centered text-only hero without required media." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive hero sizing controlled by canonical layout tokens." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".article-hero"], "description": "Default article hero state." }
+  ],
+  "behavior": [
+    { "name": "targetMetadata", "selectors": [".article-hero__meta"], "description": "Publication date, author, and reading metadata are formatted and supplied by the target." },
+    { "name": "mediaSemantics", "selectors": [".article-hero__bg img", ".article-hero--split .article-hero__media img"], "attributes": ["alt"], "description": "Target markup determines whether hero media is informative or decorative and supplies appropriate alternative text." }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Full-image, split, or text-only hero presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".article-hero", "source": "variants" }] } },
+    { "name": "backgroundMedia", "type": "slot", "required": false, "description": "Target-owned media for the full-image presentation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__bg", "classNames": [".article-hero__bg"] }] } },
+    { "name": "splitMedia", "type": "slot", "required": false, "description": "Target-owned media for the split presentation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__media", "classNames": [".article-hero__media"] }] } },
+    { "name": "category", "type": "string", "required": false, "description": "Optional article category label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-hero__category" }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Visible article title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-hero__title" }] } },
+    { "name": "metadata", "type": "slot", "required": false, "description": "Target-owned publication, author, and reading metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__meta", "classNames": [".article-hero__meta"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-accent", "--color-text-inverse", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-heading", "--typo-body-size", "--typo-display-line-height", "--typo-display-size"],
+      "spacing": ["--space-layout-container", "--space-layout-section-gap"]
+    }
+  },
+  "accessibility": [
+    "Use a page-appropriate heading level for the article title, normally the page h1.",
+    "Ensure overlaid text remains legible over full-image media in every theme and viewport.",
+    "Provide useful alternative text for informative media and an empty alt value for decorative media."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article title, image, blog, author, and publication metadata." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

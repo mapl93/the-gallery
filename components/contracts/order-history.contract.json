@@ -1,0 +1,68 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "order-history",
+  "name": "Order History",
+  "registryId": "U4",
+  "category": "account",
+  "status": "pilot",
+  "summary": "Order list with order number, date, status badge variants, and total.",
+  "dependencies": ["badge"],
+  "source": {
+    "registry": "registry.json#/components/order-history",
+    "css": { "file": "components/css/account.css", "selector": ".order-list" },
+    "docs": "site/src/content/components/order-history.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".order-list", "className": ".order-list", "required": true, "description": "Order list container." },
+    { "name": "row", "selector": ".order-row", "className": ".order-row", "required": true, "description": "Single order row." },
+    { "name": "number", "selector": ".order-row__number", "className": ".order-row__number", "required": true, "description": "Order number link." },
+    { "name": "date", "selector": ".order-row__date", "className": ".order-row__date", "required": true, "description": "Order date." },
+    { "name": "status", "selector": ".order-row__status", "className": ".order-row__status", "required": true, "description": "Order status badge." },
+    { "name": "total", "selector": ".order-row__total", "className": ".order-row__total", "required": true, "description": "Order total." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default order history list." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive order row layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".order-list"], "description": "Default order list state." },
+    { "name": "numberHover", "selectors": [".order-row__number:hover"], "description": "Order link hover state." },
+    { "name": "numberFocus", "selectors": [".order-row__number:focus-visible"], "description": "Visible keyboard focus on order navigation." },
+    { "name": "pending", "selectors": [".order-row__status--pending"], "description": "Pending status state." },
+    { "name": "shipped", "selectors": [".order-row__status--shipped"], "description": "Shipped status state." },
+    { "name": "delivered", "selectors": [".order-row__status--delivered"], "description": "Delivered status state." },
+    { "name": "cancelled", "selectors": [".order-row__status--cancelled"], "description": "Cancelled status state." }
+  ],
+  "behavior": [
+    { "name": "orderNavigation", "selectors": [".order-row__number"], "attributes": ["href"], "events": ["click"], "description": "Order number should navigate to order detail." },
+    { "name": "statusFormatting", "selectors": [".order-row__status"], "description": "Order status should map target order state to a readable label and badge style." },
+    { "name": "totalFormatting", "selectors": [".order-row__total"], "description": "Totals should be formatted by the commerce target." }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": false, "description": "Accessible name for the order-history region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".order-list", "attribute": "aria-label", "valueFrom": "property" }] } },
+    { "name": "orders", "type": "slot", "required": true, "description": "Target-owned collection of order rows.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-list", "classNames": [".order-list"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-accent", "--color-text-secondary", "--color-feedback-warning-default", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-error-default", "--color-text-primary"],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Expose order status as readable text, not only color.",
+    "Order numbers should be links with clear destination context.",
+    "Protect order history behind authentication."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer orders, financial status, fulfillment status, and order URLs." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "collection-grid",
+  "name": "Collection Grid",
+  "registryId": "E2",
+  "category": "collection",
+  "status": "pilot",
+  "summary": "Responsive product-card grid for collection listings.",
+  "dependencies": ["product-card"],
+  "source": {
+    "registry": "registry.json#/components/collection-grid",
+    "css": { "file": "components/css/collection.css", "selector": ".collection-grid" },
+    "docs": "site/src/content/components/collection-grid.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".collection-grid", "className": ".collection-grid", "required": true, "description": "Responsive product grid container." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive collection grid." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive grid columns controlled by viewport and optional --grid-columns." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".collection-grid"], "description": "Default grid state." },
+    { "name": "configuredColumns", "selectors": [".collection-grid[data-columns=\"2\"]", ".collection-grid[data-columns=\"3\"]", ".collection-grid[data-columns=\"4\"]", ".collection-grid[data-columns=\"5\"]", ".collection-grid[data-columns=\"6\"]"], "description": "Explicit desktop column configuration." }
+  ],
+  "behavior": [
+    { "name": "productCardComposition", "selectors": [".collection-grid"], "description": "Grid children should preserve Product Card behavior, pricing, badges, and quick-add semantics." },
+    { "name": "responsiveColumns", "selectors": [".collection-grid"], "description": "Targets should preserve responsive two, three, and configurable desktop column behavior." }
+  ],
+  "properties": [
+    { "name": "columns", "type": "number", "required": false, "defaultValue": 4, "min": 2, "max": 6, "step": 1, "description": "Optional desktop value for the existing --grid-columns customization hook.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".collection-grid", "attribute": "data-columns", "valueFrom": "property" }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "Ordered Product Card children rendered by the target collection adapter.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-grid", "classNames": [".collection-grid"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "spacing": ["--space-layout-grid-gap", "--space-layout-section-gap", "--space-layout-container"]
+    }
+  },
+  "accessibility": [
+    "Keep every product card reachable in DOM order.",
+    "Do not use layout-only reordering that changes reading order.",
+    "Preserve Product Card accessibility requirements for every grid item."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should render collection products as Product Card children." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

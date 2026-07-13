@@ -1,0 +1,234 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "lookbook",
+  "name": "Lookbook",
+  "registryId": "S6",
+  "category": "sections",
+  "status": "pilot",
+  "summary": "Responsive editorial image composition with optional captions and target-owned hotspot behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/lookbook",
+    "css": {
+      "file": "components/css/sections.css",
+      "selector": ".lookbook"
+    },
+    "docs": "site/src/content/components/lookbook.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".lookbook",
+      "className": ".lookbook",
+      "required": true,
+      "description": "Lookbook section root."
+    },
+    {
+      "name": "header",
+      "selector": ".lookbook__header",
+      "className": ".lookbook__header",
+      "required": false,
+      "description": "Optional heading region."
+    },
+    {
+      "name": "title",
+      "selector": ".lookbook__title",
+      "className": ".lookbook__title",
+      "required": false,
+      "description": "Optional lookbook heading."
+    },
+    {
+      "name": "grid",
+      "selector": ".lookbook__grid",
+      "className": ".lookbook__grid",
+      "required": true,
+      "description": "Ordered editorial cell composition."
+    },
+    {
+      "name": "cell",
+      "selector": ".lookbook__cell",
+      "className": ".lookbook__cell",
+      "required": false,
+      "description": "Repeated target-owned media cell."
+    },
+    {
+      "name": "wideCell",
+      "selector": ".lookbook__cell--wide",
+      "className": ".lookbook__cell--wide",
+      "required": false,
+      "description": "Item-level modifier that spans two grid columns."
+    },
+    {
+      "name": "tallCell",
+      "selector": ".lookbook__cell--tall",
+      "className": ".lookbook__cell--tall",
+      "required": false,
+      "description": "Item-level modifier that spans two grid rows."
+    },
+    {
+      "name": "caption",
+      "selector": ".lookbook__caption",
+      "className": ".lookbook__caption",
+      "required": false,
+      "description": "Optional caption disclosed on hover, focus within, and non-hover input."
+    },
+    {
+      "name": "hotspot",
+      "selector": ".lookbook__hotspot",
+      "className": ".lookbook__hotspot",
+      "required": false,
+      "description": "Optional target-owned native control positioned over a cell."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default variant."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".lookbook"
+      ],
+      "description": "Resting lookbook presentation; wide and tall are item layout modifiers rather than states."
+    },
+    {
+      "name": "itemHover",
+      "selectors": [
+        ".lookbook__cell:hover img"
+      ],
+      "description": "Pointer emphasis and caption disclosure for one cell."
+    },
+    {
+      "name": "itemFocusWithin",
+      "selectors": [
+        ".lookbook__cell:focus-visible",
+        ".lookbook__cell:focus-within img",
+        ".lookbook__cell:focus-within .lookbook__caption"
+      ],
+      "description": "Equivalent emphasis and caption disclosure when target-owned interactive content receives focus."
+    },
+    {
+      "name": "hotspotFocusVisible",
+      "selectors": [
+        ".lookbook__hotspot:focus-visible"
+      ],
+      "description": "Visible keyboard focus when a target renders a hotspot as a native control."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "itemOwnership",
+      "selectors": [
+        ".lookbook__cell"
+      ],
+      "description": "Targets supply ordered cell content and decide whether a cell is passive or contains native navigation."
+    },
+    {
+      "name": "hotspotOwnership",
+      "selectors": [
+        ".lookbook__hotspot"
+      ],
+      "description": "When a hotspot is present, the target supplies a native control, accessible name, destination or disclosure behavior, and any commerce data; canonical CSS owns presentation only."
+    }
+  ],
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible lookbook heading.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".lookbook__title" }]
+      }
+    },
+    {
+      "name": "items",
+      "type": "slot",
+      "required": true,
+      "description": "Ordered target-owned cells, including any item-level span, caption, or hotspot composition.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".lookbook__grid", "classNames": [".lookbook__grid"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-surface-primary",
+        "--color-text-inverse",
+        "--color-text-primary"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--typo-body-size",
+        "--typo-h2-size"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "shadow": [
+        "--shadow-md"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-section-gap",
+        "--space-layout-touch-target"
+      ],
+      "transition": [
+        "--transition-default",
+        "--transition-fast"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide useful alternatives for informative imagery and preserve source order when cells use wide or tall visual spans.",
+    "Captions remain available on focus within and non-hover input rather than relying on pointer hover alone.",
+    "A hotspot is a native touch-sized control only when a target supplies a real action, accessible name, keyboard behavior, and destination or disclosure semantics.",
+    "Reduced motion removes pulse and image/caption transitions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/sections.css."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

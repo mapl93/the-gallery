@@ -1,10 +1,16 @@
 import { Suspense } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { getComponent, getCategories, getComponentsByCategory } from '../lib/registry';
-import { getComponentExamples } from '../lib/examples';
-import ComponentPreview from '../components/ComponentPreview';
+import { getComponentContract } from '../lib/contracts';
+import { getStudioDefinition } from '../lib/studio';
 import { getMdxPage } from '../content';
 import { mdxComponents } from '../components/MdxComponents';
+import ContractSummary from '../components/ContractSummary';
+import { getStudioRenderer } from '../components/studio';
+import ComponentModeSwitch, {
+  type ComponentMode,
+} from '../components/studio/ComponentModeSwitch';
+import { ExhibitContractContext } from '../components/ExhibitDocument';
 
 function CompHeader({ comp, cat }: { comp: ReturnType<typeof getComponent> & {}; cat?: { name: string } }) {
   return (
@@ -57,6 +63,7 @@ function CompNav({ comp }: { comp: ReturnType<typeof getComponent> & {} }) {
 
 export default function ComponentDetail() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const comp = slug ? getComponent(slug) : undefined;
 
   if (!comp) {
@@ -71,104 +78,112 @@ export default function ComponentDetail() {
 
   const cat = getCategories().find((c) => c.key === comp.category);
   const MdxContent = getMdxPage(comp.slug);
+  const contract = getComponentContract(comp.slug);
+  const studioDefinition = getStudioDefinition(comp.slug);
+  const StudioRenderer = getStudioRenderer(comp.slug);
+  const supportsStudio = Boolean(contract && studioDefinition && StudioRenderer);
+  const mode: ComponentMode = supportsStudio && searchParams.get('view') === 'studio'
+    ? 'studio'
+    : 'exhibit';
 
-  // ── MDX page (rich docs) ──────────────────────────────────
-  if (MdxContent) {
+  function handleModeChange(nextMode: ComponentMode) {
+    const next = new URLSearchParams(searchParams);
+    if (nextMode === 'studio') next.set('view', 'studio');
+    else next.delete('view');
+    setSearchParams(next);
+  }
+
+  if (mode === 'studio' && contract && studioDefinition && StudioRenderer) {
+    return (
+      <div className="docs-component-detail docs-component-detail--studio">
+        <ComponentModeSwitch value={mode} onChange={handleModeChange} />
+        <div
+          id="component-view-panel"
+          role="tabpanel"
+          aria-labelledby="component-view-studio-tab"
+        >
+          <StudioRenderer contract={contract} definition={studioDefinition} />
+        </div>
+      </div>
+    );
+  }
+
+  if (!MdxContent) {
     return (
       <>
         <CompHeader comp={comp} cat={cat} />
-        <Suspense fallback={<p style={{ color: 'var(--docs-color-text-2)' }}>Loading…</p>}>
-          <MdxContent components={mdxComponents} />
-        </Suspense>
+
+        <h2>Documentation Pending</h2>
+        <p>
+          This component is registered but does not yet have a canonical MDX page.
+          Add <code>{`site/src/content/components/${comp.slug}.mdx`}</code> before publishing it as part of the system.
+        </p>
+
+        {comp.dependencies.length > 0 && (
+          <>
+            <h2>Dependencies</h2>
+            <ul>
+              {comp.dependencies.map((dep) => (
+                <li key={dep}>
+                  <Link to={`/components/${dep}`}>{dep}</Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {comp.tokens && Object.keys(comp.tokens).length > 0 && (
+          <>
+            <h2>Design Tokens</h2>
+            <table className="docs-token-table">
+              <thead>
+                <tr><th>Category</th><th>Tokens</th></tr>
+              </thead>
+              <tbody>
+                {Object.entries(comp.tokens).map(([tokenCategory, tokens]) => (
+                  <tr key={tokenCategory}>
+                    <td>{tokenCategory}</td>
+                    <td>
+                      {(tokens as string[]).map((token) => (
+                        <code key={token} className="docs-inline-code" style={{ marginRight: 8 }}>{token}</code>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {contract && <ContractSummary contract={contract} />}
+
         <CompNav comp={comp} />
       </>
     );
   }
 
-  // ── Auto-generated fallback ───────────────────────────────
-  const examples = getComponentExamples(comp.slug) ?? { preview: `<div class="${comp.selector}">${comp.name}</div>` };
-
   return (
-    <>
-      <CompHeader comp={comp} cat={cat} />
-
-      {/* Preview */}
-      <h2>Preview</h2>
-      <ComponentPreview html={examples.preview} label={comp.name} interaction={examples.interaction} />
-
-      {/* Variants */}
-      {examples.variants && Object.keys(examples.variants).length > 0 && (
-        <>
-          <h2>Variants</h2>
-          {comp.variants && (
-            <div className="docs-variant-tags">
-              {comp.variants.map((v) => (
-                <span key={v} className="docs-variant-tag">{v}</span>
-              ))}
-            </div>
-          )}
-          {Object.entries(examples.variants).map(([name, html]) => (
-            <ComponentPreview key={name} html={html} label={name} />
-          ))}
-        </>
+    <div className="docs-component-detail docs-component-detail--exhibit">
+      {supportsStudio && (
+        <ComponentModeSwitch value={mode} onChange={handleModeChange} />
       )}
 
-      {/* Sizes */}
-      {examples.sizes && Object.keys(examples.sizes).length > 0 && (
-        <>
-          <h2>Sizes</h2>
-          {comp.sizes && (
-            <div className="docs-variant-tags">
-              {comp.sizes.map((s) => (
-                <span key={s} className="docs-variant-tag">{s}</span>
-              ))}
-            </div>
-          )}
-          {Object.entries(examples.sizes).map(([name, html]) => (
-            <ComponentPreview key={name} html={html} label={name} />
-          ))}
-        </>
-      )}
+      <div
+        className="docs-exhibit"
+        id={supportsStudio ? 'component-view-panel' : undefined}
+        role={supportsStudio ? 'tabpanel' : undefined}
+        aria-labelledby={supportsStudio ? 'component-view-exhibit-tab' : undefined}
+      >
+        <header className="docs-exhibit__header">
+          <h1>{comp.name}</h1>
+        </header>
 
-      {/* Dependencies */}
-      {comp.dependencies.length > 0 && (
-        <>
-          <h2>Dependencies</h2>
-          <ul>
-            {comp.dependencies.map((dep) => (
-              <li key={dep}>
-                <Link to={`/components/${dep}`}>{dep}</Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {/* Tokens */}
-      {comp.tokens && Object.keys(comp.tokens).length > 0 && (
-        <>
-          <h2>Design Tokens</h2>
-          <table className="docs-token-table">
-            <thead>
-              <tr><th>Category</th><th>Tokens</th></tr>
-            </thead>
-            <tbody>
-              {Object.entries(comp.tokens).map(([cat, tokens]) => (
-                <tr key={cat}>
-                  <td>{cat}</td>
-                  <td>
-                    {(tokens as string[]).map((t) => (
-                      <code key={t} className="docs-inline-code" style={{ marginRight: 8 }}>{t}</code>
-                    ))}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
-
-      <CompNav comp={comp} />
-    </>
+        <ExhibitContractContext.Provider value={contract ?? null}>
+          <Suspense fallback={<p className="docs-exhibit__loading">Loading...</p>}>
+            <MdxContent components={mdxComponents} />
+          </Suspense>
+        </ExhibitContractContext.Provider>
+      </div>
+    </div>
   );
 }

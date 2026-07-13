@@ -1,35 +1,41 @@
 ## Overview
 
-Cart line items and summary inside a drawer.
+Cart Drawer composes target-owned cart line items and an optional compact summary inside Drawer. Product truth, mutations, totals, currency, inventory, and checkout routing remain commerce-runtime responsibilities.
 
-<Preview html={"<div style=\"max-width:360px;border:1px solid var(--color-border-default);border-radius:8px;padding:16px;\"><h3 style=\"margin-bottom:16px;\">Your Cart</h3><div class=\"cart-item\" style=\"display:flex;gap:12px;margin-bottom:16px;\"><img class=\"cart-item__image\" src=\"https://placehold.co/64x64/f5f0eb/1a1a1a?text=V\" alt=\"\" style=\"border-radius:4px;\" /><div><h4 class=\"cart-item__title\">Ceramic Vase</h4><span class=\"cart-item__variant\">Large / White</span></div></div></div>"} label="Cart Drawer" />
+<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay tg-preview-stage--tall"><button class="btn" type="button" data-preview-trigger aria-expanded="true" aria-controls="cart-drawer-preview">Open cart</button><div class="drawer-overlay is-open tg-preview-overlay-layer"><aside class="drawer is-open tg-preview-drawer-layer" id="cart-drawer-preview" role="dialog" aria-modal="true" aria-labelledby="cart-drawer-title"><div class="drawer__header"><h2 id="cart-drawer-title">Your cart</h2><button class="drawer__close" type="button" data-preview-close aria-label="Close cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12" /></svg></button></div><div class="drawer__body"><article class="cart-item"><span class="cart-item__image tg-preview-media tg-preview-media--thumb" role="img" aria-label="White artisan ceramic vase"></span><div class="cart-item__details"><a class="cart-item__title" href="#cart-artisan-vase">Artisan Ceramic Vase</a><span class="cart-item__variant">Large / White</span><div class="price" aria-label="Price $120.00"><span class="price__current">$120.00</span></div><div class="cart-item__actions"><div class="qty" role="group" aria-label="Quantity selector" data-qty><button class="qty__btn qty__btn--decrement" type="button" aria-label="Decrease Artisan Ceramic Vase quantity" data-qty-minus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg></button><input class="qty__input" type="number" value="1" min="1" max="8" step="1" aria-label="Artisan Ceramic Vase quantity" data-qty-input /><button class="qty__btn qty__btn--increment" type="button" aria-label="Increase Artisan Ceramic Vase quantity" data-qty-plus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></button></div><button class="cart-item__remove" type="button" aria-label="Remove Artisan Ceramic Vase from cart">Remove</button></div></div></article></div><div class="drawer__footer"><div class="cart-summary"><div class="cart-summary__row cart-summary__total"><span>Subtotal</span><span>$120.00</span></div></div></div></aside></div></div>'} label="Cart Drawer" layout="overlay" interaction={{ selector: '.drawer-overlay, .drawer', toggle: 'is-open', triggerLabel: 'Open Cart', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
+
+## Presentation
+
+The primary artwork uses Drawer for the visible overlay, panel, title, close control, body, and footer. The documentation fixture starts open; its close control and sibling trigger exercise only Drawer visibility, not a Cart Drawer commerce API.
+
+`lineItems` is one optional ordered slot composed from the documented cart-item anatomy, Price, and Quantity Selector. `summary` is one optional target-formatted region. Both may be absent for an empty cart, whose composition remains unresolved.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep global chrome consistent across all pages — header and footer should be in the layout template.</Do>
-  <Dont>Don't duplicate global elements inside individual sections or pages.</Dont>
+  <Do>Keep line records, formatted prices, quantity constraints, and totals synchronized with the target cart.</Do>
+  <Dont>Do not calculate commerce truth or optimistic mutation policy inside Cart Drawer presentation.</Dont>
 </DoDont>
+
+- Preserve product context in remove-action labels.
+- Keep line-item destinations and selected variants truthful.
+- Use the optional summary only when the target can update it with each cart mutation.
 
 ## Accessibility
 
-<Callout type="info">
-  Global components are typically included in your theme layout, not in individual pages.
-</Callout>
+- Inherit Drawer dialog naming, focus containment, dismissal, scroll locking, and focus restoration.
+- Give each remove action an accessible name that includes its product context.
+- Provide accessible names and native bounds for composed Quantity Selectors.
+- Announce mutation, error, item-count, and total changes according to the target's cart policy.
+- Keep product links and controls keyboard reachable with visible focus indicators.
 
-- Trap focus inside the overlay while open. Return focus to the trigger on close.
-- Close on `Escape` key press.
-
-## Dependencies
-
-This component uses:
-
-- [Drawer](/components/drawer)
-- [Price](/components/price)
-- [Quantity Selector](/components/quantity-selector)
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.cart-item`</td><td>class</td><td>—</td><td>Base cart drawer styles</td></tr>
+  <tr><td>`lineItems`</td><td>slot</td><td>optional</td><td>Ordered target-owned line-item composition</td></tr>
+  <tr><td>`summary`</td><td>slot</td><td>optional</td><td>Target-formatted compact summary rows and total</td></tr>
 </PropTable>
+
+Anatomy: `.cart-item`, optional `.cart-item__image`, required `.cart-item__details` and `.cart-item__title`, optional `.cart-item__variant`, `.cart-item__actions`, and `.cart-item__remove`; optional `.cart-summary`, `.cart-summary__row`, and `.cart-summary__total`.
+
+Dependencies: [Drawer](/components/drawer), [Price](/components/price), and [Quantity Selector](/components/quantity-selector). Cart API, mutations, errors, empty state, totals, checkout, and announcements remain open target boundaries.

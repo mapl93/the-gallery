@@ -1,0 +1,65 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "button-group",
+  "name": "Button Group",
+  "registryId": "A16",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Button grouping primitive that composes Button children with shared borders and an optional full-width layout.",
+  "dependencies": ["button"],
+  "source": {
+    "registry": "registry.json#/components/button-group",
+    "css": { "file": "components/css/primitives.css", "selector": ".btn-group" },
+    "docs": "site/src/content/components/button-group.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".btn-group", "className": ".btn-group", "required": true, "description": "Inline wrapper for grouped Button children." },
+    { "name": "button", "selector": ".btn-group .btn", "required": true, "description": "Button dependency rendered as a direct or visual child." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Content-width button group." },
+    { "name": "full", "className": ".btn-group--full", "default": false, "description": "Full-width group where child buttons share available width." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default grouped button size inherited from Button." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".btn-group"], "description": "Default button group state." },
+    { "name": "full", "selectors": [".btn-group--full", ".btn-group--full .btn"], "description": "Full-width distribution state." }
+  ],
+  "behavior": [
+    { "name": "buttonComposition", "selectors": [".btn-group .btn"], "attributes": ["role=\"group\"", "aria-label or aria-labelledby on the group"], "description": "The group composes Button children without changing their native button or link semantics, names, disabled states, or tab order." }
+  ],
+  "properties": [
+    {
+      "name": "groupLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name that explains the relationship among the grouped buttons.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".btn-group", "attribute": "aria-label", "valueFrom": "property" }] }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Content-width or full-width group layout.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".btn-group", "source": "variants" }] }
+    }
+  ],
+  "tokens": { "public": { "radius": ["--radius-md"] } },
+  "accessibility": [
+    "Preserve the accessible names and semantics of each child button.",
+    "Use a group label when the set of buttons needs a shared accessible context.",
+    "Do not change tab order to match visual grouping."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

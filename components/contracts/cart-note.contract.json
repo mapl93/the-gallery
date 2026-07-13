@@ -1,0 +1,60 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "cart-note",
+  "name": "Cart Note",
+  "registryId": "K10",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Expandable order note area that composes a textarea for cart-level instructions.",
+  "dependencies": ["textarea"],
+  "source": {
+    "registry": "registry.json#/components/cart-note",
+    "css": { "file": "components/css/cart.css", "selector": ".cart-note" },
+    "docs": "site/src/content/components/cart-note.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".cart-note", "className": ".cart-note", "required": true, "description": "Cart note wrapper." },
+    { "name": "toggle", "selector": ".cart-note__toggle", "className": ".cart-note__toggle", "required": true, "description": "Note disclosure toggle." },
+    { "name": "field", "selector": ".cart-note__field", "className": ".cart-note__field", "required": false, "description": "Textarea field wrapper or field hook." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default cart note field." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default cart note size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".cart-note"], "description": "Default cart note state." },
+    { "name": "collapsed", "selectors": [".cart-note[data-expanded=\"false\"] .cart-note__field"], "description": "Collapsed disclosure state emitted by the expanded property." },
+    { "name": "toggleFocus", "selectors": [".cart-note__toggle:focus-visible"], "description": "Visible note-disclosure focus state." }
+  ],
+  "behavior": [
+    { "name": "noteDisclosure", "selectors": [".cart-note__toggle"], "attributes": ["aria-expanded", "aria-controls"], "events": ["click"], "description": "Toggle should reveal or hide the order note textarea when collapsed by default." },
+    { "name": "notePersistence", "selectors": [".cart-note__field"], "events": ["change", "blur"], "description": "Order note content should persist to the target cart note field." }
+  ],
+  "properties": [
+    { "name": "toggleLabel", "type": "string", "required": true, "description": "Order-note disclosure label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-note__toggle" }] } },
+    { "name": "expanded", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls note field visibility and disclosure state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-note", "attribute": "data-expanded", "values": { "true": "true", "false": "false" } }, { "kind": "attribute", "selector": ".cart-note__toggle", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } },
+    { "name": "field", "type": "slot", "required": false, "description": "Textarea dependency that owns note value and validation semantics.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-note__field", "classNames": [".cart-note__field"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-accent", "--color-border-focus"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Label the note textarea clearly.",
+    "Keep note save status understandable if updates happen asynchronously.",
+    "Do not erase note content when the field is collapsed."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to Shopify cart note updates." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

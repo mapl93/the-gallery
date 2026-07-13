@@ -1,0 +1,68 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "cart-page",
+  "name": "Cart Page",
+  "registryId": "K1",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Full cart page layout that composes cart line items and a cart summary.",
+  "dependencies": ["cart-line-item", "cart-summary"],
+  "source": {
+    "registry": "registry.json#/components/cart-page",
+    "css": { "file": "components/css/cart.css", "selector": ".cart-page" },
+    "docs": "site/src/content/components/cart-page.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".cart-page", "className": ".cart-page", "required": true, "description": "Cart page grid container." },
+    { "name": "header", "selector": ".cart-page__header", "className": ".cart-page__header", "required": true, "description": "Cart page header." },
+    { "name": "title", "selector": ".cart-page__title", "className": ".cart-page__title", "required": true, "description": "Cart page title." },
+    { "name": "count", "selector": ".cart-page__count", "className": ".cart-page__count", "required": false, "description": "Cart item count." },
+    { "name": "continue", "selector": ".cart-page__continue", "className": ".cart-page__continue", "required": false, "description": "Continue shopping link." },
+    { "name": "items", "selector": ".cart-page__items", "className": ".cart-page__items", "required": true, "description": "Cart Line Item composition region." },
+    { "name": "summary", "selector": ".cart-page__summary", "className": ".cart-page__summary", "required": true, "description": "Cart Summary composition region." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default cart page layout." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive one-column to two-column cart layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".cart-page"], "description": "Default cart page state." },
+    { "name": "continueHover", "selectors": [".cart-page__continue:hover"], "description": "Continue shopping hover state." },
+    { "name": "continueFocus", "selectors": [".cart-page__continue:focus-visible"], "description": "Visible continue-shopping focus state." }
+  ],
+  "behavior": [
+    { "name": "cartComposition", "selectors": [".cart-page"], "description": "Cart page should compose Cart Line Item and Cart Summary without redefining their behavior." },
+    { "name": "liveTotals", "selectors": [".cart-page__count"], "description": "Item count and totals should update when cart line quantity or removal changes." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Cart page title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-page__title" }] } },
+    { "name": "count", "type": "string", "required": false, "description": "Target-formatted cart item count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-page__count" }] } },
+    { "name": "continueLabel", "type": "string", "required": false, "description": "Continue-shopping link label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-page__continue" }] } },
+    { "name": "continueHref", "type": "string", "required": false, "description": "Continue-shopping destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-page__continue", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
+    { "name": "lineItems", "type": "slot", "required": true, "description": "Ordered Cart Line Item dependencies.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-page__items", "classNames": [".cart-page__items"] }] } },
+    { "name": "summary", "type": "slot", "required": true, "description": "Cart Summary dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-page__summary", "classNames": [".cart-page__summary"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary", "--color-text-accent", "--color-border-focus"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
+      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use a page-level heading for the cart title.",
+    "Keep line-item changes and item count changes understandable to assistive technology.",
+    "Preserve logical reading order between cart items and the summary."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map cart items and cart totals from Shopify cart data." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

@@ -1,33 +1,50 @@
 ## Overview
 
-Full cart page layout with items and sidebar summary.
+Cart Page composes the ordered line items and the order summary into the full cart experience. It also provides the page title, optional item count, and optional continue-shopping link.
 
-<Preview html={"<div class=\"cart-page\" style=\"max-width:600px;\"><div class=\"cart-page__header\"><h1 class=\"cart-page__title\">Your Cart</h1><span class=\"cart-page__count\">2 items</span></div><a class=\"cart-page__continue\" href=\"#\">Continue Shopping</a></div>"} label="Cart Page" />
+<Preview
+  html={'<section class="cart-page tg-preview-cart-page tg-preview-frame--lg"><section class="cart-page__items"><div class="cart-page__header"><h1 class="cart-page__title">Your Cart</h1><span class="cart-page__count">1 item</span></div><a class="cart-page__continue" href="#">Continue shopping</a><article class="cart-line"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /><div class="cart-line__info"><a class="cart-line__title" href="#">Artisan Ceramic Vase</a><span class="cart-line__variant">Large / White</span></div><div class="cart-line__prices"><span class="cart-line__price">$120.00</span></div></article></section><aside class="cart-page__summary"><div class="cart-summary"><h2 class="cart-summary__title">Order Summary</h2><div class="cart-summary__row"><span>Subtotal</span><span class="cart-summary__value">$120.00</span></div><div class="cart-summary__row cart-summary__row--total"><span>Total</span><span class="cart-summary__value">$120.00</span></div><button class="btn cart-summary__checkout" type="button">Checkout</button></div></aside></section>'}
+  label="Cart Page"
+/>
+
+## Presentation
+
+The root presents one column at narrow widths and places the summary beside the line-item region at the desktop breakpoint. `lineItems` and `summary` are required composition slots; Cart Page does not replace the behavior owned by Cart Line Item or Cart Summary.
+
+The header contains the required title and may include a target-formatted item count. The continue-shopping link is optional and requires both its label and destination when present.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show real-time updates (totals, quantities) when the user modifies the cart.</Do>
-  <Dont>Don't require a page reload for cart changes — use AJAX for a smooth experience.</Dont>
+  <Do>Update the item count, line items, and summary from the same cart state.</Do>
+  <Dont>Do not let totals or quantities become stale after a cart mutation.</Dont>
 </DoDont>
+
+- Keep the line-item order consistent with the commerce target.
+- Preserve a direct path back to shopping when the continue link is included.
+- Let the target own loading, persistence, and checkout handoff behavior.
 
 ## Accessibility
 
-<Callout type="tip">
-  Cart components are designed for Shopify's AJAX Cart API. Wire up the JS interactions in your theme.
-</Callout>
+- Use a page-level heading for `title`.
+- Announce item-count and total changes when quantity or removal actions update the cart.
+- Preserve logical reading order between the line-item region and the summary.
+- Keep the continue-shopping link keyboard reachable with a visible focus indicator.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Cart Line Item](/components/cart-line-item)
 - [Cart Summary](/components/cart-summary)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.cart-page`</td><td>class</td><td>—</td><td>Base cart page styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Cart page title</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted cart item count</td></tr>
+  <tr><td>`continueLabel`</td><td>string</td><td>optional</td><td>Continue-shopping link label</td></tr>
+  <tr><td>`continueHref`</td><td>string</td><td>optional</td><td>Continue-shopping destination</td></tr>
+  <tr><td>`lineItems`</td><td>slot</td><td>required</td><td>Ordered Cart Line Item dependencies</td></tr>
+  <tr><td>`summary`</td><td>slot</td><td>required</td><td>Cart Summary dependency</td></tr>
 </PropTable>

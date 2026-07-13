@@ -1,0 +1,200 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "field-wrapper",
+  "name": "Field Wrapper",
+  "registryId": "H10",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Universal field wrapper contract with label, description, error, success, required indicator, and input-message association requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/field-wrapper",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".field"
+    },
+    "docs": "site/src/content/components/field-wrapper.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".field",
+      "className": ".field",
+      "required": true,
+      "description": "Vertical wrapper for a label, form control, and optional messages."
+    },
+    {
+      "name": "label",
+      "selector": ".field__label",
+      "className": ".field__label",
+      "required": true,
+      "description": "Visible label for the field control."
+    },
+    {
+      "name": "requiredIndicator",
+      "selector": ".field__label--required::after",
+      "className": ".field__label--required",
+      "required": false,
+      "generated": true,
+      "description": "Generated visual required marker."
+    },
+    {
+      "name": "description",
+      "selector": ".field__description",
+      "className": ".field__description",
+      "required": false,
+      "description": "Helper text that describes expected input."
+    },
+    {
+      "name": "error",
+      "selector": ".field__error",
+      "className": ".field__error",
+      "required": false,
+      "description": "Field-level validation error message."
+    },
+    {
+      "name": "errorIcon",
+      "selector": ".field__error-icon",
+      "className": ".field__error-icon",
+      "required": false,
+      "description": "Optional icon inside the error message."
+    },
+    {
+      "name": "success",
+      "selector": ".field__success",
+      "className": ".field__success",
+      "required": false,
+      "description": "Field-level success or confirmation message."
+    },
+    {
+      "name": "warning",
+      "selector": ".field__warning",
+      "className": ".field__warning",
+      "required": false,
+      "description": "Field-level warning message for input that needs attention but remains valid."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default field wrapper."
+    },
+    { "name": "error", "className": ".field--error", "default": false, "description": "Field wrapper associated with invalid input." },
+    { "name": "success", "className": ".field--success", "default": false, "description": "Field wrapper associated with validated input." },
+    { "name": "warning", "className": ".field--warning", "default": false, "description": "Field wrapper associated with input that needs attention." }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default field spacing and label size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".field"],
+      "description": "Default wrapper state."
+    },
+    {
+      "name": "required",
+      "selectors": [".field__label--required::after"],
+      "description": "Visible required indicator state."
+    },
+    {
+      "name": "error",
+      "selectors": [".field__error"],
+      "description": "Error message is present."
+    },
+    {
+      "name": "success",
+      "selectors": [".field__success"],
+      "description": "Success message is present."
+    },
+    {
+      "name": "warning",
+      "selectors": [".field__warning"],
+      "description": "Warning message is present without marking the control invalid."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "labelAssociation",
+      "selectors": [".field__label"],
+      "attributes": ["for", "id", "aria-label", "aria-labelledby"],
+      "description": "Every field wrapper should provide a visible label associated with its control or an equivalent accessible name."
+    },
+    {
+      "name": "messageAssociation",
+      "selectors": [".field__description", ".field__error", ".field__success", ".field__warning"],
+      "attributes": ["aria-describedby", "aria-invalid", "aria-live"],
+      "description": "Helper, error, and success messages should be programmatically associated with the form control when present."
+    },
+    {
+      "name": "requiredState",
+      "selectors": [".field__label--required::after"],
+      "attributes": ["required", "aria-required=\"true\""],
+      "description": "Required visuals must stay synchronized with native or ARIA required state."
+    }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible field label text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__label" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional helper text placed after the control.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__description" }] } },
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Feedback family used by the label and composed message.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".field", "source": "variants" }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows the visual required marker; consumers must synchronize the control's native required state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".field__label", "classNames": [".field__label--required"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-text-primary",
+        "--color-feedback-error-default",
+        "--color-text-secondary",
+        "--color-feedback-success-default",
+        "--color-feedback-warning-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Pair every form control with a visible label whenever possible.",
+    "Use aria-describedby to connect descriptions, errors, or success messages to the control.",
+    "Use aria-invalid=\"true\" when the field has an error.",
+    "Do not expose aria-invalid for Success or Warning feedback.",
+    "Do not rely on the generated required marker as the only required-state signal.",
+    "Keep message order predictable: label, control, helper text, then validation feedback."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by the .field class family in components/css/forms.css; the component slug remains field-wrapper for registry and docs clarity."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render field wrappers with labels, native controls, and messages using the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

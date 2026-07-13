@@ -1,26 +1,40 @@
 ## Overview
 
-Accessible close button with hover ring. Used in modals, toasts, drawers.
+Compact icon-only button that requests dismissal of a dialog, drawer, toast, alert, or another owned surface.
 
-<Preview html={"<button class=\"close-btn\" aria-label=\"Close\">&times;</button>"} label="Close Button" />
+<Preview html={'<button class="close-btn" type="button" aria-label="Close dialog"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'} label="Close Button" />
+
+## Presentation
+
+Close Button has one size and one classless variant. Hover, keyboard focus, and native disabled are its complete visual states.
+
+<Preview html={'<div class="tg-preview-inline"><button class="close-btn" type="button" aria-label="Close dialog"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="close-btn" type="button" aria-label="Close dialog" disabled><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'} label="Available and disabled" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Name the surface being dismissed when multiple close actions may be present.</Do>
+  <Dont>Do not use Close Button for destructive deletion or backward navigation.</Dont>
 </DoDont>
+
+The consumer owns the state update, exit animation, focus restoration, and removal of the dismissed surface.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Click, Enter, and Space are native button behavior. Escape belongs to the containing overlay or dismissible surface.
 </Callout>
 
-- Use `<button>` elements for actions and `<a>` for navigation. Never use `<div>` with a click handler.
+- Use `type="button"` inside forms.
+- Provide a contextual name such as `Close dialog` or `Dismiss alert`.
+- Hide the decorative icon from assistive technology.
+- Return focus according to the containing component's dismissal contract.
+- Do not attach Escape handling to the button itself.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.close-btn`</td><td>class</td><td>—</td><td>Base close button styles</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Contextual dismiss action name</td></tr>
+  <tr><td>`icon`</td><td>slot</td><td>required</td><td>Decorative indicator using `.close-btn__icon`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Native unavailable state</td></tr>
 </PropTable>

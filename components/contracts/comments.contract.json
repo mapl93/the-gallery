@@ -1,0 +1,78 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "comments",
+  "name": "Comment Section",
+  "registryId": "L11",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Threaded comment list with reply form and sort.",
+  "dependencies": ["avatar", "button", "textarea"],
+  "source": {
+    "registry": "registry.json#/components/comments",
+    "css": { "file": "components/css/blog.css", "selector": ".comments" },
+    "docs": "site/src/content/components/comments.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".comments", "className": ".comments", "required": true, "description": "Comment-section container." },
+    { "name": "title", "selector": ".comments__title", "className": ".comments__title", "required": true, "description": "Comment-section title." },
+    { "name": "count", "selector": ".comments__count", "className": ".comments__count", "required": false, "description": "Optional target-formatted comment count." },
+    { "name": "comment", "selector": ".comment", "className": ".comment", "required": false, "description": "Target-owned comment record." },
+    { "name": "avatar", "selector": ".comment__avatar", "className": ".comment__avatar", "required": false, "description": "Optional Avatar composition for the comment author." },
+    { "name": "body", "selector": ".comment__body", "className": ".comment__body", "required": false, "description": "Comment content wrapper." },
+    { "name": "header", "selector": ".comment__header", "className": ".comment__header", "required": false, "description": "Comment author and date wrapper." },
+    { "name": "author", "selector": ".comment__author", "className": ".comment__author", "required": false, "description": "Target-supplied comment author label." },
+    { "name": "date", "selector": ".comment__date", "className": ".comment__date", "required": false, "description": "Target-formatted comment date." },
+    { "name": "text", "selector": ".comment__text", "className": ".comment__text", "required": false, "description": "Comment text content." },
+    { "name": "actions", "selector": ".comment__actions", "className": ".comment__actions", "required": false, "description": "Target-owned comment actions." },
+    { "name": "action", "selector": ".comment__action-btn", "className": ".comment__action-btn", "required": false, "description": "Native button for a target-owned comment action." },
+    { "name": "replies", "selector": ".comment__replies", "className": ".comment__replies", "required": false, "description": "Nested target-owned reply composition." },
+    { "name": "composer", "selector": ".comment-form", "className": ".comment-form", "required": false, "description": "Optional target-owned comment form composition." },
+    { "name": "composerTitle", "selector": ".comment-form__title", "className": ".comment-form__title", "required": false, "description": "Optional comment-form title." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default threaded comment presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Fluid comment width with responsive wrapping and reply indentation." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".comments"], "description": "Default comment-section state." },
+    { "name": "actionHover", "selectors": [".comment__action-btn:hover"], "description": "Comment action hover state." },
+    { "name": "actionFocus", "selectors": [".comment__action-btn:focus-visible"], "description": "Visible keyboard focus for comment actions." }
+  ],
+  "behavior": [
+    { "name": "targetCommentData", "selectors": [".comment", ".comment__replies"], "description": "The target supplies comment records, author identity, dates, nesting, authentication, moderation state, and synchronization." },
+    { "name": "targetCommentActions", "selectors": [".comment__actions", ".comment-form"], "description": "Sorting, reply and top-level composers, submission, optimistic updates, and feedback remain target-owned pending a source decision." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Visible comment-section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".comments__title" }] } },
+    { "name": "count", "type": "string", "required": false, "description": "Optional target-formatted comment count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".comments__count" }] } },
+    { "name": "thread", "type": "slot", "required": true, "description": "Target-owned comment records, nesting, actions, and any empty-state content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comments", "classNames": [".comments"] }] } },
+    { "name": "composer", "type": "slot", "required": false, "description": "Target-owned top-level comment form composed from Textarea and Button controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comment-form", "classNames": [".comment-form"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-disabled", "--color-text-primary", "--color-text-secondary"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-heading", "--typo-body-line-height", "--typo-body-size", "--typo-h4-size"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-section-gap", "--space-layout-touch-target"],
+      "transition": ["--transition-fast"]
+    }
+  },
+  "accessibility": [
+    "Represent comment records and nested replies with a semantic structure that communicates their relationships without relying on indentation alone.",
+    "Expose author and date text clearly, and use a time element with a machine-readable datetime value when the target provides one.",
+    "Use native buttons for comment actions with visible focus and descriptive accessible names.",
+    "Composed Textarea and Button controls retain their own labels, validation, disabled, busy, and submission semantics.",
+    "Authentication, moderation, submission feedback, and live updates require target-specific accessible status handling."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Structural CSS is implemented; sorting, composer, authentication, moderation, and update behavior remain target-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

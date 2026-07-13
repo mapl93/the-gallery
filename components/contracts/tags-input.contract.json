@@ -1,0 +1,185 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "tags-input",
+  "name": "Tags Input",
+  "registryId": "H8",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Multi-value text input contract with removable tag chips, focus-within state, free-text entry, keyboard removal, and tag dependency.",
+  "dependencies": ["tag"],
+  "source": {
+    "registry": "registry.json#/components/tags-input",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".tags-input"
+    },
+    "docs": "site/src/content/components/tags-input.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".tags-input",
+      "className": ".tags-input",
+      "required": true,
+      "description": "Input-like wrapper for selected tags and free-text entry."
+    },
+    {
+      "name": "tag",
+      "selector": ".tags-input__tag",
+      "className": ".tags-input__tag",
+      "required": false,
+      "description": "Selected value chip."
+    },
+    {
+      "name": "remove",
+      "selector": ".tags-input__remove",
+      "className": ".tags-input__remove",
+      "required": false,
+      "description": "Remove button inside a selected tag."
+    },
+    {
+      "name": "field",
+      "selector": ".tags-input__field",
+      "className": ".tags-input__field",
+      "required": true,
+      "description": "Text input used to add tags."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default tags input."
+    },
+    { "name": "error", "className": ".tags-input--error", "default": false, "description": "Invalid tag collection presentation." },
+    { "name": "success", "className": ".tags-input--success", "default": false, "description": "Validated tag collection presentation." },
+    { "name": "warning", "className": ".tags-input--warning", "default": false, "description": "Tag collection that needs attention." }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default tag and input size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".tags-input"],
+      "description": "Default tags input state."
+    },
+    {
+      "name": "focusWithin",
+      "selectors": [".tags-input:focus-within"],
+      "description": "Focused state when the input or a child control has focus."
+    },
+    {
+      "name": "removeHover",
+      "selectors": [".tags-input__remove:hover"],
+      "description": "Pointer hover state on a remove control."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "addTag",
+      "events": ["Enter", "Comma", "Blur", "paste"],
+      "description": "Targets define which committed text creates a tag and should validate duplicates or disallowed values."
+    },
+    {
+      "name": "removeTag",
+      "selectors": [".tags-input__remove"],
+      "events": ["remove action", "Backspace", "Delete"],
+      "description": "Users can remove tags with explicit remove controls and keyboard behavior."
+    },
+    {
+      "name": "fieldSemantics",
+      "attributes": ["aria-describedby", "aria-invalid", "aria-autocomplete", "aria-controls"],
+      "description": "The text field should expose validation and optional suggestion-list relationships when present."
+    },
+    {
+      "name": "dependency",
+      "description": "The selected value chip style is local to Tags Input today, but the component depends on the Tag primitive for broader chip semantics."
+    }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the current tag collection.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".tags-input", "source": "variants" }] } },
+    { "name": "placeholder", "type": "string", "required": false, "description": "Hint shown in the free-text field.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes free-text entry unavailable; targets should also disable remove actions.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "invalid", "type": "boolean", "required": false, "defaultValue": false, "description": "Exposes native invalid state when Error is active.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "aria-invalid", "values": { "true": "true", "false": null }, "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for tag guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-surface-secondary",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-border-subtle",
+        "--color-input-default-hover-inner-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "radius": [
+        "--radius-md",
+        "--radius-full"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide a visible label or equivalent accessible name for the tag entry field.",
+    "Make each remove control keyboard accessible and clearly named with the tag value.",
+    "Announce validation errors and duplicate-tag prevention.",
+    "Keep the input focused after adding or removing tags unless the target has a documented reason not to.",
+    "Expose selected values in reading order before the text entry field."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css; tag creation, duplicate handling, suggestions, and removal behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

@@ -1,43 +1,49 @@
 ## Overview
 
-Styled data table. Striped, hover, and sortable variants.
+Native data table with responsive horizontal overflow and optional striped, hover, or sortable presentation.
 
-<Preview html={"<div class=\"table-wrapper\"><table class=\"table\"><thead><tr><th>Name</th><th>Type</th><th>Origin</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>Stoneware</td><td>Japan</td></tr><tr><td>Raku Bowl</td><td>Earthenware</td><td>Korea</td></tr><tr><td>Porcelain Cup</td><td>Porcelain</td><td>China</td></tr></tbody></table></div>"} label="Table" />
+<Preview html={'<div class="table-wrapper"><table class="table"><thead><tr><th scope="col">Object</th><th scope="col">Material</th><th scope="col">Available</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>Stoneware</td><td>12</td></tr><tr><td>Raku Bowl</td><td>Earthenware</td><td>7</td></tr><tr><td>Porcelain Cup</td><td>Porcelain</td><td>24</td></tr></tbody></table></div>'} label="Table" />
 
-## Variants
+## Presentation
 
-### Striped
+The base table can independently compose striped rows, row hover, and sortable-header anatomy. These controls are intentionally not exclusive: a sortable table may also be striped and preserve hover feedback. The responsive wrapper is optional anatomy and does not change table semantics.
 
-<Preview html={"<div class=\"table-wrapper\"><table class=\"table table--striped\"><thead><tr><th>Item</th><th>Price</th></tr></thead><tbody><tr><td>Vase</td><td>$120</td></tr><tr><td>Bowl</td><td>$80</td></tr><tr><td>Plate</td><td>$65</td></tr></tbody></table></div>"} label="Striped" />
+<Preview html={'<div class="table-wrapper"><table class="table table--striped"><thead><tr><th scope="col">Object</th><th scope="col">Material</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>Stoneware</td></tr><tr><td>Raku Bowl</td><td>Earthenware</td></tr><tr><td>Porcelain Cup</td><td>Porcelain</td></tr></tbody></table></div>'} label="Striped table" />
 
-### Hover
+<Preview html={'<div class="table-wrapper"><table class="table table--hover"><thead><tr><th scope="col">Object</th><th scope="col">Available</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>12</td></tr><tr><td>Raku Bowl</td><td>7</td></tr><tr><td>Porcelain Cup</td><td>24</td></tr></tbody></table></div>'} label="Hover table" />
 
-<Preview html={"<div class=\"table-wrapper\"><table class=\"table table--hover\"><thead><tr><th>Item</th><th>Price</th></tr></thead><tbody><tr><td>Vase</td><td>$120</td></tr><tr><td>Bowl</td><td>$80</td></tr></tbody></table></div>"} label="Hover" />
+<Preview html={'<div class="table-wrapper"><table class="table"><thead><tr><th scope="col" aria-sort="none"><button class="table__sort-btn" type="button">Object <span class="table__sort-icon" aria-hidden="true">&#8597;</span></button></th><th scope="col">Available</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>12</td></tr><tr><td>Raku Bowl</td><td>7</td></tr></tbody></table></div>'} label="Sortable table hook" />
 
-### Sortable
-
-<Preview html={"<div class=\"table-wrapper\"><table class=\"table\"><thead><tr><th><button class=\"table__sort-btn\">Name <span class=\"table__sort-icon\">↕</span></button></th><th>Price</th></tr></thead><tbody><tr><td>Vase</td><td>$120</td></tr><tr><td>Bowl</td><td>$80</td></tr></tbody></table></div>"} label="Sortable" />
+Rows, columns, values, and the sample inventory in Exhibit and Studio are fixtures, not component defaults. Sortable presentation supplies the canonical control anatomy; each target owns comparison, locale rules, ordering, pagination, and remote data updates.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Table when values need to be compared across consistent columns.</Do>
+  <Dont>Don't use table markup only to align unrelated page content.</Dont>
 </DoDont>
+
+Keep column labels concise and preserve the same data meaning down each column. Use the overflow wrapper when the table may be wider than its container instead of compressing cell content until it becomes unreadable.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Native table structure provides relationships that a collection of generic grid containers does not.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Use `<thead>`, `<tbody>`, `<th>`, and `<td>` according to the data structure.
+- Add `scope="col"` or `scope="row"` for simple headers and explicit header associations for complex tables.
+- Place `aria-sort` on the currently sortable header cell and synchronize it with the visible row order.
+- Keep sort triggers as native buttons; do not rely on pointer hover or icon direction alone.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.table`</td><td>class</td><td>—</td><td>Base table styles</td></tr>
-  <tr><td>`.table--striped`</td><td>modifier</td><td>—</td><td>Striped variant</td></tr>
-  <tr><td>`.table--hover`</td><td>modifier</td><td>—</td><td>Hover variant</td></tr>
-  <tr><td>`.table--sortable`</td><td>modifier</td><td>—</td><td>Sortable variant</td></tr>
+  <tr><td>`striped`</td><td>boolean</td><td>`false`</td><td>Adds alternating row surfaces</td></tr>
+  <tr><td>`rowHover`</td><td>boolean</td><td>`false`</td><td>Adds pointer hover feedback to rows</td></tr>
+  <tr><td>`sortable`</td><td>boolean</td><td>`false`</td><td>Composes sortable-header anatomy; target owns ordering</td></tr>
+  <tr><td>`.table-wrapper`</td><td>optional anatomy</td><td>none</td><td>Horizontal overflow container</td></tr>
+  <tr><td>`.table`</td><td>required anatomy</td><td>native `table`</td><td>Base table styles and semantics</td></tr>
+  <tr><td>`.table__sort-btn`</td><td>optional anatomy</td><td>none</td><td>Native sortable-header trigger</td></tr>
+  <tr><td>`.table__sort-icon`</td><td>optional anatomy</td><td>none</td><td>Decorative direction indicator</td></tr>
 </PropTable>

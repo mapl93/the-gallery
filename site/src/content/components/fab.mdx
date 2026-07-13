@@ -1,26 +1,47 @@
 ## Overview
 
-Floating action button. Fixed position with scroll-triggered visibility.
+Floating icon-only button for a persistent page-level action such as returning to the top of a long page.
 
-<Preview html={"<div style=\"position:relative;min-height:80px;display:flex;align-items:center;justify-content:center;\"><button class=\"fab fab--visible\" aria-label=\"Scroll to top\" style=\"position:relative;\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 19V5m-7 7l7-7 7 7\"/></svg></button></div>"} label="FAB / Back-to-Top" interaction={{"selector":".fab","toggle":"fab--visible","triggerLabel":"Show FAB","startVisible":false}} />
+<Preview html={'<button class="fab fab--visible tg-preview-static" type="button" data-preview-static-artwork aria-label="Scroll to top"><svg class="fab__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>'} label="FAB / Back-to-Top" />
+
+## Presentation
+
+FAB has one circular size and one classless variant. It is hidden by default; target-owned scroll or contextual logic composes `.fab--visible` when the action becomes relevant.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `visible` | `false` | hidden base `.fab` |
+| `visible` | `true` | `.fab--visible` |
+| `disabled` | boolean | native `disabled` |
+
+<Preview html={'<div class="tg-preview-inline"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="false">Show FAB</button><button class="fab tg-preview-static" type="button" data-preview-close aria-label="Scroll to top"><svg class="fab__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button></div>'} label="Visibility behavior" interaction={{"selector":".fab","toggle":"fab--visible","triggerLabel":"Show FAB","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":false}} />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use FAB for one high-value page action that benefits from persistent placement.</Do>
+  <Dont>Do not make it the only way to complete critical navigation or expose several competing FABs.</Dont>
 </DoDont>
+
+The target owns the visibility threshold, click result, scroll behavior, and any page-state synchronization.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Hidden FAB is removed visually with `visibility: hidden`; visible FAB remains a native named button.
 </Callout>
 
-- Use `<button>` elements for actions and `<a>` for navigation. Never use `<div>` with a click handler.
+- Provide a concise accessible name that describes the action.
+- Hide the decorative icon from assistive technology.
+- Keep the action reachable by keyboard only while visible.
+- Respect reduced-motion preferences for its visibility transition.
+- Use native `disabled` only when a visible action is temporarily unavailable.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.fab`</td><td>class</td><td>—</td><td>Base fab / back-to-top styles</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Accessible page-action name</td></tr>
+  <tr><td>`icon`</td><td>slot</td><td>required</td><td>Decorative icon using `.fab__icon`</td></tr>
+  <tr><td>`visible`</td><td>boolean</td><td>`false`</td><td>Composes `.fab--visible`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Native unavailable state</td></tr>
 </PropTable>

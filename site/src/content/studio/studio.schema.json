@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://the-gallery.dev/schema/studio-presentation.json",
+  "title": "The Gallery Studio Presentation",
+  "description": "Site-owned grouping and control metadata for a component Studio inspector.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "studioVersion", "slug", "designReference", "groups"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "studioVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "slug": { "$ref": "#/$defs/slug" },
+    "designReference": { "$ref": "#/$defs/designReference" },
+    "groups": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/group" },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "propertyName": {
+      "type": "string",
+      "pattern": "^[a-z][a-zA-Z0-9]*$"
+    },
+    "designReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileKey", "frameNodeId", "inspectorNodeId"],
+      "properties": {
+        "fileKey": { "type": "string", "minLength": 1 },
+        "frameNodeId": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" },
+        "inspectorNodeId": { "type": "string", "pattern": "^[0-9]+:[0-9]+$" }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "controls"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "label": { "type": "string", "minLength": 1 },
+        "controls": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/control" },
+          "minItems": 1
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind"],
+      "properties": {
+        "id": { "$ref": "#/$defs/slug" },
+        "label": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "text",
+            "number",
+            "select",
+            "segmented",
+            "state",
+            "icon",
+            "slot-composition",
+            "toggle",
+            "token",
+            "token-pair",
+            "token-swatch"
+          ]
+        },
+        "properties": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/propertyName" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "source": {
+          "type": "string",
+          "enum": ["states"]
+        },
+        "optionLabels": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 },
+          "minProperties": 1
+        },
+        "iconCatalogue": { "$ref": "#/$defs/iconCatalogue" },
+        "visibleWhen": { "$ref": "#/$defs/visibilityRule" },
+        "tokens": { "$ref": "#/$defs/tokenSource" }
+      },
+      "oneOf": [
+        {
+          "required": ["properties"],
+          "not": { "required": ["tokens"] }
+        },
+        {
+          "required": ["tokens"],
+          "not": { "required": ["properties"] }
+        }
+      ]
+    },
+    "iconCatalogue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "defaultLeading", "defaultTrailing"],
+      "properties": {
+        "source": { "type": "string", "enum": ["lucide"] },
+        "defaultLeading": { "$ref": "#/$defs/slug" },
+        "defaultTrailing": { "$ref": "#/$defs/slug" }
+      }
+    },
+    "visibilityRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property", "equals"],
+      "properties": {
+        "property": { "$ref": "#/$defs/propertyName" },
+        "equals": { "type": ["string", "boolean", "number"] }
+      }
+    },
+    "tokenSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category"],
+      "properties": {
+        "category": { "$ref": "#/$defs/slug" },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^--[a-zA-Z0-9_-]+$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "match": { "type": "string", "minLength": 1 }
+      },
+      "oneOf": [
+        {
+          "required": ["names"],
+          "not": { "required": ["match"] }
+        },
+        {
+          "required": ["match"],
+          "not": { "required": ["names"] }
+        }
+      ]
+    }
+  }
+}

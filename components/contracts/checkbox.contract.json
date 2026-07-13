@@ -1,0 +1,373 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "checkbox",
+  "name": "Checkbox",
+  "registryId": "A5",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Native binary choice control with checked, indeterminate, disabled, required, validation, form-value, hover, and focus-visible behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/checkbox",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".checkbox"
+    },
+    "docs": "site/src/content/components/checkbox.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".checkbox",
+      "className": ".checkbox",
+      "required": true,
+      "description": "Label wrapper that owns layout, validation presentation, and the full pointer activation area."
+    },
+    {
+      "name": "control",
+      "selector": ".checkbox__input",
+      "className": ".checkbox__input",
+      "required": true,
+      "description": "Native input with type checkbox that owns selection, keyboard, form, required, and disabled semantics."
+    },
+    {
+      "name": "label",
+      "selector": ".checkbox__label",
+      "className": ".checkbox__label",
+      "required": true,
+      "description": "Visible label text associated by the wrapping label element."
+    },
+    {
+      "name": "checkedIndicator",
+      "selector": ".checkbox__input:checked",
+      "required": false,
+      "generated": true,
+      "description": "Generated Lucide Check geometry shown by the native checked state."
+    },
+    {
+      "name": "indeterminateIndicator",
+      "selector": ".checkbox__input:indeterminate",
+      "required": false,
+      "generated": true,
+      "description": "Generated Lucide Minus geometry shown by the native indeterminate property."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default neutral checkbox."
+    },
+    {
+      "name": "error",
+      "className": ".checkbox--error",
+      "default": false,
+      "description": "Invalid choice presentation using the shared Error field hierarchy."
+    },
+    {
+      "name": "success",
+      "className": ".checkbox--success",
+      "default": false,
+      "description": "Successful validation presentation using the shared Success field hierarchy."
+    },
+    {
+      "name": "warning",
+      "className": ".checkbox--warning",
+      "default": false,
+      "description": "Attention state for a choice that remains valid using the shared Warning field hierarchy."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One 20px control size aligned with the first line of 16px label text."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".checkbox"],
+      "description": "Resting unchecked state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".checkbox:hover .checkbox__input:not(:disabled)"],
+      "description": "Pointer hover across the full label area; validation variants preserve their semantic border family."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".checkbox__input:focus-visible"],
+      "description": "Keyboard focus state using the shared 4px field ring with no offset."
+    },
+    {
+      "name": "checked",
+      "selectors": [".checkbox__input:checked"],
+      "description": "Selected native state with a generated check indicator."
+    },
+    {
+      "name": "indeterminate",
+      "selectors": [".checkbox__input:indeterminate"],
+      "description": "Mixed native state with a generated minus indicator."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".checkbox:has(.checkbox__input:disabled)", ".checkbox__input:disabled"],
+      "description": "Unavailable native control and label presentation."
+    },
+    {
+      "name": "errorFocusVisible",
+      "selectors": [".checkbox--error", ".checkbox__input:focus-visible"],
+      "description": "Focused Error variant with the lighter Error outer ring."
+    },
+    {
+      "name": "successFocusVisible",
+      "selectors": [".checkbox--success", ".checkbox__input:focus-visible"],
+      "description": "Focused Success variant with the lighter Success outer ring."
+    },
+    {
+      "name": "warningFocusVisible",
+      "selectors": [".checkbox--warning", ".checkbox__input:focus-visible"],
+      "description": "Focused Warning variant with the lighter Warning outer ring."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeSelection",
+      "selectors": [".checkbox__input", ".checkbox__input:checked"],
+      "events": ["click", "Space", "change"],
+      "description": "Pointer activation, label activation, and Space use native checkbox selection behavior."
+    },
+    {
+      "name": "labelAssociation",
+      "selectors": [".checkbox", ".checkbox__input", ".checkbox__label"],
+      "attributes": ["wrapping label or matching for/id"],
+      "description": "The visible label is the checkbox's accessible name and full activation target."
+    },
+    {
+      "name": "formValue",
+      "selectors": [".checkbox__input"],
+      "attributes": ["name", "value", "checked"],
+      "events": ["form submit", "form reset"],
+      "description": "The native control owns successful form submission and reset behavior."
+    },
+    {
+      "name": "indeterminateState",
+      "selectors": [".checkbox__input:indeterminate"],
+      "attributes": ["data-indeterminate=\"true\" maps to the native indeterminate property"],
+      "events": ["change clears the initial data-indeterminate marker"],
+      "description": "The shared enhancer initializes native mixed state without replacing checkbox semantics."
+    },
+    {
+      "name": "nativeDisabled",
+      "selectors": [".checkbox__input:disabled"],
+      "attributes": ["disabled"],
+      "description": "Unavailable controls use native disabled focus, activation, and form behavior."
+    },
+    {
+      "name": "nativeRequired",
+      "selectors": [".checkbox__input"],
+      "attributes": ["required"],
+      "events": ["constraint validation"],
+      "description": "Required binary choices participate in native form constraint validation."
+    },
+    {
+      "name": "validationSemantics",
+      "selectors": [".checkbox--error", ".checkbox--success", ".checkbox--warning", ".checkbox__input"],
+      "attributes": [
+        "aria-invalid=\"true\" only for Error",
+        "aria-describedby references feedback owned by Field Wrapper when present"
+      ],
+      "description": "Checkbox owns validation presentation and native invalid state while Field Wrapper owns associated feedback content."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible accessible label for the binary choice.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".checkbox__label" }]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "name",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "defaultValue": "on",
+      "description": "Value submitted with the native name when checked.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "value",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected independently from the native checked state.",
+      "targetMappings": {
+        "web": [{ "kind": "optionClass", "selector": ".checkbox", "source": "variants" }]
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls the native selected state.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "checked",
+          "values": { "true": "", "false": null },
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "indeterminate",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Initial mixed state synchronized to the native indeterminate property by progressive enhancement.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "data-indeterminate",
+          "values": { "true": "true", "false": null },
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native checkbox unavailable.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "disabled",
+          "values": { "true": "", "false": null },
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Participates in native required-choice constraint validation.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "required",
+          "values": { "true": "", "false": null },
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "description": "Id reference for helper or validation feedback owned by a surrounding Field Wrapper.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".checkbox__input",
+          "attribute": "aria-describedby",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-outer-border",
+        "--color-button-primary-bg-default",
+        "--color-text-primary"
+      ],
+      "spacing": [
+        "--space-input-icon-size",
+        "--space-input-icon-gap"
+      ],
+      "typography": ["--typo-body-size"],
+      "radius": ["--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Use a native input with type=\"checkbox\" for keyboard, form, constraint-validation, and assistive-technology behavior.",
+    "Associate a visible label by wrapping the input or using matching for/id attributes.",
+    "Use checked, required, disabled, name, and value on the native input rather than duplicating their behavior.",
+    "Use native indeterminate for mixed state; data-indeterminate is only its progressive initialization contract.",
+    "Use aria-invalid=\"true\" only for Error and aria-describedby for associated feedback from Field Wrapper.",
+    "Do not communicate validation or selection through color alone; checked and indeterminate retain distinct generated indicators.",
+    "Preserve native checkbox appearance in forced-colors mode."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css-js",
+      "notes": "Canonical CSS styles native states and shared theme.js initializes data-indeterminate as the native mixed property."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-js",
+      "notes": "Shopify renders native checkbox markup and the shared theme.js progressively initializes mixed state."
+    },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

@@ -1,26 +1,41 @@
 ## Overview
 
-Color swatch gallery with selectable glaze detail panel.
+Glaze Guide presents named glaze samples in a responsive grid and can include target-owned detail content without defining a selection model.
 
-<Preview html={"<div class=\"glaze-guide\" style=\"max-width:400px;\"><div class=\"glaze-guide__header\"><h2 class=\"glaze-guide__title\">Glaze Guide</h2></div><div class=\"glaze-guide__grid\" style=\"display:flex;gap:16px;\"><div class=\"glaze-swatch\"><div class=\"glaze-swatch__circle\" style=\"width:48px;height:48px;border-radius:50%;background:#5a7d6f;\"></div><span class=\"glaze-swatch__name\">Celadon</span><span class=\"glaze-swatch__code\">#5a7d6f</span></div><div class=\"glaze-swatch\"><div class=\"glaze-swatch__circle\" style=\"width:48px;height:48px;border-radius:50%;background:#c4a882;\"></div><span class=\"glaze-swatch__name\">Sand</span><span class=\"glaze-swatch__code\">#c4a882</span></div></div></div>"} label="Glaze Guide" />
+<Preview html={'<section class="glaze-guide tg-preview-frame tg-preview-frame--lg" aria-labelledby="glaze-guide-title"><header class="glaze-guide__header"><h2 class="glaze-guide__title" id="glaze-guide-title">Glaze guide</h2></header><div class="glaze-guide__grid" role="list"><article class="glaze-swatch" role="listitem"><div class="glaze-swatch__circle tg-preview-media" role="img" aria-label="Soft green celadon glaze sample"></div><p class="glaze-swatch__name">Celadon</p><p class="glaze-swatch__code">C-12</p></article><article class="glaze-swatch" role="listitem"><div class="glaze-swatch__circle tg-preview-media" role="img" aria-label="Matte pale glaze sample"></div><p class="glaze-swatch__name">Chalk</p><p class="glaze-swatch__code">M-04</p></article></div></section>'} label="Glaze Guide" />
 
-## Usage Guidelines
+## Presentation
+
+The required `swatches` slot owns target-provided samples. A title and a `.glaze-detail` region with image, text, name, and metadata are optional.
+
+The artwork keeps samples passive. The existing selected-state selector is only a visual hook; targets decide whether samples are passive or selectable and own selection, keyboard behavior, detail synchronization, and announcements.
+
+## Guidelines
 
 <DoDont>
-  <Do>Use these specialty components to tell the artisan story behind your products.</Do>
-  <Dont>Don't use generic product descriptions — ceramics customers value process, materials, and provenance.</Dont>
+  <Do>Pair every visual sample with a concise glaze name and useful target-formatted code when available.</Do>
+  <Dont>Do not infer selectable behavior or a glaze data schema from the grid and detail selectors.</Dont>
 </DoDont>
+
+- Keep target-owned glaze records and ordering consistent within a composition.
+- Add detail content only when the target can keep it synchronized with any selected sample.
+- Treat visual color as supporting information rather than the record identity.
 
 ## Accessibility
 
-<Callout type="tip">
-  Ceramics components are designed specifically for artisan e-commerce. They showcase craft and materials.
-</Callout>
+- Keep every glaze name available as text rather than color alone.
+- Give informative glaze imagery useful alternative text.
+- If samples become interactive, use a coherent native or ARIA selection pattern with visible focus.
+- Announce target-owned detail changes when selection updates content outside the control.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## Specification
 
-## API Reference
+**Dependencies:** None.
+
+**Anatomy:** `.glaze-guide`, optional header and title, required grid and repeated swatches with visual and name, optional code, and optional `.glaze-detail` image, information, name, and metadata.
 
 <PropTable>
-  <tr><td>`.glaze-guide`</td><td>class</td><td>—</td><td>Base glaze guide styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Guide heading</td></tr>
+  <tr><td>`swatches`</td><td>slot</td><td>required</td><td>Target-owned passive or interactive glaze samples</td></tr>
+  <tr><td>`detail`</td><td>slot</td><td>optional</td><td>Target-owned glaze detail content</td></tr>
 </PropTable>

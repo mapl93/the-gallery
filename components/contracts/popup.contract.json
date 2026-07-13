@@ -1,0 +1,360 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "popup",
+  "name": "Popup / Overlay",
+  "registryId": "G4",
+  "category": "marketing",
+  "status": "pilot",
+  "summary": "Marketing dialog surface with overlay, content, optional media, Close Button composition, and default, split, or slide presentation.",
+  "dependencies": [
+    "close-button"
+  ],
+  "source": {
+    "registry": "registry.json#/components/popup",
+    "css": {
+      "file": "components/css/marketing.css",
+      "selector": ".popup"
+    },
+    "docs": "site/src/content/components/popup.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "overlay",
+      "selector": ".popup-overlay",
+      "className": ".popup-overlay",
+      "required": true,
+      "description": "Backdrop and centered containment layer for popup presentation."
+    },
+    {
+      "name": "root",
+      "selector": ".popup",
+      "className": ".popup",
+      "required": true,
+      "description": "Scrollable dialog surface."
+    },
+    {
+      "name": "close",
+      "selector": ".popup__close",
+      "className": ".popup__close",
+      "required": false,
+      "description": "Optional named native dismiss button that follows Close Button obligations."
+    },
+    {
+      "name": "media",
+      "selector": ".popup__media",
+      "className": ".popup__media",
+      "required": false,
+      "description": "Optional image region."
+    },
+    {
+      "name": "body",
+      "selector": ".popup__body",
+      "className": ".popup__body",
+      "required": true,
+      "description": "Primary popup content region."
+    },
+    {
+      "name": "title",
+      "selector": ".popup__title",
+      "className": ".popup__title",
+      "required": true,
+      "description": "Visible popup title and preferred dialog label source."
+    },
+    {
+      "name": "text",
+      "selector": ".popup__text",
+      "className": ".popup__text",
+      "required": false,
+      "description": "Optional supporting message."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Centered single-column dialog surface."
+    },
+    {
+      "name": "split",
+      "className": ".popup--split",
+      "default": false,
+      "description": "Two-column media and content surface that collapses to one column on narrow viewports."
+    },
+    {
+      "name": "slide",
+      "className": ".popup--slide",
+      "default": false,
+      "description": "Bottom-docked surface with slide presentation."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Viewport-contained popup width and height."
+    }
+  ],
+  "states": [
+    {
+      "name": "overlayHidden",
+      "selectors": [
+        ".popup-overlay"
+      ],
+      "description": "Overlay is visually hidden by default."
+    },
+    {
+      "name": "overlayOpen",
+      "selectors": [
+        ".popup-overlay[data-open]"
+      ],
+      "description": "Existing overlay visibility selector."
+    },
+    {
+      "name": "slideHidden",
+      "selectors": [
+        ".popup--slide"
+      ],
+      "description": "Slide presentation is translated below the viewport by default."
+    },
+    {
+      "name": "slideOpen",
+      "selectors": [
+        ".popup--slide[data-open]"
+      ],
+      "description": "Existing slide visibility selector."
+    },
+    {
+      "name": "closeHover",
+      "selectors": [
+        ".popup__close:hover"
+      ],
+      "description": "Pointer hover on the optional dismiss action."
+    },
+    {
+      "name": "closeFocusVisible",
+      "selectors": [
+        ".popup__close:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the optional dismiss action."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibilitySurface",
+      "selectors": [
+        ".popup-overlay[data-open]",
+        ".popup--slide[data-open]"
+      ],
+      "attributes": [
+        "data-open"
+      ],
+      "description": "Canonical CSS currently recognizes data-open on the overlay and on the slide surface; the contract does not select a single public open-property surface while that ownership remains unresolved."
+    },
+    {
+      "name": "dialogSemantics",
+      "selectors": [
+        ".popup"
+      ],
+      "attributes": [
+        "role=\"dialog\"",
+        "aria-modal=\"true\"",
+        "aria-labelledby"
+      ],
+      "description": "Modal popup use requires a programmatically named dialog. Non-modal use requires an explicit target decision rather than silently reusing modal semantics."
+    },
+    {
+      "name": "focusManagement",
+      "selectors": [
+        ".popup"
+      ],
+      "events": [
+        "open",
+        "close",
+        "Tab",
+        "Shift+Tab"
+      ],
+      "description": "The consuming target moves focus into a modal popup, contains tab navigation, and restores focus to its trigger after dismissal."
+    },
+    {
+      "name": "dismissal",
+      "selectors": [
+        ".popup__close"
+      ],
+      "events": [
+        "click",
+        "Escape"
+      ],
+      "description": "A modal popup provides a visible dismiss action and Escape dismissal; Close Button composition owns native button activation while the popup target owns visibility and focus restoration."
+    }
+  ],
+  "properties": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Canonical default, split, or slide presentation.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".popup",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "media",
+      "type": "slot",
+      "required": false,
+      "description": "Optional popup image region.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".popup__media",
+            "classNames": [
+              ".popup__media"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Visible popup title used to name the dialog.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".popup__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "Optional supporting popup message.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".popup__text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dismissAction",
+      "type": "slot",
+      "required": false,
+      "description": "Optional native button that requests popup dismissal.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".popup__close",
+            "classNames": [
+              ".popup__close"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": false,
+      "description": "Contextual accessible name for the optional dismiss button.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".popup__close",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "button"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-surface-primary",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--typo-body-size",
+        "--typo-h3-size"
+      ],
+      "radius": [
+        "--radius-lg"
+      ],
+      "shadow": [
+        "--shadow-xl"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-touch-target"
+      ],
+      "transition": [
+        "--transition-default"
+      ],
+      "z-index": [
+        "--z-overlay"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use role=\"dialog\" and aria-modal=\"true\" for modal popup use and name it from the visible title.",
+    "Move focus into a modal popup when it opens, contain focus while open, and restore focus to the trigger when it closes.",
+    "Provide a visible named dismiss action and support Escape dismissal.",
+    "Do not add an email field API until popup email-capture ownership is accepted; any composed field must independently satisfy Input obligations.",
+    "Respect reduced-motion preferences for overlay and slide transitions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/marketing.css; runtime dialog behavior remains target-owned."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

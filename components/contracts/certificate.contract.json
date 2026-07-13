@@ -1,0 +1,67 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "certificate",
+  "name": "Certificate of Authenticity",
+  "registryId": "F3",
+  "category": "storytelling",
+  "status": "pilot",
+  "summary": "Certificate card with piece details, signature, and QR code.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/certificate",
+    "css": { "file": "components/css/storytelling.css", "selector": ".coa" },
+    "docs": "site/src/content/components/certificate.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".coa", "className": ".coa", "required": true, "description": "Certificate of authenticity card." },
+    { "name": "header", "selector": ".coa__header", "className": ".coa__header", "required": false, "description": "Optional certificate label." },
+    { "name": "title", "selector": ".coa__title", "className": ".coa__title", "required": true, "description": "Authenticated piece title." },
+    { "name": "artist", "selector": ".coa__artist", "className": ".coa__artist", "required": false, "description": "Optional artist attribution." },
+    { "name": "divider", "selector": ".coa__divider", "className": ".coa__divider", "required": false, "description": "Decorative divider." },
+    { "name": "details", "selector": ".coa__details", "className": ".coa__details", "required": false, "description": "Repeated certificate metadata region." },
+    { "name": "detail", "selector": ".coa__details > *", "className": null, "required": false, "description": "Repeated label-value metadata pair." },
+    { "name": "detailLabel", "selector": ".coa__detail-label", "className": ".coa__detail-label", "required": false, "description": "Metadata label." },
+    { "name": "detailValue", "selector": ".coa__detail-value", "className": ".coa__detail-value", "required": false, "description": "Metadata value." },
+    { "name": "signature", "selector": ".coa__signature", "className": ".coa__signature", "required": false, "description": "Optional signature or artist mark." },
+    { "name": "qr", "selector": ".coa__qr", "className": ".coa__qr", "required": false, "description": "Optional target-owned verification region." },
+    { "name": "qrImage", "selector": ".coa__qr img", "className": null, "required": false, "description": "Verification image supplied by the target." },
+    { "name": "verify", "selector": ".coa__verify", "className": ".coa__verify", "required": false, "description": "Verification guidance text." }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default certificate card." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained certificate card with a single-column metadata fallback on narrow viewports." }],
+  "states": [{ "name": "default", "selectors": [".coa"], "description": "Default certificate state." }],
+  "behavior": [
+    { "name": "targetData", "selectors": [".coa__details", ".coa__qr"], "description": "Targets own certificate records, verification destinations, and authenticity guarantees; the component preserves their visual and reading structure." }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": false, "description": "Optional certificate label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".coa__header" }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Authenticated piece title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".coa__title" }] } },
+    { "name": "artist", "type": "string", "required": false, "description": "Optional artist attribution.", "targetMappings": { "web": [{ "kind": "content", "selector": ".coa__artist" }] } },
+    { "name": "details", "type": "slot", "required": false, "description": "Target-owned certificate metadata pairs.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".coa__details", "classNames": [".coa__details", ".coa__detail-label", ".coa__detail-value"] }] } },
+    { "name": "signature", "type": "slot", "required": false, "description": "Optional signature or artist-mark composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".coa__signature", "classNames": [".coa__signature"] }] } },
+    { "name": "verification", "type": "slot", "required": false, "description": "Target-owned verification image, destination, and guidance.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".coa__qr", "classNames": [".coa__qr", ".coa__verify"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-decorative", "--color-surface-archival", "--color-text-accent", "--color-text-disabled", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-accent", "--font-family-heading", "--typo-body-size", "--typo-h3-size", "--typo-h4-size"],
+      "radius": ["--radius-lg"],
+      "spacing": ["--space-layout-element-gap"]
+    }
+  },
+  "accessibility": [
+    "Use semantic name-value markup such as a description list for certificate details.",
+    "Expose verification as a descriptive link when it has a destination; a QR image must not be the only verification path.",
+    "Give a verification image alternative text that describes its action rather than its appearance.",
+    "Treat the divider as decorative."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

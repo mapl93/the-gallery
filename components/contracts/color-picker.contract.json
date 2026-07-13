@@ -1,0 +1,213 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "color-picker",
+  "name": "Color Picker / Swatch",
+  "registryId": "H5",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Radio-backed color swatch group with selectable swatches, optional checkmark, focus-visible state, hover/selected border state, and swatch sizes.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/color-picker",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".color-picker"
+    },
+    "docs": "site/src/content/components/color-picker.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".color-picker",
+      "className": ".color-picker",
+      "required": true,
+      "description": "Swatch group wrapper."
+    },
+    {
+      "name": "swatch",
+      "selector": ".color-swatch",
+      "className": ".color-swatch",
+      "required": true,
+      "description": "Single selectable color option."
+    },
+    {
+      "name": "input",
+      "selector": ".color-swatch__input",
+      "className": ".color-swatch__input",
+      "required": true,
+      "description": "Native radio input for the color option."
+    },
+    {
+      "name": "fill",
+      "selector": ".color-swatch__fill",
+      "className": ".color-swatch__fill",
+      "required": true,
+      "description": "Visible color fill."
+    },
+    {
+      "name": "check",
+      "selector": ".color-swatch__check",
+      "className": ".color-swatch__check",
+      "required": false,
+      "description": "Optional selected-state checkmark."
+    },
+    {
+      "name": "label",
+      "selector": ".color-swatch__label",
+      "className": ".color-swatch__label",
+      "required": false,
+      "description": "Visible or adjacent color name."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default color swatch group."
+    },
+    { "name": "error", "className": ".color-picker--error", "default": false, "description": "Invalid color choice presentation." },
+    { "name": "success", "className": ".color-picker--success", "default": false, "description": "Validated color choice presentation." },
+    { "name": "warning", "className": ".color-picker--warning", "default": false, "description": "Color choice that needs attention." }
+  ],
+  "sizes": [
+    {
+      "name": "sm",
+      "className": ".color-swatch--sm",
+      "default": false,
+      "description": "Small swatch size."
+    },
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default swatch size."
+    },
+    {
+      "name": "lg",
+      "className": ".color-swatch--lg",
+      "default": false,
+      "description": "Large swatch size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".color-picker"],
+      "description": "Default swatch group state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".color-swatch:hover"],
+      "description": "Pointer hover state on a swatch."
+    },
+    {
+      "name": "selectedFill",
+      "selectors": [".color-swatch__input:checked + .color-swatch__fill"],
+      "description": "Selected fill border state."
+    },
+    {
+      "name": "selectedCheck",
+      "selectors": [".color-swatch__input:checked ~ .color-swatch__check"],
+      "description": "Selected checkmark state."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".color-swatch__input:focus-visible + .color-swatch__fill"],
+      "description": "Keyboard focus indicator."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeChoice",
+      "attributes": ["type=\"radio\"", "name", "checked", "disabled"],
+      "description": "Color swatches should preserve native radio group behavior for single selection."
+    },
+    {
+      "name": "selectionState",
+      "selectors": [".color-swatch__input:checked + .color-swatch__fill", ".color-swatch__input:checked ~ .color-swatch__check"],
+      "description": "Visual selection state must stay synchronized with the native radio checked state."
+    },
+    {
+      "name": "colorName",
+      "attributes": ["aria-label", "aria-labelledby"],
+      "description": "Each swatch needs an accessible color name; color alone is not enough."
+    }
+  ],
+  "properties": [
+    { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Canonical swatch size.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".color-swatch", "source": "sizes" }] } },
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the color choice group.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".color-picker", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Accessible color name for an individual swatch.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "name", "type": "string", "required": true, "description": "Native radio group name shared by swatches.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Native selected state for an individual swatch.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes an individual swatch unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for group feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-border-strong",
+        "--color-text-inverse",
+        "--color-text-secondary",
+        "--color-input-default-focused-outer-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use native radio inputs for mutually exclusive color choices.",
+    "Provide an accessible color name for every swatch.",
+    "Do not communicate selected state only by color.",
+    "Keep focus-visible state visible around the selected swatch fill."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css with hidden native radio inputs."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify product option swatches can render the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

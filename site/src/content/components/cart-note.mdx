@@ -1,32 +1,47 @@
 ## Overview
 
-Expandable order note textarea in cart.
+Cart Note is an optional disclosure for a target-owned order note. It delegates value entry, validation, resize behavior, and feedback to the Textarea dependency.
 
-<Preview html={"<div class=\"cart-note\" style=\"max-width:400px;\"><button class=\"cart-note__toggle\">Add order note</button><textarea class=\"cart-note__field\" rows=\"3\" placeholder=\"Special instructions…\" style=\"width:100%;margin-top:8px;\"></textarea></div>"} label="Cart Note" />
+<Preview
+  html={'<div class="cart-note tg-preview-frame--sm" data-expanded="true"><button class="cart-note__toggle" type="button" aria-expanded="true" aria-controls="cart-note-preview-field">Add order note</button><div class="cart-note__field input" id="cart-note-preview-field"><label class="input__label" for="cart-note-preview-textarea">Order note</label><div class="input__control"><textarea class="input__field textarea__field" id="cart-note-preview-textarea" name="note" data-resize="vertical" data-min-lines="3" data-max-lines="8" placeholder="Special instructions for this order"></textarea></div></div></div>'}
+  label="Cart Note"
+/>
+
+## Presentation
+
+`expanded` defaults to `false` and synchronizes the disclosure state of the required toggle. The optional `field` slot composes the complete Textarea dependency at `.cart-note__field`.
+
+Cart Note owns only disclosure and target persistence boundaries. Textarea owns the native value field, label, validation family, line bounds, and resize direction.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show real-time updates (totals, quantities) when the user modifies the cart.</Do>
-  <Dont>Don't require a page reload for cart changes — use AJAX for a smooth experience.</Dont>
+  <Do>Persist the note to the target cart after deliberate change or blur handling.</Do>
+  <Dont>Do not use the note field for structured choices that deserve dedicated controls.</Dont>
 </DoDont>
+
+- Preserve the note value across cart quantity and totals updates.
+- Keep the field optional unless the surrounding flow explicitly establishes a requirement.
+- Use Textarea properties for resize direction, line bounds, validation, and disabled state.
 
 ## Accessibility
 
-<Callout type="tip">
-  Cart components are designed for Shopify's AJAX Cart API. Wire up the JS interactions in your theme.
-</Callout>
+- Connect the toggle to the field region with `aria-controls` and synchronize `aria-expanded`.
+- Give the composed Textarea a visible label.
+- Preserve Textarea keyboard, resize, validation, and feedback semantics.
+- Do not discard entered content when the disclosure collapses.
+- Keep the disclosure control keyboard reachable with visible focus.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Textarea](/components/textarea)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.cart-note`</td><td>class</td><td>—</td><td>Base cart note styles</td></tr>
+  <tr><td>`toggleLabel`</td><td>string</td><td>required</td><td>Order-note disclosure label</td></tr>
+  <tr><td>`expanded`</td><td>boolean</td><td>`false`</td><td>Controls note-field visibility and disclosure state</td></tr>
+  <tr><td>`field`</td><td>slot</td><td>optional</td><td>Textarea dependency that owns note value and validation semantics</td></tr>
 </PropTable>

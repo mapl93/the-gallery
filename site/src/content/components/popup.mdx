@@ -1,50 +1,42 @@
 ## Overview
 
-Marketing popup with image, content, and CTA. Split and slide variants.
+Popup presents a dismissible dialog surface with Default, Split, and Slide treatments. Email capture is not part of the accepted Popup API.
 
-<Preview html={"<div class=\"popup-overlay\" data-open style=\"position:relative;min-height:200px;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;\"><div class=\"popup\" style=\"position:relative;padding:24px;max-width:360px;\"><button class=\"popup__close\">&times;</button><h3 class=\"popup__title\">10% Off Your First Order</h3><p class=\"popup__text\">Sign up now and get a welcome discount.</p><form style=\"display:flex;gap:8px;\"><input class=\"input__field\" type=\"email\" placeholder=\"Email\" style=\"flex:1;\" /><button class=\"btn\">Get Offer</button></form></div></div>"} label="Popup / Overlay" interaction={{"selector":".popup-overlay","toggle":"attr:data-open=","triggerLabel":"Show Popup","startVisible":true}} />
+## Presentation
 
-## Variants
+<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger aria-expanded="true" aria-controls="popup-preview-dialog" hidden>Show popup</button><div class="popup-overlay tg-preview-overlay-layer" data-open><div class="popup popup--split" id="popup-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="popup-preview-title"><button class="popup__close" type="button" data-preview-close aria-label="Close popup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button><div class="popup__media"><div class="tg-preview-media tg-preview-media--portrait" aria-hidden="true"></div></div><div class="popup__body"><h2 class="popup__title" id="popup-preview-title">Private studio viewing</h2><p class="popup__text">Reserve a place for the next presentation of one-of-a-kind works.</p></div></div></div></div>'} label="Popup / Overlay" layout="overlay" interaction={{ selector: '.popup-overlay', toggle: 'attr:data-open=', triggerLabel: 'Show Popup', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
 
-### Default
+The primary Exhibit artwork starts visible. Its sibling trigger is hidden while the overlay is active, appears after dismissal, and can reopen the fixture. This staging and geometry are site-owned documentation behavior, not a Popup default or public property.
 
-<Preview html={"<div class=\"popup\" style=\"position:relative;padding:24px;max-width:300px;border:1px solid var(--color-border-default);border-radius:12px;\"><h3 class=\"popup__title\">Default Popup</h3><p class=\"popup__text\">Centered overlay popup.</p></div>"} label="Default" />
-
-### Split
-
-<Preview html={"<div class=\"popup popup--split\" style=\"position:relative;max-width:500px;display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--color-border-default);border-radius:12px;overflow:hidden;\"><div class=\"popup__media\" style=\"background:#f5f0eb;min-height:150px;\"></div><div style=\"padding:24px;\"><h3 class=\"popup__title\">Split Popup</h3><p class=\"popup__text\">With media side.</p></div></div>"} label="Split" />
-
-### Slide
-
-<Preview html={"<div class=\"popup popup--slide\" style=\"position:relative;padding:24px;max-width:300px;border:1px solid var(--color-border-default);border-radius:12px;\"><h3 class=\"popup__title\">Slide Popup</h3><p class=\"popup__text\">Slides in from edge.</p></div>"} label="Slide" />
+Default uses `.popup`; Split adds `.popup--split`; Slide adds `.popup--slide`. Canonical CSS currently recognizes `data-open` on `.popup-overlay` and on `.popup--slide`, but the public visibility surface remains unresolved.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>A/B test marketing components (hero copy, CTA placement, popup timing) to optimize conversion.</Do>
-  <Dont>Don't show too many marketing elements at once — popups + banners + badges = fatigue.</Dont>
+  <Do>Use Popup for a concise, focused message with a clear visible way to leave.</Do>
+  <Dont>Do not add an email property or Input dependency until email-capture ownership is accepted.</Dont>
 </DoDont>
+
+The consuming target decides whether a use is modal or non-modal. It also owns visibility state, focus management, trigger timing, persistence, and dismissal behavior beyond this Exhibit fixture.
 
 ## Accessibility
 
-<Callout type="info">
-  Marketing components often need JavaScript for interactions (countdown timers, popup triggers, etc.).
-</Callout>
+- For modal use, apply `role="dialog"`, `aria-modal="true"`, and a programmatic name from the visible title.
+- Move focus into a modal popup, contain Tab and Shift+Tab navigation, and restore focus to its trigger after dismissal.
+- Provide a visible named dismiss button and support `Escape`.
+- Respect reduced-motion preferences for overlay and slide transitions.
+- Any target-composed form field must independently satisfy Input obligations; it does not become Popup anatomy.
 
-- Trap focus inside the overlay while open. Return focus to the trigger on close.
-- Close on `Escape` key press.
-- All images must have descriptive `alt` text.
+## References
 
-## Dependencies
+| Anatomy | Selector | Requirement |
+| --- | --- | --- |
+| Overlay | `.popup-overlay` | Required backdrop and centered containment layer |
+| Root | `.popup` | Required scrollable dialog surface |
+| Close | `.popup__close` | Optional named native dismiss button |
+| Media | `.popup__media` | Optional image region |
+| Body | `.popup__body` | Required primary content region |
+| Title | `.popup__title` | Required visible title and preferred label source |
+| Text | `.popup__text` | Optional supporting message |
 
-This component uses:
-
-- [Close Button](/components/close-button)
-
-## API Reference
-
-<PropTable>
-  <tr><td>`.popup`</td><td>class</td><td>—</td><td>Base popup / overlay styles</td></tr>
-  <tr><td>`.popup--split`</td><td>modifier</td><td>—</td><td>Split variant</td></tr>
-  <tr><td>`.popup--slide`</td><td>modifier</td><td>—</td><td>Slide variant</td></tr>
-</PropTable>
+Dependency: [Close Button](/components/close-button).

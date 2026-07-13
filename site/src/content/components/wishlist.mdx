@@ -1,32 +1,50 @@
 ## Overview
 
-Wishlist page with product grid and heart toggle button.
+Wishlist is a saved-products surface with a required title, optional target-formatted count, and a required slot of Product Card compositions.
 
-<Preview html={"<div class=\"wishlist\" style=\"max-width:500px;\"><div class=\"wishlist__header\"><h2 class=\"wishlist__title\">My Wishlist</h2></div><div style=\"display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:16px;\"><article class=\"product-card\"><div class=\"product-card__media\"><img class=\"product-card__image\" src=\"https://placehold.co/200x250/f5f0eb/1a1a1a?text=W1\" alt=\"\" /></div><div class=\"product-card__body\"><h3 class=\"product-card__title\">Ceramic Vase</h3></div></article></div></div>"} label="Wishlist" />
+<Preview
+  html={'<section class="wishlist tg-preview-frame tg-preview-frame--lg"><header class="wishlist__header"><h1 class="wishlist__title">My Wishlist</h1><span class="wishlist__count">2 items</span></header><div class="wishlist__grid"><article class="product-card"><a class="product-card__media" href="#"><img class="product-card__image tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /></a><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h2 class="product-card__title"><a href="#">Artisan Ceramic Vase</a></h2><div class="product-card__footer"><span class="price"><span class="price__current">$120.00</span></span><button class="wishlist-btn" type="button" aria-label="Remove Artisan Ceramic Vase from wishlist" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div></div></article><article class="product-card"><a class="product-card__media" href="#"><img class="product-card__image tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Hand-thrown stoneware bowl" /></a><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h2 class="product-card__title"><a href="#">Stoneware Bowl</a></h2><div class="product-card__footer"><span class="price"><span class="price__current">$85.00</span></span><button class="wishlist-btn" type="button" aria-label="Remove Stoneware Bowl from wishlist" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div></div></article></div></section>'}
+  label="Wishlist"
+/>
+
+## Presentation
+
+`products` is one required slot containing repeated Product Card compositions. Product identity, imagery, price, destinations, order, and per-product saved state are fixture or target data rather than top-level Wishlist properties.
+
+The artwork includes the current `.wishlist-btn` hook inside each product fixture. The Wishlist contract does not expose that button as an independent property, so its ownership is not expanded here. `count` is optional and remains target-formatted.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Keep saved state, visible products, and count synchronized from one target-owned source.</Do>
+  <Dont>Do not treat Product Card fixture data as Wishlist-level API.</Dont>
 </DoDont>
+
+- Let Product Card own product identity, media, price, and navigation.
+- Preserve the customer's saved order when the target supports it.
+- Reconcile optimistic add or remove actions with target persistence and failure feedback.
+- Provide an intentional empty state when the products slot contains no saved items.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Give every saved-state toggle a product-specific accessible name.
+- Keep `aria-pressed` synchronized with the actual saved state.
+- Make count changes understandable after add or remove actions, using target-owned live feedback when needed.
+- Preserve Product Card image alternatives, links, and heading hierarchy.
+- Protect customer-specific saved items according to the target account or local-storage model.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Product Card](/components/product-card)
 
-## API Reference
+The two cards in the artwork are fixture content inside `products`; their repeated data is not promoted to Wishlist properties.
+
+### API Reference
 
 <PropTable>
-  <tr><td>`.wishlist`</td><td>class</td><td>—</td><td>Base wishlist styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Wishlist page title</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted saved-item count</td></tr>
+  <tr><td>`products`</td><td>slot</td><td>required</td><td>Saved Product Card compositions and per-product saved state</td></tr>
 </PropTable>

@@ -1,0 +1,81 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "process-timeline",
+  "name": "Process Timeline",
+  "registryId": "F2",
+  "category": "storytelling",
+  "status": "pilot",
+  "summary": "Horizontal scrollable process steps with numbers and images.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/process-timeline",
+    "css": { "file": "components/css/storytelling.css", "selector": ".process-timeline" },
+    "docs": "site/src/content/components/process-timeline.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".process-timeline", "className": ".process-timeline", "required": true, "description": "Process timeline section." },
+    { "name": "title", "selector": ".process-timeline__title", "className": ".process-timeline__title", "required": true, "description": "Timeline heading." },
+    { "name": "track", "selector": ".process-timeline__track", "className": ".process-timeline__track", "required": true, "description": "Ordered scrollable step track." },
+    { "name": "step", "selector": ".process-step", "className": ".process-step", "required": true, "description": "Repeated process step." },
+    { "name": "stepNumber", "selector": ".process-step__number", "className": ".process-step__number", "required": true, "description": "Visible step sequence number." },
+    { "name": "stepImage", "selector": ".process-step__image", "className": ".process-step__image", "required": false, "description": "Optional step media region." },
+    { "name": "stepImageMedia", "selector": ".process-step__image img", "className": null, "required": false, "description": "Step image supplied by the target." },
+    { "name": "stepTitle", "selector": ".process-step__title", "className": ".process-step__title", "required": true, "description": "Step heading." },
+    { "name": "stepDescription", "selector": ".process-step__description", "className": ".process-step__description", "required": false, "description": "Optional step explanation." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default ordered process timeline." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Horizontal overflow on narrow viewports and a wrapping grid on wider viewports." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".process-timeline"], "description": "Default timeline state." },
+    { "name": "trackFocus", "selectors": [".process-timeline__track:focus-visible"], "description": "Visible keyboard focus when an overflowing track is made focusable." }
+  ],
+  "behavior": [
+    {
+      "name": "orderedSteps",
+      "selectors": [".process-timeline__track", ".process-step"],
+      "description": "Adapters should preserve process order and expose step numbering as text rather than relying on connector decoration."
+    },
+    {
+      "name": "responsiveOverflow",
+      "selectors": [".process-timeline__track"],
+      "description": "On narrow viewports the track scrolls horizontally with snap alignment; adapters should make an overflowing region keyboard-scrollable and provide an accessible name when needed."
+    }
+  ],
+  "properties": [
+    {
+      "name": "title", "type": "string", "required": true, "description": "Process timeline heading.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".process-timeline__title" }] }
+    },
+    {
+      "name": "steps", "type": "slot", "required": true, "description": "Ordered target-owned process steps.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".process-timeline__track", "classNames": [".process-timeline__track", ".process-step"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-decorative", "--color-border-focus", "--color-border-subtle", "--color-surface-statement", "--color-text-inverse", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-heading", "--typo-body-size", "--typo-h2-size"],
+      "radius": ["--radius-full", "--radius-md"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
+    }
+  },
+  "accessibility": [
+    "Use a heading level appropriate to the surrounding page for the timeline title and each step title.",
+    "Preserve logical step order in the source regardless of responsive layout.",
+    "Give meaningful step images useful alternative text and mark decorative images accordingly.",
+    "Do not use decorative connector lines or visual scroll position as the only indication of sequence."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

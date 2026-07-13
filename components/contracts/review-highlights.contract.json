@@ -1,0 +1,84 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "review-highlights",
+  "name": "Review Highlights / Themes",
+  "registryId": "V5",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Wrapping collection of target-supplied review themes and optional counts without fixed filtering semantics.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/review-highlights",
+    "css": { "file": "components/css/reviews.css", "selector": ".review-highlights" },
+    "docs": "site/src/content/components/review-highlights.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".review-highlights", "className": ".review-highlights", "required": true, "description": "Responsive collection boundary for target-supplied review themes." },
+    { "name": "tag", "selector": ".review-highlights__tag", "className": ".review-highlights__tag", "required": true, "description": "Repeated theme item; its native element and interaction semantics are chosen by the target." },
+    { "name": "count", "selector": ".review-highlights__count", "className": ".review-highlights__count", "required": false, "description": "Optional target-formatted count associated with one theme item." }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Optional accessible name for the themes region when surrounding context does not already name it.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-highlights", "attribute": "aria-label", "valueFrom": "property" }] }
+    },
+    {
+      "name": "items",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned repeated theme items and counts; selection mode and result synchronization are not implied.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-highlights__tag", "classNames": [".review-highlights__tag"] }] }
+    }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default wrapping theme collection." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Touch-sized theme items with contained long labels." }],
+  "states": [
+    { "name": "default", "selectors": [".review-highlights"], "description": "Theme collection with target-owned item semantics." },
+    { "name": "itemHover", "selectors": [".review-highlights__tag:hover:not(:disabled)"], "description": "Fine-pointer feedback for an available native theme action." },
+    { "name": "itemFocusVisible", "selectors": [".review-highlights__tag:focus-visible"], "description": "Visible keyboard focus on an interactive theme item." },
+    { "name": "pressed", "selectors": [".review-highlights__tag[aria-pressed=\"true\"]"], "description": "Toggle-button selection hook when a target chooses in-place selection." },
+    { "name": "activeClass", "selectors": [".review-highlights__tag.is-active"], "description": "Presentation hook for a target-owned active item; it does not define semantics by itself." },
+    { "name": "disabled", "selectors": [".review-highlights__tag:disabled"], "description": "Unavailable native button item." }
+  ],
+  "behavior": [
+    {
+      "name": "itemSemanticsBoundary",
+      "selectors": [".review-highlights__tag"],
+      "description": "Targets choose passive text, native navigation, or in-place selection. The neutral component does not define filtering, single versus multiple selection, URLs, or result announcements."
+    },
+    {
+      "name": "countOwnership",
+      "selectors": [".review-highlights__count"],
+      "description": "Counts are supplied and synchronized by the target data source rather than calculated by this component."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-border-subtle", "--color-text-secondary", "--color-border-default", "--color-surface-primary", "--color-text-primary", "--color-border-focus"],
+      "radius": ["--radius-full"],
+      "spacing": ["--space-layout-touch-target"],
+      "typography": ["--typo-body-sm-size", "--typo-caption-size"],
+      "motion": ["--motion-transition-micro"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Use native buttons for in-place selection and expose current toggle state with aria-pressed.",
+    "Use native links for navigation and an appropriate current-page attribute when applicable.",
+    "Do not apply interactive semantics or a pointer cursor to passive theme text.",
+    "Do not rely on color alone to communicate a target-owned active state.",
+    "Keep each count programmatically associated with its theme label."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Wrapping, touch, focus, disabled, forced-color, and reduced-motion presentation is implemented; item effects remain target-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must define theme data and item semantics before adding filtering behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

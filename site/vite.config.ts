@@ -15,6 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@components-css': resolve(__dirname, '..', 'components', 'css'),
+      '@platform-web': resolve(__dirname, '..', 'platforms', 'web'),
     },
   },
 });

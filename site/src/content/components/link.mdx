@@ -1,42 +1,61 @@
 ## Overview
 
-Styled anchor. Default, subtle, and nav variants.
+Native anchor primitive for inline and navigation destinations, with Default, Subtle, and Nav visual treatments.
 
-<Preview html={"<a class=\"link\" href=\"#\">Default Link</a> &nbsp; <a class=\"link link--subtle\" href=\"#\">Subtle Link</a> &nbsp; <a class=\"link link--nav\" href=\"#\">Nav Link</a>"} label="Link" />
+<Preview html={'<a class="link" href="#link-reference">View the collection</a>'} label="Link" />
 
-## Variants
+## Presentation
 
-### Default
+`variant` changes visual emphasis without changing native anchor behavior. Default is underlined and uses the accent text token, Subtle removes the resting underline and lowers emphasis, and Nav uses primary text with medium weight.
 
-<Preview html={"<a class=\"link\" href=\"#\">Default Link</a>"} label="Default" />
+<Preview html={'<nav aria-label="Example navigation"><span class="tg-preview-inline"><a class="link" href="#link-default">Default link</a><a class="link link--subtle" href="#link-subtle">Subtle link</a><a class="link link--nav" href="#link-nav" aria-current="page">Nav link</a></span></nav>'} label="Link variants" />
 
-### Subtle
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `label` | text | Anchor content |
+| `href` | destination | `<a href>` |
+| `variant` | `default` | `.link` |
+| `variant` | `subtle` | `.link.link--subtle` |
+| `variant` | `nav` | `.link.link--nav` |
+| `target` | text | `<a target>` when present |
+| `rel` | relationship tokens | `<a rel>` when present |
+| `currentPage` | `true` | `aria-current="page"` |
 
-<Preview html={"<a class=\"link link--subtle\" href=\"#\">Subtle Link</a>"} label="Subtle" />
-
-### Nav
-
-<Preview html={"<a class=\"link link--nav\" href=\"#\">Nav Link</a>"} label="Nav" />
+Hover and keyboard focus are native interaction states supplied by canonical CSS. `currentPage` communicates navigation context but does not create a fourth visual variant.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Link when activation navigates to a destination identified by `href`.</Do>
+  <Dont>Don't use Link for an action that changes local interface state; use Button.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Choose visible text that still identifies the destination outside its surrounding sentence.</Do>
+  <Dont>Don't use generic labels such as “click here” or expose the raw URL as the label.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Link keeps native anchor semantics. Its keyboard behavior and destination come from a real `a` element with `href`.
 </Callout>
 
 - Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Use real `href` values for navigation and keep buttons for actions.
+- Use `aria-current="page"` for the active navigation destination.
+- Preserve the canonical focus-visible outline.
+- When `target="_blank"` opens an untrusted destination, include an appropriate `rel`, commonly `noopener`.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.link`</td><td>class</td><td>—</td><td>Base link styles</td></tr>
-  <tr><td>`.link--subtle`</td><td>modifier</td><td>—</td><td>Subtle variant</td></tr>
-  <tr><td>`.link--nav`</td><td>modifier</td><td>—</td><td>Nav variant</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible destination text</td></tr>
+  <tr><td>`href`</td><td>string</td><td>required</td><td>Native navigation destination</td></tr>
+  <tr><td>`variant`</td><td>`default | subtle | nav`</td><td>`default`</td><td>Visual treatment</td></tr>
+  <tr><td>`target`</td><td>string</td><td>omitted</td><td>Optional native browsing context</td></tr>
+  <tr><td>`rel`</td><td>string</td><td>omitted</td><td>Optional native relationship tokens</td></tr>
+  <tr><td>`currentPage`</td><td>boolean</td><td>`false`</td><td>Maps to `aria-current="page"`</td></tr>
 </PropTable>
+
+Link intentionally has no disabled property. A destination that cannot be followed should not be rendered as an inactive anchor; actions and unavailable states belong to their owning component or flow.

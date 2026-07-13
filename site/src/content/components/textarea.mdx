@@ -1,32 +1,93 @@
 ## Overview
 
-Multi-line text input. Extends input component.
+Multi-line value-entry field that composes Input validation, feedback, typography, spacing, focus, hover, and disabled behavior while exposing configurable resize direction.
 
-<Preview html={"<div style=\"max-width:400px;\"><label class=\"input__label\" style=\"display:block;margin-bottom:4px;\">Message</label><textarea class=\"textarea__field\" rows=\"3\" placeholder=\"Write something…\"></textarea></div>"} label="Textarea" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="textarea-message">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-message" name="message" placeholder="Write a message..."></textarea></div></div></div>'} label="Textarea" />
+
+## Presentation
+
+Textarea has one default size and the four shared field variants. The root uses the canonical Input modifier classes; `.textarea__field` adds native resize direction and configurable line bounds. Vertical and four minimum lines are the defaults, while the optional `data-resize`, `data-min-lines`, and `data-max-lines` attributes configure the remaining behavior.
+
+Hover and focus preserve the active Error, Success, or Warning color family.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `default` | `.input` |
+| `variant` | `error` | `.input--error` |
+| `variant` | `success` | `.input--success` |
+| `variant` | `warning` | `.input--warning` |
+| `size` | `default` | `.textarea__field` |
+| `resize` | `vertical` | no attribute |
+| `resize` | `horizontal` | `data-resize="horizontal"` |
+| `resize` | `both` | `data-resize="both"` |
+| `minLines` | `4` | `data-min-lines` when non-default |
+| `maxLines` | no limit | `data-max-lines` when provided |
+
+### Resize direction
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="textarea-horizontal">Horizontal resize</label><div class="input__control"><textarea class="input__field textarea__field" data-resize="horizontal" id="textarea-horizontal">Resize this field horizontally.</textarea></div></div></div>'} label="Textarea horizontal resize" />
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="textarea-both">Bidirectional resize</label><div class="input__control"><textarea class="input__field textarea__field" data-resize="both" id="textarea-both">Resize this field in either direction.</textarea></div></div></div>'} label="Textarea bidirectional resize" />
+
+### Line bounds
+
+`minLines` and `maxLines` use positive whole numbers. The shared progressive enhancer converts the attributes into pixel boundaries from the field's computed line height, padding, and borders. When `maxLines` is lower than `minLines`, the effective maximum is clamped to the minimum.
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="textarea-lines">Bounded message</label><div class="input__control"><textarea class="input__field textarea__field" data-resize="vertical" data-min-lines="3" data-max-lines="8" id="textarea-lines">This field may be resized from three to eight visible lines.</textarea></div></div></div>'} label="Textarea line bounds" />
+
+### Error
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--error"><label class="input__label" for="textarea-error">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-error" aria-invalid="true" aria-describedby="textarea-error-message">Too short</textarea></div><span class="input__message" id="textarea-error-message" role="alert">Add enough detail for us to understand the request.</span></div></div>'} label="Textarea error" />
+
+### Success
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--success"><label class="input__label" for="textarea-success">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-success" aria-describedby="textarea-success-message">I would like to ask about a custom order.</textarea></div><span class="input__message" id="textarea-success-message">Your message is ready.</span></div></div>'} label="Textarea success" />
+
+### Warning
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--warning"><label class="input__label" for="textarea-warning">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-warning" aria-describedby="textarea-warning-message">Please call me about this order.</textarea></div><span class="input__message" id="textarea-warning-message">Avoid including sensitive information.</span></div></div>'} label="Textarea warning" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Textarea when the expected value may require multiple lines or a longer explanation.</Do>
+  <Dont>Do not use Textarea for compact single-line values such as names, email addresses, or codes.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Use Error for invalid content and Warning for content that needs attention but remains acceptable.</Do>
+  <Dont>Do not communicate validation through border or text color alone.</Dont>
+</DoDont>
+
+Use Vertical for normal form flows, Horizontal when height must remain fixed, and Both only where the surrounding layout safely accommodates changes on both axes. Set line bounds only when the interface needs predictable minimum or maximum space.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Textarea is a native form control. Input classes provide presentation without replacing its native value, keyboard, selection, or resize behavior.
 </Callout>
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
+- Associate every textarea with a visible `<label>` using matching `for` and `id` attributes.
+- Connect supporting and validation messages with `aria-describedby`.
+- Use `aria-invalid="true"` only for Error; Success and Warning do not expose invalid state.
+- Use `role="alert"` only when an Error message is introduced dynamically and requires immediate announcement.
+- Use native `disabled` for unavailable fields.
+- Preserve the native resize handle and choose a direction that does not hide adjacent content or validation feedback.
+- Use positive whole line counts and keep `maxLines` greater than or equal to `minLines`.
+- Keep the visible message descriptive so validation does not rely on color alone.
 
-## Dependencies
-
-This component uses:
-
-- [Input](/components/input)
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.textarea__field`</td><td>class</td><td>—</td><td>Base textarea styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible label associated with the textarea</td></tr>
+  <tr><td>`value`</td><td>string</td><td>empty</td><td>Current native textarea content</td></tr>
+  <tr><td>`placeholder`</td><td>string</td><td>empty</td><td>Supporting hint; never the accessible name</td></tr>
+  <tr><td>`message`</td><td>string</td><td>empty</td><td>Supporting or validation feedback</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
+  <tr><td>`resize`</td><td>enum</td><td>`vertical`</td><td>`vertical`, `horizontal`, or `both`; maps to `data-resize` when non-default</td></tr>
+  <tr><td>`minLines`</td><td>number</td><td>`4`</td><td>Positive whole minimum visible line count; maps to `data-min-lines` when non-default</td></tr>
+  <tr><td>`maxLines`</td><td>number</td><td>unbounded</td><td>Optional positive whole maximum visible line count; maps to `data-max-lines`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Maps to the native `disabled` attribute</td></tr>
 </PropTable>
+
+The native field composes `.input__field` and `.textarea__field` inside `.input__control`. Textarea depends on the canonical [Input](/components/input) contract and does not expose icon slots.

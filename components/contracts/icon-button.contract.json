@@ -1,0 +1,111 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "icon-button",
+  "name": "Icon Button",
+  "registryId": "A17",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Icon-only action primitive with small/default/large sizes, default or filled presentation, an independent round shape, native disabled behavior, and a required accessible name.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/icon-button",
+    "css": { "file": "components/css/primitives.css", "selector": ".icon-btn" },
+    "docs": "site/src/content/components/icon-button.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".icon-btn", "className": ".icon-btn", "required": true, "description": "Icon-only interactive root." },
+    { "name": "icon", "selector": ".icon-btn__icon", "className": ".icon-btn__icon", "required": true, "description": "Decorative SVG or image icon rendered inside the named button." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Transparent icon button." },
+    { "name": "filled", "className": ".icon-btn--filled", "default": false, "description": "Filled icon button." }
+  ],
+  "sizes": [
+    { "name": "sm", "className": ".icon-btn--sm", "default": false, "description": "Small icon button." },
+    { "name": "default", "className": null, "default": true, "description": "Default icon button size." },
+    { "name": "lg", "className": ".icon-btn--lg", "default": false, "description": "Large icon button." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".icon-btn"], "description": "Default icon button state." },
+    { "name": "hover", "selectors": [".icon-btn:hover"], "description": "Pointer hover state." },
+    { "name": "focusVisible", "selectors": [".icon-btn:focus-visible"], "description": "Keyboard focus state." },
+    { "name": "disabled", "selectors": [".icon-btn:disabled"], "description": "Disabled native button state." },
+    { "name": "filledHover", "selectors": [".icon-btn--filled:hover"], "description": "Pointer hover state for filled variant." }
+  ],
+  "behavior": [
+    { "name": "accessibleName", "selectors": [".icon-btn"], "attributes": ["aria-label or aria-labelledby"], "description": "Icon-only buttons must provide an accessible name independent from the decorative icon." },
+    { "name": "nativeButton", "selectors": [".icon-btn"], "attributes": ["type=\"button\"", "disabled", "aria-disabled"], "events": ["click", "Space", "Enter"], "description": "Targets should preserve native button behavior for icon actions." }
+  ],
+  "properties": [
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible action name for the icon-only button.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".icon-btn", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "icon",
+      "type": "slot",
+      "required": true,
+      "description": "Decorative icon whose visual meaning matches the accessible action name.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".icon-btn__icon", "classNames": [".icon-btn__icon"] }] }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Transparent or filled presentation.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".icon-btn", "source": "variants" }] }
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "sizes",
+      "description": "Visual button and icon size.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".icon-btn", "source": "sizes" }] }
+    },
+    {
+      "name": "round",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Uses the circular shape independently from variant and size.",
+      "targetMappings": { "web": [{ "kind": "class", "selector": ".icon-btn", "classNames": [".icon-btn--round"] }] }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native button unavailable.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".icon-btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-secondary", "--color-surface-secondary", "--color-text-primary", "--color-border-focus", "--color-border-subtle"],
+      "radius": ["--radius-md", "--radius-full"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Provide an accessible name for every icon-only button.",
+    "Use native button elements for actions.",
+    "Do not remove focus-visible styling.",
+    "Treat decorative child icons as hidden from assistive technology when the button has a label."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

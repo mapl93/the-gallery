@@ -1,0 +1,130 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "star-rating",
+  "name": "Star Rating (Display)",
+  "registryId": "V2",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Read-only star visualization for a supplied rating value with default and large presentation options.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/star-rating",
+    "css": { "file": "components/css/reviews.css", "selector": ".star-rating" },
+    "docs": "site/src/content/components/star-rating.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".star-rating",
+      "className": ".star-rating",
+      "required": true,
+      "description": "Read-only inline rating group with an accessible text alternative."
+    },
+    {
+      "name": "star",
+      "selector": ".star-rating__star",
+      "className": ".star-rating__star",
+      "required": true,
+      "description": "Repeated decorative star glyph or icon marked empty, filled, or half-filled by the adapter."
+    }
+  ],
+  "properties": [
+    {
+      "name": "ratingValue",
+      "type": "number",
+      "required": true,
+      "minimum": 0,
+      "maximum": 5,
+      "step": 0.5,
+      "description": "Read-only rating value represented by the decorative stars; this component does not calculate aggregates.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-rating", "attribute": "data-rating", "valueFrom": "property" }
+        ]
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible text alternative containing the supplied value and rating scale.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-rating", "attribute": "aria-label", "valueFrom": "property" }
+        ]
+      }
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Star presentation size selected from the registry-backed options; default is the contract default.",
+      "targetMappings": {
+        "web": [
+          { "kind": "optionClass", "selector": ".star-rating", "source": "variants" }
+        ]
+      }
+    }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default 16px star presentation." },
+    { "name": "lg", "className": ".star-rating--lg", "default": false, "description": "Large 24px star presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Registry default size list retained for compatibility; the registry models visual size through variants." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".star-rating"], "description": "Read-only rating group." },
+    {
+      "name": "filled",
+      "selectors": [
+        ".star-rating__star[data-filled=\"true\"]",
+        ".star-rating__star.is-filled"
+      ],
+      "description": "Decorative full-star presentation state."
+    },
+    {
+      "name": "halfFilled",
+      "selectors": [
+        ".star-rating__star[data-filled=\"half\"]",
+        ".star-rating__star.is-half"
+      ],
+      "description": "Decorative half-star presentation state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "readOnlyValue",
+      "selectors": [".star-rating"],
+      "attributes": ["data-rating", "aria-label"],
+      "description": "The adapter projects the supplied half-step value into decorative star states while preserving the complete value as accessible text."
+    },
+    {
+      "name": "decorativeStars",
+      "selectors": [".star-rating__star"],
+      "attributes": ["aria-hidden=\"true\"", "data-filled"],
+      "description": "Individual stars are hidden from assistive technology when the root already exposes the rating label."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-button-primary-bg-default", "--color-border-subtle"]
+    }
+  },
+  "accessibility": [
+    "Expose the full rating value and scale through readable text or the root accessible label.",
+    "Hide individual decorative star glyphs from assistive technology when the root supplies the complete label.",
+    "Do not use Star Rating for value entry; use Star Input for an interactive rating choice.",
+    "Do not rely on star color alone when the rating value must be understood."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Read-only visual states are implemented in components/css/reviews.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "A future adapter may map target-supplied values without owning aggregation." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

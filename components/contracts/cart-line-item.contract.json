@@ -1,0 +1,81 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "cart-line-item",
+  "name": "Cart Line Item",
+  "registryId": "K2",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Individual cart line item with product image, title, variant text, quantity controls, remove/save actions, and price.",
+  "dependencies": ["quantity-selector", "price"],
+  "source": {
+    "registry": "registry.json#/components/cart-line-item",
+    "css": { "file": "components/css/cart.css", "selector": ".cart-line" },
+    "docs": "site/src/content/components/cart-line-item.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".cart-line", "className": ".cart-line", "required": true, "description": "Cart line container." },
+    { "name": "image", "selector": ".cart-line__image", "className": ".cart-line__image", "required": true, "description": "Product image." },
+    { "name": "info", "selector": ".cart-line__info", "className": ".cart-line__info", "required": true, "description": "Product info wrapper." },
+    { "name": "title", "selector": ".cart-line__title", "className": ".cart-line__title", "required": true, "description": "Product title link." },
+    { "name": "variant", "selector": ".cart-line__variant", "className": ".cart-line__variant", "required": false, "description": "Selected variant text." },
+    { "name": "quantity", "selector": ".cart-line__quantity", "className": ".cart-line__quantity", "required": false, "description": "Quantity Selector dependency region." },
+    { "name": "actions", "selector": ".cart-line__actions", "className": ".cart-line__actions", "required": false, "description": "Secondary line actions." },
+    { "name": "remove", "selector": ".cart-line__remove", "className": ".cart-line__remove", "required": false, "description": "Remove action." },
+    { "name": "save", "selector": ".cart-line__save", "className": ".cart-line__save", "required": false, "description": "Save-for-later action." },
+    { "name": "prices", "selector": ".cart-line__prices", "className": ".cart-line__prices", "required": true, "description": "Current and optional compare-at price wrapper." },
+    { "name": "price", "selector": ".cart-line__price", "className": ".cart-line__price", "required": true, "description": "Line price." },
+    { "name": "comparePrice", "selector": ".cart-line__price-compare", "className": ".cart-line__price-compare", "required": false, "description": "Compare-at line price." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default cart line item." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive cart line item layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".cart-line"], "description": "Default cart line state." },
+    { "name": "titleHover", "selectors": [".cart-line__title:hover"], "description": "Product title hover state." },
+    { "name": "removeHover", "selectors": [".cart-line__remove:hover"], "description": "Remove action hover state." },
+    { "name": "actionFocus", "selectors": [".cart-line__title:focus-visible", ".cart-line__remove:focus-visible", ".cart-line__save:focus-visible"], "description": "Visible title and secondary-action focus states." }
+  ],
+  "behavior": [
+    { "name": "quantityUpdate", "selectors": [".cart-line"], "events": ["change"], "description": "Quantity changes should update the cart line, totals, and available inventory state." },
+    { "name": "removeLine", "selectors": [".cart-line__remove"], "events": ["click"], "description": "Remove action should remove the line item and update the cart summary." },
+    { "name": "priceFormatting", "selectors": [".cart-line__price", ".cart-line__price-compare"], "description": "Line prices should be formatted by the commerce target." }
+  ],
+  "properties": [
+    { "name": "image", "type": "slot", "required": true, "description": "Product image.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-line__image", "classNames": [".cart-line__image"] }] } },
+    { "name": "imageAlt", "type": "string", "required": true, "description": "Product image alternative text.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-line__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__title" }] } },
+    { "name": "href", "type": "string", "required": true, "description": "Product destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-line__title", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
+    { "name": "variant", "type": "string", "required": false, "description": "Selected variant description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__variant" }] } },
+    { "name": "quantitySelector", "type": "slot", "required": false, "description": "Quantity Selector dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-line__quantity", "classNames": [".cart-line__quantity"] }] } },
+    { "name": "removeLabel", "type": "string", "required": false, "description": "Remove action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__remove" }] } },
+    { "name": "saveLabel", "type": "string", "required": false, "description": "Save-for-later action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__save" }] } },
+    { "name": "price", "type": "string", "required": true, "description": "Target-formatted line price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__price" }] } },
+    { "name": "comparePrice", "type": "string", "required": false, "description": "Optional target-formatted compare-at price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__price-compare" }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-accent", "--color-text-secondary", "--color-text-disabled", "--color-feedback-error-default"],
+      "radius": ["--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-heading", "--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Product images need useful alt text or should be hidden if duplicated by adjacent product text.",
+    "Remove and save actions need clear accessible names that include the product context.",
+    "Quantity updates should not silently change totals without feedback."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify cart line data, quantity updates, discounts, and line keys." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

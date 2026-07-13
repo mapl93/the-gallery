@@ -1,0 +1,67 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "author-card",
+  "name": "Author Card",
+  "registryId": "L6",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Author bio card with avatar and social links. Full and compact variants.",
+  "dependencies": ["avatar"],
+  "source": {
+    "registry": "registry.json#/components/author-card",
+    "css": { "file": "components/css/blog.css", "selector": ".author-card" },
+    "docs": "site/src/content/components/author-card.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".author-card", "className": ".author-card", "required": true, "description": "Author identity and biography container." },
+    { "name": "avatar", "selector": ".author-card__avatar", "className": ".author-card__avatar", "required": false, "description": "Optional Avatar composition." },
+    { "name": "info", "selector": ".author-card__info", "className": ".author-card__info", "required": true, "description": "Author text content wrapper." },
+    { "name": "name", "selector": ".author-card__name", "className": ".author-card__name", "required": true, "description": "Author display name." },
+    { "name": "role", "selector": ".author-card__role", "className": ".author-card__role", "required": false, "description": "Optional author role or affiliation." },
+    { "name": "bio", "selector": ".author-card__bio", "className": ".author-card__bio", "required": false, "description": "Optional author biography, hidden in compact presentation." },
+    { "name": "links", "selector": ".author-card__links", "className": ".author-card__links", "required": false, "description": "Optional target-owned author links, hidden in compact presentation." }
+  ],
+  "variants": [
+    { "name": "full", "className": null, "default": true, "description": "Full author card with optional biography and links." },
+    { "name": "compact", "className": ".author-card--compact", "default": false, "description": "Inline author identity with biography and links visually hidden." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive size controlled by content and the Avatar dependency." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".author-card"], "description": "Default author card state." },
+    { "name": "linkFocus", "selectors": [".author-card__links a:focus-visible", ".author-card__links button:focus-visible"], "description": "Visible keyboard focus for composed author links." }
+  ],
+  "behavior": [
+    { "name": "targetAuthorData", "selectors": [".author-card__name", ".author-card__role", ".author-card__bio", ".author-card__links"], "description": "Author identity, biography, destinations, and provider choices are supplied by the target." }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Full or compact author presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".author-card", "source": "variants" }] } },
+    { "name": "avatar", "type": "slot", "required": false, "description": "Optional Avatar composition for the author.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".author-card__avatar", "classNames": [".author-card__avatar"] }] } },
+    { "name": "name", "type": "string", "required": true, "description": "Visible author display name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__name" }] } },
+    { "name": "role", "type": "string", "required": false, "description": "Optional author role or affiliation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__role" }] } },
+    { "name": "bio", "type": "string", "required": false, "description": "Optional author biography for the full presentation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__bio" }] } },
+    { "name": "links", "type": "slot", "required": false, "description": "Target-owned author profile or social links.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".author-card__links", "classNames": [".author-card__links"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-disabled", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-heading", "--typo-body-line-height", "--typo-body-size"],
+      "radius": ["--radius-lg"]
+    }
+  },
+  "accessibility": [
+    "Use an appropriate heading or text element for the author name according to the surrounding article hierarchy.",
+    "Avatar alternative text should not repeat an adjacent visible author name unless the image adds useful information.",
+    "Give icon-only author links accessible names and preserve visible keyboard focus."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article author data and target-configured profile links." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

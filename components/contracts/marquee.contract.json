@@ -1,0 +1,147 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "marquee",
+  "name": "Scrolling Text Marquee",
+  "registryId": "S18",
+  "category": "sections",
+  "status": "pilot",
+  "summary": "Horizontal repeated-content presentation with existing motion hooks and intentionally unresolved duplication and runtime ownership.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/marquee",
+    "css": {
+      "file": "components/css/sections.css",
+      "selector": ".marquee"
+    },
+    "docs": "site/src/content/components/marquee.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".marquee",
+      "className": ".marquee",
+      "required": true,
+      "description": "Clipped marquee presentation root."
+    },
+    {
+      "name": "track",
+      "selector": ".marquee__track",
+      "className": ".marquee__track",
+      "required": true,
+      "description": "Target-owned repeated-content track."
+    },
+    {
+      "name": "item",
+      "selector": ".marquee__item",
+      "className": ".marquee__item",
+      "required": false,
+      "description": "Repeated target-owned content item."
+    },
+    {
+      "name": "separator",
+      "selector": ".marquee__separator",
+      "className": ".marquee__separator",
+      "required": false,
+      "description": "Optional decorative separator between items."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default variant."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".marquee"
+      ],
+      "description": "Existing continuously translated presentation."
+    },
+    {
+      "name": "pausedByPointerOrFocus",
+      "selectors": [
+        ".marquee:hover .marquee__track",
+        ".marquee:focus-within .marquee__track"
+      ],
+      "description": "Existing pause presentation while the region is hovered or contains keyboard focus."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "contentAndMotionBoundary",
+      "selectors": [
+        ".marquee"
+      ],
+      "description": "The target owns content duplication, continuity, direction, speed, runtime controls, and announcements. This contract does not expose motion settings or require duplicated content; reduced motion renders a static wrapping track."
+    }
+  ],
+  "properties": [
+    {
+      "name": "items",
+      "type": "slot",
+      "required": true,
+      "description": "Ordered target-owned text or content items; duplication for continuous motion is not part of the semantic value.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".marquee__track", "classNames": [".marquee__track"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-text-disabled",
+        "--color-text-primary"
+      ],
+      "typography": [
+        "--font-family-heading"
+      ]
+    }
+  },
+  "accessibility": [
+    "Keep one semantic copy of each item in a logical reading order and hide any visual duplicates from assistive technology.",
+    "Do not place unique essential information only in continuously moving content.",
+    "Pause motion while focus is within the region and render a static wrapping track when reduced motion is requested.",
+    "Interactive content, if a target supplies it, uses native controls and remains reachable without chasing moving content."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/sections.css."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

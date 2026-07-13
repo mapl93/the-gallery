@@ -1,0 +1,193 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "star-input",
+  "name": "Star Rating (Interactive)",
+  "registryId": "V3",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Native radio group for choosing one integer rating from one through five.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/star-input",
+    "css": { "file": "components/css/reviews.css", "selector": ".star-input" },
+    "docs": "site/src/content/components/star-input.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".star-input",
+      "className": ".star-input",
+      "required": true,
+      "description": "Native fieldset or equivalent radio-group boundary for one rating question."
+    },
+    {
+      "name": "legend",
+      "selector": ".star-input__legend",
+      "className": ".star-input__legend",
+      "required": true,
+      "description": "Visible group question, preferably rendered as the fieldset legend."
+    },
+    {
+      "name": "choice",
+      "selector": ".star-input__label",
+      "className": ".star-input__label",
+      "required": true,
+      "description": "Repeated touch-sized native label for one integer rating choice."
+    },
+    {
+      "name": "radio",
+      "selector": ".star-input__radio",
+      "className": ".star-input__radio",
+      "required": true,
+      "description": "Visually hidden native radio that retains focus, keyboard, validation, reset, and form-submission behavior."
+    },
+    {
+      "name": "indicator",
+      "selector": ".star-input__indicator",
+      "className": ".star-input__indicator",
+      "required": false,
+      "description": "Optional decorative star icon inside a choice label."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible question describing what the one-through-five choices rate.",
+      "targetMappings": {
+        "web": [
+          { "kind": "content", "selector": ".star-input__legend" }
+        ]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "Shared native form name applied to every radio in the group.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-input__radio", "attribute": "name", "valueFrom": "property", "elements": ["input"] }
+        ]
+      }
+    },
+    {
+      "name": "value",
+      "type": "number",
+      "required": false,
+      "minimum": 1,
+      "maximum": 5,
+      "step": 1,
+      "description": "Currently selected integer rating; each radio retains its own corresponding native value.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-input", "attribute": "data-value", "valueFrom": "property" }
+        ]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Requires one native radio choice before its containing form can submit.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-input__radio", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes every native radio choice unavailable.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-input__radio", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }
+        ]
+      }
+    },
+    {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "description": "ID reference to supporting or validation feedback owned by the containing form composition.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".star-input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["fieldset"] }
+        ]
+      }
+    }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default native radio-group rating input." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default 28px star icon inside the existing touch-target token." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".star-input"], "description": "Available rating group with no pointer preview." },
+    {
+      "name": "checked",
+      "selectors": [
+        ".star-input__label:has(.star-input__radio:checked)",
+        ".star-input__label:has(~ .star-input__label .star-input__radio:checked)"
+      ],
+      "description": "Native selected value and the lower visual values shown as filled."
+    },
+    { "name": "hover", "selectors": [".star-input__label:hover"], "description": "Fine-pointer preview of a candidate value and lower values." },
+    {
+      "name": "focusVisible",
+      "selectors": [".star-input__label:has(.star-input__radio:focus-visible)"],
+      "description": "Visible focus indicator projected from the focused native radio onto its label."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".star-input__label:has(.star-input__radio:disabled)"],
+      "description": "Unavailable native rating choice."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeSelection",
+      "selectors": [".star-input__radio"],
+      "attributes": ["type=\"radio\"", "name", "value", "checked", "required", "disabled"],
+      "events": ["change"],
+      "description": "Five native radios share one name and retain browser selection, arrow-key movement, validation, form reset, and submission semantics."
+    },
+    {
+      "name": "choiceLabels",
+      "selectors": [".star-input__label"],
+      "description": "Each choice has a readable label such as 4 stars; the decorative indicator does not replace that name."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-button-primary-bg-default", "--color-border-focus", "--color-text-primary"],
+      "spacing": ["--space-layout-touch-target"],
+      "radius": ["--radius-sm"],
+      "typography": ["--typo-body-sm-size"],
+      "motion": ["--motion-transition-micro"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Use one native radio group with a visible legend or equivalent group label.",
+    "Give every radio a readable choice label such as 1 star or 5 stars.",
+    "Preserve native keyboard selection, validation, form reset, and submission behavior.",
+    "Keep the native radio focusable and project focus-visible styling onto the touch-sized label.",
+    "Use Star Rating instead when the value is read-only."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Native radio focus, checked, disabled, touch, and reduced-motion presentation is implemented in components/css/reviews.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Submission transport and provider mapping remain outside the Star Input contract." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

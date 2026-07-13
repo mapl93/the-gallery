@@ -1,0 +1,804 @@
+/* ============================================================
+   The Gallery — Forms (Base Layer)
+   Platform-agnostic. Advanced form components beyond basic inputs.
+   F-A1 Switch, F-A2 Slider/Range, F-A3 Combobox,
+   F-A4 Date Picker, F-A5 Color Picker/Swatch, F-A6 File Upload,
+   F-A7 Pin Input, F-A8 Tags Input, F-A9 Segmented Control,
+   F-A10 Field Wrapper, F-A11 Fieldset, F-A12 Inline Error,
+   F-A13 Password Input, F-A14 Number Input, F-A15 Form
+   ============================================================ */
+
+/* ── F-A1. SWITCH ── */
+.switch {
+  --_switch-w: 44px;
+  --_switch-h: 24px;
+  --_switch-thumb: 18px;
+  --_switch-bg: var(--color-input-default-unfocused-bg);
+  --_switch-border: var(--color-border-default);
+  --_switch-thumb-bg: var(--color-surface-primary);
+  --_switch-transition: var(--transition-fast) var(--easing-default);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.switch__track {
+  position: relative;
+  width: var(--_switch-w);
+  height: var(--_switch-h);
+  background: var(--_switch-bg);
+  border: 1px solid var(--_switch-border);
+  border-radius: var(--radius-full);
+  transition: background var(--_switch-transition), border-color var(--_switch-transition);
+}
+.switch__thumb {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: var(--_switch-thumb);
+  height: var(--_switch-thumb);
+  background: var(--_switch-thumb-bg);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-50%);
+  transition: left var(--_switch-transition);
+}
+.switch__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.switch__input:checked ~ .switch__track {
+  --_switch-bg: var(--color-button-primary-bg-default);
+  --_switch-border: var(--color-button-primary-bg-default);
+}
+.switch__input:checked ~ .switch__track .switch__thumb {
+  left: calc(var(--_switch-w) - var(--_switch-thumb) - 4px);
+}
+.switch__input:focus-visible ~ .switch__track {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.switch__input:disabled ~ .switch__track {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+.switch__label {
+  font-family: var(--font-family-body);
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+}
+
+.switch--sm {
+  --_switch-w: 36px;
+  --_switch-h: 20px;
+  --_switch-thumb: 14px;
+}
+
+.switch--lg {
+  --_switch-w: 52px;
+  --_switch-h: 28px;
+  --_switch-thumb: 22px;
+}
+
+
+/* ── F-A2. SLIDER / RANGE ── */
+.slider {
+  --_slider-track-h: 4px;
+  --_slider-thumb: 20px;
+  --_slider-track-bg: var(--color-surface-secondary);
+  --_slider-fill-bg: var(--color-button-primary-bg-default);
+  --_slider-thumb-bg: var(--color-surface-primary);
+  --_slider-thumb-border: var(--color-button-primary-bg-default);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.slider__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+}
+.slider__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+.slider__track {
+  position: relative;
+  height: var(--_slider-thumb);
+  display: flex;
+  align-items: center;
+}
+.slider__input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--_slider-track-h);
+  background: var(--_slider-track-bg);
+  border-radius: var(--radius-full);
+  outline: none;
+}
+.slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--_slider-thumb);
+  height: var(--_slider-thumb);
+  background: var(--_slider-thumb-bg);
+  border: 2px solid var(--_slider-thumb-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast) var(--easing-default);
+}
+.slider__input::-moz-range-thumb {
+  width: var(--_slider-thumb);
+  height: var(--_slider-thumb);
+  background: var(--_slider-thumb-bg);
+  border: 2px solid var(--_slider-thumb-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+.slider__input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--color-border-focus);
+}
+.slider__input:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Dual-handle range */
+.range-slider {
+  position: relative;
+  height: var(--_slider-thumb);
+  display: flex;
+  align-items: center;
+}
+.range-slider__track {
+  position: absolute;
+  width: 100%;
+  height: var(--_slider-track-h);
+  background: var(--_slider-track-bg);
+  border-radius: var(--radius-full);
+}
+.range-slider__fill {
+  position: absolute;
+  height: var(--_slider-track-h);
+  background: var(--_slider-fill-bg);
+  border-radius: var(--radius-full);
+}
+.range-slider__input {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  width: 100%;
+  height: var(--_slider-track-h);
+  background: transparent;
+  pointer-events: none;
+}
+.range-slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--_slider-thumb);
+  height: var(--_slider-thumb);
+  background: var(--_slider-thumb-bg);
+  border: 2px solid var(--_slider-thumb-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  pointer-events: all;
+}
+
+
+/* ── F-A3. COMBOBOX / AUTOCOMPLETE ── */
+.combobox {
+  position: relative;
+}
+.combobox__input {
+  width: 100%;
+}
+.combobox__listbox {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: var(--z-dropdown);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 240px;
+  overflow-y: auto;
+  margin-top: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity var(--transition-fast) var(--easing-default),
+              transform var(--transition-fast) var(--easing-default),
+              visibility var(--transition-fast);
+}
+.combobox--open .combobox__listbox {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.combobox__option {
+  padding: 8px 12px;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast) var(--easing-default);
+}
+.combobox__option:hover,
+.combobox__option[data-highlighted] {
+  background: var(--color-surface-secondary);
+}
+.combobox__option[aria-selected="true"] {
+  font-weight: 600;
+  color: var(--color-text-accent);
+}
+.combobox__empty {
+  padding: 12px;
+  text-align: center;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-disabled);
+}
+
+
+/* ── F-A4. DATE PICKER ── */
+.datepicker {
+  position: relative;
+}
+.datepicker__calendar {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: var(--z-dropdown);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  margin-top: 4px;
+  min-width: 280px;
+}
+.datepicker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.datepicker__month-year {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-body-size);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.datepicker__nav {
+  display: flex;
+  gap: 4px;
+}
+.datepicker__nav-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast) var(--easing-default);
+}
+.datepicker__nav-btn:hover { background: var(--color-surface-secondary); }
+.datepicker__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-disabled);
+  margin-bottom: 4px;
+}
+.datepicker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.datepicker__day {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition-fast) var(--easing-default);
+}
+.datepicker__day:hover { background: var(--color-surface-secondary); }
+.datepicker__day--today {
+  font-weight: 700;
+  border: 1px solid var(--color-border-default);
+}
+.datepicker__day--selected {
+  background: var(--color-button-primary-bg-default);
+  color: var(--color-button-primary-text-default);
+}
+.datepicker__day--outside { color: var(--color-text-disabled); }
+.datepicker__day:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+
+/* ── F-A5. COLOR PICKER / SWATCH ── */
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.color-swatch {
+  --_swatch-size: 32px;
+
+  position: relative;
+  width: var(--_swatch-size);
+  height: var(--_swatch-size);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-border-subtle);
+  cursor: pointer;
+  transition: border-color var(--transition-fast) var(--easing-default),
+              box-shadow var(--transition-fast) var(--easing-default);
+}
+.color-swatch__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.color-swatch__input:checked + .color-swatch__fill,
+.color-swatch:hover {
+  border-color: var(--color-border-strong);
+}
+.color-swatch__input:checked ~ .color-swatch__check {
+  display: flex;
+}
+.color-swatch__fill {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+.color-swatch__check {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-inverse);
+  font-size: 14px;
+}
+.color-swatch__input:focus-visible + .color-swatch__fill {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+.color-swatch--lg { --_swatch-size: 40px; }
+.color-swatch--sm { --_swatch-size: 24px; }
+.color-swatch__label {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+
+/* ── F-A6. FILE UPLOAD / DROP ZONE ── */
+.file-upload {
+  --_file-border: var(--color-border-default);
+  --_file-bg: var(--color-surface-primary);
+
+  position: relative;
+  border: 2px dashed var(--_file-border);
+  border-radius: var(--radius-lg);
+  background: var(--_file-bg);
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast) var(--easing-default),
+              background var(--transition-fast) var(--easing-default);
+}
+.file-upload:hover,
+.file-upload--dragover {
+  --_file-border: var(--color-button-primary-bg-default);
+  --_file-bg: var(--color-surface-secondary);
+}
+.file-upload__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-upload__icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 12px;
+  color: var(--color-text-disabled);
+}
+.file-upload__text {
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+}
+.file-upload__hint {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-disabled);
+  margin-top: 4px;
+}
+.file-upload__preview {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.file-upload__thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 1px solid var(--color-border-subtle);
+}
+
+
+/* ── F-A7. PIN INPUT / OTP ── */
+.pin-input {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.pin-input__field {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: var(--typo-h4-size);
+  font-family: var(--font-family-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-input-default-unfocused-bg);
+  border: 1px solid var(--color-input-default-unfocused-outer-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast) var(--easing-default);
+}
+.pin-input__field:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
+}
+.pin-input__field--filled {
+  border-color: var(--color-border-strong);
+}
+
+
+/* ── F-A8. TAGS INPUT ── */
+.tags-input {
+  --_tags-bg: var(--color-input-default-unfocused-bg);
+  --_tags-border: var(--color-input-default-unfocused-outer-border);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--_tags-bg);
+  border: 1px solid var(--_tags-border);
+  border-radius: var(--radius-md);
+  min-height: 42px;
+  align-items: center;
+  cursor: text;
+  transition: border-color var(--transition-fast) var(--easing-default);
+}
+.tags-input:focus-within {
+  --_tags-border: var(--color-border-focus);
+  box-shadow: 0 0 0 1px var(--color-border-focus);
+}
+.tags-input__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--color-surface-secondary);
+  border-radius: var(--radius-full);
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-text-primary);
+}
+.tags-input__remove {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast) var(--easing-default);
+}
+.tags-input__remove:hover { background: var(--color-border-subtle); }
+.tags-input__field {
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+  padding: 4px 0;
+}
+
+
+/* ── F-A9. SEGMENTED CONTROL ── */
+.segmented {
+  --_seg-bg: var(--color-surface-secondary);
+  --_seg-active-bg: var(--color-surface-primary);
+  --_seg-radius: var(--radius-md);
+
+  display: inline-flex;
+  background: var(--_seg-bg);
+  border-radius: var(--_seg-radius);
+  padding: 2px;
+  gap: 2px;
+}
+.segmented__item {
+  position: relative;
+}
+.segmented__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.segmented__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  font-size: var(--typo-body-size);
+  font-family: var(--font-family-body);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border-radius: calc(var(--_seg-radius) - 2px);
+  cursor: pointer;
+  transition: color var(--transition-fast) var(--easing-default),
+              background var(--transition-fast) var(--easing-default),
+              box-shadow var(--transition-fast) var(--easing-default);
+}
+.segmented__label:hover { color: var(--color-text-primary); }
+.segmented__input:checked + .segmented__label {
+  background: var(--_seg-active-bg);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+.segmented__input:focus-visible + .segmented__label {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+
+/* ── F-A10. FIELD WRAPPER ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.field__label {
+  font-size: calc(var(--typo-body-size) * 0.875);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.field__label--required::after {
+  content: " *";
+  color: var(--color-feedback-error-default);
+}
+.field__description {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-secondary);
+}
+.field__error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-feedback-error-default);
+}
+.field__error-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.field__success {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-feedback-success-default);
+}
+
+
+/* ── F-A11. FIELDSET ── */
+.fieldset {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin: 0 0 24px;
+}
+.fieldset__legend {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-body-size);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding: 0 8px;
+}
+.fieldset__description {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+
+/* ── F-A12. INLINE ERROR ── */
+.inline-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--color-feedback-error-default) 8%, transparent);
+  border-radius: var(--radius-sm);
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-feedback-error-default);
+}
+.inline-error__icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+
+/* ── F-A13. PASSWORD INPUT ── */
+.password-input {
+  position: relative;
+}
+.password-input__field { width: 100%; padding-right: 44px; }
+.password-input__toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast) var(--easing-default);
+}
+.password-input__toggle:hover { color: var(--color-text-primary); }
+
+/* Strength meter */
+.password-strength {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+.password-strength__bar {
+  flex: 1;
+  height: 3px;
+  background: var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast) var(--easing-default);
+}
+.password-strength--weak .password-strength__bar:nth-child(1) { background: var(--color-feedback-error-default); }
+.password-strength--fair .password-strength__bar:nth-child(-n+2) { background: var(--color-feedback-warning-default); }
+.password-strength--good .password-strength__bar:nth-child(-n+3) { background: var(--color-feedback-success-default); }
+.password-strength--strong .password-strength__bar { background: var(--color-feedback-success-default); }
+.password-strength__text {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+
+
+/* ── F-A14. NUMBER INPUT (STEPPER) ── */
+.number-input {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-input-default-unfocused-outer-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.number-input__btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-secondary);
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast) var(--easing-default);
+}
+.number-input__btn:hover { background: var(--color-border-subtle); }
+.number-input__btn:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+.number-input__field {
+  width: 56px;
+  height: 36px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid var(--color-border-subtle);
+  border-right: 1px solid var(--color-border-subtle);
+  font-size: var(--typo-body-size);
+  font-family: var(--font-family-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface-primary);
+  -moz-appearance: textfield;
+}
+.number-input__field::-webkit-inner-spin-button,
+.number-input__field::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+
+/* ── F-A15. FORM ── */
+.form { display: flex; flex-direction: column; }
+.form__section { margin-bottom: 24px; }
+.form__section-title {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h4-size);
+  color: var(--color-text-primary);
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .form__row--2col { grid-template-columns: 1fr 1fr; }
+  .form__row--3col { grid-template-columns: 1fr 1fr 1fr; }
+}
+.form__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+.form__error-summary {
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--color-feedback-error-default) 8%, transparent);
+  border: 1px solid var(--color-feedback-error-default);
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+}
+.form__error-summary-title {
+  font-weight: 600;
+  color: var(--color-feedback-error-default);
+  margin: 0 0 8px;
+}
+.form__error-summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.form__error-summary-list li {
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-feedback-error-default);
+  padding: 2px 0;
+}
+.form__error-summary-list a {
+  color: inherit;
+  text-decoration: underline;
+}

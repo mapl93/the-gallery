@@ -1,0 +1,204 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "modal",
+  "name": "Modal",
+  "registryId": "B2",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Dialog overlay with backdrop, dialog container, header, title, body, footer, open state, motion, and accessibility behavior requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/modal",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".modal"
+    },
+    "docs": "site/src/content/components/modal.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "overlay",
+      "selector": ".modal-overlay",
+      "className": ".modal-overlay",
+      "required": true,
+      "description": "Backdrop layer that controls visibility and centers the dialog."
+    },
+    {
+      "name": "root",
+      "selector": ".modal",
+      "className": ".modal",
+      "required": true,
+      "description": "Dialog container that owns surface, radius, shadow, scrolling, and entrance motion."
+    },
+    {
+      "name": "header",
+      "selector": ".modal__header",
+      "className": ".modal__header",
+      "required": false,
+      "description": "Optional top region for title and close affordance."
+    },
+    {
+      "name": "title",
+      "selector": ".modal__title",
+      "className": ".modal__title",
+      "required": false,
+      "description": "Optional modal title used by aria-labelledby."
+    },
+    {
+      "name": "body",
+      "selector": ".modal__body",
+      "className": ".modal__body",
+      "required": true,
+      "description": "Primary content region inside the dialog."
+    },
+    {
+      "name": "footer",
+      "selector": ".modal__footer",
+      "className": ".modal__footer",
+      "required": false,
+      "description": "Optional action region, usually containing button components."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default centered modal."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default modal width and viewport bounds."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".modal-overlay"],
+      "description": "Hidden overlay state."
+    },
+    {
+      "name": "open",
+      "selectors": [".modal-overlay[aria-hidden=\"false\"]"],
+      "description": "Visible overlay state controlled by aria-hidden=\"false\"."
+    },
+    {
+      "name": "entered",
+      "selectors": [".modal-overlay[aria-hidden=\"false\"] .modal"],
+      "description": "Dialog transform state after the overlay is open."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".modal-overlay[aria-hidden=\"false\"]"],
+      "attributes": ["aria-hidden"],
+      "description": "The overlay is hidden by default and becomes visible when aria-hidden is set to false."
+    },
+    {
+      "name": "dialogSemantics",
+      "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby"],
+      "description": "The dialog container must expose modal semantics and a programmatic name."
+    },
+    {
+      "name": "focusManagement",
+      "events": ["open", "close", "Tab", "Shift+Tab"],
+      "description": "Opening the modal moves focus inside it, traps tab navigation while open, and restores focus to the trigger on close."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "backdrop click", "close action"],
+      "description": "The modal must provide at least one visible close mechanism and should close on Escape."
+    }
+  ],
+  "properties": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the modal overlay is visible. Consumer targets still own focus management and dismissal behavior.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".modal-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-border-subtle",
+        "--color-text-primary"
+      ],
+      "radius": [
+        "--radius-lg"
+      ],
+      "shadow": [
+        "--shadow-2xl"
+      ],
+      "opacity": [
+        "--opacity-overlay"
+      ],
+      "z-index": [
+        "--z-overlay"
+      ],
+      "typography": [
+        "--typo-h3-size",
+        "--font-family-body"
+      ],
+      "transition": [
+        "--transition-base"
+      ],
+      "easing": [
+        "--easing-default",
+        "--easing-out"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ]
+    }
+  },
+  "accessibility": [
+    "Set aria-hidden=\"false\" on the overlay when open and aria-hidden=\"true\" when closed.",
+    "Use role=\"dialog\" and aria-modal=\"true\" on the modal container.",
+    "Provide a programmatic name with aria-labelledby or aria-label.",
+    "Trap keyboard focus inside the modal while it is open.",
+    "Return focus to the trigger element when the modal closes.",
+    "Close on Escape and provide a visible close or cancel action."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render modal structure while theme JavaScript controls visibility and focus behavior."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

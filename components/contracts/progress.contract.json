@@ -1,0 +1,74 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "progress",
+  "name": "Progress Bar / Circle",
+  "registryId": "A22",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Progress indicator primitive with determinate bar, circle display, and indeterminate loading states.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/progress",
+    "css": { "file": "components/css/primitives.css", "selector": ".progress" },
+    "docs": "site/src/content/components/progress.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".progress", "className": ".progress", "required": true, "description": "Progress bar wrapper." },
+    { "name": "label", "selector": ".progress__label", "className": ".progress__label", "required": false, "description": "Progress label row." },
+    { "name": "labelText", "selector": ".progress__label-text", "className": ".progress__label-text", "required": false, "description": "Visible operation label inside the label row." },
+    { "name": "value", "selector": ".progress__value", "className": ".progress__value", "required": false, "description": "Visible numeric value." },
+    { "name": "track", "selector": ".progress__track", "className": ".progress__track", "required": true, "description": "Progress track." },
+    { "name": "bar", "selector": ".progress__bar", "className": ".progress__bar", "required": true, "description": "Progress fill bar." },
+    { "name": "circle", "selector": ".progress-circle", "className": ".progress-circle", "required": false, "description": "Circular progress wrapper." },
+    { "name": "circleText", "selector": ".progress-circle__text", "className": ".progress-circle__text", "required": false, "description": "Circular progress label." }
+  ],
+  "variants": [
+    { "name": "bar", "className": null, "default": true, "description": "Default bar progress." },
+    { "name": "circle", "className": ".progress-circle", "default": false, "description": "Circular progress display." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default progress size." }
+  ],
+  "states": [
+    { "name": "determinate", "selectors": [".progress", ".progress-circle"], "description": "Known current value within a declared range." },
+    { "name": "indeterminate", "selectors": [".progress--indeterminate .progress__bar", "@keyframes progress-indeterminate"], "description": "Unknown completion value; available only for the bar presentation." }
+  ],
+  "behavior": [
+    { "name": "progressbarSemantics", "selectors": [".progress", ".progress__bar", ".progress-circle"], "attributes": ["role=\"progressbar\"", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-label"], "description": "Determinate progress should expose current value and range." },
+    { "name": "indeterminateSemantics", "selectors": [".progress--indeterminate"], "attributes": ["aria-busy=\"true\""], "description": "Indeterminate progress should communicate pending state without a false numeric value." }
+  ],
+  "properties": [
+    { "name": "accessibleLabel", "type": "string", "required": true, "description": "Accessible name for the operation whose progress is represented.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-label", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-label", "valueFrom": "property" }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Optional visible operation label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".progress__label-text" }] } },
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Bar or circular presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".progress", "source": "variants" }] } },
+    { "name": "value", "type": "number", "required": false, "unsetBehavior": "Omitted only while indeterminate is true.", "description": "Current determinate value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuenow", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuenow", "valueFrom": "property" }] } },
+    { "name": "min", "type": "number", "required": false, "defaultValue": 0, "description": "Minimum determinate value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuemin", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuemin", "valueFrom": "property" }] } },
+    { "name": "max", "type": "number", "required": false, "defaultValue": 100, "description": "Maximum determinate value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuemax", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuemax", "valueFrom": "property" }] } },
+    { "name": "valueText", "type": "string", "required": false, "description": "Optional localized visible value text and accessible value description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".progress__value" }, { "kind": "content", "selector": ".progress-circle__text" }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-valuetext", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuetext", "valueFrom": "property" }] } },
+    { "name": "indeterminate", "type": "boolean", "required": false, "defaultValue": false, "description": "Uses unknown-duration bar motion and omits a numeric current value.", "targetMappings": { "web": [{ "kind": "class", "selector": ".progress", "classNames": [".progress--indeterminate"] }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-busy", "values": { "true": "true", "false": null } }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-valuenow", "removeWhen": [true] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-button-primary-bg-default", "--color-text-primary"],
+      "radius": ["--radius-full"],
+      "transition": ["--transition-base"],
+      "easing": ["--easing-out"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use progressbar semantics for determinate progress.",
+    "Expose value text when the percentage matters to users.",
+    "Do not announce frequent progress updates too aggressively.",
+    "Respect reduced-motion preferences for indeterminate animation."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

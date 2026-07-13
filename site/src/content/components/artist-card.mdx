@@ -1,26 +1,49 @@
 ## Overview
 
-Individual artist card with portrait, name, medium, and piece count.
+Artist Card is a compact artist summary with optional portrait, badge, medium, location, and piece count around a required artist name.
 
-<Preview html={"<div class=\"artist-card\" style=\"max-width:280px;\"><div class=\"artist-card__portrait\"><img src=\"https://placehold.co/280x350/f5f0eb/1a1a1a?text=Artist\" alt=\"\" style=\"width:100%;border-radius:8px;\" /></div><h3 class=\"artist-card__name\">María García</h3><span class=\"artist-card__medium\">Ceramics</span><span class=\"artist-card__location\">Buenos Aires</span><span class=\"artist-card__piece-count\">42 pieces</span></div>"} label="Artist Card" />
+<Preview
+  html={'<article class="artist-card tg-preview-card"><div class="artist-card__portrait"><img class="tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Portrait of ceramic artist Maria Garcia" /><span class="artist-card__badge">Featured</span></div><h2 class="artist-card__name">Maria Garcia</h2><span class="artist-card__medium">Ceramics</span><span class="artist-card__location">Buenos Aires</span><span class="artist-card__piece-count">42 pieces</span></article>'}
+  label="Artist Card"
+/>
+
+## Presentation
+
+`name` is required. Portrait, badge, medium, location, and target-formatted piece count are optional. The card follows the width of its containing layout and applies portrait emphasis only for fine-pointer hover or focus within target-owned interaction.
+
+The artwork is deliberately passive. ADR 0080 does not decide whether Artist Card is always navigational, optionally interactive, or passive in some compositions. The contract therefore exposes no `href` or activation property.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use high-quality images and thoughtful copy — storytelling components are editorial by nature.</Do>
-  <Dont>Don't use storytelling blocks for product-heavy pages — they're designed for brand narrative.</Dont>
+  <Do>Use the passive card until the surrounding target has made its interaction model explicit.</Do>
+  <Dont>Do not add click handling to a passive container or assume every card navigates.</Dont>
 </DoDont>
+
+- Keep badge text short and use it only for meaningful artist context.
+- Format the piece count in the target rather than deriving grammar in the card.
+- When activation is decided, use native link or button markup and avoid nested controls.
 
 ## Accessibility
 
-<Callout type="tip">
-  These components are unique to The Gallery's editorial focus. They work best with curated content.
-</Callout>
+- Give meaningful portraits useful alternative text and mark decorative portraits accordingly.
+- When the target makes the card interactive, use native link or button markup instead of click handling on a passive container.
+- Ensure an interactive card has a descriptive accessible name, visible focus, and no nested interactive controls.
+- Do not rely on portrait hover motion to communicate identity or availability.
 
-- All images must have descriptive `alt` text.
+## References
 
-## API Reference
+**Dependencies:** None.
+
+**Anatomy:** required `.artist-card` root and `.artist-card__name`; optional `.artist-card__portrait` and portrait image, `.artist-card__badge`, `.artist-card__medium`, `.artist-card__location`, and `.artist-card__piece-count`.
+
+**API Reference**
 
 <PropTable>
-  <tr><td>`.artist-card`</td><td>class</td><td>—</td><td>Base artist card styles</td></tr>
+  <tr><td>`portrait`</td><td>slot</td><td>optional</td><td>Target-owned portrait media</td></tr>
+  <tr><td>`badge`</td><td>string</td><td>optional</td><td>Short artist badge</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Artist display name</td></tr>
+  <tr><td>`medium`</td><td>string</td><td>optional</td><td>Artist medium</td></tr>
+  <tr><td>`location`</td><td>string</td><td>optional</td><td>Human-readable location</td></tr>
+  <tr><td>`pieceCount`</td><td>string</td><td>optional</td><td>Target-formatted piece count</td></tr>
 </PropTable>

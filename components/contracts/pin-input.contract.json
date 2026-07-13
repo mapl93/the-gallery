@@ -1,0 +1,171 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "pin-input",
+  "name": "Pin Input / OTP",
+  "registryId": "H7",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "One-time code input contract with individual character cells, filled and focus states, native input attributes, paste handling, and completion behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/pin-input",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".pin-input"
+    },
+    "docs": "site/src/content/components/pin-input.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".pin-input",
+      "className": ".pin-input",
+      "required": true,
+      "description": "Wrapper that lays out individual one-time-code cells."
+    },
+    {
+      "name": "field",
+      "selector": ".pin-input__field",
+      "className": ".pin-input__field",
+      "required": true,
+      "description": "Single character native input cell."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default one-time-code input."
+    },
+    { "name": "error", "className": ".pin-input--error", "default": false, "description": "Invalid one-time code presentation." },
+    { "name": "success", "className": ".pin-input--success", "default": false, "description": "Validated one-time code presentation." },
+    { "name": "warning", "className": ".pin-input--warning", "default": false, "description": "One-time code that needs attention." }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default cell size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".pin-input"],
+      "description": "Default multi-cell code entry state."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".pin-input__field:focus-visible"],
+      "description": "Keyboard-focused cell state with the shared field focus hierarchy."
+    },
+    {
+      "name": "filled",
+      "selectors": [".pin-input__field--filled"],
+      "description": "Cell state after a character has been entered."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeTextCells",
+      "selectors": [".pin-input__field"],
+      "attributes": ["type=\"text\"", "maxlength=\"1\"", "inputmode", "autocomplete=\"one-time-code\"", "disabled", "aria-invalid"],
+      "description": "Each cell should preserve native text input semantics while constraining entry to one visible character."
+    },
+    {
+      "name": "focusManagement",
+      "selectors": [".pin-input__field"],
+      "events": ["input", "Backspace", "ArrowLeft", "ArrowRight"],
+      "description": "Targets should move focus between cells without blocking normal editing or assistive technology behavior."
+    },
+    {
+      "name": "pasteCode",
+      "selectors": [".pin-input__field"],
+      "events": ["paste"],
+      "description": "Pasted codes should be distributed across cells and validated by the target implementation."
+    },
+    {
+      "name": "completionState",
+      "selectors": [".pin-input__field--filled"],
+      "description": "Filled visual state must stay synchronized with each cell value."
+    }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the complete code entry.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".pin-input", "source": "variants" }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes every code cell unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "invalid", "type": "boolean", "required": false, "defaultValue": false, "description": "Exposes native invalid state for the code cells when Error is active.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "aria-invalid", "values": { "true": "true", "false": null }, "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for code guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-text-primary",
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-border-strong",
+        "--color-input-default-hover-inner-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-h4-size",
+        "--font-family-body"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide a visible group label for the full one-time-code input.",
+    "Use autocomplete=\"one-time-code\" when the field captures verification codes.",
+    "Keep each cell reachable with keyboard navigation.",
+    "Announce validation errors for the group, not only for an individual cell.",
+    "Support paste as an accessible shortcut for full-code entry."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css; focus movement, paste distribution, and value validation must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

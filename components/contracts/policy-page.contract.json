@@ -1,0 +1,114 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "policy-page",
+  "name": "Policy Page Template",
+  "registryId": "P3",
+  "category": "pages",
+  "status": "pilot",
+  "summary": "Readable legal-content composition with a dated header, optional table of contents, and target-owned semantic rich body.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/policy-page",
+    "css": { "file": "components/css/pages.css", "selector": ".policy-page" },
+    "docs": "site/src/content/components/policy-page.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".policy-page", "className": ".policy-page", "required": true, "description": "Contained readable-width policy page." },
+    { "name": "header", "selector": ".policy-page__header", "className": ".policy-page__header", "required": true, "description": "Policy title and update metadata region." },
+    { "name": "title", "selector": ".policy-page__title", "className": ".policy-page__title", "required": true, "description": "Page-level policy title." },
+    { "name": "date", "selector": ".policy-page__date", "className": ".policy-page__date", "required": false, "description": "Optional visible last-updated date supplied and formatted by the target." },
+    { "name": "toc", "selector": ".policy-page__toc", "className": ".policy-page__toc", "required": false, "description": "Optional table-of-contents region." },
+    { "name": "tocTitle", "selector": ".policy-page__toc-title", "className": ".policy-page__toc-title", "required": false, "description": "Optional table-of-contents heading." },
+    { "name": "tocList", "selector": ".policy-page__toc-list", "className": ".policy-page__toc-list", "required": false, "description": "Ordered target-owned section links." },
+    { "name": "tocLink", "selector": ".policy-page__toc-link", "className": ".policy-page__toc-link", "required": false, "description": "In-page link to a target-supplied policy section." },
+    { "name": "body", "selector": ".policy-page__body", "className": ".policy-page__body", "required": true, "description": "Target-owned semantic legal content preserving headings, paragraphs, lists, links, media, tables, and code where present." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default policy-page presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default readable content width." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".policy-page"], "description": "Default policy-page presentation." },
+    { "name": "tocLinkHover", "selectors": [".policy-page__toc-link:hover"], "description": "Table-of-contents link hover presentation." },
+    { "name": "tocLinkFocusVisible", "selectors": [".policy-page__toc-link:focus-visible"], "description": "Visible keyboard focus on table-of-contents links." },
+    { "name": "bodyLinkFocusVisible", "selectors": [".policy-page__body a:focus-visible"], "description": "Visible keyboard focus on links within policy content." },
+    { "name": "bodyFlow", "selectors": [".policy-page__body > * + *"], "description": "Rich-body vertical rhythm." }
+  ],
+  "behavior": [
+    {
+      "name": "tableOfContents",
+      "selectors": [".policy-page__toc", ".policy-page__toc-link"],
+      "attributes": ["href"],
+      "events": ["click"],
+      "description": "When supplied, table-of-contents links target stable section identifiers in the same document and preserve body-section order. Generation and synchronization remain target-owned."
+    },
+    {
+      "name": "legalContentBoundary",
+      "selectors": [".policy-page__body"],
+      "description": "The target supplies semantic legal content. This contract styles the resulting document but does not define a CMS schema, revision model, localization pipeline, or policy-source API."
+    }
+  ],
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Page-level policy title.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".policy-page__title" }] }
+    },
+    {
+      "name": "updatedDate",
+      "type": "string",
+      "required": false,
+      "description": "Optional target-formatted visible last-updated date; machine-readable date semantics remain markup-owned.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".policy-page__date" }] }
+    },
+    {
+      "name": "tocTitle",
+      "type": "string",
+      "required": false,
+      "description": "Optional table-of-contents heading.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".policy-page__toc-title" }] }
+    },
+    {
+      "name": "tocItems",
+      "type": "slot",
+      "required": false,
+      "description": "Target-owned in-page links ordered to match policy sections.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".policy-page__toc-list", "classNames": [".policy-page__toc-list", ".policy-page__toc-link"] }] }
+    },
+    {
+      "name": "body",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned semantic policy document content.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".policy-page__body", "classNames": [".policy-page__body"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary", "--color-surface-secondary", "--color-text-accent", "--color-border-focus"],
+      "spacing": ["--layout-gutter", "--space-layout-touch-target"],
+      "radius": ["--radius-md"],
+      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-sm-size", "--typo-body-size", "--typo-article-size", "--typo-article-line-height", "--typo-h3-size", "--typo-h4-size"]
+    }
+  },
+  "accessibility": [
+    "Use one page-level title followed by a logical, non-skipping heading hierarchy in the policy body.",
+    "Render a visible last-updated date when supplied and use machine-readable date markup when the target has an exact value.",
+    "Keep table-of-contents links in document order and point each link to a unique section identifier.",
+    "Preserve semantic lists, tables, links, quotations, and other legal-content structures from the target source.",
+    "Keep long text, media, tables, and code contained at narrow widths without removing keyboard access to horizontal overflow."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/pages.css; legal content and table-of-contents generation remain target-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map target policy content without this contract defining Shopify or cross-target CMS ownership." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

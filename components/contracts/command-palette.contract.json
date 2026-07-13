@@ -1,0 +1,276 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "command-palette",
+  "name": "Command Palette",
+  "registryId": "B13",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Command-K overlay contract with modal-like surface, search input, grouped results, highlighted command state, shortcut hints, empty state, and keyboard command behavior.",
+  "dependencies": ["modal"],
+  "source": {
+    "registry": "registry.json#/components/command-palette",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".command-palette"
+    },
+    "docs": "site/src/content/components/command-palette.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".command-palette",
+      "className": ".command-palette",
+      "required": true,
+      "description": "Fixed overlay that owns backdrop, visibility state, and vertical placement."
+    },
+    {
+      "name": "panel",
+      "selector": ".command-palette__panel",
+      "className": ".command-palette__panel",
+      "required": true,
+      "description": "Search and results surface."
+    },
+    {
+      "name": "inputWrapper",
+      "selector": ".command-palette__input-wrapper",
+      "className": ".command-palette__input-wrapper",
+      "required": true,
+      "description": "Header row containing the search icon and input."
+    },
+    {
+      "name": "searchIcon",
+      "selector": ".command-palette__search-icon",
+      "className": ".command-palette__search-icon",
+      "required": false,
+      "description": "Optional visual search icon."
+    },
+    {
+      "name": "input",
+      "selector": ".command-palette__input",
+      "className": ".command-palette__input",
+      "required": true,
+      "description": "Text input used to filter commands."
+    },
+    {
+      "name": "results",
+      "selector": ".command-palette__results",
+      "className": ".command-palette__results",
+      "required": true,
+      "description": "Scrollable result list."
+    },
+    {
+      "name": "groupLabel",
+      "selector": ".command-palette__group-label",
+      "className": ".command-palette__group-label",
+      "required": false,
+      "description": "Non-interactive result group label."
+    },
+    {
+      "name": "item",
+      "selector": ".command-palette__item",
+      "className": ".command-palette__item",
+      "required": true,
+      "description": "Interactive command result."
+    },
+    {
+      "name": "itemIcon",
+      "selector": ".command-palette__item-icon",
+      "className": ".command-palette__item-icon",
+      "required": false,
+      "description": "Optional leading icon for a command."
+    },
+    {
+      "name": "itemText",
+      "selector": ".command-palette__item-text",
+      "className": ".command-palette__item-text",
+      "required": true,
+      "description": "Command label text."
+    },
+    {
+      "name": "itemShortcut",
+      "selector": ".command-palette__item-shortcut",
+      "className": ".command-palette__item-shortcut",
+      "required": false,
+      "description": "Optional keyboard shortcut hint."
+    },
+    {
+      "name": "empty",
+      "selector": ".command-palette__empty",
+      "className": ".command-palette__empty",
+      "required": false,
+      "description": "Empty-result message."
+    },
+    {
+      "name": "footer",
+      "selector": ".command-palette__footer",
+      "className": ".command-palette__footer",
+      "required": false,
+      "description": "Optional footer with usage hints or secondary metadata."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default command palette overlay."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default panel width and result height."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".command-palette"],
+      "description": "Hidden resting overlay state."
+    },
+    {
+      "name": "open",
+      "selectors": [".command-palette--open"],
+      "description": "Visible overlay state controlled by command-palette--open."
+    },
+    {
+      "name": "itemHover",
+      "selectors": [".command-palette__item:hover"],
+      "description": "Pointer hover state on a command."
+    },
+    {
+      "name": "itemHighlighted",
+      "selectors": [".command-palette__item[data-highlighted]"],
+      "description": "Keyboard-highlighted command state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".command-palette--open"],
+      "description": "The command palette is hidden by default and becomes visible when command-palette--open is applied."
+    },
+    {
+      "name": "overlaySemantics",
+      "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby"],
+      "description": "The overlay should behave like a modal command dialog and inherit modal focus expectations."
+    },
+    {
+      "name": "searchSemantics",
+      "attributes": ["role=\"combobox\"", "aria-expanded", "aria-controls", "aria-activedescendant"],
+      "description": "The search input should expose its relationship to the active command list when the target uses custom listbox behavior."
+    },
+    {
+      "name": "keyboardShortcuts",
+      "events": ["Command+K", "Control+K", "Escape", "ArrowDown", "ArrowUp", "Enter"],
+      "description": "The palette opens through a global shortcut, navigates results by keyboard, activates with Enter, and closes with Escape."
+    },
+    {
+      "name": "filtering",
+      "events": ["input", "compositionstart", "compositionend"],
+      "description": "Typing filters commands while preserving text input composition behavior."
+    },
+    {
+      "name": "highlightedItem",
+      "selectors": [".command-palette__item[data-highlighted]"],
+      "description": "Exactly one command should be highlighted when keyboard navigation is active."
+    }
+  ],
+  "properties": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the command palette overlay is visible; shortcut handling and focus management remain target behavior.",
+      "targetMappings": {
+        "web": [
+          { "kind": "class", "selector": ".command-palette", "classNames": [".command-palette--open"] }
+        ]
+      }
+    },
+    {
+      "name": "query",
+      "type": "string",
+      "required": false,
+      "defaultValue": "",
+      "description": "Current search query rendered in the command input; filtering remains target behavior.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".command-palette__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-text-disabled"
+      ],
+      "radius": [
+        "--radius-lg",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-2xl"
+      ],
+      "z-index": [
+        "--z-modal"
+      ],
+      "opacity": [
+        "--opacity-overlay"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Treat the command palette as a modal dialog when it blocks the page behind it.",
+    "Focus the search input when the palette opens and restore focus to the invoking element when it closes.",
+    "Close on Escape and outside interaction.",
+    "Expose highlighted command state through aria-activedescendant or an equivalent native target pattern.",
+    "Support keyboard navigation and activation without requiring pointer interaction."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; shortcut handling, filtering, focus management, and command activation must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

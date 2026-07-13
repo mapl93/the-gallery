@@ -1,0 +1,200 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "number-input",
+  "name": "Number Input",
+  "registryId": "H14",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Numeric stepper contract with decrement/increment buttons, native number field, disabled button states, hidden browser spin buttons, and min/max/step behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/number-input",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".number-input"
+    },
+    "docs": "site/src/content/components/number-input.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".number-input",
+      "className": ".number-input",
+      "required": true,
+      "description": "Inline numeric stepper wrapper."
+    },
+    {
+      "name": "button",
+      "selector": ".number-input__btn",
+      "className": ".number-input__btn",
+      "required": true,
+      "description": "Increment or decrement control."
+    },
+    {
+      "name": "field",
+      "selector": ".number-input__field",
+      "className": ".number-input__field",
+      "required": true,
+      "description": "Native number input field."
+    },
+    {
+      "name": "innerSpinButton",
+      "selector": ".number-input__field::-webkit-inner-spin-button",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit inner spin button hidden by the CSS adapter."
+    },
+    {
+      "name": "outerSpinButton",
+      "selector": ".number-input__field::-webkit-outer-spin-button",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit outer spin button hidden by the CSS adapter."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default numeric stepper."
+    },
+    { "name": "error", "className": ".number-input--error", "default": false, "description": "Invalid numeric value presentation." },
+    { "name": "success", "className": ".number-input--success", "default": false, "description": "Validated numeric value presentation." },
+    { "name": "warning", "className": ".number-input--warning", "default": false, "description": "Numeric value that needs attention." }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default button and field size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".number-input"],
+      "description": "Default numeric stepper state."
+    },
+    {
+      "name": "buttonHover",
+      "selectors": [".number-input__btn:hover"],
+      "description": "Pointer hover state on increment or decrement buttons."
+    },
+    {
+      "name": "buttonDisabled",
+      "selectors": [".number-input__btn:disabled"],
+      "description": "Unavailable increment or decrement button state."
+    },
+    {
+      "name": "focusWithin",
+      "selectors": [".number-input:focus-within"],
+      "description": "Shared field focus hierarchy when any stepper control has focus."
+    },
+    {
+      "name": "spinButtonsHidden",
+      "selectors": [".number-input__field::-webkit-inner-spin-button", ".number-input__field::-webkit-outer-spin-button"],
+      "description": "Native WebKit spin buttons hidden by the CSS adapter."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeNumber",
+      "attributes": ["type=\"number\"", "min", "max", "step", "value", "disabled"],
+      "description": "The field should preserve native number input semantics and constraints."
+    },
+    {
+      "name": "incrementDecrement",
+      "selectors": [".number-input__btn"],
+      "events": ["increment", "decrement", "ArrowUp", "ArrowDown"],
+      "description": "Buttons should update the value by step while respecting min and max constraints."
+    },
+    {
+      "name": "buttonAvailability",
+      "selectors": [".number-input__btn:disabled"],
+      "description": "Increment and decrement buttons should disable when the current value reaches max or min."
+    }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the numeric value.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".number-input", "source": "variants" }] } },
+    { "name": "value", "type": "number", "required": false, "defaultValue": 1, "description": "Current native numeric value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "min", "type": "number", "required": false, "defaultValue": 0, "description": "Minimum allowed value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "min", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "max", "type": "number", "required": false, "defaultValue": 10, "description": "Maximum allowed value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "max", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "step", "type": "number", "required": false, "defaultValue": 1, "minimum": 0.01, "description": "Increment used by native and explicit controls.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "step", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes field and step controls unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".number-input__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for numeric guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-surface-secondary",
+        "--color-text-primary",
+        "--color-border-subtle",
+        "--color-text-disabled",
+        "--color-surface-primary",
+        "--color-input-default-hover-inner-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size",
+        "--font-family-body"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use a native number input for numeric semantics and mobile keyboard support.",
+    "Provide a visible label or equivalent accessible name.",
+    "Keep increment and decrement controls clearly named.",
+    "Respect min, max, step, disabled, and readonly constraints.",
+    "Do not rely on hidden browser spin buttons as the only way to change the value."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css; increment/decrement behavior and constraint synchronization must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

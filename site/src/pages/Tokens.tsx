@@ -54,9 +54,9 @@ export default function Tokens() {
     <>
       <h1>Design Tokens</h1>
       <p>
-        All design tokens extracted from the Figma Tokens JSON files. These tokens
-        define the visual language of the system: colors, spacing, typography,
-        shadows, and more.
+        Tokens are the value language of The Gallery. The canonical direction is
+        DTCG-style source under <code className="docs-inline-code">tokens/source/</code>,
+        with legacy token files still present while targets migrate.
       </p>
 
       <h2 style={{ marginTop: 'var(--docs-space-xl)' }}>Primitive Tokens</h2>

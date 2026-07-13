@@ -1,0 +1,274 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "toast",
+  "name": "Toast",
+  "registryId": "B4",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Notification toast with feedback variants, optional icon, content, close control, visible state, live-region behavior, and timed or user dismissal.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/toast",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".toast"
+    },
+    "docs": "site/src/content/components/toast.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".toast",
+      "className": ".toast",
+      "required": true,
+      "description": "Fixed notification container that owns surface, border, shadow, motion, and placement."
+    },
+    {
+      "name": "icon",
+      "selector": ".toast__icon",
+      "className": ".toast__icon",
+      "required": false,
+      "description": "Optional feedback icon."
+    },
+    {
+      "name": "content",
+      "selector": ".toast__content",
+      "className": ".toast__content",
+      "required": true,
+      "description": "Content wrapper for title and message."
+    },
+    {
+      "name": "title",
+      "selector": ".toast__title",
+      "className": ".toast__title",
+      "required": false,
+      "description": "Optional short notification title."
+    },
+    {
+      "name": "message",
+      "selector": ".toast__message",
+      "className": ".toast__message",
+      "required": true,
+      "description": "Notification message text."
+    },
+    {
+      "name": "close",
+      "selector": ".toast__close",
+      "className": ".toast__close",
+      "required": false,
+      "description": "Optional dismiss action."
+    }
+  ],
+  "variants": [
+    {
+      "name": "info",
+      "className": ".toast--info",
+      "default": true,
+      "description": "Informational notification."
+    },
+    {
+      "name": "success",
+      "className": ".toast--success",
+      "default": false,
+      "description": "Positive confirmation notification."
+    },
+    {
+      "name": "error",
+      "className": ".toast--error",
+      "default": false,
+      "description": "Error or failed action notification."
+    },
+    {
+      "name": "warning",
+      "className": ".toast--warning",
+      "default": false,
+      "description": "Warning or attention notification."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default toast width and spacing."
+    }
+  ],
+  "states": [
+    {
+      "name": "hidden",
+      "selectors": [".toast"],
+      "description": "Resting hidden state."
+    },
+    {
+      "name": "visible",
+      "selectors": [".toast.is-visible"],
+      "description": "Visible state controlled by is-visible."
+    },
+    {
+      "name": "closeHover",
+      "selectors": [".toast__close:hover"],
+      "description": "Pointer hover state on the close control."
+    },
+    {
+      "name": "closeFocusVisible",
+      "selectors": [".toast__close:focus-visible"],
+      "description": "Keyboard focus indicator on the close control."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".toast.is-visible"],
+      "description": "The toast is hidden by default and becomes visible when is-visible is applied."
+    },
+    {
+      "name": "announcement",
+      "attributes": ["role=\"status\"", "role=\"alert\"", "aria-live"],
+      "description": "Use polite live regions for routine notifications and assertive alerts only for urgent failures."
+    },
+    {
+      "name": "dismissal",
+      "events": ["close action", "timeout", "Escape"],
+      "description": "Toasts may dismiss after a timeout or by explicit user action; focused toasts should not disappear without warning."
+    }
+  ],
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional concise notification title.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".toast__title" }] }
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "required": true,
+      "description": "Visible notification message that communicates meaning without icon or color alone.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".toast__message" }] }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Semantic feedback color family.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".toast", "source": "variants" }] }
+    },
+    {
+      "name": "icon",
+      "type": "slot",
+      "required": false,
+      "description": "Optional decorative feedback icon.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".toast__icon", "classNames": [".toast__icon"] }] }
+    },
+    {
+      "name": "dismissAction",
+      "type": "slot",
+      "required": false,
+      "description": "Optional named button that requests dismissal.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".toast__close", "classNames": [".toast__close"] }] }
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the optional dismiss action.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toast__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "announcement",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "none",
+      "values": ["none", "polite", "assertive"],
+      "description": "Live-region priority used when the toast is inserted dynamically.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".toast", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } },
+          { "kind": "attribute", "selector": ".toast", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } }
+        ]
+      }
+    },
+    {
+      "name": "visible",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls visible toast presentation; target timing and queue management remain external.",
+      "targetMappings": { "web": [{ "kind": "class", "selector": ".toast", "classNames": [".is-visible"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-default",
+        "--color-border-focus",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-feedback-info-default",
+        "--color-feedback-success-default",
+        "--color-feedback-error-default",
+        "--color-feedback-warning-default"
+      ],
+      "radius": [
+        "--radius-md",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "z-index": [
+        "--z-toast"
+      ],
+      "transition": [
+        "--transition-base",
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default",
+        "--easing-out"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use role=\"status\" or aria-live=\"polite\" for non-urgent notifications.",
+    "Use role=\"alert\" only for urgent failures that require immediate attention.",
+    "Provide a clear dismiss action when the toast persists or contains an action.",
+    "Do not move keyboard focus to passive toasts.",
+    "Avoid auto-dismissing a toast while it or an action inside it has focus."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; visibility and timing behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

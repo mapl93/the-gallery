@@ -1,26 +1,39 @@
 ## Overview
 
-Draggable image comparison slider with labeled overlays.
+Before / After presents two target-owned media layers with optional visible labels and divider or control content. The source does not establish dragging or range behavior.
 
-<Preview html={"<div class=\"before-after\" style=\"max-width:500px;display:grid;grid-template-columns:1fr 1fr;gap:4px;\"><div><img src=\"https://placehold.co/250x200/d4c5b0/1a1a1a?text=Before\" alt=\"Before\" style=\"width:100%;border-radius:8px 0 0 8px;\" /><span style=\"display:block;text-align:center;font-size:13px;margin-top:4px;\">Before</span></div><div><img src=\"https://placehold.co/250x200/f5f0eb/1a1a1a?text=After\" alt=\"After\" style=\"width:100%;border-radius:0 8px 8px 0;\" /><span style=\"display:block;text-align:center;font-size:13px;margin-top:4px;\">After</span></div></div>"} label="Before / After Image Slider" />
+## Presentation
+
+<Preview html={'<figure class="before-after"><img class="before-after__image tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Unfired ceramic vessel before glazing" /><div class="before-after__overlay"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="The same ceramic vessel after its glaze firing" /></div><div class="before-after__handle" aria-hidden="true"></div><figcaption><span class="before-after__label before-after__label--before">Before firing</span><span class="before-after__label before-after__label--after">After firing</span></figcaption></figure>'} label="Before / After" />
+
+The artwork is a passive comparison using the current clipped overlay presentation. `.before-after__handle` may contain a target-owned divider or control, but no drag, pointer capture, range value, keyboard increment, or synchronization behavior is implied.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use section components for page builder blocks — they're designed to be reorderable in Shopify's theme editor.</Do>
-  <Dont>Don't hard-code section content — use Shopify schema settings for customizability.</Dont>
+  <Do>Use matched media with the same framing so the comparison is meaningful.</Do>
+  <Dont>Do not describe the component as a slider unless the target provides complete native or ARIA range behavior.</Dont>
 </DoDont>
+
+Keep visible labels concise and let the target decide whether comparison is passive or interactive.
 
 ## Accessibility
 
-<Callout type="info">
-  Sections map to Shopify's section architecture. Each one can have its own schema settings.
-</Callout>
+- Give both informative media layers alternatives that distinguish their states.
+- Keep before and after labels available as text, not embedded only in imagery.
+- Hide a purely decorative divider from assistive technology.
+- If a target makes the control interactive, it must define an accessible name, current value, minimum and maximum, keyboard operation, pointer behavior, and announcements.
 
-- All images must have descriptive `alt` text.
+## References
 
-## API Reference
+**Dependencies:** None.
+
+**Anatomy:** `.before-after`, `.before-after__image`, `.before-after__overlay`, `.before-after__handle`, its visual pseudo-elements, `.before-after__label`, `.before-after__label--before`, and `.before-after__label--after`.
 
 <PropTable>
-  <tr><td>`.before-after`</td><td>class</td><td>—</td><td>Base before / after image slider styles</td></tr>
+  <tr><td>`beforeMedia`</td><td>slot</td><td>required</td><td>Target-owned base comparison image</td></tr>
+  <tr><td>`afterMedia`</td><td>slot</td><td>required</td><td>Target-owned clipped overlay image</td></tr>
+  <tr><td>`beforeLabel`</td><td>string</td><td>optional</td><td>Visible label for the base image</td></tr>
+  <tr><td>`afterLabel`</td><td>string</td><td>optional</td><td>Visible label for the clipped image</td></tr>
+  <tr><td>`control`</td><td>slot</td><td>optional</td><td>Target-owned control or divider with no implied behavior</td></tr>
 </PropTable>

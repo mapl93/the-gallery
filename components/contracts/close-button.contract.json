@@ -1,0 +1,81 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "close-button",
+  "name": "Close Button",
+  "registryId": "A18",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Compact close action primitive used by overlays, toasts, drawers, and dismissible surfaces.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/close-button",
+    "css": { "file": "components/css/primitives.css", "selector": ".close-btn" },
+    "docs": "site/src/content/components/close-button.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".close-btn", "className": ".close-btn", "required": true, "description": "Close or dismiss button." },
+    { "name": "icon", "selector": ".close-btn__icon", "className": ".close-btn__icon", "required": true, "description": "Decorative close icon rendered inside the named button." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default close button." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default close button size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".close-btn"], "description": "Default close button state." },
+    { "name": "hover", "selectors": [".close-btn:hover"], "description": "Pointer hover state." },
+    { "name": "focusVisible", "selectors": [".close-btn:focus-visible"], "description": "Keyboard focus state." },
+    { "name": "disabled", "selectors": [".close-btn:disabled"], "description": "Unavailable native button state." }
+  ],
+  "behavior": [
+    { "name": "dismissAction", "selectors": [".close-btn"], "attributes": ["type=\"button\"", "aria-label"], "events": ["click", "Space", "Enter"], "description": "The native button requests dismissal of its owned surface without submitting forms. Escape handling belongs to that containing surface." }
+  ],
+  "properties": [
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Contextual accessible action name such as Close dialog or Dismiss alert.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".close-btn", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "icon",
+      "type": "slot",
+      "required": true,
+      "description": "Decorative close indicator hidden from assistive technology.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".close-btn__icon", "classNames": [".close-btn__icon"] }] }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Temporarily makes the native dismiss action unavailable.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".close-btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-secondary", "--color-text-primary", "--color-surface-secondary", "--color-border-focus"],
+      "radius": ["--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Provide a clear accessible name such as Close or Dismiss.",
+    "Use type=\"button\" inside forms.",
+    "Keep focus management owned by the containing overlay or dismissible surface."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

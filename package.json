@@ -1,17 +1,62 @@
 {
   "name": "the-gallery",
   "version": "0.1.0",
-  "description": "The Gallery — Multi-platform design system & e-commerce theme for art ceramics",
-  "private": true,
+  "description": "The Gallery — Platform-agnostic design system. Copy the components you need, adapt to any target.",
   "type": "module",
+  "bin": {
+    "the-gallery": "./cli/index.js"
+  },
+  "files": [
+    "cli/",
+    "components/",
+    "platforms/web/",
+    "tokens/",
+    "registry.json",
+    "registry.schema.json"
+  ],
   "scripts": {
     "build:tokens": "style-dictionary build",
-    "build": "npm run build:tokens",
-    "dev:shopify": "cd platforms/shopify && shopify theme dev"
+    "build:tokens:source": "npm run validate:tokens:source && node scripts/build-token-source.js",
+    "build:tokens:web": "npm run build:tokens:source && npm run validate:tokens:source-build && node scripts/build-web-tokens.js && npm run validate:tokens:web && npm run validate:tokens:motion && npm run validate:tokens:web-components",
+    "build:tokens:shopify": "npm run build:tokens:web && node scripts/build-shopify-tokens.js && npm run validate:tokens:shopify",
+    "build:adapter:web": "npm run build:tokens:web && node scripts/build-web-adapter.js && npm run validate:adapter:web",
+    "build:adapter:web:components": "node scripts/build-web-adapter.js && npm run validate:adapter:web",
+    "build:adapter:shopify": "npm run build:tokens:shopify && node scripts/build-shopify-adapter.js && npm run validate:adapter:shopify",
+    "build:adapter:shopify:components": "node scripts/build-shopify-adapter.js && npm run validate:adapter:shopify",
+    "build:components": "node scripts/copy-components.js",
+    "validate:registry": "node scripts/validate-registry.js",
+    "validate:tokens:source": "node scripts/validate-token-source.js",
+    "validate:tokens:source-build": "node scripts/validate-token-source-build.js",
+    "validate:tokens:web": "node scripts/validate-web-tokens.js",
+    "validate:tokens:motion": "node scripts/validate-motion-tokens.js",
+    "validate:tokens:web-components": "node scripts/validate-web-component-tokens.js",
+    "validate:tokens:shopify": "node scripts/validate-shopify-tokens.js",
+    "validate:adapter:web": "node scripts/validate-web-adapter.js",
+    "validate:adapter:shopify": "node scripts/validate-shopify-adapter.js",
+    "validate:contracts": "node scripts/validate-component-contracts.js",
+    "validate:studio": "node scripts/validate-studio-metadata.js",
+    "validate:docs": "npm run validate:registry && npm run validate:tokens:source && npm run validate:contracts && npm run validate:studio && node scripts/validate-docs.js",
+    "audit:components": "node scripts/audit-component-readiness.js --write",
+    "audit:previews:static": "node scripts/audit-component-previews.js",
+    "spike:dtcg": "style-dictionary build --config spikes/dtcg/config.js && node scripts/validate-dtcg-spike.js",
+    "build": "npm run build:adapter:shopify && npm run build:adapter:web:components && npm run build:tokens && npm run build:components",
+    "dev:site": "npm --prefix site run dev",
+    "dev:shopify": "cd platforms/shopify && shopify theme dev",
+    "tg": "node cli/index.js"
   },
   "devDependencies": {
     "style-dictionary": "^4.0.0"
   },
-  "keywords": ["design-system", "design-tokens", "shopify", "ceramics"],
-  "license": "UNLICENSED"
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "css",
+    "components",
+    "platform-agnostic",
+    "shopify",
+    "react",
+    "webflow",
+    "framer"
+  ],
+  "license": "MIT"
 }

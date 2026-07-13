@@ -1,0 +1,235 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "before-after",
+  "name": "Before / After Image Slider",
+  "registryId": "S17",
+  "category": "sections",
+  "status": "pilot",
+  "summary": "Layered before-and-after comparison presentation whose control mechanics and position state remain target-owned.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/before-after",
+    "css": {
+      "file": "components/css/sections.css",
+      "selector": ".before-after"
+    },
+    "docs": "site/src/content/components/before-after.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".before-after",
+      "className": ".before-after",
+      "required": true,
+      "description": "Layered image-comparison root."
+    },
+    {
+      "name": "image",
+      "selector": ".before-after__image",
+      "className": ".before-after__image",
+      "required": true,
+      "description": "Base comparison image."
+    },
+    {
+      "name": "overlay",
+      "selector": ".before-after__overlay",
+      "className": ".before-after__overlay",
+      "required": true,
+      "description": "Clipped comparison-image layer."
+    },
+    {
+      "name": "handle",
+      "selector": ".before-after__handle",
+      "className": ".before-after__handle",
+      "required": false,
+      "description": "Optional target-owned comparison control or visual divider."
+    },
+    {
+      "name": "handleKnob",
+      "selector": ".before-after__handle::before",
+      "required": false,
+      "generated": true,
+      "description": "Generated visual knob for the optional divider."
+    },
+    {
+      "name": "handleGlyph",
+      "selector": ".before-after__handle::after",
+      "required": false,
+      "generated": true,
+      "description": "Generated bidirectional visual cue; it is not an accessible name."
+    },
+    {
+      "name": "label",
+      "selector": ".before-after__label",
+      "className": ".before-after__label",
+      "required": false,
+      "description": "Shared comparison-label presentation."
+    },
+    {
+      "name": "beforeLabel",
+      "selector": ".before-after__label--before",
+      "className": ".before-after__label--before",
+      "required": false,
+      "description": "Visible label for the base image."
+    },
+    {
+      "name": "afterLabel",
+      "selector": ".before-after__label--after",
+      "className": ".before-after__label--after",
+      "required": false,
+      "description": "Visible label for the clipped image."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default variant."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".before-after"
+      ],
+      "description": "Static midpoint presentation supplied by canonical CSS."
+    },
+    {
+      "name": "controlFocusVisible",
+      "selectors": [
+        ".before-after__handle:focus-visible::before"
+      ],
+      "description": "Visible keyboard focus when a target renders the divider as a focusable control."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "comparisonMechanicsBoundary",
+      "selectors": [
+        ".before-after"
+      ],
+      "description": "Canonical CSS supplies a static 50 percent clip and divider. This contract does not choose pointer dragging, keyboard semantics, range values, gesture handling, or state synchronization; those require a separate accepted behavior decision."
+    },
+    {
+      "name": "mediaSemantics",
+      "selectors": [
+        ".before-after__image",
+        ".before-after__overlay img"
+      ],
+      "description": "Targets provide useful alternative text or a shared accessible comparison description without duplicating confusing image announcements."
+    }
+  ],
+  "properties": [
+    {
+      "name": "beforeMedia",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned base comparison image.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".before-after__image", "classNames": [".before-after__image"] }]
+      }
+    },
+    {
+      "name": "afterMedia",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned image rendered in the clipped overlay layer.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".before-after__overlay", "classNames": [".before-after__overlay"] }]
+      }
+    },
+    {
+      "name": "beforeLabel",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible label for the base image.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".before-after__label--before" }]
+      }
+    },
+    {
+      "name": "afterLabel",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible label for the clipped image.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".before-after__label--after" }]
+      }
+    },
+    {
+      "name": "control",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned control or divider content; no drag or range behavior is implied.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".before-after__handle", "classNames": [".before-after__handle"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-text-primary"
+      ],
+      "radius": [
+        "--radius-full",
+        "--radius-md",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-md"
+      ],
+      "typography": [
+        "--typo-caption-size"
+      ],
+      "spacing": [
+        "--space-layout-touch-target"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide a concise shared comparison description or distinct useful alternatives without announcing redundant image content.",
+    "Visible before and after labels identify the compared states and do not rely on position alone.",
+    "Do not expose the visual divider as an interactive slider until keyboard operation, value bounds, current value, pointer behavior, focus, and announcements are defined.",
+    "If a target supplies a focusable control, it uses a touch-sized target and visible focus indicator."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/sections.css."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

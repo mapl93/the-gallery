@@ -1,0 +1,82 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "article-body",
+  "name": "Article Body / Prose",
+  "registryId": "L3",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Rich article content: drop cap, blockquotes, pull quotes, callouts, figures, code, product embeds.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/article-body",
+    "css": { "file": "components/css/blog.css", "selector": ".prose" },
+    "docs": "site/src/content/components/article-body.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".prose", "className": ".prose", "required": true, "description": "Long-form article content container." },
+    { "name": "sectionHeading", "selector": ".prose h2", "required": false, "description": "Second-level article section heading." },
+    { "name": "subheading", "selector": ".prose h3", "required": false, "description": "Third-level article subsection heading." },
+    { "name": "minorHeading", "selector": ".prose h4", "required": false, "description": "Fourth-level article subsection heading." },
+    { "name": "blockquote", "selector": ".prose blockquote", "required": false, "description": "Quoted passage with optional citation." },
+    { "name": "pullQuote", "selector": ".pull-quote", "className": ".pull-quote", "required": false, "description": "Prominent editorial quotation." },
+    { "name": "pullQuoteAttribution", "selector": ".pull-quote__attribution", "className": ".pull-quote__attribution", "required": false, "description": "Optional pull-quote attribution." },
+    { "name": "callout", "selector": ".callout", "className": ".callout", "required": false, "description": "Informational callout composition." },
+    { "name": "calloutIcon", "selector": ".callout__icon", "className": ".callout__icon", "required": false, "description": "Optional callout indicator icon." },
+    { "name": "figure", "selector": ".prose figure", "required": false, "description": "Article figure with optional caption." },
+    { "name": "fullBleed", "selector": ".prose__full-bleed", "className": ".prose__full-bleed", "required": false, "description": "Viewport-width media composition." },
+    { "name": "imagePair", "selector": ".prose__image-pair", "className": ".prose__image-pair", "required": false, "description": "Responsive pair of article images." },
+    { "name": "imageGrid", "selector": ".prose__image-grid", "className": ".prose__image-grid", "required": false, "description": "Responsive article image grid." },
+    { "name": "codeBlock", "selector": ".prose pre", "required": false, "description": "Horizontally scrollable preformatted code block." },
+    { "name": "productEmbed", "selector": ".prose__product-embed", "className": ".prose__product-embed", "required": false, "description": "Optional linked product composition." },
+    { "name": "productEmbedInfo", "selector": ".prose__product-embed-info", "className": ".prose__product-embed-info", "required": false, "description": "Product embed text wrapper." },
+    { "name": "productEmbedTitle", "selector": ".prose__product-embed-title", "className": ".prose__product-embed-title", "required": false, "description": "Embedded product title." },
+    { "name": "productEmbedPrice", "selector": ".prose__product-embed-price", "className": ".prose__product-embed-price", "required": false, "description": "Target-formatted embedded product price." },
+    { "name": "table", "selector": ".prose table", "required": false, "description": "Overflow-contained tabular article content." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default long-form prose presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Readable line length and responsive article typography." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".prose"], "description": "Default prose state." },
+    { "name": "linkHover", "selectors": [".prose a:hover"], "description": "Inline link hover state." },
+    { "name": "linkFocus", "selectors": [".prose a:focus-visible"], "description": "Visible keyboard focus for article links." },
+    { "name": "productEmbedHover", "selectors": [".prose__product-embed:hover"], "description": "Product embed hover elevation." },
+    { "name": "productEmbedFocus", "selectors": [".prose__product-embed:focus-visible"], "description": "Visible keyboard focus for linked product embeds." }
+  ],
+  "behavior": [
+    { "name": "semanticContent", "selectors": [".prose h2", ".prose h3", ".prose h4", ".prose blockquote", ".prose table"], "description": "Adapters preserve the semantic heading hierarchy, quotations, lists, figures, code, and table markup supplied by the target content source." },
+    { "name": "targetEmbeds", "selectors": [".prose__product-embed", ".prose__product-embed-price"], "attributes": ["href"], "description": "Product destinations, imagery, and formatted prices are supplied by the commerce target." }
+  ],
+  "properties": [
+    { "name": "content", "type": "slot", "required": true, "description": "Target-owned semantic long-form article content, including optional rich editorial compositions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".prose", "classNames": [".prose"] }] } },
+    { "name": "dropCap", "type": "boolean", "required": false, "defaultValue": false, "description": "Applies the existing drop-cap treatment to the first paragraph.", "targetMappings": { "web": [{ "kind": "class", "selector": ".prose", "classNames": [".prose--drop-cap"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-decorative", "--color-border-focus", "--color-border-subtle", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-warning-default", "--color-surface-secondary", "--color-text-accent", "--color-text-disabled", "--color-text-primary", "--color-text-secondary"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-accent", "--font-family-body", "--font-family-heading", "--font-family-mono", "--typo-article-line-height", "--typo-article-size", "--typo-body-size", "--typo-h2-size", "--typo-h3-size", "--typo-h4-size"],
+      "radius": ["--radius-md", "--radius-sm"],
+      "shadow": ["--shadow-md"],
+      "transition": ["--transition-fast"]
+    }
+  },
+  "accessibility": [
+    "Preserve a logical heading hierarchy and native semantics for lists, quotations, figures, code, and tables.",
+    "Provide text alternatives and captions for informative media, and keep wide code or table content horizontally accessible without clipping the page.",
+    "Keep line length readable and preserve visible keyboard focus for inline links and product embeds.",
+    "Do not use the drop cap as a substitute for semantic text content."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article content and any product embeds without flattening rich text semantics." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

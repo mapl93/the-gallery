@@ -3,14 +3,17 @@
 A dialog overlay with header, body, and footer sections. The modal traps focus and provides a backdrop for critical interactions like confirmations, forms, or detail views.
 
 <Preview
-  html='<div class="modal-overlay" aria-hidden="false" style="position:relative;min-height:300px;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><div class="modal" style="position:relative;"><div class="modal__header"><h2 class="modal__title">Confirm Order</h2></div><div class="modal__body" style="padding:16px;"><p>Are you sure you want to place this order for <strong>$240.00</strong>?</p></div><div class="modal__footer" style="padding:16px;display:flex;gap:8px;justify-content:flex-end;"><button class="btn btn--outline">Cancel</button><button class="btn">Confirm</button></div></div></div>'
+  html='<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger aria-expanded="true">Open modal</button><div class="modal-overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-preview-title"><div class="modal__header"><h2 class="modal__title" id="modal-preview-title">Confirm order</h2><button class="close-btn" type="button" data-preview-close aria-label="Close modal"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="modal__body"><p>Are you sure you want to place this order for <strong>$240.00</strong>?</p></div><div class="modal__footer"><button class="btn btn--outline" type="button" data-preview-close>Cancel</button><button class="btn" type="button" data-preview-close>Confirm</button></div></div></div></div>'
   label="Modal"
-  interaction={{ selector: '.modal-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Modal', startVisible: true }}
+  layout="overlay"
+  interaction={{ selector: '.modal-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Modal', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', dismissSelector: '.modal-overlay', startVisible: true }}
 />
 
-## Anatomy
+## Presentation
 
-The modal is composed of three optional sections:
+Modal has one centered presentation. The overlay owns backdrop visibility while the dialog owns surface, scrolling, section anatomy, and entrance motion.
+
+The component is composed of an overlay, a dialog container, and structural sections:
 
 | Element            | Class             | Purpose                        |
 |--------------------|-------------------|--------------------------------|
@@ -59,9 +62,10 @@ The modal is composed of three optional sections:
 </div>
 ```
 
-## API Reference
+## References
 
 <PropTable>
+  <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Maps inverse visibility to overlay `aria-hidden`</td></tr>
   <tr><td>`.modal-overlay`</td><td>class</td><td>—</td><td>Full-screen backdrop with overlay opacity</td></tr>
   <tr><td>`.modal`</td><td>class</td><td>—</td><td>Dialog container with shadow and radius</td></tr>
   <tr><td>`.modal__header`</td><td>class</td><td>—</td><td>Header section with title</td></tr>

@@ -38,7 +38,7 @@ Every component declares its dependencies as private custom properties (`--_` pr
 | Feedback | `--color-feedback-{info,success,warning,error}-{bg,default,hover,pressed}` | Toasts, validation, badges |
 | Shadow | `--shadow-{sm,md,lg,xl,2xl}` | Elevation levels |
 | Button | `--color-button-{primary,secondary,link,outline,danger}-{text,border,bg}-{default,hover,active}` | All button variant colors |
-| Input | `--color-input-{default,error,success,validation}-{unfocused,hover,focused,disabled}-{label,placeholder,value,message,bg,inner-border,outer-border,icon}` | All input state colors |
+| Input | `--color-input-{default,error,success,warning,validation}-{unfocused,hover,focused,disabled}-{label,placeholder,value,message,bg,inner-border,outer-border,icon}` | All input state colors |
 
 ### Available Breakpoint Tokens (Layout — per mode: Mobile / Tablet / Desktop / XL)
 
@@ -49,9 +49,9 @@ Every component declares its dependencies as private custom properties (`--_` pr
 | Grid | `--grid-{columns,column-gap,row-gap}` | Responsive grid config |
 | Input Layout | `--space-input-{padding-x,padding-y,margin-bottom,icon-size,label-size,value-size,message-size}` | Input component sizing |
 
-### Tokens to Add to Breakpoints (migrated from former components.tokens.json)
+### Responsive Button Tokens (migrated from former components.tokens.json)
 
-These button layout tokens must exist in each breakpoint file:
+These button tokens must resolve in every viewport mode:
 
 | Token | Mobile | Tablet | Desktop | XL |
 |-------|--------|--------|---------|----|
@@ -60,6 +60,10 @@ These button layout tokens must exist in each breakpoint file:
 | `--space-button-min-height` | 44px | 44px | 40px | 40px |
 | `--space-button-gap` | 8px | 8px | 8px | 8px |
 | `--space-button-icon-size` | 18px | 18px | 20px | 20px |
+| `--typo-button-size` | 16px | 16px | 16px | 16px |
+| `--typo-button-weight` | 600 | 600 | 600 | 600 |
+| `--radius-button` | 8px | 8px | 8px | 8px |
+| `--transition-button-duration` | 100ms | 100ms | 100ms | 100ms |
 
 ### Static Tokens (from Primitives, not theme/breakpoint dependent)
 
@@ -70,25 +74,25 @@ These button layout tokens must exist in each breakpoint file:
 --font-family-mono          /* Code / technical */
 --radius-none | sm | md | lg | full
 --opacity-disabled: 0.5
---opacity-overlay: 0.7
---transition-fast: 150ms
---transition-base: 250ms
---transition-slow: 400ms
+--opacity-overlay: 0.6
+--transition-fast: 100ms
+--transition-base: 200ms
+--transition-slow: 300ms
 --easing-default: cubic-bezier(0.4, 0, 0.2, 1)
 --easing-in: cubic-bezier(0.4, 0, 1, 1)
 --easing-out: cubic-bezier(0, 0, 0.2, 1)
---z-dropdown: 100
---z-sticky: 200
---z-overlay: 300
---z-modal: 400
---z-toast: 500
+--z-dropdown: 1000
+--z-sticky: 1050
+--z-overlay: 1100
+--z-modal: 1200
+--z-toast: 1300
 ```
 
 ---
 
 ## Naming Conventions
 
-- **CSS classes**: BEM — `.block__element--modifier` (e.g., `.btn--primary`, `.product-card__image`)
+- **CSS classes**: BEM — `.block__element--modifier` (e.g., `.btn--secondary`, `.product-card__image`)
 - **Liquid files**: `sections/` for top-level sections, `snippets/` for reusable partials
 - **Private props**: `--_block-property` (e.g., `--_btn-bg`, `--_card-padding`)
 - **States**: Use native CSS pseudo-classes (`:hover`, `:focus-visible`, `:active`, `:disabled`, `[aria-expanded]`, `[aria-selected]`)
@@ -137,9 +141,9 @@ These button layout tokens must exist in each breakpoint file:
   --_btn-icon-size: var(--space-button-icon-size);
 
   /* ── Static (Primitives) ── */
-  --_btn-radius: var(--radius-md);
+  --_btn-radius: var(--radius-button);
   --_btn-font: var(--font-family-body);
-  --_btn-transition: var(--transition-fast) var(--easing-default);
+  --_btn-transition: var(--transition-button-duration) var(--easing-button);
 
   /* ── Application ── */
   display: inline-flex;
@@ -153,8 +157,8 @@ These button layout tokens must exist in each breakpoint file:
   border: 1px solid var(--_btn-border);
   border-radius: var(--_btn-radius);
   font-family: var(--_btn-font);
-  font-size: var(--typo-body-size);
-  font-weight: 600;
+  font-size: var(--typo-button-size);
+  font-weight: var(--typo-button-weight);
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
@@ -162,6 +166,13 @@ These button layout tokens must exist in each breakpoint file:
               color var(--_btn-transition),
               border-color var(--_btn-transition),
               box-shadow var(--_btn-transition);
+}
+
+.btn__icon {
+  display: block;
+  width: var(--_btn-icon-size);
+  height: var(--_btn-icon-size);
+  flex-shrink: 0;
 }
 
 /* ── States ── */
@@ -179,26 +190,53 @@ These button layout tokens must exist in each breakpoint file:
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
-.btn:disabled,
-.btn[aria-disabled="true"] {
+.btn:disabled:not([aria-busy="true"]),
+.btn[aria-disabled="true"]:not([aria-busy="true"]) {
   opacity: var(--opacity-disabled);
   cursor: not-allowed;
-  pointer-events: none;
 }
+.btn:disabled,
+.btn[aria-disabled="true"],
 .btn[aria-busy="true"] {
-  position: relative;
-  color: transparent;
   pointer-events: none;
 }
+.btn[aria-busy="true"]::before,
 .btn[aria-busy="true"]::after {
-  content: "";
-  position: absolute;
-  width: 1em;
-  height: 1em;
+  box-sizing: border-box;
+  display: block;
+  width: var(--_btn-icon-size);
+  height: var(--_btn-icon-size);
+  flex: 0 0 auto;
   border: 2px solid currentColor;
   border-right-color: transparent;
   border-radius: var(--radius-full);
   animation: btn-spin 0.6s linear infinite;
+}
+.btn[aria-busy="true"]::before { content: ""; }
+.btn[aria-busy="true"]::after { content: none; }
+
+.btn[aria-busy="true"] .btn__icon--leading,
+.btn[aria-busy="true"] .btn__icon:not(.btn__icon--leading):not(.btn__icon--trailing) {
+  display: none;
+}
+
+.btn[aria-busy="true"][data-loading-position="trailing"]::before,
+.btn[aria-busy="true"]:not([data-loading-position]):has(.btn__icon--trailing):not(:has(.btn__icon--leading))::before {
+  content: none;
+}
+.btn[aria-busy="true"][data-loading-position="trailing"]::after,
+.btn[aria-busy="true"]:not([data-loading-position]):has(.btn__icon--trailing):not(:has(.btn__icon--leading))::after {
+  content: "";
+}
+.btn[aria-busy="true"][data-loading-position="trailing"] .btn__icon--leading,
+.btn[aria-busy="true"][data-loading-position="trailing"] .btn__icon:not(.btn__icon--leading):not(.btn__icon--trailing),
+.btn[aria-busy="true"]:not([data-loading-position]):has(.btn__icon--trailing):not(:has(.btn__icon--leading)) .btn__icon--leading,
+.btn[aria-busy="true"]:not([data-loading-position]):has(.btn__icon--trailing):not(:has(.btn__icon--leading)) .btn__icon:not(.btn__icon--leading):not(.btn__icon--trailing) {
+  display: block;
+}
+.btn[aria-busy="true"][data-loading-position="trailing"] .btn__icon--trailing,
+.btn[aria-busy="true"]:not([data-loading-position]):has(.btn__icon--trailing):not(:has(.btn__icon--leading)) .btn__icon--trailing {
+  display: none;
 }
 @keyframes btn-spin {
   to { transform: rotate(360deg); }
@@ -238,9 +276,9 @@ These button layout tokens must exist in each breakpoint file:
 }
 
 .btn--link {
-  --_btn-bg: transparent;
+  --_btn-bg: var(--color-button-link-bg-default);
   --_btn-text: var(--color-button-link-text-default);
-  --_btn-border: transparent;
+  --_btn-border: var(--color-button-link-border-default);
   --_btn-padding-x: 0;
   --_btn-padding-y: 0;
   --_btn-min-h: auto;
@@ -248,10 +286,14 @@ These button layout tokens must exist in each breakpoint file:
   text-underline-offset: 2px;
 }
 .btn--link:hover {
+  --_btn-bg: var(--color-button-link-bg-hover);
   --_btn-text: var(--color-button-link-text-hover);
+  --_btn-border: var(--color-button-link-border-hover);
 }
 .btn--link:active {
+  --_btn-bg: var(--color-button-link-bg-active);
   --_btn-text: var(--color-button-link-text-active);
+  --_btn-border: var(--color-button-link-border-active);
 }
 
 .btn--danger {
@@ -275,13 +317,13 @@ These button layout tokens must exist in each breakpoint file:
   --_btn-padding-x: calc(var(--space-button-padding-x) * 0.75);
   --_btn-padding-y: calc(var(--space-button-padding-y) * 0.75);
   --_btn-min-h: calc(var(--space-button-min-height) - 8px);
-  font-size: calc(var(--typo-body-size) * 0.875);
+  font-size: calc(var(--typo-button-size) * 0.875);
 }
 .btn--lg {
   --_btn-padding-x: calc(var(--space-button-padding-x) * 1.25);
   --_btn-padding-y: calc(var(--space-button-padding-y) * 1.25);
   --_btn-min-h: calc(var(--space-button-min-height) + 8px);
-  font-size: calc(var(--typo-body-size) * 1.125);
+  font-size: calc(var(--typo-button-size) * 1.125);
 }
 
 /* ── Icon-only ── */
@@ -302,7 +344,7 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
 
 ```html
 <!-- Button element -->
-<button class="btn btn--primary" type="button">
+<button class="btn" type="button">
   Add to Cart
 </button>
 
@@ -311,28 +353,34 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
   View Details
 </a>
 
+<!-- Disabled links keep aria-disabled but omit href -->
+<a class="btn btn--secondary" role="link" aria-disabled="true">
+  Unavailable
+</a>
+
 <!-- Loading state (set via JS) -->
-<button class="btn btn--primary" aria-busy="true" aria-label="Adding to cart…">
+<button class="btn" type="button" aria-busy="true" disabled>
   Add to Cart
 </button>
 
 <!-- Icon + label -->
 <button class="btn btn--outline">
-  {% render 'icon', name: 'cart', class: 'btn__icon' %}
+  {% render 'icon', name: 'cart', class: 'btn__icon btn__icon--leading' %}
   <span>Cart ({{ cart.item_count }})</span>
 </button>
 
 <!-- Icon-only -->
 <button class="btn btn--outline btn--icon-only" aria-label="Search">
-  {% render 'icon', name: 'search' %}
+  {% render 'icon', name: 'search', class: 'btn__icon btn__icon--leading' %}
 </button>
 ```
 
 #### Accessibility
 
 - Always provide visible focus ring via `:focus-visible`
-- `aria-disabled="true"` preferred over `disabled` for links
-- `aria-busy="true"` during loading
+- Disabled links keep `role="link"` and `aria-disabled="true"` but omit `href`
+- Busy buttons compose `aria-busy="true"` with `disabled`; busy links keep `role="link"` but omit `href`
+- `data-loading-position="leading|trailing"` optionally overrides automatic loading placement
 - `aria-label` required for icon-only buttons
 - Minimum touch target: 44×44px (Mobile), 40×40px (Desktop)
 
@@ -340,7 +388,8 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
 
 ### A2. Input (Text)
 
-4 types (default, error, success, validation) × 4 states (unfocused, hover, focused, disabled).
+Four variants (default, error, success, warning) with explicit default, hover,
+focus-visible, disabled, and focused validation states.
 
 #### CSS Contract
 
@@ -349,6 +398,7 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
   /* ── Color contract (Theme) ── */
   --_input-bg: var(--color-input-default-unfocused-bg);
   --_input-border: var(--color-input-default-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-default-hover-inner-border);
   --_input-outer-border: var(--color-input-default-unfocused-outer-border);
   --_input-text: var(--color-input-default-unfocused-value);
   --_input-placeholder: var(--color-input-default-unfocused-placeholder);
@@ -361,27 +411,41 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
   --_input-padding-y: var(--space-input-padding-y);
   --_input-margin-bottom: var(--space-input-margin-bottom);
   --_input-icon-size: var(--space-input-icon-size);
-  --_input-label-size: var(--space-input-label-size);
-  --_input-value-size: var(--space-input-value-size);
-  --_input-message-size: var(--space-input-message-size);
+  --_input-icon-gap: var(--space-input-icon-gap);
+  --_input-label-size: var(--typo-input-label-size);
+  --_input-label-line-height: var(--typo-input-label-line-height);
+  --_input-value-size: var(--typo-input-value-size);
+  --_input-value-line-height: var(--typo-input-value-line-height);
+  --_input-message-size: var(--typo-input-message-size);
+  --_input-message-line-height: var(--typo-input-message-line-height);
 
   /* ── Static ── */
   --_input-radius: var(--radius-md);
   --_input-transition: var(--transition-fast) var(--easing-default);
 
-  display: flex;
+  position: relative;
+  display: inline-flex;
   flex-direction: column;
+  max-width: 100%;
   gap: 4px;
   margin-bottom: var(--_input-margin-bottom);
 }
 
 .input__label {
   font-size: var(--_input-label-size);
+  line-height: var(--_input-label-line-height);
   font-weight: 500;
   color: var(--_input-label);
 }
 
+.input__control {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
 .input__field {
+  width: 100%;
   padding: var(--_input-padding-y) var(--_input-padding-x);
   background: var(--_input-bg);
   color: var(--_input-text);
@@ -389,8 +453,9 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
   border-radius: var(--_input-radius);
   font-family: var(--font-family-body);
   font-size: var(--_input-value-size);
-  outline: 2px solid transparent;
-  outline-offset: 2px;
+  line-height: var(--_input-value-line-height);
+  outline: 4px solid transparent;
+  outline-offset: 0;
   transition: border-color var(--_input-transition),
               outline-color var(--_input-transition),
               background var(--_input-transition);
@@ -402,13 +467,27 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
 
 .input__message {
   font-size: var(--_input-message-size);
+  line-height: var(--_input-message-line-height);
   color: var(--_input-message);
 }
 
 .input__icon {
+  position: absolute;
+  top: 50%;
+  display: block;
   width: var(--_input-icon-size);
   height: var(--_input-icon-size);
+  transform: translateY(-50%);
   color: var(--_input-icon);
+  pointer-events: none;
+}
+.input__icon--leading { left: var(--_input-padding-x); }
+.input__icon--trailing { right: var(--_input-padding-x); }
+.input__control:has(.input__icon--leading) .input__field {
+  padding-left: calc(var(--_input-padding-x) + var(--_input-icon-size) + var(--_input-icon-gap));
+}
+.input__control:has(.input__icon--trailing) .input__field {
+  padding-right: calc(var(--_input-padding-x) + var(--_input-icon-size) + var(--_input-icon-gap));
 }
 
 /* ── States ── */
@@ -434,6 +513,7 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
 /* ── Variants ── */
 .input--error {
   --_input-border: var(--color-input-error-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-error-unfocused-inner-border);
   --_input-label: var(--color-input-error-unfocused-label);
   --_input-message: var(--color-input-error-unfocused-message);
   --_input-icon: var(--color-input-error-unfocused-icon);
@@ -446,8 +526,28 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
 
 .input--success {
   --_input-border: var(--color-input-success-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-success-unfocused-inner-border);
+  --_input-label: var(--color-input-success-unfocused-label);
   --_input-message: var(--color-input-success-unfocused-message);
   --_input-icon: var(--color-input-success-unfocused-icon);
+}
+.input--success .input__field:focus-visible {
+  --_input-border: var(--color-input-success-focused-inner-border);
+  --_input-outer-border: var(--color-input-success-focused-outer-border);
+  outline-color: var(--_input-outer-border);
+}
+
+.input--warning {
+  --_input-border: var(--color-input-warning-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-warning-unfocused-inner-border);
+  --_input-label: var(--color-input-warning-unfocused-label);
+  --_input-message: var(--color-input-warning-unfocused-message);
+  --_input-icon: var(--color-input-warning-unfocused-icon);
+}
+.input--warning .input__field:focus-visible {
+  --_input-border: var(--color-input-warning-focused-inner-border);
+  --_input-outer-border: var(--color-input-warning-focused-outer-border);
+  outline-color: var(--_input-outer-border);
 }
 ```
 
@@ -456,19 +556,20 @@ Tokens `--space-button-*` change per breakpoint. No CSS media queries needed —
 ```html
 <div class="input">
   <label class="input__label" for="email">Email</label>
-  <div class="input__wrapper">
+  <div class="input__control">
+    <svg class="input__icon input__icon--leading" aria-hidden="true"><!-- icon --></svg>
     <input class="input__field" type="email" id="email"
            placeholder="you@example.com" autocomplete="email">
   </div>
 </div>
 
-<!-- With icon + message (error state) -->
+<!-- With message (error state) -->
 <div class="input input--error">
   <label class="input__label" for="email">Email</label>
-  <div class="input__wrapper">
-    {% render 'icon', name: 'alert-circle', class: 'input__icon' %}
+  <div class="input__control">
     <input class="input__field" type="email" id="email"
            aria-invalid="true" aria-describedby="email-error">
+    <svg class="input__icon input__icon--trailing" aria-hidden="true"><!-- icon --></svg>
   </div>
   <p class="input__message" id="email-error" role="alert">
     Please enter a valid email
@@ -504,38 +605,156 @@ Same token contract as Input, with dropdown-specific additions.
   /* ── Inherits full input contract ── */
   --_input-bg: var(--color-input-default-unfocused-bg);
   --_input-border: var(--color-input-default-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-default-hover-inner-border);
+  --_input-outer-border: var(--color-input-default-focused-outer-border);
   --_input-text: var(--color-input-default-unfocused-value);
   --_input-label: var(--color-input-default-unfocused-label);
+  --_input-message: var(--color-input-default-unfocused-message);
   --_input-padding-x: var(--space-input-padding-x);
   --_input-padding-y: var(--space-input-padding-y);
   --_input-radius: var(--radius-md);
+  --_input-label-size: var(--typo-input-label-size);
+  --_input-label-line-height: var(--typo-input-label-line-height);
+  --_input-value-size: var(--typo-input-value-size);
+  --_input-value-line-height: var(--typo-input-value-line-height);
+  --_input-message-size: var(--typo-input-message-size);
+  --_input-message-line-height: var(--typo-input-message-line-height);
+  --_select-indicator: var(--color-input-default-unfocused-icon);
+  --_select-panel-padding: 4px;
   --_input-transition: var(--transition-fast) var(--easing-default);
 
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
+  max-width: 100%;
   gap: 4px;
   margin-bottom: var(--space-input-margin-bottom);
+}
+
+.select__control { position: relative; min-width: 0; }
+.select__message {
+  font-size: var(--_input-message-size);
+  line-height: var(--_input-message-line-height);
+  color: var(--_input-message);
 }
 
 .select__field {
   appearance: none;
   padding: var(--_input-padding-y) calc(var(--_input-padding-x) + 24px) var(--_input-padding-y) var(--_input-padding-x);
-  background: var(--_input-bg) url("data:image/svg+xml,...") no-repeat right var(--_input-padding-x) center;
+  background-color: var(--_input-bg);
+  /* Lucide ChevronDown geometry used by the no-JavaScript fallback. */
+  background-image: url("data:image/svg+xml,...");
+  background-position: right var(--_input-padding-x) center;
+  background-repeat: no-repeat;
   background-size: 16px;
   color: var(--_input-text);
   border: 1px solid var(--_input-border);
   border-radius: var(--_input-radius);
   font-family: var(--font-family-body);
-  font-size: var(--space-input-value-size);
+  font-size: var(--_input-value-size);
+  line-height: var(--_input-value-line-height);
+  outline: 4px solid transparent;
+  outline-offset: 0;
   cursor: pointer;
-  transition: border-color var(--_input-transition);
+  transition: border-color var(--_input-transition),
+              outline-color var(--_input-transition),
+              background-color var(--_input-transition),
+              color var(--_input-transition);
 }
 
 /* States mirror .input__field */
-.select__field:hover { --_input-border: var(--color-input-default-hover-inner-border); }
+.select__field:hover:not(:disabled) {
+  --_input-bg: var(--color-input-default-hover-bg);
+  --_input-border: var(--_input-hover-border);
+}
 .select__field:focus-visible {
-  outline: 2px solid var(--color-input-default-focused-outer-border);
-  outline-offset: 2px;
+  --_input-border: var(--color-input-default-focused-inner-border);
+  --_input-outer-border: var(--color-input-default-focused-outer-border);
+  outline-color: var(--_input-outer-border);
+}
+
+.select--error {
+  --_input-border: var(--color-input-error-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-error-unfocused-inner-border);
+  --_input-label: var(--color-input-error-unfocused-label);
+  --_input-message: var(--color-input-error-unfocused-message);
+  --_select-indicator: var(--color-input-error-unfocused-icon);
+}
+.select--success {
+  --_input-border: var(--color-input-success-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-success-unfocused-inner-border);
+  --_input-label: var(--color-input-success-unfocused-label);
+  --_input-message: var(--color-input-success-unfocused-message);
+  --_select-indicator: var(--color-input-success-unfocused-icon);
+}
+.select--warning {
+  --_input-border: var(--color-input-warning-unfocused-inner-border);
+  --_input-hover-border: var(--color-input-warning-unfocused-inner-border);
+  --_input-label: var(--color-input-warning-unfocused-label);
+  --_input-message: var(--color-input-warning-unfocused-message);
+  --_select-indicator: var(--color-input-warning-unfocused-icon);
+}
+.select--error .select__field:focus-visible {
+  outline-color: var(--color-input-error-focused-outer-border);
+}
+.select--success .select__field:focus-visible {
+  outline-color: var(--color-input-success-focused-outer-border);
+}
+.select--warning .select__field:focus-visible {
+  outline-color: var(--color-input-warning-focused-outer-border);
+}
+.select__field:disabled {
+  --_input-bg: var(--color-input-default-disabled-bg);
+  --_input-border: var(--color-input-default-disabled-inner-border);
+  --_input-text: var(--color-input-default-disabled-value);
+  --_select-indicator: var(--color-input-default-disabled-value);
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+/* Added only after progressive enhancement succeeds */
+.select__native { display: none; }
+.select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding-right: var(--_input-padding-x);
+  background-image: none;
+}
+.select__indicator,
+.select__option-check { width: 16px; height: 16px; }
+.select__listbox {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: var(--z-dropdown);
+  width: max-content;
+  min-width: 100%;
+  max-width: min(360px, calc(100vw - 32px));
+  max-height: 240px;
+  overflow: auto;
+  padding: var(--_select-panel-padding);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+.select__option {
+  min-height: 44px;
+  padding: 10px calc(var(--_input-padding-x) + 24px) 10px var(--_input-padding-x);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.select__option-check {
+  top: 50%;
+  right: calc(var(--_input-padding-x) - var(--_select-panel-padding));
+  transform: translateY(-50%);
+}
+.select__option[hidden] { display: none; }
+.select__option:hover,
+.select__option[data-highlighted] {
+  background: var(--color-surface-secondary);
 }
 ```
 
@@ -545,7 +764,7 @@ Same token contract as Input, with dropdown-specific additions.
 <div class="select">
   <label class="select__label" for="glaze">Glaze Color</label>
   <select class="select__field" id="glaze" name="glaze">
-    <option value="">Choose a glaze…</option>
+    <option value="" hidden selected>Choose a glaze…</option>
     {% for value in product.options_by_name['Glaze'].values %}
       <option value="{{ value }}"
         {% if value == product.selected_variant.option1 %}selected{% endif %}>
@@ -556,11 +775,22 @@ Same token contract as Input, with dropdown-specific additions.
 </div>
 ```
 
+The shared `theme.js` enhances this native markup into `.select__control`,
+`.select__trigger`, `.select__value`, `.select__indicator`, `.select__listbox`,
+`.select__option`, and `.select__option-check`. The native field remains the submitted value and
+the visible fallback when JavaScript is absent. The trigger is intrinsic unless
+the consumer defines a width; the listbox independently grows to fit its options
+up to its viewport-safe maximum. Error, Success, and Warning use
+`.select--error`, `.select--success`, and `.select--warning`; feedback uses
+`.select__message` with `aria-describedby`, and only Error requires
+`aria-invalid="true"` on the native field.
+
 ---
 
 ### A4. Textarea
 
-Inherits the Input contract with vertical resize.
+Inherits the Input contract and exposes vertical, horizontal, or bidirectional
+native resizing. Vertical is the default.
 
 ```css
 .textarea__field {
@@ -568,6 +798,11 @@ Inherits the Input contract with vertical resize.
   resize: vertical;
   min-height: 120px;
 }
+
+.textarea__field[data-resize="horizontal"] { resize: horizontal; }
+.textarea__field[data-resize="both"] { resize: both; }
+.textarea__field[data-min-lines] { min-height: var(--_textarea-min-height, 120px); }
+.textarea__field[data-max-lines] { max-height: var(--_textarea-max-height, none); }
 ```
 
 ```html
@@ -580,6 +815,13 @@ Inherits the Input contract with vertical resize.
 </div>
 ```
 
+Use `data-resize="horizontal"` or `data-resize="both"` on the native textarea
+to opt into another direction. Omit the attribute for the default vertical
+behavior. `data-min-lines` and `data-max-lines` accept positive whole numbers;
+the shared progressive enhancer calculates their height constraints from the
+field's computed typography and box metrics. The default minimum is four lines
+and an omitted maximum remains unbounded.
+
 ---
 
 ### A5. Checkbox
@@ -588,16 +830,19 @@ Inherits the Input contract with vertical resize.
 
 ```css
 .checkbox {
-  --_check-size: 20px;
+  --_check-size: var(--space-input-icon-size);
+  --_check-gap: var(--space-input-icon-gap);
   --_check-bg: var(--color-input-default-unfocused-bg);
   --_check-border: var(--color-input-default-unfocused-inner-border);
+  --_check-hover-border: var(--color-input-default-hover-inner-border);
   --_check-active: var(--color-button-primary-bg-default);
   --_check-text: var(--color-text-primary);
+  --_check-focus: var(--color-input-default-focused-outer-border);
   --_check-radius: var(--radius-sm);
 
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--_check-gap);
   cursor: pointer;
 }
 
@@ -623,10 +868,10 @@ Inherits the Input contract with vertical resize.
   background-repeat: no-repeat;
 }
 
-.checkbox__input:hover { --_check-border: var(--color-input-default-hover-inner-border); }
+.checkbox:hover .checkbox__input:not(:disabled) { --_check-border: var(--_check-hover-border); }
 .checkbox__input:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: 4px solid var(--_check-focus);
+  outline-offset: 0;
 }
 
 .checkbox__label {
@@ -647,25 +892,51 @@ Inherits the Input contract with vertical resize.
 
 ### A6. Radio
 
-Identical to Checkbox but with `border-radius: var(--radius-full)` and a dot instead of checkmark.
+Native mutually exclusive choice. Radio reuses the accepted choice-control
+validation boundary from Checkbox while retaining native named-group behavior.
 
 ```css
+.radio {
+  --_radio-size: var(--space-input-icon-size);
+  --_radio-gap: var(--space-input-icon-gap);
+  --_radio-active: var(--color-button-primary-bg-default);
+  --_radio-focus: var(--color-input-default-focused-outer-border);
+}
 .radio__input {
-  /* Same as .checkbox__input except: */
+  width: var(--_radio-size);
+  height: var(--_radio-size);
   border-radius: var(--radius-full);
 }
 .radio__input:checked {
-  border-color: var(--_check-active);
-  background: var(--_check-bg);
-  box-shadow: inset 0 0 0 4px var(--_check-active);
+  border-color: var(--_radio-active);
+  box-shadow: inset 0 0 0 4px var(--_radio-active);
+}
+.radio__input:focus-visible {
+  outline: 4px solid var(--_radio-focus);
+  outline-offset: 0;
 }
 ```
+
+```html
+<fieldset class="fieldset">
+  <legend class="fieldset__legend">Fulfillment method</legend>
+  <label class="radio">
+    <input class="radio__input" type="radio" name="fulfillment" value="pickup">
+    <span class="radio__label">Gallery pickup</span>
+  </label>
+</fieldset>
+```
+
+Default, Error, Success, and Warning are visual validation variants independent
+from checked state. Radio owns native input ARIA; Field Wrapper owns feedback
+content.
 
 ---
 
 ### A7. Badge
 
-Small status indicators for product states.
+Small passive status indicators for product states. Badge is non-interactive;
+`role="status"` is opt-in only for content that changes dynamically.
 
 ```css
 .badge {
@@ -705,27 +976,45 @@ Small status indicators for product states.
 
 ### A8. Tag
 
-Removable labels for filters, categories, applied facets.
+Compact labels for filters, categories, and applied facets, with an optional
+native remove button. The consuming target owns the removal state update and
+announcement.
 
 ```css
 .tag {
   --_tag-bg: var(--color-surface-secondary);
   --_tag-text: var(--color-text-secondary);
   --_tag-border: var(--color-border-subtle);
+  --_tag-padding-start: 12px;
+  --_tag-padding-end: 12px;
 
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 12px;
+  padding: 4px var(--_tag-padding-end) 4px var(--_tag-padding-start);
   border: 1px solid var(--_tag-border);
   border-radius: var(--radius-full);
   background: var(--_tag-bg);
   color: var(--_tag-text);
+  font-family: var(--font-family-body);
   font-size: calc(var(--typo-body-size) * 0.875);
+}
+
+.tag:has(.tag__remove) {
+  --_tag-padding-end: 8px;
+}
+
+.tag__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .tag__remove {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-input-icon-size);
+  height: var(--space-input-icon-size);
   padding: 0;
   border: none;
   background: none;
@@ -734,14 +1023,16 @@ Removable labels for filters, categories, applied facets.
   opacity: 0.6;
 }
 .tag__remove:hover { opacity: 1; }
+.tag__remove:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
 ```
 
 ```html
 <span class="tag">
-  Stoneware
-  <button class="tag__remove" aria-label="Remove Stoneware filter">
-    {% render 'icon', name: 'x', size: 14 %}
-  </button>
+  <span class="tag__label">Stoneware</span>
+  <button class="tag__remove" type="button" aria-label="Remove Stoneware filter"></button>
 </span>
 ```
 
@@ -804,6 +1095,12 @@ Handles regular, compare-at (sale), and sold-out pricing.
   <span class="price__unit">per piece</span>
 </div>
 ```
+
+Error, Success, and Warning use `.checkbox--error`, `.checkbox--success`, and
+`.checkbox--warning` on the wrapping label. Native `checked`, `disabled`, and
+`required` remain on the input. `data-indeterminate="true"` progressively
+initializes the native `indeterminate` property; it does not create a third form
+value. Field Wrapper owns associated helper or validation messages.
 
 ---
 
@@ -1008,7 +1305,7 @@ For zero-result searches, empty carts, etc.
   {% render 'icon', name: 'shopping-bag', class: 'empty-state__icon' %}
   <h2 class="empty-state__title">Your cart is empty</h2>
   <p class="empty-state__message">Looks like you haven't found the perfect piece yet.</p>
-  <a href="/collections/all" class="btn btn--primary">Explore the Collection</a>
+  <a href="/collections/all" class="btn">Explore the Collection</a>
 </div>
 ```
 
@@ -1220,7 +1517,7 @@ Foundation component for Product Card, Collection Card, and content cards.
       <!-- Content -->
     </div>
     <div class="modal__footer">
-      <button class="btn btn--primary" data-modal-close>Got it</button>
+      <button class="btn" data-modal-close>Got it</button>
     </div>
   </div>
 </div>
@@ -2103,7 +2400,7 @@ Uses Drawer (B3) with Shopify Cart API integration.
     <p style="font-size: calc(var(--typo-body-size) * 0.75); color: var(--color-text-secondary); margin: 8px 0;">
       Shipping calculated at checkout
     </p>
-    <a href="/checkout" class="btn btn--primary btn--full">Checkout</a>
+    <a href="/checkout" class="btn btn--full">Checkout</a>
   </div>
   {% endif %}
 </aside>
@@ -2253,7 +2550,7 @@ The primary browsing unit. Appears in collection grids, related products, and se
 
     {% if product.available and product.variants.size == 1 %}
       <div class="product-card__quick-add">
-        <button class="btn btn--primary btn--full btn--sm"
+        <button class="btn btn--full btn--sm"
                 data-quick-add="{{ product.variants.first.id }}">
           Quick Add
         </button>
@@ -2684,7 +2981,7 @@ Handles color swatches (for glazes), size selection, and other options.
 
 .product-form__submit {
   flex: 1;
-  /* Extends .btn .btn--primary .btn--lg */
+  /* Extends .btn .btn--lg */
 }
 
 .product-form__wishlist {
@@ -2711,7 +3008,7 @@ Handles color swatches (for glazes), size selection, and other options.
            data-variant-id>
 
     <div class="product-form__actions">
-      <button class="btn btn--primary btn--lg product-form__submit"
+      <button class="btn btn--lg product-form__submit"
               type="submit"
               {% unless product.selected_or_first_available_variant.available %}
                 disabled aria-disabled="true"
@@ -3781,7 +4078,7 @@ Art-first presentation, larger images than standard product grid.
     {% endif %}
     <div class="hero__actions">
       {% if section.settings.cta_url %}
-        <a href="{{ section.settings.cta_url }}" class="btn btn--primary btn--lg">
+        <a href="{{ section.settings.cta_url }}" class="btn btn--lg">
           {{ section.settings.cta_text | default: 'Shop Now' }}
         </a>
       {% endif %}
@@ -3855,7 +4152,7 @@ Art-first presentation, larger images than standard product grid.
         <input class="input__field newsletter__input" type="email"
                name="contact[email]" placeholder="Your email"
                aria-label="Email address" required autocomplete="email">
-        <button class="btn btn--primary" type="submit">Subscribe</button>
+        <button class="btn" type="submit">Subscribe</button>
       </div>
     {% endform %}
     <p class="newsletter__note">No spam. Unsubscribe anytime.</p>

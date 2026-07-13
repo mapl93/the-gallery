@@ -1,0 +1,71 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "collection-promo",
+  "name": "Collection Promo Tile",
+  "registryId": "E6",
+  "category": "collection",
+  "status": "pilot",
+  "summary": "Inline promotional tile for collection grids with media, overlay, editorial copy, CTA, and optional two-column span.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/collection-promo",
+    "css": { "file": "components/css/collection.css", "selector": ".collection-promo" },
+    "docs": "site/src/content/components/collection-promo.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".collection-promo", "className": ".collection-promo", "required": true, "description": "Promo tile container." },
+    { "name": "media", "selector": ".collection-promo__media", "className": ".collection-promo__media", "required": false, "description": "Background media." },
+    { "name": "overlay", "selector": ".collection-promo__overlay", "className": ".collection-promo__overlay", "required": false, "description": "Readable text overlay gradient." },
+    { "name": "content", "selector": ".collection-promo__content", "className": ".collection-promo__content", "required": true, "description": "Promo content wrapper." },
+    { "name": "eyebrow", "selector": ".collection-promo__eyebrow", "className": ".collection-promo__eyebrow", "required": false, "description": "Short promotional eyebrow." },
+    { "name": "title", "selector": ".collection-promo__title", "className": ".collection-promo__title", "required": true, "description": "Promo title." },
+    { "name": "cta", "selector": ".collection-promo__cta", "className": ".collection-promo__cta", "required": false, "description": "Promo call to action." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default single-column promo tile." },
+    { "name": "span-2", "className": ".collection-promo--span-2", "default": false, "description": "Promo tile spans two grid columns on wider viewports." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default promo tile size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".collection-promo"], "description": "Default promo state." },
+    { "name": "span2", "selectors": [".collection-promo--span-2"], "description": "Two-column span state." },
+    { "name": "ctaHover", "selectors": [".collection-promo__cta:hover"], "description": "CTA hover state." },
+    { "name": "ctaFocus", "selectors": [".collection-promo__cta:focus-visible"], "description": "Visible promotional-link focus state." }
+  ],
+  "behavior": [
+    { "name": "promotionLink", "selectors": [".collection-promo__cta"], "attributes": ["href"], "events": ["click"], "description": "CTA should navigate to the promoted collection, product, or campaign destination." },
+    { "name": "mediaContrast", "selectors": [".collection-promo__overlay"], "description": "Overlay exists to keep text readable over media." }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Default or two-column promotional tile.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".collection-promo", "source": "variants" }] } },
+    { "name": "media", "type": "slot", "required": false, "description": "Optional promotional media.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-promo__media", "classNames": [".collection-promo__media"] }] } },
+    { "name": "mediaAlt", "type": "string", "required": false, "description": "Alternative text when promotional media conveys content.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".collection-promo__media", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
+    { "name": "eyebrow", "type": "string", "required": false, "description": "Short promotional context.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-promo__eyebrow" }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Promotional title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-promo__title" }] } },
+    { "name": "ctaLabel", "type": "string", "required": false, "description": "Visible promotional link label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-promo__cta" }] } },
+    { "name": "href", "type": "string", "required": false, "description": "Promotional destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".collection-promo__cta", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-statement", "--color-text-primary", "--color-text-inverse", "--color-border-focus"],
+      "radius": ["--radius-md"],
+      "typography": ["--typo-body-size", "--typo-h3-size", "--typo-body-sm-size", "--font-family-heading"]
+    }
+  },
+  "accessibility": [
+    "Ensure text over media meets contrast requirements.",
+    "Keep the CTA text descriptive.",
+    "Do not rely on imagery alone to communicate the promotion."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map promo block settings to media, copy, CTA, and span behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

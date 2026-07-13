@@ -1,0 +1,119 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "link",
+  "name": "Link",
+  "registryId": "A28",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Native anchor primitive with destination, visible label, current-page semantics, direct target and relationship attributes, three visual variants, and canonical hover and focus-visible states.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/link",
+    "css": { "file": "components/css/primitives.css", "selector": ".link" },
+    "docs": "site/src/content/components/link.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".link", "className": ".link", "required": true, "description": "Anchor or navigation link." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default underlined link." },
+    { "name": "subtle", "className": ".link--subtle", "default": false, "description": "Subtle lower-emphasis link." },
+    { "name": "nav", "className": ".link--nav", "default": false, "description": "Navigation link style." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default link size inherited from surrounding text." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".link"], "description": "Default link state." },
+    { "name": "hover", "selectors": [".link:hover"], "description": "Pointer hover state." },
+    { "name": "focusVisible", "selectors": [".link:focus-visible"], "description": "Keyboard focus state." },
+    { "name": "subtleHover", "selectors": [".link--subtle:hover"], "description": "Subtle link hover state." },
+    { "name": "navHover", "selectors": [".link--nav:hover"], "description": "Navigation link hover state." }
+  ],
+  "behavior": [
+    { "name": "navigation", "selectors": [".link"], "attributes": ["href", "target", "rel", "aria-current"], "events": ["click"], "description": "Links use native anchors with href for navigation. Target, relationship, and current-page metadata remain native anchor attributes; actions use Button." }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible link text that communicates the destination when read outside its surrounding sentence.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".link" }]
+      }
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "Native navigation destination. Link requires href; use Button when activation does not navigate.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Visual treatment selected from Default, Subtle, or Nav; Default is classless.",
+      "targetMappings": {
+        "web": [{ "kind": "optionClass", "selector": ".link", "source": "variants" }]
+      }
+    },
+    {
+      "name": "target",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit target and use the current browsing context.",
+      "description": "Optional native anchor target such as _blank or the name of a browsing context.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".link", "attribute": "target", "valueFrom": "property", "elements": ["a"] }]
+      }
+    },
+    {
+      "name": "rel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit rel when the relationship does not need to be declared.",
+      "description": "Optional native relationship tokens. Include noopener when opening an untrusted destination in a new browsing context.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".link", "attribute": "rel", "valueFrom": "property", "elements": ["a"] }]
+      }
+    },
+    {
+      "name": "currentPage",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Marks this destination as the current page without introducing a separate visual variant.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".link", "attribute": "aria-current", "values": { "true": "page", "false": null }, "elements": ["a"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-accent", "--color-text-primary", "--color-border-focus", "--color-text-secondary"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Use anchors with href for navigation.",
+    "Make link text meaningful outside its immediate visual context.",
+    "Keep focus-visible styling intact.",
+    "Use rel=\"noopener\" for untrusted new-tab destinations when appropriate.",
+    "Use aria-current=\"page\" only for the link whose destination represents the current page."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

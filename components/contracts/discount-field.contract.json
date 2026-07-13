@@ -1,0 +1,71 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "discount-field",
+  "name": "Discount / Promo Field",
+  "registryId": "K4",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Expandable cart discount field with promo input, apply action, applied-code state, and remove action.",
+  "dependencies": ["input", "button"],
+  "source": {
+    "registry": "registry.json#/components/discount-field",
+    "css": { "file": "components/css/cart.css", "selector": ".discount-field" },
+    "docs": "site/src/content/components/discount-field.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".discount-field", "className": ".discount-field", "required": true, "description": "Discount field wrapper." },
+    { "name": "toggle", "selector": ".discount-field__toggle", "className": ".discount-field__toggle", "required": true, "description": "Disclosure toggle." },
+    { "name": "form", "selector": ".discount-field__form", "className": ".discount-field__form", "required": false, "description": "Promo-code form." },
+    { "name": "input", "selector": ".discount-field__input", "className": ".discount-field__input", "required": false, "description": "Promo-code input wrapper or field hook." },
+    { "name": "apply", "selector": ".discount-field__apply", "className": ".discount-field__apply", "required": false, "description": "Promo-code apply action." },
+    { "name": "applied", "selector": ".discount-field__applied", "className": ".discount-field__applied", "required": false, "description": "Applied code chip." },
+    { "name": "remove", "selector": ".discount-field__remove", "className": ".discount-field__remove", "required": false, "description": "Applied code remove action." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default discount field." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default inline promo field size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".discount-field"], "description": "Default discount field state." },
+    { "name": "collapsed", "selectors": [".discount-field[data-expanded=\"false\"] .discount-field__form"], "description": "Collapsed disclosure state emitted by the expanded property." },
+    { "name": "applied", "selectors": [".discount-field__applied"], "description": "Applied discount state." },
+    { "name": "actionFocus", "selectors": [".discount-field__toggle:focus-visible", ".discount-field__remove:focus-visible"], "description": "Visible disclosure and remove-action focus states." }
+  ],
+  "behavior": [
+    { "name": "applyDiscount", "selectors": [".discount-field__form", ".discount-field__input"], "events": ["submit"], "description": "Submitting a code should validate and apply the discount in the target commerce system." },
+    { "name": "removeDiscount", "selectors": [".discount-field__remove"], "events": ["click"], "description": "Removing an applied code should update totals and active discount state." },
+    { "name": "disclosure", "selectors": [".discount-field__toggle"], "attributes": ["aria-expanded", "aria-controls"], "events": ["click"], "description": "Expandable promo form should expose disclosure state when hidden by default." }
+  ],
+  "properties": [
+    { "name": "toggleLabel", "type": "string", "required": true, "description": "Promo disclosure label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".discount-field__toggle" }] } },
+    { "name": "expanded", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls promo form visibility and disclosure state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".discount-field", "attribute": "data-expanded", "values": { "true": "true", "false": "false" } }, { "kind": "attribute", "selector": ".discount-field__toggle", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } },
+    { "name": "input", "type": "slot", "required": false, "description": "Input dependency for entering a promo code.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".discount-field__input", "classNames": [".discount-field__input"] }] } },
+    { "name": "applyLabel", "type": "string", "required": false, "description": "Apply action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".discount-field__apply" }] } },
+    { "name": "applied", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows the applied-code state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".discount-field", "attribute": "data-applied", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "appliedCode", "type": "string", "required": false, "description": "Readable applied discount code.", "targetMappings": { "web": [{ "kind": "content", "selector": ".discount-field__applied" }] } },
+    { "name": "removeLabel", "type": "string", "required": false, "description": "Accessible applied-code removal label.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".discount-field__remove", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-accent", "--color-feedback-success-default", "--color-border-focus"],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Label the promo-code input.",
+    "Announce applied or rejected discount feedback.",
+    "Keep remove-discount actions labelled with the applied code when possible."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should integrate with Shopify discount code behavior or target-specific cart discount APIs." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

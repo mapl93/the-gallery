@@ -1,0 +1,72 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "account-dashboard",
+  "name": "Account Dashboard",
+  "registryId": "U3",
+  "category": "account",
+  "status": "pilot",
+  "summary": "Account overview with greeting and responsive navigation cards.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/account-dashboard",
+    "css": { "file": "components/css/account.css", "selector": ".account-dashboard" },
+    "docs": "site/src/content/components/account-dashboard.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".account-dashboard", "className": ".account-dashboard", "required": true, "description": "Account dashboard container." },
+    { "name": "header", "selector": ".account-dashboard__header", "className": ".account-dashboard__header", "required": true, "description": "Dashboard header." },
+    { "name": "greeting", "selector": ".account-dashboard__greeting", "className": ".account-dashboard__greeting", "required": true, "description": "Customer greeting." },
+    { "name": "actions", "selector": ".account-dashboard__actions", "className": ".account-dashboard__actions", "required": false, "description": "Optional header actions." },
+    { "name": "grid", "selector": ".account-dashboard__grid", "className": ".account-dashboard__grid", "required": true, "description": "Dashboard card grid." },
+    { "name": "card", "selector": ".account-card", "className": ".account-card", "required": true, "description": "Account navigation card." },
+    { "name": "cardIcon", "selector": ".account-card__icon", "className": ".account-card__icon", "required": false, "description": "Card icon." },
+    { "name": "cardTitle", "selector": ".account-card__title", "className": ".account-card__title", "required": true, "description": "Card title." },
+    { "name": "cardDescription", "selector": ".account-card__description", "className": ".account-card__description", "required": false, "description": "Card description." },
+    { "name": "cardLink", "selector": ".account-card__link", "className": ".account-card__link", "required": false, "description": "Card destination link." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default account dashboard." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive account dashboard grid." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".account-dashboard"], "description": "Default dashboard state." },
+    { "name": "cardHover", "selectors": [".account-card:hover"], "description": "Account card hover state." },
+    { "name": "cardLinkFocus", "selectors": [".account-card__link:focus-visible"], "description": "Visible keyboard focus on account-card navigation." },
+    { "name": "responsiveGrid", "selectors": [".account-dashboard__grid"], "description": "Responsive one, two, and three-column card grid." }
+  ],
+  "behavior": [
+    { "name": "customerGreeting", "selectors": [".account-dashboard__greeting"], "description": "Greeting should map authenticated customer data from the target." },
+    { "name": "accountNavigation", "selectors": [".account-card__link"], "attributes": ["href"], "events": ["click"], "description": "Dashboard cards should navigate to account areas." }
+  ],
+  "properties": [
+    { "name": "greeting", "type": "string", "required": true, "description": "Customer-facing dashboard greeting.", "targetMappings": { "web": [{ "kind": "content", "selector": ".account-dashboard__greeting" }] } },
+    { "name": "headerActions", "type": "slot", "required": false, "description": "Optional account-level actions beside the greeting.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".account-dashboard__actions", "classNames": [".account-dashboard__actions"] }] } },
+    { "name": "cards", "type": "slot", "required": true, "description": "Target-owned account navigation cards.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".account-dashboard__grid", "classNames": [".account-dashboard__grid"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-border-subtle", "--color-border-default", "--color-border-focus", "--color-text-secondary", "--color-text-accent"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
+      "radius": ["--radius-lg"],
+      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Protect account dashboard routes behind the target authentication system.",
+    "Use clear link text for account navigation cards.",
+    "Do not expose sensitive customer data in dashboard summaries without user intent."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer name and account route links." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

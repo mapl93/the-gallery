@@ -1,0 +1,105 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "badge",
+  "name": "Badge",
+  "registryId": "A7",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Passive status or metadata label with Info, Success, Warning, and Error variants and optional live-status semantics.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/badge",
+    "css": { "file": "components/css/primitives.css", "selector": ".badge" },
+    "docs": "site/src/content/components/badge.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".badge",
+      "className": ".badge",
+      "required": true,
+      "description": "Inline non-interactive status or metadata label."
+    }
+  ],
+  "variants": [
+    { "name": "info", "className": null, "default": true, "description": "Default informational badge." },
+    { "name": "success", "className": ".badge--success", "default": false, "description": "Positive or complete status." },
+    { "name": "warning", "className": ".badge--warning", "default": false, "description": "Cautionary status." },
+    { "name": "error", "className": ".badge--error", "default": false, "description": "Error, destructive, or unavailable status." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default compact badge size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".badge"], "description": "Passive badge state; visual meaning is selected through its variant." }
+  ],
+  "behavior": [
+    {
+      "name": "passiveSemantics",
+      "selectors": [".badge"],
+      "description": "Badge presents status or metadata and does not receive pointer or keyboard interaction."
+    },
+    {
+      "name": "liveStatus",
+      "selectors": [".badge"],
+      "attributes": ["role=\"status\" only when content changes dynamically"],
+      "description": "Optional status semantics announce dynamic content changes without making every static badge a live region."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible text that communicates the badge meaning without relying on color.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".badge" }] }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Semantic color family for the passive status.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".badge", "source": "variants" }] }
+    },
+    {
+      "name": "announceChanges",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Adds live status semantics when the badge content changes dynamically.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".badge", "attribute": "role", "values": { "true": "status", "false": null } }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-feedback-info-bg",
+        "--color-feedback-info-default",
+        "--color-feedback-success-bg",
+        "--color-feedback-success-default",
+        "--color-feedback-warning-bg",
+        "--color-feedback-warning-default",
+        "--color-feedback-error-bg",
+        "--color-feedback-error-default"
+      ],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-size", "--font-family-body"]
+    }
+  },
+  "accessibility": [
+    "Use visible text that communicates the badge meaning; do not rely on color alone.",
+    "Keep Badge non-interactive. Use Button or Link for actions and Tag for a removable value.",
+    "Use role=\"status\" only when badge content changes dynamically and should be announced.",
+    "Do not add a redundant aria-label when the visible text already communicates the complete status."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css; Info is the default .badge style." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class", "notes": "Shopify Liquid can render product, order, inventory, or marketing badges with the same class contract." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

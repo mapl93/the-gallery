@@ -1,0 +1,188 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "urgency",
+  "name": "Urgency Indicators",
+  "registryId": "G8",
+  "category": "marketing",
+  "status": "pilot",
+  "summary": "Passive urgency message with low-stock, selling-fast, viewers, or recent-sale visual treatment selected from truthful target data.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/urgency",
+    "css": {
+      "file": "components/css/marketing.css",
+      "selector": ".urgency"
+    },
+    "docs": "site/src/content/components/urgency.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".urgency",
+      "className": ".urgency",
+      "required": true,
+      "description": "Passive urgency message root."
+    },
+    {
+      "name": "lowStockIndicator",
+      "selector": ".urgency--low-stock::before",
+      "required": false,
+      "generated": true,
+      "description": "Generated visual pulse used by the low-stock presentation."
+    },
+    {
+      "name": "sellingFastIcon",
+      "selector": ".urgency--selling-fast svg",
+      "required": false,
+      "description": "Optional visual icon in the selling-fast presentation."
+    },
+    {
+      "name": "emphasis",
+      "selector": ".urgency--viewers strong",
+      "required": false,
+      "description": "Optional textual emphasis within the viewers presentation."
+    }
+  ],
+  "variants": [
+    {
+      "name": "low-stock",
+      "className": ".urgency--low-stock",
+      "default": true,
+      "description": "Warning-family presentation for a truthful low-stock claim; the required semantic property prevents this registry default marker from becoming an inferred data default."
+    },
+    {
+      "name": "selling-fast",
+      "className": ".urgency--selling-fast",
+      "default": false,
+      "description": "Error-family presentation for a truthful selling-fast claim."
+    },
+    {
+      "name": "viewers",
+      "className": ".urgency--viewers",
+      "default": false,
+      "description": "Neutral presentation for a truthful current-viewer claim."
+    },
+    {
+      "name": "recent-sale",
+      "className": ".urgency--recent-sale",
+      "default": false,
+      "description": "Neutral presentation for a truthful recent-sale claim."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Single compact message size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".urgency"
+      ],
+      "description": "Passive message presentation; variant classes represent meaning, not interaction state."
+    },
+    {
+      "name": "animatedCue",
+      "selectors": [
+        ".urgency--low-stock::before",
+        ".urgency--selling-fast svg"
+      ],
+      "description": "Optional motion cue disabled when reduced motion is requested."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "truthfulTargetData",
+      "selectors": [
+        ".urgency"
+      ],
+      "description": "The target supplies and verifies the message and its semantic presentation; the source contract does not define thresholds, viewer counting, sale recency, or a runtime default."
+    }
+  ],
+  "properties": [
+    {
+      "name": "message",
+      "type": "string",
+      "required": true,
+      "description": "Visible, self-contained urgency statement supplied from truthful target data.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".urgency"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": true,
+      "valuesFrom": "variants",
+      "description": "Explicit semantic treatment selected from target data; required so the contract does not infer an urgency default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".urgency",
+            "source": "variants"
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-feedback-error-default",
+        "--color-feedback-warning-default",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Communicate the complete claim in text and do not rely on color, icon, or motion alone.",
+    "Do not expose unverified stock, sales, or viewer claims.",
+    "Keep the indicator passive and out of the keyboard focus order.",
+    "Disable pulse animation when the user requests reduced motion."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Visual treatments are implemented; thresholds, data truth, and runtime defaults remain target-owned and unresolved."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

@@ -1,37 +1,39 @@
 ## Overview
 
-Article navigation with heading links. Optional sticky variant.
+Table of Contents presents a target-owned hierarchy of links to headings in the current article. It supports an in-flow default and an optional sticky presentation.
 
-<Preview html={"<nav class=\"toc\" style=\"max-width:280px;padding:16px;border:1px solid var(--color-border-default);border-radius:8px;\"><h4>Contents</h4><ul style=\"list-style:none;padding:0;margin-top:8px;font-size:14px;\"><li style=\"padding:4px 0;\"><a href=\"#\">Introduction</a></li><li style=\"padding:4px 0;\"><a href=\"#\">The Process</a></li><li style=\"padding:4px 0;\"><a href=\"#\">Materials</a></li></ul></nav>"} label="Table of Contents" />
+## Presentation
 
-## Variants
+<Preview html={'<nav class="toc tg-preview-frame--sm" aria-label="On this page"><h2 class="toc__title">On this page</h2><ul class="toc__list"><li class="toc__item"><a class="toc__link" href="#article-introduction">Introduction</a></li><li class="toc__item"><a class="toc__link" href="#article-process">The making process</a></li><li class="toc__item toc__item--h3"><a class="toc__link" href="#article-materials">Choosing materials</a></li><li class="toc__item toc__item--h4"><a class="toc__link" href="#article-clay-body">Clay body</a></li></ul></nav>'} label="Table of Contents" />
 
-### Default
-
-<Preview html={"<nav class=\"toc\" style=\"max-width:250px;padding:12px;border:1px solid var(--color-border-default);border-radius:8px;\"><h4>TOC</h4></nav>"} label="Default" />
-
-### Sticky
-
-<Preview html={"<nav class=\"toc toc--sticky\" style=\"max-width:250px;padding:12px;border:1px solid var(--color-border-default);border-radius:8px;\"><h4>Sticky TOC</h4></nav>"} label="Sticky" />
+The in-flow presentation has no modifier class. `sticky` maps to `.toc--sticky`. Third- and fourth-level items use `.toc__item--h3` and `.toc__item--h4`; a target-synchronized active link may use `.toc__link--active`.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the article body/prose component for rich text — it handles typography, images, and spacing.</Do>
-  <Dont>Don't manually style article content with inline styles — let the prose class handle it.</Dont>
+  <Do>Match every fragment destination to a unique heading identifier in the article content.</Do>
+  <Dont>Do not mark a link active unless the target keeps that state synchronized with the reading position.</Dont>
 </DoDont>
+
+Heading extraction and active-section synchronization remain target-owned. Whether this component shares a neutral reading-state enhancement with Reading Progress or receives state independently from each target remains unresolved.
 
 ## Accessibility
 
-<Callout type="info">
-  Blog components support Shopify's article template system. Use metafields for custom article data.
-</Callout>
+- Use a `nav` landmark with a useful accessible name when the page contains more than one navigation region.
+- Keep list indentation aligned with the article heading hierarchy.
+- Ensure every fragment link resolves to one unique heading `id`.
+- Use active styling or `aria-current` only when its semantics match synchronized target state.
+- Preserve visible keyboard focus and touch-sized links.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.toc`</td><td>class</td><td>—</td><td>Base table of contents styles</td></tr>
-  <tr><td>`.toc--sticky`</td><td>modifier</td><td>—</td><td>Sticky variant</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default` or `sticky`</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Accessible name for the navigation landmark</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible table-of-contents title</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned heading links and active-state markers</td></tr>
 </PropTable>
+
+Anatomy: `.toc`, `.toc__title`, `.toc__list`, `.toc__item`, `.toc__item--h3`, `.toc__item--h4`, and `.toc__link`.
+
+Dependencies: none. The contract remains `pilot`; neutral heading extraction and reading-state synchronization are explicitly unresolved.

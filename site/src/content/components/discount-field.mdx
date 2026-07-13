@@ -1,33 +1,52 @@
 ## Overview
 
-Expandable promo code input with applied state.
+Discount Field is a promo-code disclosure that composes Input and Button. It represents both code entry and an optional applied-code state while the commerce target owns validation and totals.
 
-<Preview html={"<div class=\"discount-field\" style=\"max-width:360px;\"><button class=\"discount-field__toggle\">Have a discount code?</button><div class=\"discount-field__form\" style=\"display:flex;gap:8px;margin-top:8px;\"><input class=\"input__field\" type=\"text\" placeholder=\"Enter code\" style=\"flex:1;\" /><button class=\"btn btn--outline\">Apply</button></div></div>"} label="Discount / Promo Field" />
+<Preview
+  html={'<div class="discount-field tg-preview-frame--sm" data-expanded="true" data-applied="false"><button class="discount-field__toggle" type="button" aria-expanded="true" aria-controls="discount-preview-form">Have a discount code?</button><form class="discount-field__form" id="discount-preview-form"><div class="input discount-field__input"><label class="input__label" for="discount-preview-code">Promo code</label><div class="input__control"><input class="input__field" id="discount-preview-code" type="text" autocomplete="off" /></div></div><button class="btn btn--outline discount-field__apply" type="submit">Apply</button></form><div class="discount-field__applied"><span>SAVE10 applied</span><button class="discount-field__remove" type="button" aria-label="Remove SAVE10 discount"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button></div></div>'}
+  label="Discount Field"
+/>
+
+## Presentation
+
+`expanded` defaults to `false` and controls the disclosure state of the promo-code form. The optional `input` slot is the canonical Input dependency; `applyLabel` names the adjacent Button action.
+
+`applied` also defaults to `false`. When active, `appliedCode` supplies the readable code and `removeLabel` supplies the removal action's accessible name. Applying or removing a code updates target-owned commerce state rather than local presentation data alone.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show real-time updates (totals, quantities) when the user modifies the cart.</Do>
-  <Dont>Don't require a page reload for cart changes — use AJAX for a smooth experience.</Dont>
+  <Do>Validate the submitted code through the commerce target and reflect the resulting totals.</Do>
+  <Dont>Do not present a code as applied until the target confirms it.</Dont>
 </DoDont>
+
+- Preserve the entered value when a recoverable validation response is shown.
+- Keep applied-code removal available wherever the active code is displayed.
+- Use the Input dependency for field validation and feedback semantics.
 
 ## Accessibility
 
-<Callout type="tip">
-  Cart components are designed for Shopify's AJAX Cart API. Wire up the JS interactions in your theme.
-</Callout>
+- Connect the disclosure button to the form with `aria-controls` and synchronize `aria-expanded`.
+- Give the promo input a visible label; placeholder text is not its accessible name.
+- Announce whether a code was applied, rejected, or removed and whether totals changed.
+- Include the active code in `removeLabel`.
+- Preserve visible focus for the disclosure and removal controls.
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Input](/components/input)
 - [Button](/components/button)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.discount-field`</td><td>class</td><td>—</td><td>Base discount / promo field styles</td></tr>
+  <tr><td>`toggleLabel`</td><td>string</td><td>required</td><td>Promo disclosure label</td></tr>
+  <tr><td>`expanded`</td><td>boolean</td><td>`false`</td><td>Controls promo-form visibility and disclosure state</td></tr>
+  <tr><td>`input`</td><td>slot</td><td>optional</td><td>Input dependency for the promo code</td></tr>
+  <tr><td>`applyLabel`</td><td>string</td><td>optional</td><td>Apply-action label</td></tr>
+  <tr><td>`applied`</td><td>boolean</td><td>`false`</td><td>Shows the applied-code state</td></tr>
+  <tr><td>`appliedCode`</td><td>string</td><td>optional</td><td>Readable applied discount code</td></tr>
+  <tr><td>`removeLabel`</td><td>string</td><td>optional</td><td>Accessible applied-code removal label</td></tr>
 </PropTable>

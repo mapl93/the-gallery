@@ -1,26 +1,52 @@
 ## Overview
 
-Full exhibition layout: hero, info sidebar, works grid, artists list.
+Exhibition Page composes an exhibition hero, information and metadata, featured works, and participating artists in a preserved narrative order.
 
-<Preview html={"<div class=\"exhibition-page\" style=\"max-width:600px;\"><div class=\"exhibition-hero\" style=\"position:relative;min-height:200px;background:#f5f0eb;border-radius:8px;display:flex;align-items:flex-end;padding:24px;\"><div class=\"exhibition-hero__content\"><span class=\"exhibition-hero__label\">Current Exhibition</span><h1 class=\"exhibition-hero__title\" style=\"font-size:1.5rem;\">Earth Forms</h1><span class=\"exhibition-hero__dates\">March 1 – April 30, 2026</span><span class=\"exhibition-hero__location\">Buenos Aires Studio</span></div></div></div>"} label="Exhibition Landing Page" />
+<Preview
+  html={'<article class="exhibition-page tg-preview-frame tg-preview-frame--lg"><header class="exhibition-hero"><div class="exhibition-hero__media"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Earth-toned ceramic forms arranged in the exhibition space" /></div><div class="exhibition-hero__overlay" aria-hidden="true"></div><div class="exhibition-hero__content"><span class="exhibition-hero__label">Current exhibition</span><h1 class="exhibition-hero__title">Earth Forms</h1><p class="exhibition-hero__dates"><time datetime="2026-03-01">March 1</time> to <time datetime="2026-04-30">April 30, 2026</time></p><p class="exhibition-hero__location">Buenos Aires Studio</p></div></header><section class="exhibition-info" aria-label="Exhibition information"><div class="exhibition-info__description"><p>Earth Forms brings together vessels shaped by geological textures, mineral color, and slow studio practice.</p></div><dl class="exhibition-info__sidebar"><div class="exhibition-info__detail"><dt class="exhibition-info__detail-label">Curator</dt><dd class="exhibition-info__detail-value">Ana Torres</dd></div><div class="exhibition-info__detail"><dt class="exhibition-info__detail-label">Admission</dt><dd class="exhibition-info__detail-value">Free</dd></div></dl></section><section class="exhibition-works"><h2 class="exhibition-works__heading">Featured works</h2><div class="exhibition-works__grid" role="list"><figure role="listitem"><div class="tg-preview-media tg-preview-media--portrait" role="img" aria-label="Tall mineral-glazed vessel"></div><figcaption>Mineral Form I</figcaption></figure><figure role="listitem"><div class="tg-preview-media tg-preview-media--portrait" role="img" aria-label="Low stoneware bowl with layered glaze"></div><figcaption>River Basin</figcaption></figure></div></section><section class="exhibition-artists"><h2 class="exhibition-artists__heading">Participating artists</h2><div class="exhibition-artists__list" role="list"><article class="exhibition-artists__item" role="listitem"><img class="exhibition-artists__avatar tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Portrait of Maria Garcia" /><div><h3 class="exhibition-artists__name">Maria Garcia</h3><p class="exhibition-artists__role">Ceramic artist</p></div></article><article class="exhibition-artists__item" role="listitem"><img class="exhibition-artists__avatar tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Portrait of Tomas Silva" /><div><h3 class="exhibition-artists__name">Tomas Silva</h3><p class="exhibition-artists__role">Sculptor</p></div></article></div></section></article>'}
+  label="Exhibition Landing Page"
+/>
+
+## Presentation
+
+`title` is required. Hero media, label, dates, location, narrative description, metadata details, featured works, and participating artists are optional target-owned content. The composition preserves hero, information, works, and artist reading order as its responsive grids stack.
+
+The featured-work and participating-artist slots intentionally use passive fixture records in the artwork. ADR 0080 does not decide whether Product Card, Artist Card, links, or another dependency owns those records or interactions.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use high-quality images and thoughtful copy — storytelling components are editorial by nature.</Do>
-  <Dont>Don't use storytelling blocks for product-heavy pages — they're designed for brand narrative.</Dont>
+  <Do>Keep the page-level narrative order stable and let each target supply exhibition records.</Do>
+  <Dont>Do not assign Product Card, Artist Card, or activation ownership to the open composition slots.</Dont>
 </DoDont>
+
+- Use the hero for the exhibition identity, date, and location rather than unrelated promotion.
+- Present exhibition metadata as clear name-value pairs.
+- Keep works and participating artists as target-owned compositions until their ownership boundary is accepted.
 
 ## Accessibility
 
-<Callout type="tip">
-  These components are unique to The Gallery's editorial focus. They work best with curated content.
-</Callout>
+- Use one page-level heading for the exhibition title and logical headings for optional works and artist regions.
+- Give meaningful hero and artist media useful alternative text and mark decorative media accordingly.
+- Use semantic name-value markup for exhibition details and machine-readable date markup where the target can provide it.
+- Composed works and artist items retain their own link, control, focus, and accessible-name requirements.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## API Reference
+**Dependencies:** None. Product Card and Artist Card are not dependencies while record and interaction ownership remains unresolved.
+
+**Anatomy:** required `.exhibition-page`, `.exhibition-hero`, `.exhibition-hero__content`, and `.exhibition-hero__title`; optional hero media, image, overlay, label, dates, and location; optional `.exhibition-info` description and metadata anatomy; optional `.exhibition-works` heading and grid; optional `.exhibition-artists` heading, list, item, avatar, name, and role.
+
+**API Reference**
 
 <PropTable>
-  <tr><td>`.exhibition-page`</td><td>class</td><td>—</td><td>Base exhibition landing page styles</td></tr>
+  <tr><td>`heroMedia`</td><td>slot</td><td>optional</td><td>Target-owned hero media</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Exhibition label</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Exhibition title</td></tr>
+  <tr><td>`dates`</td><td>string</td><td>optional</td><td>Target-formatted exhibition dates</td></tr>
+  <tr><td>`location`</td><td>string</td><td>optional</td><td>Exhibition location</td></tr>
+  <tr><td>`description`</td><td>slot</td><td>optional</td><td>Target-owned narrative rich content</td></tr>
+  <tr><td>`details`</td><td>slot</td><td>optional</td><td>Target-owned exhibition metadata</td></tr>
+  <tr><td>`works`</td><td>slot</td><td>optional</td><td>Target-owned featured-work composition</td></tr>
+  <tr><td>`artists`</td><td>slot</td><td>optional</td><td>Target-owned participating-artist composition</td></tr>
 </PropTable>

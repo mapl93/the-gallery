@@ -1,26 +1,39 @@
 ## Overview
 
-Star rating display with half-star support.
+Read-only rating display with full- and half-star anatomy plus optional review-count text.
 
-<Preview html={"<div class=\"rating\"><div class=\"rating__stars\"><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star\">★</span></div><span class=\"rating__count\">(24)</span></div>"} label="Rating Stars" />
+<Preview html={"<div class=\"rating\" role=\"img\" aria-label=\"4.5 out of 5 stars, based on 24 reviews\"><div class=\"rating__stars\" aria-hidden=\"true\"><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--half\">★</span></div><span class=\"rating__count\">(24)</span></div>"} label="Rating Stars" />
+
+## Presentation
+
+Rating has one classless presentation and one size. Filled, half-filled, and empty stars are structural states inside the star group; they are not interactive choices.
+
+The target adapter composes the star sequence from its rating data. The neutral web CSS styles that supplied anatomy but does not parse a numeric value or generate the sequence.
+
+<Preview html={"<div class=\"rating\" role=\"img\" aria-label=\"3.5 out of 5 stars\"><div class=\"rating__stars\" aria-hidden=\"true\"><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--half\">★</span><span class=\"rating__star\">★</span></div></div>"} label="Partial Rating" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Rating to display a value already resolved by the target adapter.</Do>
+  <Dont>Do not use this passive component to collect a rating; use Star Input instead.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Rating Stars is display-only. Use Star Input for interactive review input.
 </Callout>
 
 - Provide a text alternative for the rating value (e.g., "4 out of 5 stars").
+- Hide decorative star glyphs from assistive technology when a rating label is provided.
+- Do not rely on color alone to communicate rating value.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.rating`</td><td>class</td><td>—</td><td>Base rating stars styles</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Localized rating value and scale for assistive technology</td></tr>
+  <tr><td>`reviewCount`</td><td>string</td><td>none</td><td>Optional localized count text beside the stars</td></tr>
 </PropTable>
+
+Required anatomy is `.rating` with an aria-hidden `.rating__stars` group containing `.rating__star` elements. `.rating__star--filled` and `.rating__star--half` represent the supplied rating value; `.rating__count` is optional.

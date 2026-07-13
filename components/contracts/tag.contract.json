@@ -1,0 +1,137 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "tag",
+  "name": "Tag",
+  "registryId": "A8",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Compact value label with an optional named remove action whose state update remains owned by the consuming target.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/tag",
+    "css": { "file": "components/css/primitives.css", "selector": ".tag" },
+    "docs": "site/src/content/components/tag.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".tag",
+      "className": ".tag",
+      "required": true,
+      "description": "Inline wrapper for one category, filter, or selected value."
+    },
+    {
+      "name": "label",
+      "selector": ".tag__label",
+      "className": ".tag__label",
+      "required": true,
+      "description": "Visible value text."
+    },
+    {
+      "name": "remove",
+      "selector": ".tag__remove",
+      "className": ".tag__remove",
+      "required": false,
+      "description": "Optional native button that requests removal."
+    },
+    {
+      "name": "removeIndicator",
+      "selector": ".tag__remove::before",
+      "required": false,
+      "generated": true,
+      "description": "Generated fixed X indicator using Lucide geometry."
+    }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default neutral tag." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default compact tag size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".tag"], "description": "Resting tag and optional remove action." },
+    { "name": "removeHover", "selectors": [".tag__remove:hover"], "description": "Pointer hover on the remove action." },
+    { "name": "removeFocusVisible", "selectors": [".tag__remove:focus-visible"], "description": "Keyboard focus on the remove action." },
+    { "name": "removeDisabled", "selectors": [".tag__remove:disabled"], "description": "Unavailable remove action while the value remains visible." }
+  ],
+  "behavior": [
+    {
+      "name": "removeRequest",
+      "selectors": [".tag__remove"],
+      "attributes": ["type=\"button\"", "aria-label"],
+      "events": ["click", "Space", "Enter"],
+      "description": "The native button emits a removal request; the consuming target updates application state and removes the Tag."
+    },
+    {
+      "name": "removalAnnouncement",
+      "selectors": [".tag__remove"],
+      "description": "When removal changes an editable list or active filters, the consuming target announces the result in its contextual live region."
+    },
+    {
+      "name": "nativeDisabled",
+      "selectors": [".tag__remove:disabled"],
+      "attributes": ["disabled"],
+      "description": "A temporarily unavailable remove action uses native disabled behavior without hiding the current value."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible category, filter, or selected value.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".tag__label" }] }
+    },
+    {
+      "name": "removeAction",
+      "type": "slot",
+      "required": false,
+      "description": "Optional native button that requests removal of the represented value.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".tag__remove", "classNames": [".tag__remove"] }] }
+    },
+    {
+      "name": "removeLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the optional remove action, including the value being removed.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tag__remove", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "removalDisabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Temporarily disables the optional native remove button.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tag__remove", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-secondary",
+        "--color-text-secondary",
+        "--color-border-subtle",
+        "--color-border-focus"
+      ],
+      "spacing": ["--space-input-icon-size"],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-size", "--font-family-body"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Use a native type=\"button\" remove action and include the represented value in its aria-label.",
+    "Do not make the entire Tag interactive when only removal is available.",
+    "Keep the visible value readable and let the consuming target announce removal from an editable list or filter set.",
+    "Use Badge for passive status and Link when activating the label should navigate."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css; the consumer owns the state update requested by the remove button." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js", "notes": "Shopify may use a named button for client-owned filters or a target-native link when removal is navigation." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

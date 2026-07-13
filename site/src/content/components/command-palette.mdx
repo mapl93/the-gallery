@@ -2,32 +2,51 @@
 
 ⌘K command palette with search input and grouped results.
 
-<Preview html={"<div class=\"command-palette command-palette--open\" style=\"position:relative;max-width:480px;\"><input class=\"cmd-palette__input\" type=\"text\" placeholder=\"Type a command…\" /><div class=\"cmd-palette__results\"><button class=\"cmd-palette__item\">Go to Products</button><button class=\"cmd-palette__item\">Go to Orders</button></div></div>"} label="Command Palette" interaction={{"selector":".command-palette","toggle":"command-palette--open","triggerLabel":"Open Palette","startVisible":true}} />
+## Presentation
+
+<Preview html={"<div class=\"tg-preview-stage tg-preview-stage--overlay\"><button class=\"btn btn--outline\" type=\"button\" data-preview-trigger aria-expanded=\"true\">Open command palette</button><div class=\"command-palette command-palette--open tg-preview-overlay-layer\"><div class=\"command-palette__panel\"><div class=\"command-palette__input-wrapper\"><svg class=\"command-palette__search-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"9\" cy=\"9\" r=\"6\"/><path d=\"m14 14 4 4\"/></svg><input class=\"command-palette__input\" type=\"text\" placeholder=\"Type a command…\" value=\"pro\" /></div><div class=\"command-palette__results\"><div class=\"command-palette__group-label\">Products</div><button class=\"command-palette__item\" type=\"button\" data-highlighted data-preview-close><span class=\"command-palette__item-text\">Go to Products</span><span class=\"command-palette__item-shortcut\">G P</span></button><button class=\"command-palette__item\" type=\"button\" data-preview-close><span class=\"command-palette__item-text\">Create Product</span><span class=\"command-palette__item-shortcut\">C P</span></button></div></div></div></div>"} label="Command Palette" layout="overlay" interaction={{"selector":".command-palette","toggle":"command-palette--open","triggerLabel":"Open Palette","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use semantic HTML (section, nav, aside) alongside the layout classes.</Do>
-  <Dont>Don't nest layout overlays (modal inside drawer, etc.) — it creates confusing z-index stacking.</Dont>
+  <Do>Use command palette for global commands, search, and fast navigation.</Do>
+  <Dont>Don't hide essential navigation or destructive actions only inside the command palette.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="warning">
-  Layout components handle z-index and focus trapping. Test keyboard navigation before shipping.
+  The CSS adapter handles the visual overlay; the target owns shortcut handling, filtering, highlighted result state, and command execution.
 </Callout>
 
 - Trap focus inside the overlay while open. Return focus to the trigger on close.
 - Close on `Escape` key press.
+- Focus the search input when the palette opens.
+- Keep the highlighted command synchronized with `aria-activedescendant` or the target's equivalent native pattern.
 
-## Dependencies
+### Dependencies
 
 This component uses:
 
 - [Modal](/components/modal)
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.cmd-palette`</td><td>class</td><td>—</td><td>Base command palette styles</td></tr>
+  <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Visible state of the overlay</td></tr>
+  <tr><td>`query`</td><td>string</td><td>empty</td><td>Current command search query</td></tr>
+  <tr><td>`.command-palette`</td><td>class</td><td>—</td><td>Base command palette overlay</td></tr>
+  <tr><td>`.command-palette--open`</td><td>modifier</td><td>—</td><td>Visible command palette state</td></tr>
+  <tr><td>`.command-palette__panel`</td><td>element</td><td>—</td><td>Surface container for search and results</td></tr>
+  <tr><td>`.command-palette__input-wrapper`</td><td>element</td><td>—</td><td>Search input row</td></tr>
+  <tr><td>`.command-palette__search-icon`</td><td>element</td><td>—</td><td>Optional search icon</td></tr>
+  <tr><td>`.command-palette__input`</td><td>element</td><td>—</td><td>Command search input</td></tr>
+  <tr><td>`.command-palette__results`</td><td>element</td><td>—</td><td>Scrollable results container</td></tr>
+  <tr><td>`.command-palette__group-label`</td><td>element</td><td>—</td><td>Non-interactive result group label</td></tr>
+  <tr><td>`.command-palette__item`</td><td>element</td><td>`data-highlighted`</td><td>Command result item</td></tr>
+  <tr><td>`.command-palette__item-icon`</td><td>element</td><td>—</td><td>Optional command icon</td></tr>
+  <tr><td>`.command-palette__item-text`</td><td>element</td><td>—</td><td>Command label text</td></tr>
+  <tr><td>`.command-palette__item-shortcut`</td><td>element</td><td>—</td><td>Optional command shortcut hint</td></tr>
+  <tr><td>`.command-palette__empty`</td><td>element</td><td>—</td><td>Empty-result message</td></tr>
+  <tr><td>`.command-palette__footer`</td><td>element</td><td>—</td><td>Optional footer metadata</td></tr>
 </PropTable>

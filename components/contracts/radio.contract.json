@@ -1,0 +1,214 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "radio",
+  "name": "Radio",
+  "registryId": "A6",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Native mutually exclusive choice with checked, disabled, required, form-value, and validation behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/radio",
+    "css": { "file": "components/css/primitives.css", "selector": ".radio" },
+    "docs": "site/src/content/components/radio.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".radio",
+      "className": ".radio",
+      "required": true,
+      "description": "Label wrapper that aligns the native radio input with visible label text."
+    },
+    {
+      "name": "control",
+      "selector": ".radio__input",
+      "className": ".radio__input",
+      "required": true,
+      "description": "Native radio input that owns selection, form, focus, and validation semantics."
+    },
+    {
+      "name": "label",
+      "selector": ".radio__label",
+      "className": ".radio__label",
+      "required": true,
+      "description": "Visible accessible label for the choice."
+    },
+    {
+      "name": "selectedIndicator",
+      "selector": ".radio__input:checked",
+      "required": false,
+      "generated": true,
+      "description": "Generated inner dot produced by the checked native input state."
+    }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default radio presentation." },
+    { "name": "error", "className": ".radio--error", "default": false, "description": "Invalid choice presentation." },
+    { "name": "success", "className": ".radio--success", "default": false, "description": "Validated choice presentation." },
+    { "name": "warning", "className": ".radio--warning", "default": false, "description": "Cautionary choice presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default 20px radio control size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".radio"], "description": "Resting unselected radio." },
+    { "name": "hover", "selectors": [".radio:hover .radio__input:not(:disabled):not(:checked)"], "description": "Pointer hover on an available unselected choice." },
+    { "name": "focusVisible", "selectors": [".radio__input:focus-visible"], "description": "Keyboard focus on the native control." },
+    { "name": "checked", "selectors": [".radio__input:checked"], "description": "Selected state controlled by the native checked property." },
+    { "name": "disabled", "selectors": [".radio__input:disabled"], "description": "Unavailable native choice." },
+    { "name": "errorFocusVisible", "selectors": [".radio--error .radio__input:focus-visible"], "description": "Focused Error variant with a lighter matching outer ring." },
+    { "name": "successFocusVisible", "selectors": [".radio--success .radio__input:focus-visible"], "description": "Focused Success variant with a lighter matching outer ring." },
+    { "name": "warningFocusVisible", "selectors": [".radio--warning .radio__input:focus-visible"], "description": "Focused Warning variant with a lighter matching outer ring." }
+  ],
+  "behavior": [
+    {
+      "name": "nativeSelection",
+      "selectors": [".radio__input"],
+      "attributes": ["type=\"radio\"", "checked"],
+      "events": ["click", "Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
+      "description": "Native radio behavior provides activation and keyboard movement within a named group."
+    },
+    {
+      "name": "mutualExclusion",
+      "selectors": [".radio__input"],
+      "attributes": ["same name within one choice group"],
+      "description": "Choosing one native radio clears the other radios with the same form owner and name."
+    },
+    {
+      "name": "nativeFormValue",
+      "selectors": [".radio__input"],
+      "attributes": ["name", "value", "checked"],
+      "events": ["form submission", "form reset"],
+      "description": "Only the checked radio contributes its configured value to native form data."
+    },
+    {
+      "name": "nativeDisabled",
+      "selectors": [".radio__input:disabled"],
+      "attributes": ["disabled"],
+      "description": "Unavailable choices use native disabled focus, activation, and form behavior."
+    },
+    {
+      "name": "nativeRequired",
+      "selectors": [".radio__input"],
+      "attributes": ["required"],
+      "events": ["constraint validation"],
+      "description": "A required named group participates in native choice-group constraint validation."
+    },
+    {
+      "name": "validationSemantics",
+      "selectors": [".radio--error", ".radio--success", ".radio--warning", ".radio__input"],
+      "attributes": [
+        "aria-invalid=\"true\" only for Error",
+        "aria-describedby references feedback owned by Field Wrapper when present"
+      ],
+      "description": "Radio owns validation presentation and native invalid state while Field Wrapper owns associated feedback content."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible accessible label for the choice.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".radio__label" }] }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "Native group name shared by mutually exclusive choices.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "defaultValue": "on",
+      "description": "Value submitted when this radio is checked.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected independently from checked state.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".radio", "source": "variants" }] }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls the native selected state.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native radio unavailable.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Requires one choice in the named native group.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] }
+    },
+    {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "description": "Id reference for helper or validation feedback owned by a surrounding Field Wrapper.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-outer-border",
+        "--color-button-primary-bg-default",
+        "--color-text-primary"
+      ],
+      "spacing": ["--space-input-icon-size", "--space-input-icon-gap"],
+      "typography": ["--typo-body-size"],
+      "radius": ["--radius-full"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Use native input elements with type=\"radio\" and one shared name for each mutually exclusive group.",
+    "Wrap related choices in Fieldset and provide a visible Legend that names the question.",
+    "Keep each visible label associated by wrapping its native input or using matching for and id values.",
+    "Use aria-invalid only for Error and associate helper or validation feedback with aria-describedby.",
+    "Success and Warning require non-color feedback in the surrounding Field Wrapper when validation meaning must be communicated."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by native radio markup and class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class", "notes": "Shopify Liquid can render native named radio groups with the same class contract." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

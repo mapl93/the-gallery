@@ -1,0 +1,77 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "search-overlay",
+  "name": "Search Overlay",
+  "registryId": "C5",
+  "category": "global",
+  "status": "pilot",
+  "summary": "Full-screen search overlay with search box, result list, and open state.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/search-overlay",
+    "css": { "file": "components/css/global.css", "selector": ".search-overlay" },
+    "docs": "site/src/content/components/search-overlay.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".search-overlay", "className": ".search-overlay", "required": true, "description": "Fixed overlay backdrop." },
+    { "name": "box", "selector": ".search-box", "className": ".search-box", "required": true, "description": "Search panel container." },
+    { "name": "input", "selector": ".search-box__input", "className": ".search-box__input", "required": true, "description": "Search input." },
+    { "name": "results", "selector": ".search-results", "className": ".search-results", "required": false, "description": "Result list container." },
+    { "name": "result", "selector": ".search-result", "className": ".search-result", "required": false, "description": "Single result link." },
+    { "name": "resultImage", "selector": ".search-result__image", "className": ".search-result__image", "required": false, "description": "Result thumbnail." },
+    { "name": "resultTitle", "selector": ".search-result__title", "className": ".search-result__title", "required": false, "description": "Result title." },
+    { "name": "resultPrice", "selector": ".search-result__price", "className": ".search-result__price", "required": false, "description": "Result price text." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default full-screen search overlay." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default centered search panel size." }
+  ],
+  "states": [
+    { "name": "closed", "selectors": [".search-overlay"], "description": "Default hidden overlay state." },
+    { "name": "open", "selectors": [".search-overlay.is-open"], "description": "Visible overlay state." },
+    { "name": "resultHover", "selectors": [".search-result:hover"], "description": "Search-result hover state." }
+  ],
+  "behavior": [
+    { "name": "openState", "selectors": [".search-overlay.is-open"], "attributes": ["aria-hidden"], "description": "Overlay visibility should be synchronized with accessible hidden state." },
+    { "name": "queryInput", "selectors": [".search-box__input"], "attributes": ["type=\"search\"", "aria-label"], "events": ["input"], "description": "Search input should drive target search results." },
+    { "name": "dismissal", "selectors": [".search-overlay"], "events": ["Escape", "click"], "description": "Overlay should close on Escape and intentional outside/close actions." },
+    { "name": "resultNavigation", "selectors": [".search-result"], "attributes": ["href"], "events": ["click"], "description": "Search results should navigate to the target result destination." }
+  ],
+  "properties": [
+    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls visual visibility and accessible hidden state. Consumer targets still own triggering, focus management, dismissal, and focus restoration.", "targetMappings": { "web": [{ "kind": "class", "selector": ".search-overlay", "classNames": [".is-open"] }, { "kind": "attribute", "selector": ".search-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] } },
+    { "name": "inputLabel", "type": "string", "required": true, "description": "Accessible name for the native search input.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "query", "type": "string", "required": false, "description": "Current value of the native search input.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "placeholder", "type": "string", "required": false, "description": "Optional hint displayed while the search query is empty; it does not replace the accessible input label.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "results", "type": "slot", "required": false, "description": "Target-owned search result, loading, empty, or error content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".search-results", "classNames": [".search-results"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-border-focus"],
+      "spacing": ["--space-layout-element-gap"],
+      "radius": ["--radius-lg", "--radius-md", "--radius-sm"],
+      "shadow": ["--shadow-2xl"],
+      "opacity": ["--opacity-overlay"],
+      "z-index": ["--z-overlay"],
+      "typography": ["--typo-h4-size", "--typo-body-size", "--font-family-body"],
+      "transition": ["--transition-base", "--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Focus the search input when the overlay opens.",
+    "Close on Escape and return focus to the trigger.",
+    "Expose result count or no-results state when results update dynamically.",
+    "Use real links for navigable results."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map predictive search data, query state, result links, and close behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

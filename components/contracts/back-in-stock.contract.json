@@ -1,0 +1,91 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "back-in-stock",
+  "name": "Back in Stock Alert",
+  "registryId": "D8",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Email capture component for unavailable products, with submitted state and success feedback.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/back-in-stock",
+    "css": { "file": "components/css/product.css", "selector": ".back-in-stock" },
+    "docs": "site/src/content/components/back-in-stock.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".back-in-stock", "className": ".back-in-stock", "required": true, "description": "Back-in-stock notification container." },
+    { "name": "heading", "selector": ".back-in-stock__heading", "className": ".back-in-stock__heading", "required": true, "description": "Signup heading." },
+    { "name": "text", "selector": ".back-in-stock__text", "className": ".back-in-stock__text", "required": false, "description": "Signup helper copy." },
+    { "name": "form", "selector": ".back-in-stock__form", "className": ".back-in-stock__form", "required": true, "description": "Email signup form." },
+    { "name": "field", "selector": ".back-in-stock__field", "className": ".back-in-stock__field", "required": true, "description": "Email field composition." },
+    { "name": "label", "selector": ".back-in-stock__label", "className": ".back-in-stock__label", "required": true, "description": "Visible email label." },
+    { "name": "control", "selector": ".back-in-stock__control", "className": ".back-in-stock__control", "required": true, "description": "Input and fixed validation-indicator wrapper." },
+    { "name": "input", "selector": ".back-in-stock__input", "className": ".back-in-stock__input", "required": true, "description": "Email input." },
+    { "name": "indicator", "selector": ".back-in-stock__indicator", "className": ".back-in-stock__indicator", "required": false, "description": "Fixed validation or field indicator." },
+    { "name": "message", "selector": ".back-in-stock__message", "className": ".back-in-stock__message", "required": false, "description": "Associated guidance or validation message." },
+    { "name": "submit", "selector": ".back-in-stock__submit", "className": ".back-in-stock__submit", "required": true, "description": "Signup submit action." },
+    { "name": "success", "selector": ".back-in-stock__success", "className": ".back-in-stock__success", "required": false, "description": "Submitted success message." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default back-in-stock signup." },
+    { "name": "error", "className": ".back-in-stock--error", "default": false, "description": "Invalid email feedback family." },
+    { "name": "success", "className": ".back-in-stock--success", "default": false, "description": "Valid email feedback family." },
+    { "name": "warning", "className": ".back-in-stock--warning", "default": false, "description": "Cautionary email feedback family." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default stacked signup size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".back-in-stock"], "description": "Default signup form state." },
+    { "name": "inputHover", "selectors": [".back-in-stock__input:hover"], "description": "Input hover state that preserves the active validation family." },
+    { "name": "inputFocus", "selectors": [".back-in-stock__input:focus-visible"], "description": "Four-pixel zero-offset input focus state." },
+    { "name": "inputDisabled", "selectors": [".back-in-stock__input:disabled"], "description": "Unavailable email input state." },
+    { "name": "error", "selectors": [".back-in-stock--error"], "description": "Error validation family." },
+    { "name": "success", "selectors": [".back-in-stock--success"], "description": "Success validation family." },
+    { "name": "warning", "selectors": [".back-in-stock--warning"], "description": "Warning validation family." },
+    { "name": "submitHover", "selectors": [".back-in-stock__submit:hover"], "description": "Submit hover state." },
+    { "name": "submitted", "selectors": [".back-in-stock.is-submitted .back-in-stock__form", ".back-in-stock.is-submitted .back-in-stock__success"], "description": "Submitted state hides the form and shows success feedback." }
+  ],
+  "behavior": [
+    { "name": "emailSignup", "selectors": [".back-in-stock__form", ".back-in-stock__input", ".back-in-stock__submit"], "attributes": ["type=\"email\"", "required"], "events": ["submit"], "description": "Targets should validate an email address and submit it to the platform notification flow." },
+    { "name": "successFeedback", "selectors": [".back-in-stock__success"], "attributes": ["aria-live=\"polite\""], "description": "Submitted feedback should be announced without moving focus unexpectedly." }
+  ],
+  "properties": [
+    { "name": "heading", "type": "string", "required": true, "description": "Visible signup heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__heading" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional signup helper copy.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__text" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Visible label associated with the email input.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__label" }] } },
+    { "name": "value", "type": "string", "required": false, "defaultValue": "", "description": "Current email value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "placeholder", "type": "string", "required": false, "description": "Optional email hint that does not replace the visible label.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "message", "type": "string", "required": false, "description": "Associated guidance or validation message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__message" }] } },
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation independent from submitted state.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".back-in-stock", "source": "variants" }] } },
+    { "name": "indicator", "type": "slot", "required": false, "description": "Fixed passive validation indicator.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".back-in-stock__indicator", "classNames": [".back-in-stock__indicator"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": true, "description": "Marks the native email input as required.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the email input and submit action unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".back-in-stock__submit", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "submitLabel", "type": "string", "required": true, "description": "Visible submit action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__submit" }] } },
+    { "name": "submitted", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows submitted success feedback and hides the form.", "targetMappings": { "web": [{ "kind": "class", "selector": ".back-in-stock", "classNames": [".is-submitted"] }] } },
+    { "name": "successMessage", "type": "string", "required": true, "description": "Polite submitted-state confirmation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__success" }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover", "--color-button-primary-border-default", "--color-button-primary-border-hover", "--color-feedback-success-default", "--color-input-default-unfocused-bg", "--color-input-default-unfocused-inner-border", "--color-input-default-focused-outer-border", "--color-input-error-unfocused-inner-border", "--color-input-error-focused-outer-border", "--color-input-success-unfocused-inner-border", "--color-input-success-focused-outer-border", "--color-input-warning-unfocused-inner-border", "--color-input-warning-focused-outer-border"],
+      "radius": ["--radius-md", "--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size", "--typo-body-sm-size"]
+    }
+  },
+  "accessibility": [
+    "Label the email input with visible text or an equivalent accessible name.",
+    "Announce success and validation feedback through a live region when the form updates inline.",
+    "Do not remove the form before submission has a clear success or error result."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should connect to the chosen back-in-stock provider or notification endpoint." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

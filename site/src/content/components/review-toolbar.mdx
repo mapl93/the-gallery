@@ -1,26 +1,43 @@
 ## Overview
 
-Toolbar with sort dropdown and write-review CTA.
+Responsive structural toolbar for target-owned review-list controls, with optional Select and Button or link composition.
 
-<Preview html={"<div class=\"review-toolbar\"><div class=\"review-toolbar__sort\"><label>Sort by</label><select class=\"review-toolbar__sort-select\"><option>Most Recent</option><option>Highest Rated</option><option>Most Helpful</option></select></div><button class=\"review-toolbar__write-btn btn btn--outline\">Write a Review</button></div>"} label="Review Sort / Filter Bar" />
+<Preview html={'<div class="review-toolbar tg-preview-frame--md" role="toolbar" aria-label="Review controls"><div class="review-toolbar__sort"><div class="select"><label class="select__label" for="review-sort">Order reviews</label><select class="select__field review-toolbar__sort-select" id="review-sort" name="review-sort"><option value="recent" selected>Most recent</option><option value="rated">Highest rated</option></select></div></div><button class="btn btn--outline review-toolbar__write-btn" type="button">Write a review</button></div>'} label="Review Toolbar" />
+
+## Presentation
+
+The required root provides responsive layout only. The optional sort wrapper contains a target-owned native control or composed Select. The optional write action composes Button or a native link. On narrow viewports, the layout stacks and stretches its child controls.
+
+Select retains its label, options, enhancement, validation, focus, and disabled semantics. Button retains its action, link, focus, disabled, and busy semantics. The preview options are documentation fixtures rather than component defaults.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Display aggregate ratings prominently — social proof drives conversions.</Do>
-  <Dont>Don't hide negative reviews — authenticity builds trust.</Dont>
+  <Do>Use Review Toolbar to arrange controls whose meaning and behavior have already been chosen by the target.</Do>
+  <Dont>Do not define sort options, filtering, write-review entry behavior, URL state, or result updates in this layout component.</Dont>
 </DoDont>
+
+Ordering and filtering models, navigation versus in-place updates, write-review destination, focus retention, empty results, and announcements remain open target decisions.
 
 ## Accessibility
 
 <Callout type="info">
-  Review components work with Shopify product metafields or third-party review apps.
+  Label the toolbar when surrounding context does not already identify its controls.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Preserve the composed Select's visible label, native fallback, keyboard behavior, validation, and disabled state.
+- Use Button for an action and an anchor when the write-review affordance navigates.
+- Preserve visible focus and accessible names for every control.
+- When a target updates results in place, preserve focus and announce meaningful changes outside this layout contract.
 
-## API Reference
+## References
+
+**Anatomy:** required `.review-toolbar` root; optional `.review-toolbar__sort`, composed `.select`, legacy `.review-toolbar__sort-select` containment hook, and composed `.btn` action.
+
+**Dependencies:** None. Select and Button are optional reviewed compositions; the current registry dependency array remains empty.
 
 <PropTable>
-  <tr><td>`.review-toolbar`</td><td>class</td><td>—</td><td>Base review sort / filter bar styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional accessible toolbar name</td></tr>
+  <tr><td>`control`</td><td>slot</td><td>none</td><td>Target-owned Select or native review-list control</td></tr>
+  <tr><td>`writeAction`</td><td>slot</td><td>none</td><td>Target-owned Button or native link</td></tr>
 </PropTable>

@@ -1,32 +1,47 @@
 ## Overview
 
-Sticky site header with logo, navigation, and action buttons.
+Header is the global site masthead. It combines required brand content and destination with optional primary navigation, target-owned actions, cart count, and a Button-composed mobile-menu trigger.
 
-<Preview html={"<header class=\"header\" style=\"position:relative;\"><a class=\"header__logo\" href=\"#\">The Gallery</a><nav style=\"display:flex;gap:16px;\"><a class=\"header__nav-link\" href=\"#\" aria-current=\"page\">Shop</a><a class=\"header__nav-link\" href=\"#\">Artists</a><a class=\"header__nav-link\" href=\"#\">About</a></nav><div class=\"header__actions\"><button class=\"header__cart-count\">0</button></div></header>"} label="Header" />
+<Preview html={'<header class="header tg-preview-static"><a class="header__logo" href="#header-home">The Gallery</a><nav class="header__nav" aria-label="Primary navigation"><a class="header__nav-link" href="#header-shop" aria-current="page">Shop</a><a class="header__nav-link" href="#header-artists">Artists</a><a class="header__nav-link" href="#header-about">About</a></nav><div class="header__actions"><a class="btn btn--outline btn--sm" href="#header-search">Search</a><a class="btn btn--sm" href="#header-cart">Cart<span class="header__cart-count" aria-label="2 items in cart">2</span></a></div></header>'} label="Header" />
+
+## Presentation
+
+The root owns the sticky horizontal composition and responsive containment. The optional primary navigation is hidden at the canonical mobile breakpoint; a consuming target may supply `mobileMenuTrigger` through `.header__hamburger` when it also provides the corresponding Mobile Menu or Drawer runtime.
+
+Brand content, destinations, navigation records, actions, and cart state are target data. Header does not decide which global actions exist or connect them to Search Overlay, Cart Drawer, Mobile Menu, Drawer, or Mega Menu.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep global chrome consistent across all pages — header and footer should be in the layout template.</Do>
-  <Dont>Don't duplicate global elements inside individual sections or pages.</Dont>
+  <Do>Keep the brand destination, primary navigation, and target-owned actions consistent across the site shell.</Do>
+  <Dont>Do not duplicate overlay behavior or commerce state inside Header.</Dont>
 </DoDont>
+
+- Keep the visible action set focused at each breakpoint.
+- Supply `cartCount` only when a target can keep it synchronized with cart state.
+- Use the Button dependency for an optional mobile-menu trigger without making its fixture content a Header default.
 
 ## Accessibility
 
-<Callout type="info">
-  Global components are typically included in your theme layout, not in individual pages.
-</Callout>
+- Give the optional primary navigation a useful accessible name.
+- Mark the current destination with `aria-current="page"` when applicable.
+- Ensure the brand link has an accessible name; use `logoLabel` only when visible brand content is insufficient.
+- A target-connected mobile-menu trigger must synchronize `aria-expanded` and `aria-controls` with the controlled surface.
+- Announce meaningful cart-count changes according to the target's live-region policy rather than relying on the badge alone.
 
-- Use `<nav>` with `aria-label` to identify the navigation region.
-
-## Dependencies
-
-This component uses:
-
-- [Button](/components/button)
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.header`</td><td>class</td><td>—</td><td>Base header styles</td></tr>
+  <tr><td>`logo`</td><td>slot</td><td>required</td><td>Brand name or image rendered by the logo link</td></tr>
+  <tr><td>`logoHref`</td><td>string</td><td>required</td><td>Brand-home destination</td></tr>
+  <tr><td>`logoLabel`</td><td>string</td><td>optional</td><td>Accessible name when visible brand content is insufficient</td></tr>
+  <tr><td>`navigationLabel`</td><td>string</td><td>optional</td><td>Accessible name for the primary navigation region</td></tr>
+  <tr><td>`navigation`</td><td>slot</td><td>optional</td><td>Target-owned links and current-page markup</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Target-owned Button and link actions</td></tr>
+  <tr><td>`cartCount`</td><td>string</td><td>optional</td><td>Target-formatted cart count</td></tr>
+  <tr><td>`mobileMenuTrigger`</td><td>slot</td><td>optional</td><td>Button dependency connected by the target runtime</td></tr>
 </PropTable>
+
+Anatomy: `.header`, `.header__logo`, optional `.header__nav` and `.header__nav-link`, optional `.header__actions`, optional `.header__cart-count`, and optional `.header__hamburger`.
+
+Dependency: [Button](/components/button). Trigger coordination and navigation data remain open target boundaries.

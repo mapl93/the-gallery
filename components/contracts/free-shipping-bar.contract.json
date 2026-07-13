@@ -1,0 +1,64 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "free-shipping-bar",
+  "name": "Free Shipping Bar",
+  "registryId": "K5",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Free-shipping progress indicator with threshold text, track, fill, and achieved state.",
+  "dependencies": ["progress"],
+  "source": {
+    "registry": "registry.json#/components/free-shipping-bar",
+    "css": { "file": "components/css/cart.css", "selector": ".shipping-bar" },
+    "docs": "site/src/content/components/free-shipping-bar.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".shipping-bar", "className": ".shipping-bar", "required": true, "description": "Shipping progress container." },
+    { "name": "text", "selector": ".shipping-bar__text", "className": ".shipping-bar__text", "required": true, "description": "Threshold text." },
+    { "name": "track", "selector": ".shipping-bar__track", "className": ".shipping-bar__track", "required": true, "description": "Progress track." },
+    { "name": "fill", "selector": ".shipping-bar__fill", "className": ".shipping-bar__fill", "required": true, "description": "Progress fill." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default free-shipping progress state." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default compact shipping bar." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".shipping-bar"], "description": "Default progress state." },
+    { "name": "achieved", "selectors": [".shipping-bar--achieved .shipping-bar__text"], "description": "Free shipping achieved state." }
+  ],
+  "behavior": [
+    { "name": "thresholdProgress", "selectors": [".shipping-bar__text", ".shipping-bar__fill"], "attributes": ["role=\"progressbar\"", "aria-valuenow"], "description": "Progress should reflect cart total relative to the free-shipping threshold." },
+    { "name": "achievedState", "selectors": [".shipping-bar--achieved .shipping-bar__text"], "description": "When threshold is reached, text should communicate the achieved state." }
+  ],
+  "properties": [
+    { "name": "text", "type": "string", "required": true, "description": "Threshold or achieved-state message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".shipping-bar__text" }] } },
+    { "name": "value", "type": "number", "required": true, "min": 0, "defaultValue": 0, "description": "Current cart amount represented by the progressbar.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".shipping-bar__track", "attribute": "aria-valuenow", "valueFrom": "property" }] } },
+    { "name": "max", "type": "number", "required": true, "min": 1, "defaultValue": 100, "description": "Free-shipping threshold represented by the progressbar.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".shipping-bar__track", "attribute": "aria-valuemax", "valueFrom": "property" }] } },
+    { "name": "achieved", "type": "boolean", "required": false, "defaultValue": false, "description": "Communicates that the threshold has been reached.", "targetMappings": { "web": [{ "kind": "class", "selector": ".shipping-bar", "classNames": [".shipping-bar--achieved"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-text-secondary", "--color-text-primary", "--color-border-subtle", "--color-feedback-success-default"],
+      "radius": ["--radius-md", "--radius-full"],
+      "transition": ["--transition-base"],
+      "easing": ["--easing-out"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Expose the amount remaining or achieved free-shipping state as text.",
+    "Do not rely on the fill width alone to communicate progress.",
+    "Keep progress values synchronized when cart totals change."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should compute threshold progress from Shopify cart subtotal and shop settings." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

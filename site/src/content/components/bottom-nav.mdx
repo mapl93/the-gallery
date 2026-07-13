@@ -1,26 +1,41 @@
 ## Overview
 
-Fixed bottom navigation for mobile with badge support.
+Bottom Navigation is a fixed mobile navigation region with target-owned destinations, visible labels, optional icons, current-page state, and optional badges.
 
-<Preview html={"<nav class=\"bottom-nav\" style=\"position:relative;display:flex;justify-content:space-around;padding:8px 0;border-top:1px solid var(--color-border-default);\"><a class=\"bottom-nav__item\" href=\"#\" aria-current=\"page\"><span class=\"bottom-nav__icon\">🏠</span><span class=\"bottom-nav__label\">Home</span></a><a class=\"bottom-nav__item\" href=\"#\"><span class=\"bottom-nav__icon\">🔍</span><span class=\"bottom-nav__label\">Search</span></a><a class=\"bottom-nav__item\" href=\"#\"><span class=\"bottom-nav__icon\">🛒</span><span class=\"bottom-nav__label\">Cart</span><span class=\"bottom-nav__badge\">2</span></a></nav>"} label="Bottom Navigation Bar" />
+<Preview html={'<nav class="bottom-nav tg-preview-bottom-nav" aria-label="Primary mobile navigation"><a class="bottom-nav__item" href="#bottom-home" aria-current="page"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /></svg><span class="bottom-nav__label">Home</span></a><a class="bottom-nav__item" href="#bottom-search"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg><span class="bottom-nav__label">Search</span></a><a class="bottom-nav__item" href="#bottom-cart"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12l1 6H5l1-6Z" /><path d="M5 8h14l-1 13H6L5 8Z" /></svg><span class="bottom-nav__label">Cart</span><span class="bottom-nav__badge" aria-label="2 items in cart">2</span></a></nav>'} label="Bottom Navigation" />
+
+## Presentation
+
+The root is fixed by canonical CSS on narrow viewports; the documentation helper contains it as the artwork. Each `.bottom-nav__item` remains a native link with required `.bottom-nav__label`, optional `.bottom-nav__icon`, optional `.bottom-nav__badge`, and target-owned current-page state.
+
+Destinations, item count, order, icon source, badge values, and body-offset policy are target responsibilities rather than component defaults.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep global chrome consistent across all pages — header and footer should be in the layout template.</Do>
-  <Dont>Don't duplicate global elements inside individual sections or pages.</Dont>
+  <Do>Reserve the limited mobile space for persistent, high-priority destinations with visible labels.</Do>
+  <Dont>Do not use badges or active color as the only way to identify a destination or state.</Dont>
 </DoDont>
+
+- Keep the destination set stable enough to build user recognition.
+- Use badges only for concise target state that can remain synchronized.
+- Coordinate page-bottom spacing in the consuming layout so content is not obscured.
 
 ## Accessibility
 
-<Callout type="info">
-  Global components are typically included in your theme layout, not in individual pages.
-</Callout>
+- Provide the required accessible navigation `label`.
+- Keep a visible text label for every item, even when an icon is present.
+- Use `aria-current="page"` for the active destination.
+- Hide decorative icons from assistive technology.
+- Announce dynamic badge changes according to target policy and preserve safe-area spacing and touch target size.
 
-- Use `<nav>` with `aria-label` to identify the navigation region.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.bottom-nav`</td><td>class</td><td>—</td><td>Base bottom navigation bar styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Accessible name for the mobile navigation region</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned destinations, labels, optional icons, current-page state, and badges</td></tr>
 </PropTable>
+
+Anatomy: required `.bottom-nav`, `.bottom-nav__item`, and `.bottom-nav__label`, with optional `.bottom-nav__icon` and `.bottom-nav__badge`. Dependencies: none.
+
+Destination priority, body-offset strategy, and dynamic badge announcement policy remain open target boundaries.

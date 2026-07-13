@@ -1,0 +1,70 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "alert",
+  "name": "Alert / Banner",
+  "registryId": "A21",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Inline feedback banner with info, success, warning, and error variants plus optional dismiss action.",
+  "dependencies": ["close-button"],
+  "source": {
+    "registry": "registry.json#/components/alert",
+    "css": { "file": "components/css/primitives.css", "selector": ".alert" },
+    "docs": "site/src/content/components/alert.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".alert", "className": ".alert", "required": true, "description": "Inline feedback container." },
+    { "name": "icon", "selector": ".alert__icon", "className": ".alert__icon", "required": false, "description": "Optional feedback icon." },
+    { "name": "content", "selector": ".alert__content", "className": ".alert__content", "required": true, "description": "Text content wrapper." },
+    { "name": "title", "selector": ".alert__title", "className": ".alert__title", "required": false, "description": "Alert title." },
+    { "name": "message", "selector": ".alert__message", "className": ".alert__message", "required": true, "description": "Alert body text." },
+    { "name": "dismiss", "selector": ".alert__dismiss", "className": ".alert__dismiss", "required": false, "description": "Optional dismiss control, usually Close Button." }
+  ],
+  "variants": [
+    { "name": "info", "className": ".alert--info", "default": true, "description": "Informational alert." },
+    { "name": "success", "className": ".alert--success", "default": false, "description": "Success alert." },
+    { "name": "warning", "className": ".alert--warning", "default": false, "description": "Warning alert." },
+    { "name": "error", "className": ".alert--error", "default": false, "description": "Error alert." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default alert size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".alert"], "description": "Visible alert; semantic severity is selected through its variant." }
+  ],
+  "behavior": [
+    { "name": "announcement", "selectors": [".alert"], "attributes": ["role=\"alert\"", "aria-live=\"polite\"", "aria-live=\"assertive\""], "description": "Targets choose live-region priority based on severity and timing." },
+    { "name": "dismiss", "selectors": [".alert__dismiss"], "attributes": ["aria-label", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "Dismissible alerts should use a named close action." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional concise alert heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".alert__title" }] } },
+    { "name": "message", "type": "string", "required": true, "description": "Visible feedback message that communicates meaning without color or icon alone.", "targetMappings": { "web": [{ "kind": "content", "selector": ".alert__message" }] } },
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Semantic feedback color family.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".alert", "source": "variants" }] } },
+    { "name": "icon", "type": "slot", "required": false, "description": "Optional decorative feedback icon.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".alert__icon", "classNames": [".alert__icon"] }] } },
+    { "name": "dismissAction", "type": "slot", "required": false, "description": "Optional Close Button that requests removal of the alert.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".alert__dismiss", "classNames": [".alert__dismiss"] }] } },
+    { "name": "dismissLabel", "type": "string", "required": false, "description": "Accessible name for the optional dismiss action.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".alert__dismiss", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "announcement", "type": "enum", "required": false, "defaultValue": "none", "values": ["none", "polite", "assertive"], "description": "Live-region priority used only when feedback is inserted dynamically.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".alert", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } }, { "kind": "attribute", "selector": ".alert", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-border-default", "--color-text-primary", "--color-text-secondary", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-warning-default", "--color-feedback-error-default"],
+      "radius": ["--radius-md"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use live-region semantics only for alerts inserted dynamically.",
+    "Provide visible text for the message; do not rely on icon or color alone.",
+    "Name dismiss controls clearly.",
+    "Choose assertive announcements only for urgent failures."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

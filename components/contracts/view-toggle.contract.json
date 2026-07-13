@@ -1,0 +1,65 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "view-toggle",
+  "name": "Grid / List View Toggle",
+  "registryId": "E5",
+  "category": "collection",
+  "status": "pilot",
+  "summary": "Collection view toggle for switching between grid and list presentations.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/view-toggle",
+    "css": { "file": "components/css/collection.css", "selector": ".view-toggle" },
+    "docs": "site/src/content/components/view-toggle.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".view-toggle", "className": ".view-toggle", "required": true, "description": "View toggle group." },
+    { "name": "button", "selector": ".view-toggle__btn", "className": ".view-toggle__btn", "required": true, "description": "Single view mode button." },
+    { "name": "icon", "selector": ".view-toggle__btn svg", "required": false, "description": "View mode icon." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default two-option view toggle." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default square icon-button size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".view-toggle"], "description": "Default toggle state." },
+    { "name": "hover", "selectors": [".view-toggle__btn:hover"], "description": "Button hover state." },
+    { "name": "focus", "selectors": [".view-toggle__btn:focus-visible"], "description": "Visible view-button focus state." },
+    { "name": "active", "selectors": [".view-toggle__btn[aria-pressed=\"true\"]", ".view-toggle__btn.is-active"], "description": "Pressed view mode state." },
+    { "name": "disabled", "selectors": [".view-toggle__btn:disabled"], "description": "Unavailable view-mode state." }
+  ],
+  "behavior": [
+    { "name": "pressedState", "selectors": [".view-toggle__btn[aria-pressed=\"true\"]", ".view-toggle__btn.is-active"], "attributes": ["aria-pressed", "aria-label"], "events": ["click", "Space", "Enter"], "description": "Pressed state should stay synchronized with the active collection view mode." },
+    { "name": "viewMode", "selectors": [".view-toggle__btn"], "description": "Adapters own applying the selected grid/list view to the collection results." }
+  ],
+  "properties": [
+    { "name": "groupLabel", "type": "string", "required": true, "description": "Accessible name for the related view controls.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle", "attribute": "aria-label", "valueFrom": "property" }] } },
+    { "name": "activeView", "type": "enum", "required": false, "defaultValue": "grid", "values": ["grid", "list"], "description": "Target-owned view mode synchronized across both pressed buttons.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle", "attribute": "data-view", "values": { "grid": "grid", "list": "list" } }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables both native view buttons.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-secondary", "--color-text-primary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover"],
+      "radius": ["--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Provide accessible names for icon-only view buttons.",
+    "Keep aria-pressed synchronized with the active view.",
+    "Do not change focus unexpectedly when switching views."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should persist selected view mode where appropriate." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

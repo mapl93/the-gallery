@@ -1,0 +1,321 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "social-proof",
+  "name": "Social Proof Notifications",
+  "registryId": "G10",
+  "category": "marketing",
+  "status": "pilot",
+  "summary": "Passive, dismissible social-proof notification presentation with truthful target-supplied content and optional media.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/social-proof",
+    "css": {
+      "file": "components/css/marketing.css",
+      "selector": ".social-proof"
+    },
+    "docs": "site/src/content/components/social-proof.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".social-proof",
+      "className": ".social-proof",
+      "required": true,
+      "description": "Viewport-contained notification surface."
+    },
+    {
+      "name": "image",
+      "selector": ".social-proof__image",
+      "className": ".social-proof__image",
+      "required": false,
+      "description": "Optional target-supplied image or image wrapper."
+    },
+    {
+      "name": "text",
+      "selector": ".social-proof__text",
+      "className": ".social-proof__text",
+      "required": true,
+      "description": "Visible social-proof statement."
+    },
+    {
+      "name": "time",
+      "selector": ".social-proof__time",
+      "className": ".social-proof__time",
+      "required": false,
+      "description": "Optional target-supplied relative or absolute time text."
+    },
+    {
+      "name": "close",
+      "selector": ".social-proof__close",
+      "className": ".social-proof__close",
+      "required": false,
+      "description": "Optional named native dismiss button."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Single notification presentation."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Viewport-contained notification width."
+    }
+  ],
+  "states": [
+    {
+      "name": "hidden",
+      "selectors": [
+        ".social-proof"
+      ],
+      "description": "Notification is translated outside the viewport by default."
+    },
+    {
+      "name": "visible",
+      "selectors": [
+        ".social-proof[data-visible]"
+      ],
+      "description": "Visible notification state."
+    },
+    {
+      "name": "closeHover",
+      "selectors": [
+        ".social-proof__close:hover"
+      ],
+      "description": "Pointer hover on the optional dismiss action."
+    },
+    {
+      "name": "closeFocusVisible",
+      "selectors": [
+        ".social-proof__close:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the optional dismiss action."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [
+        ".social-proof[data-visible]"
+      ],
+      "attributes": [
+        "data-visible"
+      ],
+      "description": "The notification is hidden by canonical CSS until data-visible is present."
+    },
+    {
+      "name": "truthfulTargetData",
+      "selectors": [
+        ".social-proof__text",
+        ".social-proof__time"
+      ],
+      "description": "The target supplies and verifies purchaser, product, location, and time content; the source contract does not manufacture social-proof data or timing."
+    },
+    {
+      "name": "dismissal",
+      "selectors": [
+        ".social-proof__close"
+      ],
+      "events": [
+        "click"
+      ],
+      "description": "The optional native button requests dismissal; the target owns visibility state, persistence, queueing, and any later reappearance."
+    }
+  ],
+  "properties": [
+    {
+      "name": "message",
+      "type": "string",
+      "required": true,
+      "description": "Visible, self-contained social-proof statement from verified target data.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".social-proof__text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "time",
+      "type": "string",
+      "required": false,
+      "description": "Optional target-supplied time text.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".social-proof__time"
+          }
+        ]
+      }
+    },
+    {
+      "name": "image",
+      "type": "slot",
+      "required": false,
+      "description": "Optional product or contextual image supplied by the target.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".social-proof__image",
+            "classNames": [
+              ".social-proof__image"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "imageAlt",
+      "type": "string",
+      "required": false,
+      "description": "Alternative text when the optional image adds meaning beyond the message.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".social-proof__image",
+            "attribute": "alt",
+            "valueFrom": "property",
+            "elements": [
+              "img"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "dismissAction",
+      "type": "slot",
+      "required": false,
+      "description": "Optional native button that requests dismissal.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".social-proof__close",
+            "classNames": [
+              ".social-proof__close"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for the optional dismiss button.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".social-proof__close",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "button"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "visible",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls presentation only; timing and queue behavior remain target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".social-proof",
+            "attribute": "data-visible",
+            "values": {
+              "true": "",
+              "false": null
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-surface-primary",
+        "--color-text-disabled",
+        "--color-text-primary"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "radius": [
+        "--radius-lg",
+        "--radius-md"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-touch-target"
+      ],
+      "transition": [
+        "--transition-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ],
+      "z-index": [
+        "--z-toast"
+      ]
+    }
+  },
+  "accessibility": [
+    "Keep the complete notification meaning in text and treat an optional image as decorative when it adds no information.",
+    "Use a polite status announcement only when dynamic insertion needs to be conveyed; do not move keyboard focus to passive social proof.",
+    "Provide a named, keyboard-operable dismiss button when the notification persists.",
+    "Do not auto-dismiss while the notification or an action within it has focus.",
+    "Respect reduced-motion preferences for entrance and exit transitions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Presentation is implemented; source data, timing, queueing, and persistence remain target-owned."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

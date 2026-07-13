@@ -1,0 +1,249 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "slider",
+  "name": "Slider / Range",
+  "registryId": "H2",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Native range input contract for single-value sliders and dual-handle range sliders with value display, thumb states, disabled state, and range-fill behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/slider",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".slider"
+    },
+    "docs": "site/src/content/components/slider.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".slider",
+      "className": ".slider",
+      "required": true,
+      "description": "Single-value slider wrapper."
+    },
+    {
+      "name": "label",
+      "selector": ".slider__label",
+      "className": ".slider__label",
+      "required": false,
+      "description": "Visible slider label and value row."
+    },
+    {
+      "name": "value",
+      "selector": ".slider__value",
+      "className": ".slider__value",
+      "required": false,
+      "description": "Formatted current value display."
+    },
+    {
+      "name": "track",
+      "selector": ".slider__track",
+      "className": ".slider__track",
+      "required": false,
+      "description": "Optional positioning wrapper for the native range input."
+    },
+    {
+      "name": "input",
+      "selector": ".slider__input",
+      "className": ".slider__input",
+      "required": true,
+      "description": "Native range input."
+    },
+    {
+      "name": "webkitThumb",
+      "selector": ".slider__input::-webkit-slider-thumb",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit range thumb."
+    },
+    {
+      "name": "mozThumb",
+      "selector": ".slider__input::-moz-range-thumb",
+      "required": false,
+      "generated": true,
+      "description": "Generated Firefox range thumb."
+    },
+    {
+      "name": "rangeRoot",
+      "selector": ".range-slider",
+      "className": ".range-slider",
+      "required": false,
+      "description": "Dual-handle range slider wrapper."
+    },
+    {
+      "name": "rangeTrack",
+      "selector": ".range-slider__track",
+      "className": ".range-slider__track",
+      "required": false,
+      "description": "Dual-handle range track."
+    },
+    {
+      "name": "rangeFill",
+      "selector": ".range-slider__fill",
+      "className": ".range-slider__fill",
+      "required": false,
+      "description": "Selected range fill between handles."
+    },
+    {
+      "name": "rangeInput",
+      "selector": ".range-slider__input",
+      "className": ".range-slider__input",
+      "required": false,
+      "description": "Native range input used as one range handle."
+    }
+  ],
+  "variants": [
+    {
+      "name": "single",
+      "className": null,
+      "default": true,
+      "description": "Default single-value slider."
+    },
+    {
+      "name": "range",
+      "className": ".range-slider",
+      "default": false,
+      "description": "Dual-handle range slider structure."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default slider track and thumb size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".slider"],
+      "description": "Default single-value slider state."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".slider__input:focus-visible::-webkit-slider-thumb"],
+      "description": "Keyboard focus state on the WebKit thumb."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".slider__input:disabled"],
+      "description": "Unavailable slider state."
+    },
+    {
+      "name": "range",
+      "selectors": [".range-slider"],
+      "description": "Dual-handle range structure."
+    },
+    {
+      "name": "rangeFill",
+      "selectors": [".range-slider__fill"],
+      "description": "Selected range fill state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeRange",
+      "attributes": ["type=\"range\"", "min", "max", "step", "value", "disabled"],
+      "description": "Single-value sliders should preserve native range input behavior and value semantics."
+    },
+    {
+      "name": "rangePair",
+      "selectors": [".range-slider", ".range-slider__input", ".range-slider__fill"],
+      "attributes": ["aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-valuetext"],
+      "description": "Dual-handle range sliders must keep lower and upper values ordered and synchronize the fill between handles."
+    },
+    {
+      "name": "keyboardNavigation",
+      "events": ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"],
+      "description": "Keyboard users should be able to adjust slider values using native range keyboard behavior."
+    }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible label for the slider.", "targetMappings": { "web": [{ "kind": "content", "selector": ".slider__label" }] } },
+    { "name": "mode", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Single-value or dual-handle range structure.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".slider", "source": "variants" }] } },
+    { "name": "variant", "type": "enum", "required": false, "values": ["default", "error", "success", "warning"], "description": "Validation presentation composed independently from slider mode.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider", "attribute": "data-validation", "values": { "default": null, "error": "error", "success": "success", "warning": "warning" } }, { "kind": "attribute", "selector": ".range-slider", "attribute": "data-validation", "values": { "default": null, "error": "error", "success": "success", "warning": "warning" } }] } },
+    { "name": "value", "type": "number", "required": false, "defaultValue": 50, "description": "Current native range value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "min", "type": "number", "required": false, "defaultValue": 0, "description": "Minimum native range value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "min", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "min", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "max", "type": "number", "required": false, "defaultValue": 100, "description": "Maximum native range value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "max", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "max", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "step", "type": "number", "required": false, "defaultValue": 1, "minimum": 0.01, "description": "Native value increment.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "step", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "step", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes slider handles unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for supporting or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-secondary",
+        "--color-button-primary-bg-default",
+        "--color-surface-primary",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-input-default-focused-outer-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "shadow": [
+        "--shadow-sm"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use native input type=\"range\" where possible.",
+    "Provide a visible label or equivalent accessible name.",
+    "Expose min, max, step, and current value.",
+    "Keep displayed value text synchronized with the native input value.",
+    "For dual-handle ranges, prevent lower and upper handles from crossing unless the target documents that behavior."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css; value display and dual-handle range synchronization must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

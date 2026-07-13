@@ -1,0 +1,231 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "carousel",
+  "name": "Carousel / Slider",
+  "registryId": "B15",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Horizontal scroll-snap carousel with track, slide, navigation controls, dots, disabled navigation, active dot state, and gallery accessibility requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/carousel",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".carousel"
+    },
+    "docs": "site/src/content/components/carousel.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".carousel",
+      "className": ".carousel",
+      "required": true,
+      "description": "Carousel viewport and positioning context."
+    },
+    {
+      "name": "track",
+      "selector": ".carousel__track",
+      "className": ".carousel__track",
+      "required": true,
+      "description": "Horizontal scroll-snap track."
+    },
+    {
+      "name": "slide",
+      "selector": ".carousel__slide",
+      "className": ".carousel__slide",
+      "required": true,
+      "description": "Single scroll-snapped slide."
+    },
+    {
+      "name": "nav",
+      "selector": ".carousel__nav",
+      "className": ".carousel__nav",
+      "required": false,
+      "description": "Positioning wrapper for previous or next navigation."
+    },
+    {
+      "name": "navButton",
+      "selector": ".carousel__nav-btn",
+      "className": ".carousel__nav-btn",
+      "required": false,
+      "description": "Previous or next slide control."
+    },
+    {
+      "name": "dots",
+      "selector": ".carousel__dots",
+      "className": ".carousel__dots",
+      "required": false,
+      "description": "Slide pagination dots wrapper."
+    },
+    {
+      "name": "dot",
+      "selector": ".carousel__dot",
+      "className": ".carousel__dot",
+      "required": false,
+      "description": "Slide pagination dot."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default horizontal scroll carousel."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default carousel gap and navigation size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".carousel"],
+      "description": "Default carousel state."
+    },
+    {
+      "name": "previousNav",
+      "selectors": [".carousel__nav--prev"],
+      "description": "Previous navigation placement."
+    },
+    {
+      "name": "nextNav",
+      "selectors": [".carousel__nav--next"],
+      "description": "Next navigation placement."
+    },
+    {
+      "name": "navHover",
+      "selectors": [".carousel__nav-btn:hover"],
+      "description": "Pointer hover state on navigation controls."
+    },
+    {
+      "name": "navDisabled",
+      "selectors": [".carousel__nav-btn:disabled"],
+      "description": "Unavailable navigation control state."
+    },
+    {
+      "name": "dotActive",
+      "selectors": [".carousel__dot--active", ".carousel__dot[aria-current=\"true\"]"],
+      "description": "Current slide pagination dot state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "scrollSnap",
+      "selectors": [".carousel__track", ".carousel__slide"],
+      "description": "The track scrolls horizontally and each slide snaps to the start edge."
+    },
+    {
+      "name": "navigation",
+      "selectors": [".carousel__nav--prev", ".carousel__nav--next"],
+      "events": ["previous slide", "next slide", "ArrowLeft", "ArrowRight"],
+      "description": "Navigation controls and keyboard shortcuts should move to adjacent slides."
+    },
+    {
+      "name": "pagination",
+      "selectors": [".carousel__dot--active", ".carousel__dot[aria-current=\"true\"]"],
+      "attributes": ["aria-current=\"true\"", "aria-label"],
+      "description": "Dots should expose and synchronize the current slide."
+    },
+    {
+      "name": "motionControl",
+      "events": ["pause", "resume"],
+      "description": "Auto-advancing carousels must provide pause controls and respect reduced motion preferences."
+    }
+  ],
+  "properties": [
+    {
+      "name": "current",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Marks an individual pagination dot as representing the current slide.",
+      "targetMappings": {
+        "web": [
+          { "kind": "class", "selector": ".carousel__dot", "classNames": [".carousel__dot--active"] },
+          { "kind": "attribute", "selector": ".carousel__dot", "attribute": "aria-current", "values": { "true": "true", "false": null } }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Disables an individual previous or next navigation control when no adjacent slide exists.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".carousel__nav-btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-subtle",
+        "--color-text-primary"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "shadow": [
+        "--shadow-md"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide descriptive alt text for images and accessible names for previous, next, and pagination controls.",
+    "Expose the current slide through aria-current or equivalent target semantics.",
+    "Do not auto-advance without a pause mechanism.",
+    "Respect reduced motion preferences for animated slide transitions.",
+    "Ensure keyboard users can reach slide content and controls in a logical order."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; slide index, navigation, pagination state, and optional autoplay must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

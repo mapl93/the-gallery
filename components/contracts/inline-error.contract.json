@@ -1,0 +1,131 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "inline-error",
+  "name": "Inline Error",
+  "registryId": "H12",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Inline field-level error contract with error surface, optional icon, live-region guidance, and control association requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/inline-error",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".inline-error"
+    },
+    "docs": "site/src/content/components/inline-error.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".inline-error",
+      "className": ".inline-error",
+      "required": true,
+      "description": "Inline validation error message wrapper."
+    },
+    {
+      "name": "icon",
+      "selector": ".inline-error__icon",
+      "className": ".inline-error__icon",
+      "required": false,
+      "description": "Optional icon that supports, but does not replace, the error text."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default inline error."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default inline error size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".inline-error"],
+      "description": "Error message is visible."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "errorAssociation",
+      "selectors": [".inline-error"],
+      "attributes": ["id", "aria-describedby", "aria-invalid=\"true\""],
+      "description": "The error message should be associated with the invalid field it describes."
+    },
+    {
+      "name": "announcement",
+      "selectors": [".inline-error"],
+      "attributes": ["role=\"alert\"", "aria-live=\"polite\""],
+      "description": "Targets should announce newly inserted error messages without interrupting unrelated interaction."
+    },
+    {
+      "name": "iconSemantics",
+      "selectors": [".inline-error__icon"],
+      "attributes": ["aria-hidden=\"true\"", "focusable=\"false\""],
+      "description": "Decorative error icons should not duplicate the text announcement."
+    }
+  ],
+  "properties": [
+    { "name": "message", "type": "string", "required": true, "description": "Visible error message associated with an invalid field.", "targetMappings": { "web": [{ "kind": "content", "selector": ".inline-error" }] } },
+    { "name": "icon", "type": "slot", "required": false, "description": "Optional decorative error icon that does not replace the message.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".inline-error__icon", "classNames": [".inline-error__icon"] }] } },
+    { "name": "announcement", "type": "enum", "required": false, "values": ["none", "polite", "assertive"], "defaultValue": "polite", "description": "Live-announcement priority when the message is inserted dynamically.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".inline-error", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } }, { "kind": "attribute", "selector": ".inline-error", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-feedback-error-default"
+      ],
+      "radius": [
+        "--radius-sm"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use text, not icon or color alone, to explain the error.",
+    "Associate the message with the invalid control using aria-describedby.",
+    "Set aria-invalid=\"true\" on the invalid control.",
+    "Announce dynamically inserted errors with a polite live region or equivalent target behavior.",
+    "Keep decorative icons hidden from assistive technology."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css; announcement and form-control association are target responsibilities."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render validation messages with matching ids and form control references."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

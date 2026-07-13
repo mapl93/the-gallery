@@ -1,0 +1,221 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "switch",
+  "name": "Switch / Toggle",
+  "registryId": "H1",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Native checkbox-backed switch with tokenized track and thumb, checked, focus-visible, disabled, and size states.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/switch",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".switch"
+    },
+    "docs": "site/src/content/components/switch.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".switch",
+      "className": ".switch",
+      "required": true,
+      "description": "Label wrapper that aligns the hidden native input, visual switch, and visible label."
+    },
+    {
+      "name": "input",
+      "selector": ".switch__input",
+      "className": ".switch__input",
+      "required": true,
+      "description": "Native checkbox input that owns checked, focus, disabled, and form behavior."
+    },
+    {
+      "name": "track",
+      "selector": ".switch__track",
+      "className": ".switch__track",
+      "required": true,
+      "description": "Visual switch track."
+    },
+    {
+      "name": "thumb",
+      "selector": ".switch__thumb",
+      "className": ".switch__thumb",
+      "required": true,
+      "description": "Movable switch thumb."
+    },
+    {
+      "name": "label",
+      "selector": ".switch__label",
+      "className": ".switch__label",
+      "required": false,
+      "description": "Visible label text."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default switch treatment."
+    },
+    {
+      "name": "error", "className": ".switch--error", "default": false,
+      "description": "Invalid switch value using the shared Error field hierarchy."
+    },
+    {
+      "name": "success", "className": ".switch--success", "default": false,
+      "description": "Validated switch value using the shared Success field hierarchy."
+    },
+    {
+      "name": "warning", "className": ".switch--warning", "default": false,
+      "description": "Switch value that needs attention using the shared Warning field hierarchy."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "sm",
+      "className": ".switch--sm",
+      "default": false,
+      "description": "Small switch size."
+    },
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default switch size."
+    },
+    {
+      "name": "lg",
+      "className": ".switch--lg",
+      "default": false,
+      "description": "Large switch size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".switch"],
+      "description": "Default unchecked switch state."
+    },
+    {
+      "name": "checked",
+      "selectors": [".switch__input:checked ~ .switch__track", ".switch__input:checked ~ .switch__track .switch__thumb"],
+      "description": "Checked state driven by the native checkbox input."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".switch__input:focus-visible ~ .switch__track"],
+      "description": "Keyboard focus indicator."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".switch__input:disabled ~ .switch__track"],
+      "description": "Unavailable switch state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeControl",
+      "attributes": ["type=\"checkbox\"", "checked", "disabled", "required"],
+      "description": "Switch should preserve native checkbox behavior for form submission, keyboard toggling, and assistive technology."
+    },
+    {
+      "name": "checkedState",
+      "selectors": [".switch__input:checked ~ .switch__track"],
+      "attributes": ["aria-checked", "role=\"switch\""],
+      "description": "Adapters may expose role=\"switch\", but checked state must stay synchronized with the native checked value."
+    },
+    {
+      "name": "keyboardToggle",
+      "events": ["Space"],
+      "description": "Keyboard users toggle the switch with Space through the native input."
+    }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible accessible label for the switch.", "targetMappings": { "web": [{ "kind": "content", "selector": ".switch__label" }] } },
+    { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Canonical switch size.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".switch", "source": "sizes" }] } },
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation independent from checked state.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".switch", "source": "variants" }] } },
+    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Native checked state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the native switch unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Participates in native required-choice validation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "name", "type": "string", "required": false, "description": "Native form field name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for helper or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-border-default",
+        "--color-surface-primary",
+        "--color-button-primary-bg-default",
+        "--color-text-primary",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "shadow": [
+        "--shadow-sm"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size",
+        "--font-family-body"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use a native checkbox input or equivalent platform switch primitive.",
+    "Provide a visible label or an equivalent accessible name.",
+    "Keep checked, disabled, and required state synchronized with the input.",
+    "Support Space to toggle the switch."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css with a visually hidden native checkbox."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render native checkbox switches with the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

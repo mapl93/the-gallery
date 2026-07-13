@@ -1,0 +1,558 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.4.0",
+  "slug": "select",
+  "name": "Select",
+  "registryId": "A3",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Progressively enhanced single-choice field with validation variants, associated feedback, a custom trigger and listbox, native form fallback, and complete keyboard behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/select",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".select"
+    },
+    "docs": "site/src/content/components/select.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".select",
+      "className": ".select",
+      "required": true,
+      "description": "Relative wrapper that owns the label, native fallback, custom trigger, and anchored listbox."
+    },
+    {
+      "name": "label",
+      "selector": ".select__label",
+      "className": ".select__label",
+      "required": true,
+      "description": "Visible label associated with the enhanced trigger."
+    },
+    {
+      "name": "control",
+      "selector": ".select__control",
+      "className": ".select__control",
+      "required": true,
+      "generated": true,
+      "description": "Positioning context that groups the native field, enhanced trigger, and anchored listbox."
+    },
+    {
+      "name": "nativeField",
+      "selector": ".select__native",
+      "className": ".select__native",
+      "required": true,
+      "generated": true,
+      "description": "Original native select marked as the hidden form and fallback control after enhancement succeeds."
+    },
+    {
+      "name": "trigger",
+      "selector": ".select__trigger",
+      "className": ".select__trigger",
+      "required": true,
+      "generated": true,
+      "description": "Button that displays the current value and controls the custom listbox."
+    },
+    {
+      "name": "value",
+      "selector": ".select__value",
+      "className": ".select__value",
+      "required": true,
+      "generated": true,
+      "description": "Current selected option label rendered inside the trigger."
+    },
+    {
+      "name": "message",
+      "selector": ".select__message",
+      "className": ".select__message",
+      "required": false,
+      "description": "Optional supporting or validation message associated with the native field and enhanced trigger."
+    },
+    {
+      "name": "listbox",
+      "selector": ".select__listbox",
+      "className": ".select__listbox",
+      "required": true,
+      "generated": true,
+      "description": "Custom popup surface anchored below the trigger with an eight-pixel gap."
+    },
+    {
+      "name": "option",
+      "selector": ".select__option",
+      "className": ".select__option",
+      "required": true,
+      "generated": true,
+      "description": "Custom listbox option generated from one native option."
+    },
+    {
+      "name": "indicator",
+      "selector": ".select__indicator",
+      "className": ".select__indicator",
+      "required": true,
+      "generated": true,
+      "description": "Decorative SVG indicator rendered at the trailing edge of the trigger."
+    },
+    {
+      "name": "optionCheck",
+      "selector": ".select__option-check",
+      "className": ".select__option-check",
+      "required": true,
+      "generated": true,
+      "description": "Decorative SVG check shown only beside the selected option."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default custom select presentation."
+    },
+    {
+      "name": "error",
+      "className": ".select--error",
+      "default": false,
+      "description": "Validation error state with error label, border, message, indicator, and focus ring."
+    },
+    {
+      "name": "success",
+      "className": ".select--success",
+      "default": false,
+      "description": "Successful validation state with success label, border, message, indicator, and focus ring."
+    },
+    {
+      "name": "warning",
+      "className": ".select--warning",
+      "default": false,
+      "description": "Validation warning state with warning label, border, message, indicator, and focus ring."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default select size aligned with the default Input field."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".select"
+      ],
+      "description": "Closed resting state."
+    },
+    {
+      "name": "hover",
+      "selectors": [
+        ".select__field:hover:not(:disabled)"
+      ],
+      "description": "Pointer hover state on an available fallback field or enhanced trigger; validation variants retain their semantic border family."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [
+        ".select__field:focus-visible"
+      ],
+      "description": "Keyboard focus indicator with the shared field focus-ring hierarchy."
+    },
+    {
+      "name": "disabled",
+      "selectors": [
+        ".select__field:disabled"
+      ],
+      "description": "Unavailable native field and enhanced trigger state."
+    },
+    {
+      "name": "errorFocusVisible",
+      "selectors": [
+        ".select--error .select__field:focus-visible"
+      ],
+      "description": "Focused error variant with semantic inner and outer borders."
+    },
+    {
+      "name": "successFocusVisible",
+      "selectors": [
+        ".select--success .select__field:focus-visible"
+      ],
+      "description": "Focused success variant with semantic inner and outer borders."
+    },
+    {
+      "name": "warningFocusVisible",
+      "selectors": [
+        ".select--warning .select__field:focus-visible"
+      ],
+      "description": "Focused warning variant with semantic inner and outer borders."
+    },
+    {
+      "name": "open",
+      "selectors": [
+        ".select--open .select__trigger"
+      ],
+      "description": "Expanded trigger state with the listbox visible below the field."
+    },
+    {
+      "name": "optionHover",
+      "selectors": [
+        ".select__option:hover"
+      ],
+      "description": "Pointer hover state on an available option."
+    },
+    {
+      "name": "optionHighlighted",
+      "selectors": [
+        ".select__option[data-highlighted]"
+      ],
+      "description": "Keyboard-highlighted option referenced by aria-activedescendant."
+    },
+    {
+      "name": "optionSelected",
+      "selectors": [
+        ".select__option[aria-selected=\"true\"]"
+      ],
+      "description": "Option synchronized with the current native select value."
+    },
+    {
+      "name": "optionDisabled",
+      "selectors": [
+        ".select__option[aria-disabled=\"true\"]"
+      ],
+      "description": "Unavailable option skipped by pointer and keyboard selection."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "progressiveEnhancement",
+      "selectors": [
+        ".select__native",
+        ".select__trigger",
+        ".select__listbox"
+      ],
+      "description": "The native select remains visible and functional without JavaScript. Enhancement hides it only after the custom trigger and listbox are ready."
+    },
+    {
+      "name": "labelAssociation",
+      "selectors": [
+        ".select__label",
+        ".select__trigger"
+      ],
+      "attributes": [
+        "for on .select__label references id on .select__trigger",
+        "aria-labelledby on .select__trigger references .select__label"
+      ],
+      "description": "The visible label names and activates the enhanced trigger."
+    },
+    {
+      "name": "messageAssociation",
+      "selectors": [
+        ".select__native",
+        ".select__trigger",
+        ".select__message"
+      ],
+      "attributes": [
+        "aria-describedby on .select__native and .select__trigger references .select__message"
+      ],
+      "description": "Supporting and validation feedback is programmatically associated with both the form value owner and the visible trigger."
+    },
+    {
+      "name": "errorSemantics",
+      "selectors": [
+        ".select--error",
+        ".select__native",
+        ".select__trigger",
+        ".select__message"
+      ],
+      "attributes": [
+        "aria-invalid=\"true\" on .select__native and .select__trigger",
+        "role=\"alert\" on a dynamically presented error message"
+      ],
+      "description": "The error class provides visual treatment while native and enhanced controls expose invalid state and corrective feedback semantics."
+    },
+    {
+      "name": "triggerRelationship",
+      "selectors": [
+        ".select__trigger",
+        ".select__listbox"
+      ],
+      "attributes": [
+        "aria-haspopup=\"listbox\"",
+        "aria-expanded",
+        "aria-controls",
+        "aria-activedescendant"
+      ],
+      "description": "The trigger exposes expanded state, references the listbox, and identifies the keyboard-highlighted option while focus remains on the trigger."
+    },
+    {
+      "name": "listboxSemantics",
+      "selectors": [
+        ".select__listbox",
+        ".select__option"
+      ],
+      "attributes": [
+        "role=\"listbox\"",
+        "role=\"option\"",
+        "aria-selected",
+        "aria-disabled"
+      ],
+      "description": "The popup and generated options expose single-select listbox semantics."
+    },
+    {
+      "name": "placeholderPrompt",
+      "selectors": [
+        ".select__native",
+        ".select__value"
+      ],
+      "attributes": [
+        "hidden on the empty-value placeholder option"
+      ],
+      "description": "An initial placeholder may label the closed trigger through a hidden empty-value native option, but it is not exposed as a disabled listbox choice."
+    },
+    {
+      "name": "selectionSynchronization",
+      "selectors": [
+        ".select__native",
+        ".select__value",
+        ".select__option"
+      ],
+      "events": [
+        "input",
+        "change"
+      ],
+      "description": "Selecting a custom option updates the native value, selected label, aria-selected states, and dispatches native input and change events."
+    },
+    {
+      "name": "keyboardNavigation",
+      "selectors": [
+        ".select__trigger",
+        ".select__option"
+      ],
+      "events": [
+        "ArrowDown",
+        "ArrowUp",
+        "Home",
+        "End",
+        "Enter",
+        "Space",
+        "Escape",
+        "Tab",
+        "typeahead"
+      ],
+      "description": "Keyboard interaction opens, navigates, selects, dismisses, and performs prefix matching while skipping disabled options."
+    },
+    {
+      "name": "dismissal",
+      "selectors": [
+        ".select--open .select__trigger",
+        ".select__listbox"
+      ],
+      "events": [
+        "Escape",
+        "Tab",
+        "outside pointer",
+        "option select",
+        "trigger click"
+      ],
+      "description": "The listbox closes after Escape, Tab, outside interaction, selection, or repeated trigger activation without moving focus into the popup."
+    },
+    {
+      "name": "nativeDisabled",
+      "selectors": [
+        ".select__field:disabled",
+        ".select__option[aria-disabled=\"true\"]"
+      ],
+      "attributes": [
+        "disabled",
+        "aria-disabled"
+      ],
+      "description": "The native disabled state synchronizes to the trigger, and disabled options are exposed and skipped without becoming selectable."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible label associated with the enhanced trigger and listbox.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".select__label"
+          }
+        ]
+      }
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "required": false,
+      "description": "Optional supporting or validation message associated with the Select.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".select__message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected from the canonical variant list; default is the contract default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".select",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes both the native fallback and enhanced trigger unavailable.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".select__field",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "select"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-unfocused-value",
+        "--color-input-default-unfocused-label",
+        "--color-input-default-unfocused-message",
+        "--color-input-default-unfocused-icon",
+        "--color-input-default-hover-bg",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-default-disabled-bg",
+        "--color-input-default-disabled-inner-border",
+        "--color-input-default-disabled-value",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-unfocused-message",
+        "--color-input-error-unfocused-icon",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-unfocused-message",
+        "--color-input-success-unfocused-icon",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-unfocused-message",
+        "--color-input-warning-unfocused-icon",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border",
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-subtle",
+        "--color-text-primary"
+      ],
+      "spacing": [
+        "--space-input-padding-x",
+        "--space-input-padding-y",
+        "--space-input-margin-bottom"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-input-label-size",
+        "--typo-input-label-line-height",
+        "--typo-input-value-size",
+        "--typo-input-value-line-height",
+        "--typo-input-message-size",
+        "--typo-input-message-line-height"
+      ],
+      "radius": [
+        "--radius-md",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "z-index": [
+        "--z-dropdown"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ]
+    }
+  },
+  "accessibility": [
+    "Preserve the native select as the no-JavaScript fallback and form value owner.",
+    "Associate the visible label with the enhanced trigger and reference it from the listbox.",
+    "Connect supporting and validation messages to both the native field and enhanced trigger with aria-describedby.",
+    "Use aria-invalid=\"true\" on both native and enhanced controls for the error variant; do not apply aria-invalid for success or warning.",
+    "Do not rely on validation color or the indicator alone; include associated feedback text.",
+    "Expose aria-haspopup, aria-expanded, aria-controls, and aria-activedescendant on the trigger.",
+    "Expose role=listbox, role=option, aria-selected, and aria-disabled on the custom popup and options.",
+    "Keep an initial placeholder out of the option panel with a hidden empty-value native option; do not represent it as a disabled listbox choice.",
+    "Keep DOM focus on the trigger while arrow keys update the highlighted option.",
+    "Support ArrowUp, ArrowDown, Home, End, Enter, Space, Escape, Tab, and typeahead behavior.",
+    "Close on outside interaction and synchronize custom selection back to the native field.",
+    "Use Combobox instead when the list requires search, filtering, asynchronous results, or free-form input."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css-js",
+      "notes": "Canonical CSS styles the fallback and enhanced UI; components/js/theme.js generates and synchronizes the custom listbox."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-js",
+      "notes": "Shopify renders native select markup and the shared theme.js progressively enhances it without changing submitted values."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

@@ -1,0 +1,236 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "form",
+  "name": "Form",
+  "registryId": "H15",
+  "category": "forms",
+  "status": "pilot",
+  "summary": "Form layout contract with sections, responsive rows, actions, error summary, native submission semantics, and dependencies on Field Wrapper and Button.",
+  "dependencies": ["field-wrapper", "button"],
+  "source": {
+    "registry": "registry.json#/components/form",
+    "css": {
+      "file": "components/css/forms.css",
+      "selector": ".form"
+    },
+    "docs": "site/src/content/components/form.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".form",
+      "className": ".form",
+      "required": true,
+      "description": "Native form or form-like layout wrapper."
+    },
+    {
+      "name": "section",
+      "selector": ".form__section",
+      "className": ".form__section",
+      "required": false,
+      "description": "Optional major group within the form."
+    },
+    {
+      "name": "sectionTitle",
+      "selector": ".form__section-title",
+      "className": ".form__section-title",
+      "required": false,
+      "description": "Heading for a form section."
+    },
+    {
+      "name": "row",
+      "selector": ".form__row",
+      "className": ".form__row",
+      "required": false,
+      "description": "Responsive grid row for fields."
+    },
+    {
+      "name": "twoColumnRow",
+      "selector": ".form__row--2col",
+      "className": ".form__row--2col",
+      "required": false,
+      "description": "Two-column row modifier at supported viewport widths."
+    },
+    {
+      "name": "threeColumnRow",
+      "selector": ".form__row--3col",
+      "className": ".form__row--3col",
+      "required": false,
+      "description": "Three-column row modifier at supported viewport widths."
+    },
+    {
+      "name": "actions",
+      "selector": ".form__actions",
+      "className": ".form__actions",
+      "required": false,
+      "description": "Submit, cancel, or secondary action row."
+    },
+    {
+      "name": "errorSummary",
+      "selector": ".form__error-summary",
+      "className": ".form__error-summary",
+      "required": false,
+      "description": "Top-level summary of form validation errors."
+    },
+    {
+      "name": "errorSummaryTitle",
+      "selector": ".form__error-summary-title",
+      "className": ".form__error-summary-title",
+      "required": false,
+      "description": "Heading for the error summary."
+    },
+    {
+      "name": "errorSummaryList",
+      "selector": ".form__error-summary-list",
+      "className": ".form__error-summary-list",
+      "required": false,
+      "description": "List of links or messages for invalid fields."
+    },
+    {
+      "name": "errorSummaryItem",
+      "selector": ".form__error-summary-list li",
+      "required": false,
+      "description": "Single error summary item."
+    },
+    {
+      "name": "errorSummaryLink",
+      "selector": ".form__error-summary-list a",
+      "required": false,
+      "description": "Optional link from the error summary to a specific invalid field."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default form layout."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default form spacing."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".form"],
+      "description": "Default form layout state."
+    },
+    {
+      "name": "twoColumn",
+      "selectors": [".form__row--2col"],
+      "description": "Responsive two-column row is present."
+    },
+    {
+      "name": "threeColumn",
+      "selectors": [".form__row--3col"],
+      "description": "Responsive three-column row is present."
+    },
+    {
+      "name": "withActions",
+      "selectors": [".form__actions"],
+      "description": "Action row is present."
+    },
+    {
+      "name": "withErrorSummary",
+      "selectors": [".form__error-summary"],
+      "description": "Top-level validation summary is present."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeSubmission",
+      "selectors": [".form"],
+      "attributes": ["<form>", "action", "method", "novalidate", "autocomplete"],
+      "events": ["submit", "reset"],
+      "description": "Targets should preserve native form submission semantics unless the target explicitly owns submission."
+    },
+    {
+      "name": "fieldComposition",
+      "selectors": [".form__section", ".form__row"],
+      "description": "Forms compose Field Wrapper and input controls while preserving a logical reading and tab order."
+    },
+    {
+      "name": "responsiveRows",
+      "selectors": [".form__row--2col", ".form__row--3col"],
+      "description": "Responsive row modifiers should not change source order or keyboard order."
+    },
+    {
+      "name": "actionSemantics",
+      "selectors": [".form__actions"],
+      "attributes": ["type=\"submit\"", "type=\"button\"", "disabled", "aria-disabled"],
+      "description": "Action buttons should use explicit button types and respect pending or disabled states."
+    },
+    {
+      "name": "errorSummary",
+      "selectors": [".form__error-summary", ".form__error-summary-list", ".form__error-summary-list a"],
+      "attributes": ["role=\"alert\"", "aria-labelledby", "href"],
+      "description": "Error summaries should announce validation failures and link to invalid fields when possible."
+    }
+  ],
+  "properties": [
+    { "name": "columns", "type": "enum", "required": false, "values": ["one", "two", "three"], "defaultValue": "one", "description": "Responsive field count for a composed form row.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form__row", "attribute": "data-columns", "values": { "one": "one", "two": "two", "three": "three" } }] } },
+    { "name": "errorSummary", "type": "slot", "required": false, "description": "Optional top-level summary that links validation errors to their fields.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form__error-summary", "classNames": [".form__error-summary"] }] } },
+    { "name": "actions", "type": "slot", "required": false, "description": "Optional explicit submit and secondary action row.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form__actions", "classNames": [".form__actions"] }] } },
+    { "name": "noValidate", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables native browser validation when the target owns a complete accessible validation flow.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form", "attribute": "novalidate", "values": { "true": "", "false": null }, "elements": ["form"] }] } },
+    { "name": "autocomplete", "type": "string", "required": false, "defaultValue": "on", "description": "Native form autocomplete policy.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form", "attribute": "autocomplete", "valueFrom": "property", "elements": ["form"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-text-primary",
+        "--color-border-subtle",
+        "--color-feedback-error-default"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-h4-size",
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use native form elements for form submission when available.",
+    "Keep field order, visual order, and tab order aligned.",
+    "Use explicit button types for submit, reset, and non-submit actions.",
+    "Provide a top-level error summary for longer forms with multiple invalid fields.",
+    "Link error summary items to their invalid fields when the target supports focusable anchors."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/forms.css; validation, submission, pending state, and error-summary focus behavior are target responsibilities."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render native forms, field wrappers, buttons, and error summaries with this class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

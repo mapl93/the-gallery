@@ -1,38 +1,37 @@
 ## Overview
 
-Social sharing buttons. Inline and sticky sidebar variants.
+Share Buttons arranges target-owned share links or actions in inline or column presentation. It does not choose providers, destinations, native sharing behavior, copy feedback, or fallbacks.
 
-<Preview html={"<div class=\"share-buttons\" style=\"display:flex;gap:8px;\"><button class=\"btn btn--outline btn--sm\">Twitter</button><button class=\"btn btn--outline btn--sm\">Facebook</button><button class=\"btn btn--outline btn--sm\">Copy Link</button></div>"} label="Share Buttons" />
+## Presentation
 
-## Variants
+<Preview html={'<div class="share-buttons share-buttons--inline" role="group" aria-label="Share this article"><button type="button">Share</button><button type="button">Copy link</button></div>'} label="Share Buttons" />
 
-### Inline
-
-<Preview html={"<div class=\"share-buttons share-buttons--inline\" style=\"display:flex;gap:8px;\"><button class=\"btn btn--outline btn--sm\">Share</button></div>"} label="Inline" />
-
-### Sticky
-
-<Preview html={"<div class=\"share-buttons share-buttons--sticky\" style=\"display:flex;flex-direction:column;gap:8px;\"><button class=\"btn btn--outline btn--sm\">T</button><button class=\"btn btn--outline btn--sm\">F</button></div>"} label="Sticky" />
+`inline` maps to `.share-buttons--inline` and is the default. `sticky` maps to `.share-buttons--sticky`, which changes the action layout to a column but does not itself position the component. Each action retains the semantics and presentation owned by its target control.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the article body/prose component for rich text — it handles typography, images, and spacing.</Do>
-  <Dont>Don't manually style article content with inline styles — let the prose class handle it.</Dont>
+  <Do>Use links for provider destinations and buttons for native share or copy actions.</Do>
+  <Dont>Do not infer providers, URLs, icons, feedback, or fallback behavior from the static preview.</Dont>
 </DoDont>
+
+Which CSS family is canonical between `.share-buttons` and `.share` remains unresolved. The layer that owns provider URLs, Web Share, copy feedback, and fallbacks also remains unresolved. This contract maps only the registry-backed `.share-buttons` family.
 
 ## Accessibility
 
-<Callout type="info">
-  Blog components support Shopify's article template system. Use metafields for custom article data.
-</Callout>
+- Give the action group a useful accessible name when surrounding text does not identify it.
+- Use links for destinations and native buttons for actions.
+- Give icon-only actions provider-specific accessible names.
+- Preserve each composed control's visible focus and keyboard behavior.
+- Announce copy success or failure through the target action's accepted feedback pattern.
 
-- Use `<button>` elements for actions and `<a>` for navigation. Never use `<div>` with a click handler.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.share-buttons`</td><td>class</td><td>—</td><td>Base share buttons styles</td></tr>
-  <tr><td>`.share-buttons--inline`</td><td>modifier</td><td>—</td><td>Inline variant</td></tr>
-  <tr><td>`.share-buttons--sticky`</td><td>modifier</td><td>—</td><td>Sticky variant</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`inline`</td><td>`inline` or `sticky`</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>required</td><td>Target-owned share links or buttons</td></tr>
 </PropTable>
+
+Anatomy: `.share-buttons`. Registered modifiers: `.share-buttons--inline` and `.share-buttons--sticky`.
+
+Dependencies: none. The contract remains `pilot`; the canonical share family and ownership of all provider behavior and feedback are explicitly unresolved.

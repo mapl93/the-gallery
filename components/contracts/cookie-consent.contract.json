@@ -1,0 +1,282 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "cookie-consent",
+  "name": "Cookie Consent",
+  "registryId": "G9",
+  "category": "marketing",
+  "status": "pilot",
+  "summary": "Dismissible cookie notice presentation with Button-composed actions and optional preference-surface anatomy; the consent model remains target-owned.",
+  "dependencies": [
+    "button"
+  ],
+  "source": {
+    "registry": "registry.json#/components/cookie-consent",
+    "css": {
+      "file": "components/css/marketing.css",
+      "selector": ".cookie-banner"
+    },
+    "docs": "site/src/content/components/cookie-consent.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".cookie-banner",
+      "className": ".cookie-banner",
+      "required": true,
+      "description": "Viewport-edge cookie notice surface."
+    },
+    {
+      "name": "inner",
+      "selector": ".cookie-banner__inner",
+      "className": ".cookie-banner__inner",
+      "required": true,
+      "description": "Responsive notice content wrapper."
+    },
+    {
+      "name": "text",
+      "selector": ".cookie-banner__text",
+      "className": ".cookie-banner__text",
+      "required": true,
+      "description": "Cookie notice and optional policy link."
+    },
+    {
+      "name": "actions",
+      "selector": ".cookie-banner__actions",
+      "className": ".cookie-banner__actions",
+      "required": true,
+      "description": "Button-composed consent actions."
+    },
+    {
+      "name": "preferences",
+      "selector": ".cookie-preferences",
+      "className": ".cookie-preferences",
+      "required": false,
+      "description": "Optional preference-surface content shell without a prescribed consent model."
+    },
+    {
+      "name": "preferenceCategory",
+      "selector": ".cookie-preferences__category",
+      "className": ".cookie-preferences__category",
+      "required": false,
+      "description": "Repeated preference category row."
+    },
+    {
+      "name": "preferenceName",
+      "selector": ".cookie-preferences__name",
+      "className": ".cookie-preferences__name",
+      "required": false,
+      "description": "Preference category name."
+    },
+    {
+      "name": "preferenceDescription",
+      "selector": ".cookie-preferences__desc",
+      "className": ".cookie-preferences__desc",
+      "required": false,
+      "description": "Preference category description."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Single responsive cookie-notice presentation."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Full-width, viewport-contained banner."
+    }
+  ],
+  "states": [
+    {
+      "name": "hidden",
+      "selectors": [
+        ".cookie-banner"
+      ],
+      "description": "Banner is translated below the viewport by default."
+    },
+    {
+      "name": "visible",
+      "selectors": [
+        ".cookie-banner[data-visible]"
+      ],
+      "description": "Visible banner state."
+    },
+    {
+      "name": "policyLinkFocusVisible",
+      "selectors": [
+        ".cookie-banner__text a:focus-visible"
+      ],
+      "description": "Visible keyboard focus on an optional policy link."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [
+        ".cookie-banner[data-visible]"
+      ],
+      "attributes": [
+        "data-visible"
+      ],
+      "description": "The banner is hidden by canonical CSS until data-visible is present."
+    },
+    {
+      "name": "buttonComposition",
+      "selectors": [
+        ".cookie-banner__actions"
+      ],
+      "events": [
+        "click"
+      ],
+      "description": "Consent actions compose Button and emit native action requests; the target owns policy meaning, persistence, blocking, and subsequent state."
+    },
+    {
+      "name": "preferenceBoundary",
+      "selectors": [
+        ".cookie-preferences",
+        ".cookie-preferences__category"
+      ],
+      "description": "Canonical CSS provides preference layout anatomy only and does not define categories, defaults, required cookies, control types, storage, or consent withdrawal behavior."
+    }
+  ],
+  "properties": [
+    {
+      "name": "message",
+      "type": "string",
+      "required": true,
+      "description": "Visible cookie notice text.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".cookie-banner__text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "actions",
+      "type": "slot",
+      "required": true,
+      "description": "Target-defined consent actions composed from Button.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cookie-banner__actions",
+            "classNames": [
+              ".cookie-banner__actions"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preferences",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-defined preference content; this slot does not define the cookie preference model.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cookie-preferences",
+            "classNames": [
+              ".cookie-preferences"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "visible",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls banner presentation only; consent state and persistence remain target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".cookie-banner",
+            "attribute": "data-visible",
+            "values": {
+              "true": "",
+              "false": null
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-border-subtle",
+        "--color-surface-primary",
+        "--color-text-accent",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "spacing": [
+        "--space-layout-container"
+      ],
+      "transition": [
+        "--transition-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ],
+      "z-index": [
+        "--z-overlay"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use clear Button labels that describe each target-defined consent action.",
+    "Keep the policy link keyboard reachable with visible focus.",
+    "Do not treat closing the banner as consent unless an accepted target policy explicitly defines that meaning.",
+    "When preferences open in a modal surface, that containing surface owns naming, focus containment, Escape dismissal, and focus restoration.",
+    "Respect reduced-motion preferences for banner transitions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Banner and preference layout CSS are implemented; the legal preference model and persistence are unresolved."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "cart-summary",
+  "name": "Cart Summary",
+  "registryId": "K3",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Sticky cart summary with subtotal rows, total row, note, checkout CTA, express checkout area, and divider.",
+  "dependencies": ["button"],
+  "source": {
+    "registry": "registry.json#/components/cart-summary",
+    "css": { "file": "components/css/cart.css", "selector": ".cart-summary" },
+    "docs": "site/src/content/components/cart-summary.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".cart-summary", "className": ".cart-summary", "required": true, "description": "Summary container." },
+    { "name": "title", "selector": ".cart-summary__title", "className": ".cart-summary__title", "required": true, "description": "Summary title." },
+    { "name": "row", "selector": ".cart-summary__row", "className": ".cart-summary__row", "required": true, "description": "Single summary row." },
+    { "name": "totalRow", "selector": ".cart-summary__row--total", "className": ".cart-summary__row--total", "required": true, "description": "Total row." },
+    { "name": "value", "selector": ".cart-summary__value", "className": ".cart-summary__value", "required": true, "description": "Summary value." },
+    { "name": "note", "selector": ".cart-summary__note", "className": ".cart-summary__note", "required": false, "description": "Checkout note." },
+    { "name": "checkout", "selector": ".cart-summary__checkout", "className": ".cart-summary__checkout", "required": true, "description": "Checkout action." },
+    { "name": "express", "selector": ".cart-summary__express", "className": ".cart-summary__express", "required": false, "description": "Express checkout area." },
+    { "name": "divider", "selector": ".cart-summary__divider", "className": ".cart-summary__divider", "required": false, "description": "Divider between checkout options." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default sticky summary." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default sidebar summary size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".cart-summary"], "description": "Default cart summary state." },
+    { "name": "total", "selectors": [".cart-summary__row--total"], "description": "Emphasized total row state." },
+    { "name": "dividerLines", "selectors": [".cart-summary__divider::before", ".cart-summary__divider::after"], "description": "Generated divider lines." }
+  ],
+  "behavior": [
+    { "name": "checkout", "selectors": [".cart-summary__checkout"], "events": ["click"], "description": "Checkout action should hand off to the target checkout flow." },
+    { "name": "totals", "selectors": [".cart-summary__row", ".cart-summary__value"], "description": "Rows should update with subtotal, shipping, discounts, taxes, and total from commerce state." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Summary title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__title" }] } },
+    { "name": "rows", "type": "slot", "required": true, "description": "Subtotal, shipping, discount, tax, and total rows.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary__row", "classNames": [".cart-summary__row"] }] } },
+    { "name": "note", "type": "string", "required": false, "description": "Checkout expectation note.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__note" }] } },
+    { "name": "checkoutLabel", "type": "string", "required": true, "description": "Primary checkout action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__checkout" }] } },
+    { "name": "checkoutDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables checkout while cart state is unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-summary__checkout", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "express", "type": "slot", "required": false, "description": "Optional target-native express checkout actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary__express", "classNames": [".cart-summary__express"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-border-subtle", "--color-text-disabled"],
+      "radius": ["--radius-lg"],
+      "typography": ["--font-family-heading", "--typo-h4-size", "--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use readable labels for every summary value.",
+    "Keep checkout action reachable after totals update.",
+    "Do not rely on sticky positioning as the only way to access checkout."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify cart totals, discounts, shipping/tax messaging, and checkout URL." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

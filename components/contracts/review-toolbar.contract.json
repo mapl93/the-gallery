@@ -1,0 +1,83 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "review-toolbar",
+  "name": "Review Sort / Filter Bar",
+  "registryId": "V8",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Responsive review-list toolbar that composes target-owned controls without defining sorting, filtering, or form-entry behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/review-toolbar",
+    "css": { "file": "components/css/reviews.css", "selector": ".review-toolbar" },
+    "docs": "site/src/content/components/review-toolbar.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".review-toolbar", "className": ".review-toolbar", "required": true, "description": "Responsive toolbar region for target-owned review-list controls." },
+    { "name": "sortGroup", "selector": ".review-toolbar__sort", "className": ".review-toolbar__sort", "required": false, "description": "Optional structural wrapper for a target-owned ordering or filtering control." },
+    { "name": "select", "selector": ".review-toolbar .select", "className": ".select", "required": false, "description": "Optional composed Select; its label, options, enhancement, validation, and disabled state remain canonical Select concerns." },
+    { "name": "nativeSelectCompatibility", "selector": ".review-toolbar__sort-select", "className": ".review-toolbar__sort-select", "required": false, "description": "Legacy containment hook for an unenhanced native select; no field visuals are owned here." },
+    { "name": "writeAction", "selector": ".review-toolbar .btn", "className": ".btn", "required": false, "description": "Optional composed Button or link for a target-owned review-entry destination or action." }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Optional accessible toolbar name when surrounding context does not already identify it.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-toolbar", "attribute": "aria-label", "valueFrom": "property" }] }
+    },
+    {
+      "name": "control",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned Select or other native review-list control; option meaning and list effects are not defined here.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-toolbar__sort", "classNames": [".review-toolbar__sort"] }] }
+    },
+    {
+      "name": "writeAction",
+      "type": "slot",
+      "required": false,
+      "description": "Optional Button or link composition; the target decides whether it navigates, reveals in-page content, or invokes another flow.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-toolbar .btn", "classNames": [".btn"] }] }
+    }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default responsive toolbar layout." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Inline toolbar that stacks and stretches composed controls on narrow viewports." }],
+  "states": [
+    { "name": "default", "selectors": [".review-toolbar"], "description": "Structural toolbar state; composed controls own their interaction states." }
+  ],
+  "behavior": [
+    {
+      "name": "controlBoundary",
+      "selectors": [".review-toolbar__sort"],
+      "description": "The target owns option inventory, ordering or filtering meaning, URL synchronization, result updates, focus retention, and announcements."
+    },
+    {
+      "name": "actionBoundary",
+      "selectors": [".review-toolbar .btn"],
+      "description": "The optional action preserves Button or native-link semantics; Review Toolbar does not decide whether it navigates or opens a form."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle"],
+      "typography": ["--typo-body-sm-size"]
+    }
+  },
+  "accessibility": [
+    "Use a labelled toolbar or equivalent region when the surrounding context does not identify the controls.",
+    "Preserve the composed Select label, native fallback, focus, disabled, and validation semantics.",
+    "Preserve Button semantics and use an anchor when the write-review affordance is navigation.",
+    "When a target updates the review list in place, preserve focus and announce meaningful result changes outside this layout contract."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical CSS owns responsive layout and containment only; composed controls own visual states." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must select provider-backed options and write-review entry behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

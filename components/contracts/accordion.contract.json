@@ -1,0 +1,217 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "accordion",
+  "name": "Accordion",
+  "registryId": "B6",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Collapsible disclosure group with trigger, icon, animated panel, expanded state, and ARIA disclosure behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/accordion",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".accordion"
+    },
+    "docs": "site/src/content/components/accordion.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".accordion",
+      "className": ".accordion",
+      "required": true,
+      "description": "Wrapper around one or more collapsible items."
+    },
+    {
+      "name": "item",
+      "selector": ".accordion__item",
+      "className": ".accordion__item",
+      "required": true,
+      "description": "Individual accordion item."
+    },
+    {
+      "name": "trigger",
+      "selector": ".accordion__trigger",
+      "className": ".accordion__trigger",
+      "required": true,
+      "description": "Button that toggles its associated panel."
+    },
+    {
+      "name": "icon",
+      "selector": ".accordion__icon",
+      "className": ".accordion__icon",
+      "required": false,
+      "description": "Optional expansion indicator."
+    },
+    {
+      "name": "panel",
+      "selector": ".accordion__panel",
+      "className": ".accordion__panel",
+      "required": true,
+      "description": "Animated collapsible panel."
+    },
+    {
+      "name": "panelInner",
+      "selector": ".accordion__panel-inner",
+      "className": ".accordion__panel-inner",
+      "required": false,
+      "description": "Optional inner wrapper used to hide overflowing panel content during animation."
+    },
+    {
+      "name": "content",
+      "selector": ".accordion__content",
+      "className": ".accordion__content",
+      "required": true,
+      "description": "Content region inside the panel."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default accordion group."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default accordion spacing."
+    }
+  ],
+  "states": [
+    {
+      "name": "collapsed",
+      "selectors": [".accordion__panel"],
+      "description": "Resting collapsed panel state."
+    },
+    {
+      "name": "expanded",
+      "selectors": [".accordion__trigger[aria-expanded=\"true\"] + .accordion__panel"],
+      "description": "Expanded panel state controlled by aria-expanded on the trigger."
+    },
+    {
+      "name": "iconExpanded",
+      "selectors": [".accordion__trigger[aria-expanded=\"true\"] .accordion__icon"],
+      "description": "Expanded icon rotation state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".accordion__trigger:hover"],
+      "description": "Pointer hover state on the trigger."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".accordion__trigger:focus-visible"],
+      "description": "Keyboard focus indicator on the trigger."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "disclosureSemantics",
+      "attributes": ["aria-expanded", "aria-controls", "id"],
+      "description": "Each trigger must expose expanded state and reference the panel it controls."
+    },
+    {
+      "name": "toggle",
+      "selectors": [".accordion__trigger[aria-expanded=\"true\"] + .accordion__panel"],
+      "events": ["click", "Enter", "Space"],
+      "description": "Activating a trigger toggles aria-expanded and the associated panel."
+    },
+    {
+      "name": "mode",
+      "events": ["single item open", "multiple items open"],
+      "description": "Adapters may choose single-open or multi-open behavior, but must keep aria-expanded synchronized."
+    }
+  ],
+  "properties": [
+    {
+      "name": "expanded",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls the expanded state of an individual accordion item; groups may coordinate this state as single-open or multi-open.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".accordion__trigger",
+            "attribute": "aria-expanded",
+            "values": {
+              "true": "true",
+              "false": "false"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-border-focus"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "transition": [
+        "--transition-fast",
+        "--transition-base"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--font-family-body"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use a native button for each accordion trigger.",
+    "Set aria-expanded on each trigger and keep it synchronized with panel visibility.",
+    "Connect triggers and panels with aria-controls and matching ids.",
+    "Support Enter and Space activation on triggers.",
+    "Preserve heading hierarchy around accordion triggers when accordions structure page content."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; toggle behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "table-of-contents",
+  "name": "Table of Contents",
+  "registryId": "L5",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Article navigation with heading links. Optional sticky variant.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/table-of-contents",
+    "css": { "file": "components/css/blog.css", "selector": ".toc" },
+    "docs": "site/src/content/components/table-of-contents.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".toc", "className": ".toc", "required": true, "description": "Table-of-contents navigation container." },
+    { "name": "title", "selector": ".toc__title", "className": ".toc__title", "required": false, "description": "Optional visible navigation title." },
+    { "name": "list", "selector": ".toc__list", "className": ".toc__list", "required": true, "description": "Target-owned heading-link list." },
+    { "name": "item", "selector": ".toc__item", "className": ".toc__item", "required": true, "description": "Heading-link list item." },
+    { "name": "levelThreeItem", "selector": ".toc__item--h3", "className": ".toc__item--h3", "required": false, "description": "Indented third-level heading item." },
+    { "name": "levelFourItem", "selector": ".toc__item--h4", "className": ".toc__item--h4", "required": false, "description": "Further-indented fourth-level heading item." },
+    { "name": "link", "selector": ".toc__link", "className": ".toc__link", "required": true, "description": "In-page heading destination." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "In-flow table of contents." },
+    { "name": "sticky", "className": ".toc--sticky", "default": false, "description": "Sticky table of contents for a containing layout that provides sufficient space." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Fluid width controlled by the containing article layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".toc"], "description": "Default table-of-contents state." },
+    { "name": "linkHover", "selectors": [".toc__link:hover"], "description": "Heading-link hover state." },
+    { "name": "linkFocus", "selectors": [".toc__link:focus-visible"], "description": "Visible keyboard focus for heading links." },
+    { "name": "activeLink", "selectors": [".toc__link--active"], "description": "Existing visual marker for the target-supplied active heading." }
+  ],
+  "behavior": [
+    { "name": "headingNavigation", "selectors": [".toc__link"], "attributes": ["href"], "events": ["click"], "description": "Links use fragment destinations that match heading identifiers in the article content." },
+    { "name": "targetHeadingState", "selectors": [".toc__list", ".toc__link--active"], "description": "The target supplies the heading inventory and any active marker; neutral extraction and scroll synchronization remain unresolved." }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "In-flow or sticky presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".toc", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Optional accessible name for the navigation landmark.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toc", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
+    { "name": "title", "type": "string", "required": false, "description": "Optional visible table-of-contents title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".toc__title" }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "Target-owned hierarchy of heading links and active-state markers.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".toc__list", "classNames": [".toc__list"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-heading", "--typo-body-size"],
+      "radius": ["--radius-md"],
+      "spacing": ["--space-layout-touch-target"],
+      "transition": ["--transition-fast"]
+    }
+  },
+  "accessibility": [
+    "Use a nav landmark with a useful accessible name when the page contains more than one navigation region.",
+    "Keep list nesting aligned with the article heading hierarchy and ensure every fragment link resolves to a unique heading id.",
+    "Do not use aria-current or active styling unless the target keeps it synchronized with the reading position.",
+    "Preserve visible keyboard focus and touch-sized heading links."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Visual CSS is implemented; heading extraction and active-state behavior are target-owned pending a source decision." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

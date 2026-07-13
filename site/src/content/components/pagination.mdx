@@ -1,26 +1,38 @@
 ## Overview
 
-Page navigation controls.
+Page navigation for bounded collection results.
 
-<Preview html={"<nav class=\"pagination\" aria-label=\"Pagination\"><a class=\"pagination__link\" href=\"#\">&laquo; Prev</a><a class=\"pagination__link\" href=\"#\">1</a><span class=\"pagination__current\">2</span><a class=\"pagination__link\" href=\"#\">3</a><span class=\"pagination__ellipsis\">…</span><a class=\"pagination__link\" href=\"#\">10</a><a class=\"pagination__link\" href=\"#\">Next &raquo;</a></nav>"} label="Pagination" />
+<Preview html={"<nav class=\"pagination\" aria-label=\"Collection pages\" data-current-page=\"2\"><a class=\"pagination__link\" href=\"#previous\" aria-label=\"Previous page\">Previous</a><a class=\"pagination__link\" href=\"#page-1\">1</a><span class=\"pagination__current\" aria-current=\"page\">2</span><a class=\"pagination__link\" href=\"#page-3\">3</a><span class=\"pagination__ellipsis\" aria-hidden=\"true\">...</span><a class=\"pagination__link\" href=\"#page-10\">10</a><a class=\"pagination__link\" href=\"#next\" aria-label=\"Next page\">Next</a></nav>"} label="Pagination" />
+
+## Presentation
+
+The current page uses the neutral primary-action family. Adjacent pages remain quiet until hover or focus, and ellipsis content is informational rather than interactive.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the collection grid with product cards for consistent spacing and responsive behavior.</Do>
-  <Dont>Don't mix collection grid with manual floats or absolute positioning.</Dont>
+  <Do>Keep the current page and nearby destinations visible.</Do>
+  <Dont>Do not render an ellipsis as a disabled link.</Dont>
 </DoDont>
+
+- Disable previous or next navigation only at a real boundary.
+- Preserve collection filters and view mode when changing pages.
+- Use target-native URLs so navigation still works without JavaScript.
 
 ## Accessibility
 
-<Callout type="info">
-  Collection components handle responsive breakpoints automatically via CSS Grid.
-</Callout>
+- Use a `<nav>` with a specific accessible label.
+- Mark the current page with `aria-current="page"`.
+- Give icon-only previous and next links accessible names.
+- Use `aria-disabled="true"` only when an unavailable link remains in the DOM.
 
-- Use `<nav>` with `aria-label` to identify the navigation region.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.pagination`</td><td>class</td><td>—</td><td>Base pagination styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Pagination navigation name</td></tr>
+  <tr><td>`currentPage`</td><td>number</td><td>required</td><td>Current page used to generate items</td></tr>
+  <tr><td>`pageItems`</td><td>slot</td><td>required</td><td>Previous, page, ellipsis, and next items</td></tr>
+  <tr><td>`.pagination__link`</td><td>class</td><td>optional</td><td>Page or directional link</td></tr>
+  <tr><td>`.pagination__current`</td><td>class</td><td>required</td><td>Current page indicator</td></tr>
+  <tr><td>`.pagination__ellipsis`</td><td>class</td><td>optional</td><td>Skipped page range</td></tr>
 </PropTable>

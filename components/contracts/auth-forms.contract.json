@@ -1,0 +1,81 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "auth-forms",
+  "name": "Auth Forms (Login / Register)",
+  "registryId": "U1",
+  "category": "account",
+  "status": "pilot",
+  "summary": "Login and registration form shell with header, form stack, divider, social actions, footer link, and forgot-password link.",
+  "dependencies": ["input", "button", "form"],
+  "source": {
+    "registry": "registry.json#/components/auth-forms",
+    "css": { "file": "components/css/account.css", "selector": ".auth" },
+    "docs": "site/src/content/components/auth-forms.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".auth", "className": ".auth", "required": true, "description": "Auth form container." },
+    { "name": "header", "selector": ".auth__header", "className": ".auth__header", "required": false, "description": "Auth header." },
+    { "name": "title", "selector": ".auth__title", "className": ".auth__title", "required": true, "description": "Auth title." },
+    { "name": "subtitle", "selector": ".auth__subtitle", "className": ".auth__subtitle", "required": false, "description": "Auth supporting text." },
+    { "name": "form", "selector": ".auth__form", "className": ".auth__form", "required": true, "description": "Auth form stack." },
+    { "name": "divider", "selector": ".auth__divider", "className": ".auth__divider", "required": false, "description": "Separator between auth methods." },
+    { "name": "dividerLine", "selector": ".auth__divider::before", "generated": true, "required": false, "description": "Generated divider line." },
+    { "name": "social", "selector": ".auth__social", "className": ".auth__social", "required": false, "description": "Social authentication button group." },
+    { "name": "socialButton", "selector": ".auth__social-btn", "className": ".auth__social-btn", "required": false, "description": "Social authentication action." },
+    { "name": "footer", "selector": ".auth__footer", "className": ".auth__footer", "required": false, "description": "Auth footer text and links." },
+    { "name": "forgot", "selector": ".auth__forgot", "className": ".auth__forgot", "required": false, "description": "Forgot-password link wrapper." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default auth form shell." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default narrow account form width." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".auth"], "description": "Default auth form state." },
+    { "name": "socialHover", "selectors": [".auth__social-btn:hover"], "description": "Social auth button hover state." },
+    { "name": "socialFocus", "selectors": [".auth__social-btn:focus-visible"], "description": "Visible keyboard focus on social authentication actions." },
+    { "name": "footerLinkFocus", "selectors": [".auth__footer a:focus-visible", ".auth__forgot a:focus-visible"], "description": "Visible keyboard focus on auth support links." },
+    { "name": "footerLinks", "selectors": [".auth__footer a", ".auth__forgot a"], "description": "Auth footer and forgot-password link state." }
+  ],
+  "behavior": [
+    { "name": "formSubmission", "selectors": [".auth__form"], "events": ["submit"], "description": "Auth form should submit login or registration data to the account target." },
+    { "name": "inputComposition", "selectors": [".auth__form"], "description": "Auth Forms should compose Input, Button, and Form primitives for field semantics and validation." },
+    { "name": "socialAuth", "selectors": [".auth__social-btn"], "events": ["click"], "description": "Social auth actions should hand off to target authentication providers." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Authentication form title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__title" }] } },
+    { "name": "subtitle", "type": "string", "required": false, "description": "Supporting authentication guidance.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__subtitle" }] } },
+    { "name": "form", "type": "slot", "required": true, "description": "Form dependency containing target-owned authentication fields and submission.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__form", "classNames": [".auth__form"] }] } },
+    { "name": "forgotAction", "type": "slot", "required": false, "description": "Password-recovery link composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__forgot", "classNames": [".auth__forgot"] }] } },
+    { "name": "dividerLabel", "type": "string", "required": false, "description": "Readable separator between authentication methods.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__divider" }] } },
+    { "name": "socialActions", "type": "slot", "required": false, "description": "Target-owned social authentication actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__social", "classNames": [".auth__social"] }] } },
+    { "name": "footer", "type": "slot", "required": false, "description": "Supporting account-mode navigation or legal content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__footer", "classNames": [".auth__footer"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary", "--color-text-disabled", "--color-border-subtle", "--color-border-default", "--color-border-focus", "--color-surface-primary", "--color-surface-secondary", "--color-text-accent"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
+      "radius": ["--radius-md"],
+      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Associate every input with a label and error description.",
+    "Composed fields preserve the dependency-owned default, error, success, and warning validation families; aria-invalid is reserved for error.",
+    "Do not expose account forms or data without the target authentication flow.",
+    "Social auth buttons need provider-specific accessible names.",
+    "Password recovery should be reachable from login forms."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer login, registration, and recovery forms." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "price",
+  "name": "Price",
+  "registryId": "A9",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Commerce price primitive with current price, compare-at price, unit price, and sale visual treatment.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/price",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".price"
+    },
+    "docs": "site/src/content/components/price.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".price",
+      "className": ".price",
+      "required": true,
+      "description": "Inline price wrapper."
+    },
+    {
+      "name": "current",
+      "selector": ".price__current",
+      "className": ".price__current",
+      "required": true,
+      "description": "Current payable price."
+    },
+    {
+      "name": "compare",
+      "selector": ".price__compare",
+      "className": ".price__compare",
+      "required": false,
+      "description": "Original or compare-at price shown when discounted."
+    },
+    {
+      "name": "unit",
+      "selector": ".price__unit",
+      "className": ".price__unit",
+      "required": false,
+      "description": "Optional unit or recurring price qualifier."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default price display."
+    },
+    {
+      "name": "on-sale",
+      "className": ".price--on-sale",
+      "default": false,
+      "description": "Discounted price with compare-at value."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default price size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".price"],
+      "description": "Passive display state. Sale treatment is a variant, not a duplicated state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "moneyFormatting",
+      "selectors": [".price__current", ".price__compare", ".price__unit"],
+      "attributes": ["aria-label"],
+      "description": "Targets provide already-formatted locale, currency, compare-at, and unit-price strings while preserving the price anatomy."
+    },
+    {
+      "name": "openTypeFeatures",
+      "selectors": [".price"],
+      "attributes": ["data-price-alternate-digits", "data-price-slashed-zero", "data-price-tabular-numbers", "data-price-contextual-alternates", "data-price-fractions"],
+      "description": "Price exposes independent OpenType feature switches. Unsupported features are ignored by the active font without changing content semantics."
+    }
+  ],
+  "properties": [
+    {
+      "name": "currentPrice",
+      "type": "string",
+      "required": true,
+      "description": "Already-formatted current payable price supplied by the target.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".price__current"
+          }
+        ]
+      }
+    },
+    {
+      "name": "compareAtPrice",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the compare-at element when no formatted value is supplied.",
+      "description": "Optional already-formatted original or compare-at price used with the on-sale variant.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".price__compare"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unitPrice",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the unit-price element when no formatted value is supplied.",
+      "description": "Optional already-formatted unit or recurring price qualifier.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".price__unit"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Price presentation selected from the canonical variant list; default is the classless contract variant.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".price",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Use the visible price text as the accessible content when no aggregate label is supplied.",
+      "description": "Optional localized aggregate label that explains sale and compare-at meaning without relying on strikethrough.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".price",
+            "attribute": "aria-label",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "alternateDigits",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Enables the active font's ss01 stylistic set; in Inter this provides alternate open digits.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-alternate-digits", "values": { "true": "true", "false": "false" } }]
+      }
+    },
+    {
+      "name": "slashedZero",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": true,
+      "description": "Enables the standard zero OpenType feature for a slashed zero when supported.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-slashed-zero", "values": { "true": "true", "false": "false" } }]
+      }
+    },
+    {
+      "name": "tabularNumbers",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": true,
+      "description": "Enables tabular numeric widths to keep changing and aligned prices stable.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-tabular-numbers", "values": { "true": "true", "false": "false" } }]
+      }
+    },
+    {
+      "name": "contextualAlternates",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": true,
+      "description": "Enables contextual alternates when supported by the active font.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-contextual-alternates", "values": { "true": "true", "false": "false" } }]
+      }
+    },
+    {
+      "name": "fractions",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Enables automatic fractions for price content that intentionally contains fraction notation.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-fractions", "values": { "true": "true", "false": "false" } }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-text-primary",
+        "--color-text-disabled",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--typo-h4-size",
+        "--typo-body-size",
+        "--font-family-body"
+      ]
+    }
+  },
+  "accessibility": [
+    "Expose the payable price in text, not only visually.",
+    "Make discounted pricing understandable to assistive technology with clear text or aria-labels.",
+    "Do not rely on strikethrough alone to explain compare-at pricing.",
+    "Preserve locale and currency formatting for the target market."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/primitives.css; targets provide formatted string content."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid formats prices with Shopify money filters and renders the canonical root variant and element classes."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

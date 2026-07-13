@@ -1,26 +1,50 @@
 ## Overview
 
-Vertical timeline with connected dots and active state.
+Vertical ordered timeline with generated markers, connectors, and semantic entry states.
 
-<Preview html={"<div class=\"timeline\"><div class=\"timeline__item timeline__item--active\"><span class=\"timeline__date\">2024</span><h4 class=\"timeline__title\">Founded</h4><p class=\"timeline__content\">Studio established in Buenos Aires.</p></div><div class=\"timeline__item\"><span class=\"timeline__date\">2025</span><h4 class=\"timeline__title\">First Collection</h4><p class=\"timeline__content\">Launched the artisan ceramic line.</p></div></div>"} label="Timeline" />
+<Preview html={"<ol class=\"timeline\"><li class=\"timeline__item\" data-status=\"completed\"><div class=\"timeline__meta\"><span class=\"timeline__date\">2024</span><span class=\"timeline__status\">Completed</span></div><h4 class=\"timeline__title\">Studio founded</h4><p class=\"timeline__content\">The first collection takes shape in Buenos Aires.</p></li><li class=\"timeline__item\" data-status=\"current\" aria-current=\"step\"><div class=\"timeline__meta\"><span class=\"timeline__date\">2025</span><span class=\"timeline__status\">Current</span></div><h4 class=\"timeline__title\">Gallery opens</h4><p class=\"timeline__content\">The collection becomes available to a wider audience.</p></li><li class=\"timeline__item\" data-status=\"delayed\"><div class=\"timeline__meta\"><span class=\"timeline__date\">2026</span><span class=\"timeline__status\">Delayed</span></div><h4 class=\"timeline__title\">New chapter</h4><p class=\"timeline__content\">The studio expands its material research.</p></li></ol>"} label="Timeline" />
+
+## Presentation
+
+Timeline has one vertical presentation. Markers and connectors are generated from each item; the final connector is omitted automatically. `status` supports `default`, `current`, `completed`, `delayed`, `warning`, and `error` on each entry.
+
+`current` uses the system primary color and applies `aria-current="step"`. `completed` uses success, `warning` and the outlined `delayed` treatment use warning tokens, and `error` uses error tokens. The legacy `.timeline__item--active` selector remains a compatibility alias for current presentation.
+
+Dates, localized status labels, titles, descriptions, and the selected entry in Studio are fixtures. The target owns the repeated timeline data and decides whether the sequence represents current progress.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Timeline for chronological or sequential events whose order carries meaning.</Do>
+  <Dont>Don't mark an entry as current when the timeline is only a historical record.</Dont>
 </DoDont>
+
+Keep entry titles concise and use the content area for supporting detail. Use Steps instead when users are completing a bounded multi-step task.
+
+Use `delayed` for schedule variance, `warning` when attention is required, and `error` only when an entry has failed or contains an error. Do not use multiple statuses on one entry.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Semantic presentation supplements ordered content; marker color is never the only source of meaning.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Use `<ol>` and `<li>` when chronology or sequence is meaningful.
+- Apply `aria-current="step"` only to the single current entry when the timeline represents progress.
+- Add localized visible status text with `.timeline__status` when the state meaning matters.
+- Keep dates, titles, and descriptions in a logical reading order.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.timeline`</td><td>class</td><td>—</td><td>Base timeline styles</td></tr>
+  <tr><td>`status`</td><td>enum</td><td>`default`</td><td>`default`, `current`, `completed`, `delayed`, `warning`, or `error`</td></tr>
+  <tr><td>`.timeline`</td><td>class</td><td>required</td><td>Ordered timeline root</td></tr>
+  <tr><td>`.timeline__item`</td><td>class</td><td>required</td><td>Single timeline entry</td></tr>
+  <tr><td>`data-status`</td><td>attribute</td><td>optional</td><td>Canonical semantic entry state</td></tr>
+  <tr><td>`.timeline__item--active`</td><td>class</td><td>legacy</td><td>Compatibility alias for current presentation</td></tr>
+  <tr><td>`.timeline__meta`</td><td>class</td><td>optional</td><td>Date and visible status row</td></tr>
+  <tr><td>`.timeline__date`</td><td>class</td><td>optional</td><td>Date or metadata</td></tr>
+  <tr><td>`.timeline__status`</td><td>class</td><td>optional</td><td>Visible localized status text</td></tr>
+  <tr><td>`.timeline__title`</td><td>class</td><td>required</td><td>Entry title</td></tr>
+  <tr><td>`.timeline__content`</td><td>class</td><td>optional</td><td>Supporting description</td></tr>
 </PropTable>

@@ -1,0 +1,98 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "data-table",
+  "name": "Table",
+  "registryId": "A25",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Native data table primitive with responsive overflow and independently composable striped, row-hover, and sortable-header capabilities.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/data-table",
+    "css": { "file": "components/css/primitives.css", "selector": ".table" },
+    "docs": "site/src/content/components/data-table.mdx"
+  },
+  "anatomy": [
+    { "name": "wrapper", "selector": ".table-wrapper", "className": ".table-wrapper", "required": false, "description": "Horizontal scroll wrapper." },
+    { "name": "root", "selector": ".table", "className": ".table", "required": true, "description": "Native table element." },
+    { "name": "sortButton", "selector": ".table__sort-btn", "className": ".table__sort-btn", "required": false, "description": "Sortable header button." },
+    { "name": "sortIcon", "selector": ".table__sort-icon", "className": ".table__sort-icon", "required": false, "description": "Sort direction icon." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default table." },
+    { "name": "striped", "className": ".table--striped", "default": false, "description": "Composable striped-row presentation hook." },
+    { "name": "hover", "className": ".table--hover", "default": false, "description": "Composable row-hover presentation hook." },
+    { "name": "sortable", "className": null, "default": false, "description": "Composable sortable-header anatomy using .table__sort-btn; targets own data comparison and ordering." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default table density." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".table"], "description": "Default table state." },
+    { "name": "striped", "selectors": [".table--striped tbody tr:nth-child(even)"], "description": "Striped row state." },
+    { "name": "rowHover", "selectors": [".table--hover tbody tr:hover"], "description": "Row hover state." },
+    { "name": "sorted", "selectors": ["th[aria-sort]:not([aria-sort=\"none\"]) .table__sort-icon"], "description": "Canonical visual hook for a sorted header icon." }
+  ],
+  "behavior": [
+    { "name": "tableSemantics", "selectors": [".table"], "attributes": ["<table>", "<thead>", "<tbody>", "<th>", "<td>", "scope"], "description": "Targets preserve native table structure and associate header cells with their data cells." },
+    { "name": "sorting", "selectors": [".table__sort-btn", "th[aria-sort]:not([aria-sort=\"none\"]) .table__sort-icon"], "attributes": ["aria-sort on <th>", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "Sortable headers use native buttons and keep aria-sort on the owning header synchronized. Targets own comparison, locale rules, data ordering, and remote requests." },
+    { "name": "responsiveOverflow", "selectors": [".table-wrapper"], "description": "The optional wrapper preserves table width and provides horizontal scrolling when columns exceed the available inline space." }
+  ],
+  "properties": [
+    {
+      "name": "striped",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Adds alternating row surfaces independently of hover and sorting.",
+      "targetMappings": {
+        "web": [{ "kind": "class", "selector": ".table", "classNames": [".table--striped"] }]
+      }
+    },
+    {
+      "name": "rowHover",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Highlights the row under the pointer independently of striping and sorting.",
+      "targetMappings": {
+        "web": [{ "kind": "class", "selector": ".table", "classNames": [".table--hover"] }]
+      }
+    },
+    {
+      "name": "sortable",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Composes a native sort button inside a header and initializes aria-sort without owning the target's comparison or data-ordering logic.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".table th", "attribute": "aria-sort", "values": { "true": "none", "false": null }, "elements": ["th"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-surface-secondary"],
+      "radius": ["--radius-md"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use native table markup for tabular data.",
+    "Use scope for simple tables and explicit header associations when the table structure is complex.",
+    "Place aria-sort on the sorted th and synchronize it with the visible order when sorting is available.",
+    "Keep sortable header triggers native buttons so pointer and keyboard activation share one behavior.",
+    "Do not use tables for layout-only content."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical CSS implements table presentation and sortable-header hooks; comparison, ordering, pagination, and data updates are target-owned." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "subscription-option",
+  "name": "Subscription / Recurring Option",
+  "registryId": "D10",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Recurring purchase option with selected state, custom radio indicator, price, savings label, details, and frequency selector.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/subscription-option",
+    "css": { "file": "components/css/product.css", "selector": ".subscription-option" },
+    "docs": "site/src/content/components/subscription-option.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".subscription-option", "className": ".subscription-option", "required": true, "description": "Subscription option container." },
+    { "name": "header", "selector": ".subscription-option__header", "className": ".subscription-option__header", "required": true, "description": "Option header row." },
+    { "name": "radio", "selector": ".subscription-option__radio", "className": ".subscription-option__radio", "required": true, "description": "Custom radio indicator." },
+    { "name": "label", "selector": ".subscription-option__label", "className": ".subscription-option__label", "required": true, "description": "Option label." },
+    { "name": "price", "selector": ".subscription-option__price", "className": ".subscription-option__price", "required": false, "description": "Option price." },
+    { "name": "savings", "selector": ".subscription-option__savings", "className": ".subscription-option__savings", "required": false, "description": "Savings badge." },
+    { "name": "details", "selector": ".subscription-option__details", "className": ".subscription-option__details", "required": false, "description": "Expanded subscription details." },
+    { "name": "frequency", "selector": ".subscription-option__frequency", "className": ".subscription-option__frequency", "required": false, "description": "Frequency control row." },
+    { "name": "frequencyLabel", "selector": ".subscription-option__frequency-label", "className": ".subscription-option__frequency-label", "required": false, "description": "Visible frequency field label." },
+    { "name": "frequencyControl", "selector": ".subscription-option__frequency-control", "className": ".subscription-option__frequency-control", "required": false, "description": "Frequency select and fixed indicator wrapper." },
+    { "name": "frequencySelect", "selector": ".subscription-option__frequency-select", "className": ".subscription-option__frequency-select", "required": false, "description": "Delivery frequency selector." },
+    { "name": "frequencyIndicator", "selector": ".subscription-option__frequency-indicator", "className": ".subscription-option__frequency-indicator", "required": false, "description": "Fixed passive frequency validation indicator." },
+    { "name": "frequencyMessage", "selector": ".subscription-option__frequency-message", "className": ".subscription-option__frequency-message", "required": false, "description": "Associated frequency guidance or validation message." },
+    { "name": "note", "selector": ".subscription-option__note", "className": ".subscription-option__note", "required": false, "description": "Supplemental note." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default subscription option." },
+    { "name": "error", "className": ".subscription-option--error", "default": false, "description": "Invalid frequency feedback family." },
+    { "name": "success", "className": ".subscription-option--success", "default": false, "description": "Valid frequency feedback family." },
+    { "name": "warning", "className": ".subscription-option--warning", "default": false, "description": "Cautionary frequency feedback family." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default subscription option size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".subscription-option"], "description": "Default unselected state." },
+    { "name": "hover", "selectors": [".subscription-option:hover"], "description": "Hover state." },
+    { "name": "selected", "selectors": [".subscription-option[aria-checked=\"true\"]", ".subscription-option.is-selected"], "description": "Selected option state." },
+    { "name": "selectedRadio", "selectors": [".subscription-option[aria-checked=\"true\"] .subscription-option__radio", ".subscription-option.is-selected .subscription-option__radio"], "description": "Selected radio outline state." },
+    { "name": "selectedIndicator", "selectors": [".subscription-option[aria-checked=\"true\"] .subscription-option__radio::after", ".subscription-option.is-selected .subscription-option__radio::after"], "description": "Generated selected radio indicator." },
+    { "name": "detailsVisible", "selectors": [".subscription-option[aria-checked=\"true\"] .subscription-option__details", ".subscription-option.is-selected .subscription-option__details"], "description": "Details become visible when selected." },
+    { "name": "frequencyHover", "selectors": [".subscription-option__frequency-select:hover"], "description": "Frequency field hover preserving validation family." },
+    { "name": "frequencyFocus", "selectors": [".subscription-option__frequency-select:focus-visible"], "description": "Four-pixel zero-offset frequency field focus state." },
+    { "name": "frequencyDisabled", "selectors": [".subscription-option__frequency-select:disabled"], "description": "Unavailable frequency selector state." }
+  ],
+  "behavior": [
+    { "name": "radioSelection", "selectors": [".subscription-option[aria-checked=\"true\"]", ".subscription-option.is-selected"], "attributes": ["role=\"radio\"", "aria-checked"], "events": ["click", "Space", "Enter"], "description": "Selection state should behave like a radio option within purchase options." },
+    { "name": "sellingPlan", "selectors": [".subscription-option__frequency-select"], "attributes": ["name", "value"], "events": ["change"], "description": "Frequency changes should update the selected selling plan or target-native subscription value." },
+    { "name": "pricing", "selectors": [".subscription-option__price", ".subscription-option__savings"], "description": "Price and savings values should be formatted by the target's commerce layer." }
+  ],
+  "properties": [
+    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Frequency-field validation presentation independent from option selection.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".subscription-option", "source": "variants" }] } },
+    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Radio selection and expanded-details state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".subscription-option", "classNames": [".is-selected"] }, { "kind": "attribute", "selector": ".subscription-option", "attribute": "aria-checked", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Visible purchase-option label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__label" }] } },
+    { "name": "price", "type": "string", "required": false, "description": "Target-formatted recurring price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__price" }] } },
+    { "name": "savings", "type": "string", "required": false, "description": "Optional readable savings statement.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__savings" }] } },
+    { "name": "frequencyLabel", "type": "string", "required": true, "description": "Visible label associated with the frequency selector.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__frequency-label" }] } },
+    { "name": "frequency", "type": "string", "required": false, "description": "Selected target selling-plan value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option__frequency-select", "attribute": "value", "valueFrom": "property", "elements": ["select"] }] } },
+    { "name": "frequencyMessage", "type": "string", "required": false, "description": "Associated frequency guidance or validation message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__frequency-message" }] } },
+    { "name": "frequencyIndicator", "type": "slot", "required": false, "description": "Fixed passive frequency control indicator.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".subscription-option__frequency-indicator", "classNames": [".subscription-option__frequency-indicator"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the frequency selector unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option__frequency-select", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["select"] }] } },
+    { "name": "note", "type": "string", "required": false, "description": "Optional supplemental subscription note.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__note" }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-border-default", "--color-feedback-success-default", "--color-surface-primary", "--color-text-secondary", "--color-input-default-unfocused-bg", "--color-input-default-unfocused-inner-border", "--color-input-default-focused-outer-border", "--color-input-error-unfocused-inner-border", "--color-input-error-focused-outer-border", "--color-input-success-unfocused-inner-border", "--color-input-success-focused-outer-border", "--color-input-warning-unfocused-inner-border", "--color-input-warning-focused-outer-border"],
+      "radius": ["--radius-md", "--radius-full", "--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size", "--typo-body-sm-size", "--typo-caption-size"]
+    }
+  },
+  "accessibility": [
+    "Use radio semantics or native target radio controls when subscription options are mutually exclusive.",
+    "Keep aria-checked or native selected state synchronized with visual selection.",
+    "Expose savings and delivery frequency as readable text."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify selling plans, recurring prices, and selected allocation state." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

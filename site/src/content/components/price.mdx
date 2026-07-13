@@ -1,26 +1,76 @@
 ## Overview
 
-Price display with sale and compare-at states.
+Passive commerce price display with current, compare-at, and unit-price content.
 
-<Preview html={"<span class=\"price\"><span class=\"price__current\">$120.00</span></span> <span class=\"price price--on-sale\"><span class=\"price__compare\">$150.00</span> <span class=\"price__current\">$120.00</span></span>"} label="Price" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><span class="price price--on-sale" role="group" aria-label="Sale price $120.00, previously $150.00"><span class="price__compare">$150.00</span><span class="price__current">$120.00</span></span></div>'} label="Price on sale" />
+
+## Presentation
+
+Price has one size. Default is the classless presentation; `on-sale` adds `.price--on-sale` to the root and may compose the optional compare-at value. The current price remains `--color-text-primary` in both variants; discount is not an error state.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `default` | `.price` |
+| `variant` | `on-sale` | `.price.price--on-sale` |
+| `currentPrice` | formatted string | `.price__current` content |
+| `compareAtPrice` | formatted string | `.price__compare` content |
+| `unitPrice` | formatted string | `.price__unit` content |
+| `accessibleLabel` | localized string | `aria-label` on `.price` |
+
+Targets format monetary values before passing them to Price. The component does not parse amounts, choose currencies, or apply locale rules.
+
+### OpenType Features
+
+Price enables tabular numbers, slashed zero, and contextual alternates by default. Alternate digits and automatic fractions are opt-in. Every feature can be overridden independently through its `data-price-*` attribute; unsupported features are ignored by the active font.
+
+| Property | Default | Web attribute | OpenType |
+| --- | --- | --- | --- |
+| `alternateDigits` | `false` | `data-price-alternate-digits` | `ss01` |
+| `slashedZero` | `true` | `data-price-slashed-zero` | `zero` |
+| `tabularNumbers` | `true` | `data-price-tabular-numbers` | `tnum` |
+| `contextualAlternates` | `true` | `data-price-contextual-alternates` | `calt` |
+| `fractions` | `false` | `data-price-fractions` | `frac` |
+
+<Preview html={'<div class="tg-preview-stack"><span class="price" data-price-alternate-digits="true"><span class="price__current">$1,204.00</span></span><span class="price" data-price-fractions="true"><span class="price__current">$12 1/2</span></span></div>'} label="OpenType features" />
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><span class="price"><span class="price__current">$120.00</span><span class="price__unit">$12.00 / 100 g</span></span></div>'} label="Price with unit qualifier" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Pass complete, locale-aware monetary strings from the target adapter.</Do>
+  <Dont>Do not pass raw numeric amounts and expect Price to format them.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Compose unavailable inventory externally with Badge when a sold-out label is needed.</Do>
+  <Dont>Do not treat sold-out as a Price variant or interaction state.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Price owns display anatomy. Locale, currency, sale, and unit-price formatting belong to the target adapter.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Expose the payable price in text.
+- Supply a localized aggregate label or equivalent hidden text when compare-at pricing needs additional explanation.
+- Do not rely on strikethrough or sale color alone to communicate the discount.
+- Preserve locale and currency formatting for the target market.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.price`</td><td>class</td><td>—</td><td>Base price styles</td></tr>
+  <tr><td>`currentPrice`</td><td>string</td><td>required</td><td>Already-formatted current payable price</td></tr>
+  <tr><td>`compareAtPrice`</td><td>string</td><td>none</td><td>Optional already-formatted original price</td></tr>
+  <tr><td>`unitPrice`</td><td>string</td><td>none</td><td>Optional already-formatted unit or recurring qualifier</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default` or `on-sale`</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>none</td><td>Optional localized aggregate label for assistive technology</td></tr>
+  <tr><td>`alternateDigits`</td><td>boolean</td><td>`false`</td><td>Enables `ss01` for the active font</td></tr>
+  <tr><td>`slashedZero`</td><td>boolean</td><td>`true`</td><td>Enables slashed zero</td></tr>
+  <tr><td>`tabularNumbers`</td><td>boolean</td><td>`true`</td><td>Uses stable tabular numeric widths</td></tr>
+  <tr><td>`contextualAlternates`</td><td>boolean</td><td>`true`</td><td>Enables contextual alternates</td></tr>
+  <tr><td>`fractions`</td><td>boolean</td><td>`false`</td><td>Enables automatic fractions when intentionally needed</td></tr>
 </PropTable>
+
+The required anatomy is `.price` with `.price__current`. Optional `.price__compare` and `.price__unit` elements are omitted when their values are absent.

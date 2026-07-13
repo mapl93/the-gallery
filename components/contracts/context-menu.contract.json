@@ -1,0 +1,186 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "context-menu",
+  "name": "Context Menu",
+  "registryId": "B12",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Context-triggered menu that reuses Dropdown Menu item anatomy while adding fixed positioning, contextmenu entry points, keyboard invocation, and dismissal behavior.",
+  "dependencies": ["dropdown-menu"],
+  "source": {
+    "registry": "registry.json#/components/context-menu",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".context-menu"
+    },
+    "docs": "site/src/content/components/context-menu.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".context-menu",
+      "className": ".context-menu",
+      "required": true,
+      "description": "Fixed-position menu surface anchored to a context interaction point."
+    },
+    {
+      "name": "item",
+      "selector": ".dropdown__item",
+      "className": ".dropdown__item",
+      "required": true,
+      "description": "Inherited Dropdown Menu item used for context commands."
+    },
+    {
+      "name": "separator",
+      "selector": ".dropdown__separator",
+      "className": ".dropdown__separator",
+      "required": false,
+      "description": "Inherited separator used to group context commands."
+    },
+    {
+      "name": "label",
+      "selector": ".dropdown__label",
+      "className": ".dropdown__label",
+      "required": false,
+      "description": "Inherited non-interactive group label."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default context menu surface."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default context menu width and item spacing."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".context-menu"],
+      "description": "Hidden resting state."
+    },
+    {
+      "name": "open",
+      "selectors": [".context-menu--open"],
+      "description": "Visible state controlled by the context-menu--open modifier."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".context-menu--open"],
+      "description": "The context menu is hidden by default and becomes visible when context-menu--open is applied."
+    },
+    {
+      "name": "entryPoints",
+      "events": ["contextmenu", "Shift+F10", "Menu"],
+      "description": "The menu should open from pointer contextmenu events and keyboard context menu entry points."
+    },
+    {
+      "name": "positioning",
+      "description": "The menu should position near the invocation point while clamping inside the viewport."
+    },
+    {
+      "name": "menuSemantics",
+      "attributes": ["role=\"menu\"", "role=\"menuitem\"", "aria-disabled"],
+      "description": "The inherited menu items must preserve menu semantics and disabled behavior."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "outside click", "scroll", "resize", "item select"],
+      "description": "The menu should close on Escape, outside interaction, viewport changes, or completed commands."
+    }
+  ],
+  "properties": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the context menu surface is visible; invocation coordinates and viewport clamping remain target behavior.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".context-menu",
+            "classNames": [".context-menu--open"]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-disabled",
+        "--color-feedback-error-default"
+      ],
+      "radius": [
+        "--radius-md",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "z-index": [
+        "--z-modal"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide keyboard access through Shift+F10 or the Menu key when a context menu is available.",
+    "Do not make critical actions available only through a context menu.",
+    "Use the Dropdown Menu item semantics and disabled behavior for inherited menu items.",
+    "Move focus into the menu while it is open and restore focus to the invoking element when it closes.",
+    "Close on Escape and outside interaction."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css and inherited Dropdown Menu classes; invocation and positioning behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

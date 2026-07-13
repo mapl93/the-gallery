@@ -1,0 +1,289 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "review-summary",
+  "name": "Review Summary",
+  "registryId": "V1",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Read-only aggregate rating, review count, and optional target-supplied rating distribution.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/review-summary",
+    "css": {
+      "file": "components/css/reviews.css",
+      "selector": ".review-summary"
+    },
+    "docs": "site/src/content/components/review-summary.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".review-summary",
+      "className": ".review-summary",
+      "required": true,
+      "description": "Read-only aggregate review summary container."
+    },
+    {
+      "name": "average",
+      "selector": ".review-summary__average",
+      "className": ".review-summary__average",
+      "required": true,
+      "description": "Group containing the visible aggregate score, optional Star Rating composition, and review count."
+    },
+    {
+      "name": "score",
+      "selector": ".review-summary__score",
+      "className": ".review-summary__score",
+      "required": true,
+      "description": "Visible, target-formatted aggregate score text."
+    },
+    {
+      "name": "rating",
+      "selector": ".review-summary .star-rating",
+      "className": ".star-rating",
+      "required": false,
+      "description": "Optional composed Star Rating that visualizes the same aggregate score without replacing readable text."
+    },
+    {
+      "name": "count",
+      "selector": ".review-summary__count",
+      "className": ".review-summary__count",
+      "required": true,
+      "description": "Visible, target-formatted total review count."
+    },
+    {
+      "name": "bars",
+      "selector": ".review-summary__bars",
+      "className": ".review-summary__bars",
+      "required": false,
+      "description": "Optional target-supplied rating-distribution group."
+    },
+    {
+      "name": "barRow",
+      "selector": ".review-summary__bar-row",
+      "className": ".review-summary__bar-row",
+      "required": false,
+      "description": "Repeated distribution row for one target-defined rating bucket."
+    },
+    {
+      "name": "barLabel",
+      "selector": ".review-summary__bar-label",
+      "className": ".review-summary__bar-label",
+      "required": false,
+      "description": "Visible rating-bucket label."
+    },
+    {
+      "name": "barTrack",
+      "selector": ".review-summary__bar-track",
+      "className": ".review-summary__bar-track",
+      "required": false,
+      "description": "Passive visual track for one distribution value."
+    },
+    {
+      "name": "barFill",
+      "selector": ".review-summary__bar-fill",
+      "className": ".review-summary__bar-fill",
+      "required": false,
+      "description": "Passive visual fill whose width is supplied by the target."
+    },
+    {
+      "name": "barCount",
+      "selector": ".review-summary__bar-count",
+      "className": ".review-summary__bar-count",
+      "required": false,
+      "description": "Visible target-formatted count for one rating bucket."
+    }
+  ],
+  "properties": [
+    {
+      "name": "ratingValue",
+      "type": "number",
+      "required": true,
+      "minimum": 0,
+      "maximum": 5,
+      "step": 0.1,
+      "description": "Aggregate rating value supplied by the target; the contract does not define how it is calculated.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".review-summary",
+            "attribute": "data-rating",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "scoreLabel",
+      "type": "string",
+      "required": true,
+      "description": "Visible target-formatted score, such as 4.5.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".review-summary__score"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ratingLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible aggregate-rating text, such as 4.5 out of 5 stars.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".review-summary",
+            "attribute": "aria-label",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "reviewCount",
+      "type": "number",
+      "required": true,
+      "minimum": 0,
+      "step": 1,
+      "description": "Total review count supplied by the target; the contract does not synchronize or aggregate records.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".review-summary",
+            "attribute": "data-review-count",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "reviewCountLabel",
+      "type": "string",
+      "required": true,
+      "description": "Visible target-formatted review count, including any surrounding label.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".review-summary__count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "distribution",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned rating-distribution rows with visible bucket labels and counts.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".review-summary__bars",
+            "classNames": [
+              ".review-summary__bars"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default review summary presentation."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Responsive summary that stacks when available inline space is narrow."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".review-summary"
+      ],
+      "description": "Read-only aggregate summary state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "readOnlyAggregate",
+      "selectors": [
+        ".review-summary__score",
+        ".review-summary__count"
+      ],
+      "description": "The summary displays supplied values only; calculation, moderation, filtering, and synchronization remain target responsibilities."
+    },
+    {
+      "name": "distributionText",
+      "selectors": [
+        ".review-summary__bar-label",
+        ".review-summary__bar-count"
+      ],
+      "description": "Every supplied distribution width has equivalent visible bucket and count text."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-surface-secondary",
+        "--color-button-primary-bg-default"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--typo-h1-size",
+        "--typo-body-sm-size",
+        "--typo-caption-size"
+      ],
+      "motion": [
+        "--motion-transition-standard"
+      ]
+    }
+  },
+  "accessibility": [
+    "Expose the aggregate score and total as readable text rather than only stars or bar widths.",
+    "Provide an accessible rating label that includes the value and scale.",
+    "Every distribution bar needs visible bucket and count text; do not rely on width or color alone.",
+    "Do not announce passive aggregate data as a live region unless the consuming target has a separate update requirement."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Canonical responsive presentation is implemented in components/css/reviews.css; aggregate data is target supplied."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js",
+      "notes": "A future adapter must select a review data source without changing this passive display contract."
+    },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

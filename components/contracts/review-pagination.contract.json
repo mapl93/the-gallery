@@ -1,0 +1,88 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "review-pagination",
+  "name": "Review Pagination",
+  "registryId": "V9",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Contained review navigation controls with native-link or native-button semantics supplied by the target.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/review-pagination",
+    "css": { "file": "components/css/reviews.css", "selector": ".review-pagination" },
+    "docs": "site/src/content/components/review-pagination.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".review-pagination", "className": ".review-pagination", "required": true, "description": "Horizontally contained navigation region, preferably rendered as a labelled nav element." },
+    { "name": "list", "selector": ".review-pagination__list", "className": ".review-pagination__list", "required": false, "description": "Optional semantic list wrapper for the target-supplied controls." },
+    { "name": "item", "selector": ".review-pagination__item", "className": ".review-pagination__item", "required": false, "description": "Optional semantic list item wrapper." },
+    { "name": "control", "selector": ".review-pagination__btn", "className": ".review-pagination__btn", "required": true, "description": "Repeated native anchor for navigation or native button for a target-owned in-place paging strategy." },
+    { "name": "ellipsis", "selector": ".review-pagination__ellipsis", "className": ".review-pagination__ellipsis", "required": false, "description": "Optional passive omission marker hidden from the control sequence." }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name identifying the navigation as review pagination.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-pagination", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] }
+    },
+    {
+      "name": "controls",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned previous, numbered, omitted, and next controls with current and unavailable state.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-pagination__btn", "classNames": [".review-pagination__btn"] }] }
+    }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default contained navigation controls." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Touch-sized controls in a horizontally contained sequence." }],
+  "states": [
+    { "name": "default", "selectors": [".review-pagination"], "description": "Navigation region with target-supplied controls." },
+    { "name": "hover", "selectors": [".review-pagination__btn:hover:not(:disabled):not([aria-disabled=\"true\"]):not([aria-current=\"page\"])"], "description": "Fine-pointer feedback for an available non-current control." },
+    { "name": "focusVisible", "selectors": [".review-pagination__btn:focus-visible"], "description": "Visible keyboard focus on a native control." },
+    { "name": "current", "selectors": [".review-pagination__btn[aria-current=\"page\"]"], "description": "Current target-supplied page." },
+    { "name": "disabled", "selectors": [".review-pagination__btn:disabled", ".review-pagination__btn[aria-disabled=\"true\"]"], "description": "Unavailable native button or target-disabled link presentation." }
+  ],
+  "behavior": [
+    {
+      "name": "navigationBoundary",
+      "selectors": [".review-pagination__btn"],
+      "attributes": ["aria-label", "aria-current=\"page\"", "disabled", "aria-disabled=\"true\""],
+      "description": "Targets choose links, in-place buttons, URL state, page-window size, cursor versus offset strategy, loading, and focus/result behavior. The neutral component supplies no paging algorithm."
+    },
+    {
+      "name": "currentPage",
+      "selectors": [".review-pagination__btn[aria-current=\"page\"]"],
+      "attributes": ["aria-current=\"page\""],
+      "description": "Exactly one numbered control is marked current when the selected strategy exposes page numbers."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-border-default", "--color-surface-secondary", "--color-surface-statement", "--color-text-inverse", "--color-border-focus", "--color-text-secondary"],
+      "radius": ["--radius-sm"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"],
+      "typography": ["--typo-body-sm-size"],
+      "motion": ["--motion-transition-micro"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Use a nav element with a specific accessible label for review navigation.",
+    "Prefer native links when controls navigate to URLs and native buttons only for a target-owned in-place paging flow.",
+    "Expose the current numbered page with aria-current=\"page\".",
+    "Give previous and next controls names that include direction and unavailable state.",
+    "Do not leave aria-disabled links activatable; omit their href or prevent every input modality according to the selected target pattern.",
+    "Keep the control sequence keyboard reachable when it overflows horizontally."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Touch targets, horizontal containment, focus, current, disabled, forced-colors, and reduced-motion presentation are implemented." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must choose a provider-compatible pagination strategy and native control semantics." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://the-gallery.dev/schema/registry.json",
+  "title": "The Gallery Registry",
+  "description": "Manifest for The Gallery tokens, base files, components, categories, and target adapters.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "name",
+    "version",
+    "description",
+    "tokens",
+    "base",
+    "components",
+    "categories",
+    "targets"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tokens": {
+      "$ref": "#/$defs/tokens"
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/baseEntry"
+      },
+      "minProperties": 1
+    },
+    "components": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/component"
+      },
+      "minProperties": 1
+    },
+    "categories": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/category"
+      },
+      "minProperties": 1
+    },
+    "targets": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/slug"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/target"
+      },
+      "minProperties": 1
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["categories", "files"],
+      "properties": {
+        "categories": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/path"
+          },
+          "minProperties": 1
+        }
+      }
+    },
+    "baseEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "description", "dependencies"],
+      "properties": {
+        "file": {
+          "$ref": "#/$defs/path"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependencies": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "id",
+        "category",
+        "file",
+        "selector",
+        "description",
+        "dependencies"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][0-9]+[a-z]?$"
+        },
+        "category": {
+          "$ref": "#/$defs/slug"
+        },
+        "file": {
+          "$ref": "#/$defs/path"
+        },
+        "selector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variants": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "sizes": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "tokens": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/stringArray"
+          }
+        }
+      }
+    },
+    "category": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "description", "file", "count"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "file": {
+          "type": ["string", "null"]
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "path", "description"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["active", "planned", "experimental", "deprecated"]
+        },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

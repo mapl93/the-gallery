@@ -1,0 +1,59 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "mobile-menu",
+  "name": "Mobile Menu",
+  "registryId": "C4",
+  "category": "global",
+  "status": "pilot",
+  "summary": "Mobile navigation list intended to be composed inside a Drawer.",
+  "dependencies": ["drawer"],
+  "source": {
+    "registry": "registry.json#/components/mobile-menu",
+    "css": { "file": "components/css/global.css", "selector": ".mobile-nav" },
+    "docs": "site/src/content/components/mobile-menu.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".mobile-nav", "className": ".mobile-nav", "required": true, "description": "Mobile navigation list." },
+    { "name": "item", "selector": ".mobile-nav__item", "className": ".mobile-nav__item", "required": false, "description": "Navigation list item." },
+    { "name": "link", "selector": ".mobile-nav__link", "className": ".mobile-nav__link", "required": true, "description": "Mobile navigation link." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default mobile navigation list." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default touch-friendly mobile row size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".mobile-nav"], "description": "Default mobile navigation list." },
+    { "name": "separatedItems", "selectors": [".mobile-nav__item + .mobile-nav__item"], "description": "Separated stacked navigation rows." },
+    { "name": "currentPage", "selectors": [".mobile-nav__link[aria-current=\"page\"]"], "description": "Current mobile navigation destination." }
+  ],
+  "behavior": [
+    { "name": "drawerComposition", "selectors": [".mobile-nav"], "description": "Mobile Menu should inherit Drawer focus management and dismissal when rendered inside an overlay." },
+    { "name": "mobileNavigation", "selectors": [".mobile-nav__link"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "Navigation links should navigate or close the drawer after activation depending on target behavior." }
+  ],
+  "properties": [
+    { "name": "items", "type": "slot", "required": true, "description": "Target-owned mobile navigation items, destinations, labels, and current-page markup.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mobile-nav", "classNames": [".mobile-nav"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-accent"],
+      "typography": ["--typo-body-size"],
+      "spacing": ["--space-layout-touch-target"]
+    }
+  },
+  "accessibility": [
+    "Render the list inside a labelled navigation region.",
+    "Preserve Drawer focus management when the menu is shown as an overlay.",
+    "Expose current page state with aria-current where possible."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map mobile menu links and nested menu behavior from Shopify navigation data." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

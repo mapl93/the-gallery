@@ -1,0 +1,69 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "blog-sidebar",
+  "name": "Blog Sidebar / Tag Cloud",
+  "registryId": "L8",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Sidebar with tag cloud, search, categories, and recent posts.",
+  "dependencies": ["tag"],
+  "source": {
+    "registry": "registry.json#/components/blog-sidebar",
+    "css": { "file": "components/css/blog.css", "selector": ".blog-sidebar" },
+    "docs": "site/src/content/components/blog-sidebar.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".blog-sidebar", "className": ".blog-sidebar", "required": true, "description": "Blog complementary-content container." },
+    { "name": "section", "selector": ".blog-sidebar__section", "className": ".blog-sidebar__section", "required": true, "description": "Repeatable target-owned sidebar section." },
+    { "name": "title", "selector": ".blog-sidebar__title", "className": ".blog-sidebar__title", "required": false, "description": "Optional sidebar section title." },
+    { "name": "list", "selector": ".blog-sidebar__list", "className": ".blog-sidebar__list", "required": false, "description": "Optional category or article link list." },
+    { "name": "listItem", "selector": ".blog-sidebar__list-item", "className": ".blog-sidebar__list-item", "required": false, "description": "Sidebar list item." },
+    { "name": "link", "selector": ".blog-sidebar__link", "className": ".blog-sidebar__link", "required": false, "description": "Sidebar navigation link." },
+    { "name": "tagCloud", "selector": ".tag-cloud", "className": ".tag-cloud", "required": false, "description": "Optional wrapping target-owned tag collection." },
+    { "name": "tag", "selector": ".tag-cloud__item", "className": ".tag-cloud__item", "required": false, "description": "Target-owned tag destination." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default stacked sidebar sections." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Fluid width controlled by the containing blog layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".blog-sidebar"], "description": "Default blog sidebar state." },
+    { "name": "linkHover", "selectors": [".blog-sidebar__link:hover"], "description": "Sidebar link hover state." },
+    { "name": "linkFocus", "selectors": [".blog-sidebar__link:focus-visible"], "description": "Visible keyboard focus for sidebar links." },
+    { "name": "tagHover", "selectors": [".tag-cloud__item:hover"], "description": "Tag destination hover state." },
+    { "name": "tagFocus", "selectors": [".tag-cloud__item:focus-visible"], "description": "Visible keyboard focus for tag destinations." }
+  ],
+  "behavior": [
+    { "name": "targetSections", "selectors": [".blog-sidebar__section", ".blog-sidebar__list", ".tag-cloud"], "description": "The target supplies sidebar sections, links, search composition, categories, recent posts, and tags; search and Tag dependency ownership remain unresolved." }
+  ],
+  "properties": [
+    { "name": "sections", "type": "slot", "required": true, "description": "Target-owned sidebar sections, including any search, category, recent-post, or tag composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".blog-sidebar", "classNames": [".blog-sidebar"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-focus", "--color-border-subtle", "--color-surface-secondary", "--color-surface-statement", "--color-text-accent", "--color-text-inverse", "--color-text-primary", "--color-text-secondary"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-heading", "--typo-body-size"],
+      "radius": ["--radius-full"],
+      "spacing": ["--space-layout-touch-target"],
+      "transition": ["--transition-fast"]
+    }
+  },
+  "accessibility": [
+    "Use an aside or complementary landmark only when the sidebar content is complementary to the main article or blog listing.",
+    "Give repeated sections semantic headings and preserve list markup for grouped destinations.",
+    "Preserve visible keyboard focus and touch-sized links and tags.",
+    "Any composed search field retains its owning field contract, label, and validation semantics."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Visual CSS is implemented; search and tag ownership remain target-owned pending a source decision." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

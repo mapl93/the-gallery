@@ -1,0 +1,68 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "bottom-nav",
+  "name": "Bottom Navigation Bar",
+  "registryId": "C8",
+  "category": "global",
+  "status": "pilot",
+  "summary": "Fixed mobile bottom navigation with icons, labels, current state, and badge support.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/bottom-nav",
+    "css": { "file": "components/css/global.css", "selector": ".bottom-nav" },
+    "docs": "site/src/content/components/bottom-nav.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".bottom-nav", "className": ".bottom-nav", "required": true, "description": "Fixed mobile navigation bar." },
+    { "name": "item", "selector": ".bottom-nav__item", "className": ".bottom-nav__item", "required": true, "description": "Navigation item link." },
+    { "name": "icon", "selector": ".bottom-nav__icon", "className": ".bottom-nav__icon", "required": false, "description": "Navigation icon." },
+    { "name": "label", "selector": ".bottom-nav__label", "className": ".bottom-nav__label", "required": true, "description": "Navigation item label." },
+    { "name": "badge", "selector": ".bottom-nav__badge", "className": ".bottom-nav__badge", "required": false, "description": "Item badge such as cart count." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default mobile bottom navigation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default safe-area-aware mobile bar." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".bottom-nav"], "description": "Default bottom navigation state." },
+    { "name": "mobileVisible", "selectors": [".bottom-nav { display: flex; }"], "description": "Mobile breakpoint visible state." },
+    { "name": "itemHover", "selectors": [".bottom-nav__item:hover"], "description": "Navigation item hover state." },
+    { "name": "currentPage", "selectors": [".bottom-nav__item[aria-current=\"page\"]"], "description": "Current bottom-navigation destination." },
+    { "name": "badge", "selectors": [".bottom-nav__badge"], "description": "Badge visible state." }
+  ],
+  "behavior": [
+    { "name": "mobileNavigation", "selectors": [".bottom-nav__item"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "Items should navigate and expose current-page state." },
+    { "name": "badgeCount", "selectors": [".bottom-nav__badge"], "description": "Badges should update from target state such as cart item count." },
+    { "name": "safeArea", "selectors": [".bottom-nav"], "description": "Adapters should preserve safe-area spacing on mobile devices." }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Accessible name for the mobile navigation region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".bottom-nav", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "Target-owned navigation destinations with visible labels, optional icons, current-page markup, and optional badges.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".bottom-nav", "classNames": [".bottom-nav"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-text-secondary", "--color-text-primary", "--color-feedback-error-default"],
+      "radius": ["--radius-full"],
+      "spacing": ["--space-layout-touch-target"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Expose the bar as a labelled navigation region.",
+    "Provide text labels even when icons are visible.",
+    "Use aria-current for the active destination.",
+    "Keep badge values readable and announced when they change dynamically."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map mobile navigation links, current route, and cart badge count." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

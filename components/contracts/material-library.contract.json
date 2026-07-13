@@ -1,0 +1,42 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "material-library",
+  "name": "Material Library",
+  "registryId": "R1",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Material card grid with swatches, descriptions, and property tags.",
+  "dependencies": ["tag"],
+  "source": { "registry": "registry.json#/components/material-library", "css": { "file": "components/css/ceramics.css", "selector": ".material-library" }, "docs": "site/src/content/components/material-library.mdx" },
+  "anatomy": [
+    { "name": "root", "selector": ".material-library", "className": ".material-library", "required": true, "description": "Material library section." },
+    { "name": "header", "selector": ".material-library__header", "className": ".material-library__header", "required": false, "description": "Optional introductory header." },
+    { "name": "title", "selector": ".material-library__title", "className": ".material-library__title", "required": false, "description": "Section heading." },
+    { "name": "subtitle", "selector": ".material-library__subtitle", "className": ".material-library__subtitle", "required": false, "description": "Optional introductory text." },
+    { "name": "grid", "selector": ".material-library__grid", "className": ".material-library__grid", "required": true, "description": "Repeated material-card region." },
+    { "name": "card", "selector": ".material-card", "className": ".material-card", "required": true, "description": "Single material record." },
+    { "name": "swatch", "selector": ".material-card__swatch", "className": ".material-card__swatch", "required": false, "description": "Optional material image or visual sample." },
+    { "name": "body", "selector": ".material-card__body", "className": ".material-card__body", "required": true, "description": "Material text content." },
+    { "name": "name", "selector": ".material-card__name", "className": ".material-card__name", "required": true, "description": "Material name." },
+    { "name": "type", "selector": ".material-card__type", "className": ".material-card__type", "required": false, "description": "Optional target-supplied material classification." },
+    { "name": "description", "selector": ".material-card__description", "className": ".material-card__description", "required": false, "description": "Optional material description." },
+    { "name": "properties", "selector": ".material-card__properties", "className": ".material-card__properties", "required": false, "description": "Optional property-tag composition." },
+    { "name": "propertyTag", "selector": ".material-card__tag", "className": ".material-card__tag", "required": false, "description": "Legacy material property tag styling; adapters may compose canonical Tag." }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default material library presentation." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Responsive material-card grid." }],
+  "states": [{ "name": "default", "selectors": [".material-library"], "description": "Default passive presentation." }],
+  "behavior": [
+    { "name": "repeatedMaterials", "selectors": [".material-library__grid", ".material-card"], "description": "The target owns material records, ordering, and data mapping; the neutral contract owns only repeated anatomy." },
+    { "name": "mediaAlternatives", "selectors": [".material-card__swatch"], "attributes": ["alt", "aria-hidden"], "description": "Material media needs useful alternative text when informative and decorative treatment otherwise." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional section heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".material-library__title" }] } },
+    { "name": "subtitle", "type": "string", "required": false, "description": "Optional section introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".material-library__subtitle" }] } },
+    { "name": "materials", "type": "slot", "required": true, "description": "Target-owned ordered material cards; no CMS record shape is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".material-library__grid", "classNames": [".material-library__grid"] }] } }
+  ],
+  "tokens": { "public": { "color": ["--color-border-default", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-h2-size"], "radius": ["--radius-full", "--radius-lg"], "spacing": ["--space-layout-container", "--space-layout-grid-gap", "--space-layout-section-gap"], "transition": ["--transition-fast"], "easing": ["--easing-default"] } },
+  "accessibility": ["Use a heading level appropriate to the containing page.", "Keep material names and technical properties available as text.", "Provide useful alternative text for informative swatches or mark decorative samples accordingly."],
+  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+}

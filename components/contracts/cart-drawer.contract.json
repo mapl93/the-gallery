@@ -1,0 +1,71 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "cart-drawer",
+  "name": "Cart Drawer",
+  "registryId": "C6",
+  "category": "global",
+  "status": "pilot",
+  "summary": "Cart drawer content with line items, remove action, and compact summary.",
+  "dependencies": ["drawer", "price", "quantity-selector"],
+  "source": {
+    "registry": "registry.json#/components/cart-drawer",
+    "css": { "file": "components/css/global.css", "selector": ".cart-item" },
+    "docs": "site/src/content/components/cart-drawer.mdx"
+  },
+  "anatomy": [
+    { "name": "item", "selector": ".cart-item", "className": ".cart-item", "required": true, "description": "Cart drawer line item." },
+    { "name": "image", "selector": ".cart-item__image", "className": ".cart-item__image", "required": false, "description": "Line item image." },
+    { "name": "details", "selector": ".cart-item__details", "className": ".cart-item__details", "required": true, "description": "Line item detail wrapper." },
+    { "name": "title", "selector": ".cart-item__title", "className": ".cart-item__title", "required": true, "description": "Line item title link." },
+    { "name": "variant", "selector": ".cart-item__variant", "className": ".cart-item__variant", "required": false, "description": "Line item variant text." },
+    { "name": "actions", "selector": ".cart-item__actions", "className": ".cart-item__actions", "required": false, "description": "Line item actions wrapper." },
+    { "name": "remove", "selector": ".cart-item__remove", "className": ".cart-item__remove", "required": false, "description": "Remove action." },
+    { "name": "summary", "selector": ".cart-summary", "className": ".cart-summary", "required": false, "description": "Compact cart summary." },
+    { "name": "summaryRow", "selector": ".cart-summary__row", "className": ".cart-summary__row", "required": false, "description": "Compact summary row." },
+    { "name": "summaryTotal", "selector": ".cart-summary__total", "className": ".cart-summary__total", "required": false, "description": "Compact summary total." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default cart drawer content." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default compact drawer item layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".cart-item"], "description": "Default cart item state." },
+    { "name": "separatedItems", "selectors": [".cart-item + .cart-item"], "description": "Separator between drawer line items." },
+    { "name": "removeHover", "selectors": [".cart-item__remove:hover"], "description": "Remove action hover state." },
+    { "name": "summaryTotal", "selectors": [".cart-summary__total"], "description": "Emphasized compact summary total." }
+  ],
+  "behavior": [
+    { "name": "drawerComposition", "selectors": [".cart-item"], "description": "Cart Drawer should inherit Drawer focus management and dismissal when rendered as an overlay." },
+    { "name": "removeLine", "selectors": [".cart-item__remove"], "events": ["click"], "description": "Remove action should remove the line and update summary totals." },
+    { "name": "summaryTotals", "selectors": [".cart-summary", ".cart-summary__row", ".cart-summary__total"], "description": "Compact summary should update from commerce cart state." }
+  ],
+  "properties": [
+    { "name": "lineItems", "type": "slot", "required": false, "description": "Ordered target-owned cart item records composed from the documented image, details, Price, Quantity Selector, and remove-action anatomy. It may be absent for an empty cart.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-item", "classNames": [".cart-item"] }] } },
+    { "name": "summary", "type": "slot", "required": false, "description": "Optional target-formatted compact cart summary rows and total.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary", "classNames": [".cart-summary"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-secondary", "--color-feedback-error-default"],
+      "radius": ["--radius-sm"],
+      "typography": ["--typo-body-size", "--typo-h4-size"],
+      "spacing": ["--space-layout-touch-target"]
+    }
+  },
+  "accessibility": [
+    "Preserve Drawer focus management while the cart drawer is open.",
+    "Product images need useful alt text or should be hidden if duplicated by adjacent text.",
+    "Remove actions need accessible names that include product context.",
+    "Announce cart totals or item count changes when line items update."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify cart line keys, quantities, remove actions, and cart totals." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

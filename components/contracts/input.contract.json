@@ -1,0 +1,426 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.6.0",
+  "slug": "input",
+  "name": "Input",
+  "registryId": "A2",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Text input with a visible label, optional supporting message, validation variants, and independent passive leading and trailing icon slots.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/input",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".input"
+    },
+    "docs": "site/src/content/components/input.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".input",
+      "className": ".input",
+      "required": true,
+      "description": "Wrapper that groups the visible label, native field, optional icon composition, and supporting message."
+    },
+    {
+      "name": "label",
+      "selector": ".input__label",
+      "className": ".input__label",
+      "required": true,
+      "description": "Visible label associated with the form control."
+    },
+    {
+      "name": "control",
+      "selector": ".input__control",
+      "className": ".input__control",
+      "required": false,
+      "description": "Positioning wrapper used when the field includes a leading or trailing icon."
+    },
+    {
+      "name": "field",
+      "selector": ".input__field",
+      "className": ".input__field",
+      "required": true,
+      "description": "Native text input control."
+    },
+    {
+      "name": "message",
+      "selector": ".input__message",
+      "className": ".input__message",
+      "required": false,
+      "description": "Supporting, validation, or error text."
+    },
+    {
+      "name": "leadingIcon",
+      "selector": ".input__icon--leading",
+      "className": ".input__icon--leading",
+      "required": false,
+      "description": "Optional passive icon positioned before the field value."
+    },
+    {
+      "name": "trailingIcon",
+      "selector": ".input__icon--trailing",
+      "className": ".input__icon--trailing",
+      "required": false,
+      "description": "Optional passive icon positioned after the field value."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default neutral input."
+    },
+    {
+      "name": "error",
+      "className": ".input--error",
+      "default": false,
+      "description": "Validation error state."
+    },
+    {
+      "name": "success",
+      "className": ".input--success",
+      "default": false,
+      "description": "Successful validation state."
+    },
+    {
+      "name": "warning",
+      "className": ".input--warning",
+      "default": false,
+      "description": "Validation warning state for values that need attention without being invalid."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default input size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".input"],
+      "description": "Resting wrapper state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".input__field:hover"],
+      "description": "Pointer hover state on the native field; validation variants retain their semantic border family."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".input__field:focus-visible"],
+      "description": "Keyboard focus indicator on the native field."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".input__field:disabled"],
+      "description": "Unavailable input state."
+    },
+    {
+      "name": "errorFocusVisible",
+      "selectors": [".input--error .input__field:focus-visible"],
+      "description": "Focused error variant state."
+    },
+    {
+      "name": "successFocusVisible",
+      "selectors": [".input--success .input__field:focus-visible"],
+      "description": "Focused success variant state."
+    },
+    {
+      "name": "warningFocusVisible",
+      "selectors": [".input--warning .input__field:focus-visible"],
+      "description": "Focused warning variant state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "labelAssociation",
+      "selectors": [".input__label", ".input__field"],
+      "attributes": [
+        "for on .input__label matches id on .input__field"
+      ],
+      "description": "The visible label and native field share an explicit for/id association so the label is the field's accessible name and activates the field."
+    },
+    {
+      "name": "messageAssociation",
+      "selectors": [".input__field", ".input__message"],
+      "attributes": [
+        "aria-describedby on .input__field references id on .input__message"
+      ],
+      "description": "When supporting or validation text is present, the native field references that message through aria-describedby."
+    },
+    {
+      "name": "errorSemantics",
+      "selectors": [".input--error", ".input__field", ".input__message"],
+      "attributes": [
+        "aria-invalid=\"true\" on .input__field",
+        "role=\"alert\" on a dynamically presented error message"
+      ],
+      "description": "The error class provides visual treatment only. The native field also exposes aria-invalid, and a newly presented error message may use alert semantics."
+    },
+    {
+      "name": "nativeDisabled",
+      "selectors": [".input__field:disabled"],
+      "attributes": ["disabled"],
+      "description": "Unavailable fields use the native disabled attribute, which supplies form and focus behavior in addition to the visual disabled state."
+    },
+    {
+      "name": "passiveIconComposition",
+      "selectors": [
+        ".input__control",
+        ".input__icon--leading",
+        ".input__icon--trailing"
+      ],
+      "attributes": [
+        "decorative icons use aria-hidden=\"true\""
+      ],
+      "description": "Leading and trailing icons are independent passive slots and may coexist. Interactive field actions belong to specialized components instead of these slots."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible label associated with the native field.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".input__label"
+          }
+        ]
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Current text value of the native field.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".input__field",
+            "attribute": "value",
+            "valueFrom": "property",
+            "elements": ["input"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Optional supporting hint shown when the native field is empty; it does not replace the visible label.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".input__field",
+            "attribute": "placeholder",
+            "valueFrom": "property",
+            "elements": ["input"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "required": false,
+      "description": "Optional supporting or validation message associated with the native field.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".input__message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected from the canonical variant list; default is the contract default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".input",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native field unavailable through its disabled attribute.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".input__field",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": ["input"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "leadingIcon",
+      "type": "slot",
+      "required": false,
+      "description": "Optional passive icon before the field value. It can coexist with trailingIcon.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".input__icon--leading",
+            "classNames": [
+              ".input__icon",
+              ".input__icon--leading"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "trailingIcon",
+      "type": "slot",
+      "required": false,
+      "description": "Optional passive icon after the field value. It can coexist with leadingIcon.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".input__icon--trailing",
+            "classNames": [
+              ".input__icon",
+              ".input__icon--trailing"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-unfocused-outer-border",
+        "--color-input-default-unfocused-value",
+        "--color-input-default-unfocused-placeholder",
+        "--color-input-default-unfocused-label",
+        "--color-input-default-unfocused-message",
+        "--color-input-default-unfocused-icon",
+        "--color-input-default-hover-bg",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-default-disabled-bg",
+        "--color-input-default-disabled-inner-border",
+        "--color-input-default-disabled-value",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-unfocused-message",
+        "--color-input-error-unfocused-icon",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-unfocused-message",
+        "--color-input-success-unfocused-icon",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-unfocused-message",
+        "--color-input-warning-unfocused-icon",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "spacing": [
+        "--space-input-padding-x",
+        "--space-input-padding-y",
+        "--space-input-margin-bottom",
+        "--space-input-icon-size",
+        "--space-input-icon-gap"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-input-label-size",
+        "--typo-input-label-line-height",
+        "--typo-input-value-size",
+        "--typo-input-value-line-height",
+        "--typo-input-message-size",
+        "--typo-input-message-line-height"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ]
+    }
+  },
+  "accessibility": [
+    "Associate every input field with a visible label using matching for/id attributes or an equivalent accessible name.",
+    "Use aria-describedby to connect supporting or validation messages to the input when messages are present.",
+    "Use aria-invalid=\"true\" for error states; do not apply aria-invalid for success or warning.",
+    "Use native disabled when the field is unavailable.",
+    "Do not rely on icon color alone to communicate validation status.",
+    "Treat leading and trailing icon slots as decorative or status cues; use a specialized component for interactive field actions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/primitives.css."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render labels, native input elements, and validation messages with the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "popover",
+  "name": "Popover",
+  "registryId": "B9",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Floating content panel with arrow, title/content anatomy, open state, trigger relationship, escape dismissal, and focus behavior requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/popover",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".popover"
+    },
+    "docs": "site/src/content/components/popover.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".popover",
+      "className": ".popover",
+      "required": true,
+      "description": "Floating panel that owns surface, border, shadow, and visibility motion."
+    },
+    {
+      "name": "arrow",
+      "selector": ".popover__arrow",
+      "className": ".popover__arrow",
+      "required": false,
+      "description": "Optional arrow pointing toward the trigger."
+    },
+    {
+      "name": "title",
+      "selector": ".popover__title",
+      "className": ".popover__title",
+      "required": false,
+      "description": "Optional popover title."
+    },
+    {
+      "name": "content",
+      "selector": ".popover__content",
+      "className": ".popover__content",
+      "required": true,
+      "description": "Primary popover content."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default popover panel."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default popover width and padding."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".popover"],
+      "description": "Hidden resting state."
+    },
+    {
+      "name": "open",
+      "selectors": [".popover--open"],
+      "description": "Visible state controlled by the popover--open modifier."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".popover--open"],
+      "description": "The popover is hidden by default and becomes visible when popover--open is applied."
+    },
+    {
+      "name": "triggerRelationship",
+      "attributes": ["aria-expanded", "aria-controls", "aria-haspopup"],
+      "description": "The trigger should expose its expanded state and reference the popover panel."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "outside click", "trigger click"],
+      "description": "The popover should close on Escape, outside interaction, or repeated trigger activation."
+    },
+    {
+      "name": "focusManagement",
+      "events": ["open", "close", "Tab"],
+      "description": "Non-modal popovers should preserve natural tab order and restore focus to the trigger when closed by keyboard."
+    }
+  ],
+  "properties": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the popover panel is visible; trigger state, dismissal, focus restoration, and positioning remain target behavior.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".popover",
+            "classNames": [".popover--open"]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "z-index": [
+        "--z-dropdown"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use popover for supplemental content; use modal dialog patterns when interaction behind the panel must be blocked.",
+    "Connect the trigger and panel with aria-controls and keep aria-expanded synchronized.",
+    "Close on Escape and outside interaction.",
+    "Do not trap focus in a non-modal popover.",
+    "Use a dialog pattern if the popover contains a complex form or long interaction."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; positioning and interaction behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

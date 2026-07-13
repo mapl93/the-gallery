@@ -1,26 +1,45 @@
 ## Overview
 
-Increment/decrement quantity control.
+Compact quantity control with native number semantics and progressively enhanced step buttons.
 
-<Preview html={"<div class=\"qty\"><button class=\"qty__btn\" aria-label=\"Decrease\">−</button><input class=\"qty__input\" type=\"number\" value=\"1\" min=\"1\" /><button class=\"qty__btn\" aria-label=\"Increase\">+</button></div>"} label="Quantity Selector" />
+<Preview html={"<div class=\"qty\" role=\"group\" aria-label=\"Quantity selector\" data-qty><button class=\"qty__btn qty__btn--decrement\" type=\"button\" aria-label=\"Decrease quantity\" data-qty-minus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\" /></svg></button><input class=\"qty__input\" type=\"number\" value=\"1\" min=\"1\" max=\"8\" step=\"1\" aria-label=\"Quantity\" data-qty-input /><button class=\"qty__btn qty__btn--increment\" type=\"button\" aria-label=\"Increase quantity\" data-qty-plus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" /></svg></button></div>"} label="Quantity Selector" />
+
+## Presentation
+
+Default, Error, Success, and Warning share the same control anatomy. Validation feedback is composed through a field wrapper and associated with the native input.
+
+The validation modifiers are `.qty--error`, `.qty--success`, and `.qty--warning`.
+
+<Preview html={"<div><div class=\"qty qty--warning\" role=\"group\" aria-label=\"Quantity selector\" data-qty><button class=\"qty__btn qty__btn--decrement\" type=\"button\" aria-label=\"Decrease quantity\" data-qty-minus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\" /></svg></button><input class=\"qty__input\" type=\"number\" value=\"8\" min=\"1\" max=\"8\" aria-label=\"Quantity\" aria-describedby=\"quantity-warning\" data-qty-input /><button class=\"qty__btn qty__btn--increment\" type=\"button\" aria-label=\"Increase quantity\" data-qty-plus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" /></svg></button></div><p id=\"quantity-warning\" class=\"tg-preview-note\">Only eight pieces are currently available.</p></div>"} label="Validation composition" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Set native min, max, and step constraints from the target's inventory rules.</Do>
+  <Dont>Don't keep the buttons active past a valid boundary.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Quantity Selector owns structure, validation treatment, and neutral-web stepping. Inventory and cart persistence remain target-owned.
 </Callout>
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
+- Provide a visible label or equivalent accessible name.
+- Name increment and decrement buttons clearly.
+- Respect min, max, step, disabled, and inventory constraints.
+- Associate validation feedback with `aria-describedby`; only Error sets `aria-invalid="true"`.
+- Preserve native Arrow Up and Arrow Down behavior on the number field.
 
 ## API Reference
 
 <PropTable>
-  <tr><td>`.qty`</td><td>class</td><td>—</td><td>Base quantity selector styles</td></tr>
+  <tr><td>`variant`</td><td>`default | error | success | warning`</td><td>`default`</td><td>Validation presentation</td></tr>
+  <tr><td>`value`</td><td>`number`</td><td>required</td><td>Current quantity</td></tr>
+  <tr><td>`min` / `max`</td><td>`number`</td><td>unset</td><td>Optional native boundaries</td></tr>
+  <tr><td>`step`</td><td>`number`</td><td>`1`</td><td>Increment used by native and enhanced stepping</td></tr>
+  <tr><td>`disabled`</td><td>`boolean`</td><td>`false`</td><td>Disables the field and both buttons</td></tr>
+  <tr><td>`accessibleLabel`</td><td>`string`</td><td>required</td><td>Accessible name for the number field</td></tr>
+  <tr><td>`decrementLabel` / `incrementLabel`</td><td>`string`</td><td>required</td><td>Accessible names for step buttons</td></tr>
+  <tr><td>`describedBy`</td><td>`string`</td><td>unset</td><td>Associated supporting or validation feedback id</td></tr>
 </PropTable>

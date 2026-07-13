@@ -1,26 +1,80 @@
 ## Overview
 
-Radio button with label.
+Native mutually exclusive choice with checked, disabled, required, form-value, validation, hover, and focus-visible behavior.
 
-<Preview html={"<fieldset style=\"border:none;padding:0;\"><label class=\"radio\"><input class=\"radio__input\" type=\"radio\" name=\"demo\" checked /><span class=\"radio__label\">Option A</span></label> <label class=\"radio\"><input class=\"radio__input\" type=\"radio\" name=\"demo\" /><span class=\"radio__label\">Option B</span></label></fieldset>"} label="Radio" />
+<Preview html={'<fieldset class="tg-preview-radio-group"><legend>Options</legend><label class="radio"><input class="radio__input" type="radio" name="options" value="option-1" checked /><span class="radio__label">Option 1</span></label><label class="radio"><input class="radio__input" type="radio" name="options" value="option-2" /><span class="radio__label">Option 2</span></label><label class="radio"><input class="radio__input" type="radio" name="options" value="option-3" /><span class="radio__label">Option 3</span></label></fieldset>'} label="Radio group" />
+
+## Presentation
+
+Radio has one default size and four validation variants. Selection is a native state independent from validation, so any variant may be selected or unselected.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `default` | `.radio` |
+| `variant` | `error` | `.radio--error` |
+| `variant` | `success` | `.radio--success` |
+| `variant` | `warning` | `.radio--warning` |
+| `checked` | `true` | native `checked` |
+| `disabled` | `true` | native `disabled` |
+| `required` | `true` | native `required` |
+
+The selected dot uses the active variant color. Hover preserves that semantic family, and focus uses the matching lighter `4px` outer ring with no gap.
+
+### Disabled
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><label class="radio"><input class="radio__input" type="radio" disabled /><span class="radio__label">Unavailable delivery window</span></label></div>'} label="Disabled radio" />
+
+### Error
+
+<Preview html={'<fieldset class="field fieldset tg-preview-frame tg-preview-frame--sm"><legend class="fieldset__legend">Fulfillment method</legend><label class="radio radio--error"><input class="radio__input" type="radio" name="fulfillment-error" required aria-invalid="true" aria-describedby="radio-error-message" /><span class="radio__label">Gallery pickup</span></label><p class="field__error" id="radio-error-message" role="alert">Choose one fulfillment method.</p></fieldset>'} label="Radio error" />
+
+### Success
+
+<Preview html={'<fieldset class="field fieldset tg-preview-frame tg-preview-frame--sm"><legend class="fieldset__legend">Fulfillment method</legend><label class="radio radio--success"><input class="radio__input" type="radio" name="fulfillment-success" checked aria-describedby="radio-success-message" /><span class="radio__label">Gallery pickup</span></label><p class="field__success" id="radio-success-message">Pickup is available for this order.</p></fieldset>'} label="Radio success" />
+
+### Warning
+
+<Preview html={'<fieldset class="field fieldset tg-preview-frame tg-preview-frame--sm"><legend class="fieldset__legend">Fulfillment method</legend><label class="radio radio--warning"><input class="radio__input" type="radio" name="fulfillment-warning" checked aria-describedby="radio-warning-message" /><span class="radio__label">Home delivery</span></label><p class="field__warning" id="radio-warning-message">Delivery may require additional handling time.</p></fieldset>'} label="Radio warning" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Radio when one and only one option may be selected from a visible set.</Do>
+  <Dont>Do not use Radio for independent choices or multiple selection; use Checkbox instead.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Give every choice in one group the same native `name` and a distinct submitted `value`.</Do>
+  <Dont>Do not visually group radios without a programmatic group name.</Dont>
+</DoDont>
+
+Use Fieldset and Legend to name the choice group. Radio owns visual validation and native ARIA on each input; Field Wrapper owns associated feedback content.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Radio keeps a native `input[type="radio"]`. Custom presentation does not replace its mutual exclusion, arrow-key navigation, form, required, disabled, or assistive-technology behavior.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Use one shared `name` for each mutually exclusive group.
+- Wrap related choices in `<fieldset>` and name the question with `<legend>`.
+- Keep each visible choice label associated with its native input.
+- Arrow keys move selection within a focused native group; Space selects the focused choice.
+- Use `aria-invalid="true"` only for Error and connect external feedback with `aria-describedby`.
+- Success and Warning do not expose invalid or alert semantics.
+- Forced-colors mode restores native radio appearance.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.radio`</td><td>class</td><td>—</td><td>Base radio styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible accessible choice label</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Native mutually exclusive group name</td></tr>
+  <tr><td>`value`</td><td>string</td><td>`on`</td><td>Submitted value when selected</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
+  <tr><td>`checked`</td><td>boolean</td><td>`false`</td><td>Native selected state</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Native unavailable state</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required group constraint</td></tr>
+  <tr><td>`describedBy`</td><td>string</td><td>empty</td><td>Id reference for feedback owned by Field Wrapper</td></tr>
 </PropTable>
+
+The canonical root remains a wrapping `<label class="radio">`. Validation classes belong on that root; form and ARIA attributes remain on `.radio__input`.

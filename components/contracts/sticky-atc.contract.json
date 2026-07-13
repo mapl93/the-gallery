@@ -1,0 +1,74 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "sticky-atc",
+  "name": "Sticky Add-to-Cart Bar",
+  "registryId": "K9",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Fixed add-to-cart bar with visibility state, product image, title, price, and CTA.",
+  "dependencies": ["button", "price"],
+  "source": {
+    "registry": "registry.json#/components/sticky-atc",
+    "css": { "file": "components/css/cart.css", "selector": ".sticky-atc" },
+    "docs": "site/src/content/components/sticky-atc.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".sticky-atc", "className": ".sticky-atc", "required": true, "description": "Sticky add-to-cart bar." },
+    { "name": "inner", "selector": ".sticky-atc__inner", "className": ".sticky-atc__inner", "required": true, "description": "Centered bar content wrapper." },
+    { "name": "info", "selector": ".sticky-atc__info", "className": ".sticky-atc__info", "required": true, "description": "Product info group." },
+    { "name": "image", "selector": ".sticky-atc__image", "className": ".sticky-atc__image", "required": false, "description": "Product thumbnail." },
+    { "name": "title", "selector": ".sticky-atc__title", "className": ".sticky-atc__title", "required": true, "description": "Product title." },
+    { "name": "price", "selector": ".sticky-atc__price", "className": ".sticky-atc__price", "required": false, "description": "Product price." },
+    { "name": "action", "selector": ".sticky-atc__action", "className": ".sticky-atc__action", "required": true, "description": "Primary add-to-cart action." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Hidden-by-default sticky add-to-cart bar." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default fixed bottom bar size." }
+  ],
+  "states": [
+    { "name": "hidden", "selectors": [".sticky-atc"], "description": "Hidden off-canvas state." },
+    { "name": "visible", "selectors": [".sticky-atc--visible"], "description": "Visible sticky bar state." }
+  ],
+  "behavior": [
+    { "name": "visibility", "selectors": [".sticky-atc--visible"], "description": "Target logic owns when the bar appears, usually after primary product form scrolls out of view." },
+    { "name": "addToCart", "selectors": [".sticky-atc__inner"], "events": ["click"], "description": "CTA should use the same selected variant, quantity, and selling-plan state as Product Form." },
+    { "name": "pricing", "selectors": [".sticky-atc__price"], "description": "Price should be formatted by the commerce target or Price dependency." }
+  ],
+  "properties": [
+    { "name": "visible", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls target-owned sticky visibility.", "targetMappings": { "web": [{ "kind": "class", "selector": ".sticky-atc", "classNames": [".sticky-atc--visible"] }] } },
+    { "name": "image", "type": "slot", "required": false, "description": "Optional product thumbnail.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".sticky-atc__image", "classNames": [".sticky-atc__image"] }] } },
+    { "name": "imageAlt", "type": "string", "required": false, "description": "Product thumbnail alternative text.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__title" }] } },
+    { "name": "price", "type": "string", "required": false, "description": "Target-formatted product price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__price" }] } },
+    { "name": "actionLabel", "type": "string", "required": true, "description": "Add-to-cart action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__action" }] } },
+    { "name": "actionDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables add to cart when selection is unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "z-index": ["--z-sticky"],
+      "color": ["--color-surface-primary", "--color-border-subtle", "--color-text-primary"],
+      "shadow": ["--shadow-lg"],
+      "spacing": ["--space-layout-container"],
+      "radius": ["--radius-sm"],
+      "transition": ["--transition-base"],
+      "easing": ["--easing-out"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Avoid covering focused content or checkout-critical controls.",
+    "Keep the sticky CTA name clear and consistent with the main add-to-cart action.",
+    "Do not duplicate live announcements when both sticky and primary forms update the same cart state."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should synchronize with selected Shopify variant and product form state." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

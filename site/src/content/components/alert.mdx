@@ -1,54 +1,42 @@
 ## Overview
 
-Inline feedback banner. info, success, warning, error variants.
+Inline feedback message with semantic severity, optional icon, and optional dismiss action.
 
-<Preview html={"<div class=\"alert alert--info\"><span class=\"alert__icon\">ℹ️</span><div class=\"alert__content\"><p class=\"alert__title\">Info</p><p class=\"alert__message\">This is an informational message.</p></div><button class=\"alert__dismiss\" aria-label=\"Dismiss\">&times;</button></div>"} label="Alert / Banner" />
+<Preview html={'<div class="alert alert--info"><svg class="alert__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><div class="alert__content"><p class="alert__title">Notice</p><p class="alert__message">Your changes have been saved.</p></div><button class="close-btn alert__dismiss" type="button" aria-label="Dismiss notification"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'} label="Alert / Banner" />
 
-## Variants
+## Presentation
 
-### Info
+Info, Success, Warning, and Error are variants rather than interaction states. Title, icon, and dismissal are optional; message is required.
 
-<Preview html={"<div class=\"alert alert--info\"><span class=\"alert__icon\">ℹ️</span><div class=\"alert__content\"><p class=\"alert__title\">Info</p><p class=\"alert__message\">Informational alert.</p></div></div>"} label="Info" />
+| Variant | Web mapping |
+| --- | --- |
+| Info | `.alert--info` |
+| Success | `.alert--success` |
+| Warning | `.alert--warning` |
+| Error | `.alert--error` |
 
-### Success
-
-<Preview html={"<div class=\"alert alert--success\"><span class=\"alert__icon\">✓</span><div class=\"alert__content\"><p class=\"alert__title\">Success</p><p class=\"alert__message\">Operation completed.</p></div></div>"} label="Success" />
-
-### Warning
-
-<Preview html={"<div class=\"alert alert--warning\"><span class=\"alert__icon\">⚠</span><div class=\"alert__content\"><p class=\"alert__title\">Warning</p><p class=\"alert__message\">Please review.</p></div></div>"} label="Warning" />
-
-### Error
-
-<Preview html={"<div class=\"alert alert--error\"><span class=\"alert__icon\">✕</span><div class=\"alert__content\"><p class=\"alert__title\">Error</p><p class=\"alert__message\">Something went wrong.</p></div></div>"} label="Error" />
+<Preview html={'<div class="alert alert--warning"><div class="alert__content"><p class="alert__title">Review required</p><p class="alert__message">Confirm the shipping address before continuing.</p></div></div>'} label="Warning alert" />
 
 ## Usage Guidelines
 
-<DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
-</DoDont>
+<DoDont><Do>Use visible copy that explains the feedback and next step.</Do><Dont>Do not rely on color, icon, or live-region priority as the message.</Dont></DoDont>
+
+Static alerts use no live-region semantics. Use Polite for non-urgent dynamically inserted feedback and Assertive only for urgent failures requiring immediate attention.
 
 ## Accessibility
 
-<Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
-</Callout>
+- `announcement="none"` is the default for content already present on load.
+- Polite maps to `role="status"`; Assertive maps to `role="alert"`.
+- Hide decorative icons from assistive technology.
+- Compose [Close Button](/components/close-button) for dismissal and let the consumer own removal, focus, and announcements.
 
-- Use `role="alert"` or `aria-live="assertive"` for important notifications.
-
-## Dependencies
-
-This component uses:
-
-- [Close Button](/components/close-button)
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.alert`</td><td>class</td><td>—</td><td>Base alert / banner styles</td></tr>
-  <tr><td>`.alert--info`</td><td>modifier</td><td>—</td><td>Info variant</td></tr>
-  <tr><td>`.alert--success`</td><td>modifier</td><td>—</td><td>Success variant</td></tr>
-  <tr><td>`.alert--warning`</td><td>modifier</td><td>—</td><td>Warning variant</td></tr>
-  <tr><td>`.alert--error`</td><td>modifier</td><td>—</td><td>Error variant</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Concise visible heading</td></tr>
+  <tr><td>`message`</td><td>string</td><td>required</td><td>Complete feedback text</td></tr>
+  <tr><td>`variant`</td><td>`info | success | warning | error`</td><td>`info`</td><td>Semantic feedback family</td></tr>
+  <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Decorative leading icon</td></tr>
+  <tr><td>`dismissAction` / `dismissLabel`</td><td>slot / string</td><td>optional</td><td>Named Close Button composition</td></tr>
+  <tr><td>`announcement`</td><td>`none | polite | assertive`</td><td>`none`</td><td>Dynamic announcement priority</td></tr>
 </PropTable>

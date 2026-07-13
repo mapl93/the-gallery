@@ -1,34 +1,50 @@
 ## Overview
 
-Account preferences sections (profile, password, notifications).
+Account Settings is an authenticated container for target-owned settings sections composed from Input, Button, and Switch controls.
 
-<Preview html={"<div style=\"max-width:480px;\"><h2>Account Settings</h2><form style=\"margin-top:16px;\"><div class=\"field\"><label class=\"field__label\">Name</label><input class=\"input__field\" type=\"text\" value=\"María García\" /></div><div class=\"field\" style=\"margin-top:12px;\"><label class=\"field__label\">Email</label><input class=\"input__field\" type=\"email\" value=\"maria@example.com\" /></div><button class=\"btn\" style=\"margin-top:16px;\">Save Changes</button></form></div>"} label="Account Settings" />
+<Preview
+  html={'<form class="account-settings tg-preview-frame tg-preview-frame--md"><section class="account-settings__section"><h2 class="account-settings__section-title">Profile</h2><p class="account-settings__section-description">Contact information used for account communication.</p><div class="input"><label class="input__label" for="settings-name">Display name</label><div class="input__control"><input class="input__field" id="settings-name" name="name" type="text" autocomplete="name" value="Maria Garcia" /></div></div></section><section class="account-settings__section"><h2 class="account-settings__section-title">Notifications</h2><p class="account-settings__section-description" id="settings-orders-description">Choose whether to receive order progress updates.</p><label class="switch"><input class="switch__input" type="checkbox" role="switch" aria-describedby="settings-orders-description" checked /><span class="switch__track"><span class="switch__thumb"></span></span><span class="switch__label">Order updates</span></label></section><section class="account-settings__section"><h2 class="account-settings__section-title">Security</h2><p class="account-settings__section-description">Review the credentials connected to this account.</p><button class="btn btn--outline" type="button">Manage password</button></section></form>'}
+  label="Account Settings"
+/>
+
+## Presentation
+
+`sections` is the only Account Settings property. Section titles, descriptions, controls, actions, ordering, validation, and persistence are repeated fixture or target-owned composition inside that slot.
+
+The artwork demonstrates Input, Switch, and Button dependencies without establishing whether a target saves on submit, on change, or by another section-specific strategy. Account Settings supplies grouping and visual structure only.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Group related preferences under concise titles and explain consequences where needed.</Do>
+  <Dont>Do not make the wrapper responsible for child-control validation or persistence policy.</Dont>
 </DoDont>
+
+- Let each target decide which sections and controls are available.
+- Use Input and Switch validation semantics for field-level feedback.
+- Make destructive account actions visually and verbally explicit and confirm them according to target policy.
+- Keep persistence, loading, success, and failure behavior consistent within the chosen target strategy.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Protect account settings behind the target authentication system.
+- Give every section a descriptive heading and preserve logical heading order.
+- Associate controls with visible labels and supporting descriptions where needed.
+- Keep Switch checked state synchronized with its native checkbox.
+- Announce save failures or confirmations through target-owned feedback and move focus appropriately after errors.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Input](/components/input)
 - [Button](/components/button)
-- [Switch / Toggle](/components/switch)
+- [Switch](/components/switch)
 
-## API Reference
+The sections and controls in the artwork are fixture content inside `sections`; they do not define a fixed settings schema or save strategy.
+
+### API Reference
 
 <PropTable>
-  <tr><td>`.account-settings`</td><td>class</td><td>—</td><td>Base account settings styles</td></tr>
+  <tr><td>`sections`</td><td>slot</td><td>required</td><td>Target-owned settings sections and composed controls</td></tr>
 </PropTable>

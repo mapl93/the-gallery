@@ -1,0 +1,250 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "dropdown-menu",
+  "name": "Dropdown Menu",
+  "registryId": "B11",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Action menu contract with trigger-owned open state, menu item anatomy, labels, separators, shortcuts, danger item styling, disabled state, and menu keyboard behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/dropdown-menu",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".dropdown"
+    },
+    "docs": "site/src/content/components/dropdown-menu.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".dropdown",
+      "className": ".dropdown",
+      "required": true,
+      "description": "Relative wrapper for trigger and menu positioning."
+    },
+    {
+      "name": "menu",
+      "selector": ".dropdown__menu",
+      "className": ".dropdown__menu",
+      "required": true,
+      "description": "Floating menu surface that contains grouped menu content."
+    },
+    {
+      "name": "item",
+      "selector": ".dropdown__item",
+      "className": ".dropdown__item",
+      "required": true,
+      "description": "Interactive command inside the menu."
+    },
+    {
+      "name": "itemIcon",
+      "selector": ".dropdown__item-icon",
+      "className": ".dropdown__item-icon",
+      "required": false,
+      "description": "Optional leading icon for a menu item."
+    },
+    {
+      "name": "itemShortcut",
+      "selector": ".dropdown__item-shortcut",
+      "className": ".dropdown__item-shortcut",
+      "required": false,
+      "description": "Optional trailing keyboard shortcut hint."
+    },
+    {
+      "name": "separator",
+      "selector": ".dropdown__separator",
+      "className": ".dropdown__separator",
+      "required": false,
+      "description": "Visual divider between item groups."
+    },
+    {
+      "name": "label",
+      "selector": ".dropdown__label",
+      "className": ".dropdown__label",
+      "required": false,
+      "description": "Non-interactive group label."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default dropdown menu with standard item styling."
+    },
+    {
+      "name": "danger",
+      "className": ".dropdown__item--danger",
+      "default": false,
+      "description": "Danger styling for destructive menu items."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default dropdown width and spacing."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".dropdown__menu"],
+      "description": "Hidden resting menu state."
+    },
+    {
+      "name": "open",
+      "selectors": [".dropdown--open .dropdown__menu"],
+      "description": "Visible menu state controlled by the dropdown--open modifier."
+    },
+    {
+      "name": "itemHover",
+      "selectors": [".dropdown__item:hover"],
+      "description": "Pointer hover state on a menu item."
+    },
+    {
+      "name": "itemHighlighted",
+      "selectors": [".dropdown__item[data-highlighted]"],
+      "description": "Keyboard-highlighted item state."
+    },
+    {
+      "name": "itemDanger",
+      "selectors": [".dropdown__item--danger"],
+      "description": "Destructive item visual state."
+    },
+    {
+      "name": "itemDisabled",
+      "selectors": [".dropdown__item:disabled"],
+      "description": "Unavailable item state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".dropdown--open .dropdown__menu"],
+      "description": "The menu is hidden by default and becomes visible when dropdown--open is applied to the root."
+    },
+    {
+      "name": "triggerRelationship",
+      "attributes": ["aria-haspopup=\"menu\"", "aria-expanded", "aria-controls"],
+      "description": "The trigger owns the expanded state and references the menu element."
+    },
+    {
+      "name": "menuSemantics",
+      "attributes": ["role=\"menu\"", "role=\"menuitem\"", "aria-disabled"],
+      "description": "The menu and items must expose menu semantics when native button lists are not sufficient for the target."
+    },
+    {
+      "name": "keyboardNavigation",
+      "events": ["ArrowDown", "ArrowUp", "Home", "End", "Enter", "Space", "Escape"],
+      "description": "Keyboard navigation moves the highlighted item, activates commands, and closes the menu with Escape."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "outside click", "item select"],
+      "description": "The menu closes after Escape, outside interaction, or a completed command unless the target documents a persistent menu pattern."
+    }
+  ],
+  "properties": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the menu surface is visible; focus movement, keyboard navigation, and dismissal remain target behavior.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".dropdown",
+            "classNames": [".dropdown--open"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "itemVariant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Applies the canonical visual variant to an individual menu command.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".dropdown__item",
+            "source": "variants"
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-disabled",
+        "--color-feedback-error-default"
+      ],
+      "radius": [
+        "--radius-md",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-lg"
+      ],
+      "z-index": [
+        "--z-dropdown"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use a button as the trigger and keep aria-expanded synchronized with the open state.",
+    "Close the menu on Escape and outside interaction.",
+    "Support arrow key navigation between enabled items.",
+    "Use disabled or aria-disabled for unavailable items and skip them during keyboard activation.",
+    "Reserve danger styling for destructive actions and keep the label explicit."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; open state, focus movement, and command execution must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

@@ -1,0 +1,383 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.4.0",
+  "slug": "textarea",
+  "name": "Textarea",
+  "registryId": "A4",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Multi-line value-entry field that composes the canonical Input anatomy, validation variants, feedback semantics, and interaction states while exposing configurable resize direction.",
+  "dependencies": ["input"],
+  "source": {
+    "registry": "registry.json#/components/textarea",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".textarea__field"
+    },
+    "docs": "site/src/content/components/textarea.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".input",
+      "className": ".input",
+      "required": true,
+      "description": "Canonical Input wrapper that owns label, field, message, validation presentation, and layout."
+    },
+    {
+      "name": "label",
+      "selector": ".input__label",
+      "className": ".input__label",
+      "required": true,
+      "description": "Visible label explicitly associated with the native textarea."
+    },
+    {
+      "name": "fieldBase",
+      "selector": ".input__field",
+      "className": ".input__field",
+      "required": true,
+      "description": "Canonical Input field class that supplies shared typography, spacing, color, focus, hover, and disabled behavior."
+    },
+    {
+      "name": "textareaField",
+      "selector": ".textarea__field",
+      "className": ".textarea__field",
+      "required": true,
+      "description": "Textarea-specific class that provides a multi-line minimum height and configurable vertical, horizontal, or bidirectional resizing."
+    },
+    {
+      "name": "message",
+      "selector": ".input__message",
+      "className": ".input__message",
+      "required": false,
+      "description": "Optional supporting or validation message associated with the textarea."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default neutral textarea."
+    },
+    {
+      "name": "error",
+      "className": ".input--error",
+      "default": false,
+      "description": "Invalid value presentation with Error label, border, message, and focus ring."
+    },
+    {
+      "name": "success",
+      "className": ".input--success",
+      "default": false,
+      "description": "Successful validation presentation with Success label, border, message, and focus ring."
+    },
+    {
+      "name": "warning",
+      "className": ".input--warning",
+      "default": false,
+      "description": "Attention state for values that remain valid, with Warning label, border, message, and focus ring."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default textarea size with a 120px minimum height."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".textarea__field"],
+      "description": "Resting textarea field state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".input__field:hover"],
+      "description": "Inherited pointer hover state that preserves the active validation border family."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".input__field:focus-visible"],
+      "description": "Inherited keyboard focus indicator with the shared field focus-ring hierarchy."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".input__field:disabled"],
+      "description": "Inherited native unavailable state."
+    },
+    {
+      "name": "errorFocusVisible",
+      "selectors": [".input--error .input__field:focus-visible"],
+      "description": "Focused Error variant with semantic inner and outer borders."
+    },
+    {
+      "name": "successFocusVisible",
+      "selectors": [".input--success .input__field:focus-visible"],
+      "description": "Focused Success variant with semantic inner and outer borders."
+    },
+    {
+      "name": "warningFocusVisible",
+      "selectors": [".input--warning .input__field:focus-visible"],
+      "description": "Focused Warning variant with semantic inner and outer borders."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "labelAssociation",
+      "selectors": [".input__label", ".textarea__field"],
+      "attributes": ["for on .input__label matches id on .textarea__field"],
+      "description": "The visible label is the native textarea's accessible name and activates the field."
+    },
+    {
+      "name": "messageAssociation",
+      "selectors": [".textarea__field", ".input__message"],
+      "attributes": ["aria-describedby on .textarea__field references id on .input__message"],
+      "description": "Supporting and validation feedback is programmatically associated with the native textarea."
+    },
+    {
+      "name": "errorSemantics",
+      "selectors": [".input--error", ".textarea__field", ".input__message"],
+      "attributes": [
+        "aria-invalid=\"true\" on .textarea__field",
+        "role=\"alert\" on a dynamically presented error message"
+      ],
+      "description": "Error presentation is paired with native invalid state and corrective feedback semantics."
+    },
+    {
+      "name": "nativeDisabled",
+      "selectors": [".input__field:disabled"],
+      "attributes": ["disabled"],
+      "description": "Unavailable textareas use the native disabled attribute for form and focus behavior."
+    },
+    {
+      "name": "resizeDirection",
+      "selectors": [
+        ".textarea__field",
+        ".textarea__field[data-resize=\"horizontal\"]",
+        ".textarea__field[data-resize=\"both\"]"
+      ],
+      "attributes": ["data-resize=\"horizontal\" or data-resize=\"both\"; absence means vertical"],
+      "description": "The field supports vertical, horizontal, or bidirectional user resizing while preserving its 120px minimum height."
+    },
+    {
+      "name": "lineBounds",
+      "selectors": [
+        ".textarea__field[data-min-lines]",
+        ".textarea__field[data-max-lines]"
+      ],
+      "attributes": [
+        "data-min-lines is a positive integer",
+        "data-max-lines is absent or a positive integer greater than or equal to the effective minimum"
+      ],
+      "description": "Progressive enhancement converts optional line-count attributes into native resize boundaries using the field's computed typography and box metrics."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible label associated with the native textarea.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".input__label" }]
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "description": "Current multi-line value of the native textarea.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".textarea__field" }]
+      }
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Optional hint shown when the textarea is empty; it does not replace the visible label.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "placeholder",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "required": false,
+      "description": "Optional supporting or validation message associated with the textarea.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".input__message" }]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected from the canonical field variant list.",
+      "targetMappings": {
+        "web": [{ "kind": "optionClass", "selector": ".input", "source": "variants" }]
+      }
+    },
+    {
+      "name": "resize",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "vertical",
+      "values": ["vertical", "horizontal", "both"],
+      "description": "Controls the native direction in which the textarea may be resized by the user.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "data-resize",
+          "values": {
+            "vertical": null,
+            "horizontal": "horizontal",
+            "both": "both"
+          },
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "minLines",
+      "type": "number",
+      "required": false,
+      "defaultValue": 4,
+      "minimum": 1,
+      "step": 1,
+      "description": "Minimum visible line count allowed by native textarea resizing.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "data-min-lines",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "maxLines",
+      "type": "number",
+      "required": false,
+      "minimum": 1,
+      "step": 1,
+      "unsetBehavior": "No maximum line limit is applied.",
+      "description": "Optional maximum visible line count allowed by native textarea resizing; effective values never fall below minLines.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "data-max-lines",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native textarea unavailable through its disabled attribute.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "disabled",
+          "values": { "true": "", "false": null },
+          "elements": ["textarea"]
+        }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-unfocused-outer-border",
+        "--color-input-default-unfocused-value",
+        "--color-input-default-unfocused-placeholder",
+        "--color-input-default-unfocused-label",
+        "--color-input-default-unfocused-message",
+        "--color-input-default-hover-bg",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-default-disabled-bg",
+        "--color-input-default-disabled-inner-border",
+        "--color-input-default-disabled-value",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-unfocused-message",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-unfocused-message",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-unfocused-message",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border"
+      ],
+      "spacing": [
+        "--space-input-padding-x",
+        "--space-input-padding-y",
+        "--space-input-margin-bottom"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-input-label-size",
+        "--typo-input-label-line-height",
+        "--typo-input-value-size",
+        "--typo-input-value-line-height",
+        "--typo-input-message-size",
+        "--typo-input-message-line-height"
+      ],
+      "radius": ["--radius-md"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Associate every textarea with a visible label using matching for/id attributes or an equivalent accessible name.",
+    "Use aria-describedby to connect supporting and validation messages when present.",
+    "Use aria-invalid=\"true\" only for Error; Success and Warning do not expose invalid state.",
+    "Do not rely on validation color alone; include concise associated feedback text.",
+    "Use native disabled when the field is unavailable.",
+    "Choose vertical, horizontal, or bidirectional resizing to match the available layout without hiding content or feedback.",
+    "Use positive whole numbers for minLines and maxLines, and keep maxLines greater than or equal to minLines."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Composes canonical Input classes with textarea__field in components/css/primitives.css."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid renders native textarea elements with input__field and textarea__field classes."
+    },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

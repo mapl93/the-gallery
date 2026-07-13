@@ -1,0 +1,69 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "product-gallery",
+  "name": "Product Gallery",
+  "registryId": "D2",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Product image gallery with main media, thumbnails, mobile dots, selected state, and desktop zoom behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/product-gallery",
+    "css": { "file": "components/css/product.css", "selector": ".product-gallery" },
+    "docs": "site/src/content/components/product-gallery.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".product-gallery", "className": ".product-gallery", "required": true, "description": "Gallery container." },
+    { "name": "main", "selector": ".product-gallery__main", "className": ".product-gallery__main", "required": true, "description": "Main selected media frame." },
+    { "name": "mainImage", "selector": ".product-gallery__main img", "required": true, "description": "Current product image." },
+    { "name": "thumbs", "selector": ".product-gallery__thumbs", "className": ".product-gallery__thumbs", "required": false, "description": "Thumbnail rail." },
+    { "name": "thumb", "selector": ".product-gallery__thumb", "className": ".product-gallery__thumb", "required": false, "description": "Thumbnail trigger." },
+    { "name": "thumbImage", "selector": ".product-gallery__thumb img", "required": false, "description": "Thumbnail image." },
+    { "name": "dots", "selector": ".product-gallery__dots", "className": ".product-gallery__dots", "required": false, "description": "Mobile dot navigation." },
+    { "name": "dot", "selector": ".product-gallery__dot", "className": ".product-gallery__dot", "required": false, "description": "Mobile dot trigger." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive gallery with thumbnails and optional dots." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive gallery size determined by parent layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".product-gallery"], "description": "Default gallery state." },
+    { "name": "selectedThumb", "selectors": [".product-gallery__thumb[aria-selected=\"true\"]"], "description": "Selected thumbnail state." },
+    { "name": "selectedDot", "selectors": [".product-gallery__dot[aria-selected=\"true\"]"], "description": "Selected mobile dot state." },
+    { "name": "desktopZoom", "selectors": [".product-gallery__main:hover img"], "description": "Hover zoom behavior on desktop viewports." }
+  ],
+  "behavior": [
+    { "name": "selection", "selectors": [".product-gallery__thumb[aria-selected=\"true\"]", ".product-gallery__dot[aria-selected=\"true\"]"], "attributes": ["aria-selected"], "events": ["click"], "description": "Thumbnail and dot selection should update the main image and selected state." },
+    { "name": "zoom", "selectors": [".product-gallery__main:hover img"], "description": "Desktop targets may update zoom origin with private CSS variables while preserving image semantics." },
+    { "name": "mediaAltText", "selectors": [".product-gallery__main img", ".product-gallery__thumb img"], "attributes": ["alt"], "description": "Every product image should include useful alt text unless intentionally decorative." }
+  ],
+  "properties": [
+    { "name": "mainAlt", "type": "string", "required": true, "description": "Alternative text synchronized with the selected main media.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery__main img", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
+    { "name": "controlLabel", "type": "string", "required": true, "description": "Accessible name for an individual thumbnail or dot control.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery__thumb", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }, { "kind": "attribute", "selector": ".product-gallery__dot", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Selected state for an individual thumbnail or dot control.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery__thumb", "attribute": "aria-selected", "values": { "true": "true", "false": "false" }, "elements": ["button"] }, { "kind": "attribute", "selector": ".product-gallery__dot", "attribute": "aria-selected", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-border-focus", "--color-border-subtle", "--color-text-primary"],
+      "radius": ["--radius-md", "--radius-sm", "--radius-full"],
+      "transition": ["--transition-slow", "--transition-fast"],
+      "easing": ["--easing-out", "--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Use buttons for thumbnail and dot controls.",
+    "Expose the selected media state with aria-selected or an equivalent target-native selected state.",
+    "Keep image alt text synchronized with the selected product media."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map product media arrays to main image, thumbnails, and mobile dots." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

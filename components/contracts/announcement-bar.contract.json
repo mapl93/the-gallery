@@ -1,0 +1,58 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "announcement-bar",
+  "name": "Announcement Bar",
+  "registryId": "C2",
+  "category": "global",
+  "status": "pilot",
+  "summary": "Top-of-page promotional bar with optional link content.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/announcement-bar",
+    "css": { "file": "components/css/global.css", "selector": ".announcement" },
+    "docs": "site/src/content/components/announcement-bar.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".announcement", "className": ".announcement", "required": true, "description": "Announcement container." },
+    { "name": "link", "selector": ".announcement a", "required": false, "description": "Optional announcement link." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default promotional announcement." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default compact bar size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".announcement"], "description": "Default announcement state." },
+    { "name": "linked", "selectors": [".announcement a"], "description": "Announcement with inline link." }
+  ],
+  "behavior": [
+    { "name": "announcementMessage", "selectors": [".announcement"], "description": "Announcement text should be concise and remain visible above global header chrome." },
+    { "name": "announcementLink", "selectors": [".announcement a"], "attributes": ["href"], "events": ["click"], "description": "Linked announcement should navigate to a relevant campaign or destination." }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": false, "description": "Accessible name when the announcement is rendered as a labelled region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "aria-label", "valueFrom": "property", "elements": ["div", "section"] }] } },
+    { "name": "message", "type": "slot", "required": true, "description": "Announcement content with an optional native link supplied by the target.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement", "classNames": [".announcement"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-statement", "--color-text-inverse"],
+      "spacing": ["--space-layout-container"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Keep announcement text readable against the statement surface.",
+    "Use a real link when the message navigates somewhere.",
+    "Avoid placing critical checkout or legal information only in a dismissible promotional bar."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map theme announcement settings and optional campaign URL." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "masonry-gallery",
+  "name": "Masonry Gallery",
+  "registryId": "F5",
+  "category": "storytelling",
+  "status": "pilot",
+  "summary": "Multi-column image gallery with optional artwork overlays.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/masonry-gallery",
+    "css": { "file": "components/css/storytelling.css", "selector": ".masonry-gallery" },
+    "docs": "site/src/content/components/masonry-gallery.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".masonry-gallery", "className": ".masonry-gallery", "required": true, "description": "Masonry gallery container." },
+    { "name": "item", "selector": ".masonry-gallery__item", "className": ".masonry-gallery__item", "required": true, "description": "Repeated masonry item wrapper." },
+    { "name": "piece", "selector": ".gallery-piece", "className": ".gallery-piece", "required": true, "description": "Artwork presentation within an item; markup may remain passive or receive target-owned interaction semantics." },
+    { "name": "image", "selector": ".gallery-piece img", "className": null, "required": true, "description": "Artwork image supplied by the target." },
+    { "name": "overlay", "selector": ".gallery-piece__overlay", "className": ".gallery-piece__overlay", "required": false, "description": "Optional artwork metadata overlay." },
+    { "name": "title", "selector": ".gallery-piece__title", "className": ".gallery-piece__title", "required": false, "description": "Optional artwork title." },
+    { "name": "price", "selector": ".gallery-piece__price", "className": ".gallery-piece__price", "required": false, "description": "Optional target-formatted artwork price." }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Responsive one, two, and three-column masonry layout." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Column count adapts at the canonical responsive breakpoints." }],
+  "states": [
+    { "name": "default", "selectors": [".masonry-gallery"], "description": "Default gallery state." },
+    { "name": "pieceHover", "selectors": [".gallery-piece:hover"], "description": "Fine-pointer artwork disclosure state." },
+    { "name": "pieceFocus", "selectors": [".gallery-piece:is(a, button):focus-visible", ".gallery-piece:focus-within"], "description": "Visible keyboard focus and metadata disclosure for target-interactive artwork." }
+  ],
+  "behavior": [
+    { "name": "interactionBoundary", "selectors": [".gallery-piece"], "description": "This contract does not decide whether a piece is passive, a link, or a lightbox trigger. Targets must use native interactive markup and corresponding keyboard behavior when interaction is added." },
+    { "name": "overlayDisclosure", "selectors": [".gallery-piece__overlay"], "description": "Overlay metadata remains visible where hover is unavailable and is revealed by hover or focus-within on fine-pointer devices." }
+  ],
+  "properties": [
+    { "name": "items", "type": "slot", "required": true, "description": "Target-owned ordered artwork items, including media and optional metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".masonry-gallery", "classNames": [".masonry-gallery__item", ".gallery-piece", ".gallery-piece__overlay", ".gallery-piece__title", ".gallery-piece__price"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-focus", "--color-button-primary-bg-default", "--color-button-primary-text-default", "--color-text-inverse"],
+      "transition": ["--transition-base", "--transition-slow"],
+      "easing": ["--easing-default", "--easing-out"],
+      "motion": ["--motion-opacity-subtle"],
+      "typography": ["--font-family-heading", "--typo-body-size"],
+      "radius": ["--radius-md"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
+    }
+  },
+  "accessibility": [
+    "Give every meaningful artwork image useful alternative text and mark decorative images accordingly.",
+    "Do not communicate title or price only through a hover-exclusive overlay.",
+    "When a target makes a piece interactive, use a native link or button with a descriptive accessible name and visible focus.",
+    "Lightbox focus management, dismissal, and restoration belong to the composed Lightbox or target adapter, not this gallery contract."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

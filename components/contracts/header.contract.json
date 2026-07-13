@@ -1,0 +1,77 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "header",
+  "name": "Header",
+  "registryId": "C1",
+  "category": "global",
+  "status": "pilot",
+  "summary": "Sticky site header with logo, primary navigation, action buttons, and cart-count support.",
+  "dependencies": ["button"],
+  "source": {
+    "registry": "registry.json#/components/header",
+    "css": { "file": "components/css/global.css", "selector": ".header" },
+    "docs": "site/src/content/components/header.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".header", "className": ".header", "required": true, "description": "Sticky header container." },
+    { "name": "logo", "selector": ".header__logo", "className": ".header__logo", "required": true, "description": "Brand logo link or image." },
+    { "name": "nav", "selector": ".header__nav", "className": ".header__nav", "required": false, "description": "Primary navigation wrapper." },
+    { "name": "navLink", "selector": ".header__nav-link", "className": ".header__nav-link", "required": false, "description": "Primary navigation link." },
+    { "name": "actions", "selector": ".header__actions", "className": ".header__actions", "required": false, "description": "Header action group." },
+    { "name": "cartCount", "selector": ".header__cart-count", "className": ".header__cart-count", "required": false, "description": "Cart item-count badge." },
+    { "name": "hamburger", "selector": ".header__hamburger", "className": ".header__hamburger", "required": false, "description": "Mobile menu trigger." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default sticky header." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive header height and spacing." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".header"], "description": "Default header state." },
+    { "name": "navHover", "selectors": [".header__nav-link:hover"], "description": "Navigation-link hover state." },
+    { "name": "currentPage", "selectors": [".header__nav-link[aria-current=\"page\"]"], "description": "Current navigation destination state." },
+    { "name": "desktopNav", "selectors": [".header__nav", ".header__hamburger"], "description": "Desktop breakpoint reveals navigation and hides hamburger trigger." }
+  ],
+  "behavior": [
+    { "name": "primaryNavigation", "selectors": [".header__nav", ".header__nav-link"], "attributes": ["aria-label", "aria-current"], "description": "Primary navigation should expose a labelled navigation region and current-page state." },
+    { "name": "mobileMenuTrigger", "selectors": [".header__hamburger"], "attributes": ["aria-expanded", "aria-controls"], "events": ["click"], "description": "Mobile trigger should open the mobile navigation or drawer adapter." },
+    { "name": "cartCount", "selectors": [".header__cart-count"], "description": "Cart count should update when commerce state changes and remain readable at small sizes." }
+  ],
+  "properties": [
+    { "name": "logo", "type": "slot", "required": true, "description": "Brand name or brand image rendered by the logo link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__logo", "classNames": [".header__logo"] }] } },
+    { "name": "logoHref", "type": "string", "required": true, "description": "Brand-home destination for the logo link.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__logo", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
+    { "name": "logoLabel", "type": "string", "required": false, "description": "Accessible name for the logo link when visible brand content is insufficient.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__logo", "attribute": "aria-label", "valueFrom": "property", "elements": ["a"] }] } },
+    { "name": "navigationLabel", "type": "string", "required": false, "description": "Accessible name for the optional primary navigation region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__nav", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
+    { "name": "navigation", "type": "slot", "required": false, "description": "Target-owned primary navigation links and current-page markup.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__nav", "classNames": [".header__nav"] }] } },
+    { "name": "actions", "type": "slot", "required": false, "description": "Button and link dependencies for search, cart, mobile navigation, or other target-owned global actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__actions", "classNames": [".header__actions"] }] } },
+    { "name": "cartCount", "type": "string", "required": false, "description": "Target-formatted cart count displayed by a composed cart action.", "targetMappings": { "web": [{ "kind": "content", "selector": ".header__cart-count" }] } },
+    { "name": "mobileMenuTrigger", "type": "slot", "required": false, "description": "Optional Button dependency that a target may connect to Mobile Menu or Drawer behavior.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__hamburger", "classNames": [".header__hamburger"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-secondary", "--color-text-accent", "--color-button-primary-bg-default", "--color-button-primary-text-default"],
+      "spacing": ["--space-layout-touch-target", "--space-layout-container", "--space-layout-element-gap"],
+      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size"],
+      "z-index": ["--z-sticky"],
+      "radius": ["--radius-full"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Use a labelled nav region for the primary navigation.",
+    "Expose current destination with aria-current when possible.",
+    "Keep cart-count changes understandable to assistive technology.",
+    "Mobile menu triggers need aria-expanded and aria-controls when they toggle a drawer."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map navigation links, cart count, search trigger, and mobile menu trigger from theme data." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

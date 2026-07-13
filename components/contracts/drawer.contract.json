@@ -1,0 +1,248 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "drawer",
+  "name": "Drawer",
+  "registryId": "B3",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Side-panel overlay with backdrop, right and left placement variants, close control, body/footer regions, open state, and accessibility behavior requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/drawer",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".drawer"
+    },
+    "docs": "site/src/content/components/drawer.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "overlay",
+      "selector": ".drawer-overlay",
+      "className": ".drawer-overlay",
+      "required": true,
+      "description": "Backdrop layer that dims content behind the drawer."
+    },
+    {
+      "name": "root",
+      "selector": ".drawer",
+      "className": ".drawer",
+      "required": true,
+      "description": "Fixed side panel that owns placement, surface, shadow, and slide motion."
+    },
+    {
+      "name": "header",
+      "selector": ".drawer__header",
+      "className": ".drawer__header",
+      "required": false,
+      "description": "Optional top region for title and close affordance."
+    },
+    {
+      "name": "close",
+      "selector": ".drawer__close",
+      "className": ".drawer__close",
+      "required": false,
+      "description": "Optional close control styled for hover and focus-visible states."
+    },
+    {
+      "name": "body",
+      "selector": ".drawer__body",
+      "className": ".drawer__body",
+      "required": true,
+      "description": "Scrollable primary content region inside the drawer."
+    },
+    {
+      "name": "footer",
+      "selector": ".drawer__footer",
+      "className": ".drawer__footer",
+      "required": false,
+      "description": "Optional bottom action or summary region."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default right-side drawer."
+    },
+    {
+      "name": "left",
+      "className": ".drawer--left",
+      "default": false,
+      "description": "Left-side drawer placement."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default drawer width and viewport bounds."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".drawer"],
+      "description": "Hidden side-panel state."
+    },
+    {
+      "name": "overlayOpen",
+      "selectors": [".drawer-overlay.is-open"],
+      "description": "Visible backdrop state."
+    },
+    {
+      "name": "open",
+      "selectors": [".drawer.is-open"],
+      "description": "Visible drawer state."
+    },
+    {
+      "name": "leftPlacement",
+      "selectors": [".drawer--left"],
+      "description": "Left-side resting transform."
+    },
+    {
+      "name": "leftOpen",
+      "selectors": [".drawer--left.is-open"],
+      "description": "Visible left-side drawer state."
+    },
+    {
+      "name": "closeHover",
+      "selectors": [".drawer__close:hover"],
+      "description": "Pointer hover state on the close control."
+    },
+    {
+      "name": "closeFocusVisible",
+      "selectors": [".drawer__close:focus-visible"],
+      "description": "Keyboard focus indicator on the close control."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".drawer-overlay.is-open", ".drawer.is-open"],
+      "description": "The overlay and drawer are hidden by default and become visible when is-open is applied to both elements."
+    },
+    {
+      "name": "placement",
+      "selectors": [".drawer--left", ".drawer--left.is-open"],
+      "description": "The default placement slides from the right; the left variant changes the resting and open transform direction."
+    },
+    {
+      "name": "dialogSemantics",
+      "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby"],
+      "description": "The drawer should expose modal dialog semantics when it blocks interaction with the page behind it."
+    },
+    {
+      "name": "focusManagement",
+      "events": ["open", "close", "Tab", "Shift+Tab"],
+      "description": "Opening the drawer moves focus inside it, traps tab navigation while open, and restores focus to the trigger on close."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "backdrop click", "close action"],
+      "description": "The drawer must provide a visible close mechanism and should close on Escape."
+    }
+  ],
+  "properties": [
+    {
+      "name": "placement",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Side from which the drawer enters.",
+      "targetMappings": {
+        "web": [
+          { "kind": "optionClass", "selector": ".drawer", "source": "variants" }
+        ]
+      }
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls visibility of both the drawer and its backdrop. Consumer targets still own focus management and dismissal behavior.",
+      "targetMappings": {
+        "web": [
+          { "kind": "class", "selector": ".drawer-overlay", "classNames": [".is-open"] },
+          { "kind": "class", "selector": ".drawer", "classNames": [".is-open"] }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-border-focus"
+      ],
+      "radius": [
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-2xl"
+      ],
+      "opacity": [
+        "--opacity-overlay"
+      ],
+      "z-index": [
+        "--z-overlay",
+        "--z-modal"
+      ],
+      "transition": [
+        "--transition-base",
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default",
+        "--easing-out"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use role=\"dialog\" and aria-modal=\"true\" when the drawer blocks page interaction.",
+    "Provide a programmatic name with aria-labelledby or aria-label.",
+    "Trap keyboard focus inside the drawer while it is open.",
+    "Return focus to the trigger element when the drawer closes.",
+    "Close on Escape and provide a visible close control.",
+    "Use the left placement only when it matches the target reading direction or product pattern."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render drawer structure while theme JavaScript controls visibility and focus behavior."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

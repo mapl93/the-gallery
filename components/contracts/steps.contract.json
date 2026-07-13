@@ -1,0 +1,205 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "steps",
+  "name": "Steps / Stepper",
+  "registryId": "B14",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Horizontal or vertical progress indicator with generated connectors, active, completed, done, and upcoming step states, plus ordered progress semantics.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/steps",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".steps"
+    },
+    "docs": "site/src/content/components/steps.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".steps",
+      "className": ".steps",
+      "required": true,
+      "description": "Progress container for ordered steps."
+    },
+    {
+      "name": "item",
+      "selector": ".steps__item",
+      "className": ".steps__item",
+      "required": true,
+      "description": "Single step item."
+    },
+    {
+      "name": "connector",
+      "selector": ".steps__item::before",
+      "required": false,
+      "generated": true,
+      "description": "Generated connector line before each step item except the first."
+    },
+    {
+      "name": "indicator",
+      "selector": ".steps__indicator",
+      "className": ".steps__indicator",
+      "required": true,
+      "description": "Step number, icon, or completion mark."
+    },
+    {
+      "name": "title",
+      "selector": ".steps__title",
+      "className": ".steps__title",
+      "required": false,
+      "description": "Primary step label."
+    },
+    {
+      "name": "label",
+      "selector": ".steps__label",
+      "className": ".steps__label",
+      "required": false,
+      "description": "Alternate step label used by some implementations."
+    }
+  ],
+  "variants": [
+    {
+      "name": "horizontal",
+      "className": null,
+      "default": true,
+      "description": "Default horizontal stepper."
+    },
+    {
+      "name": "vertical",
+      "className": ".steps--vertical",
+      "default": false,
+      "description": "Vertical stepper layout."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default step indicator and label size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".steps"],
+      "description": "Default horizontal stepper state."
+    },
+    {
+      "name": "vertical",
+      "selectors": [".steps--vertical"],
+      "description": "Vertical layout state."
+    },
+    {
+      "name": "firstItem",
+      "selectors": [".steps__item:first-child::before"],
+      "description": "First step hides the generated connector before it."
+    },
+    {
+      "name": "completed",
+      "selectors": [".steps__item--completed::before", ".steps__item--completed .steps__indicator"],
+      "description": "Completed step connector and indicator state."
+    },
+    {
+      "name": "active",
+      "selectors": [".steps__item--active::before", ".steps__item--active .steps__indicator", ".steps__item--active .steps__title", ".steps__item--active .steps__label"],
+      "description": "Current active step state."
+    },
+    {
+      "name": "done",
+      "selectors": [".steps__item--done::before", ".steps__item--done .steps__indicator"],
+      "description": "Done step alias currently supported by the CSS adapter."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "progressSemantics",
+      "attributes": ["aria-current=\"step\"", "aria-label", "aria-describedby"],
+      "description": "Expose the current step and provide a clear accessible name for the progress sequence."
+    },
+    {
+      "name": "orderedSequence",
+      "description": "Steps should preserve a logical ordered sequence even when rendered horizontally or vertically."
+    },
+    {
+      "name": "orientation",
+      "selectors": [".steps--vertical"],
+      "attributes": ["aria-orientation"],
+      "description": "Targets with explicit orientation semantics should synchronize them with the horizontal or vertical variant."
+    },
+    {
+      "name": "completedState",
+      "selectors": [".steps__item--completed::before", ".steps__item--done::before"],
+      "description": "Completed and done states currently both represent prior completed progress in the CSS adapter."
+    }
+  ],
+  "properties": [
+    {
+      "name": "orientation",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Selects the horizontal or vertical canonical layout without changing the ordered progress semantics.",
+      "targetMappings": {
+        "web": [
+          { "kind": "optionClass", "selector": ".steps", "source": "variants" }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-button-primary-bg-default",
+        "--color-button-primary-text-default",
+        "--color-surface-secondary",
+        "--color-text-secondary",
+        "--color-text-primary"
+      ],
+      "radius": [
+        "--radius-full"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use ordered markup or equivalent semantics so the step sequence is understandable without layout.",
+    "Mark the current step with aria-current=\"step\".",
+    "Do not communicate completion only by color; include text, icon, or state metadata.",
+    "Keep horizontal and vertical variants semantically equivalent."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render ordered steps with the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

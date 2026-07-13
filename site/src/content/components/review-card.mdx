@@ -1,32 +1,47 @@
 ## Overview
 
-Individual review with author, rating, verified badge, photos, helpfulness, brand reply.
+Semantic article for one target-supplied review record, composed with passive Star Rating and optional identity, verification, photo, helpfulness, and reply regions.
 
-<Preview html={"<article class=\"review-card\" style=\"max-width:480px;\"><div class=\"review-card__header\"><img class=\"review-card__avatar\" src=\"https://i.pravatar.cc/40?img=12\" alt=\"\" /><div class=\"review-card__meta\"><span class=\"review-card__author\">María G.</span><span class=\"review-card__date\">March 15, 2026</span></div><span class=\"review-card__verified\">✓ Verified</span></div><div class=\"star-rating\" style=\"margin-bottom:8px;\"><span class=\"star-rating__star is-filled\">★</span><span class=\"star-rating__star is-filled\">★</span><span class=\"star-rating__star is-filled\">★</span><span class=\"star-rating__star is-filled\">★</span><span class=\"star-rating__star is-filled\">★</span></div><h4 class=\"review-card__title\">Absolutely beautiful piece</h4><p class=\"review-card__body\">The craftsmanship is incredible. Each detail is perfect.</p><div class=\"review-card__actions\"><button class=\"review-card__helpful-btn\">👍 Helpful</button><span class=\"review-card__helpful-count\">12</span></div></article>"} label="Review Card" />
+<Preview html={'<article class="review-card tg-preview-frame--md" aria-labelledby="review-card-title"><header class="review-card__header"><div class="review-card__meta"><span class="review-card__author">Maria G.</span><time class="review-card__date" datetime="2026-03-15">March 15, 2026</time></div><span class="review-card__verified">Verified purchase</span></header><div class="star-rating" data-rating="5" aria-label="5 out of 5 stars"><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></div><h3 class="review-card__title" id="review-card-title">Balanced and beautifully finished</h3><p class="review-card__body">The glaze has subtle variation, and the form feels comfortable to hold.</p><div class="review-card__actions"><button class="review-card__helpful-btn" type="button" aria-pressed="false" aria-describedby="review-card-helpful-count">Helpful</button><span class="review-card__helpful-count" id="review-card-helpful-count">12 people found this helpful</span></div></article>'} label="Review Card" />
+
+## Presentation
+
+Required anatomy is the article root, flexible header, author metadata, composed Star Rating, and review body. Date and title are optional. Avatar, readable verification status, ordered photos, helpfulness action and count, and associated reply are optional target-owned regions.
+
+The optional helpfulness action may expose local `aria-pressed` and native disabled state. Authentication, persistence, optimistic updates, deduplication, and count synchronization are not component behavior. Photos remain passive unless the target supplies a native link or button.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Display aggregate ratings prominently — social proof drives conversions.</Do>
-  <Dont>Don't hide negative reviews — authenticity builds trust.</Dont>
+  <Do>Render each review as a self-contained article in a logical author, rating, title, and body order.</Do>
+  <Dont>Do not infer verification, generate dates, open a lightbox, or confirm helpfulness persistence from component presentation.</Dont>
 </DoDont>
+
+Review records, moderation, author identity, verification truth, replies, photos, and counts remain target data. A target that activates photos must separately choose the navigation, Lightbox, or Modal behavior.
 
 ## Accessibility
 
 <Callout type="info">
-  Review components work with Shopify product metafields or third-party review apps.
+  Optional actions use native elements; supplied content remains readable without relying on icons, color, or hover.
 </Callout>
 
-- All images must have descriptive `alt` text.
+- Use a semantic article for one review record.
+- Render dates with `<time>` when a machine-readable value is available.
+- Keep verification status readable as text and grounded in target data.
+- Give informative photos meaningful alt text and decorative duplicates empty alt text.
+- Use native links or buttons for photo actions and preserve visible focus.
+- Put `aria-pressed` on the native helpfulness button, and do not announce unsynchronized counts as confirmed updates.
 
-## Dependencies
+## References
 
-This component uses:
+**Anatomy:** required article root, header, metadata, author, composed Star Rating, and body; optional avatar, date, verification, title, photos, actions, helpfulness count, and reply anatomy.
 
-- [Star Rating (Display)](/components/star-rating)
-
-## API Reference
+**Dependencies:** [Star Rating (Display)](/components/star-rating).
 
 <PropTable>
-  <tr><td>`.review-card`</td><td>class</td><td>—</td><td>Base review card styles</td></tr>
+  <tr><td>`author`</td><td>string</td><td>required</td><td>Target-supplied reviewer attribution</td></tr>
+  <tr><td>`rating`</td><td>slot</td><td>required</td><td>Read-only Star Rating composition</td></tr>
+  <tr><td>`body`</td><td>string</td><td>required</td><td>Target-supplied review body</td></tr>
+  <tr><td>`date`, `avatar`, `verifiedStatus`, `title`, `photos`, `reply`</td><td>content or slot</td><td>none</td><td>Optional target-owned review content</td></tr>
+  <tr><td>`helpfulLabel`, `helpfulPressed`, `helpfulDisabled`, `helpfulCount`</td><td>mixed</td><td>none</td><td>Optional local action state and target-formatted count</td></tr>
 </PropTable>

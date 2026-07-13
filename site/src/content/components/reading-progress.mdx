@@ -1,26 +1,36 @@
 ## Overview
 
-Fixed top bar showing scroll progress through article.
+Reading Progress provides a fixed top-edge track and a target-controlled visual indicator. It does not define how reading progress is calculated, synchronized, or exposed to assistive technology.
 
-<Preview html={"<div class=\"reading-progress\" style=\"position:relative;height:4px;background:var(--color-surface-secondary);border-radius:2px;\"><div style=\"width:35%;height:100%;background:var(--color-text-accent);border-radius:2px;\"></div></div>"} label="Reading Progress Bar" />
+## Presentation
+
+<Preview html={'<div class="reading-progress tg-preview-static tg-preview-frame"><div class="reading-progress__bar tg-preview-w-50"></div></div>'} label="Reading Progress" />
+
+The root uses `.reading-progress`; the required indicator slot uses `.reading-progress__bar`. The target supplies the measured width and any target-required state or semantics. The preview is intentionally visual and does not select a progressbar or decorative contract.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the article body/prose component for rich text — it handles typography, images, and spacing.</Do>
-  <Dont>Don't manually style article content with inline styles — let the prose class handle it.</Dont>
+  <Do>Treat the indicator as target-owned until a reading-state architecture is accepted.</Do>
+  <Dont>Do not infer scroll calculation, synchronization, or live announcements from the width transition.</Dont>
 </DoDont>
+
+Whether Reading Progress and Table of Contents share a neutral reading-state enhancement or receive state independently from each target remains unresolved. Whether Reading Progress is semantic or decorative also remains unresolved.
 
 ## Accessibility
 
-<Callout type="info">
-  Blog components support Shopify's article template system. Use metafields for custom article data.
-</Callout>
+- Do not add `aria-live`, `role="status"`, or continuous scroll announcements without an accepted behavior decision.
+- If a target chooses progressbar semantics, provide a useful accessible name and synchronized bounded values.
+- If a target chooses a decorative indicator, keep it out of the accessibility tree.
+- Keep the fixed visual track from intercepting pointer interaction with page content.
+- Honor the canonical reduced-motion fallback.
 
-- Use `aria-live="polite"` or `role="status"` so screen readers announce loading state.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.reading-progress`</td><td>class</td><td>—</td><td>Base reading progress bar styles</td></tr>
+  <tr><td>`indicator`</td><td>slot</td><td>required</td><td>Target-owned visual indicator, state, and any target-required semantics</td></tr>
 </PropTable>
+
+Anatomy: `.reading-progress` and `.reading-progress__bar`.
+
+Dependencies: none. The contract remains `pilot`; progress calculation, scroll synchronization, and semantic ownership are explicitly unresolved.

@@ -1,0 +1,67 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "pagination",
+  "name": "Pagination",
+  "registryId": "E4",
+  "category": "collection",
+  "status": "pilot",
+  "summary": "Collection page navigation with links, current page, and ellipsis.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/pagination",
+    "css": { "file": "components/css/collection.css", "selector": ".pagination" },
+    "docs": "site/src/content/components/pagination.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".pagination", "className": ".pagination", "required": true, "description": "Pagination navigation container." },
+    { "name": "link", "selector": ".pagination__link", "className": ".pagination__link", "required": false, "description": "Page, previous, or next link." },
+    { "name": "current", "selector": ".pagination__current", "className": ".pagination__current", "required": false, "description": "Current page indicator." },
+    { "name": "ellipsis", "selector": ".pagination__ellipsis", "className": ".pagination__ellipsis", "required": false, "description": "Skipped page range indicator." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default pagination." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default touch-friendly page control size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".pagination"], "description": "Default pagination state." },
+    { "name": "hover", "selectors": [".pagination__link:hover"], "description": "Page link hover state." },
+    { "name": "focus", "selectors": [".pagination__link:focus-visible"], "description": "Visible page-link focus state." },
+    { "name": "disabled", "selectors": [".pagination__link[aria-disabled=\"true\"]"], "description": "Unavailable previous or next navigation state." },
+    { "name": "current", "selectors": [".pagination__current"], "description": "Current page state." }
+  ],
+  "behavior": [
+    { "name": "navigation", "selectors": [".pagination__link", ".pagination__current"], "attributes": ["<nav>", "aria-label", "href", "aria-current=\"page\""], "events": ["click"], "description": "Pagination should use navigation semantics and mark the current page." },
+    { "name": "ellipsis", "selectors": [".pagination__ellipsis"], "description": "Ellipsis is informational and should not be presented as an unavailable link." }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Accessible name for the pagination navigation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pagination", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
+    { "name": "currentPage", "type": "number", "required": true, "min": 1, "step": 1, "description": "Current page number used to generate readable content and aria-current.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pagination", "attribute": "data-current-page", "valueFrom": "property", "elements": ["nav"] }] } },
+    { "name": "pageItems", "type": "slot", "required": true, "description": "Ordered previous, page, ellipsis, and next navigation items.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".pagination", "classNames": [".pagination"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-secondary", "--color-surface-secondary", "--color-text-primary", "--color-text-disabled", "--color-border-focus", "--color-button-primary-bg-default", "--color-button-primary-text-default"],
+      "spacing": ["--space-button-min-height", "--space-layout-section-gap"],
+      "radius": ["--radius-md"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Wrap pagination in a navigation landmark with an accessible label.",
+    "Mark the current page with aria-current or equivalent target-native state.",
+    "Keep previous and next links descriptive."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify paginate objects to links and current state." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

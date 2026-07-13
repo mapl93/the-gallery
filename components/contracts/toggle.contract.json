@@ -1,0 +1,76 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "toggle",
+  "name": "Toggle / Toggle Group",
+  "registryId": "A19",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Toggle button group primitive for mutually exclusive or pressed state actions such as grid/list view.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/toggle",
+    "css": { "file": "components/css/primitives.css", "selector": ".toggle-group" },
+    "docs": "site/src/content/components/toggle.mdx"
+  },
+  "anatomy": [
+    { "name": "group", "selector": ".toggle-group", "className": ".toggle-group", "required": true, "description": "Wrapper for toggle buttons." },
+    { "name": "toggle", "selector": ".toggle", "className": ".toggle", "required": true, "description": "Single toggle button." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default toggle group." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default toggle size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".toggle-group"], "description": "Default group state." },
+    { "name": "hover", "selectors": [".toggle:hover"], "description": "Pointer hover state." },
+    { "name": "pressed", "selectors": [".toggle[aria-pressed=\"true\"]", ".toggle--active"], "description": "Pressed or active toggle state." },
+    { "name": "focusVisible", "selectors": [".toggle:focus-visible"], "description": "Keyboard focus state." },
+    { "name": "disabled", "selectors": [".toggle:disabled"], "description": "Unavailable native toggle state." }
+  ],
+  "behavior": [
+    { "name": "pressedState", "selectors": [".toggle[aria-pressed=\"true\"]", ".toggle--active"], "attributes": ["aria-pressed", "role=\"group\"", "aria-label"], "events": ["click", "Space", "Enter"], "description": "Each slotted native button exposes aria-pressed. Neutral web progressively synchronizes exactly one pressed item after pointer or keyboard activation." }
+  ],
+  "properties": [
+    {
+      "name": "groupLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the related toggle-button set.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toggle-group", "attribute": "aria-label", "valueFrom": "property" }] }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Disables every native toggle button when the entire choice is unavailable.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toggle", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-secondary", "--color-border-subtle", "--color-surface-secondary", "--color-button-primary-bg-default", "--color-button-primary-text-default", "--color-border-focus"],
+      "radius": ["--radius-md"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size", "--font-family-body"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Expose pressed state with aria-pressed or native radio semantics depending on the target pattern.",
+    "Provide a group label when multiple toggles represent one setting.",
+    "Keep keyboard focus visible."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css-js", "notes": "CSS owns presentation; shared progressive enhancement synchronizes exclusive aria-pressed state." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

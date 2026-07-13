@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { getCategories, getComponentsByCategory } from '../lib/registry';
+import { hasComponentContract } from '../lib/contracts';
 
 const categories = getCategories();
 
@@ -28,7 +29,10 @@ export default function ComponentList() {
                   to={`/components/${comp.slug}`}
                   className="docs-component-card"
                 >
-                  <div className="docs-component-card__name">{comp.name}</div>
+                  <div className="docs-component-card__top">
+                    <div className="docs-component-card__name">{comp.name}</div>
+                    {hasComponentContract(comp.slug) && <span className="docs-component-card__badge">Contract</span>}
+                  </div>
                   <div className="docs-component-card__selector">{comp.selector}</div>
                 </Link>
               ))}

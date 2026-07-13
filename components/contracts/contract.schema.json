@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://the-gallery.dev/schema/component-contract.json",
+  "title": "The Gallery Component Contract",
+  "description": "Target-agnostic component contract for The Gallery adapters.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "contractVersion",
+    "slug",
+    "name",
+    "registryId",
+    "category",
+    "status",
+    "summary",
+    "dependencies",
+    "source",
+    "anatomy",
+    "variants",
+    "sizes",
+    "states",
+    "tokens",
+    "accessibility",
+    "adapters"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "contractVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "slug": { "$ref": "#/$defs/slug" },
+    "name": { "type": "string", "minLength": 1 },
+    "registryId": { "type": "string", "pattern": "^[A-Z][0-9]+[a-z]?$" },
+    "category": { "$ref": "#/$defs/slug" },
+    "status": { "type": "string", "enum": ["draft", "pilot", "stable", "deprecated"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "dependencies": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/slug" },
+      "uniqueItems": true
+    },
+    "source": { "$ref": "#/$defs/source" },
+    "anatomy": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/anatomyPart" },
+      "minItems": 1
+    },
+    "variants": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/option" },
+      "minItems": 1
+    },
+    "sizes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/option" },
+      "minItems": 1
+    },
+    "states": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/state" },
+      "minItems": 1
+    },
+    "behavior": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/behavior" }
+    },
+    "properties": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/semanticProperty" },
+      "minItems": 1
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public"],
+      "properties": {
+        "public": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/cssCustomProperty" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "accessibility": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "adapters": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/adapter" },
+      "minProperties": 1
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cssSelector": {
+      "type": ["string", "null"],
+      "pattern": "^(\\.|\\[|:|[a-zA-Z]|#|$)"
+    },
+    "cssClass": {
+      "type": ["string", "null"],
+      "pattern": "^\\.[a-zA-Z][a-zA-Z0-9_-]*$"
+    },
+    "cssCustomProperty": {
+      "type": "string",
+      "pattern": "^--[a-zA-Z0-9_-]+$"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry", "css", "docs"],
+      "properties": {
+        "registry": { "$ref": "#/$defs/path" },
+        "css": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file", "selector"],
+          "properties": {
+            "file": { "$ref": "#/$defs/path" },
+            "selector": { "type": "string", "minLength": 1 }
+          }
+        },
+        "docs": { "$ref": "#/$defs/path" }
+      }
+    },
+    "anatomyPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "selector", "required", "description"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "selector": { "$ref": "#/$defs/cssSelector" },
+        "className": { "$ref": "#/$defs/cssClass" },
+        "required": { "type": "boolean" },
+        "generated": { "type": "boolean" },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "className", "default", "description"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "className": { "$ref": "#/$defs/cssClass" },
+        "default": { "type": "boolean" },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "selectors", "description"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "selectors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "behavior": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "description"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "selectors": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "attributes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "events": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "description": { "type": "string", "minLength": 1 }
+      }
+    },
+    "semanticProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "required", "description", "targetMappings"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "boolean", "number", "enum", "slot"]
+        },
+        "required": { "type": "boolean" },
+        "defaultValue": { "type": ["string", "boolean", "number"] },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "step": { "type": "number", "exclusiveMinimum": 0 },
+        "values": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "valuesFrom": {
+          "type": "string",
+          "enum": ["variants", "sizes"]
+        },
+        "unsetBehavior": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "targetMappings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/targetMapping" },
+            "minItems": 1
+          },
+          "minProperties": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "enum" } },
+            "required": ["type"]
+          },
+          "then": {
+            "oneOf": [
+              { "required": ["values"] },
+              { "required": ["valuesFrom"] }
+            ]
+          }
+        }
+      ]
+    },
+    "targetMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["content", "optionClass", "class", "attribute", "slot"]
+        },
+        "selector": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "string",
+          "enum": ["variants", "sizes"]
+        },
+        "classNames": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/cssClass" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "attribute": {
+          "type": "string",
+          "pattern": "^[a-zA-Z_:][a-zA-Z0-9_.:-]*$"
+        },
+        "values": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "boolean", "number", "null"] },
+          "minProperties": 1
+        },
+        "removeWhen": {
+          "type": "array",
+          "items": { "type": ["string", "boolean", "number"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "valueFrom": {
+          "type": "string",
+          "enum": ["property"]
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "content" } }, "required": ["kind"] },
+          "then": { "required": ["selector"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "optionClass" } }, "required": ["kind"] },
+          "then": { "required": ["selector", "source"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "class" } }, "required": ["kind"] },
+          "then": { "required": ["selector", "classNames"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "attribute" } }, "required": ["kind"] },
+          "then": {
+            "required": ["selector", "attribute"],
+            "oneOf": [
+              { "required": ["values"] },
+              { "required": ["removeWhen"] },
+              { "required": ["valueFrom"] }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "slot" } }, "required": ["kind"] },
+          "then": { "required": ["selector", "classNames"] }
+        }
+      ]
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "kind"],
+      "properties": {
+        "status": { "type": "string", "enum": ["implemented", "planned", "unsupported"] },
+        "kind": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

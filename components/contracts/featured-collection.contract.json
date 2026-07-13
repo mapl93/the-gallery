@@ -1,0 +1,224 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "featured-collection",
+  "name": "Featured Collection",
+  "registryId": "S2",
+  "category": "sections",
+  "status": "pilot",
+  "summary": "Featured commerce section that composes target-owned Product Card items in grid, carousel, or spotlight presentation.",
+  "dependencies": [
+    "product-card"
+  ],
+  "source": {
+    "registry": "registry.json#/components/featured-collection",
+    "css": {
+      "file": "components/css/sections.css",
+      "selector": ".featured-collection"
+    },
+    "docs": "site/src/content/components/featured-collection.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".featured-collection",
+      "className": ".featured-collection",
+      "required": true,
+      "description": "Featured collection section root."
+    },
+    {
+      "name": "header",
+      "selector": ".featured-collection__header",
+      "className": ".featured-collection__header",
+      "required": false,
+      "description": "Optional heading and view-all region."
+    },
+    {
+      "name": "title",
+      "selector": ".featured-collection__title",
+      "className": ".featured-collection__title",
+      "required": false,
+      "description": "Optional section heading."
+    },
+    {
+      "name": "link",
+      "selector": ".featured-collection__link",
+      "className": ".featured-collection__link",
+      "required": false,
+      "description": "Optional native link to the target-owned collection destination."
+    },
+    {
+      "name": "grid",
+      "selector": ".featured-collection__grid",
+      "className": ".featured-collection__grid",
+      "required": true,
+      "description": "Ordered Product Card composition region."
+    }
+  ],
+  "variants": [
+    {
+      "name": "grid",
+      "className": null,
+      "default": true,
+      "description": "Default responsive Product Card grid."
+    },
+    {
+      "name": "carousel",
+      "className": ".featured-collection--carousel",
+      "default": false,
+      "description": "Horizontally scrollable snap presentation."
+    },
+    {
+      "name": "spotlight",
+      "className": ".featured-collection--spotlight",
+      "default": false,
+      "description": "Grid presentation with the first supplied item visually emphasized."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".featured-collection"
+      ],
+      "description": "Resting section presentation; carousel and spotlight are variants rather than states."
+    },
+    {
+      "name": "viewAllFocusVisible",
+      "selectors": [
+        ".featured-collection__link:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the optional collection link."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "productComposition",
+      "selectors": [
+        ".featured-collection__grid"
+      ],
+      "description": "The target supplies, orders, limits, and refreshes repeated commerce records; each rendered child preserves Product Card ownership and semantics."
+    },
+    {
+      "name": "viewAllNavigation",
+      "selectors": [
+        ".featured-collection__link"
+      ],
+      "attributes": [
+        "href",
+        "aria-label"
+      ],
+      "description": "When present, the view-all action is a native link whose destination and accessible name are supplied by the target."
+    }
+  ],
+  "properties": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "grid",
+      "valuesFrom": "variants",
+      "description": "Grid, horizontal carousel, or first-item spotlight presentation.",
+      "targetMappings": {
+        "web": [{ "kind": "optionClass", "selector": ".featured-collection", "source": "variants" }]
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible section heading.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".featured-collection__title" }]
+      }
+    },
+    {
+      "name": "viewAllLabel",
+      "type": "string",
+      "required": false,
+      "description": "Visible label for the optional collection link.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".featured-collection__link" }]
+      }
+    },
+    {
+      "name": "viewAllDestination",
+      "type": "string",
+      "required": false,
+      "description": "Target-owned destination for the optional collection link.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".featured-collection__link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }]
+      }
+    },
+    {
+      "name": "products",
+      "type": "slot",
+      "required": true,
+      "description": "Ordered target-owned Product Card compositions.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".featured-collection__grid", "classNames": [".featured-collection__grid"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-text-accent",
+        "--color-text-primary"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--typo-body-size",
+        "--typo-h2-size"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-grid-gap",
+        "--space-layout-section-gap",
+        "--space-layout-touch-target"
+      ]
+    }
+  },
+  "accessibility": [
+    "Associate the section with its visible heading when one is present.",
+    "Each composed Product Card preserves its own image alternatives, names, prices, actions, focus, and status semantics.",
+    "The optional view-all control is a descriptive native link with a visible focus indicator and touch-sized target.",
+    "Horizontal carousel presentation remains keyboard-scrollable and does not hide required Product Card content."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/sections.css."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

@@ -1,32 +1,49 @@
 ## Overview
 
-Order list with status badges, dates, and totals.
+Order History is an authenticated, labelled region containing a target-owned collection of order rows. Each row presents a destination, date, readable status, and formatted total.
 
-<Preview html={"<div class=\"order-list\" style=\"max-width:600px;\"><div class=\"order-row\" style=\"display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-default);\"><span class=\"order-row__number\">#1042</span><span class=\"order-row__date\">Mar 15, 2026</span><span class=\"order-row__status order-row__status--delivered\">Delivered</span><span class=\"order-row__total\">$120.00</span></div><div class=\"order-row\" style=\"display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-default);\"><span class=\"order-row__number\">#1038</span><span class=\"order-row__date\">Feb 28, 2026</span><span class=\"order-row__status order-row__status--shipped\">Shipped</span><span class=\"order-row__total\">$85.00</span></div></div>"} label="Order History" />
+<Preview
+  html={'<section class="order-list tg-preview-frame tg-preview-frame--lg" aria-label="Order history"><article class="order-row"><a class="order-row__number" href="#" aria-label="View order 1042">#1042</a><time class="order-row__date" datetime="2026-06-15">Jun 15, 2026</time><span class="badge order-row__status order-row__status--delivered">Delivered</span><span class="order-row__total">$120.00</span></article><article class="order-row"><a class="order-row__number" href="#" aria-label="View order 1038">#1038</a><time class="order-row__date" datetime="2026-05-28">May 28, 2026</time><span class="badge order-row__status order-row__status--shipped">Shipped</span><span class="order-row__total">$85.00</span></article><article class="order-row"><a class="order-row__number" href="#" aria-label="View order 1031">#1031</a><time class="order-row__date" datetime="2026-04-09">Apr 9, 2026</time><span class="badge order-row__status order-row__status--pending">Pending</span><span class="order-row__total">$64.00</span></article></section>'}
+  label="Order History"
+/>
+
+## Presentation
+
+`orders` is one required slot containing repeated order rows. Order number, date, status, total, destination, row count, and ordering are fixture or target data; they are not independent Order History properties.
+
+The labels and status modifiers shown in the artwork demonstrate the current visual hooks only. The contract does not establish a canonical commerce status taxonomy. Each target maps its own order state to readable text and an appropriate Badge presentation.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Format dates, statuses, destinations, and totals from the same authoritative order record.</Do>
+  <Dont>Do not infer order state from color or presentation-only class names.</Dont>
 </DoDont>
+
+- Sort and paginate the repeated rows according to target account behavior.
+- Keep the order number as a direct link to the corresponding detail view.
+- Use concise, customer-facing status copy derived from target data.
+- Provide a distinct empty state outside the repeated row slot when no orders exist.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Protect order history behind the target authentication system.
+- Use `label` to name the region when surrounding headings do not already do so.
+- Keep order numbers as links with clear destination context.
+- Expose every status as readable text and never through color alone.
+- Use semantic dates and preserve a logical reading order at narrow widths.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Badge](/components/badge)
 
-## API Reference
+The repeated rows in the artwork are fixture content inside `orders`; row data is not promoted to top-level contract properties.
+
+### API Reference
 
 <PropTable>
-  <tr><td>`.order-list`</td><td>class</td><td>—</td><td>Base order history styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Accessible name for the order-history region</td></tr>
+  <tr><td>`orders`</td><td>slot</td><td>required</td><td>Target-owned collection of order rows</td></tr>
 </PropTable>

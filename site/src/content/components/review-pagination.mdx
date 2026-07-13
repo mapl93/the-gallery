@@ -1,26 +1,45 @@
 ## Overview
 
-Numbered pagination for review list.
+Labelled, horizontally contained sequence for target-supplied review pagination controls. The neutral component provides presentation, not a paging algorithm.
 
-<Preview html={"<div class=\"review-pagination\"><button class=\"review-pagination__btn\">1</button><button class=\"review-pagination__btn\" aria-current=\"page\">2</button><button class=\"review-pagination__btn\">3</button></div>"} label="Review Pagination" />
+<Preview html={'<nav class="review-pagination tg-preview-frame--md" aria-label="Review pages"><ul class="review-pagination__list"><li class="review-pagination__item"><button class="review-pagination__btn" type="button" aria-label="Previous review page" disabled>Previous</button></li><li class="review-pagination__item"><button class="review-pagination__btn" type="button" aria-label="Review page 1">1</button></li><li class="review-pagination__item"><button class="review-pagination__btn" type="button" aria-label="Review page 2" aria-current="page">2</button></li><li class="review-pagination__item"><button class="review-pagination__btn" type="button" aria-label="Review page 3">3</button></li><li class="review-pagination__item"><button class="review-pagination__btn" type="button" aria-label="Next review page">Next</button></li></ul></nav>'} label="Review Pagination" />
+
+## Presentation
+
+The required root is preferably a labelled nav. Optional list and item wrappers contain required repeated native controls and an optional passive ellipsis. Controls expose default, hover, focus-visible, current, and unavailable presentation while the sequence remains horizontally reachable.
+
+Targets choose native links for URL navigation or native buttons for an in-place strategy. They also supply previous, numbered, omitted, and next controls, including current and unavailable state.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Display aggregate ratings prominently — social proof drives conversions.</Do>
-  <Dont>Don't hide negative reviews — authenticity builds trust.</Dont>
+  <Do>Choose native links or buttons only after the target pagination strategy and destination behavior are defined.</Do>
+  <Dont>Do not infer page windows, URL state, loading, scrolling, focus movement, or result updates from the CSS sequence.</Dont>
 </DoDont>
+
+Numbered pages, cursor or offset pagination, load more, infinite loading, provider-managed navigation, and every synchronization behavior remain open target decisions. The preview demonstrates native button anatomy only; it does not implement paging.
 
 ## Accessibility
 
 <Callout type="info">
-  Review components work with Shopify product metafields or third-party review apps.
+  The navigation label distinguishes review pagination from other page navigation.
 </Callout>
 
-- Use `<nav>` with `aria-label` to identify the navigation region.
+- Use a `<nav>` with a specific accessible label.
+- Prefer anchors for URL navigation and buttons only for a target-owned in-place flow.
+- Mark exactly one numbered control with `aria-current="page"` when the strategy exposes page numbers.
+- Give previous and next controls directional accessible names.
+- Use native `disabled` for unavailable buttons.
+- Do not leave `aria-disabled` links activatable; omit their destination and prevent every input modality according to the selected target pattern.
+- Keep the control sequence keyboard reachable when it overflows horizontally.
 
-## API Reference
+## References
+
+**Anatomy:** required `.review-pagination` root and repeated `.review-pagination__btn`; optional `.review-pagination__list`, `.review-pagination__item`, and passive `.review-pagination__ellipsis`.
+
+**Dependencies:** None.
 
 <PropTable>
-  <tr><td>`.review-pagination`</td><td>class</td><td>—</td><td>Base review pagination styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Accessible review-navigation name</td></tr>
+  <tr><td>`controls`</td><td>slot</td><td>required</td><td>Target-owned previous, numbered, omitted, and next controls</td></tr>
 </PropTable>

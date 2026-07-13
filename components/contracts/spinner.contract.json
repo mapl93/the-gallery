@@ -1,0 +1,61 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "spinner",
+  "name": "Spinner",
+  "registryId": "A23",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "CSS-only loading spinner primitive with small, default, large, extra-large sizes and optional overlay text.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/spinner",
+    "css": { "file": "components/css/primitives.css", "selector": ".spinner" },
+    "docs": "site/src/content/components/spinner.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".spinner", "className": ".spinner", "required": true, "description": "Animated loading spinner." },
+    { "name": "overlay", "selector": ".spinner-overlay", "className": ".spinner-overlay", "required": false, "description": "Optional centered loading overlay." },
+    { "name": "overlayText", "selector": ".spinner-overlay__text", "className": ".spinner-overlay__text", "required": false, "description": "Optional loading text." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default spinner." }
+  ],
+  "sizes": [
+    { "name": "sm", "className": ".spinner--sm", "default": false, "description": "Small spinner." },
+    { "name": "default", "className": null, "default": true, "description": "Default spinner size." },
+    { "name": "lg", "className": ".spinner--lg", "default": false, "description": "Large spinner." },
+    { "name": "xl", "className": ".spinner--xl", "default": false, "description": "Extra-large spinner." }
+  ],
+  "states": [
+    { "name": "loading", "selectors": [".spinner", "@keyframes spinner-rotate"], "description": "Indeterminate loading state." }
+  ],
+  "behavior": [
+    { "name": "loadingSemantics", "selectors": [".spinner", ".spinner-overlay"], "attributes": ["aria-hidden=\"true\"", "role=\"status\"", "aria-live=\"polite\"", "aria-busy=\"true\""], "description": "Spinner visuals are often decorative; loading announcement should live on the containing region when needed." }
+  ],
+  "properties": [
+    { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Visual spinner diameter.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".spinner", "source": "sizes" }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Optional visible loading text rendered by the overlay composition.", "targetMappings": { "web": [{ "kind": "content", "selector": ".spinner-overlay__text" }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use role=\"status\" or aria-busy on the loading region when loading must be announced.",
+    "Hide decorative spinner graphics from assistive technology when text announces loading.",
+    "The spinner graphic is decorative and should use aria-hidden=\"true\"; the containing region owns aria-busy or status text.",
+    "Respect reduced-motion preferences; the neutral web target stops rotation."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition and keyframes in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

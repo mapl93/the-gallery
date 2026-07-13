@@ -1,0 +1,69 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "wishlist",
+  "name": "Wishlist",
+  "registryId": "U8",
+  "category": "account",
+  "status": "pilot",
+  "summary": "Wishlist page with header, count, product grid, and wishlist toggle button.",
+  "dependencies": ["product-card"],
+  "source": {
+    "registry": "registry.json#/components/wishlist",
+    "css": { "file": "components/css/account.css", "selector": ".wishlist" },
+    "docs": "site/src/content/components/wishlist.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".wishlist", "className": ".wishlist", "required": true, "description": "Wishlist page container." },
+    { "name": "header", "selector": ".wishlist__header", "className": ".wishlist__header", "required": true, "description": "Wishlist header." },
+    { "name": "title", "selector": ".wishlist__title", "className": ".wishlist__title", "required": true, "description": "Wishlist title." },
+    { "name": "count", "selector": ".wishlist__count", "className": ".wishlist__count", "required": false, "description": "Wishlist item count." },
+    { "name": "grid", "selector": ".wishlist__grid", "className": ".wishlist__grid", "required": true, "description": "Wishlist product grid." },
+    { "name": "button", "selector": ".wishlist-btn", "className": ".wishlist-btn", "required": false, "description": "Wishlist toggle button." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default wishlist page." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive product grid." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".wishlist"], "description": "Default wishlist state." },
+    { "name": "buttonHover", "selectors": [".wishlist-btn:hover"], "description": "Wishlist toggle hover state." },
+    { "name": "buttonFocus", "selectors": [".wishlist-btn:focus-visible"], "description": "Visible keyboard focus on wishlist toggles." },
+    { "name": "buttonPressed", "selectors": [".wishlist-btn[aria-pressed=\"true\"]"], "description": "Wishlist toggle selected state." }
+  ],
+  "behavior": [
+    { "name": "productGridComposition", "selectors": [".wishlist__grid"], "description": "Wishlist grid should compose Product Card for saved products." },
+    { "name": "wishlistToggle", "selectors": [".wishlist-btn"], "attributes": ["aria-pressed"], "events": ["click"], "description": "Toggle should add or remove a product from wishlist state." },
+    { "name": "wishlistCount", "selectors": [".wishlist__count"], "description": "Wishlist count should update when saved products change." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Wishlist page title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".wishlist__title" }] } },
+    { "name": "count", "type": "string", "required": false, "description": "Target-formatted saved-item count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".wishlist__count" }] } },
+    { "name": "products", "type": "slot", "required": true, "description": "Saved Product Card compositions, including per-product toggle state.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".wishlist__grid", "classNames": [".wishlist__grid"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary", "--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-feedback-error-default"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--space-layout-grid-gap", "--space-layout-touch-target"],
+      "radius": ["--radius-full"],
+      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Wishlist toggles need aria-pressed and product-specific accessible names.",
+    "Wishlist count changes should be understandable after add/remove actions.",
+    "Protect customer-specific saved items behind the appropriate account or local-storage model."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to customer metafields, app-backed wishlist state, or local wishlist storage." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

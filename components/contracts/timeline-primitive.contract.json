@@ -1,0 +1,84 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "timeline-primitive",
+  "name": "Timeline",
+  "registryId": "A27",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Vertical timeline primitive with connected generated markers, entry metadata, and semantic current, completed, delayed, warning, and error states.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/timeline-primitive",
+    "css": { "file": "components/css/primitives.css", "selector": ".timeline" },
+    "docs": "site/src/content/components/timeline-primitive.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".timeline", "className": ".timeline", "required": true, "description": "Vertical timeline wrapper." },
+    { "name": "item", "selector": ".timeline__item", "className": ".timeline__item", "required": true, "description": "Single timeline entry." },
+    { "name": "marker", "selector": ".timeline__item::before", "required": false, "generated": true, "description": "Generated timeline dot." },
+    { "name": "connector", "selector": ".timeline__item::after", "required": false, "generated": true, "description": "Generated timeline connector." },
+    { "name": "metadata", "selector": ".timeline__meta", "className": ".timeline__meta", "required": false, "description": "Optional row grouping the date and visible status text." },
+    { "name": "date", "selector": ".timeline__date", "className": ".timeline__date", "required": false, "description": "Timeline entry date or metadata." },
+    { "name": "status", "selector": ".timeline__status", "className": ".timeline__status", "required": false, "description": "Consumer-authored visible status text that supplements marker color." },
+    { "name": "title", "selector": ".timeline__title", "className": ".timeline__title", "required": true, "description": "Timeline entry title." },
+    { "name": "content", "selector": ".timeline__content", "className": ".timeline__content", "required": false, "description": "Timeline entry body." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default timeline." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default timeline spacing." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".timeline"], "description": "Default timeline state." },
+    { "name": "current", "selectors": [".timeline__item[data-status=\"current\"]", ".timeline__item--active"], "description": "Current entry in a sequential process." },
+    { "name": "completed", "selectors": [".timeline__item[data-status=\"completed\"]"], "description": "Successfully completed entry." },
+    { "name": "delayed", "selectors": [".timeline__item[data-status=\"delayed\"]"], "description": "Entry that is behind its expected schedule." },
+    { "name": "warning", "selectors": [".timeline__item[data-status=\"warning\"]"], "description": "Entry that requires attention without representing a failure." },
+    { "name": "error", "selectors": [".timeline__item[data-status=\"error\"]"], "description": "Entry that failed or contains an error." }
+  ],
+  "behavior": [
+    { "name": "orderedContent", "selectors": [".timeline", ".timeline__item"], "attributes": ["<ol>", "<li>"], "description": "Targets preserve ordered-list semantics when chronology or sequence is meaningful." },
+    { "name": "singleCurrentItem", "selectors": [".timeline__item[data-status=\"current\"]", ".timeline__item--active"], "attributes": ["aria-current=\"step\""], "description": "When the timeline represents current progress, the target applies aria-current to at most one current entry." },
+    { "name": "visibleStatus", "selectors": [".timeline__status"], "description": "When status meaning matters, consumers provide localized visible text so marker color is not the only signal." },
+    { "name": "repeatedContent", "selectors": [".timeline__item", ".timeline__date", ".timeline__status", ".timeline__title", ".timeline__content"], "description": "The consumer owns the repeated dates, status labels, titles, and descriptions; Studio sample entries are fixtures rather than component defaults." }
+  ],
+  "properties": [
+    {
+      "name": "status",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "default",
+      "values": ["default", "current", "completed", "delayed", "warning", "error"],
+      "description": "Semantic state for one timeline entry. Default removes explicit status presentation.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".timeline__item", "attribute": "data-status", "values": { "default": null, "current": "current", "completed": "completed", "delayed": "delayed", "warning": "warning", "error": "error" }, "elements": ["li"] },
+          { "kind": "attribute", "selector": ".timeline__item", "attribute": "aria-current", "values": { "default": null, "current": "step", "completed": null, "delayed": null, "warning": null, "error": null }, "elements": ["li"] }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-surface-primary", "--color-button-primary-bg-default", "--color-text-disabled", "--color-text-primary", "--color-text-secondary", "--color-feedback-success-default", "--color-feedback-warning-bg", "--color-feedback-warning-default", "--color-feedback-error-default"],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use list semantics when timeline order matters.",
+    "Apply aria-current only to the current item when the timeline represents progress.",
+    "Use visible localized status text when completed, delayed, warning, or error meaning must be communicated.",
+    "Do not rely on marker color alone to communicate entry status."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition and generated markers in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

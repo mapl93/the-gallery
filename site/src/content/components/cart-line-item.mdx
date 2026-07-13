@@ -1,33 +1,55 @@
 ## Overview
 
-Individual cart item with image, info, quantity, and price.
+Cart Line Item represents one product in the cart with required media, product identity, destination, and formatted line price. Variant information, quantity, compare price, and secondary actions are optional.
 
-<Preview html={"<div class=\"cart-line\" style=\"max-width:500px;display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--color-border-default);\"><img class=\"cart-line__image\" src=\"https://placehold.co/80x80/f5f0eb/1a1a1a?text=Item\" alt=\"\" style=\"border-radius:8px;\" /><div style=\"flex:1;\"><h4 class=\"cart-line__title\">Artisan Ceramic Vase</h4><span class=\"cart-line__variant\">Large / White</span><div class=\"cart-line__actions\"><button class=\"cart-line__remove\">Remove</button></div></div><span class=\"cart-line__price\">$120.00</span></div>"} label="Cart Line Item" />
+<Preview
+  html={'<article class="cart-line tg-preview-frame--lg"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /><div class="cart-line__info"><a class="cart-line__title" href="#">Artisan Ceramic Vase</a><span class="cart-line__variant">Large / White</span><div class="cart-line__quantity"><div class="qty" role="group" aria-label="Quantity selector" data-qty><button class="qty__btn qty__btn--decrement" type="button" aria-label="Decrease quantity" data-qty-minus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg></button><input class="qty__input" type="number" value="1" min="1" max="8" aria-label="Quantity" data-qty-input /><button class="qty__btn qty__btn--increment" type="button" aria-label="Increase quantity" data-qty-plus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></button></div></div><div class="cart-line__actions"><button class="cart-line__remove" type="button" aria-label="Remove Artisan Ceramic Vase">Remove</button><button class="cart-line__save" type="button" aria-label="Save Artisan Ceramic Vase for later">Save for later</button></div></div><div class="cart-line__prices"><span class="cart-line__price-compare">$150.00</span><span class="cart-line__price">$120.00</span></div></article>'}
+  label="Cart Line Item"
+/>
+
+## Presentation
+
+The required anatomy is media, product information, title link, and current line price. The optional Quantity Selector is composed inside `.cart-line__quantity`; Cart Line Item does not redefine its native stepping, bounds, or validation behavior.
+
+The target formats `price` and `comparePrice`. Remove and save-for-later are independent optional actions and remain visually secondary to product navigation and quantity editing.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show real-time updates (totals, quantities) when the user modifies the cart.</Do>
-  <Dont>Don't require a page reload for cart changes — use AJAX for a smooth experience.</Dont>
+  <Do>Update the line price and cart summary immediately after a valid quantity change.</Do>
+  <Dont>Do not format commerce amounts or inventory rules inside the presentation layer.</Dont>
 </DoDont>
+
+- Include variant text only when it distinguishes the selected purchasable item.
+- Preserve product context in remove and save-for-later labels.
+- Disable quantity transitions that exceed target-owned inventory boundaries.
 
 ## Accessibility
 
-<Callout type="tip">
-  Cart components are designed for Shopify's AJAX Cart API. Wire up the JS interactions in your theme.
-</Callout>
+- Provide useful alternative text through `imageAlt`; use empty alternative text only when adjacent content makes the image redundant.
+- Keep `title` as a descriptive product link to `href`.
+- Give remove and save actions accessible names that include the product title.
+- Provide an accessible name for the Quantity Selector and announce resulting total or availability changes.
+- Keep every interactive element keyboard reachable with a visible focus indicator.
 
-- All images must have descriptive `alt` text.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Quantity Selector](/components/quantity-selector)
 - [Price](/components/price)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.cart-line`</td><td>class</td><td>—</td><td>Base cart line item styles</td></tr>
+  <tr><td>`image`</td><td>slot</td><td>required</td><td>Product image</td></tr>
+  <tr><td>`imageAlt`</td><td>string</td><td>required</td><td>Product image alternative text</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Product title</td></tr>
+  <tr><td>`href`</td><td>string</td><td>required</td><td>Product destination</td></tr>
+  <tr><td>`variant`</td><td>string</td><td>optional</td><td>Selected variant description</td></tr>
+  <tr><td>`quantitySelector`</td><td>slot</td><td>optional</td><td>Quantity Selector dependency</td></tr>
+  <tr><td>`removeLabel`</td><td>string</td><td>optional</td><td>Accessible remove-action label</td></tr>
+  <tr><td>`saveLabel`</td><td>string</td><td>optional</td><td>Accessible save-for-later label</td></tr>
+  <tr><td>`price`</td><td>string</td><td>required</td><td>Target-formatted line price</td></tr>
+  <tr><td>`comparePrice`</td><td>string</td><td>optional</td><td>Target-formatted compare-at price</td></tr>
 </PropTable>

@@ -1,0 +1,568 @@
+/* ============================================================
+   The Gallery — Marketing Components (Base Layer)
+   Platform-agnostic. Depends only on design token custom properties.
+   G1 Hero Banner, G2 Newsletter Signup, G3 Testimonials,
+   G4 Popup / Overlay, G5 Trust Badges, G6 Payment Icons,
+   G7 Countdown Timer, G8 Urgency Indicators, G9 Cookie Consent,
+   G10 Social Proof Notifications, G11 Announcement Bar (ext.)
+   ============================================================ */
+
+/* ── G1. HERO BANNER ── */
+.hero {
+  --_hero-min-h: 400px;
+  --_hero-text: var(--color-text-inverse);
+
+  position: relative;
+  min-height: var(--_hero-min-h);
+  display: flex;
+  align-items: center;
+  padding: var(--space-layout-section-gap) var(--space-layout-container);
+  overflow: hidden;
+}
+@media (min-width: 768px) { .hero { --_hero-min-h: 560px; } }
+@media (min-width: 1024px) { .hero { --_hero-min-h: 640px; } }
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+}
+.hero__media img,
+.hero__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 100%);
+}
+.hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+.hero__label {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--_hero-text);
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+.hero__title {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-display-size);
+  line-height: var(--typo-display-line-height);
+  color: var(--_hero-text);
+  margin: 0 0 16px;
+}
+.hero__description {
+  font-size: var(--typo-article-size);
+  line-height: var(--typo-article-line-height);
+  color: var(--_hero-text);
+  opacity: 0.9;
+  margin-bottom: 24px;
+}
+.hero__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+
+/* ── G2. NEWSLETTER SIGNUP ── */
+.newsletter {
+  --_newsletter-bg: var(--color-surface-secondary);
+
+  padding: var(--space-layout-section-gap) var(--space-layout-container);
+  background: var(--_newsletter-bg);
+  text-align: center;
+}
+.newsletter__content { max-width: 500px; margin: 0 auto; }
+.newsletter__title {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h3-size);
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+.newsletter__description {
+  font-size: var(--typo-body-size);
+  color: var(--color-text-secondary);
+  margin-bottom: 24px;
+}
+.newsletter__form { display: flex; gap: 8px; }
+.newsletter__input { flex: 1; }
+.newsletter__note {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-disabled);
+  margin-top: 12px;
+}
+
+
+/* ── G3. TESTIMONIALS ── */
+.testimonials {
+  padding: var(--space-layout-section-gap) var(--space-layout-container);
+}
+.testimonials__title {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h2-size);
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: var(--space-layout-section-gap);
+}
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-layout-grid-gap);
+}
+@media (min-width: 768px) { .testimonials__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .testimonials__grid { grid-template-columns: repeat(3, 1fr); } }
+
+.testimonial {
+  padding: 24px;
+  background: var(--color-surface-secondary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.testimonial__quote {
+  font-size: var(--typo-article-size);
+  line-height: var(--typo-article-line-height);
+  color: var(--color-text-primary);
+  font-style: italic;
+}
+.testimonial__quote::before {
+  content: "\201C";
+  font-size: 2em;
+  line-height: 0;
+  color: var(--color-text-accent);
+}
+.testimonial__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+}
+.testimonial__name {
+  font-weight: 600;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+}
+.testimonial__detail {
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-text-secondary);
+}
+
+
+/* ── G4. POPUP / OVERLAY ── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-default) var(--easing-default),
+              visibility 0s linear var(--transition-default);
+}
+.popup-overlay[data-open] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.popup {
+  position: relative;
+  width: 90vw;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+.popup__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  z-index: 1;
+}
+.popup__media {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.popup__media img { width: 100%; display: block; }
+.popup__body { padding: 24px; }
+.popup__title {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h3-size);
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+.popup__text {
+  font-size: var(--typo-body-size);
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+/* Popup — split (image + content side-by-side) */
+.popup--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 680px;
+}
+@media (max-width: 639px) {
+  .popup--split { grid-template-columns: 1fr; }
+}
+.popup--split .popup__media {
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  height: 100%;
+}
+.popup--split .popup__media img { height: 100%; object-fit: cover; }
+
+/* Popup — slide-in from bottom (mobile) */
+.popup--slide {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 100%;
+  width: 100%;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  transform: translateY(100%);
+  transition: transform var(--transition-default) var(--easing-default);
+}
+.popup--slide[data-open] { transform: translateY(0); }
+
+
+/* ── G5. TRUST BADGES ── */
+.trust-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 16px;
+}
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-text-secondary);
+}
+.trust-badge svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-feedback-success-default);
+}
+/* Compact row for product pages / cart */
+.trust-badges--compact {
+  gap: 8px 16px;
+  font-size: calc(var(--typo-body-size) * 0.75);
+}
+
+
+/* ── G6. PAYMENT ICONS ── */
+.payment-icons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.payment-icons img,
+.payment-icons svg {
+  height: 24px;
+  width: auto;
+  opacity: 0.5;
+  filter: grayscale(1);
+  transition: opacity var(--transition-fast) var(--easing-default);
+}
+.payment-icons img:hover,
+.payment-icons svg:hover { opacity: 1; filter: none; }
+.payment-icons--sm img,
+.payment-icons--sm svg { height: 18px; }
+
+
+/* ── G7. COUNTDOWN TIMER ── */
+.countdown {
+  display: inline-flex;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.countdown__segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 48px;
+}
+.countdown__number {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h2-size);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+.countdown__label {
+  font-size: calc(var(--typo-body-size) * 0.625);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+.countdown__separator {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h2-size);
+  color: var(--color-text-disabled);
+  align-self: flex-start;
+  line-height: 1;
+}
+
+/* Compact inline variant (for banners) */
+.countdown--inline {
+  gap: 4px;
+}
+.countdown--inline .countdown__segment {
+  flex-direction: row;
+  gap: 2px;
+  min-width: auto;
+}
+.countdown--inline .countdown__number { font-size: var(--typo-body-size); }
+.countdown--inline .countdown__label {
+  font-size: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Card variant (padded boxes) */
+.countdown--cards .countdown__segment {
+  background: var(--color-surface-secondary);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  min-width: 56px;
+}
+
+
+/* ── G8. URGENCY INDICATORS ── */
+.urgency {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: calc(var(--typo-body-size) * 0.875);
+  font-weight: 600;
+}
+
+/* Low-stock */
+.urgency--low-stock { color: var(--color-feedback-warning-default); }
+.urgency--low-stock::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-feedback-warning-default);
+  animation: urgency-pulse 1.5s infinite;
+}
+@keyframes urgency-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Selling fast */
+.urgency--selling-fast { color: var(--color-feedback-error-default); }
+.urgency--selling-fast svg {
+  width: 16px;
+  height: 16px;
+  animation: urgency-pulse 1.5s infinite;
+}
+
+/* Viewers count */
+.urgency--viewers { color: var(--color-text-secondary); }
+.urgency--viewers strong { color: var(--color-text-primary); }
+
+/* Recently sold */
+.urgency--recent-sale { color: var(--color-text-secondary); }
+
+
+/* ── G9. COOKIE CONSENT ── */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-overlay);
+  padding: 16px var(--space-layout-container);
+  background: var(--color-surface-primary);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(100%);
+  transition: transform var(--transition-default) var(--easing-default);
+}
+.cookie-banner[data-visible] { transform: translateY(0); }
+.cookie-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (max-width: 639px) {
+  .cookie-banner__inner { flex-direction: column; text-align: center; }
+}
+.cookie-banner__text {
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-text-secondary);
+}
+.cookie-banner__text a {
+  color: var(--color-text-accent);
+  text-decoration: underline;
+}
+.cookie-banner__actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Modal variant for GDPR detailed preferences */
+.cookie-preferences {
+  max-width: 480px;
+}
+.cookie-preferences__category {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.cookie-preferences__category:last-child { border-bottom: none; }
+.cookie-preferences__name {
+  font-weight: 600;
+  font-size: var(--typo-body-size);
+  color: var(--color-text-primary);
+}
+.cookie-preferences__desc {
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+
+/* ── G10. SOCIAL PROOF NOTIFICATIONS ── */
+.social-proof {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-surface-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 320px;
+  transform: translateX(-120%);
+  transition: transform var(--transition-default) var(--easing-default);
+}
+.social-proof[data-visible] { transform: translateX(0); }
+.social-proof__image {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.social-proof__image img { width: 100%; height: 100%; object-fit: cover; }
+.social-proof__text {
+  font-size: calc(var(--typo-body-size) * 0.875);
+  color: var(--color-text-primary);
+}
+.social-proof__time {
+  font-size: calc(var(--typo-body-size) * 0.75);
+  color: var(--color-text-disabled);
+}
+.social-proof__close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-disabled);
+  cursor: pointer;
+}
+
+
+/* ── G11. ANNOUNCEMENT BAR (EXTENDED VARIANTS) ── */
+/* Base announcement bar is in global.css — these are marketing extensions */
+
+/* Countdown in announcement */
+.announcement-bar--countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Rotating messages */
+.announcement-bar--rotating {
+  overflow: hidden;
+  position: relative;
+  height: 2em;
+}
+.announcement-bar__slides {
+  display: flex;
+  flex-direction: column;
+  animation: announcement-rotate 8s infinite;
+}
+.announcement-bar__slide {
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes announcement-rotate {
+  0%, 30% { transform: translateY(0); }
+  33%, 63% { transform: translateY(-2em); }
+  66%, 96% { transform: translateY(-4em); }
+  100% { transform: translateY(0); }
+}
+
+/* Dismissible */
+.announcement-bar--dismissible {
+  position: relative;
+  padding-right: 40px;
+}
+.announcement-bar__dismiss {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+.announcement-bar__dismiss:hover { opacity: 1; }

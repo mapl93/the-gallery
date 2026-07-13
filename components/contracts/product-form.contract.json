@@ -1,0 +1,56 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "product-form",
+  "name": "Product Form",
+  "registryId": "D5",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Add-to-cart form layout that composes variant selection, quantity selection, and primary product actions.",
+  "dependencies": ["button", "quantity-selector", "variant-selector"],
+  "source": {
+    "registry": "registry.json#/components/product-form",
+    "css": { "file": "components/css/product.css", "selector": ".product-form" },
+    "docs": "site/src/content/components/product-form.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".product-form", "className": ".product-form", "required": true, "description": "Product purchase form." },
+    { "name": "actions", "selector": ".product-form__actions", "className": ".product-form__actions", "required": true, "description": "Action row for add-to-cart and secondary actions." },
+    { "name": "submit", "selector": ".product-form__submit", "className": ".product-form__submit", "required": true, "description": "Primary submit button." },
+    { "name": "variantSelector", "selector": ".variant-selector", "className": ".variant-selector", "required": false, "description": "Variant selector dependency." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default product form layout." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default product form size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".product-form"], "description": "Default add-to-cart form state." }
+  ],
+  "behavior": [
+    { "name": "addToCart", "selectors": [".product-form", ".product-form__submit"], "attributes": ["method", "action", "type=\"submit\""], "events": ["submit"], "description": "Form submission should validate variant, quantity, and selling-plan state before adding to cart." },
+    { "name": "dependencyComposition", "selectors": [".variant-selector"], "description": "The form composes variant and quantity dependencies without replacing their semantics." }
+  ],
+  "properties": [
+    { "name": "variantSelector", "type": "slot", "required": false, "description": "Optional Variant Selector dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".variant-selector", "classNames": [".variant-selector"] }] } },
+    { "name": "submitLabel", "type": "string", "required": true, "description": "Visible primary submit action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-form__submit" }] } },
+    { "name": "submitDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the primary submit action unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-form__submit", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+  ],
+  "tokens": {
+    "public": {}
+  },
+  "accessibility": [
+    "Use a real form for add-to-cart flows when the target platform supports it.",
+    "Keep variant and quantity controls labelled and reachable before the submit action.",
+    "Disable or explain unavailable submit states when a required variant is missing."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to Shopify product form actions, variant ids, quantities, and selling plans." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

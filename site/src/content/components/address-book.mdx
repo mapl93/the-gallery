@@ -1,32 +1,49 @@
 ## Overview
 
-Address card grid with default tag and add-new card.
+Address Book is an authenticated grid of target-owned address cards and actions. It can identify a default address and include an add-address action with an optional visible label.
 
-<Preview html={"<div class=\"address-grid\" style=\"display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px;\"><div class=\"address-card address-card--default\" style=\"padding:16px;border:1px solid var(--color-border-default);border-radius:8px;\"><span class=\"address-card__default-tag\">Default</span><p class=\"address-card__name\">María García</p><p class=\"address-card__text\">123 Studio Street<br/>Buenos Aires, Argentina</p><div class=\"address-card__actions\"><button class=\"btn btn--outline btn--sm\">Edit</button></div></div><div class=\"address-card address-card--new\" style=\"padding:16px;border:1px dashed var(--color-border-default);border-radius:8px;text-align:center;display:flex;align-items:center;justify-content:center;\"><span>+ Add Address</span></div></div>"} label="Address Book" />
+<Preview
+  html={'<section class="address-grid tg-preview-frame tg-preview-frame--lg"><article class="address-card address-card--default"><span class="address-card__default-tag">Default</span><h2 class="address-card__name">Maria Garcia</h2><p class="address-card__text">123 Studio Street<br />Buenos Aires, Argentina</p><div class="address-card__actions"><button class="btn btn--outline btn--sm" type="button" aria-label="Edit address for Maria Garcia">Edit</button><button class="btn btn--link btn--sm" type="button" aria-label="Delete address for Maria Garcia">Delete</button></div></article><article class="address-card"><h2 class="address-card__name">Studio Office</h2><p class="address-card__text">45 Gallery Avenue<br />Cordoba, Argentina</p><div class="address-card__actions"><button class="btn btn--outline btn--sm" type="button" aria-label="Edit Studio Office address">Edit</button></div></article><button class="address-card address-card--new" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add address</span></button></section>'}
+  label="Address Book"
+/>
+
+## Presentation
+
+`addresses` is one required slot containing the repeated address cards, their default state, and their actions. Recipient names, formatted addresses, card count, ordering, and action availability are fixture or target data rather than Address Book properties.
+
+`newAddressLabel` controls the visible text inside the optional `.address-card--new` action. The target owns navigation or disclosure into Address Form and all create, edit, delete, and default-address mutations.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Identify the default address with visible text as well as its border treatment.</Do>
+  <Dont>Do not expose address data before the target authenticates and authorizes the customer.</Dont>
 </DoDont>
+
+- Format address lines according to their locale and target data model.
+- Keep card actions concise and specific to the address they affect.
+- Confirm destructive deletion according to target policy.
+- Preserve the current default address until a target mutation succeeds.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Protect address data behind the target authentication system.
+- Expose the default state as readable text, not color alone.
+- Give edit and delete actions names that identify the affected address.
+- Implement the add-address card as a keyboard-operable button or link with visible focus.
+- Announce the result of address mutations through target-owned feedback.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Button](/components/button)
 
-## API Reference
+The cards and their data in the artwork are fixture content inside `addresses`; they do not define a fixed card-data API.
+
+### API Reference
 
 <PropTable>
-  <tr><td>`.address-grid`</td><td>class</td><td>—</td><td>Base address book styles</td></tr>
+  <tr><td>`addresses`</td><td>slot</td><td>required</td><td>Target-owned collection of address cards and actions</td></tr>
+  <tr><td>`newAddressLabel`</td><td>string</td><td>optional</td><td>Visible accessible label for the add-address action</td></tr>
 </PropTable>

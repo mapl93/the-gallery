@@ -1,32 +1,43 @@
 ## Overview
 
-GDPR cookie consent banner with preferences modal.
+Cookie Consent presents a viewport-edge notice, Button-composed actions, and optional preference-layout anatomy without defining a consent policy or preference model.
 
-<Preview html={"<div class=\"cookie-banner\" data-visible style=\"position:relative;\"><div class=\"cookie-banner__inner\"><p class=\"cookie-banner__text\">We use cookies for a better experience. <a href=\"#\">Learn more</a></p><div class=\"cookie-banner__actions\"><button class=\"btn\">Accept</button><button class=\"btn btn--outline\">Preferences</button></div></div></div>"} label="Cookie Consent" interaction={{"selector":".cookie-banner","toggle":"attr:data-visible=","triggerLabel":"Show Banner","startVisible":true}} />
+## Presentation
+
+<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="true" aria-controls="cookie-preview-banner" hidden>Show cookie notice</button><aside class="cookie-banner tg-preview-bottom-layer tg-preview-contained-cookie" id="cookie-preview-banner" data-visible aria-label="Cookie options"><div class="cookie-banner__inner"><p class="cookie-banner__text">This site uses cookies according to its published policy. <a href="#cookie-preview-policy">Read the cookie policy</a>.</p><div class="cookie-banner__actions"><button class="btn" type="button" data-preview-close>Review options</button><button class="btn btn--outline" type="button" data-preview-close>Dismiss notice</button></div></div></aside></div>'} label="Cookie Consent" layout="overlay" interaction={{ selector: '.cookie-banner', toggle: 'attr:data-visible=', triggerLabel: 'Show Banner', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
+
+The primary Exhibit artwork starts visible. Its sibling trigger is hidden while the banner is active, appears after dismissal, and can reopen the fixture. That open/dismiss/reopen behavior and bounded edge placement belong to the docs site; they do not define consent, persistence, or a component default.
+
+`data-visible` controls banner presentation. `.cookie-preferences` and its repeated category anatomy provide layout only.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>A/B test marketing components (hero copy, CTA placement, popup timing) to optimize conversion.</Do>
-  <Dont>Don't show too many marketing elements at once — popups + banners + badges = fatigue.</Dont>
+  <Do>Define action meaning, storage, blocking, withdrawal, and jurisdiction-specific requirements in the consuming target before deployment.</Do>
+  <Dont>Do not treat dismissal as consent or infer categories, required cookies, defaults, or control types from this fixture.</Dont>
 </DoDont>
+
+The preference model remains unresolved. This component does not decide which categories exist or how their choices are represented.
 
 ## Accessibility
 
-<Callout type="info">
-  Marketing components often need JavaScript for interactions (countdown timers, popup triggers, etc.).
-</Callout>
+- Use clear Button labels that describe each target-defined action.
+- Keep the policy link keyboard reachable with visible focus.
+- Do not equate closing the banner with consent unless an accepted target policy explicitly defines that meaning.
+- If preferences open in a modal surface, that surface owns naming, focus containment, `Escape`, and focus restoration.
+- Respect reduced-motion preferences for banner transitions.
 
-- Use `role="alert"` or `aria-live="assertive"` for important notifications.
+## References
 
-## Dependencies
+| Anatomy | Selector | Requirement |
+| --- | --- | --- |
+| Root | `.cookie-banner` | Required viewport-edge notice surface |
+| Inner | `.cookie-banner__inner` | Required responsive content wrapper |
+| Text | `.cookie-banner__text` | Required notice and optional policy link |
+| Actions | `.cookie-banner__actions` | Required Button-composed action group |
+| Preferences | `.cookie-preferences` | Optional target-defined layout shell |
+| Preference category | `.cookie-preferences__category` | Optional repeated category row |
+| Preference name | `.cookie-preferences__name` | Optional category name |
+| Preference description | `.cookie-preferences__desc` | Optional category description |
 
-This component uses:
-
-- [Button](/components/button)
-
-## API Reference
-
-<PropTable>
-  <tr><td>`.cookie-banner`</td><td>class</td><td>—</td><td>Base cookie consent styles</td></tr>
-</PropTable>
+Dependency: [Button](/components/button).

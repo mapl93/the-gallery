@@ -1,34 +1,39 @@
 ## Overview
 
-Threaded comment list with reply form and sort.
+Comments presents a required heading, optional target-formatted count, target-owned comment thread, and optional target-owned composer. It supplies static editorial structure without defining discussion-service behavior.
 
-<Preview html={"<div class=\"comments\" style=\"max-width:500px;\"><h3>Comments (3)</h3><div style=\"margin-top:16px;padding:12px 0;border-bottom:1px solid var(--color-border-default);\"><p style=\"font-weight:600;font-size:14px;\">Ana R.</p><p style=\"font-size:14px;\">Beautiful article! Love learning about the process.</p></div></div>"} label="Comment Section" />
+## Presentation
+
+<Preview html={'<section class="comments tg-preview-frame--md" aria-labelledby="comments-title"><h2 id="comments-title" class="comments__title">Comments <span class="comments__count">(1)</span></h2><ol><li class="comment"><div class="comment__avatar"><span class="avatar" aria-hidden="true">AR</span></div><div class="comment__body"><div class="comment__header"><span id="comment-author-1" class="comment__author">Ana Ruiz</span><time class="comment__date" datetime="2026-07-12">July 12, 2026</time></div><p class="comment__text">The notes about proportion changed how I look at the rim of a vessel.</p><div class="comment__actions"><button class="comment__action-btn" type="button" aria-label="Reply to Ana Ruiz">Reply</button></div></div></li></ol><form class="comment-form" aria-labelledby="comment-form-title"><h3 id="comment-form-title" class="comment-form__title">Join the discussion</h3><div class="input"><label class="input__label" for="comment-message">Comment</label><div class="input__control"><textarea class="input__field textarea__field" id="comment-message" name="comment" placeholder="Write your comment"></textarea></div></div><button class="btn" type="submit">Post comment</button></form></section>'} label="Comments" />
+
+The component has one fluid threaded presentation. Comment records use `.comment`; author, date, text, actions, and nested replies use their canonical elements. The optional `.comment-form` composes Textarea and Button controls but remains a target-owned slot.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the article body/prose component for rich text — it handles typography, images, and spacing.</Do>
-  <Dont>Don't manually style article content with inline styles — let the prose class handle it.</Dont>
+  <Do>Supply comment data, nesting, controls, and form handling from the target integration.</Do>
+  <Dont>Do not infer sorting, reply logic, authentication, moderation, optimistic updates, or count synchronization from the static classes.</Dont>
 </DoDont>
+
+Which comment behaviors belong to the neutral component and which belong to targets remains unresolved. Until that boundary is accepted, thread actions and the composer are presentation slots rather than a neutral discussion API.
 
 ## Accessibility
 
-<Callout type="info">
-  Blog components support Shopify's article template system. Use metafields for custom article data.
-</Callout>
+- Use semantic lists or another structure that communicates comment and reply relationships without relying on indentation alone.
+- Expose author and date text clearly; use `time` with a machine-readable `datetime` value when available.
+- Use native buttons for comment actions with descriptive names and visible focus.
+- Keep Textarea labels, validation relationships, disabled state, and Button submission semantics intact.
+- Provide target-specific accessible status handling for authentication, moderation, submission feedback, and live updates.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
-
-## Dependencies
-
-This component uses:
-
-- [Avatar](/components/avatar)
-- [Button](/components/button)
-- [Textarea](/components/textarea)
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.comments`</td><td>class</td><td>—</td><td>Base comment section styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible comment-section heading</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted comment count</td></tr>
+  <tr><td>`thread`</td><td>slot</td><td>required</td><td>Target-owned records, nesting, actions, and empty state</td></tr>
+  <tr><td>`composer`</td><td>slot</td><td>optional</td><td>Target-owned top-level form composed from Textarea and Button</td></tr>
 </PropTable>
+
+Anatomy: `.comments`, `.comments__title`, `.comments__count`, `.comment`, `.comment__avatar`, `.comment__body`, `.comment__header`, `.comment__author`, `.comment__date`, `.comment__text`, `.comment__actions`, `.comment__action-btn`, `.comment__replies`, `.comment-form`, and `.comment-form__title`.
+
+Dependencies: [Avatar](/components/avatar), [Button](/components/button), and [Textarea](/components/textarea). The contract remains `pilot`; sorting, replies, authentication, moderation, optimistic updates, submission feedback, and count synchronization remain explicitly target-owned pending resolution.

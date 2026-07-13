@@ -83,12 +83,16 @@ export default function Foundations() {
       <table className="docs-token-table">
         <thead><tr><th>Token</th><th>Value</th></tr></thead>
         <tbody>
-          <tr><td><code className="docs-inline-code">--duration-fast</code></td><td>150ms</td></tr>
-          <tr><td><code className="docs-inline-code">--duration-normal</code></td><td>250ms</td></tr>
-          <tr><td><code className="docs-inline-code">--duration-slow</code></td><td>400ms</td></tr>
-          <tr><td><code className="docs-inline-code">--easing-default</code></td><td>cubic-bezier(.4,0,.2,1)</td></tr>
-          <tr><td><code className="docs-inline-code">--easing-in</code></td><td>cubic-bezier(.4,0,1,1)</td></tr>
-          <tr><td><code className="docs-inline-code">--easing-out</code></td><td>cubic-bezier(0,0,.2,1)</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-duration-micro</code></td><td>100ms</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-duration-standard</code></td><td>200ms</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-duration-moderate</code></td><td>300ms</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-duration-emphasis</code></td><td>500ms</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-curve-standard</code></td><td>cubic-bezier(.4,0,.2,1)</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-curve-enter</code></td><td>cubic-bezier(0,0,.2,1)</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-curve-exit</code></td><td>cubic-bezier(.4,0,1,1)</td></tr>
+          <tr><td><code className="docs-inline-code">--motion-transition-feedback</code></td><td>200ms cubic-bezier(0,0,.2,1) 0ms</td></tr>
+          <tr><td><code className="docs-inline-code">--transition-base</code></td><td>Compatibility alias for --motion-duration-standard</td></tr>
+          <tr><td><code className="docs-inline-code">--easing-out</code></td><td>Compatibility alias for --motion-curve-enter</td></tr>
         </tbody>
       </table>
 

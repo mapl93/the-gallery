@@ -1,0 +1,192 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "countdown",
+  "name": "Countdown Timer",
+  "registryId": "G7",
+  "category": "marketing",
+  "status": "pilot",
+  "summary": "Presentational countdown segments with default, compact inline, and card treatments; calculation and expiration behavior remain outside the source contract.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/countdown",
+    "css": {
+      "file": "components/css/marketing.css",
+      "selector": ".countdown"
+    },
+    "docs": "site/src/content/components/countdown.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".countdown",
+      "className": ".countdown",
+      "required": true,
+      "description": "Countdown segment collection."
+    },
+    {
+      "name": "segment",
+      "selector": ".countdown__segment",
+      "className": ".countdown__segment",
+      "required": true,
+      "description": "Repeated time-unit group."
+    },
+    {
+      "name": "number",
+      "selector": ".countdown__number",
+      "className": ".countdown__number",
+      "required": true,
+      "description": "Displayed value for one time unit."
+    },
+    {
+      "name": "label",
+      "selector": ".countdown__label",
+      "className": ".countdown__label",
+      "required": true,
+      "description": "Visible unit label for one value."
+    },
+    {
+      "name": "separator",
+      "selector": ".countdown__separator",
+      "className": ".countdown__separator",
+      "required": false,
+      "description": "Optional visual separator between segments."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Stacked value and unit labels."
+    },
+    {
+      "name": "inline",
+      "className": ".countdown--inline",
+      "default": false,
+      "description": "Compact inline value and unit pairs for constrained contexts."
+    },
+    {
+      "name": "cards",
+      "className": ".countdown--cards",
+      "default": false,
+      "description": "Segments rendered on padded card surfaces."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Responsive segment sizing supplied by canonical CSS."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".countdown"
+      ],
+      "description": "Presentational values supplied by the consuming target."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "suppliedValues",
+      "selectors": [
+        ".countdown__number",
+        ".countdown__label"
+      ],
+      "description": "The source layer presents values and unit labels supplied by a target; it does not define date math, tick cadence, time zones, synchronization, or expiration behavior."
+    }
+  ],
+  "properties": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Default, inline, or card presentation.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".countdown",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "segments",
+      "type": "slot",
+      "required": true,
+      "description": "Target-supplied repeated value and unit groups.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".countdown",
+            "classNames": [
+              ".countdown"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-secondary",
+        "--color-text-disabled",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--typo-body-size",
+        "--typo-h2-size"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "spacing": [
+        "--space-layout-touch-target"
+      ]
+    }
+  },
+  "accessibility": [
+    "Keep every number associated with a visible or programmatic unit label.",
+    "Expose a concise complete time-remaining phrase when visual segmentation would be verbose or ambiguous to assistive technology.",
+    "Do not announce every tick through a live region.",
+    "The consuming target must define and communicate expiration behavior before treating the countdown as functional."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Presentational CSS is implemented; calculation and expiration behavior are unresolved."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

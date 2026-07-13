@@ -1,0 +1,82 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "variant-selector",
+  "name": "Variant Selector",
+  "registryId": "D4",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Product variant selector with grouped labels, swatches, pills, checked state, focus state, and unavailable state.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/variant-selector",
+    "css": { "file": "components/css/product.css", "selector": ".variant-selector" },
+    "docs": "site/src/content/components/variant-selector.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".variant-selector", "className": ".variant-selector", "required": true, "description": "Variant selector container." },
+    { "name": "group", "selector": ".variant-selector__group", "className": ".variant-selector__group", "required": false, "description": "Single option group." },
+    { "name": "label", "selector": ".variant-selector__label", "className": ".variant-selector__label", "required": true, "description": "Option group label." },
+    { "name": "swatches", "selector": ".variant-swatches", "className": ".variant-swatches", "required": false, "description": "Swatch option group." },
+    { "name": "swatch", "selector": ".variant-swatch", "className": ".variant-swatch", "required": false, "description": "Single swatch option." },
+    { "name": "swatchInput", "selector": ".variant-swatch input", "required": false, "description": "Native input for swatch selection." },
+    { "name": "swatchColor", "selector": ".variant-swatch__color", "className": ".variant-swatch__color", "required": false, "description": "Swatch color or image surface." },
+    { "name": "swatchRing", "selector": ".variant-swatch__ring", "className": ".variant-swatch__ring", "required": false, "description": "Selected or focus ring layer." },
+    { "name": "pills", "selector": ".variant-pills", "className": ".variant-pills", "required": false, "description": "Pill option group." },
+    { "name": "pill", "selector": ".variant-pill", "className": ".variant-pill", "required": false, "description": "Single pill option." },
+    { "name": "pillInput", "selector": ".variant-pill input", "required": false, "description": "Native input for pill selection." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default selector supporting swatches and pills." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default product variant control size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".variant-selector"], "description": "Default variant selector state." },
+    { "name": "checkedSwatch", "selectors": [".variant-swatch input:checked + .variant-swatch__color", ".variant-swatch input:checked ~ .variant-swatch__ring"], "description": "Selected swatch state." },
+    { "name": "focusSwatch", "selectors": [".variant-swatch input:focus-visible ~ .variant-swatch__ring"], "description": "Keyboard focus ring for swatches." },
+    { "name": "imageSwatch", "selectors": [".variant-swatch--image"], "description": "Image-backed swatch state." },
+    { "name": "unavailableSwatch", "selectors": [".variant-swatch--unavailable", ".variant-swatch--unavailable::after"], "description": "Unavailable swatch state." },
+    { "name": "checkedPill", "selectors": [".variant-pill:has(input:checked)"], "description": "Selected pill state." },
+    { "name": "focusPill", "selectors": [".variant-pill:has(input:focus-visible)"], "description": "Keyboard focus ring for pills." },
+    { "name": "unavailablePill", "selectors": [".variant-pill--unavailable"], "description": "Unavailable pill state." }
+  ],
+  "behavior": [
+    { "name": "selection", "selectors": [".variant-swatch input", ".variant-pill input"], "attributes": ["name", "value", "checked", "disabled"], "events": ["change"], "description": "Variant choice should use native input state or equivalent target-native selection state." },
+    { "name": "availability", "selectors": [".variant-swatch--unavailable", ".variant-pill--unavailable"], "attributes": ["disabled", "aria-disabled"], "description": "Unavailable variants should be announced and prevented from selection." },
+    { "name": "variantData", "selectors": [".variant-selector__label"], "description": "Adapters own mapping selected options to product variant ids, availability, price, media, and selling plan state." }
+  ],
+  "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible option-group label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-selector__label" }] } },
+    { "name": "selectedValue", "type": "string", "required": false, "description": "Visible selected option value.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-selector__label span" }] } },
+    { "name": "optionLabel", "type": "string", "required": true, "description": "Accessible name for an individual native option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "name", "type": "string", "required": true, "description": "Native radio-group name for an individual option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": true, "description": "Native submitted value for an individual option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Selected state for an individual native option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Unavailable state for an individual native option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-default", "--color-border-strong", "--color-border-focus", "--color-surface-primary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover", "--color-button-primary-border-default", "--color-button-primary-border-hover", "--color-text-primary", "--color-text-disabled"],
+      "radius": ["--radius-full", "--radius-md"],
+      "opacity": ["--opacity-disabled"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use native radio inputs, a radiogroup pattern, or target-native single-selection controls.",
+    "Keep visible selected, focus, unavailable, and disabled states synchronized with semantic state.",
+    "Expose option names and currently selected values in text, not color alone."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify product options and variants to swatches or pills." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

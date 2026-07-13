@@ -1,26 +1,91 @@
 ## Overview
 
-Checkbox with label.
+Native binary choice with checked, indeterminate, disabled, required, form-value, validation, hover, and focus-visible behavior.
 
-<Preview html={"<label class=\"checkbox\"><input class=\"checkbox__input\" type=\"checkbox\" checked /><span class=\"checkbox__label\">Accept terms</span></label> <label class=\"checkbox\"><input class=\"checkbox__input\" type=\"checkbox\" /><span class=\"checkbox__label\">Subscribe to newsletter</span></label>"} label="Checkbox" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><label class="checkbox"><input class="checkbox__input" type="checkbox" name="terms" value="accepted" /><span class="checkbox__label">Accept terms and conditions</span></label></div>'} label="Checkbox" />
+
+## Presentation
+
+Checkbox has one default size and four validation variants. Selection is a native state independent from validation: any variant may be unchecked, checked, or indeterminate.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `default` | `.checkbox` |
+| `variant` | `error` | `.checkbox--error` |
+| `variant` | `success` | `.checkbox--success` |
+| `variant` | `warning` | `.checkbox--warning` |
+| `checked` | `true` | native `checked` |
+| `indeterminate` | `true` | `data-indeterminate="true"` initializes native mixed state |
+| `disabled` | `true` | native `disabled` |
+| `required` | `true` | native `required` |
+
+The generated Check and Minus indicators use accepted Lucide geometry without adding an icon-library dependency to the web adapter.
+
+### Checked
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><label class="checkbox"><input class="checkbox__input" type="checkbox" checked /><span class="checkbox__label">Include gift wrapping</span></label></div>'} label="Checked checkbox" />
+
+### Indeterminate
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><label class="checkbox"><input class="checkbox__input" type="checkbox" data-indeterminate="true" /><span class="checkbox__label">Select all products</span></label></div>'} label="Indeterminate checkbox" />
+
+### Disabled
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><label class="checkbox"><input class="checkbox__input" type="checkbox" disabled /><span class="checkbox__label">Unavailable option</span></label></div>'} label="Disabled checkbox" />
+
+### Error
+
+<Preview html={'<div class="field tg-preview-frame tg-preview-frame--sm"><label class="checkbox checkbox--error"><input class="checkbox__input" type="checkbox" required aria-invalid="true" aria-describedby="checkbox-error-message" /><span class="checkbox__label">Accept the return policy</span></label><p class="field__error" id="checkbox-error-message" role="alert">Accept the policy before continuing.</p></div>'} label="Checkbox error" />
+
+### Success
+
+<Preview html={'<div class="field tg-preview-frame tg-preview-frame--sm"><label class="checkbox checkbox--success"><input class="checkbox__input" type="checkbox" checked aria-describedby="checkbox-success-message" /><span class="checkbox__label">Email verified</span></label><p class="field__success" id="checkbox-success-message">Your preference was saved.</p></div>'} label="Checkbox success" />
+
+### Warning
+
+<Preview html={'<div class="field tg-preview-frame tg-preview-frame--sm"><label class="checkbox checkbox--warning"><input class="checkbox__input" type="checkbox" aria-describedby="checkbox-warning-message" /><span class="checkbox__label">Share optional analytics</span></label><p class="field__warning" id="checkbox-warning-message">Turning this off may limit personalized recommendations.</p></div>'} label="Checkbox warning" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Checkbox for independent binary choices or for selecting multiple items from a set.</Do>
+  <Dont>Do not use Checkbox when exactly one option must be chosen; use Radio instead.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Use indeterminate only to summarize a mixed group and let the next user action resolve it.</Do>
+  <Dont>Do not treat indeterminate as a third submitted value; native form submission still depends on checked.</Dont>
+</DoDont>
+
+Use Field Wrapper for helper or validation feedback. Checkbox owns the visual variant and native state; Field Wrapper owns message layout and content.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Checkbox keeps a native `input[type="checkbox"]`. Custom presentation does not replace its keyboard, form, required, disabled, or assistive-technology behavior.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Wrap the native input and visible text in a `<label>`, or associate them using matching `for` and `id` attributes.
+- Keep `name`, `value`, `checked`, `required`, and `disabled` on the native input.
+- Space toggles the focused checkbox; clicking any part of the wrapping label toggles it.
+- Use native `indeterminate` for mixed state. `data-indeterminate="true"` is the progressive initialization hook.
+- Use `aria-invalid="true"` only for Error and connect external feedback with `aria-describedby`.
+- Success and Warning do not expose invalid or alert semantics.
+- Checked and indeterminate retain different visible indicators so selection does not rely on color.
+- Forced-colors mode restores native checkbox appearance.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.checkbox`</td><td>class</td><td>—</td><td>Base checkbox styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible accessible label</td></tr>
+  <tr><td>`name`</td><td>string</td><td>empty</td><td>Native form field name</td></tr>
+  <tr><td>`value`</td><td>string</td><td>`on`</td><td>Submitted value when checked</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
+  <tr><td>`checked`</td><td>boolean</td><td>`false`</td><td>Native selected state</td></tr>
+  <tr><td>`indeterminate`</td><td>boolean</td><td>`false`</td><td>Initial native mixed state</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Native unavailable state</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required-choice constraint</td></tr>
+  <tr><td>`describedBy`</td><td>string</td><td>empty</td><td>Id reference for feedback owned by Field Wrapper</td></tr>
 </PropTable>
+
+The canonical root remains a wrapping `<label class="checkbox">`. Validation classes belong on that root; form and ARIA attributes remain on `.checkbox__input`.

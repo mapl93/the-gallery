@@ -1,0 +1,64 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "product-info",
+  "name": "Product Info",
+  "registryId": "D3",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Product detail information block for vendor, title, subtitle, description, price dependency, and metadata.",
+  "dependencies": ["price"],
+  "source": {
+    "registry": "registry.json#/components/product-info",
+    "css": { "file": "components/css/product.css", "selector": ".product-info" },
+    "docs": "site/src/content/components/product-info.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".product-info", "className": ".product-info", "required": true, "description": "Product information container." },
+    { "name": "vendor", "selector": ".product-info__vendor", "className": ".product-info__vendor", "required": false, "description": "Vendor or brand line." },
+    { "name": "title", "selector": ".product-info__title", "className": ".product-info__title", "required": true, "description": "Product title." },
+    { "name": "subtitle", "selector": ".product-info__subtitle", "className": ".product-info__subtitle", "required": false, "description": "Editorial subtitle or edition note." },
+    { "name": "description", "selector": ".product-info__description", "className": ".product-info__description", "required": false, "description": "Product description text." },
+    { "name": "meta", "selector": ".product-info__meta", "className": ".product-info__meta", "required": false, "description": "Product metadata description list." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default stacked product info layout." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default product detail typography scale." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".product-info"], "description": "Default product information state." }
+  ],
+  "behavior": [
+    { "name": "metadataSemantics", "selectors": [".product-info__meta dt", ".product-info__meta dd"], "attributes": ["<dl>", "<dt>", "<dd>"], "description": "Metadata should preserve description-list semantics." },
+    { "name": "priceComposition", "selectors": [".product-info"], "description": "Price formatting should be delegated to the Price dependency." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Visible product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__title" }] } },
+    { "name": "vendor", "type": "string", "required": false, "description": "Optional vendor or brand line.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__vendor" }] } },
+    { "name": "subtitle", "type": "string", "required": false, "description": "Optional editorial subtitle or edition note.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__subtitle" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional product description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__description" }] } },
+    { "name": "metadata", "type": "slot", "required": false, "description": "Optional description-list metadata composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-info__meta", "classNames": [".product-info__meta"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--space-layout-element-gap"],
+      "typography": ["--font-family-heading", "--font-family-accent", "--typo-h2-size", "--typo-h4-size", "--typo-body-size", "--typo-article-size"]
+    }
+  },
+  "accessibility": [
+    "Use a single appropriate heading level for the product title in the page context.",
+    "Render metadata as a description list when pairing labels and values.",
+    "Do not communicate product status or pricing changes by color alone."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map product title, vendor, description, price, and metafields into the contract anatomy." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

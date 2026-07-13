@@ -1,34 +1,54 @@
 ## Overview
 
-Login and registration forms with social auth and dividers.
+Auth Forms is a narrow authentication shell for a target-owned account entry flow. It provides the heading, form stack, password-recovery action, authentication-method divider, social actions, and footer composition without defining a login/register mode.
 
-<Preview html={"<div class=\"auth\" style=\"max-width:380px;\"><div class=\"auth__header\"><h2 class=\"auth__title\">Sign In</h2><p class=\"auth__subtitle\">Welcome back</p></div><form class=\"auth__form\"><div class=\"field\"><label class=\"field__label\">Email</label><input class=\"input__field\" type=\"email\" placeholder=\"your@email.com\" /></div><div class=\"field\"><label class=\"field__label\">Password</label><input class=\"input__field\" type=\"password\" placeholder=\"••••••••\" /></div><button class=\"btn\" style=\"width:100%;margin-top:12px;\">Sign In</button></form></div>"} label="Auth Forms (Login / Register)" />
+<Preview
+  html={'<section class="auth"><header class="auth__header"><h2 class="auth__title">Sign in</h2><p class="auth__subtitle">Welcome back to The Gallery</p></header><form class="auth__form"><div class="input"><label class="input__label" for="auth-email">Email address</label><div class="input__control"><input class="input__field" id="auth-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" /></div></div><div class="input"><label class="input__label" for="auth-password">Password</label><div class="input__control"><input class="input__field" id="auth-password" name="password" type="password" autocomplete="current-password" /></div></div><div class="auth__forgot"><a href="#">Forgot password?</a></div><button class="btn" type="submit">Sign in</button></form><div class="auth__divider">or continue with</div><div class="auth__social"><button class="auth__social-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Continue with provider</button></div><p class="auth__footer">New to The Gallery? <a href="#">Create an account</a></p></section>'}
+  label="Auth Forms"
+/>
+
+## Presentation
+
+The artwork uses a sign-in fixture, but the contract defines a neutral shell rather than a canonical login/register mode. `form`, `forgotAction`, `socialActions`, and `footer` are composition slots whose fields, routes, providers, submission, and account-mode navigation remain target-owned.
+
+`title` is required. The supporting `subtitle`, divider, recovery action, social actions, and footer may be omitted independently when they do not apply to the target flow.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Compose the canonical Input, Button, and Form behavior inside the form slot.</Do>
+  <Dont>Do not duplicate field validation or authentication policy in the Auth Forms shell.</Dont>
 </DoDont>
+
+- Keep the visible title aligned with the target flow being presented.
+- Include password recovery where the authentication method supports it.
+- Treat social providers, routes, errors, loading, and submission as target integration concerns.
+- Login and registration entry points may be public; access to resulting account data remains controlled by the target authentication system.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Associate every input with a visible label and connect validation messages with `aria-describedby`.
+- Give each social authentication action a provider-specific accessible name.
+- Keep password recovery and account-mode navigation keyboard reachable with visible focus.
+- Announce authentication errors without revealing sensitive account existence information.
+- Preserve native form submission semantics and appropriate autocomplete values.
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Input](/components/input)
 - [Button](/components/button)
 - [Form](/components/form)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.auth`</td><td>class</td><td>—</td><td>Base auth forms (login / register) styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Authentication form title</td></tr>
+  <tr><td>`subtitle`</td><td>string</td><td>optional</td><td>Supporting authentication guidance</td></tr>
+  <tr><td>`form`</td><td>slot</td><td>required</td><td>Target-owned authentication fields and submission</td></tr>
+  <tr><td>`forgotAction`</td><td>slot</td><td>optional</td><td>Password-recovery link composition</td></tr>
+  <tr><td>`dividerLabel`</td><td>string</td><td>optional</td><td>Readable separator between authentication methods</td></tr>
+  <tr><td>`socialActions`</td><td>slot</td><td>optional</td><td>Target-owned social authentication actions</td></tr>
+  <tr><td>`footer`</td><td>slot</td><td>optional</td><td>Supporting account navigation or legal content</td></tr>
 </PropTable>

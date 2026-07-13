@@ -1,26 +1,65 @@
 ## Overview
 
-Legal/policy page with table of contents, dated header, and rich body.
+Policy Page presents a page title, optional visible update date, optional table of contents, and one required semantic legal-content slot. The target supplies the document structure and content; the component does not define a CMS schema, revision model, localization pipeline, policy inventory, or source API.
 
-<Preview html={"<div class=\"policy-page\" style=\"max-width:600px;\"><div class=\"policy-page__header\"><h1 class=\"policy-page__title\">Privacy Policy</h1><span class=\"policy-page__date\">Last updated: March 2026</span></div><div class=\"policy-page__body\" style=\"margin-top:16px;\"><h2>Information We Collect</h2><p>We collect information you provide directly, including name and email address.</p></div></div>"} label="Policy Page Template" />
+<Preview
+  html={'<main class="policy-page tg-preview-frame--lg" aria-labelledby="policy-preview-title"><header class="policy-page__header"><h1 class="policy-page__title" id="policy-preview-title">Privacy policy</h1><time class="policy-page__date" datetime="2026-07-12">Last updated July 12, 2026</time></header><nav class="policy-page__toc" aria-labelledby="policy-preview-toc-title"><p class="policy-page__toc-title" id="policy-preview-toc-title">On this page</p><ol class="policy-page__toc-list"><li><a class="policy-page__toc-link" href="#policy-preview-information">Information provided by visitors</a></li><li><a class="policy-page__toc-link" href="#policy-preview-contact">Contact</a></li></ol></nav><article class="policy-page__body"><section id="policy-preview-information" aria-labelledby="policy-preview-information-title"><h2 id="policy-preview-information-title">Information provided by visitors</h2><p>This preview preserves headings, paragraphs, lists, and links supplied by the target document.</p><ul><li>Contact details submitted through target-owned forms</li><li>Messages sent to the gallery</li></ul></section><section id="policy-preview-contact" aria-labelledby="policy-preview-contact-title"><h2 id="policy-preview-contact-title">Contact</h2><p><a href="#">Use the target-provided contact destination</a> for questions about this document.</p></section></article></main>'}
+  label="Policy Page"
+/>
+
+## Presentation
+
+The root, header, page-level title, and semantic body are required. A target-formatted visible update date and a table of contents with its own title, ordered list, and in-page links are optional.
+
+The body is one semantic document slot. It preserves target-supplied headings, paragraphs, lists, links, tables, media, dates, quotations, code, and stable section identifiers. The artwork is a documentation fixture and does not establish a policy type, required clause, or content source.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep page templates simple and focused on their primary purpose.</Do>
-  <Dont>Don't add navigation-heavy sidebars to simple pages like 404 or policy pages.</Dont>
+  <Do>Preserve the legal document's semantic structure and source order.</Do>
+  <Dont>Do not turn preview content into a shared CMS schema, revision system, or policy inventory.</Dont>
 </DoDont>
+
+- Keep table-of-contents links in the same order as their target sections.
+- Use stable, unique in-page identifiers when a table of contents is supplied.
+- Let the target format visible dates and provide exact machine-readable values when available.
+- Preserve horizontal keyboard access when wide tables or code blocks overflow.
 
 ## Accessibility
 
-<Callout type="info">
-  Page components map to Shopify template types. Each has a corresponding .json template file.
-</Callout>
+- Use one page-level title followed by a logical, non-skipping heading hierarchy.
+- Render the optional update date as visible text and use `<time datetime>` when the target supplies an exact value.
+- Place the optional table of contents in a labelled navigation landmark.
+- Keep every table-of-contents link paired with a unique section identifier in the same document.
+- Preserve semantic lists, tables, links, quotations, media alternatives, and other structures from the target source.
+- Keep long text, media, tables, and code contained at narrow widths without removing keyboard access to overflow.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## API Reference
+**Contract:** `policy-page` v0.2.0, `pilot`.
+
+**Dependencies:** None declared.
+
+**Anatomy**
+
+| Part | Selector | Requirement |
+| --- | --- | --- |
+| Root | `.policy-page` | Required |
+| Header | `.policy-page__header` | Required |
+| Title | `.policy-page__title` | Required |
+| Updated date | `.policy-page__date` | Optional |
+| Table of contents | `.policy-page__toc` | Optional |
+| Table-of-contents title | `.policy-page__toc-title` | Optional |
+| Table-of-contents list | `.policy-page__toc-list` | Optional |
+| Table-of-contents link | `.policy-page__toc-link` | Optional |
+| Semantic body | `.policy-page__body` | Required |
+
+**API Reference**
 
 <PropTable>
-  <tr><td>`.policy-page`</td><td>class</td><td>—</td><td>Base policy page template styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Page-level policy title</td></tr>
+  <tr><td>`updatedDate`</td><td>string</td><td>optional</td><td>Target-formatted visible update date</td></tr>
+  <tr><td>`tocTitle`</td><td>string</td><td>optional</td><td>Table-of-contents heading</td></tr>
+  <tr><td>`tocItems`</td><td>slot</td><td>optional</td><td>Target-owned in-page links in policy-section order</td></tr>
+  <tr><td>`body`</td><td>slot</td><td>required</td><td>Target-owned semantic policy document content</td></tr>
 </PropTable>

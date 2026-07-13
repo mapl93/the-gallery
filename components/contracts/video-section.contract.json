@@ -1,0 +1,218 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "video-section",
+  "name": "Video Section",
+  "registryId": "S7",
+  "category": "sections",
+  "status": "pilot",
+  "summary": "Contained or full-width media shell with poster, optional play intent, and target-owned playback behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/video-section",
+    "css": {
+      "file": "components/css/sections.css",
+      "selector": ".video-section"
+    },
+    "docs": "site/src/content/components/video-section.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".video-section",
+      "className": ".video-section",
+      "required": true,
+      "description": "Video section root."
+    },
+    {
+      "name": "wrapper",
+      "selector": ".video-section__wrapper",
+      "className": ".video-section__wrapper",
+      "required": true,
+      "description": "Aspect-ratio media and control positioning region."
+    },
+    {
+      "name": "poster",
+      "selector": ".video-section__poster",
+      "className": ".video-section__poster",
+      "required": false,
+      "description": "Optional target-owned poster or media element."
+    },
+    {
+      "name": "play",
+      "selector": ".video-section__play",
+      "className": ".video-section__play",
+      "required": false,
+      "description": "Optional native button expressing play intent."
+    },
+    {
+      "name": "caption",
+      "selector": ".video-section__caption",
+      "className": ".video-section__caption",
+      "required": false,
+      "description": "Optional visible media caption."
+    }
+  ],
+  "variants": [
+    {
+      "name": "contained",
+      "className": null,
+      "default": true,
+      "description": "Default padded presentation with rounded media."
+    },
+    {
+      "name": "fullwidth",
+      "className": ".video-section--fullwidth",
+      "default": false,
+      "description": "Edge-to-edge presentation without wrapper radius."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".video-section"
+      ],
+      "description": "Resting media presentation."
+    },
+    {
+      "name": "hover",
+      "selectors": [
+        ".video-section__play:hover"
+      ],
+      "description": "Pointer emphasis on the optional play-intent control."
+    },
+    {
+      "name": "playFocusVisible",
+      "selectors": [
+        ".video-section__play:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the optional play-intent button."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "playbackOwnership",
+      "selectors": [
+        ".video-section__wrapper",
+        ".video-section__play"
+      ],
+      "description": "The target owns media loading, play and pause state, controls, autoplay policy, captions, transcripts, errors, and synchronization; canonical CSS supplies only the visual shell."
+    }
+  ],
+  "properties": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "contained",
+      "valuesFrom": "variants",
+      "description": "Contained or full-width media presentation.",
+      "targetMappings": {
+        "web": [{ "kind": "optionClass", "selector": ".video-section", "source": "variants" }]
+      }
+    },
+    {
+      "name": "media",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned poster, video, embed, or player composition.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".video-section__wrapper", "classNames": [".video-section__wrapper"] }]
+      }
+    },
+    {
+      "name": "playAction",
+      "type": "slot",
+      "required": false,
+      "description": "Optional native button that expresses play intent without prescribing playback implementation.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".video-section__play", "classNames": [".video-section__play"] }]
+      }
+    },
+    {
+      "name": "playLabel",
+      "type": "string",
+      "required": false,
+      "description": "Contextual accessible name for the optional play-intent button.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".video-section__play", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }]
+      }
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible media caption.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".video-section__caption" }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-text-secondary"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "radius": [
+        "--radius-full",
+        "--radius-lg"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-section-gap"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "A poster image needs useful alternative text only when it conveys information not available in adjacent text or the media label.",
+    "The optional play-intent control is a native button with a contextual accessible name, visible focus, and a touch-sized target.",
+    "The target player owns keyboard controls, captions, transcripts, audio descriptions, autoplay policy, and current playback state.",
+    "Reduced motion removes play-control scaling transitions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/sections.css."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
+}

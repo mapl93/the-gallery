@@ -1,0 +1,228 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "lightbox",
+  "name": "Lightbox",
+  "registryId": "B17",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Modal image viewer contract with open state, content, image, close, previous and next navigation, counter, caption, focus trapping, and gallery keyboard behavior.",
+  "dependencies": ["modal"],
+  "source": {
+    "registry": "registry.json#/components/lightbox",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".lightbox"
+    },
+    "docs": "site/src/content/components/lightbox.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".lightbox",
+      "className": ".lightbox",
+      "required": true,
+      "description": "Fixed full-screen overlay that owns backdrop and visibility state."
+    },
+    {
+      "name": "content",
+      "selector": ".lightbox__content",
+      "className": ".lightbox__content",
+      "required": true,
+      "description": "Image stage and positioning context."
+    },
+    {
+      "name": "image",
+      "selector": ".lightbox__image",
+      "className": ".lightbox__image",
+      "required": true,
+      "description": "Displayed image."
+    },
+    {
+      "name": "close",
+      "selector": ".lightbox__close",
+      "className": ".lightbox__close",
+      "required": true,
+      "description": "Dismiss control."
+    },
+    {
+      "name": "nav",
+      "selector": ".lightbox__nav",
+      "className": ".lightbox__nav",
+      "required": false,
+      "description": "Previous or next image navigation control."
+    },
+    {
+      "name": "counter",
+      "selector": ".lightbox__counter",
+      "className": ".lightbox__counter",
+      "required": false,
+      "description": "Current image position indicator."
+    },
+    {
+      "name": "caption",
+      "selector": ".lightbox__caption",
+      "className": ".lightbox__caption",
+      "required": false,
+      "description": "Visible image caption."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default modal image viewer."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default viewport-based image bounds."
+    }
+  ],
+  "states": [
+    {
+      "name": "closed",
+      "selectors": [".lightbox"],
+      "description": "Hidden resting overlay state."
+    },
+    {
+      "name": "open",
+      "selectors": [".lightbox--open"],
+      "description": "Visible overlay state controlled by lightbox--open."
+    },
+    {
+      "name": "previousNav",
+      "selectors": [".lightbox__nav--prev"],
+      "description": "Previous image navigation placement."
+    },
+    {
+      "name": "nextNav",
+      "selectors": [".lightbox__nav--next"],
+      "description": "Next image navigation placement."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "visibility",
+      "selectors": [".lightbox--open"],
+      "description": "The lightbox is hidden by default and becomes visible when lightbox--open is applied."
+    },
+    {
+      "name": "modalSemantics",
+      "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby", "aria-describedby"],
+      "description": "The lightbox inherits modal dialog semantics and must describe the current image or gallery context."
+    },
+    {
+      "name": "focusManagement",
+      "events": ["open", "close", "Tab", "Shift+Tab"],
+      "description": "Focus should move into the lightbox on open, remain contained while open, and return to the invoking element on close."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "close action", "backdrop click"],
+      "description": "The lightbox should close on Escape, explicit close, or documented backdrop interaction."
+    },
+    {
+      "name": "galleryNavigation",
+      "selectors": [".lightbox__nav--prev", ".lightbox__nav--next"],
+      "events": ["ArrowLeft", "ArrowRight", "previous image", "next image"],
+      "description": "Previous and next controls should update the image, counter, caption, and accessible description together."
+    }
+  ],
+  "properties": [
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the lightbox overlay is visible; focus management and dismissal remain target behavior.",
+      "targetMappings": {
+        "web": [
+          { "kind": "class", "selector": ".lightbox", "classNames": [".lightbox--open"] }
+        ]
+      }
+    },
+    {
+      "name": "alt",
+      "type": "string",
+      "required": true,
+      "description": "Accessible alternative text for the displayed image.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".lightbox__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }
+        ]
+      }
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible caption synchronized with the displayed image.",
+      "targetMappings": {
+        "web": [
+          { "kind": "content", "selector": ".lightbox__caption" }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-text-inverse"
+      ],
+      "radius": [
+        "--radius-sm"
+      ],
+      "z-index": [
+        "--z-modal"
+      ],
+      "transition": [
+        "--transition-base"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Trap focus inside the lightbox while it is open and restore focus to the invoking element on close.",
+    "Close on Escape and provide a visible close control.",
+    "Provide descriptive alt text for every image.",
+    "Keep counter, caption, and accessible description synchronized when navigating images.",
+    "Respect reduced motion preferences for image transitions."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; modal behavior, focus trapping, image navigation, and state synchronization must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

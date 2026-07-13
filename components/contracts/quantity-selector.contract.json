@@ -1,0 +1,344 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "quantity-selector",
+  "name": "Quantity Selector",
+  "registryId": "A10",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Quantity stepper primitive with decrement and increment controls, native number input, hidden browser spinner, and min/max/step behavior.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/quantity-selector",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".qty"
+    },
+    "docs": "site/src/content/components/quantity-selector.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".qty",
+      "className": ".qty",
+      "required": true,
+      "description": "Inline quantity stepper wrapper."
+    },
+    {
+      "name": "button",
+      "selector": ".qty__btn",
+      "className": ".qty__btn",
+      "required": true,
+      "description": "Increment or decrement button."
+    },
+    {
+      "name": "input",
+      "selector": ".qty__input",
+      "className": ".qty__input",
+      "required": true,
+      "description": "Native numeric quantity input."
+    },
+    {
+      "name": "innerSpinButton",
+      "selector": ".qty__input::-webkit-inner-spin-button",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit spin button hidden by the CSS adapter."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default quantity selector."
+    },
+    {
+      "name": "error",
+      "className": ".qty--error",
+      "default": false,
+      "description": "Invalid quantity presentation."
+    },
+    {
+      "name": "success",
+      "className": ".qty--success",
+      "default": false,
+      "description": "Successfully validated quantity presentation."
+    },
+    {
+      "name": "warning",
+      "className": ".qty--warning",
+      "default": false,
+      "description": "Quantity that needs attention without being invalid."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default quantity button and input size."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".qty"],
+      "description": "Default quantity selector state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".qty:hover:not(:has(.qty__input:disabled))"],
+      "description": "Pointer hover state that preserves the active validation color family."
+    },
+    {
+      "name": "focusWithin",
+      "selectors": [".qty:focus-within"],
+      "description": "Shared inner border and outer focus ring when a control inside the selector has focus."
+    },
+    {
+      "name": "buttonHover",
+      "selectors": [".qty__btn:hover:not(:disabled)"],
+      "description": "Pointer hover state on increment or decrement buttons."
+    },
+    {
+      "name": "buttonDisabled",
+      "selectors": [".qty__btn:disabled"],
+      "description": "Derived unavailable state when the value reaches a boundary or the whole field is disabled."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".qty:has(.qty__input:disabled)"],
+      "description": "Unavailable selector state driven by the native input disabled attribute."
+    },
+    {
+      "name": "errorFocusWithin",
+      "selectors": [".qty--error:focus-within"],
+      "description": "Focused error variant state."
+    },
+    {
+      "name": "successFocusWithin",
+      "selectors": [".qty--success:focus-within"],
+      "description": "Focused success variant state."
+    },
+    {
+      "name": "warningFocusWithin",
+      "selectors": [".qty--warning:focus-within"],
+      "description": "Focused warning variant state."
+    },
+    {
+      "name": "spinButtonsHidden",
+      "selectors": [".qty__input::-webkit-inner-spin-button", ".qty__input::-webkit-outer-spin-button"],
+      "description": "Native WebKit spin buttons hidden by the CSS adapter."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeNumber",
+      "selectors": [".qty__input"],
+      "attributes": ["type=\"number\"", "min", "max", "step", "value", "disabled", "aria-label", "aria-describedby", "aria-invalid"],
+      "description": "The input should preserve native number semantics, constraints, and mobile keyboard support."
+    },
+    {
+      "name": "incrementDecrement",
+      "selectors": [".qty__btn--decrement", ".qty__btn--increment", ".qty__input"],
+      "events": ["click on step buttons", "input", "change", "ArrowUp and ArrowDown on the native field"],
+      "description": "Shared progressive enhancement updates by step, clamps to min and max, emits input and change, and preserves native keyboard stepping."
+    },
+    {
+      "name": "buttonAvailability",
+      "selectors": [".qty__btn:disabled"],
+      "attributes": ["disabled"],
+      "description": "Progressive enhancement disables decrement and increment at their respective boundaries and disables both when the field is unavailable."
+    },
+    {
+      "name": "validationComposition",
+      "selectors": [".qty--error", ".qty--success", ".qty--warning", ".qty__input"],
+      "attributes": ["aria-invalid=\"true\" only for error", "aria-describedby references associated feedback"],
+      "description": "The selector owns validation treatment for its control; a composing field wrapper owns visible label and feedback text."
+    }
+  ],
+  "properties": [
+    {
+      "name": "value",
+      "type": "number",
+      "required": true,
+      "description": "Current quantity represented by the native number field.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "min",
+      "type": "number",
+      "required": false,
+      "unsetBehavior": "Omit min when the target has no lower quantity boundary.",
+      "description": "Optional minimum quantity used by native validation and step-button availability.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "min", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "required": false,
+      "unsetBehavior": "Omit max when the target has no upper quantity boundary.",
+      "description": "Optional maximum quantity used by native validation and step-button availability.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "max", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "minimum": 0,
+      "step": 1,
+      "defaultValue": 1,
+      "description": "Positive increment used by native and enhanced stepping; native number inputs default to one.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "step", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected from the canonical variant list.",
+      "targetMappings": {
+        "web": [{ "kind": "optionClass", "selector": ".qty", "source": "variants" }]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native field and both step buttons unavailable.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".qty__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] },
+          { "kind": "attribute", "selector": ".qty__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }
+        ]
+      }
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the native quantity field.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "decrementLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the decrement button.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__btn--decrement", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }]
+      }
+    },
+    {
+      "name": "incrementLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the increment button.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__btn--increment", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }]
+      }
+    },
+    {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit aria-describedby when no external feedback is composed.",
+      "description": "Id of external supporting or validation feedback associated with the field.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-surface-secondary",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-focused-inner-border",
+        "--color-input-error-focused-outer-border",
+        "--color-input-error-unfocused-icon",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-focused-inner-border",
+        "--color-input-success-focused-outer-border",
+        "--color-input-success-unfocused-icon",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-focused-inner-border",
+        "--color-input-warning-focused-outer-border",
+        "--color-input-warning-unfocused-icon"
+      ],
+      "spacing": [
+        "--space-button-min-height"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size",
+        "--font-family-body"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ]
+    }
+  },
+  "accessibility": [
+    "Provide a visible label or equivalent accessible name for the quantity input.",
+    "Name increment and decrement buttons clearly.",
+    "Respect min, max, step, disabled, and inventory constraints.",
+    "Do not rely on hidden browser spin buttons as the only way to change the value.",
+    "Keep typed values and button updates synchronized."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css-js",
+      "notes": "Canonical CSS and shared progressive enhancement implement validation, step updates, boundaries, and state synchronization."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-js",
+      "notes": "Shopify Liquid can render the quantity control and target JavaScript should synchronize cart quantity changes."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

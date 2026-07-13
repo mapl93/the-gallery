@@ -1,0 +1,152 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "scroll-area",
+  "name": "Scroll Area",
+  "registryId": "B16",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Native scroll container with tokenized scrollbar track/thumb styling, hover state, and keyboard-accessible scroll-region requirements.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/scroll-area",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".scroll-area"
+    },
+    "docs": "site/src/content/components/scroll-area.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".scroll-area",
+      "className": ".scroll-area",
+      "required": true,
+      "description": "Scrollable content region."
+    },
+    {
+      "name": "scrollbar",
+      "selector": ".scroll-area::-webkit-scrollbar",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit scrollbar box."
+    },
+    {
+      "name": "scrollbarTrack",
+      "selector": ".scroll-area::-webkit-scrollbar-track",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit scrollbar track."
+    },
+    {
+      "name": "scrollbarThumb",
+      "selector": ".scroll-area::-webkit-scrollbar-thumb",
+      "required": false,
+      "generated": true,
+      "description": "Generated WebKit scrollbar thumb."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default thin scroll area."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default scrollbar thickness."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".scroll-area"],
+      "description": "Default scrollable region state."
+    },
+    {
+      "name": "thumbHover",
+      "selectors": [".scroll-area::-webkit-scrollbar-thumb:hover"],
+      "description": "Pointer hover state on supported scrollbar thumbs."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "nativeScrolling",
+      "selectors": [".scroll-area"],
+      "description": "The component should preserve native scrolling behavior instead of replacing it with custom drag-only mechanics."
+    },
+    {
+      "name": "keyboardAccess",
+      "attributes": ["tabindex", "aria-label", "aria-labelledby"],
+      "description": "When a scroll area contains overflow not reachable through child focus, the region should be focusable and named."
+    },
+    {
+      "name": "scrollbarStyling",
+      "selectors": [".scroll-area::-webkit-scrollbar-thumb", ".scroll-area::-webkit-scrollbar-thumb:hover"],
+      "description": "Scrollbar styling is progressive enhancement and must not remove platform scroll affordances."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for a focusable scroll region when surrounding context does not already provide one.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".scroll-area", "attribute": "aria-label", "valueFrom": "property" }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-border-default"
+      ],
+      "radius": [
+        "--radius-full"
+      ]
+    }
+  },
+  "accessibility": [
+    "Preserve native scrolling and platform scrollbar behavior.",
+    "Make the scroll region focusable and named when keyboard users need to scroll overflow content directly.",
+    "Do not hide scrollbars when overflow content needs to be discoverable.",
+    "Ensure content inside the scroll area remains reachable by keyboard and assistive technology."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css with progressive WebKit scrollbar styling."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render scroll regions with the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

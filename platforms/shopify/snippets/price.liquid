@@ -1,12 +1,32 @@
 {%- comment -%}
   Snippet: price
-  Usage: {% render 'price', product: product %}
+  Usage: {% render 'price', product: product, accessible_label: accessible_label %}
+
+  Optional OpenType switches:
+  - alternate_digits, slashed_zero, tabular_numbers
+  - contextual_alternates, fractions
 {%- endcomment -%}
 
-<div class="price">
-  {%- if product.compare_at_price > product.price -%}
+{%- assign on_sale = false -%}
+{%- if product.compare_at_price > product.price -%}
+  {%- assign on_sale = true -%}
+{%- endif -%}
+
+<div
+  class="price{% if on_sale %} price--on-sale{% endif %}"
+  data-price-alternate-digits="{% if alternate_digits %}true{% else %}false{% endif %}"
+  data-price-slashed-zero="{% if slashed_zero == false %}false{% else %}true{% endif %}"
+  data-price-tabular-numbers="{% if tabular_numbers == false %}false{% else %}true{% endif %}"
+  data-price-contextual-alternates="{% if contextual_alternates == false %}false{% else %}true{% endif %}"
+  data-price-fractions="{% if fractions %}true{% else %}false{% endif %}"
+  {% if accessible_label != blank %}
+    role="group"
+    aria-label="{{ accessible_label | escape }}"
+  {% endif %}
+>
+  {%- if on_sale -%}
     <span class="price__compare">{{ product.compare_at_price | money }}</span>
-    <span class="price__current price__current--sale">{{ product.price | money }}</span>
+    <span class="price__current">{{ product.price | money }}</span>
   {%- else -%}
     <span class="price__current">{{ product.price | money }}</span>
   {%- endif -%}
@@ -16,7 +36,4 @@
       / {{ product.selected_or_first_available_variant.unit_price_measurement.reference_unit }}
     </span>
   {%- endif -%}
-  {%- unless product.available -%}
-    <span class="badge badge--error">Sold Out</span>
-  {%- endunless -%}
 </div>

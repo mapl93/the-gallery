@@ -1,0 +1,190 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "tabs",
+  "name": "Tabs",
+  "registryId": "B7",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Tablist and panel navigation with selected tab state, hidden panel state, keyboard navigation behavior, and ARIA tab semantics.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/tabs",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".tabs"
+    },
+    "docs": "site/src/content/components/tabs.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".tabs",
+      "className": ".tabs",
+      "required": true,
+      "description": "Wrapper for tablist and panels."
+    },
+    {
+      "name": "list",
+      "selector": ".tabs__list",
+      "className": ".tabs__list",
+      "required": true,
+      "description": "Scrollable tablist container."
+    },
+    {
+      "name": "tab",
+      "selector": ".tabs__tab",
+      "className": ".tabs__tab",
+      "required": true,
+      "description": "Interactive tab control."
+    },
+    {
+      "name": "panel",
+      "selector": ".tabs__panel",
+      "className": ".tabs__panel",
+      "required": true,
+      "description": "Content panel associated with a tab."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default horizontal tabs."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default tab spacing."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".tabs"],
+      "description": "Resting tabs state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".tabs__tab:hover"],
+      "description": "Pointer hover state on each tab."
+    },
+    {
+      "name": "selected",
+      "selectors": [".tabs__tab[aria-selected=\"true\"]"],
+      "description": "Selected tab state."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".tabs__tab:focus-visible"],
+      "description": "Keyboard focus indicator on each tab."
+    },
+    {
+      "name": "panelHidden",
+      "selectors": [".tabs__panel[hidden]"],
+      "description": "Hidden inactive panel state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "tabSemantics",
+      "attributes": ["role=\"tablist\"", "role=\"tab\"", "role=\"tabpanel\"", "aria-selected", "aria-controls", "aria-labelledby"],
+      "description": "Tabs must expose linked tab and panel semantics."
+    },
+    {
+      "name": "keyboardNavigation",
+      "events": ["ArrowLeft", "ArrowRight", "Home", "End", "Enter", "Space"],
+      "description": "Keyboard navigation should move between tabs and activate the selected panel."
+    },
+    {
+      "name": "panelVisibility",
+      "selectors": [".tabs__panel[hidden]"],
+      "attributes": ["hidden"],
+      "description": "Only the active panel should be visible; inactive panels use hidden."
+    }
+  ],
+  "properties": [
+    {
+      "name": "selected",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Marks an individual tab as selected; the containing tab set must keep exactly one tab and panel active.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".tabs__tab",
+            "attribute": "aria-selected",
+            "values": {
+              "true": "true",
+              "false": "false"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-text-secondary",
+        "--color-text-primary",
+        "--color-text-accent",
+        "--color-border-focus"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size",
+        "--font-family-body"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use role=\"tablist\" on the list, role=\"tab\" on each trigger, and role=\"tabpanel\" on each panel.",
+    "Connect each tab and panel with aria-controls and aria-labelledby.",
+    "Set aria-selected=\"true\" only on the active tab.",
+    "Use hidden on inactive panels.",
+    "Support arrow key navigation between tabs."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class composition in components/css/layout.css; tab selection behavior must be provided by the consuming target."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

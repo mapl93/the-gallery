@@ -1,26 +1,61 @@
 ## Overview
 
-Removable tag/chip for filtering.
+Compact category, filter, or selected-value label with an optional named remove action.
 
-<Preview html={"<span class=\"tag\">Ceramic <button class=\"tag__remove\" aria-label=\"Remove\">&times;</button></span> <span class=\"tag\">Handmade <button class=\"tag__remove\" aria-label=\"Remove\">&times;</button></span>"} label="Tag" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><span class="tag"><span class="tag__label">Stoneware</span><button class="tag__remove" type="button" aria-label="Remove Stoneware filter"></button></span></div>'} label="Removable tag" />
+
+## Presentation
+
+Tag has one neutral variant and one compact size. The visible value is required; the remove button is optional and uses a fixed X indicator with accepted Lucide geometry.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `label` | text | `.tag__label` |
+| `removeAction` | `true` | `.tag__remove` button slot |
+| `removeLabel` | text | `.tag__remove[aria-label]` |
+| `removalDisabled` | `true` | `.tag__remove[disabled]` |
+
+### Passive value
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><span class="tag"><span class="tag__label">Handmade</span></span></div>'} label="Tag without remove action" />
+
+### Disabled removal
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><span class="tag"><span class="tag__label">Stoneware</span><button class="tag__remove" type="button" aria-label="Remove Stoneware filter" disabled></button></span></div>'} label="Tag with disabled remove action" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Tag to represent one current value, applied filter, or category that may be removed.</Do>
+  <Dont>Do not use Tag as a passive status; use Badge instead.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Keep only the remove button interactive when removal is the available action.</Do>
+  <Dont>Do not make the full Tag clickable unless the product requirement is navigation, in which case use Link.</Dont>
+</DoDont>
+
+The native button emits the removal request. The consuming target owns the state update, DOM removal, focus destination, and contextual announcement.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  The remove control is a native `button`, so Enter and Space activation work without custom keyboard handling.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+- Use `type="button"` so removal does not submit a surrounding form.
+- Include the visible value in the accessible name, such as `Remove Stoneware filter`.
+- Keep the X indicator decorative; the button's accessible name communicates the action.
+- When removal changes an editable list or active filters, announce the result from the consuming interface's live region.
+- Move focus intentionally when removing the currently focused Tag from a keyboard-managed collection.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.tag`</td><td>class</td><td>—</td><td>Base tag styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible represented value</td></tr>
+  <tr><td>`removeAction`</td><td>slot</td><td>absent</td><td>Optional native remove button</td></tr>
+  <tr><td>`removeLabel`</td><td>string</td><td>empty</td><td>Accessible name including the represented value</td></tr>
+  <tr><td>`removalDisabled`</td><td>boolean</td><td>`false`</td><td>Temporarily disables the remove button</td></tr>
 </PropTable>
+
+The canonical structure separates `.tag__label` from the optional `.tag__remove`, allowing adapters to update content and actions independently.

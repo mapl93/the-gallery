@@ -1,32 +1,50 @@
 ## Overview
 
-Sticky sidebar with subtotal, shipping, tax, total, and checkout CTA.
+Cart Summary presents target-owned totals and the primary checkout handoff. It supports an optional expectation note and optional target-native express checkout actions.
 
-<Preview html={"<div class=\"cart-summary\" style=\"max-width:360px;padding:16px;border:1px solid var(--color-border-default);border-radius:8px;\"><h3 class=\"cart-summary__title\">Order Summary</h3><div class=\"cart-summary__row\"><span>Subtotal</span><span class=\"cart-summary__value\">$240.00</span></div><div class=\"cart-summary__row\"><span>Shipping</span><span class=\"cart-summary__value\">Free</span></div><div class=\"cart-summary__divider\"></div><div class=\"cart-summary__row cart-summary__row--total\"><span>Total</span><span class=\"cart-summary__value\">$240.00</span></div><button class=\"btn\" style=\"width:100%;margin-top:16px;\">Checkout</button></div>"} label="Cart Summary" />
+<Preview
+  html={'<aside class="cart-summary tg-preview-frame--sm"><h2 class="cart-summary__title">Order Summary</h2><div class="cart-summary__row"><span>Subtotal</span><span class="cart-summary__value">$240.00</span></div><div class="cart-summary__row"><span>Shipping</span><span class="cart-summary__value">Free</span></div><div class="cart-summary__row"><span>Discount</span><span class="cart-summary__value">-$24.00</span></div><div class="cart-summary__row cart-summary__row--total"><span>Total</span><span class="cart-summary__value">$216.00</span></div><button class="btn cart-summary__checkout" type="button">Checkout</button><p class="cart-summary__note">Taxes calculated at checkout.</p></aside>'}
+  label="Cart Summary"
+/>
+
+## Presentation
+
+`rows` is a required slot for subtotal, shipping, discounts, taxes, and total. The total row may use `.cart-summary__row--total` for emphasis, while each target-formatted amount uses `.cart-summary__value`.
+
+The checkout button is required. `checkoutDisabled` represents a temporarily unavailable cart state; optional express actions compose in their own region without replacing the primary handoff.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show real-time updates (totals, quantities) when the user modifies the cart.</Do>
-  <Dont>Don't require a page reload for cart changes — use AJAX for a smooth experience.</Dont>
+  <Do>Derive every displayed amount and checkout state from the same commerce snapshot.</Do>
+  <Dont>Do not estimate taxes, discounts, or shipping in the component presentation.</Dont>
 </DoDont>
+
+- Keep the total visually distinct from supporting rows.
+- Use `note` for concise checkout expectations, not policy-length content.
+- Explain unavailable checkout state in surrounding content when disabling the action.
 
 ## Accessibility
 
-<Callout type="tip">
-  Cart components are designed for Shopify's AJAX Cart API. Wire up the JS interactions in your theme.
-</Callout>
+- Use readable labels for every subtotal, discount, tax, shipping, and total value.
+- Keep row labels and values in a logical reading order.
+- Ensure the checkout action remains keyboard reachable after totals update.
+- Do not rely on sticky positioning as the only path to checkout.
+- Give target-native express actions distinct accessible names.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Button](/components/button)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.cart-summary`</td><td>class</td><td>—</td><td>Base cart summary styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Summary title</td></tr>
+  <tr><td>`rows`</td><td>slot</td><td>required</td><td>Subtotal, shipping, discount, tax, and total rows</td></tr>
+  <tr><td>`note`</td><td>string</td><td>optional</td><td>Checkout expectation note</td></tr>
+  <tr><td>`checkoutLabel`</td><td>string</td><td>required</td><td>Primary checkout action label</td></tr>
+  <tr><td>`checkoutDisabled`</td><td>boolean</td><td>`false`</td><td>Disables checkout while cart state is unavailable</td></tr>
+  <tr><td>`express`</td><td>slot</td><td>optional</td><td>Target-native express checkout actions</td></tr>
 </PropTable>

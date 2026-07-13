@@ -1,0 +1,513 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "button",
+  "name": "Button",
+  "registryId": "A1",
+  "category": "primitives",
+  "status": "stable",
+  "summary": "Foundation action component with visual variants, size modifiers, accessibility states, independent leading and trailing icon slots, configurable loading placement, complete activation suppression, and copy-and-own CSS implementation.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/button",
+    "css": {
+      "file": "components/css/primitives.css",
+      "selector": ".btn"
+    },
+    "docs": "site/src/content/components/button.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".btn",
+      "className": ".btn",
+      "required": true,
+      "description": "Interactive root element. Use a native button for actions or an anchor for navigation."
+    },
+    {
+      "name": "leadingIcon",
+      "selector": ".btn__icon--leading",
+      "className": ".btn__icon--leading",
+      "required": false,
+      "description": "Optional icon slot before the visible label. Compose it with the base .btn__icon class."
+    },
+    {
+      "name": "trailingIcon",
+      "selector": ".btn__icon--trailing",
+      "className": ".btn__icon--trailing",
+      "required": false,
+      "description": "Optional icon slot after the visible label. Compose it with the base .btn__icon class."
+    },
+    {
+      "name": "leadingLoadingIndicator",
+      "selector": ".btn[aria-busy=\"true\"]::before",
+      "required": false,
+      "generated": true,
+      "description": "Generated busy indicator used when loading resolves to the leading side."
+    },
+    {
+      "name": "trailingLoadingIndicator",
+      "selector": ".btn[aria-busy=\"true\"]::after",
+      "required": false,
+      "generated": true,
+      "description": "Generated busy indicator used when loading resolves to the trailing side."
+    }
+  ],
+  "variants": [
+    {
+      "name": "primary",
+      "className": null,
+      "default": true,
+      "description": "Default high-emphasis action."
+    },
+    {
+      "name": "secondary",
+      "className": ".btn--secondary",
+      "default": false,
+      "description": "Supporting action alongside a primary button."
+    },
+    {
+      "name": "outline",
+      "className": ".btn--outline",
+      "default": false,
+      "description": "Lower-emphasis bordered action."
+    },
+    {
+      "name": "link",
+      "className": ".btn--link",
+      "default": false,
+      "description": "Text-link visual treatment with button semantics; hover preserves the resting visual style."
+    },
+    {
+      "name": "danger",
+      "className": ".btn--danger",
+      "default": false,
+      "description": "Destructive or irreversible action."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "sm",
+      "className": ".btn--sm",
+      "default": false,
+      "description": "Compact button for dense interfaces."
+    },
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default button size."
+    },
+    {
+      "name": "lg",
+      "className": ".btn--lg",
+      "default": false,
+      "description": "Large button for high-emphasis calls to action."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [".btn"],
+      "description": "Interactive resting state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".btn:hover"],
+      "description": "Pointer hover state."
+    },
+    {
+      "name": "active",
+      "selectors": [".btn:active"],
+      "description": "Pressed state."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".btn:focus-visible"],
+      "description": "Keyboard focus indicator."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".btn:disabled", ".btn[aria-disabled=\"true\"]"],
+      "description": "Unavailable action state."
+    },
+    {
+      "name": "busy",
+      "selectors": [".btn[aria-busy=\"true\"]"],
+      "description": "Pending action state that preserves the label and replaces at most one icon with a generated loading indicator."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "loadingPlacement",
+      "selectors": [".btn[aria-busy=\"true\"]"],
+      "attributes": [
+        "aria-busy=\"true\"",
+        "data-loading-position=\"leading\"",
+        "data-loading-position=\"trailing\""
+      ],
+      "description": "An explicit loading position wins. When it is omitted and exactly one positioned icon exists, loading replaces that icon. With no icons or with both icons, loading resolves to leading. The label and the icon on the opposite side remain visible."
+    },
+    {
+      "name": "disabledActivation",
+      "selectors": [".btn:disabled", ".btn[aria-disabled=\"true\"]"],
+      "attributes": [
+        "disabled",
+        "aria-disabled=\"true\"",
+        "role=\"link\" on anchor",
+        "href omitted"
+      ],
+      "description": "A disabled native button uses disabled. A disabled anchor keeps link semantics with role=\"link\" and aria-disabled=\"true\" while omitting href, so it has no native mouse, touch, or keyboard activation."
+    },
+    {
+      "name": "busyActivation",
+      "selectors": [".btn[aria-busy=\"true\"]"],
+      "attributes": [
+        "aria-busy=\"true\"",
+        "disabled on button",
+        "role=\"link\" on anchor",
+        "href omitted on anchor"
+      ],
+      "description": "A busy root cannot be reactivated. Native buttons compose aria-busy=\"true\" with disabled; anchors keep role=\"link\" while composing aria-busy=\"true\" with an omitted href. When disabled and busy overlap, the disabling attribute remains present while either property is true."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Visible button label. It may be omitted only for an icon-only button with an equivalent accessible name.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".btn"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Visual emphasis selected from the canonical variant list; primary is the contract default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".btn",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "sizes",
+      "description": "Button size selected from the canonical size list; default is the contract default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".btn",
+            "source": "sizes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the action unavailable. Native buttons use disabled; anchors keep role=\"link\" and aria-disabled=\"true\" while omitting href.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": ["button"]
+          },
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "aria-disabled",
+            "values": {
+              "true": "true",
+              "false": null
+            },
+            "elements": ["a"]
+          },
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "role",
+            "values": {
+              "true": "link",
+              "false": null
+            },
+            "elements": ["a"]
+          },
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "href",
+            "removeWhen": [true],
+            "elements": ["a"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "busy",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Marks a pending action, prevents reactivation, and shows the generated loading indicator while preserving visible label content and the root's accessible role and name.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "aria-busy",
+            "values": {
+              "true": "true",
+              "false": null
+            }
+          },
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": ["button"]
+          },
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "role",
+            "values": {
+              "true": "link",
+              "false": null
+            },
+            "elements": ["a"]
+          },
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "href",
+            "removeWhen": [true],
+            "elements": ["a"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "leadingIcon",
+      "type": "slot",
+      "required": false,
+      "description": "Optional icon before the label. It can coexist with trailingIcon.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".btn__icon--leading",
+            "classNames": [".btn__icon", ".btn__icon--leading"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "trailingIcon",
+      "type": "slot",
+      "required": false,
+      "description": "Optional icon after the label. It can coexist with leadingIcon.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".btn__icon--trailing",
+            "classNames": [".btn__icon", ".btn__icon--trailing"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "iconOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Uses square icon-only layout. An accessible name remains required.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".btn",
+            "classNames": [".btn--icon-only"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Expands the button to the available inline width.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".btn",
+            "classNames": [".btn--full"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "loadingPosition",
+      "type": "enum",
+      "required": false,
+      "values": ["leading", "trailing"],
+      "unsetBehavior": "When exactly one positioned icon exists, use that side. Otherwise use leading.",
+      "description": "Optional explicit side for the loading indicator. The selected side is replaced and the opposite icon remains visible.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".btn",
+            "attribute": "data-loading-position",
+            "values": {
+              "leading": "leading",
+              "trailing": "trailing"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-button-primary-bg-default",
+        "--color-button-primary-bg-hover",
+        "--color-button-primary-bg-active",
+        "--color-button-primary-text-default",
+        "--color-button-primary-text-hover",
+        "--color-button-primary-text-active",
+        "--color-button-primary-border-default",
+        "--color-button-primary-border-hover",
+        "--color-button-primary-border-active",
+        "--color-button-secondary-bg-default",
+        "--color-button-secondary-bg-hover",
+        "--color-button-secondary-bg-active",
+        "--color-button-secondary-text-default",
+        "--color-button-secondary-text-hover",
+        "--color-button-secondary-text-active",
+        "--color-button-secondary-border-default",
+        "--color-button-secondary-border-hover",
+        "--color-button-secondary-border-active",
+        "--color-button-outline-bg-default",
+        "--color-button-outline-bg-hover",
+        "--color-button-outline-bg-active",
+        "--color-button-outline-text-default",
+        "--color-button-outline-text-hover",
+        "--color-button-outline-text-active",
+        "--color-button-outline-border-default",
+        "--color-button-outline-border-hover",
+        "--color-button-outline-border-active",
+        "--color-button-link-bg-default",
+        "--color-button-link-bg-hover",
+        "--color-button-link-bg-active",
+        "--color-button-link-text-default",
+        "--color-button-link-text-hover",
+        "--color-button-link-text-active",
+        "--color-button-link-border-default",
+        "--color-button-link-border-hover",
+        "--color-button-link-border-active",
+        "--color-button-danger-bg-default",
+        "--color-button-danger-bg-hover",
+        "--color-button-danger-bg-active",
+        "--color-button-danger-text-default",
+        "--color-button-danger-text-hover",
+        "--color-button-danger-text-active",
+        "--color-button-danger-border-default",
+        "--color-button-danger-border-hover",
+        "--color-button-danger-border-active",
+        "--color-border-focus"
+      ],
+      "spacing": [
+        "--space-button-padding-x",
+        "--space-button-padding-y",
+        "--space-button-min-height",
+        "--space-button-gap",
+        "--space-button-icon-size"
+      ],
+      "typography": [
+        "--typo-button-size",
+        "--typo-button-weight",
+        "--font-family-body"
+      ],
+      "radius": [
+        "--radius-button",
+        "--radius-full"
+      ],
+      "transition": [
+        "--transition-button-duration"
+      ],
+      "easing": [
+        "--easing-button"
+      ],
+      "opacity": [
+        "--opacity-disabled"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use native button elements for actions and anchor elements for navigation.",
+    "Do not remove visible focus indication from focus-visible state.",
+    "Icon-only buttons must provide an accessible name with aria-label or equivalent visible text.",
+    "Leading and trailing icons are decorative when the visible label already names the action and should be hidden from assistive technology.",
+    "Disabled actions should use disabled for native buttons. Disabled anchors keep role=\"link\" and aria-disabled=\"true\" while omitting href.",
+    "Busy actions should use aria-busy=\"true\" while preserving the visible label, accessible role, and accessible name. Busy native buttons also use disabled; busy anchors keep role=\"link\" while omitting href so no input method can reactivate them."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented by class, slot, and attribute composition in components/css/primitives.css."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render native button or anchor elements with the same class contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

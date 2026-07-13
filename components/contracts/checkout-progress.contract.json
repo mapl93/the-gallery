@@ -1,0 +1,93 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "checkout-progress",
+  "name": "Checkout Progress Indicator",
+  "registryId": "P4",
+  "category": "pages",
+  "status": "pilot",
+  "summary": "Informational ordered progress composition with complete, current, and upcoming step presentation while routing and navigation remain target-owned.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/checkout-progress",
+    "css": { "file": "components/css/pages.css", "selector": ".checkout-progress" },
+    "docs": "site/src/content/components/checkout-progress.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".checkout-progress", "className": ".checkout-progress", "required": true, "description": "Ordered informational checkout-progress root." },
+    { "name": "step", "selector": ".checkout-progress__step", "className": ".checkout-progress__step", "required": true, "description": "Repeated target-owned checkout step with a complete, current, or upcoming status." },
+    { "name": "connector", "selector": ".checkout-progress__step::after", "required": false, "generated": true, "description": "Decorative connector between adjacent steps." },
+    { "name": "indicator", "selector": ".checkout-progress__indicator", "className": ".checkout-progress__indicator", "required": true, "description": "Visible step number, completion mark, or equivalent non-color status cue." },
+    { "name": "label", "selector": ".checkout-progress__label", "className": ".checkout-progress__label", "required": true, "description": "Visible step label." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default informational progress presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Horizontal wide layout that stacks vertically at narrow widths." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".checkout-progress"], "description": "Default progress presentation, including upcoming steps without a status modifier style." },
+    { "name": "complete", "selectors": [".checkout-progress__step[data-status=\"complete\"] .checkout-progress__indicator", ".checkout-progress__step[data-status=\"complete\"]::after"], "description": "Completed-step presentation." },
+    { "name": "current", "selectors": [".checkout-progress__step[data-status=\"current\"] .checkout-progress__indicator", ".checkout-progress__step[data-status=\"current\"] .checkout-progress__label"], "description": "Current-step presentation." },
+    { "name": "lastStep", "selectors": [".checkout-progress__step:last-child::after", ".checkout-progress__step:last-child"], "description": "Final step omits the trailing connector." }
+  ],
+  "behavior": [
+    {
+      "name": "stepStatus",
+      "selectors": [".checkout-progress__step", ".checkout-progress__indicator", ".checkout-progress__label"],
+      "attributes": ["data-status", "aria-current=\"step\""],
+      "description": "Targets supply ordered steps and status values. Only the current step uses aria-current=\"step\"; complete status also has a textual or symbolic cue that does not rely on color alone."
+    },
+    {
+      "name": "progressSemantics",
+      "selectors": [".checkout-progress"],
+      "attributes": ["aria-label"],
+      "description": "The root exposes an accessible name and ordered-list semantics. It is informational unless a target separately composes native navigation."
+    },
+    {
+      "name": "navigationBoundary",
+      "selectors": [".checkout-progress__step"],
+      "description": "This contract does not assign links, route transitions, click behavior, visited-state rules, or checkout-state synchronization to steps."
+    }
+  ],
+  "properties": [
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name describing the checkout-progress sequence.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".checkout-progress", "attribute": "aria-label", "valueFrom": "property", "elements": ["ol"] }] }
+    },
+    {
+      "name": "steps",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned ordered step records containing status, visible indicator content, and label text.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".checkout-progress", "classNames": [".checkout-progress__step", ".checkout-progress__indicator", ".checkout-progress__label"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-surface-secondary", "--color-text-secondary", "--color-button-primary-bg-default", "--color-button-primary-text-default", "--color-surface-primary", "--color-text-primary"],
+      "spacing": ["--space-layout-touch-target"],
+      "radius": ["--radius-full"],
+      "typography": ["--typo-body-sm-size", "--typo-caption-size"]
+    }
+  },
+  "accessibility": [
+    "Render steps as an ordered list with an accessible sequence label.",
+    "Apply aria-current=\"step\" only to the current step and expose complete status through text or a meaningful symbol in addition to color.",
+    "Keep every step label visible and in source order across horizontal and stacked layouts.",
+    "Treat generated connectors as decorative and exclude them from the accessibility tree.",
+    "Do not add link or button semantics unless a target explicitly owns checkout navigation and supplies the full interaction contract."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented as an informational responsive composition in components/css/pages.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Checkout state and navigation availability require target-native review before adapter mapping." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

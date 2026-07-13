@@ -1,27 +1,48 @@
 ## Overview
 
-Interactive star rating input for review forms with RTL trick.
+Interactive native radio group for choosing one integer rating from one through five. Star Input owns value entry; read-only contexts use Star Rating instead.
 
-<Preview html={"<div class=\"star-input\"><label class=\"star-input__label\"><input class=\"star-input__radio\" type=\"radio\" name=\"star\" value=\"1\" /><span>★</span></label><label class=\"star-input__label\"><input class=\"star-input__radio\" type=\"radio\" name=\"star\" value=\"2\" /><span>★</span></label><label class=\"star-input__label\"><input class=\"star-input__radio\" type=\"radio\" name=\"star\" value=\"3\" /><span>★</span></label><label class=\"star-input__label\"><input class=\"star-input__radio\" type=\"radio\" name=\"star\" value=\"4\" checked /><span>★</span></label><label class=\"star-input__label\"><input class=\"star-input__radio\" type=\"radio\" name=\"star\" value=\"5\" /><span>★</span></label></div>"} label="Star Rating (Interactive)" />
+<Preview html={'<fieldset class="star-input tg-preview-frame" data-value="4" aria-describedby="star-input-help"><legend class="star-input__legend">Your rating</legend><label class="star-input__label"><input class="star-input__radio" type="radio" name="preview-rating" value="1" aria-label="1 star" /><svg class="star-input__indicator" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></label><label class="star-input__label"><input class="star-input__radio" type="radio" name="preview-rating" value="2" aria-label="2 stars" /><svg class="star-input__indicator" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></label><label class="star-input__label"><input class="star-input__radio" type="radio" name="preview-rating" value="3" aria-label="3 stars" /><svg class="star-input__indicator" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></label><label class="star-input__label"><input class="star-input__radio" type="radio" name="preview-rating" value="4" aria-label="4 stars" checked /><svg class="star-input__indicator" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></label><label class="star-input__label"><input class="star-input__radio" type="radio" name="preview-rating" value="5" aria-label="5 stars" /><svg class="star-input__indicator" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></label></fieldset><p class="tg-preview-note" id="star-input-help">Choose one rating.</p>'} label="Star Input" />
+
+## Presentation
+
+The root is a native fieldset with a visible legend. Five labels contain native radios that share one `name`; each label is a touch-sized focus projection for its radio, and the optional indicator remains decorative. Checked, hover, focus-visible, and disabled presentation derive from the native radio state.
+
+The selected `value` is an integer from `1` through `5`. `required` and `disabled` map to native radio attributes, while `describedBy` associates the fieldset with supporting or validation feedback. Pointer preview never replaces the checked value.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Display aggregate ratings prominently — social proof drives conversions.</Do>
-  <Dont>Don't hide negative reviews — authenticity builds trust.</Dont>
+  <Do>Use one Star Input for one clearly labelled rating question inside a native form.</Do>
+  <Dont>Do not replace the radios with click-only stars or reuse Star Input for passive display.</Dont>
 </DoDont>
+
+The containing form decides whether a rating is required and owns any supporting or validation message. Provider submission, persistence, and normalization remain outside Star Input.
 
 ## Accessibility
 
 <Callout type="info">
-  Review components work with Shopify product metafields or third-party review apps.
+  Native radios retain arrow-key movement, validation, reset, focus, and form-submission behavior.
 </Callout>
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
-- Provide a text alternative for the rating value (e.g., "4 out of 5 stars").
+- Use a visible legend or an equivalent programmatic group label.
+- Give every radio a readable choice name such as `1 star` or `5 stars`.
+- Keep all radios in the group on the same native `name`.
+- Project `:focus-visible` from the radio onto its label without removing the radio from the focus order.
+- Associate supporting or validation feedback through `aria-describedby` on the group.
+- Use native `required` and `disabled` states rather than visual-only substitutes.
 
-## API Reference
+## References
+
+**Anatomy:** required `.star-input` group, `.star-input__legend`, repeated `.star-input__label`, and `.star-input__radio`; optional `.star-input__indicator`.
+
+**Dependencies:** None.
 
 <PropTable>
-  <tr><td>`.star-input`</td><td>class</td><td>—</td><td>Base star rating (interactive) styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible rating question</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Shared native radio name</td></tr>
+  <tr><td>`value`</td><td>number</td><td>none</td><td>Selected integer from `1` through `5`</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Requires one native choice</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Makes every radio unavailable</td></tr>
+  <tr><td>`describedBy`</td><td>string</td><td>none</td><td>Supporting or validation message ID</td></tr>
 </PropTable>

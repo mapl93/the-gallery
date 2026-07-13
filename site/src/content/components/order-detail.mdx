@@ -1,33 +1,52 @@
 ## Overview
 
-Single order view with tracking timeline and line items.
+Order Detail presents one authenticated order with a required title and optional metadata, target-owned tracking, and purchased line-item composition.
 
-<Preview html={"<div class=\"order-detail\" style=\"max-width:500px;\"><div class=\"order-detail__header\"><h2 class=\"order-detail__title\">Order #1042</h2></div><div class=\"order-tracking\" style=\"display:flex;gap:24px;margin:16px 0;\"><div class=\"order-tracking__step order-tracking__step--done\"><span class=\"order-tracking__dot\"></span><span class=\"order-tracking__label\">Placed</span></div><div class=\"order-tracking__step order-tracking__step--done\"><span class=\"order-tracking__dot\"></span><span class=\"order-tracking__label\">Shipped</span></div><div class=\"order-tracking__step order-tracking__step--active\"><span class=\"order-tracking__dot\"></span><span class=\"order-tracking__label\">Delivered</span></div></div></div>"} label="Order Detail" />
+<Preview
+  html={'<article class="order-detail tg-preview-frame tg-preview-frame--lg"><header class="order-detail__header"><h1 class="order-detail__title">Order #1042</h1><div class="order-detail__meta"><time datetime="2026-06-15">Jun 15, 2026</time></div></header><div class="order-tracking" aria-label="Delivery progress"><div class="order-tracking__step order-tracking__step--done"><span class="order-tracking__dot" aria-hidden="true"></span><span class="order-tracking__label">Placed</span></div><div class="order-tracking__step order-tracking__step--active" aria-current="step"><span class="order-tracking__dot" aria-hidden="true"></span><span class="order-tracking__label">In transit</span></div><div class="order-tracking__step"><span class="order-tracking__dot" aria-hidden="true"></span><span class="order-tracking__label">Delivered</span></div></div><section class="order-detail__items" aria-label="Purchased items"><article class="cart-line"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /><div class="cart-line__info"><a class="cart-line__title" href="#">Artisan Ceramic Vase</a><span class="cart-line__variant">Large / White</span></div><div class="cart-line__prices"><span class="cart-line__price">$120.00</span></div></article></section></article>'}
+  label="Order Detail"
+/>
+
+## Presentation
+
+The header combines required `title` with optional target-owned `meta`. The example date is fixture content inside that slot.
+
+`tracking` contains repeated steps and their current-state semantics. The labels and number of steps in the artwork are illustrative; the contract does not define a fixed tracking sequence. `lineItems` composes Cart Line Item anatomy for purchased products without quantity, remove, or save-for-later controls.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Map metadata, tracking, and line items from the same authenticated order record.</Do>
+  <Dont>Do not expose cart mutation controls on purchased line items.</Dont>
 </DoDont>
+
+- Let the target determine which tracking steps exist and which step is current.
+- Format order identifiers, dates, statuses, and prices in the target layer.
+- Include only order metadata that helps the customer understand fulfillment or payment.
+- Keep purchased line items linked to useful product detail when that destination remains available.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Protect order details behind the target authentication system and authorize access to the requested order.
+- Mark the active tracking step with `aria-current="step"` and readable text.
+- Keep tracking dots decorative; do not rely on their color to communicate state.
+- Label the purchased-items region and preserve a logical reading order.
+- Remove cart-only mutation controls from composed purchased line items.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Badge](/components/badge)
 - [Cart Line Item](/components/cart-line-item)
 
-## API Reference
+Tracking steps and purchased rows are fixture data inside their respective slots. Neither collection becomes a fixed top-level schema here.
+
+### API Reference
 
 <PropTable>
-  <tr><td>`.order-detail`</td><td>class</td><td>—</td><td>Base order detail styles</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Order title or target-formatted number</td></tr>
+  <tr><td>`meta`</td><td>slot</td><td>optional</td><td>Target-owned date, status, or supporting metadata</td></tr>
+  <tr><td>`tracking`</td><td>slot</td><td>optional</td><td>Target-owned tracking steps and current-state semantics</td></tr>
+  <tr><td>`lineItems`</td><td>slot</td><td>optional</td><td>Purchased Cart Line Item compositions without mutation controls</td></tr>
 </PropTable>

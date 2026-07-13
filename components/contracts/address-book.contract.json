@@ -1,0 +1,68 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "address-book",
+  "name": "Address Book",
+  "registryId": "U6",
+  "category": "account",
+  "status": "pilot",
+  "summary": "Address card grid with default address state, editable cards, and add-new card.",
+  "dependencies": ["button"],
+  "source": {
+    "registry": "registry.json#/components/address-book",
+    "css": { "file": "components/css/account.css", "selector": ".address-grid" },
+    "docs": "site/src/content/components/address-book.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".address-grid", "className": ".address-grid", "required": true, "description": "Address card grid." },
+    { "name": "card", "selector": ".address-card", "className": ".address-card", "required": true, "description": "Address card." },
+    { "name": "defaultTag", "selector": ".address-card__default-tag", "className": ".address-card__default-tag", "required": false, "description": "Default address marker." },
+    { "name": "name", "selector": ".address-card__name", "className": ".address-card__name", "required": true, "description": "Recipient name." },
+    { "name": "text", "selector": ".address-card__text", "className": ".address-card__text", "required": true, "description": "Formatted address text." },
+    { "name": "actions", "selector": ".address-card__actions", "className": ".address-card__actions", "required": false, "description": "Address actions group." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default address card grid." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive address grid." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".address-grid"], "description": "Default address grid." },
+    { "name": "defaultCard", "selectors": [".address-card--default"], "description": "Default address card state." },
+    { "name": "newCard", "selectors": [".address-card--new"], "description": "Add-new address card state." },
+    { "name": "newCardHover", "selectors": [".address-card--new:hover"], "description": "Add-new card hover state." },
+    { "name": "newCardFocus", "selectors": [".address-card--new:focus-visible"], "description": "Visible keyboard focus on the add-address action." }
+  ],
+  "behavior": [
+    { "name": "addressActions", "selectors": [".address-card__actions"], "events": ["click"], "description": "Address actions should edit, delete, or set default address through target account APIs." },
+    { "name": "newAddress", "selectors": [".address-card--new"], "attributes": ["native button or link semantics"], "events": ["click", "Enter", "Space"], "description": "Add-new card should use a native action and open or navigate to Address Form." },
+    { "name": "defaultAddress", "selectors": [".address-card--default", ".address-card__default-tag"], "description": "Default address should be represented as text and state." }
+  ],
+  "properties": [
+    { "name": "addresses", "type": "slot", "required": true, "description": "Target-owned collection of address cards and actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-grid", "classNames": [".address-grid"] }] } },
+    { "name": "newAddressLabel", "type": "string", "required": false, "description": "Visible accessible label for the add-address action.", "targetMappings": { "web": [{ "kind": "content", "selector": ".address-card--new span" }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-button-primary-bg-default", "--color-text-primary", "--color-text-secondary", "--color-surface-secondary", "--color-text-disabled"],
+      "radius": ["--radius-md"],
+      "typography": ["--typo-body-size"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Protect address data behind authentication.",
+    "Default address state must be readable text, not only border color.",
+    "Edit, delete, and add actions need clear accessible names."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer addresses and default address state." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

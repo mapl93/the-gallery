@@ -1,0 +1,57 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "related-articles",
+  "name": "Related Articles",
+  "registryId": "L10",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Related/recommended article grid with next/prev navigation.",
+  "dependencies": ["article-card"],
+  "source": {
+    "registry": "registry.json#/components/related-articles",
+    "css": { "file": "components/css/blog.css", "selector": ".related-articles" },
+    "docs": "site/src/content/components/related-articles.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".related-articles", "className": ".related-articles", "required": true, "description": "Related-article section container." },
+    { "name": "title", "selector": ".related-articles__title", "className": ".related-articles__title", "required": false, "description": "Optional related-articles section title." },
+    { "name": "grid", "selector": ".related-articles__grid", "className": ".related-articles__grid", "required": true, "description": "Responsive Article Card composition grid." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default responsive related-article grid." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "One, two, or three columns according to available viewport width." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".related-articles"], "description": "Default related-articles section state." }
+  ],
+  "behavior": [
+    { "name": "targetRecommendations", "selectors": [".related-articles__grid"], "description": "The target selects and supplies related articles as Article Card compositions." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional visible section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".related-articles__title" }] } },
+    { "name": "articles", "type": "slot", "required": true, "description": "Target-owned collection of related Article Card compositions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".related-articles__grid", "classNames": [".related-articles__grid"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary"],
+      "typography": ["--font-family-heading", "--typo-h3-size"],
+      "spacing": ["--space-layout-grid-gap", "--space-layout-section-gap"]
+    }
+  },
+  "accessibility": [
+    "Use a heading level that fits the surrounding article page hierarchy.",
+    "Preserve each composed Article Card's separate heading, destination, image alternative text, and focus behavior.",
+    "Do not include next/previous article navigation in this public property surface until .article-nav ownership is decided."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Related-article grid CSS is implemented; adjacent .article-nav ownership remains unresolved." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map target-selected article recommendations to Article Card compositions." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

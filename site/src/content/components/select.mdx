@@ -1,26 +1,80 @@
 ## Overview
 
-Dropdown select with label.
+Single-choice field with validation feedback, a custom trigger and listbox anchored below the control, plus a native select fallback for forms and no-JavaScript environments.
 
-<Preview html={"<div class=\"select\" style=\"max-width:320px;\"><label class=\"select__label\">Country</label><select class=\"select__field\"><option>Choose an option</option><option>Argentina</option><option>Mexico</option><option>Spain</option></select></div>"} label="Select" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select"><label class="select__label" for="select-country">Country</label><select class="select__field" id="select-country" name="country"><option value="" hidden selected>Choose a country</option><option value="ar">Argentina</option><option value="mx">Mexico</option><option value="es">Spain</option></select></div></div>'} label="Select" />
+
+## Presentation
+
+Select has default, error, success, and warning variants plus one default size. When `theme.js` loads, it generates a control wrapper, trigger, and custom listbox from the native options. The panel opens below the field with an `8px` gap instead of covering the selected value. Without an explicit width, the trigger follows its current content; the panel may grow wider to preserve option legibility while remaining within the viewport.
+
+Hover preserves the active Error, Success, or Warning color family instead of returning the trigger border to Default.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `default` | `.select` |
+| `variant` | `error` | `.select--error` |
+| `variant` | `success` | `.select--success` |
+| `variant` | `warning` | `.select--warning` |
+| `size` | `default` | `.select` |
+
+### Error
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select select--error"><label class="select__label" for="select-country-error">Country</label><select class="select__field" id="select-country-error" name="country-error" aria-invalid="true" aria-describedby="select-country-error-message"><option value="" hidden selected>Choose a country</option><option value="ar">Argentina</option><option value="mx">Mexico</option><option value="es">Spain</option></select><span class="select__message" id="select-country-error-message" role="alert">Choose a country to continue.</span></div></div>'} label="Select error" />
+
+### Success
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select select--success"><label class="select__label" for="select-country-success">Country</label><select class="select__field" id="select-country-success" name="country-success" aria-describedby="select-country-success-message"><option value="ar">Argentina</option><option value="mx" selected>Mexico</option><option value="es">Spain</option></select><span class="select__message" id="select-country-success-message">Country verified.</span></div></div>'} label="Select success" />
+
+### Warning
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select select--warning"><label class="select__label" for="select-country-warning">Country</label><select class="select__field" id="select-country-warning" name="country-warning" aria-describedby="select-country-warning-message"><option value="ar">Argentina</option><option value="mx" selected>Mexico</option><option value="es">Spain</option></select><span class="select__message" id="select-country-warning-message">Confirm that this matches the billing country.</span></div></div>'} label="Select warning" />
+
+The option collection belongs to each use case. The countries shown in the preview are documentation fixtures, not component defaults. Without JavaScript, the original native select remains visible and functional.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Select when a person chooses one value from a compact, known list.</Do>
+  <Dont>Do not use Select for commands, navigation, or multiple selection.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Use a hidden, selected empty-value option when the field needs an initial prompt.</Do>
+  <Dont>Do not use the prompt as a substitute for the visible label.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Pair Error, Success, and Warning styling with a concise, associated message.</Do>
+  <Dont>Do not communicate validation through label, border, or chevron color alone.</Dont>
+</DoDont>
+
+Use Combobox instead when the list requires search, filtering, asynchronous results, or free-form input.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  The native select remains the form value and no-JavaScript fallback. The enhanced UI follows a single-select listbox pattern.
 </Callout>
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
+- Associate the visible label with the enhanced trigger and listbox.
+- Keep focus on the trigger while arrow keys update `aria-activedescendant`.
+- Expose `aria-expanded`, `aria-controls`, `aria-selected`, and `aria-disabled` as documented by the contract.
+- Support Arrow Up, Arrow Down, Home, End, Enter, Space, Escape, Tab, and typeahead.
+- Close after selection, outside interaction, Escape, Tab, or repeated trigger activation.
+- Synchronize every custom selection to the original native field and dispatch native `input` and `change` events.
+- Connect supporting and validation messages to both the native field and generated trigger with `aria-describedby`.
+- Add `aria-invalid="true"` to the native field for errors; the enhancer mirrors it to the trigger. Success and Warning do not use `aria-invalid`.
+- Keep the placeholder as a hidden empty-value native option so it labels the closed trigger without appearing as a disabled choice.
+- Use the native `disabled` attribute for unavailable fields and disabled native options for unavailable choices.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.select`</td><td>class</td><td>—</td><td>Base select styles</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible label associated with the enhanced trigger and listbox</td></tr>
+  <tr><td>`message`</td><td>string</td><td>empty</td><td>Supporting or validation feedback associated with the control</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the native fallback and generated trigger</td></tr>
 </PropTable>
+
+Choices remain native `<option>` children of `.select__field`. The shared `theme.js` generates `.select__control`, `.select__trigger`, `.select__value`, `.select__indicator`, `.select__listbox`, `.select__option`, and `.select__option-check`, then keeps them synchronized with the native field. The chevron and selected check use Lucide geometry.

@@ -1,34 +1,55 @@
 ## Overview
 
-Product quick-view modal with gallery and add-to-cart.
+Quick View composes Modal, Product Gallery, and an optional reduced Product Form into a focused product-purchase surface. It may also provide a direct link to the complete product page.
 
-<Preview html={"<div class=\"quick-view\" style=\"display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:600px;padding:24px;border:1px solid var(--color-border-default);border-radius:12px;\"><div class=\"quick-view__gallery\"><img src=\"https://placehold.co/280x280/f5f0eb/1a1a1a?text=Product\" alt=\"\" style=\"width:100%;border-radius:8px;\" /></div><div class=\"quick-view__info\"><h3 class=\"quick-view__title\">Ceramic Vase</h3><span class=\"quick-view__vendor\">The Gallery</span><p class=\"quick-view__description\">Hand-thrown stoneware vase.</p><a class=\"quick-view__full-link\" href=\"#\">View Full Details</a></div></div>"} label="Quick View" />
+<Preview
+  html={'<div class="tg-preview-stage tg-preview-stage--overlay tg-preview-stage--tall"><button class="btn" type="button" data-preview-trigger aria-expanded="true">Open quick view</button><div class="modal-overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal quick-view" role="dialog" aria-modal="true" aria-labelledby="quick-view-preview-title"><div class="quick-view__gallery"><div class="tg-preview-media tg-preview-media--square" role="img" aria-label="Ceramic vase"></div></div><div class="quick-view__info"><button class="close-btn" type="button" data-preview-close aria-label="Close quick view"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button><h2 class="quick-view__title" id="quick-view-preview-title">Ceramic Vase</h2><span class="quick-view__vendor">The Gallery</span><p class="quick-view__description">Hand-thrown stoneware with a soft mineral glaze.</p><form class="product-form quick-view__form"><div class="product-form__actions"><button class="btn product-form__submit" type="submit">Add to Cart</button></div></form><a class="quick-view__full-link" href="#">View full details</a></div></div></div></div>'}
+  label="Quick View"
+  layout="overlay"
+  interaction={{ selector: '.modal-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Quick View', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', dismissSelector: '.modal-overlay', startVisible: true }}
+/>
+
+## Presentation
+
+Quick View uses the ADR 0069 overlay family: the trigger and surface are siblings, the modal is visible on first load, and the trigger does not constrain its geometry. Modal owns backdrop visibility, focus management, dismissal, and labelled-dialog behavior.
+
+`gallery` and `title` are required. `vendor`, `description`, the reduced `productForm`, and the complete-product link are optional. Quick View does not redefine the behavior of Product Gallery or Product Form.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show real-time updates (totals, quantities) when the user modifies the cart.</Do>
-  <Dont>Don't require a page reload for cart changes — use AJAX for a smooth experience.</Dont>
+  <Do>Use Quick View for a reduced purchase decision that can be completed without the full product page.</Do>
+  <Dont>Do not duplicate every product-page section inside the modal.</Dont>
 </DoDont>
+
+- Include only the media, information, and controls needed for the immediate decision.
+- Provide `fullLinkLabel` and `href` when important details remain on the product page.
+- Keep selected variant and availability state synchronized with the commerce target.
 
 ## Accessibility
 
-<Callout type="tip">
-  Cart components are designed for Shopify's AJAX Cart API. Wire up the JS interactions in your theme.
-</Callout>
+- Inherit Modal focus trapping, Escape dismissal, backdrop behavior, and focus return.
+- Use `role="dialog"`, `aria-modal="true"`, and a label relationship to the product title.
+- Keep gallery alternatives, variant labels, and purchase feedback available in the modal context.
+- Include a visible close mechanism in addition to supported dismissal behavior.
+- Preserve a descriptive focus indicator on the full-details link.
 
-- Trap focus inside the overlay while open. Return focus to the trigger on close.
+## References
 
-## Dependencies
-
-This component uses:
+### Dependencies
 
 - [Modal](/components/modal)
 - [Product Gallery](/components/product-gallery)
 - [Product Form](/components/product-form)
 
-## API Reference
+### API Reference
 
 <PropTable>
-  <tr><td>`.quick-view`</td><td>class</td><td>—</td><td>Base quick view styles</td></tr>
+  <tr><td>`gallery`</td><td>slot</td><td>required</td><td>Product Gallery dependency or reduced media fixture</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Product title</td></tr>
+  <tr><td>`vendor`</td><td>string</td><td>optional</td><td>Vendor or maker text</td></tr>
+  <tr><td>`description`</td><td>string</td><td>optional</td><td>Truncated product description</td></tr>
+  <tr><td>`productForm`</td><td>slot</td><td>optional</td><td>Reduced Product Form dependency</td></tr>
+  <tr><td>`fullLinkLabel`</td><td>string</td><td>optional</td><td>Full product-details link label</td></tr>
+  <tr><td>`href`</td><td>string</td><td>optional</td><td>Full product-details destination</td></tr>
 </PropTable>

@@ -1,0 +1,70 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "stat",
+  "name": "Stat / Statistic",
+  "registryId": "A24",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Metric display primitive with value, label, optional positive or negative change, and responsive stat groups.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/stat",
+    "css": { "file": "components/css/primitives.css", "selector": ".stat" },
+    "docs": "site/src/content/components/stat.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".stat", "className": ".stat", "required": true, "description": "Single metric wrapper." },
+    { "name": "value", "selector": ".stat__value", "className": ".stat__value", "required": true, "description": "Primary metric value." },
+    { "name": "label", "selector": ".stat__label", "className": ".stat__label", "required": true, "description": "Metric label." },
+    { "name": "change", "selector": ".stat__change", "className": ".stat__change", "required": false, "description": "Optional change indicator." },
+    { "name": "group", "selector": ".stat-group", "className": ".stat-group", "required": false, "description": "Responsive group for multiple stats." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default stat." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default stat size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".stat"], "description": "Default stat state." },
+    { "name": "changeUp", "selectors": [".stat__change--up"], "description": "Positive change state." },
+    { "name": "changeDown", "selectors": [".stat__change--down"], "description": "Negative change state." }
+  ],
+  "behavior": [
+    { "name": "metricFormatting", "selectors": [".stat__value", ".stat__change"], "description": "Targets own numeric, currency, percent, and locale formatting." },
+    { "name": "changeText", "selectors": [".stat__change"], "description": "Change indicators should include text or symbols, not color alone." },
+    { "name": "openTypeFeatures", "selectors": [".stat__value", ".stat__change"], "attributes": ["data-stat-alternate-digits", "data-stat-slashed-zero", "data-stat-tabular-numbers", "data-stat-contextual-alternates", "data-stat-fractions"], "description": "Stat exposes the same independent OpenType feature switches as Price. Unsupported features are ignored by the active font without changing content semantics." }
+  ],
+  "properties": [
+    { "name": "value", "type": "string", "required": true, "description": "Target-formatted metric value.", "targetMappings": { "web": [{ "kind": "content", "selector": ".stat__value" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Visible metric label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".stat__label" }] } },
+    { "name": "change", "type": "string", "required": false, "description": "Optional target-formatted change text including a visible direction sign or word.", "targetMappings": { "web": [{ "kind": "content", "selector": ".stat__change" }] } },
+    { "name": "changeDirection", "type": "enum", "required": false, "defaultValue": "neutral", "values": ["neutral", "up", "down"], "description": "Semantic color direction for the optional change text.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".stat__change", "attribute": "data-direction", "values": { "neutral": null, "up": "up", "down": "down" } }] } },
+    { "name": "alternateDigits", "type": "boolean", "required": false, "defaultValue": false, "description": "Enables the active font's ss01 stylistic set; in Inter this provides alternate open digits.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".stat", "attribute": "data-stat-alternate-digits", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "slashedZero", "type": "boolean", "required": false, "defaultValue": true, "description": "Enables the standard zero OpenType feature for a slashed zero when supported.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".stat", "attribute": "data-stat-slashed-zero", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "tabularNumbers", "type": "boolean", "required": false, "defaultValue": true, "description": "Enables tabular numeric widths to keep changing and aligned metrics stable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".stat", "attribute": "data-stat-tabular-numbers", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "contextualAlternates", "type": "boolean", "required": false, "defaultValue": true, "description": "Enables contextual alternates when supported by the active font.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".stat", "attribute": "data-stat-contextual-alternates", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "fractions", "type": "boolean", "required": false, "defaultValue": false, "description": "Enables automatic fractions for metric content that intentionally contains fraction notation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".stat", "attribute": "data-stat-fractions", "values": { "true": "true", "false": "false" } }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary", "--color-feedback-success-default", "--color-feedback-error-default"],
+      "spacing": ["--space-layout-grid-gap"],
+      "typography": ["--font-family-body", "--typo-h2-size", "--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Keep metric value and label together in reading order.",
+    "Do not communicate positive or negative change by color alone.",
+    "Format numbers for the target locale."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

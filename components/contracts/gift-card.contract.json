@@ -1,0 +1,174 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "gift-card",
+  "name": "Gift Card Page",
+  "registryId": "P2",
+  "category": "pages",
+  "status": "pilot",
+  "summary": "Gift-card presentation with target-formatted card content, copy and action hooks, optional QR media, and a workflow-neutral canonical form-composition region.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/gift-card",
+    "css": { "file": "components/css/pages.css", "selector": ".gift-card" },
+    "docs": "site/src/content/components/gift-card.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".gift-card", "className": ".gift-card", "required": true, "description": "Centered gift-card page container." },
+    { "name": "visual", "selector": ".gift-card__visual", "className": ".gift-card__visual", "required": true, "description": "Gift-card visual composition." },
+    { "name": "visualOverlay", "selector": ".gift-card__visual-overlay", "className": ".gift-card__visual-overlay", "required": false, "description": "Optional readable text overlay." },
+    { "name": "brand", "selector": ".gift-card__brand", "className": ".gift-card__brand", "required": false, "description": "Optional visible brand text." },
+    { "name": "amount", "selector": ".gift-card__amount", "className": ".gift-card__amount", "required": true, "description": "Target-formatted gift-card amount." },
+    { "name": "heading", "selector": ".gift-card__heading", "className": ".gift-card__heading", "required": true, "description": "Page heading." },
+    { "name": "message", "selector": ".gift-card__message", "className": ".gift-card__message", "required": false, "description": "Optional supporting message." },
+    { "name": "codeWrapper", "selector": ".gift-card__code-wrapper", "className": ".gift-card__code-wrapper", "required": true, "description": "Gift-card code and optional copy-action wrapper." },
+    { "name": "code", "selector": ".gift-card__code", "className": ".gift-card__code", "required": true, "description": "Selectable gift-card code." },
+    { "name": "copyButton", "selector": ".gift-card__copy-btn", "className": ".gift-card__copy-btn", "required": false, "description": "Optional native copy action." },
+    { "name": "balance", "selector": ".gift-card__balance", "className": ".gift-card__balance", "required": false, "description": "Optional target-formatted balance content; this contract does not calculate it." },
+    { "name": "actions", "selector": ".gift-card__actions", "className": ".gift-card__actions", "required": false, "description": "Optional target-owned action composition." },
+    { "name": "action", "selector": ".gift-card__action", "className": ".gift-card__action", "required": false, "description": "Single target-owned action." },
+    { "name": "qr", "selector": ".gift-card__qr", "className": ".gift-card__qr", "required": false, "description": "Optional target-supplied QR media." },
+    { "name": "form", "selector": ".gift-card__form", "className": ".gift-card__form", "required": false, "description": "Optional workflow-neutral native form composition." },
+    { "name": "field", "selector": ".gift-card__field", "className": ".gift-card__field", "required": false, "description": "Sizing hook composed with canonical Input anatomy; Input owns label, message, and validation state." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default gift-card presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default centered responsive layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".gift-card"], "description": "Default gift-card presentation." },
+    { "name": "copyHover", "selectors": [".gift-card__copy-btn:hover"], "description": "Copy-action hover presentation." },
+    { "name": "copyFocusVisible", "selectors": [".gift-card__copy-btn:focus-visible"], "description": "Visible keyboard focus on the copy action." },
+    { "name": "primaryAction", "selectors": [".gift-card__action--primary"], "description": "Primary action styling hook; it does not define the action's workflow." },
+    { "name": "secondaryAction", "selectors": [".gift-card__action--secondary"], "description": "Secondary action styling hook; it does not define the action's workflow." },
+    { "name": "actionHover", "selectors": [".gift-card__action:hover"], "description": "Action hover presentation." },
+    { "name": "actionFocusVisible", "selectors": [".gift-card__action:focus-visible"], "description": "Visible keyboard focus on target-owned actions." }
+  ],
+  "behavior": [
+    {
+      "name": "copyCode",
+      "selectors": [".gift-card__copy-btn", ".gift-card__code"],
+      "events": ["click"],
+      "description": "When supplied, the target-owned copy action copies the visible code and announces success or failure without making visual change the only feedback."
+    },
+    {
+      "name": "commerceContentBoundary",
+      "selectors": [".gift-card__amount", ".gift-card__balance", ".gift-card__actions", ".gift-card__qr"],
+      "description": "Targets supply formatted amounts, optional balance content, actions, and QR payloads. This contract does not calculate balance or define redemption, purchase, or account workflows."
+    },
+    {
+      "name": "formComposition",
+      "selectors": [".gift-card__form", ".gift-card__field"],
+      "events": ["submit"],
+      "description": "If a target supplies a value-entry form, it composes canonical Input and Button anatomy. Fields preserve default, error, success, warning, hover, focus-visible, disabled, label, message, aria-invalid, and aria-describedby obligations; the form's purpose and endpoint remain target-owned."
+    }
+  ],
+  "properties": [
+    {
+      "name": "visual",
+      "type": "slot",
+      "required": true,
+      "description": "Gift-card visual media and optional readable overlay content.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".gift-card__visual", "classNames": [".gift-card__visual", ".gift-card__visual-overlay"] }] }
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible brand text.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-card__brand" }] }
+    },
+    {
+      "name": "amount",
+      "type": "string",
+      "required": true,
+      "description": "Target-formatted gift-card amount; no numeric calculation is inferred.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-card__amount" }] }
+    },
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "Gift-card page heading.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-card__heading" }] }
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "required": false,
+      "description": "Optional supporting message.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-card__message" }] }
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "required": true,
+      "description": "Visible selectable gift-card code.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-card__code" }] }
+    },
+    {
+      "name": "copyLabel",
+      "type": "string",
+      "required": false,
+      "description": "Accessible name for an optional icon-only copy button.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".gift-card__copy-btn", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "balance",
+      "type": "string",
+      "required": false,
+      "description": "Optional target-formatted balance content; this property does not define how balance is obtained or refreshed.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-card__balance" }] }
+    },
+    {
+      "name": "actions",
+      "type": "slot",
+      "required": false,
+      "description": "Target-owned actions without a contract-defined purchase or redemption workflow.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".gift-card__actions", "classNames": [".gift-card__actions", ".gift-card__action", ".gift-card__action--primary", ".gift-card__action--secondary"] }] }
+    },
+    {
+      "name": "qr",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-supplied QR media and accessible purpose text.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".gift-card__qr", "classNames": [".gift-card__qr"] }] }
+    },
+    {
+      "name": "form",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned native form composed from canonical Input and Button anatomy without assigning a workflow.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".gift-card__form", "classNames": [".gift-card__form", ".gift-card__field"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary", "--color-surface-secondary", "--color-surface-primary", "--color-button-primary-bg-default", "--color-button-primary-text-default", "--color-border-default", "--color-border-focus"],
+      "spacing": ["--space-layout-touch-target"],
+      "radius": ["--radius-lg", "--radius-sm"],
+      "shadow": ["--shadow-lg"],
+      "typography": ["--font-family-heading", "--font-family-mono", "--typo-h4-size", "--typo-h1-size", "--typo-h3-size", "--typo-body-size", "--typo-body-sm-size"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
+    }
+  },
+  "accessibility": [
+    "Keep the gift-card code selectable and expose a clearly named native copy button when copying is supported.",
+    "Announce copy success or failure without relying on icon or color change alone.",
+    "Provide useful alternative text for meaningful gift-card imagery and explain the purpose of QR media.",
+    "Treat amount and balance strings as target-formatted content with clear currency context.",
+    "Any composed value-entry field uses canonical Input label, message, default, error, success, and warning semantics; aria-invalid is reserved for error.",
+    "Target-owned actions retain native element semantics, visible focus, and understandable accessible names."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/pages.css; commerce workflows remain target-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Gift-card data and available actions require target-native mapping without this contract assuming balance, redemption, or purchase behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

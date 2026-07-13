@@ -1,0 +1,70 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "quick-view",
+  "name": "Quick View",
+  "registryId": "K8",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Product quick-view content composed inside a Modal with gallery, product info, and product form behavior.",
+  "dependencies": ["modal", "product-gallery", "product-form"],
+  "source": {
+    "registry": "registry.json#/components/quick-view",
+    "css": { "file": "components/css/cart.css", "selector": ".quick-view" },
+    "docs": "site/src/content/components/quick-view.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".quick-view", "className": ".quick-view", "required": true, "description": "Quick-view content grid." },
+    { "name": "gallery", "selector": ".quick-view__gallery", "className": ".quick-view__gallery", "required": true, "description": "Quick-view image or gallery area." },
+    { "name": "info", "selector": ".quick-view__info", "className": ".quick-view__info", "required": true, "description": "Quick-view product info wrapper." },
+    { "name": "title", "selector": ".quick-view__title", "className": ".quick-view__title", "required": true, "description": "Product title." },
+    { "name": "vendor", "selector": ".quick-view__vendor", "className": ".quick-view__vendor", "required": false, "description": "Vendor text." },
+    { "name": "description", "selector": ".quick-view__description", "className": ".quick-view__description", "required": false, "description": "Truncated product description." },
+    { "name": "form", "selector": ".quick-view__form", "className": ".quick-view__form", "required": false, "description": "Product Form dependency region." },
+    { "name": "fullLink", "selector": ".quick-view__full-link", "className": ".quick-view__full-link", "required": false, "description": "Full product-detail link." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default quick-view modal content." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive one-column to two-column quick-view layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".quick-view"], "description": "Default quick-view content state." },
+    { "name": "fullLinkFocus", "selectors": [".quick-view__full-link:focus-visible"], "description": "Visible full-details link focus state." }
+  ],
+  "behavior": [
+    { "name": "modalComposition", "selectors": [".quick-view"], "description": "Quick View should inherit Modal focus management, dismissal, and labelled dialog behavior." },
+    { "name": "productComposition", "selectors": [".quick-view__gallery", ".quick-view__info"], "description": "Quick View composes product gallery and product form behavior for a reduced product purchase flow." },
+    { "name": "fullDetails", "selectors": [".quick-view__full-link"], "attributes": ["href"], "events": ["click"], "description": "Full details link should navigate to the product page." }
+  ],
+  "properties": [
+    { "name": "gallery", "type": "slot", "required": true, "description": "Product Gallery dependency or reduced media fixture.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__gallery", "classNames": [".quick-view__gallery"] }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__title" }] } },
+    { "name": "vendor", "type": "string", "required": false, "description": "Vendor or maker text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__vendor" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Truncated product description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__description" }] } },
+    { "name": "productForm", "type": "slot", "required": false, "description": "Reduced Product Form dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__form", "classNames": [".quick-view__form"] }] } },
+    { "name": "fullLinkLabel", "type": "string", "required": false, "description": "Full product details link label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__full-link" }] } },
+    { "name": "href", "type": "string", "required": false, "description": "Full product details destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".quick-view__full-link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary", "--color-text-accent", "--color-border-focus"],
+      "radius": ["--radius-md"],
+      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size", "--typo-body-line-height"]
+    }
+  },
+  "accessibility": [
+    "Preserve Modal focus management and return focus to the trigger on close.",
+    "Keep product title, price, variants, and add-to-cart actions readable in the modal context.",
+    "Provide a full product-detail link when quick view truncates content."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map product data and variant form behavior into modal content." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

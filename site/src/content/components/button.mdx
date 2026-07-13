@@ -1,82 +1,116 @@
 ## Overview
 
-The button is the foundation for all interactive actions in The Gallery. It comes in 5 variants × 3 sizes × 6 states, giving you full flexibility for any context.
+Button is the foundation for interactive actions in The Gallery. Its public contract supports five visual variants, three sizes, independent leading and trailing icon slots, disabled and busy states, icon-only layout, and full-width layout.
 
-<Preview html='<button class="btn">Primary</button> <button class="btn btn--secondary">Secondary</button> <button class="btn btn--outline">Outline</button> <button class="btn btn--link">Link</button> <button class="btn btn--danger">Danger</button>' label="All Variants" />
+<Preview html={'<button class="btn" type="button"><svg class="btn__icon btn__icon--leading" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2l1 4h10l1-4"/><path d="M5 6h14l-1 15H6L5 6z"/></svg><span>Add to cart</span><svg class="btn__icon btn__icon--trailing" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button>'} label="Button" />
 
-## Variants
+## Presentation
 
-### Primary
+Primary is the default variant and default is the default size. Their absence of a modifier class is intentional.
 
-The default button. Use it for the main action on a page — "Add to Cart", "Checkout", "Submit".
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `primary` | `.btn` |
+| `variant` | `secondary` | `.btn--secondary` |
+| `variant` | `outline` | `.btn--outline` |
+| `variant` | `link` | `.btn--link` |
+| `variant` | `danger` | `.btn--danger` |
+| `size` | `sm` | `.btn--sm` |
+| `size` | `default` | `.btn` |
+| `size` | `lg` | `.btn--lg` |
 
-<Preview html='<button class="btn">Primary Button</button>' label="Primary" />
+`iconOnly` maps to `.btn--icon-only`. `fullWidth` maps to `.btn--full`. Both are independent boolean properties rather than variants.
 
-### Secondary
+### Icon Composition
 
-For supporting actions that sit alongside a primary button.
+`leadingIcon` and `trailingIcon` are independent slots and may be used together. Every positioned icon composes the base `.btn__icon` class with its position class.
 
-<Preview html='<button class="btn btn--secondary">Secondary Button</button>' label="Secondary" />
+```html
+<button class="btn" type="button">
+  <svg class="btn__icon btn__icon--leading" aria-hidden="true"><!-- icon --></svg>
+  <span>Add to cart</span>
+  <svg class="btn__icon btn__icon--trailing" aria-hidden="true"><!-- icon --></svg>
+</button>
+```
 
-### Outline
+An icon-only button uses the same slot classes and requires an accessible name.
 
-Lower visual weight. Good for filter toggles, secondary navigation, or when many buttons appear together.
+```html
+<button class="btn btn--outline btn--icon-only" type="button" aria-label="Search">
+  <svg class="btn__icon btn__icon--leading" aria-hidden="true"><!-- icon --></svg>
+</button>
+```
 
-<Preview html='<button class="btn btn--outline">Outline Button</button>' label="Outline" />
+### Disabled
 
-### Link
+Native buttons use the `disabled` attribute. Disabled anchors keep `role="link"` and `aria-disabled="true"` but omit `href` until they become available again.
 
-Renders as a text link with button semantics. Use sparingly — prefer actual `<a>` elements for navigation.
+```html
+<button class="btn" type="button" disabled>Unavailable</button>
 
-<Preview html='<button class="btn btn--link">Link Button</button>' label="Link" />
+<a class="btn" role="link" aria-disabled="true">Unavailable destination</a>
+```
 
-### Danger
+### Loading
 
-For destructive actions: delete, remove, cancel order.
+Set `aria-busy="true"` while an action is pending. A busy native button also uses `disabled`; a busy anchor keeps `role="link"` but omits `href`. Loading therefore blocks mouse, touch, and keyboard reactivation while keeping the visible label, accessible role, and accessible name in place.
 
-<Preview html='<button class="btn btn--danger">Danger Button</button>' label="Danger" />
+- An explicit `data-loading-position="leading"` or `data-loading-position="trailing"` wins.
+- Without an explicit position, one configured icon determines the loading side.
+- Without icons, loading defaults to leading.
+- With both icons, loading defaults to leading.
+- The icon on the opposite side remains visible.
 
-## Sizes
+```html
+<!-- One trailing icon: loading infers trailing and replaces that icon. -->
+<button class="btn" type="button" aria-busy="true" disabled>
+  <span>Continue</span>
+  <svg class="btn__icon btn__icon--trailing" aria-hidden="true"><!-- icon --></svg>
+</button>
 
-<Preview html='<button class="btn btn--sm">Small</button> <button class="btn">Default</button> <button class="btn btn--lg">Large</button>' label="Sizes" />
+<!-- Explicit trailing: the leading icon and label remain visible. -->
+<button class="btn" type="button" aria-busy="true" data-loading-position="trailing" disabled>
+  <svg class="btn__icon btn__icon--leading" aria-hidden="true"><!-- icon --></svg>
+  <span>Save changes</span>
+  <svg class="btn__icon btn__icon--trailing" aria-hidden="true"><!-- icon --></svg>
+</button>
 
-| Class      | Use case                          |
-|------------|-----------------------------------|
-| `.btn--sm` | Inline actions, table rows        |
-| *(default)*| Most buttons                      |
-| `.btn--lg` | Hero CTAs, full-width mobile      |
+<!-- Busy navigation has no actionable href. -->
+<a class="btn" role="link" aria-busy="true">Preparing destination</a>
+```
 
 ## Usage Guidelines
 
 <DoDont>
   <Do>Use one primary button per section to establish a clear action hierarchy.</Do>
-  <Dont>Don't place multiple primary buttons side by side — demote one to secondary or outline.</Dont>
+  <Dont>Do not place multiple primary buttons side by side; demote one to secondary or outline.</Dont>
 </DoDont>
 
 <DoDont>
-  <Do>Use the danger variant for destructive actions like "Delete" or "Remove".</Do>
-  <Dont>Don't use danger for non-destructive actions — it creates unnecessary alarm.</Dont>
+  <Do>Use the danger variant for destructive actions such as delete or remove.</Do>
+  <Dont>Do not use danger for non-destructive actions.</Dont>
 </DoDont>
 
 ## Accessibility
 
-<Callout type="tip">
-  Always provide visible text inside buttons. If using an icon-only button, add `aria-label` for screen readers.
-</Callout>
+- Use `<button>` for actions and `<a>` for navigation.
+- Keep the visible focus indication provided by `:focus-visible`.
+- Use native `disabled` on buttons. A disabled anchor keeps `role="link"` and `aria-disabled="true"` but omits `href`.
+- Keep the label unchanged while `aria-busy="true"` so the accessible name remains stable. Busy buttons also use `disabled`; busy anchors keep `role="link"` but omit `href`.
+- Mark decorative icons as hidden from assistive technology when the visible label already names the action.
+- Provide `aria-label` or equivalent accessible text for every icon-only button.
 
-- Buttons are focusable by default — don't override `tabindex` unless necessary.
-- Use `<button>` for actions and `<a>` for navigation. Never use `<div>` with a click handler.
-- Disabled buttons (`disabled` attribute) are excluded from the tab order automatically.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.btn`</td><td>class</td><td>—</td><td>Base button styles (primary by default)</td></tr>
-  <tr><td>`.btn--secondary`</td><td>modifier</td><td>—</td><td>Secondary variant</td></tr>
-  <tr><td>`.btn--outline`</td><td>modifier</td><td>—</td><td>Outline variant</td></tr>
-  <tr><td>`.btn--link`</td><td>modifier</td><td>—</td><td>Link-style variant</td></tr>
-  <tr><td>`.btn--danger`</td><td>modifier</td><td>—</td><td>Danger/destructive variant</td></tr>
-  <tr><td>`.btn--sm`</td><td>modifier</td><td>—</td><td>Small size</td></tr>
-  <tr><td>`.btn--lg`</td><td>modifier</td><td>—</td><td>Large size</td></tr>
-  <tr><td>`disabled`</td><td>attribute</td><td>—</td><td>Disables the button (reduced opacity, no pointer events)</td></tr>
+  <tr><td>`label`</td><td>string</td><td>none</td><td>Visible label; optional only when icon-only content has an accessible name</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`primary`</td><td>`primary`, `secondary`, `outline`, `link`, or `danger`</td></tr>
+  <tr><td>`size`</td><td>enum</td><td>`default`</td><td>`sm`, `default`, or `lg`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Maps to native `disabled`; anchors keep `role="link"` and `aria-disabled="true"` while omitting `href`</td></tr>
+  <tr><td>`busy`</td><td>boolean</td><td>`false`</td><td>Maps to `aria-busy="true"` plus native `disabled`, or keeps `role="link"` while omitting an anchor's `href`</td></tr>
+  <tr><td>`leadingIcon`</td><td>slot</td><td>none</td><td>Uses `.btn__icon.btn__icon--leading`</td></tr>
+  <tr><td>`trailingIcon`</td><td>slot</td><td>none</td><td>Uses `.btn__icon.btn__icon--trailing`</td></tr>
+  <tr><td>`iconOnly`</td><td>boolean</td><td>`false`</td><td>Maps to `.btn--icon-only`</td></tr>
+  <tr><td>`fullWidth`</td><td>boolean</td><td>`false`</td><td>Maps to `.btn--full`</td></tr>
+  <tr><td>`loadingPosition`</td><td>enum</td><td>contextual</td><td>`leading` or `trailing`; when omitted, icon composition determines the side</td></tr>
 </PropTable>

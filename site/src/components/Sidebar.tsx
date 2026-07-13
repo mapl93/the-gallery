@@ -13,6 +13,9 @@ export default function Sidebar() {
       <div className="docs-sidebar__group">
         <div className="docs-sidebar__label">Getting Started</div>
         <NavLink className="docs-sidebar__link" to="/" end>Overview</NavLink>
+        <NavLink className="docs-sidebar__link" to="/architecture">Architecture</NavLink>
+        <NavLink className="docs-sidebar__link" to="/adapters">Adapters</NavLink>
+        <NavLink className="docs-sidebar__link" to="/contracts">Contracts</NavLink>
         <NavLink className="docs-sidebar__link" to="/foundations">Foundations</NavLink>
         <NavLink className="docs-sidebar__link" to="/components">Components</NavLink>
         <NavLink className="docs-sidebar__link" to="/tokens">Tokens</NavLink>

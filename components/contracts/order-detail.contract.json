@@ -1,0 +1,71 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "order-detail",
+  "name": "Order Detail",
+  "registryId": "U5",
+  "category": "account",
+  "status": "pilot",
+  "summary": "Single order view with order header and tracking timeline that can compose cart line items.",
+  "dependencies": ["badge", "cart-line-item"],
+  "source": {
+    "registry": "registry.json#/components/order-detail",
+    "css": { "file": "components/css/account.css", "selector": ".order-detail" },
+    "docs": "site/src/content/components/order-detail.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".order-detail", "className": ".order-detail", "required": true, "description": "Order detail container." },
+    { "name": "header", "selector": ".order-detail__header", "className": ".order-detail__header", "required": true, "description": "Order detail header." },
+    { "name": "title", "selector": ".order-detail__title", "className": ".order-detail__title", "required": true, "description": "Order title or number." },
+    { "name": "meta", "selector": ".order-detail__meta", "className": ".order-detail__meta", "required": false, "description": "Target-formatted order metadata." },
+    { "name": "tracking", "selector": ".order-tracking", "className": ".order-tracking", "required": false, "description": "Order tracking timeline." },
+    { "name": "trackingStep", "selector": ".order-tracking__step", "className": ".order-tracking__step", "required": false, "description": "Tracking step." },
+    { "name": "trackingConnector", "selector": ".order-tracking__step::before", "generated": true, "required": false, "description": "Generated tracking connector." },
+    { "name": "trackingDot", "selector": ".order-tracking__dot", "className": ".order-tracking__dot", "required": false, "description": "Tracking status dot." },
+    { "name": "trackingLabel", "selector": ".order-tracking__label", "className": ".order-tracking__label", "required": false, "description": "Tracking step label." },
+    { "name": "items", "selector": ".order-detail__items", "className": ".order-detail__items", "required": false, "description": "Purchased line-item composition region." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default order detail page." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default order detail layout." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".order-detail"], "description": "Default order detail state." },
+    { "name": "trackingDone", "selectors": [".order-tracking__step--done::before", ".order-tracking__step--done .order-tracking__dot"], "description": "Completed tracking step." },
+    { "name": "trackingActive", "selectors": [".order-tracking__step--active::before", ".order-tracking__step--active .order-tracking__dot", ".order-tracking__step--active .order-tracking__label"], "description": "Active tracking step." }
+  ],
+  "behavior": [
+    { "name": "orderData", "selectors": [".order-detail__title"], "description": "Order detail should map authenticated order number and metadata from target data." },
+    { "name": "trackingStatus", "selectors": [".order-tracking__step", ".order-tracking__label"], "attributes": ["aria-current=\"step\""], "description": "Tracking timeline should expose completed and active status as readable text." },
+    { "name": "lineItemsComposition", "selectors": [".order-detail__items"], "description": "Order Detail can compose Cart Line Item for purchased line item anatomy without cart mutation behavior." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Order title or target-formatted number.", "targetMappings": { "web": [{ "kind": "content", "selector": ".order-detail__title" }] } },
+    { "name": "meta", "type": "slot", "required": false, "description": "Target-owned order date, status, or supporting metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__meta", "classNames": [".order-detail__meta"] }] } },
+    { "name": "tracking", "type": "slot", "required": false, "description": "Target-owned tracking steps and current-state semantics.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-tracking", "classNames": [".order-tracking"] }] } },
+    { "name": "lineItems", "type": "slot", "required": false, "description": "Purchased Cart Line Item compositions without cart mutation controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__items", "classNames": [".order-detail__items"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-border-subtle", "--color-feedback-success-default", "--color-surface-secondary", "--color-text-secondary"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
+      "radius": ["--radius-full"],
+      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Protect order details behind authentication.",
+    "Expose current tracking step with text and appropriate current-state semantics.",
+    "Do not treat purchased line items as editable cart controls."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify order detail, fulfillment status, tracking, and line items." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

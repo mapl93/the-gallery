@@ -4,18 +4,20 @@
 {%- endcomment -%}
 
 {%- if rating -%}
-  <div class="rating" role="img" aria-label="{{ rating }} out of 5 stars">
-    {%- assign rating_value = rating | round: 1 -%}
-    {%- for i in (1..5) -%}
-      {%- assign half_star = i | minus: 0.5 -%}
-      {%- if rating_value >= i -%}
-        {% render 'icon', name: 'star' %}
-      {%- elsif rating_value >= half_star -%}
-        {% render 'icon', name: 'star-half' %}
-      {%- else -%}
-        {% render 'icon', name: 'star-empty' %}
-      {%- endif -%}
-    {%- endfor -%}
+  {%- assign rating_value = rating | round: 1 -%}
+  <div class="rating" role="img" aria-label="{{ rating_value }} out of 5 stars">
+    <span class="rating__stars" aria-hidden="true">
+      {%- for i in (1..5) -%}
+        {%- assign half_star = i | minus: 0.5 -%}
+        {%- if rating_value >= i -%}
+          <span class="rating__star rating__star--filled">{% render 'icon', name: 'star' %}</span>
+        {%- elsif rating_value >= half_star -%}
+          <span class="rating__star rating__star--half">{% render 'icon', name: 'star-half' %}</span>
+        {%- else -%}
+          <span class="rating__star">{% render 'icon', name: 'star-empty' %}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </span>
     {%- if count -%}
       <span class="rating__count">({{ count }})</span>
     {%- endif -%}

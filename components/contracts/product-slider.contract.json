@@ -1,0 +1,65 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "product-slider",
+  "name": "Product Slider",
+  "registryId": "D6",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Horizontal product carousel for related products, recommendations, and recently viewed lists.",
+  "dependencies": ["icon-button", "product-card"],
+  "source": {
+    "registry": "registry.json#/components/product-slider",
+    "css": { "file": "components/css/product.css", "selector": ".product-slider" },
+    "docs": "site/src/content/components/product-slider.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".product-slider", "className": ".product-slider", "required": true, "description": "Slider section container." },
+    { "name": "header", "selector": ".product-slider__header", "className": ".product-slider__header", "required": false, "description": "Header row for title and navigation." },
+    { "name": "title", "selector": ".product-slider__title", "className": ".product-slider__title", "required": false, "description": "Slider title." },
+    { "name": "nav", "selector": ".product-slider__nav", "className": ".product-slider__nav", "required": false, "description": "Previous and next navigation controls." },
+    { "name": "track", "selector": ".product-slider__track", "className": ".product-slider__track", "required": true, "description": "Horizontally scrolling product-card track." },
+    { "name": "trackItem", "selector": ".product-slider__track > *", "required": true, "description": "Scroll-snapped product-card child." },
+    { "name": "productCard", "selector": ".product-card", "className": ".product-card", "required": true, "description": "Product Card dependency rendered in the track." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default horizontal product slider." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Responsive track item width controlled by breakpoints." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".product-slider"], "description": "Default product slider state." },
+    { "name": "snapTrack", "selectors": [".product-slider__track > *"], "description": "Scroll snap item state." },
+    { "name": "hiddenScrollbar", "selectors": [".product-slider__track::-webkit-scrollbar"], "description": "Hidden visual scrollbar state on supported browsers." }
+  ],
+  "behavior": [
+    { "name": "horizontalScroll", "selectors": [".product-slider__track"], "events": ["scroll", "click"], "description": "Track should support horizontal scrolling and optional previous/next controls." },
+    { "name": "productCardComposition", "selectors": [".product-card"], "description": "Each item should preserve Product Card navigation, pricing, badge, and quick-add behavior." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional slider section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-slider__title" }] } },
+    { "name": "navigation", "type": "slot", "required": false, "description": "Optional previous and next navigation controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-slider__nav", "classNames": [".product-slider__nav"] }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "Consumer-owned Product Card collection rendered in the track.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-slider__track", "classNames": [".product-slider__track"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary"],
+      "spacing": ["--space-layout-element-gap"],
+      "typography": ["--typo-h3-size", "--font-family-heading"]
+    }
+  },
+  "accessibility": [
+    "Expose previous and next controls with clear accessible names when navigation buttons are present.",
+    "Allow keyboard users to reach every product card in the track.",
+    "Do not rely only on drag gestures to reveal additional products."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map product recommendation, related product, or recently viewed arrays to Product Card children." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

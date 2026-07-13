@@ -1,26 +1,37 @@
 ## Overview
 
-Toggle between grid and list view for collection pages.
+Two-button control for switching a collection between grid and list presentation.
 
-<Preview html={"<div class=\"view-toggle\"><button class=\"view-toggle__btn is-active\" aria-pressed=\"true\" aria-label=\"Grid\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 18 18\"><rect x=\"1\" y=\"1\" width=\"7\" height=\"7\" fill=\"currentColor\" rx=\"1\"/><rect x=\"10\" y=\"1\" width=\"7\" height=\"7\" fill=\"currentColor\" rx=\"1\"/><rect x=\"1\" y=\"10\" width=\"7\" height=\"7\" fill=\"currentColor\" rx=\"1\"/><rect x=\"10\" y=\"10\" width=\"7\" height=\"7\" fill=\"currentColor\" rx=\"1\"/></svg></button><button class=\"view-toggle__btn\" aria-pressed=\"false\" aria-label=\"List\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 18 18\"><rect x=\"1\" y=\"2\" width=\"16\" height=\"3\" fill=\"currentColor\" rx=\"1\"/><rect x=\"1\" y=\"7.5\" width=\"16\" height=\"3\" fill=\"currentColor\" rx=\"1\"/><rect x=\"1\" y=\"13\" width=\"16\" height=\"3\" fill=\"currentColor\" rx=\"1\"/></svg></button></div>"} label="Grid / List View Toggle" />
+<Preview html={"<div class=\"view-toggle\" role=\"group\" aria-label=\"Collection view\" data-view=\"grid\"><button class=\"view-toggle__btn\" type=\"button\" aria-pressed=\"true\" aria-label=\"Grid view\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/></svg></button><button class=\"view-toggle__btn\" type=\"button\" aria-pressed=\"false\" aria-label=\"List view\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg></button></div>"} label="Grid / List View Toggle" />
+
+## Presentation
+
+The active button uses the primary-action background and text tokens. Both controls share a compact border and preserve a 4px focus indicator.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the collection grid with product cards for consistent spacing and responsive behavior.</Do>
-  <Dont>Don't mix collection grid with manual floats or absolute positioning.</Dont>
+  <Do>Offer the toggle only when both layouts provide meaningful value.</Do>
+  <Dont>Do not reset filters, sort order, or scroll position solely because the view changes.</Dont>
 </DoDont>
+
+- Keep Grid and List in a stable order.
+- Apply the selected mode to the results region without moving focus.
+- Persist the preference only when the target product has a clear policy for it.
 
 ## Accessibility
 
-<Callout type="info">
-  Collection components handle responsive breakpoints automatically via CSS Grid.
-</Callout>
+- Give the group and both icon-only buttons accessible names.
+- Keep `aria-pressed` synchronized so exactly one view is active.
+- Use native buttons for Space and Enter behavior.
+- Disable both buttons when view switching is unavailable.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
-
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.view-toggle`</td><td>class</td><td>—</td><td>Base grid / list view toggle styles</td></tr>
+  <tr><td>`groupLabel`</td><td>string</td><td>required</td><td>Accessible group name</td></tr>
+  <tr><td>`activeView`</td><td>enum</td><td>`grid`</td><td>`grid` or `list`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables both native buttons</td></tr>
+  <tr><td>`data-view`</td><td>attribute</td><td>`grid`</td><td>Web view-state mapping</td></tr>
+  <tr><td>`.view-toggle__btn[aria-pressed=&quot;true&quot;]`</td><td>state</td><td>required</td><td>Active view button</td></tr>
 </PropTable>

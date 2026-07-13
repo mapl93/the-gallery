@@ -2,19 +2,60 @@
   Snippet: quantity-selector
   Usage: {% render 'quantity-selector' %}
   Usage with cart item: {% render 'quantity-selector', item: item %}
+
+  Optional parameters:
+  - value, min, max, step
+  - variant: default, error, success, warning
+  - disabled
+  - accessible_label, decrement_label, increment_label, described_by
 {%- endcomment -%}
 
-<div class="qty" data-qty>
-  <button class="qty__btn" type="button" aria-label="Decrease quantity" data-qty-minus>
-    {% render 'icon', name: 'minus' %}
+{%- liquid
+  assign quantity_value = 1
+  assign quantity_min = 1
+  if item
+    assign quantity_value = item.quantity
+    assign quantity_min = 0
+  endif
+  if value != nil
+    assign quantity_value = value
+  endif
+  if min != nil
+    assign quantity_min = min
+  endif
+
+  assign quantity_step = step | default: 1
+  assign quantity_label = accessible_label | default: 'Quantity'
+  assign quantity_decrement_label = decrement_label | default: 'Decrease quantity'
+  assign quantity_increment_label = increment_label | default: 'Increase quantity'
+
+  assign quantity_variant_class = ''
+  case variant
+    when 'error'
+      assign quantity_variant_class = ' qty--error'
+    when 'success'
+      assign quantity_variant_class = ' qty--success'
+    when 'warning'
+      assign quantity_variant_class = ' qty--warning'
+  endcase
+-%}
+
+<div class="qty{{ quantity_variant_class }}" data-qty>
+  <button class="qty__btn qty__btn--decrement" type="button" aria-label="{{ quantity_decrement_label | escape }}" data-qty-minus{% if disabled %} disabled{% endif %}>
+    <span class="qty__icon">{% render 'icon', name: 'minus' %}</span>
   </button>
   <input class="qty__input" type="number"
          name="{% if item %}updates[{{ item.key }}]{% else %}quantity{% endif %}"
-         value="{% if item %}{{ item.quantity }}{% else %}1{% endif %}"
-         min="{% if item %}0{% else %}1{% endif %}"
-         aria-label="Quantity"
+         value="{{ quantity_value }}"
+         min="{{ quantity_min }}"
+         {% if max != nil %}max="{{ max }}"{% endif %}
+         step="{{ quantity_step }}"
+         aria-label="{{ quantity_label | escape }}"
+         {% if described_by != blank %}aria-describedby="{{ described_by | escape }}"{% endif %}
+         {% if variant == 'error' %}aria-invalid="true"{% endif %}
+         {% if disabled %}disabled{% endif %}
          data-qty-input>
-  <button class="qty__btn" type="button" aria-label="Increase quantity" data-qty-plus>
-    {% render 'icon', name: 'plus' %}
+  <button class="qty__btn qty__btn--increment" type="button" aria-label="{{ quantity_increment_label | escape }}" data-qty-plus{% if disabled %} disabled{% endif %}>
+    <span class="qty__icon">{% render 'icon', name: 'plus' %}</span>
   </button>
 </div>

@@ -1,0 +1,137 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "review-form",
+  "name": "Write-a-Review Form",
+  "registryId": "V7",
+  "category": "reviews",
+  "status": "pilot",
+  "summary": "Native review-form composition that delegates rating and field semantics to Star Input, Input, Textarea, File Upload, Select, and Button.",
+  "dependencies": ["star-input"],
+  "source": {
+    "registry": "registry.json#/components/review-form",
+    "css": { "file": "components/css/reviews.css", "selector": ".review-form" },
+    "docs": "site/src/content/components/review-form.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".review-form", "className": ".review-form", "required": true, "description": "Native form boundary that owns layout and emits a submit request without defining transport or workflow." },
+    { "name": "fields", "selector": ".review-form__fields", "className": ".review-form__fields", "required": false, "description": "Optional structural group for composed form fields." },
+    { "name": "group", "selector": ".review-form__group", "className": ".review-form__group", "required": false, "description": "Compatibility layout wrapper; it does not own labels, controls, messages, or validation." },
+    { "name": "rating", "selector": ".review-form .star-input", "className": ".star-input", "required": true, "description": "Composed Star Input that owns the native rating question and radio behavior." },
+    { "name": "input", "selector": ".review-form .input", "className": ".input", "required": false, "description": "Optional composed Input that owns its label, value, message, validation variant, focus, and disabled state." },
+    { "name": "textarea", "selector": ".review-form .textarea__field", "className": ".textarea__field", "required": true, "description": "Composed Textarea field that retains Input validation composition and multi-line behavior." },
+    { "name": "fileUpload", "selector": ".review-form .file-upload", "className": ".file-upload", "required": false, "description": "Optional composed File Upload that owns native file input, constraints, feedback, and selected-file presentation." },
+    { "name": "select", "selector": ".review-form .select", "className": ".select", "required": false, "description": "Optional composed Select that owns its native fallback, enhancement, options, and validation state." },
+    { "name": "actions", "selector": ".review-form__actions", "className": ".review-form__actions", "required": true, "description": "Wrapping action region for the form controls." },
+    { "name": "submitButton", "selector": ".review-form .btn", "className": ".btn", "required": true, "description": "Composed Button rendered as the native submit action; Button owns disabled and busy presentation." },
+    { "name": "status", "selector": ".review-form__status", "className": ".review-form__status", "required": false, "description": "Optional target-owned response region; presence does not define when or how submission feedback appears." }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Optional accessible name for the native form when a surrounding heading does not already label it.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-form", "attribute": "aria-label", "valueFrom": "property", "elements": ["form"] }] }
+    },
+    {
+      "name": "rating",
+      "type": "slot",
+      "required": true,
+      "description": "Required Star Input composition; its label, name, value, required, disabled, and describedBy properties remain owned by Star Input.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form .star-input", "classNames": [".star-input"] }] }
+    },
+    {
+      "name": "textField",
+      "type": "slot",
+      "required": false,
+      "description": "Optional Input composition, such as a review title; Input retains all value-entry and validation semantics.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form .input", "classNames": [".input"] }] }
+    },
+    {
+      "name": "reviewBody",
+      "type": "slot",
+      "required": true,
+      "description": "Required Textarea composition; Textarea and Input retain label, value, line bounds, resize, message, and validation ownership.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form .textarea__field", "classNames": [".textarea__field"] }] }
+    },
+    {
+      "name": "photoUpload",
+      "type": "slot",
+      "required": false,
+      "description": "Optional File Upload composition; file constraints, selection feedback, validation, and removal remain owned by File Upload and the target.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form .file-upload", "classNames": [".file-upload"] }] }
+    },
+    {
+      "name": "classification",
+      "type": "slot",
+      "required": false,
+      "description": "Optional Select composition whose option inventory and meaning are target-owned.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form .select", "classNames": [".select"] }] }
+    },
+    {
+      "name": "submitAction",
+      "type": "slot",
+      "required": true,
+      "description": "Required native submit Button composition; Button retains label, variant, disabled, busy, icon, and loading semantics.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form .btn", "classNames": [".btn"] }] }
+    },
+    {
+      "name": "status",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned submission feedback or status region without a prescribed workflow.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-form__status", "classNames": [".review-form__status"] }] }
+    }
+  ],
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default native form composition." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained form with a maximum inline size of 600px." }],
+  "states": [
+    { "name": "default", "selectors": [".review-form"], "description": "Structural form state; composed controls expose their own interaction and validation states." }
+  ],
+  "behavior": [
+    {
+      "name": "nativeSubmitRequest",
+      "selectors": [".review-form"],
+      "events": ["submit"],
+      "description": "The native form emits a submit request after browser and composed-control validation. Endpoint, authentication, pending state, errors, success, moderation, and reset behavior remain target-owned."
+    },
+    {
+      "name": "valueEntryComposition",
+      "selectors": [".review-form .input", ".review-form .textarea__field", ".review-form .select"],
+      "description": "Input, Textarea, and Select retain their canonical labels, messages, Default, Error, Success, Warning, hover, focus-visible, disabled, and native-value obligations; Review Form does not duplicate them."
+    },
+    {
+      "name": "fileComposition",
+      "selectors": [".review-form .file-upload"],
+      "description": "File Upload retains native file selection, constraints, validation, and selected-file feedback. Review Form does not infer file policy or upload transport."
+    },
+    {
+      "name": "buttonComposition",
+      "selectors": [".review-form .btn"],
+      "description": "Button retains native submit, disabled, busy, focus-visible, and loading-indicator behavior; Review Form does not create a parallel submit-button state model."
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-secondary"],
+      "spacing": ["--space-layout-element-gap", "--space-input-margin-bottom", "--space-button-gap"],
+      "typography": ["--typo-body-sm-size"]
+    }
+  },
+  "accessibility": [
+    "Use a native form and preserve each composed control's native label, name, value, validation, reset, and submission behavior.",
+    "Do not replace Input, Textarea, File Upload, Select, Star Input, or Button validation and focus semantics with Review Form selectors.",
+    "Associate target-owned feedback with the relevant composed control and use live-region behavior only when the target workflow requires it.",
+    "Keep validation errors available before and after submission without moving focus unless the target deliberately implements an error-summary pattern.",
+    "Button busy state must prevent duplicate activation while preserving its accessible name."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical CSS owns only responsive form layout and containment; composed components retain visual and validation ownership." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must select a review provider, form endpoint, file policy, and submission workflow." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

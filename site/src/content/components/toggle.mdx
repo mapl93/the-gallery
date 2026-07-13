@@ -1,26 +1,48 @@
 ## Overview
 
-Mutually exclusive toggle buttons (e.g., grid/list view).
+Mutually exclusive pressed buttons for a compact view or mode selection.
 
-<Preview html={"<div class=\"toggle-group\"><button class=\"toggle toggle--active\">Grid</button><button class=\"toggle\">List</button></div>"} label="Toggle / Toggle Group" />
+<Preview html={'<div class="toggle-group" role="group" aria-label="View mode"><button class="toggle toggle--active" type="button" aria-pressed="true">Option 1</button><button class="toggle" type="button" aria-pressed="false">Option 2</button><button class="toggle" type="button" aria-pressed="false">Option 3</button></div>'} label="Toggle / Toggle Group" />
+
+## Presentation
+
+The group has one size and one classless variant. Each slotted native button owns its label and `aria-pressed` value; `.toggle--active` mirrors the selected visual state.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `groupLabel` | string | `aria-label` on `.toggle-group` |
+| `disabled` | boolean | native `disabled` on each `.toggle` |
+
+<Preview html={'<div class="toggle-group" role="group" aria-label="View mode"><button class="toggle toggle--active" type="button" aria-pressed="true" disabled>Option 1</button><button class="toggle" type="button" aria-pressed="false" disabled>Option 2</button><button class="toggle" type="button" aria-pressed="false" disabled>Option 3</button></div>'} label="Disabled Toggle Group" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Toggle for a small set of peer modes where one value remains selected.</Do>
+  <Dont>Do not use it for unrelated commands or multiple independent filters.</Dont>
 </DoDont>
+
+The target owns option data, the initial value, and the effect of a selection. Neutral web progressively synchronizes one pressed item after activation. Use Segmented Control when native radio semantics or form submission is required.
+
+The selected item uses the primary action surface and text tokens; it does not use the decorative statement color family.
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  The base web pattern uses native buttons with `aria-pressed`; every option remains a normal keyboard focus stop.
 </Callout>
 
-- Use `<button>` elements for actions and `<a>` for navigation. Never use `<div>` with a click handler.
+- Label the group with `aria-label` or `aria-labelledby`.
+- Keep exactly one `aria-pressed="true"` item for the registry-defined mutually exclusive pattern.
+- Update visual selection and `aria-pressed` in the same state change.
+- Preserve Enter and Space activation on each native button.
+- Use native `disabled` on every item when the entire mode choice is unavailable.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.toggle-group`</td><td>class</td><td>—</td><td>Base toggle / toggle group styles</td></tr>
+  <tr><td>`groupLabel`</td><td>string</td><td>required</td><td>Accessible name for the mode selection</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables every slotted native toggle</td></tr>
 </PropTable>
+
+Options and the selected value remain target-owned slotted content rather than fixed contract defaults.

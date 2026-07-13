@@ -1,0 +1,62 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "gift-wrap",
+  "name": "Gift Wrap Option",
+  "registryId": "K11",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Gift-wrap cart option that composes a checkbox with label, price, and optional details.",
+  "dependencies": ["checkbox"],
+  "source": {
+    "registry": "registry.json#/components/gift-wrap",
+    "css": { "file": "components/css/cart.css", "selector": ".gift-wrap" },
+    "docs": "site/src/content/components/gift-wrap.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".gift-wrap", "className": ".gift-wrap", "required": true, "description": "Gift-wrap option container." },
+    { "name": "control", "selector": ".gift-wrap__control", "className": ".gift-wrap__control", "required": true, "description": "Checkbox dependency wrapper." },
+    { "name": "info", "selector": ".gift-wrap__info", "className": ".gift-wrap__info", "required": false, "description": "Gift-wrap text wrapper." },
+    { "name": "label", "selector": ".gift-wrap__label", "className": ".gift-wrap__label", "required": true, "description": "Gift-wrap option label." },
+    { "name": "price", "selector": ".gift-wrap__price", "className": ".gift-wrap__price", "required": false, "description": "Gift-wrap price." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default gift-wrap option." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default gift-wrap option size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".gift-wrap"], "description": "Default gift-wrap option state." }
+  ],
+  "behavior": [
+    { "name": "selection", "selectors": [".gift-wrap"], "attributes": ["checked", "name", "value"], "events": ["change"], "description": "Checkbox state should add, remove, or update gift-wrap cart state." },
+    { "name": "pricing", "selectors": [".gift-wrap__price"], "description": "Gift-wrap price should be formatted by the target commerce layer." }
+  ],
+  "properties": [
+    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Gift-wrap Checkbox selection state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".gift-wrap__control .checkbox__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Gift-wrap option label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-wrap__label" }] } },
+    { "name": "price", "type": "string", "required": false, "description": "Target-formatted gift-wrap price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-wrap__price" }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables the composed native Checkbox.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".gift-wrap__control .checkbox__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-md"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use native checkbox semantics or equivalent target-native checked state.",
+    "Expose any additional price as readable text.",
+    "Keep gift-wrap state synchronized with cart totals."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to gift-wrap line item, cart attribute, or target-specific gift option." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

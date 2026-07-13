@@ -1,0 +1,66 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "cart-upsell",
+  "name": "Cart Upsell",
+  "registryId": "K6",
+  "category": "cart",
+  "status": "pilot",
+  "summary": "Cart upsell block with title, recommended items, product image, title, price, and add action.",
+  "dependencies": ["button"],
+  "source": {
+    "registry": "registry.json#/components/cart-upsell",
+    "css": { "file": "components/css/cart.css", "selector": ".cart-upsell" },
+    "docs": "site/src/content/components/cart-upsell.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".cart-upsell", "className": ".cart-upsell", "required": true, "description": "Upsell container." },
+    { "name": "title", "selector": ".cart-upsell__title", "className": ".cart-upsell__title", "required": true, "description": "Upsell section title." },
+    { "name": "items", "selector": ".cart-upsell__items", "className": ".cart-upsell__items", "required": true, "description": "Recommended item list." },
+    { "name": "item", "selector": ".cart-upsell__item", "className": ".cart-upsell__item", "required": true, "description": "Single recommendation." },
+    { "name": "itemImage", "selector": ".cart-upsell__item-image", "className": ".cart-upsell__item-image", "required": false, "description": "Recommendation image." },
+    { "name": "itemInfo", "selector": ".cart-upsell__item-info", "className": ".cart-upsell__item-info", "required": true, "description": "Recommendation info wrapper." },
+    { "name": "itemTitle", "selector": ".cart-upsell__item-title", "className": ".cart-upsell__item-title", "required": true, "description": "Recommendation title." },
+    { "name": "itemPrice", "selector": ".cart-upsell__item-price", "className": ".cart-upsell__item-price", "required": false, "description": "Recommendation price." },
+    { "name": "action", "selector": ".cart-upsell__action", "className": ".cart-upsell__action", "required": true, "description": "Add recommendation action." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default cart upsell block." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default compact upsell list." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".cart-upsell"], "description": "Default upsell state." }
+  ],
+  "behavior": [
+    { "name": "addUpsell", "selectors": [".cart-upsell__item"], "events": ["click"], "description": "Add actions should add the recommended item to cart and update totals." },
+    { "name": "recommendations", "selectors": [".cart-upsell__items"], "description": "Targets own recommendation source, item availability, and variant selection rules." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": true, "description": "Recommendation-section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-upsell__title" }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "Target-owned recommendation items.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-upsell__items", "classNames": [".cart-upsell__items"] }] } },
+    { "name": "addLabel", "type": "string", "required": true, "description": "Add recommendation action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-upsell__action" }] } },
+    { "name": "addDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables recommendation actions when unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-upsell__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-md", "--radius-sm"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Use clear add-action labels that include the product name.",
+    "Expose price and availability as text.",
+    "Do not force upsell focus before the main checkout path."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map recommendations, related items, or manual upsells." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
+}

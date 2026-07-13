@@ -1,42 +1,77 @@
 ## Overview
 
-Text input with label, message, icon. 4 types × 4 states.
+Text input with a visible label, optional message, validation variants, and independent passive icon slots.
 
-<Preview html={"<div class=\"input\" style=\"max-width:320px;\"><label class=\"input__label\">Name</label><input class=\"input__field\" type=\"text\" placeholder=\"Enter your name\" /></div>"} label="Input" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="input-name">Name</label><div class="input__control"><input class="input__field" id="input-name" type="text" placeholder="Enter your name" /></div></div></div>'} label="Input" />
 
-## Variants
+## Presentation
+
+Input has one default size and four validation variants. The absence of a modifier class selects the default variant.
+Leading and trailing icons are optional, independent, and passive; they may be used together without changing the native field semantics.
+Hover preserves the active Error, Success, or Warning color family instead of returning the border to Default.
+
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `variant` | `default` | `.input` |
+| `variant` | `error` | `.input--error` |
+| `variant` | `success` | `.input--success` |
+| `variant` | `warning` | `.input--warning` |
+| `size` | `default` | `.input` |
 
 ### Default
 
-<Preview html={"<div class=\"input\" style=\"max-width:320px;\"><label class=\"input__label\">Default</label><input class=\"input__field\" type=\"text\" placeholder=\"Placeholder\" /></div>"} label="Default" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="input-default">Default</label><div class="input__control"><svg class="input__icon input__icon--leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><input class="input__field" id="input-default" type="text" placeholder="name@example.com" /></div></div></div>'} label="Default with leading icon" />
 
 ### Error
 
-<Preview html={"<div class=\"input input--error\" style=\"max-width:320px;\"><label class=\"input__label\">With error</label><input class=\"input__field\" type=\"text\" value=\"Invalid\" /><span class=\"input__message\">This field is required</span></div>"} label="Error" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--error"><label class="input__label" for="input-error">With error</label><div class="input__control"><input class="input__field" id="input-error" type="text" value="Invalid" aria-invalid="true" aria-describedby="input-error-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><span class="input__message" id="input-error-message" role="alert">This field is required</span></div></div>'} label="Error with trailing status icon" />
 
 ### Success
 
-<Preview html={"<div class=\"input input--success\" style=\"max-width:320px;\"><label class=\"input__label\">Success</label><input class=\"input__field\" type=\"text\" value=\"Valid\" /></div>"} label="Success" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--success"><label class="input__label" for="input-success">Success</label><div class="input__control"><svg class="input__icon input__icon--leading" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><input class="input__field" id="input-success" type="text" value="Valid" aria-describedby="input-success-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></div><span class="input__message" id="input-success-message">Address verified</span></div></div>'} label="Success with both icon slots" />
+
+### Warning
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--warning"><label class="input__label" for="input-warning">Warning</label><div class="input__control"><input class="input__field" id="input-warning" type="text" value="Almost complete" aria-describedby="input-warning-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21.73 18 13.73 4a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg></div><span class="input__message" id="input-warning-message">Add a unit number if applicable.</span></div></div>'} label="Warning with trailing status icon" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use this component consistently across your theme for a cohesive UI.</Do>
-  <Dont>Don't override the component's built-in states with custom CSS — use the provided variants instead.</Dont>
+  <Do>Use Error for invalid values and Warning for values that need attention but can remain valid.</Do>
+  <Dont>Do not communicate validation through border or icon color alone.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Keep labels visible and concise, and use placeholder text only as supporting guidance.</Do>
+  <Dont>Do not use placeholder text as the field's only accessible name.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Primitive components are building blocks. They're referenced by higher-level components throughout the system.
+  Validation classes are visual. Native attributes provide the corresponding form semantics.
 </Callout>
 
 - Associate every input with a `<label>` using matching `for`/`id` attributes.
+- Connect supporting and validation messages with `aria-describedby`.
+- Add `aria-invalid="true"` when the error variant represents an invalid value.
+- Do not add `aria-invalid` to Success or Warning; keep their associated message descriptive.
+- Use native `disabled` for unavailable fields.
+- Do not rely on icon or color alone to communicate validation status.
+- Keep `leadingIcon` and `trailingIcon` passive and hidden from assistive technology when decorative.
+- Use a specialized component such as Password Input when an icon performs an action.
 
-## API Reference
+## References
 
 <PropTable>
-  <tr><td>`.input`</td><td>class</td><td>—</td><td>Base input styles</td></tr>
-  <tr><td>`.input--error`</td><td>modifier</td><td>—</td><td>Error variant</td></tr>
-  <tr><td>`.input--success`</td><td>modifier</td><td>—</td><td>Success variant</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible label associated with the field</td></tr>
+  <tr><td>`value`</td><td>string</td><td>empty</td><td>Current native field value</td></tr>
+  <tr><td>`placeholder`</td><td>string</td><td>empty</td><td>Supporting hint; never the accessible name</td></tr>
+  <tr><td>`message`</td><td>string</td><td>empty</td><td>Supporting or validation message</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Maps to the native `disabled` attribute</td></tr>
+  <tr><td>`leadingIcon`</td><td>slot</td><td>empty</td><td>Passive icon before the value</td></tr>
+  <tr><td>`trailingIcon`</td><td>slot</td><td>empty</td><td>Passive icon after the value</td></tr>
 </PropTable>
+
+Positioned icons compose `.input__icon` with `.input__icon--leading` or `.input__icon--trailing` inside `.input__control`. Both slots may be present at once.

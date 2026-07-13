@@ -1,0 +1,167 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "tooltip",
+  "name": "Tooltip",
+  "registryId": "B5",
+  "category": "layout",
+  "status": "pilot",
+  "summary": "Short non-interactive helper text rendered from aria-label with generated bubble and arrow, hover and focus-visible visibility states, and tokenized surface styling.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/tooltip",
+    "css": {
+      "file": "components/css/layout.css",
+      "selector": ".tooltip"
+    },
+    "docs": "site/src/content/components/tooltip.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".tooltip",
+      "className": ".tooltip",
+      "required": true,
+      "description": "Inline wrapper that owns positioning and receives the accessible tooltip text."
+    },
+    {
+      "name": "bubble",
+      "selector": ".tooltip::before",
+      "required": true,
+      "generated": true,
+      "description": "Generated text bubble rendered from the aria-label attribute."
+    },
+    {
+      "name": "arrow",
+      "selector": ".tooltip::after",
+      "required": false,
+      "generated": true,
+      "description": "Generated arrow that visually connects the bubble to the trigger."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default top-positioned tooltip."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default compact tooltip size."
+    }
+  ],
+  "states": [
+    {
+      "name": "hidden",
+      "selectors": [".tooltip::before", ".tooltip::after"],
+      "description": "Resting generated content state with zero opacity."
+    },
+    {
+      "name": "hover",
+      "selectors": [".tooltip:hover::before", ".tooltip:hover::after"],
+      "description": "Pointer hover state that reveals the tooltip."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".tooltip:focus-visible::before", ".tooltip:focus-visible::after"],
+      "description": "Keyboard focus-visible state that reveals the tooltip."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "contentSource",
+      "attributes": ["aria-label"],
+      "description": "The generated bubble reads its text from aria-label; adapters that do not use CSS-generated content must preserve an equivalent accessible label or description."
+    },
+    {
+      "name": "visibility",
+      "selectors": [".tooltip:hover::before", ".tooltip:hover::after", ".tooltip:focus-visible::before", ".tooltip:focus-visible::after"],
+      "events": ["hover", "focus"],
+      "description": "Tooltip content appears on hover and keyboard focus without requiring a click."
+    },
+    {
+      "name": "nonInteractive",
+      "description": "Tooltip content must remain short and non-interactive; use Popover when the floating content contains controls or rich structure."
+    }
+  ],
+  "properties": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Short supplemental text exposed through aria-label and rendered by the web tooltip bubble.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".tooltip",
+            "attribute": "aria-label",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-surface-statement",
+        "--color-text-inverse"
+      ],
+      "radius": [
+        "--radius-sm"
+      ],
+      "z-index": [
+        "--z-dropdown"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
+      "typography": [
+        "--typo-body-size"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use Tooltip only for short supplemental text, not required instructions or interactive content.",
+    "Ensure the trigger is keyboard focusable when the tooltip is attached to a non-focusable element.",
+    "Reveal the tooltip on keyboard focus, not only on hover.",
+    "Do not rely on generated visual text as the only accessible name when the trigger needs a different label."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented with generated pseudo-elements in components/css/layout.css."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-class",
+      "notes": "Shopify Liquid can render the same tooltip wrapper and aria-label contract."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "style"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
+}

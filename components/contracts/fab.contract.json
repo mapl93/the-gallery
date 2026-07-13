@@ -1,0 +1,93 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "fab",
+  "name": "FAB / Back-to-Top",
+  "registryId": "A20",
+  "category": "primitives",
+  "status": "pilot",
+  "summary": "Floating action button primitive with hidden and visible states for scroll-triggered actions such as back-to-top.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/fab",
+    "css": { "file": "components/css/primitives.css", "selector": ".fab" },
+    "docs": "site/src/content/components/fab.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".fab", "className": ".fab", "required": true, "description": "Fixed-position floating action button." },
+    { "name": "icon", "selector": ".fab__icon", "className": ".fab__icon", "required": true, "description": "Decorative action icon rendered inside the named button." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default floating action button." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Default floating action button size." }
+  ],
+  "states": [
+    { "name": "hidden", "selectors": [".fab"], "description": "Default hidden state." },
+    { "name": "visible", "selectors": [".fab--visible"], "description": "Visible state." },
+    { "name": "hover", "selectors": [".fab:hover"], "description": "Pointer hover state." },
+    { "name": "focusVisible", "selectors": [".fab:focus-visible"], "description": "Keyboard focus state." },
+    { "name": "disabled", "selectors": [".fab:disabled"], "description": "Unavailable visible action state." }
+  ],
+  "behavior": [
+    { "name": "scrollVisibility", "selectors": [".fab--visible"], "events": ["scroll"], "description": "Targets own when the FAB becomes visible based on scroll or context." },
+    { "name": "action", "selectors": [".fab"], "attributes": ["aria-label", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "The button should expose a clear action name and preserve native button behavior." }
+  ],
+  "properties": [
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Accessible name for the persistent page-level action.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".fab", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "icon",
+      "type": "slot",
+      "required": true,
+      "description": "Decorative icon that visually identifies the page-level action.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".fab__icon", "classNames": [".fab__icon"] }] }
+    },
+    {
+      "name": "visible",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Shows the FAB after target-owned scroll or contextual visibility logic decides it is relevant.",
+      "targetMappings": { "web": [{ "kind": "class", "selector": ".fab", "classNames": [".fab--visible"] }] }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes a visible native FAB unavailable without changing target-owned visibility.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".fab", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-primary", "--color-text-primary", "--color-border-subtle", "--color-surface-secondary", "--color-border-focus"],
+      "radius": ["--radius-full"],
+      "shadow": ["--shadow-lg"],
+      "transition": ["--transition-base", "--transition-fast"],
+      "easing": ["--easing-default", "--easing-out"],
+      "z-index": ["--z-sticky"],
+      "opacity": ["--opacity-disabled"]
+    }
+  },
+  "accessibility": [
+    "Provide a clear accessible name for the floating action.",
+    "Do not make the FAB the only way to complete critical navigation.",
+    "Keep the control reachable by keyboard when visible."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css; scroll visibility is target-owned." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js" },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
+  }
+}

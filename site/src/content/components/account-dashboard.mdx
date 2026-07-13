@@ -1,26 +1,48 @@
 ## Overview
 
-Account overview with navigation cards grid.
+Account Dashboard is an authenticated account overview with a customer greeting, optional account-level actions, and a responsive grid of target-owned navigation cards.
 
-<Preview html={"<div class=\"account-dashboard\" style=\"max-width:600px;\"><div class=\"account-dashboard__header\"><h1 class=\"account-dashboard__greeting\">Hello, María</h1></div><div class=\"account-dashboard__grid\" style=\"display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:16px;\"><div class=\"account-card\"><span class=\"account-card__icon\">📦</span><h3 class=\"account-card__title\">Orders</h3><p class=\"account-card__description\">View order history</p></div><div class=\"account-card\"><span class=\"account-card__icon\">📍</span><h3 class=\"account-card__title\">Addresses</h3><p class=\"account-card__description\">Manage addresses</p></div></div></div>"} label="Account Dashboard" />
+<Preview
+  html={'<section class="account-dashboard tg-preview-frame tg-preview-frame--lg"><header class="account-dashboard__header"><h1 class="account-dashboard__greeting">Welcome back, Maria</h1><div class="account-dashboard__actions"><a class="btn btn--outline btn--sm" href="#">Sign out</a></div></header><div class="account-dashboard__grid"><article class="account-card"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 7h18v13H3zM7 7V4h10v3"/></svg><h2 class="account-card__title">Orders</h2><p class="account-card__description">Review purchases and delivery progress.</p><a class="account-card__link" href="#">View orders</a></article><article class="account-card"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></svg><h2 class="account-card__title">Addresses</h2><p class="account-card__description">Manage delivery and billing locations.</p><a class="account-card__link" href="#">Manage addresses</a></article><article class="account-card"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><h2 class="account-card__title">Profile</h2><p class="account-card__description">Update contact details and preferences.</p><a class="account-card__link" href="#">Open settings</a></article></div></section>'}
+  label="Account Dashboard"
+/>
+
+## Presentation
+
+The header combines the required `greeting` with the optional `headerActions` slot. The example action is fixture content; authentication and navigation behavior come from the target.
+
+`cards` is one required slot. Card titles, descriptions, icons, destinations, count, and order remain repeated fixture or target data rather than top-level Dashboard properties. The canonical grid adapts from one to two and three columns at its existing breakpoints.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Pre-fill fields when possible (e.g., address from previous orders) to reduce friction.</Do>
-  <Dont>Don't expose sensitive account data without authentication.</Dont>
+  <Do>Use cards for clear destinations into distinct account areas.</Do>
+  <Dont>Do not expose sensitive customer or order details merely to fill the overview.</Dont>
 </DoDont>
+
+- Derive the greeting and available destinations from authenticated target data.
+- Keep each card focused on one destination with descriptive link text.
+- Omit unavailable destinations instead of rendering empty cards.
+- Keep account-level actions separate from the card collection.
 
 ## Accessibility
 
-<Callout type="warning">
-  Account components require Shopify customer authentication. They render only for logged-in customers.
-</Callout>
+- Protect the dashboard route through the target authentication system.
+- Use a logical heading hierarchy for the greeting and card titles.
+- Give every card destination clear link text rather than relying on the surrounding card.
+- Keep decorative card icons hidden from assistive technology.
+- Do not expose sensitive data in summary copy without clear user intent.
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
+## References
 
-## API Reference
+### Composition
+
+The card collection is target-owned slot content. The repeated card data in the artwork is a fixture, not a canonical property schema for individual cards.
+
+### API Reference
 
 <PropTable>
-  <tr><td>`.account-dashboard`</td><td>class</td><td>—</td><td>Base account dashboard styles</td></tr>
+  <tr><td>`greeting`</td><td>string</td><td>required</td><td>Customer-facing dashboard greeting</td></tr>
+  <tr><td>`headerActions`</td><td>slot</td><td>optional</td><td>Account-level actions beside the greeting</td></tr>
+  <tr><td>`cards`</td><td>slot</td><td>required</td><td>Target-owned account navigation cards</td></tr>
 </PropTable>

@@ -1,26 +1,79 @@
 ## Overview
 
-Gift card display with visual, code, copy button, balance, and QR.
+Gift Card presents target-formatted amount and balance strings, a selectable code, optional copy action, target-owned actions, optional QR media, and an optional workflow-neutral form. It does not calculate commerce data or define purchase, redemption, wallet, print, or balance-lookup behavior.
 
-<Preview html={"<div class=\"gift-card\" style=\"max-width:400px;text-align:center;\"><div class=\"gift-card__visual\" style=\"background:#f5f0eb;padding:32px;border-radius:12px;\"><span class=\"gift-card__brand\" style=\"font-weight:600;\">The Gallery</span><span class=\"gift-card__amount\" style=\"display:block;font-size:2rem;margin:8px 0;\">$100</span></div><h2 class=\"gift-card__heading\" style=\"margin-top:16px;\">Your Gift Card</h2><div class=\"gift-card__code-wrapper\" style=\"margin-top:8px;\"><code class=\"gift-card__code\" style=\"font-size:18px;letter-spacing:2px;\">GIFT-ABCD-1234</code></div></div>"} label="Gift Card Page" />
+<Preview
+  html={'<main class="gift-card tg-preview-frame--md" aria-labelledby="gift-card-preview-title"><div class="gift-card__visual tg-preview-media"><div class="gift-card__visual-overlay"><span class="gift-card__brand">The Gallery</span><span class="gift-card__amount">$100.00</span></div></div><h1 class="gift-card__heading" id="gift-card-preview-title">Your gift card</h1><p class="gift-card__message">Use the visible code with the target that issued this card.</p><div class="gift-card__code-wrapper"><code class="gift-card__code">GIFT-ABCD-1234</code></div><p class="gift-card__balance">Balance: <strong>$100.00</strong></p><form class="gift-card__form" aria-label="Additional target-owned information"><div class="input input--warning gift-card__field"><label class="input__label" for="gift-card-reference">Reference</label><div class="input__control"><input class="input__field" id="gift-card-reference" name="reference" type="text" value="ABC" aria-describedby="gift-card-reference-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.73 18 13.73 4a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg></div><span class="input__message" id="gift-card-reference-message">Confirm this value before submitting.</span></div><button class="btn" type="submit">Submit</button></form></main>'}
+  label="Gift Card"
+/>
+
+## Presentation
+
+Visual media, target-formatted amount, page heading, code wrapper, and selectable code are required. Brand text, supporting message, copy action, balance, action group, QR media, and form are optional. The visual may include a readable overlay, while the amount and balance remain target-formatted strings rather than calculated values.
+
+The artwork's form is a workflow-neutral preview fixture. It composes a complete Input with visible label, control, native field, associated message, fixed Warning indicator, and no `aria-invalid`. Default, Error, Success, and Warning remain Input variants, and the submit action composes Button semantics. The form purpose, endpoint, pending state, and response lifecycle remain target-owned.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep page templates simple and focused on their primary purpose.</Do>
-  <Dont>Don't add navigation-heavy sidebars to simple pages like 404 or policy pages.</Dont>
+  <Do>Display the exact code and target-formatted commerce strings supplied by the issuing target.</Do>
+  <Dont>Do not infer balance lookup, redemption, purchase, wallet, print, or account behavior from this page.</Dont>
 </DoDont>
+
+- Keep the code selectable even when a copy action is also supplied.
+- Name target-owned actions by their actual target behavior.
+- Explain the purpose of QR media without exposing its payload as the only usable representation.
+- Treat the artwork amount, balance, code, form field, and action as preview fixtures, not component defaults.
 
 ## Accessibility
 
-<Callout type="info">
-  Page components map to Shopify template types. Each has a corresponding .json template file.
-</Callout>
+- Keep the gift-card code selectable and expose a clearly named native button when copying is supported.
+- Announce copy success or failure without relying on icon or color change alone.
+- Provide useful alternative text for meaningful gift-card imagery and explain the purpose of QR media.
+- Give amount and balance strings clear currency context.
+- Every composed Input retains its visible label, control, associated message, and Default, Error, Success, and Warning semantics.
+- Reserve `aria-invalid="true"` for Error; Success and Warning use descriptive messages without `aria-invalid`.
+- Keep target-owned actions native, keyboard accessible, visibly focused, and clearly named.
 
-- All images must have descriptive `alt` text.
+## References
 
-## API Reference
+**Contract:** `gift-card` v0.2.0, `pilot`.
+
+**Dependencies:** None declared. Input and Button are optional slot compositions, not formal registry dependencies in this pass.
+
+**Anatomy**
+
+| Part | Selector | Requirement |
+| --- | --- | --- |
+| Root | `.gift-card` | Required |
+| Visual | `.gift-card__visual` | Required |
+| Visual overlay | `.gift-card__visual-overlay` | Optional |
+| Brand | `.gift-card__brand` | Optional |
+| Amount | `.gift-card__amount` | Required |
+| Heading | `.gift-card__heading` | Required |
+| Message | `.gift-card__message` | Optional |
+| Code wrapper | `.gift-card__code-wrapper` | Required |
+| Code | `.gift-card__code` | Required |
+| Copy action | `.gift-card__copy-btn` | Optional |
+| Balance | `.gift-card__balance` | Optional |
+| Action group | `.gift-card__actions` | Optional |
+| Action | `.gift-card__action` | Optional |
+| QR media | `.gift-card__qr` | Optional |
+| Native form | `.gift-card__form` | Optional |
+| Input sizing hook | `.gift-card__field` | Optional |
+
+**API Reference**
 
 <PropTable>
-  <tr><td>`.gift-card`</td><td>class</td><td>—</td><td>Base gift card page styles</td></tr>
+  <tr><td>`visual`</td><td>slot</td><td>required</td><td>Gift-card media and optional readable overlay content</td></tr>
+  <tr><td>`brand`</td><td>string</td><td>optional</td><td>Visible brand text</td></tr>
+  <tr><td>`amount`</td><td>string</td><td>required</td><td>Target-formatted amount without inferred calculation</td></tr>
+  <tr><td>`heading`</td><td>string</td><td>required</td><td>Page heading</td></tr>
+  <tr><td>`message`</td><td>string</td><td>optional</td><td>Supporting message</td></tr>
+  <tr><td>`code`</td><td>string</td><td>required</td><td>Visible selectable gift-card code</td></tr>
+  <tr><td>`copyLabel`</td><td>string</td><td>optional</td><td>Accessible name for an icon-only copy action</td></tr>
+  <tr><td>`balance`</td><td>string</td><td>optional</td><td>Target-formatted balance content</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Target-owned actions without a contract-defined workflow</td></tr>
+  <tr><td>`qr`</td><td>slot</td><td>optional</td><td>Target-supplied QR media and purpose text</td></tr>
+  <tr><td>`form`</td><td>slot</td><td>optional</td><td>Target-owned native form composed from Input and Button anatomy</td></tr>
 </PropTable>

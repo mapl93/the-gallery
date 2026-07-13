@@ -28,13 +28,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialImage } from './editorialMedia';
 
 interface SectionsStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtures: Record<string, StudioPropertyValues> = {
@@ -122,7 +122,7 @@ function SectionMedia({ index = 1, className = '', alt }: { index?: number; clas
   return (
     <img
       className={`${className} docs-studio__sections-media docs-studio__sections-media--${((index - 1) % 6) + 1}`}
-      src={transparentImage}
+      src={editorialImage(index - 1)}
       alt={alt}
     />
   );

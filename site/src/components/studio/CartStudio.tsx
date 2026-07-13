@@ -21,13 +21,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialMedia } from './editorialMedia';
 
 interface CartStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -104,7 +104,7 @@ function resolveTokens(control: StudioControl, contract: ComponentContract): str
 }
 
 function CartMedia({ className = '', alt = '' }: { className?: string; alt?: string }) {
-  return <img src={transparentImage} alt={alt} className={`${className} docs-studio__cart-media`} />;
+  return <img src={editorialMedia.texturedVase} alt={alt} className={`${className} docs-studio__cart-media`} />;
 }
 
 export default function CartStudio({ contract, definition }: CartStudioProps) {

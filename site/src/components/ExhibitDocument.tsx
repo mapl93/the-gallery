@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentType,
   type ReactNode,
 } from 'react';
 import {
@@ -19,6 +20,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { ComponentContract } from '../lib/contracts';
+import type { StudioDefinition } from '../lib/studio';
 import { ContractReference } from './ContractSummary';
 
 type ExhibitSectionKey =
@@ -56,6 +58,17 @@ const canonicalHeadingAliases: Record<ExhibitSectionKey, string[]> = {
 };
 
 export const ExhibitContractContext = createContext<ComponentContract | null>(null);
+
+interface ExhibitSharedRenderer {
+  Renderer: ComponentType<{
+    contract: ComponentContract;
+    definition: StudioDefinition;
+  }>;
+  contract: ComponentContract;
+  definition: StudioDefinition;
+}
+
+export const ExhibitSharedRendererContext = createContext<ExhibitSharedRenderer | null>(null);
 
 function normalizeHeading(value: string): string {
   return value.trim().toLowerCase();
@@ -177,6 +190,7 @@ function parseDocument(children: ReactNode): ParsedExhibit {
 
 export default function ExhibitDocument({ children }: { children: ReactNode }) {
   const contract = useContext(ExhibitContractContext);
+  const sharedRenderer = useContext(ExhibitSharedRendererContext);
   const parsed = useMemo(() => parseDocument(children), [children]);
   const firstSection = parsed.sections[0]?.key ?? 'overview';
   const [activeSection, setActiveSection] = useState<ExhibitSectionKey>(firstSection);
@@ -252,8 +266,17 @@ export default function ExhibitDocument({ children }: { children: ReactNode }) {
       </div>
 
       <div className="docs-exhibit__artwork" aria-label="Component exhibit">
-        {parsed.artwork ?? (
-          <p className="docs-exhibit__empty">Canonical preview pending</p>
+        {sharedRenderer ? (
+          <div className="docs-exhibit__shared-renderer">
+            <sharedRenderer.Renderer
+              contract={sharedRenderer.contract}
+              definition={sharedRenderer.definition}
+            />
+          </div>
+        ) : (
+          parsed.artwork ?? (
+            <p className="docs-exhibit__empty">Canonical preview pending</p>
+          )
         )}
       </div>
     </div>

@@ -117,7 +117,7 @@ function buildComponentsCss(cssFiles) {
     );
   }
 
-  write(outputPaths.components, `${sections.join('\n')}\n`);
+  write(outputPaths.components, `${sections.join('\n').trimEnd()}\n`);
 }
 
 function buildIndexCss() {

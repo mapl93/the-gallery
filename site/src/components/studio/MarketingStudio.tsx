@@ -24,13 +24,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialMedia } from './editorialMedia';
 
 interface MarketingStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -149,10 +149,16 @@ function MarketingMedia({
   kind: 'hero' | 'popup' | 'social-proof';
   alt: string;
 }) {
+  const source = {
+    hero: editorialMedia.tableware,
+    popup: editorialMedia.texturedVase,
+    'social-proof': editorialMedia.artistInStudio,
+  }[kind];
+
   return (
     <img
       className={`${className} docs-studio__marketing-media docs-studio__marketing-media--${kind}`}
-      src={transparentImage}
+      src={source}
       alt={alt}
     />
   );

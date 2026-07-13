@@ -10,7 +10,10 @@ import { getStudioRenderer } from '../components/studio';
 import ComponentModeSwitch, {
   type ComponentMode,
 } from '../components/studio/ComponentModeSwitch';
-import { ExhibitContractContext } from '../components/ExhibitDocument';
+import {
+  ExhibitContractContext,
+  ExhibitSharedRendererContext,
+} from '../components/ExhibitDocument';
 
 function CompHeader({ comp, cat }: { comp: ReturnType<typeof getComponent> & {}; cat?: { name: string } }) {
   return (
@@ -179,9 +182,15 @@ export default function ComponentDetail() {
         </header>
 
         <ExhibitContractContext.Provider value={contract ?? null}>
-          <Suspense fallback={<p className="docs-exhibit__loading">Loading...</p>}>
-            <MdxContent components={mdxComponents} />
-          </Suspense>
+          <ExhibitSharedRendererContext.Provider
+            value={contract && studioDefinition && StudioRenderer
+              ? { contract, definition: studioDefinition, Renderer: StudioRenderer }
+              : null}
+          >
+            <Suspense fallback={<p className="docs-exhibit__loading">Loading...</p>}>
+              <MdxContent components={mdxComponents} />
+            </Suspense>
+          </ExhibitSharedRendererContext.Provider>
         </ExhibitContractContext.Provider>
       </div>
     </div>

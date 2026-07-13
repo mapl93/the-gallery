@@ -6,13 +6,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialImage } from './editorialMedia';
 
 interface StorytellingStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -137,7 +137,7 @@ function StoryMedia({
 }) {
   return (
     <img
-      src={transparentImage}
+      src={editorialImage(tone + 1)}
       alt={alt}
       className={`${className} docs-studio__story-media docs-studio__story-media--${tone}`}
     />

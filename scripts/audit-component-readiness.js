@@ -296,7 +296,6 @@ function toMarkdown(report) {
     }
   }
 
-  lines.push('');
   return `${lines.join('\n')}\n`;
 }
 

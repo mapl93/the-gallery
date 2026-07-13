@@ -7,6 +7,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialImage } from './editorialMedia';
 
 interface OverlaySearchMediaStudioProps {
   contract: ComponentContract;
@@ -14,7 +15,6 @@ interface OverlaySearchMediaStudioProps {
 }
 
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
-const transparentImage = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
 
 const commandFixtures = [
   { label: 'Find artwork', shortcut: 'G A', icon: PackageSearch },
@@ -181,7 +181,7 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
         <div className="lightbox__content docs-studio__lightbox-content">
           <img
             className={`lightbox__image docs-studio__lightbox-artwork docs-studio__lightbox-artwork--${imageIndex + 1}`}
-            src={transparentImage}
+            src={editorialImage(imageIndex)}
             alt={String(values.alt || '')}
           />
         </div>

@@ -23,13 +23,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialMedia } from './editorialMedia';
 
 interface PagesStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -247,8 +247,8 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
         {values.backgroundMedia === true && (
           <img
             className="coming-soon__bg docs-studio__pages-media docs-studio__pages-media--coming-soon"
-            src={transparentImage}
-            alt="Abstract gallery installation preview"
+            src={editorialMedia.galleryInterior}
+            alt="Sunlit gallery interior with painting, sculptural works, and a wooden bench"
           />
         )}
         {values.brand === true && (
@@ -396,8 +396,8 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
           <div className="gift-card__visual">
             <img
               className="docs-studio__pages-media docs-studio__pages-media--gift-card"
-              src={transparentImage}
-              alt="Abstract ceramic composition on a gift card"
+              src={editorialMedia.texturedVase}
+              alt="Close view of a tall, ribbed ceramic vase"
             />
             <div className="gift-card__visual-overlay">
               {String(values.brand || '') && <span className="gift-card__brand">{String(values.brand)}</span>}

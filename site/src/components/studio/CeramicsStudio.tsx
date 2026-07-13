@@ -24,13 +24,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialImage } from './editorialMedia';
 
 interface CeramicsStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtures: Record<string, StudioPropertyValues> = {
@@ -132,7 +132,7 @@ function CeramicMedia({ index, className = '', alt }: { index: number; className
   return (
     <img
       className={`${className} docs-studio__ceramics-media docs-studio__ceramics-media--${((index - 1) % 6) + 1}`}
-      src={transparentImage}
+      src={editorialImage(index - 1)}
       alt={alt}
     />
   );

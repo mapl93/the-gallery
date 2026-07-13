@@ -22,13 +22,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialImage, editorialMedia } from './editorialMedia';
 
 interface ReviewsStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -340,8 +340,8 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
           {values.avatar === true && (
             <img
               className="review-card__avatar docs-studio__reviews-avatar"
-              src={transparentImage}
-              alt={`${String(values.author)} portrait placeholder`}
+              src={editorialMedia.artistInStudio}
+              alt={`${String(values.author)} working in a ceramics studio`}
             />
           )}
           <div className="review-card__meta">
@@ -357,7 +357,7 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
           <div className="review-card__photos" aria-label="Review photos">
             {photoAlts.slice(0, 3).map((alt, index) => (
               <span className="review-card__photo" key={alt}>
-                <img className={`docs-studio__reviews-media docs-studio__reviews-media--${index + 1}`} src={transparentImage} alt={alt} />
+                <img className={`docs-studio__reviews-media docs-studio__reviews-media--${index + 1}`} src={editorialImage(index)} alt={alt} />
               </span>
             ))}
           </div>
@@ -419,7 +419,7 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
           <div className="photo-reviews__item" role="listitem" key={alt}>
             <img
               className={`photo-reviews__image docs-studio__reviews-media docs-studio__reviews-media--${index + 1}`}
-              src={transparentImage}
+              src={editorialImage(index)}
               alt={alt}
             />
           </div>

@@ -13,13 +13,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialMedia } from './editorialMedia';
 
 interface CollectionStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -76,7 +76,7 @@ function variantClass(contract: ComponentContract, value: StudioPropertyValue): 
 }
 
 function CollectionMedia({ className = '', alt = '' }: { className?: string; alt?: string }) {
-  return <img src={transparentImage} alt={alt} className={`${className} docs-studio__collection-media`} />;
+  return <img src={editorialMedia.tableware} alt={alt} className={`${className} docs-studio__collection-media`} />;
 }
 
 export default function CollectionStudio({ contract, definition }: CollectionStudioProps) {

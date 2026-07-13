@@ -25,6 +25,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialMedia } from './editorialMedia';
 
 interface AccountStudioProps {
   contract: ComponentContract;
@@ -41,7 +42,6 @@ interface FieldProps {
   onChange: (value: string) => void;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -164,7 +164,7 @@ function Field({ id, label, type = 'text', value, autoComplete, required, onChan
 }
 
 function AccountMedia({ className = '', alt = '' }: { className?: string; alt?: string }) {
-  return <img src={transparentImage} alt={alt} className={`${className} docs-studio__account-media`} />;
+  return <img src={editorialMedia.artistInStudio} alt={alt} className={`${className} docs-studio__account-media`} />;
 }
 
 export default function AccountStudio({ contract, definition }: AccountStudioProps) {

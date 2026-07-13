@@ -103,6 +103,8 @@ work.
 ### 7. Canonical Documentation
 
 - The MDX page has one canonical preview suitable for Exhibit.
+- Exhibit and Studio mount the same registered renderer and initial fixture when
+  Studio support exists; MDX preview markup is fallback and audit evidence only.
 - Relevant properties and states can be exercised without rendering a wall of
   redundant variants.
 - When Studio metadata exists, its renderer uses canonical component CSS, covers

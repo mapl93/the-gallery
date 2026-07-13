@@ -22,13 +22,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialImage } from './editorialMedia';
 
 interface BlogStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -117,7 +117,7 @@ function variantClass(contract: ComponentContract, value: StudioPropertyValue): 
 function BlogMedia({ index = 1, className = '', alt = '' }: { index?: number; className?: string; alt?: string }) {
   return (
     <img
-      src={transparentImage}
+      src={editorialImage(index)}
       alt={alt}
       className={`${className} docs-studio__blog-media docs-studio__blog-media--${index}`}
     />

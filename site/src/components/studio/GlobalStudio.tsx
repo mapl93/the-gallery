@@ -27,13 +27,13 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import { editorialMedia } from './editorialMedia';
 
 interface GlobalStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
 
-const transparentImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
@@ -119,7 +119,7 @@ function preventNavigation(event: MouseEvent<HTMLAnchorElement>) {
 }
 
 function FixtureImage({ className, alt }: { className: string; alt: string }) {
-  return <img className={className} src={transparentImage} alt={alt} />;
+  return <img className={className} src={editorialMedia.ceramicsShelves} alt={alt} />;
 }
 
 export default function GlobalStudio({ contract, definition }: GlobalStudioProps) {

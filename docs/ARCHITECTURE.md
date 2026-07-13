@@ -432,9 +432,11 @@ bundle.
 Component MDX is presented through the site-owned Exhibit wrapper in
 `site/src/components/ExhibitDocument.tsx`. It groups canonical headings into
 Overview, Presentation, Guidelines, Accessibility, and Specification, promotes the
-first preview to the artwork pedestal, and omits secondary previews from Exhibit.
-The MDX source remains unchanged and continues to drive audit evidence. See ADR
-0038.
+first preview as fallback artwork, and omits secondary previews from Exhibit. When
+a component has Studio metadata and a registered renderer, Exhibit and Studio mount
+that same renderer and initial fixture; Exhibit removes only the inspector and
+Studio page title. The MDX source remains unchanged and continues to drive audit
+evidence. See ADRs 0038 and 0087.
 
 Build and validate the neutral web adapter with:
 

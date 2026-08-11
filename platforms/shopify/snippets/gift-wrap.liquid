@@ -1,0 +1,84 @@
+{% doc %}
+Renders the target-native Gift Wrap Option for one merchant-configured,
+dedicated, single-variant product. The canonical Checkbox emits requested
+checkedness; gift-wrap.js owns Ajax mutation and authoritative cart
+reconciliation. The sellable line remains visible in totals, checkout, tax,
+refunds, and fulfillment through Shopify's normal merchandise lifecycle.
+
+@param {product} gift_wrap_product - Dedicated single-variant gift-wrap product.
+@param {string} gift_wrap_id - Unique id prefix for this cart surface.
+
+@example
+{% render 'gift-wrap', gift_wrap_product: settings.gift_wrap_product, gift_wrap_id: 'CartPageGiftWrap' %}
+{% enddoc %}
+
+{%- liquid
+  assign gift_wrap_id = gift_wrap_id | default: 'GiftWrap'
+  assign gift_wrap_price_label = 'cart.gift_wrap_price' | t
+  assign gift_wrap_variant = gift_wrap_product.selected_or_first_available_variant
+  assign gift_wrap_selected = false
+  assign gift_wrap_quantity = 0
+
+  if gift_wrap_variant != blank
+    for item in cart.items
+      if item.variant_id == gift_wrap_variant.id
+        assign gift_wrap_selected = true
+        assign gift_wrap_quantity = gift_wrap_quantity | plus: item.quantity
+      endif
+    endfor
+  endif
+
+  assign gift_wrap_addable = false
+  if gift_wrap_variant.available
+    assign gift_wrap_addable = true
+  endif
+
+  assign gift_wrap_interactive = gift_wrap_addable
+  if gift_wrap_selected
+    assign gift_wrap_interactive = true
+  endif
+-%}
+
+{%- if gift_wrap_product != blank and gift_wrap_product.variants.size == 1 and gift_wrap_variant != blank -%}
+  {%- assign status_id = gift_wrap_id | append: '-status' -%}
+  <div
+    data-gift-wrap-target
+    data-gift-wrap-variant-id="{{ gift_wrap_variant.id }}"
+    data-gift-wrap-addable="{% if gift_wrap_addable %}true{% else %}false{% endif %}"
+    data-gift-wrap-selected-quantity="{{ gift_wrap_quantity }}"
+    data-added-message="{{ 'cart.gift_wrap_added' | t | escape }}"
+    data-removed-message="{{ 'cart.gift_wrap_removed' | t | escape }}"
+    data-error-message="{{ 'cart.gift_wrap_error' | t | escape }}"
+    data-unavailable-message="{{ 'cart.gift_wrap_unavailable' | t | escape }}"
+  >
+    <label class="checkbox gift-wrap">
+      <input
+        class="checkbox__input"
+        type="checkbox"
+        value="{{ gift_wrap_variant.id }}"
+        aria-describedby="{{ status_id }}"
+        data-gift-wrap-input
+        {% if gift_wrap_selected %}checked{% endif %}
+        {% unless gift_wrap_interactive %}disabled{% endunless %}
+      >
+      <span class="checkbox__label gift-wrap__info">
+        <span class="gift-wrap__label">{{ 'cart.gift_wrap_label' | t }}</span>
+        <span class="gift-wrap__price">
+          {% render 'price',
+             product: gift_wrap_product,
+             variant: gift_wrap_variant,
+             current_price_label: gift_wrap_price_label %}
+        </span>
+      </span>
+    </label>
+
+    <p
+      class="visually-hidden"
+      id="{{ status_id }}"
+      role="status"
+      data-gift-wrap-status
+    >
+      {%- unless gift_wrap_interactive -%}{{ 'cart.gift_wrap_unavailable' | t }}{%- endunless -%}
+    </p>
+  </div>
+{%- endif -%}

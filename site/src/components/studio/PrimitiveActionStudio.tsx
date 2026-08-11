@@ -235,7 +235,7 @@ export default function PrimitiveActionStudio({
             optionClass(contract.variants, values.variant),
           ].filter(Boolean).join(' ')}
           role="group"
-          aria-label={String(values.groupLabel || 'Display options')}
+          aria-label={String(values.groupLabel ?? '')}
         >
           {['Option 1', 'Option 2', 'Option 3'].map((label) => (
             <button className="btn btn--outline" type="button" key={label}>{label}</button>
@@ -263,7 +263,7 @@ export default function PrimitiveActionStudio({
             values.round === true ? 'icon-btn--round' : null,
           ].filter(Boolean).join(' ')}
           type="button"
-          aria-label={String(values.accessibleLabel || 'Icon action')}
+          aria-label={String(values.accessibleLabel ?? '')}
           disabled={disabled}
           style={style}
         >
@@ -283,7 +283,7 @@ export default function PrimitiveActionStudio({
         <button
           className="close-btn docs-studio__preview-close-button"
           type="button"
-          aria-label={String(values.accessibleLabel || 'Close')}
+          aria-label={String(values.accessibleLabel ?? '')}
           disabled={disabled}
           style={style}
         >
@@ -297,7 +297,7 @@ export default function PrimitiveActionStudio({
         <div
           className="toggle-group docs-studio__preview-toggle-group"
           role="group"
-          aria-label={String(values.groupLabel || 'View mode')}
+          aria-label={String(values.groupLabel ?? '')}
         >
           {['Option 1', 'Option 2', 'Option 3'].map((label, index) => {
             const pressed = selectedToggle === index;
@@ -338,7 +338,7 @@ export default function PrimitiveActionStudio({
             visible ? 'fab--visible' : null,
           ].filter(Boolean).join(' ')}
           type="button"
-          aria-label={String(values.accessibleLabel || 'Page action')}
+          aria-label={String(values.accessibleLabel ?? '')}
           disabled={disabled}
           style={style}
         >

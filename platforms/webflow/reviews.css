@@ -1,503 +1,764 @@
 /* ============================================================
-   The Gallery — Reviews System
-   Star ratings, review cards, summary, write-a-review,
-   photo reviews, helpfulness voting, brand replies
+   The Gallery - Reviews System
+   Aggregate displays, rating controls, review content, and
+   provider-agnostic review composition.
    ============================================================ */
 
-/* ── V1 · Review Summary ─────────────────────────────────── */
+:where(
+  .review-summary,
+  .star-input,
+  .review-card,
+  .review-highlights,
+  .photo-reviews,
+  .review-form,
+  .review-toolbar,
+  .review-pagination
+),
+:where(
+  .review-summary,
+  .star-input,
+  .review-card,
+  .review-highlights,
+  .photo-reviews,
+  .review-form,
+  .review-toolbar,
+  .review-pagination
+) *,
+:where(
+  .review-summary,
+  .star-input,
+  .review-card,
+  .review-highlights,
+  .photo-reviews,
+  .review-form,
+  .review-toolbar,
+  .review-pagination
+)::before,
+:where(
+  .review-summary,
+  .star-input,
+  .review-card,
+  .review-highlights,
+  .photo-reviews,
+  .review-form,
+  .review-toolbar,
+  .review-pagination
+)::after {
+  box-sizing: border-box;
+}
+
+/* V1. Review Summary */
 .review-summary {
-  --_border: var(--color-border-subtle);
+  --_review-summary-border: var(--color-border-subtle);
+  --_review-summary-average-basis: 7rem;
+  --_review-summary-bars-basis: 24rem;
+  --_review-summary-inline-gap: 0.25rem;
+  --_review-summary-rows-gap: 0.375rem;
+  --_review-summary-row-gap: 0.5rem;
+  --_review-summary-track-size: 0.5rem;
   display: flex;
-  gap: 32px;
+  flex-wrap: wrap;
   align-items: flex-start;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--_border);
+  gap: var(--space-layout-element-gap);
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding-block: var(--space-layout-element-gap);
+  border-block-end: 1px solid var(--_review-summary-border);
 }
+
 .review-summary__average {
-  text-align: center;
-  min-width: 100px;
+  display: grid;
+  flex: 0 1 var(--_review-summary-average-basis);
+  justify-items: start;
+  min-inline-size: 0;
+  margin: 0;
+  text-align: start;
 }
+
 .review-summary__score {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-h1-size);
-  line-height: 1;
+  display: block;
   color: var(--color-text-primary);
+  font: var(--tg-typography-h1-weight) var(--typo-h1-size)/var(--typo-h1-line-height) var(--font-family-heading);
+  overflow-wrap: anywhere;
 }
+
 .review-summary__count {
-  font-size: var(--typo-body-sm-size, 0.875rem);
+  display: block;
+  margin-block-start: var(--_review-summary-inline-gap);
   color: var(--color-text-secondary);
-  margin-top: 4px;
+  font: var(--tg-typography-body-small-weight) var(--typo-body-sm-size)/var(--typo-body-sm-line-height) var(--font-family-body);
+  overflow-wrap: anywhere;
 }
+
+.review-summary .rating {
+  margin-block-start: var(--_review-summary-inline-gap);
+}
+
 .review-summary__bars {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  flex: 1 1 var(--_review-summary-bars-basis);
+  gap: var(--_review-summary-rows-gap);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
+
 .review-summary__bar-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: fit-content(7rem) minmax(4rem, 1fr) fit-content(5rem);
   align-items: center;
-  gap: 8px;
-  font-size: var(--typo-body-sm-size, 0.875rem);
+  gap: var(--_review-summary-row-gap);
+  min-inline-size: 0;
 }
+
 .review-summary__bar-label {
-  width: 16px;
-  text-align: right;
   color: var(--color-text-secondary);
+  font: var(--tg-typography-body-small-weight) var(--typo-body-sm-size)/var(--typo-body-sm-line-height) var(--font-family-body);
+  text-align: end;
+  overflow-wrap: anywhere;
 }
+
 .review-summary__bar-track {
-  flex: 1;
-  height: 8px;
+  display: block;
+  block-size: var(--_review-summary-track-size);
+  min-inline-size: 0;
+  overflow: hidden;
   background: var(--color-surface-secondary);
   border-radius: var(--radius-full);
-  overflow: hidden;
 }
+
 .review-summary__bar-fill {
-  height: 100%;
+  display: block;
+  block-size: 100%;
+  max-inline-size: 100%;
   background: var(--color-text-accent);
   border-radius: var(--radius-full);
-  transition: width var(--transition-default, 200ms) var(--easing-default);
 }
+
 .review-summary__bar-count {
-  width: 28px;
-  font-size: 0.75rem;
   color: var(--color-text-secondary);
+  font: var(--tg-typography-body-caption-weight) var(--typo-caption-size)/var(--typo-caption-line-height) var(--font-family-body);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 639px) {
-  .review-summary {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  .review-summary__average { text-align: left; }
-}
-
-
-/* ── V2 · Star Rating (display) ──────────────────────────── */
-.star-rating {
-  --_star-size: 16px;
-  --_star-color: var(--color-text-accent);
-  --_star-empty: var(--color-border-subtle);
-  display: inline-flex;
-  gap: 2px;
-}
-.star-rating--lg { --_star-size: 24px; }
-.star-rating__star {
-  width: var(--_star-size);
-  height: var(--_star-size);
-  color: var(--_star-empty);
-}
-.star-rating__star[data-filled="true"],
-.star-rating__star.is-filled {
-  color: var(--_star-color);
-}
-.star-rating__star[data-filled="half"],
-.star-rating__star.is-half {
-  color: var(--_star-color);
-  clip-path: inset(0 50% 0 0);
-}
-
-
-/* ── V3 · Star Rating (interactive / write form) ─────────── */
+/* V3. Star Rating (interactive value entry) */
 .star-input {
-  display: inline-flex;
-  gap: 4px;
+  --_star-input-empty: color-mix(in srgb, var(--color-input-default-unfocused-inner-border) 60%, var(--color-text-primary));
+  --_star-input-hover: var(--color-input-default-hover-inner-border);
+  --_star-input-filled: var(--color-button-primary-bg-default);
+  --_star-input-label: var(--color-text-primary);
+  --_star-input-focus: var(--color-input-default-focused-outer-border);
+
+  display: inline-block;
+  inline-size: fit-content;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
+
+.star-input--error {
+  --_star-input-empty: color-mix(in srgb, var(--color-input-error-unfocused-inner-border) 70%, var(--color-text-primary));
+  --_star-input-hover: var(--_star-input-empty);
+  --_star-input-filled: var(--_star-input-empty);
+  --_star-input-label: color-mix(in srgb, var(--color-input-error-unfocused-label) 55%, var(--color-text-primary));
+  --_star-input-focus: var(--color-input-error-focused-outer-border);
+}
+
+.star-input--success {
+  --_star-input-empty: color-mix(in srgb, var(--color-input-success-unfocused-inner-border) 70%, var(--color-text-primary));
+  --_star-input-hover: var(--_star-input-empty);
+  --_star-input-filled: var(--_star-input-empty);
+  --_star-input-label: color-mix(in srgb, var(--color-input-success-unfocused-label) 55%, var(--color-text-primary));
+  --_star-input-focus: var(--color-input-success-focused-outer-border);
+}
+
+.star-input--warning {
+  --_star-input-empty: color-mix(in srgb, var(--color-input-warning-unfocused-inner-border) 70%, var(--color-text-primary));
+  --_star-input-hover: var(--_star-input-empty);
+  --_star-input-filled: var(--_star-input-empty);
+  --_star-input-label: color-mix(in srgb, var(--color-input-warning-unfocused-label) 55%, var(--color-text-primary));
+  --_star-input-focus: var(--color-input-warning-focused-outer-border);
+}
+
+.star-input__legend {
+  max-inline-size: 100%;
+  margin-block-end: var(--space-input-icon-gap);
+  color: var(--_star-input-label);
+  font-size: var(--typo-body-sm-size, 0.875rem);
+  font-weight: 600;
+  line-height: var(--typo-body-sm-line-height);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.star-input__choices {
+  display: flex;
+  direction: ltr;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+
 .star-input__radio {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  inline-size: 1px;
+  block-size: 1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
+
 .star-input__label {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 var(--space-layout-touch-target);
+  inline-size: var(--space-layout-touch-target);
+  min-inline-size: var(--space-layout-touch-target);
+  block-size: var(--space-layout-touch-target);
+  min-block-size: var(--space-layout-touch-target);
+  color: var(--_star-input-empty);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  width: 28px;
-  height: 28px;
-  color: var(--color-border-subtle);
-  transition: color var(--transition-fast) var(--easing-default);
-}
-.star-input__radio:checked ~ .star-input__label { color: var(--color-border-subtle); }
-.star-input__label:hover,
-.star-input__label:hover ~ .star-input__label { color: var(--color-text-accent); }
-.star-input__radio:checked + .star-input__label,
-.star-input__radio:checked + .star-input__label ~ .star-input__label { color: var(--color-border-subtle); }
-/* Reverse order trick: stars are rendered RTL so ~ works correctly */
-.star-input {
-  direction: rtl;
-}
-.star-input__radio:checked + .star-input__label,
-.star-input__radio:checked ~ .star-input__label {
-  color: var(--color-text-accent);
-}
-.star-input__label:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-  border-radius: 2px;
+  transition: color var(--motion-transition-micro, var(--transition-fast) var(--easing-default));
 }
 
+.star-input__label-text {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
-/* ── V4 · Review Card ────────────────────────────────────── */
+.star-input__indicator {
+  display: block;
+  inline-size: 28px;
+  block-size: 28px;
+  fill: none;
+  pointer-events: none;
+  forced-color-adjust: auto;
+}
+
+.star-input__label:has(.star-input__radio:checked),
+.star-input__label:has(~ .star-input__label .star-input__radio:checked) {
+  color: var(--_star-input-filled);
+}
+
+.star-input__label:has(.star-input__radio:checked) .star-input__indicator,
+.star-input__label:has(~ .star-input__label .star-input__radio:checked) .star-input__indicator {
+  fill: currentColor;
+}
+
+.star-input__label:has(.star-input__radio:focus-visible) {
+  outline: 4px solid var(--_star-input-focus);
+  outline-offset: 0;
+}
+
+.star-input--error .star-input__label:has(.star-input__radio:focus-visible),
+.star-input--success .star-input__label:has(.star-input__radio:focus-visible),
+.star-input--warning .star-input__label:has(.star-input__radio:focus-visible) {
+  outline-color: var(--_star-input-focus);
+}
+
+.star-input__label:has(.star-input__radio:disabled) {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .star-input__choices .star-input__label:hover ~ .star-input__label {
+    color: var(--_star-input-empty);
+  }
+
+  .star-input__choices .star-input__label:hover ~ .star-input__label .star-input__indicator {
+    fill: none;
+  }
+
+  .star-input__label:hover,
+  .star-input__label:has(~ .star-input__label:hover) {
+    color: var(--_star-input-hover);
+  }
+
+  .star-input__label:hover .star-input__indicator,
+  .star-input__label:has(~ .star-input__label:hover) .star-input__indicator {
+    fill: currentColor;
+  }
+}
+
+/* V4. Review Card */
 .review-card {
-  --_border: var(--color-border-subtle);
-  padding: 24px 0;
-  border-bottom: 1px solid var(--_border);
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  padding-block: var(--space-layout-element-gap);
+  border-block-end: 1px solid var(--color-border-subtle);
+  font: var(--tg-typography-body-default-weight) var(--typo-body-size)/var(--typo-body-line-height) var(--font-family-body);
+  overflow-wrap: anywhere;
 }
+
 .review-card__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  min-inline-size: 0;
+  margin-block-end: 12px;
 }
+
 .review-card__avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
+  flex: 0 0 40px;
+  inline-size: 40px;
+  block-size: 40px;
   object-fit: cover;
   background: var(--color-surface-secondary);
+  border-radius: var(--radius-full);
 }
+
 .review-card__meta {
-  flex: 1;
+  flex: 1 1 12rem;
+  min-inline-size: 0;
 }
-.review-card__author {
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
+
+.review-card__author,
 .review-card__date {
-  font-size: var(--typo-caption-size, 0.75rem);
-  color: var(--color-text-secondary);
+  display: block;
 }
+
+.review-card__author {
+  color: var(--color-text-primary);
+  font-weight: var(--tg-font-weight-semibold);
+}
+
+.review-card__date {
+  color: var(--color-text-secondary);
+  font: var(--tg-typography-body-caption-weight) var(--typo-caption-size)/var(--typo-caption-line-height) var(--font-family-body);
+}
+
 .review-card__verified {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--typo-caption-size, 0.75rem);
-  color: var(--color-feedback-success-default);
-  font-weight: 500;
+  max-inline-size: 100%;
+  color: color-mix(in srgb, var(--color-feedback-success-default) 55%, var(--color-text-primary));
+  font: var(--tg-font-weight-medium) var(--typo-caption-size)/var(--typo-caption-line-height) var(--font-family-body);
 }
+
+.review-card > .rating {
+  margin-block-end: 8px;
+}
+
 .review-card__title {
-  font-weight: 600;
-  margin-bottom: 8px;
+  margin-block: 0 8px;
   color: var(--color-text-primary);
+  font: var(--tg-typography-h3-weight) var(--typo-h3-size)/var(--typo-h3-line-height) var(--font-family-heading);
 }
+
 .review-card__body {
-  font-size: var(--typo-body-size);
-  line-height: 1.6;
+  margin: 0;
   color: var(--color-text-primary);
 }
 
-/* Photo attachments */
 .review-card__photos {
   display: flex;
   gap: 8px;
-  margin-top: 16px;
+  max-inline-size: 100%;
+  margin: 16px 0 0;
+  padding: 0 0 2px;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  list-style: none;
 }
-.review-card__photo {
-  flex-shrink: 0;
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: opacity var(--transition-fast) var(--easing-default);
-}
-.review-card__photo:hover { opacity: 0.8; }
 
-/* Helpfulness */
+.review-card__photo {
+  flex: 0 0 80px;
+  inline-size: 80px;
+  block-size: 80px;
+  max-inline-size: 100%;
+  overflow: hidden;
+  background: var(--color-surface-secondary);
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+.review-card__photo img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.review-card__photo:is(a, button) {
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity var(--motion-transition-micro, var(--transition-fast) var(--easing-default));
+}
+
+.review-card__photo:is(a, button):focus-visible,
+.review-card__helpful-btn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.review-card__actions,
+.review-card__reply {
+  font: var(--tg-typography-body-small-weight) var(--typo-body-sm-size)/var(--typo-body-sm-line-height) var(--font-family-body);
+}
+
 .review-card__actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  margin-top: 16px;
-  font-size: var(--typo-body-sm-size, 0.875rem);
+  gap: 12px 16px;
+  margin-block-start: 16px;
 }
+
 .review-card__helpful-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
+  min-block-size: var(--space-layout-touch-target);
+  max-inline-size: 100%;
+  padding: 4px 12px;
+  color: var(--color-text-secondary);
+  font: inherit;
   background: none;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
-  padding: 4px 12px;
   cursor: pointer;
-  color: var(--color-text-secondary);
-  font-size: inherit;
-  transition: border-color var(--transition-fast) var(--easing-default),
-              color var(--transition-fast) var(--easing-default);
+  overflow-wrap: anywhere;
+  transition: border-color var(--motion-transition-micro, var(--transition-fast) var(--easing-default)),
+              color var(--motion-transition-micro, var(--transition-fast) var(--easing-default));
 }
-.review-card__helpful-btn:hover {
-  border-color: var(--color-border-default);
-  color: var(--color-text-primary);
-}
+
 .review-card__helpful-btn[aria-pressed="true"] {
-  border-color: var(--color-text-accent);
-  color: var(--color-text-accent);
+  color: var(--color-button-primary-bg-default);
+  border-color: var(--color-button-primary-bg-default);
+  font-weight: var(--tg-font-weight-semibold);
 }
+
+.review-card__helpful-btn:disabled {
+  cursor: not-allowed;
+  opacity: var(--opacity-disabled);
+}
+
 .review-card__helpful-count {
   color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Brand reply */
 .review-card__reply {
+  min-inline-size: 0;
+  margin-block-start: 16px;
+  padding: 16px;
   background: var(--color-surface-secondary);
   border-radius: var(--radius-md);
-  padding: 16px;
-  margin-top: 16px;
 }
+
 .review-card__reply-label {
-  font-weight: 600;
-  font-size: var(--typo-body-sm-size, 0.875rem);
+  margin-block-end: 6px;
   color: var(--color-text-primary);
-  margin-bottom: 6px;
+  font-weight: var(--tg-font-weight-semibold);
 }
+
 .review-card__reply-body {
-  font-size: var(--typo-body-sm-size, 0.875rem);
+  margin: 0;
   color: var(--color-text-secondary);
-  line-height: 1.5;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .review-card__photo:is(a, button):hover {
+    opacity: var(--motion-opacity-subtle, 0.8);
+  }
 
-/* ── V5 · Review Highlights / Themes ────────────────────── */
+  .review-card__helpful-btn:hover:not(:disabled):not([aria-pressed="true"]) {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-default);
+  }
+}
+
+/* V5 */
 .review-highlights {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin: 0;
   padding: 16px 0;
+  list-style: none;
 }
+
 .review-highlights__tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  padding: 6px 14px;
+  color: var(--color-text-secondary);
+  font: var(--tg-typography-body-small-weight) var(--typo-body-sm-size)/var(--typo-body-sm-line-height) var(--font-family-body);
   background: var(--color-surface-secondary);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-full);
-  padding: 6px 14px;
-  font-size: var(--typo-body-sm-size, 0.875rem);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: border-color var(--transition-fast) var(--easing-default),
-              background var(--transition-fast) var(--easing-default);
+  overflow-wrap: anywhere;
 }
-.review-highlights__tag:hover {
-  border-color: var(--color-border-default);
-  background: var(--color-surface-primary);
+
+.review-highlights__tag:is(a, button) {
+  min-block-size: var(--space-layout-touch-target);
+  text-decoration: none;
 }
-.review-highlights__tag[aria-pressed="true"],
-.review-highlights__tag.is-active {
-  border-color: var(--color-text-primary);
-  background: var(--color-surface-primary);
+
+.review-highlights__tag:is([aria-pressed="true"], [aria-current]:not([aria-current="false"])) {
   color: var(--color-text-primary);
+  font-weight: var(--tg-font-weight-semibold);
+  background: var(--color-surface-primary);
+  border-color: var(--color-text-primary);
 }
+
+.review-highlights__tag:is(a, button):focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.review-highlights__tag:disabled {
+  opacity: var(--opacity-disabled);
+}
+
 .review-highlights__count {
-  font-size: 0.75rem;
-  opacity: 0.7;
+  font: var(--tg-typography-body-caption-weight) var(--typo-caption-size)/var(--typo-caption-line-height) var(--font-family-body);
 }
 
-
-/* ── V6 · Photo Reviews Gallery ──────────────────────────── */
-.photo-reviews {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 8px;
-}
-.photo-reviews__item {
-  position: relative;
-  aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-.photo-reviews__item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--transition-default, 200ms) var(--easing-default);
-}
-.photo-reviews__item:hover img {
-  transform: scale(1.05);
-}
-.photo-reviews__item::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 50%, color-mix(in srgb, black 40%, transparent));
-  opacity: 0;
-  transition: opacity var(--transition-fast) var(--easing-default);
-}
-.photo-reviews__item:hover::after { opacity: 1; }
-
-
-/* ── V7 · Write-a-Review Form ────────────────────────────── */
-.review-form {
-  max-width: 600px;
-}
-.review-form__group {
-  margin-bottom: 20px;
-}
-.review-form__label {
-  display: block;
-  font-weight: 600;
-  font-size: var(--typo-body-sm-size, 0.875rem);
-  color: var(--color-text-primary);
-  margin-bottom: 6px;
-}
-.review-form__input,
-.review-form__textarea {
-  width: 100%;
-  padding: 10px 14px;
-  font-size: var(--typo-body-size);
-  font-family: inherit;
-  color: var(--color-text-primary);
-  background: var(--color-surface-primary);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  transition: border-color var(--transition-fast) var(--easing-default);
-}
-.review-form__input:focus,
-.review-form__textarea:focus {
-  outline: none;
-  border-color: var(--color-border-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus) 25%, transparent);
-}
-.review-form__textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-.review-form__photo-upload {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.review-form__photo-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: 1px dashed var(--color-border-default);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text-secondary);
-  font-size: var(--typo-body-sm-size, 0.875rem);
-  cursor: pointer;
-  transition: border-color var(--transition-fast) var(--easing-default);
-}
-.review-form__photo-btn:hover {
-  border-color: var(--color-text-primary);
-  color: var(--color-text-primary);
-}
-.review-form__photo-previews {
-  display: flex;
-  gap: 8px;
-}
-.review-form__photo-preview {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-.review-form__photo-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.review-form__photo-remove {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, black 60%, transparent);
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-}
-
-
-/* ── V8 · Reviews Sort / Filter Bar ─────────────────────── */
-.review-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-.review-toolbar__sort {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: var(--typo-body-sm-size, 0.875rem);
-}
-.review-toolbar__sort-select {
-  padding: 6px 10px;
-  font-size: inherit;
-  font-family: inherit;
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-primary);
-  color: var(--color-text-primary);
-}
-.review-toolbar__write-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 20px;
-  font-size: var(--typo-body-sm-size, 0.875rem);
-  font-weight: 600;
-  background: var(--color-surface-statement);
-  color: var(--color-text-inverse);
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: opacity var(--transition-fast) var(--easing-default);
-}
-.review-toolbar__write-btn:hover { opacity: 0.85; }
-
-@media (max-width: 639px) {
-  .review-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+@media (hover: hover) and (pointer: fine) {
+  .review-highlights__tag:is(a, button):hover:not(:disabled):not([aria-pressed="true"]):not([aria-current]) {
+    background: var(--color-surface-primary);
+    border-color: var(--color-border-default);
   }
 }
 
+.photo-reviews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
+  gap: 8px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-/* ── V9 · Review Pagination ──────────────────────────────── */
-.review-pagination {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  padding: 24px 0;
-}
-.review-pagination__btn {
-  min-width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text-primary);
-  font-size: var(--typo-body-sm-size, 0.875rem);
-  cursor: pointer;
-  transition: border-color var(--transition-fast) var(--easing-default),
-              background var(--transition-fast) var(--easing-default);
-}
-.review-pagination__btn:hover {
-  border-color: var(--color-border-default);
+.photo-reviews__item {
+  position: relative;
+  min-inline-size: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
   background: var(--color-surface-secondary);
+  border-radius: var(--radius-sm);
 }
-.review-pagination__btn[aria-current="page"] {
-  background: var(--color-surface-statement);
-  color: var(--color-text-inverse);
-  border-color: var(--color-surface-statement);
+
+.photo-reviews__image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.photo-reviews__action {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.photo-reviews__action::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--color-text-primary) 20%, transparent);
+  opacity: 0;
+  transition: var(--motion-transition-micro);
+}
+
+.photo-reviews__action .photo-reviews__image {
+  transition: var(--motion-transition-media);
+}
+
+.photo-reviews__action:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 2px var(--color-surface-primary);
+}
+
+.photo-reviews__action:disabled {
+  opacity: var(--opacity-disabled);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .photo-reviews__action:where(:hover:not(:disabled)) .photo-reviews__image {
+    transform: scale(1.05);
+  }
+
+  .photo-reviews__action:hover:not(:disabled)::after {
+    opacity: 1;
+  }
+}
+
+/* V7. Write-a-Review Form
+   Field visuals and validation belong to the composed canonical components. */
+.review-form {
+  display: grid;
+  gap: var(--space-layout-element-gap);
+  inline-size: 100%;
+  max-inline-size: min(600px, 100%);
+  min-inline-size: 0;
+}
+
+.review-form__group,
+.review-form__fields,
+.review-form__actions,
+.review-form .star-input,
+.review-form .input,
+.review-form .select,
+.review-form .file-upload,
+.review-form .btn {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.review-form__group,
+.review-form__fields {
+  display: grid;
+  gap: var(--space-input-margin-bottom);
+}
+
+.review-form .input,
+.review-form .select,
+.review-form .file-upload,
+.review-form .textarea__field {
+  inline-size: 100%;
+}
+
+.review-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-button-gap);
+}
+
+.review-form__status {
+  min-inline-size: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--typo-body-sm-size);
+  overflow-wrap: anywhere;
+}
+
+/* V8. Review Toolbar
+   A labelled control group; Select and Button own interaction. */
+.review-toolbar {
+  container: review-toolbar / inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  padding-block: 16px;
+  border-block-end: 1px solid var(--color-border-subtle);
+}
+
+.review-toolbar__sort,
+.review-toolbar .select,
+.review-toolbar .btn {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.review-toolbar__sort {
+  display: flex;
+  flex: 1 1 14rem;
+  align-items: center;
+}
+
+.review-toolbar__sort-select {
+  max-inline-size: 100%;
+}
+
+.review-toolbar__write-btn {
+  flex: 0 0 auto;
+}
+
+@container review-toolbar (max-width: 30rem) {
+  .review-toolbar__sort {
+    align-items: stretch;
+    flex-basis: 100%;
+    flex-direction: column;
+  }
+
+  .review-toolbar .select,
+  .review-toolbar .btn,
+  .review-toolbar__sort-select,
+  .review-toolbar__write-btn {
+    inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-input__label,
+  .review-card__photo,
+  .review-card__helpful-btn,
+  .photo-reviews__action .photo-reviews__image,
+  .photo-reviews__action::after {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .review-summary__bar-track {
+    background: Canvas;
+    border: 1px solid GrayText;
+    forced-color-adjust: none;
+  }
+
+  .review-summary__bar-fill {
+    background: CanvasText;
+  }
+
+  .star-input__label {
+    color: CanvasText;
+  }
+
+  .star-input__label:has(.star-input__radio:focus-visible) {
+    outline-color: Highlight;
+  }
+
+  .star-input__label:has(.star-input__radio:checked),
+  .star-input__label:has(~ .star-input__label .star-input__radio:checked) {
+    color: CanvasText;
+  }
+
+  .review-card__helpful-btn[aria-pressed="true"],
+  .review-highlights__tag:is([aria-pressed="true"], [aria-current]:not([aria-current="false"])) {
+    color: HighlightText;
+    background: Highlight;
+    border-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  .photo-reviews__action::after {
+    display: none;
+  }
+
+  .photo-reviews__action:focus-visible {
+    outline-color: Highlight;
+  }
 }

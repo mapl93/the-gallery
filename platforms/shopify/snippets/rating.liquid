@@ -1,25 +1,48 @@
 {%- comment -%}
   Snippet: rating
-  Usage: {% render 'rating', rating: product.metafields.reviews.rating, count: product.metafields.reviews.rating_count %}
+  Usage: {% render 'rating', rating: product.metafields.reviews.rating, count: product.metafields.reviews.rating_count, size: 'default' %}
+
+  Shopify's Rating object owns the raw value and scale. This compact adapter
+  projects a five-point source to the nearest half step because canonical
+  Rating accepts only 0..5 half-step values. Other provider scales require an
+  explicit target normalization policy before this snippet is invoked.
+  Aggregation, missing data, and review destinations remain outside.
 {%- endcomment -%}
 
-{%- if rating -%}
-  {%- assign rating_value = rating | round: 1 -%}
-  <div class="rating" role="img" aria-label="{{ rating_value }} out of 5 stars">
-    <span class="rating__stars" aria-hidden="true">
+{%- liquid
+  assign rating_object = rating.value | default: rating
+  assign rating_value = rating_object.rating | default: rating_object
+  assign rating_scale_max = rating_object.scale_max | default: 5
+  assign rating_visual_steps = rating_value | times: 2 | round
+  assign rating_visual_value = rating_visual_steps | divided_by: 2.0
+  assign review_count = count.value | default: count
+  assign rating_size = size | default: 'default'
+  assign rating_label = 'rating.label' | t: value: rating_visual_value, maximum: 5
+-%}
+
+{%- if rating_value != blank and rating_scale_max == 5 and rating_visual_value >= 0 and rating_visual_value <= 5 -%}
+  <span
+    class="rating{% if rating_size == 'lg' %} rating--lg{% endif %}"
+    data-rating="{{ rating_visual_value }}"
+  >
+    <span
+      class="rating__stars"
+      role="img"
+      aria-label="{{ rating_label | escape }}"
+    >
       {%- for i in (1..5) -%}
         {%- assign half_star = i | minus: 0.5 -%}
-        {%- if rating_value >= i -%}
-          <span class="rating__star rating__star--filled">{% render 'icon', name: 'star' %}</span>
-        {%- elsif rating_value >= half_star -%}
-          <span class="rating__star rating__star--half">{% render 'icon', name: 'star-half' %}</span>
+        {%- if rating_visual_value >= i -%}
+          <span class="rating__star rating__star--filled" aria-hidden="true">{% render 'icon', name: 'star' %}</span>
+        {%- elsif rating_visual_value >= half_star -%}
+          <span class="rating__star rating__star--half" aria-hidden="true">{% render 'icon', name: 'star-half' %}</span>
         {%- else -%}
-          <span class="rating__star">{% render 'icon', name: 'star-empty' %}</span>
+          <span class="rating__star" aria-hidden="true">{% render 'icon', name: 'star-empty' %}</span>
         {%- endif -%}
       {%- endfor -%}
     </span>
-    {%- if count -%}
-      <span class="rating__count">({{ count }})</span>
+    {%- if review_count != blank -%}
+      <span class="rating__count" dir="auto">{{ 'rating.reviews' | t: count: review_count | escape }}</span>
     {%- endif -%}
-  </div>
+  </span>
 {%- endif -%}

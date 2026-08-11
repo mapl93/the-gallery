@@ -1,38 +1,46 @@
 ## Overview
 
-Quick View composes Modal, Product Gallery, and an optional reduced Product Form into a focused product-purchase surface. It may also provide a direct link to the complete product page.
+Quick View is a focused product-decision profile of canonical Modal. It opens only from one complete target-coordinated product snapshot and composes the full canonical rich-media Product Gallery, target-formatted Price, an optional native Product Form, and an optional Link to the complete product page without becoming a second product page or commerce controller.
 
 <Preview
-  html={'<div class="tg-preview-stage tg-preview-stage--overlay tg-preview-stage--tall"><button class="btn" type="button" data-preview-trigger aria-expanded="true">Open quick view</button><div class="modal-overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal quick-view" role="dialog" aria-modal="true" aria-labelledby="quick-view-preview-title"><div class="quick-view__gallery"><div class="tg-preview-media tg-preview-media--square" role="img" aria-label="Ceramic vase"></div></div><div class="quick-view__info"><button class="close-btn" type="button" data-preview-close aria-label="Close quick view"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button><h2 class="quick-view__title" id="quick-view-preview-title">Ceramic Vase</h2><span class="quick-view__vendor">The Gallery</span><p class="quick-view__description">Hand-thrown stoneware with a soft mineral glaze.</p><form class="product-form quick-view__form"><div class="product-form__actions"><button class="btn product-form__submit" type="submit">Add to Cart</button></div></form><a class="quick-view__full-link" href="#">View full details</a></div></div></div></div>'}
+  html={'<div class="tg-preview-stage tg-preview-stage--overlay tg-preview-stage--tall"><button class="btn" type="button" data-preview-trigger aria-haspopup="dialog" aria-controls="quick-view-preview" aria-expanded="true">Open quick view for Celadon Study No. 4</button><div class="modal-overlay quick-view-overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal quick-view" id="quick-view-preview" role="dialog" aria-modal="true" aria-labelledby="quick-view-preview-title"><div class="modal__header"><h2 class="modal__title" id="quick-view-preview-title">Celadon Study No. 4</h2><button class="close-btn modal__close" type="button" data-preview-close aria-label="Close quick view"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button></div><div class="modal__body"><div class="quick-view__layout"><div class="quick-view__gallery"><div class="product-gallery"><div class="product-gallery__layout"><div class="product-gallery__main"><img src="/media/editorial/textured-vase.jpg" alt="Celadon glazed stoneware vessel" /></div></div></div></div><div class="quick-view__info"><p class="quick-view__vendor" dir="auto">Lucia Ferrer</p><div class="quick-view__price"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$120.00</bdi></span></span></div><p class="quick-view__description" dir="auto">Hand-thrown stoneware finished with a satin celadon glaze.</p><form class="product-form quick-view__form" action="#cart" method="post"><input type="hidden" name="merchandise" value="celadon-study-4" /><div class="product-form__actions"><button class="btn btn--lg product-form__submit" type="submit" name="intent" value="add">Add to cart</button></div></form><a class="link quick-view__full-link" href="#product">View full details</a></div></div></div></div></div></div>'}
   label="Quick View"
   layout="overlay"
-  interaction={{ selector: '.modal-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Quick View', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', dismissSelector: '.modal-overlay', startVisible: true }}
+  interaction={{ selector: '.quick-view-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Quick View', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', dismissSelector: '.quick-view-overlay', startVisible: true }}
 />
 
 ## Presentation
 
-Quick View uses the ADR 0069 overlay family: the trigger and surface are siblings, the modal is visible on first load, and the trigger does not constrain its geometry. Modal owns backdrop visibility, focus management, dismissal, and labelled-dialog behavior.
+The product title is both the visible Modal title and its accessible name. The body keeps a stable source order—Gallery, then product information and continuations—and switches its internal columns from the Quick View container rather than the page viewport.
 
-`gallery` and `title` are required. `vendor`, `description`, the reduced `productForm`, and the complete-product link are optional. Quick View does not redefine the behavior of Product Gallery or Product Form.
+`gallery`, `price`, `title`, and `dismissLabel` are required. `vendor` and a concise target-authored `description` are optional. A valid Quick View provides `productForm`, a coherent `fullLinkLabel`/`href` pair, or both. One-sided Link values, a blank title, or no continuation are invalid and should omit the incomplete surface instead of inventing markup or URLs.
+
+Modal owns overlay anatomy and the visible Close Button. Product Gallery owns images, hosted video, external video, models, selection, direct swipe, explicit activation/release and alternatives. Inside Quick View the same Gallery is configured with `imageDetail="none"`: images are passive and never open or transfer a nested Lightbox. Price owns target-formatted monetary presentation. Product Form owns its native form and child action states. Link owns native navigation and focus. K8 owns only the domain composition and its private responsive layout.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use Quick View for a reduced purchase decision that can be completed without the full product page.</Do>
-  <Dont>Do not duplicate every product-page section inside the modal.</Dont>
+  <Do>Use Quick View for a focused decision that needs less information than the complete product page.</Do>
+  <Dont>Do not duplicate every product-page section, silently choose a variant, or report local purchase success before the target confirms it.</Dont>
 </DoDont>
 
-- Include only the media, information, and controls needed for the immediate decision.
-- Provide `fullLinkLabel` and `href` when important details remain on the product page.
-- Keep selected variant and availability state synchronized with the commerce target.
+- Open Quick View only after one target product coordinator has a complete coherent product snapshot. Omit it while data is incomplete, loading, stale or cannot be synchronized.
+- Keep selected options, purchasable merchandise id, the full rich-media Gallery and current media id, Price, availability, quantity rules, URL, Product Form and result state synchronized through that coordinator.
+- Keep image selection, direct swipe, explicit video activation and model interaction available. Do not add nested image detail; the complete-product destination uses Product Gallery's default `imageDetail="lightbox"` experience.
+- Use the complete-product Link for specifications, policies, customization and supplementary fields that remain outside the focused modal.
+- Keep native Product Form submission available as a progressive baseline; Ajax purchase, Cart Drawer refresh, retry, analytics and result status remain target behavior.
+- Treat mobile full-screen/sheet presentation, accelerated checkout, selling plans, line-item properties and one-of-one quantity policy as product decisions rather than generic K8 controls.
+- Do not expose modal width, breakpoint, gap, media ratio, close placement, focus selector, portal or description-line count as public properties.
 
 ## Accessibility
 
-- Inherit Modal focus trapping, Escape dismissal, backdrop behavior, and focus return.
-- Use `role="dialog"`, `aria-modal="true"`, and a label relationship to the product title.
-- Keep gallery alternatives, variant labels, and purchase feedback available in the modal context.
-- Include a visible close mechanism in addition to supported dismissal behavior.
-- Preserve a descriptive focus indicator on the full-details link.
+- Present K8 through the complete Modal lifecycle: outside content inert, content-aware initial focus, contained Tab/Shift+Tab, Escape dismissal, a visible named close action, and logical focus restoration.
+- Assert `aria-modal="true"` only when modality is real. Native `<dialog>.showModal()` is the preferred Web mapping when the target architecture permits it.
+- Reference the required visible product title with `aria-labelledby`. Do not add `aria-describedby` for a structurally rich product composition that should be read element by element.
+- Preserve Product Gallery alternatives, named selection controls, current-media status, explicit rich-media activation/release and native fallbacks; canonical Price bidirectional isolation; native Product Form validity/submission; and native Link activation.
+- Keep exactly one modal dialog. Featured images are passive in K8 and cannot open a nested or transferred Lightbox.
+- Use at most one deliberate target-owned localized status for coordinated media/price/availability/purchase updates; K8 is not itself a live region.
+- Honor reduced motion and forced colors, preserve logical direction, and contain long localized or unbroken content at effective 200 percent zoom.
 
 ## References
 
@@ -40,16 +48,21 @@ Quick View uses the ADR 0069 overlay family: the trigger and surface are sibling
 
 - [Modal](/components/modal)
 - [Product Gallery](/components/product-gallery)
+- [Price](/components/price)
 - [Product Form](/components/product-form)
+- [Link](/components/link)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`gallery`</td><td>slot</td><td>required</td><td>Product Gallery dependency or reduced media fixture</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Product title</td></tr>
-  <tr><td>`vendor`</td><td>string</td><td>optional</td><td>Vendor or maker text</td></tr>
-  <tr><td>`description`</td><td>string</td><td>optional</td><td>Truncated product description</td></tr>
-  <tr><td>`productForm`</td><td>slot</td><td>optional</td><td>Reduced Product Form dependency</td></tr>
-  <tr><td>`fullLinkLabel`</td><td>string</td><td>optional</td><td>Full product-details link label</td></tr>
-  <tr><td>`href`</td><td>string</td><td>optional</td><td>Full product-details destination</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible product title and dialog accessible name</td></tr>
+  <tr><td>`dismissLabel`</td><td>string</td><td>required</td><td>Contextual accessible name for the visible close action</td></tr>
+  <tr><td>`open`</td><td>boolean</td><td>optional</td><td>Semantic visibility state; complete lifecycle remains target-owned</td></tr>
+  <tr><td>`gallery`</td><td>slot</td><td>required</td><td>One canonical Product Gallery with the complete coordinated rich-media collection and `imageDetail="none"`</td></tr>
+  <tr><td>`vendor`</td><td>string</td><td>optional</td><td>Vendor or maker plaintext</td></tr>
+  <tr><td>`price`</td><td>slot</td><td>required</td><td>One canonical target-formatted Price</td></tr>
+  <tr><td>`description`</td><td>string</td><td>optional</td><td>Concise target-authored product excerpt</td></tr>
+  <tr><td>`productForm`</td><td>slot</td><td>optional</td><td>Canonical native Product Form continuation</td></tr>
+  <tr><td>`fullLinkLabel`</td><td>string</td><td>optional</td><td>Complete-product Link label; requires `href`</td></tr>
+  <tr><td>`href`</td><td>string</td><td>optional</td><td>Target-owned complete-product destination; requires `fullLinkLabel`</td></tr>
 </PropTable>

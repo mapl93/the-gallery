@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "multicolumn",
   "name": "Multicolumn",
   "registryId": "S4",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive section shell for an optional heading and target-owned repeated feature items.",
+  "summary": "Passive container-responsive list of target-owned parallel feature items beneath an optional contextual heading.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/multicolumn",
@@ -22,56 +22,56 @@
       "selector": ".multicolumn",
       "className": ".multicolumn",
       "required": true,
-      "description": "Multicolumn section root."
+      "description": "Titled thematic section or untitled generic root for one complete repeated-item composition."
     },
     {
       "name": "header",
       "selector": ".multicolumn__header",
       "className": ".multicolumn__header",
       "required": false,
-      "description": "Optional centered heading region."
+      "description": "Optional centered contextual-heading region."
     },
     {
       "name": "title",
       "selector": ".multicolumn__title",
       "className": ".multicolumn__title",
       "required": false,
-      "description": "Optional section heading."
+      "description": "Optional visible contextual heading that names the thematic root."
     },
     {
       "name": "grid",
       "selector": ".multicolumn__grid",
       "className": ".multicolumn__grid",
       "required": true,
-      "description": "Responsive repeated-item composition region."
+      "description": "Required target-owned native list whose items wrap through the parent responsive composition."
     },
     {
       "name": "item",
       "selector": ".multicolumn__item",
       "className": ".multicolumn__item",
       "required": false,
-      "description": "Repeated target-owned feature item."
+      "description": "Repeated native list item containing meaningful target-owned feature content."
     },
     {
       "name": "icon",
       "selector": ".multicolumn__icon",
       "className": ".multicolumn__icon",
       "required": false,
-      "description": "Optional item visual supplied by the target."
+      "description": "Optional passive item visual supplied and semantically classified by the target."
     },
     {
       "name": "itemTitle",
       "selector": ".multicolumn__item-title",
       "className": ".multicolumn__item-title",
       "required": false,
-      "description": "Optional item heading."
+      "description": "Optional contextual item heading supplied at the correct document level."
     },
     {
       "name": "itemText",
       "selector": ".multicolumn__item-text",
       "className": ".multicolumn__item-text",
       "required": false,
-      "description": "Optional item supporting copy."
+      "description": "Optional item supporting copy; every rendered item still requires meaningful text content."
     }
   ],
   "variants": [
@@ -101,11 +101,35 @@
   ],
   "behavior": [
     {
+      "name": "rootSemantics",
+      "selectors": [
+        ".multicolumn",
+        ".multicolumn__title"
+      ],
+      "description": "A non-empty title produces a thematic section named by its visible heading; an untitled composition uses a generic root rather than an unnamed section."
+    },
+    {
       "name": "itemComposition",
       "selectors": [
+        ".multicolumn__grid",
+        ".multicolumn__item"
+      ],
+      "description": "The target supplies one or more source-ordered native list items and their content semantics; the parent owns only consistent repeated-item composition."
+    },
+    {
+      "name": "responsiveComposition",
+      "selectors": [
+        ".multicolumn",
         ".multicolumn__grid"
       ],
-      "description": "The target supplies ordered item records and appropriate semantics; the parent section owns only their responsive composition."
+      "description": "An intrinsic repeated layout responds to component inline space without changing, duplicating, or visually reordering items."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".multicolumn"
+      ],
+      "description": "Missing required items omits the root; an empty optional title omits only the header and selects generic root semantics."
     }
   ],
   "properties": [
@@ -113,7 +137,7 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible section heading.",
+      "description": "Optional non-empty visible contextual heading; when present it names the thematic root.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".multicolumn__title" }]
       }
@@ -122,7 +146,7 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned feature item compositions.",
+      "description": "One or more source-ordered target-owned native list-item compositions with meaningful text content.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".multicolumn__grid", "classNames": [".multicolumn__grid"] }]
       }
@@ -136,32 +160,45 @@
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-body-default-weight",
+        "--tg-typography-body-large-weight",
+        "--tg-typography-h2-weight",
         "--typo-body-size",
+        "--typo-body-line-height",
         "--typo-h2-size",
-        "--typo-h4-size"
+        "--typo-h2-line-height",
+        "--typo-h4-size",
+        "--typo-h4-line-height"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Use a list when item order or grouping is meaningful and preserve a logical heading hierarchy.",
-    "Hide decorative icons from assistive technology; provide adjacent or alternative text when an icon carries meaning.",
-    "Responsive column changes must not alter item reading order."
+    "When title is present, render a thematic section associated with the visible contextual heading through aria-labelledby; use a generic root when title is absent.",
+    "Render parallel features as a native ul/li list; use ol only when sequence changes meaning and route process-specific content to Process Timeline when appropriate.",
+    "Require at least one meaningful item, omit empty target records, and preserve a logical contextual heading hierarchy.",
+    "Hide decorative visuals from assistive technology; informative target media supplies native alternative text without duplicating adjacent content.",
+    "Responsive column changes must preserve DOM/source order and must not use position, icon, or color as the only meaning cue.",
+    "Add no section focus model, Arrow-key behavior, live region, drag, swipe, autoplay, timer, authored motion, or neutral runtime.",
+    "Leave item content, heading rank, native list choice, child interactions, media loading, analytics, and editor lifecycle with the owning target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by conditional titled-section semantics, native list fixture composition, intrinsic container-responsive CSS, strict required-slot omission, and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps an optional contextual title and reorderable native-list item blocks with explicit passive-media semantics and no component runtime."
     },
     "react": {
       "status": "planned",

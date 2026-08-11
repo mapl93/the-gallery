@@ -1,72 +1,115 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "table-of-contents",
   "name": "Table of Contents",
   "registryId": "L5",
   "category": "blog",
   "status": "pilot",
-  "summary": "Article navigation with heading links. Optional sticky variant.",
-  "dependencies": [],
+  "summary": "Fail-closed named same-document navigation from target-supplied ordered nested heading records, with canonical Links, optional controlled current-section projection, safely degrading flow or sticky placement, and zero L5-owned runtime.",
+  "dependencies": ["link"],
   "source": {
     "registry": "registry.json#/components/table-of-contents",
     "css": { "file": "components/css/blog.css", "selector": ".toc" },
     "docs": "site/src/content/components/table-of-contents.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".toc", "className": ".toc", "required": true, "description": "Table-of-contents navigation container." },
-    { "name": "title", "selector": ".toc__title", "className": ".toc__title", "required": false, "description": "Optional visible navigation title." },
-    { "name": "list", "selector": ".toc__list", "className": ".toc__list", "required": true, "description": "Target-owned heading-link list." },
-    { "name": "item", "selector": ".toc__item", "className": ".toc__item", "required": true, "description": "Heading-link list item." },
-    { "name": "levelThreeItem", "selector": ".toc__item--h3", "className": ".toc__item--h3", "required": false, "description": "Indented third-level heading item." },
-    { "name": "levelFourItem", "selector": ".toc__item--h4", "className": ".toc__item--h4", "required": false, "description": "Further-indented fourth-level heading item." },
-    { "name": "link", "selector": ".toc__link", "className": ".toc__link", "required": true, "description": "In-page heading destination." }
+    { "name": "root", "selector": ".toc", "className": ".toc", "required": true, "description": "Native navigation landmark named by the required accessible label." },
+    { "name": "title", "selector": ".toc__title", "className": ".toc__title", "required": false, "description": "Optional visible localized title; contextual heading rank remains host-owned." },
+    { "name": "list", "selector": ".toc__list", "className": ".toc__list", "required": true, "description": "Native ordered list preserving document section order; nested instances express subsection hierarchy." },
+    { "name": "item", "selector": ".toc__item", "className": ".toc__item", "required": true, "description": "Native list item for one validated target-supplied section record." },
+    { "name": "link", "selector": ".toc__link", "className": ".toc__link", "required": true, "description": "Canonical Link anchor whose fragment resolves to the record's stable unique heading id." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "In-flow table of contents." },
-    { "name": "sticky", "className": ".toc--sticky", "default": false, "description": "Sticky table of contents for a containing layout that provides sufficient space." }
+    { "name": "sticky", "className": ".toc--sticky", "default": true, "description": "Preferred sticky placement when the target and available viewport can satisfy the documented safe offset, height, collision, and focus requirements; otherwise it degrades to flow." },
+    { "name": "flow", "className": null, "default": false, "description": "Explicit in-flow presentation using the same content, semantics, source order, and current-section projection." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Fluid width controlled by the containing article layout." }
+    { "name": "default", "className": null, "default": true, "description": "One fluid container-responsive size with complete wrapping and logical nested indentation." }
   ],
   "states": [
-    { "name": "default", "selectors": [".toc"], "description": "Default table-of-contents state." },
-    { "name": "linkHover", "selectors": [".toc__link:hover"], "description": "Heading-link hover state." },
-    { "name": "linkFocus", "selectors": [".toc__link:focus-visible"], "description": "Visible keyboard focus for heading links." },
-    { "name": "activeLink", "selectors": [".toc__link--active"], "description": "Existing visual marker for the target-supplied active heading." }
+    { "name": "default", "selectors": [".toc"], "description": "Named passive same-document navigation with no current section projected." },
+    { "name": "currentLocation", "selectors": [".toc__link[aria-current=\"location\"]"], "description": "Exactly one optional target-controlled current section, communicated by ARIA plus color, weight, and a logical-start border." },
+    { "name": "stickyCapable", "selectors": [".toc--sticky"], "description": "Sticky preference becomes sticky only in a sufficiently wide and tall viewport with a bounded safe-area-aware scroll surface." },
+    { "name": "stickyFallback", "selectors": [".toc--sticky"], "description": "Narrow, zoomed, short, or target-incompatible contexts keep the same root in normal flow without changing DOM or semantics." }
   ],
   "behavior": [
-    { "name": "headingNavigation", "selectors": [".toc__link"], "attributes": ["href"], "events": ["click"], "description": "Links use fragment destinations that match heading identifiers in the article content." },
-    { "name": "targetHeadingState", "selectors": [".toc__list", ".toc__link--active"], "description": "The target supplies the heading inventory and any active marker; neutral extraction and scroll synchronization remain unresolved." }
+    { "name": "requiredComposition", "selectors": [".toc", ".toc__list"], "attributes": ["aria-label"], "description": "A non-empty accessible label and at least one valid heading record are required. Missing or invalid required data omits the complete navigation instead of rendering an unnamed, empty, or partially trustworthy landmark." },
+    { "name": "documentHierarchy", "selectors": [".toc__list", ".toc__item", ".toc__link"], "description": "Targets supply records with stable unique id, complete localized label, document order, and nested children. Real nested ordered lists express hierarchy; visual indentation never substitutes for DOM nesting." },
+    { "name": "headingNavigation", "selectors": [".toc__link"], "attributes": ["href"], "events": ["click"], "description": "Canonical native anchors use encoded same-document fragments that resolve to the corresponding unique heading ids. Browser navigation remains functional without L5 JavaScript." },
+    { "name": "controlledCurrentLocation", "selectors": [".toc__link[aria-current=\"location\"]"], "attributes": ["aria-current"], "description": "Optional currentSectionId is controlled target state. A matching valid record projects aria-current=location to exactly one Link; blank or unmatched values project no current state. L5 has no uncontrolled current-section mode." },
+    { "name": "sharedReadingStateBoundary", "selectors": [".toc__link[aria-current=\"location\"]"], "description": "A capable target may derive currentSectionId from the same bounded reading-state service used by Reading Progress. L5 creates no second observer, scroll poller, heading parser, identifier generator, or competing store." },
+    { "name": "placementSafety", "selectors": [".toc--sticky"], "description": "placement changes presentation only. Sticky is requested by default but degrades to flow when the target cannot prove header/safe-area offset, available block size, collision bounds, zoom, long-list reachability, and focus-not-obscured behavior." },
+    { "name": "targetOwnership", "selectors": [".toc"], "description": "Heading extraction, generated identifiers, rich-HTML parsing, sanitization, shared reading-state calculation, smooth scrolling, focus relocation, history behavior, localization, article composition, and analytics remain target-owned." },
+    { "name": "passiveRuntime", "selectors": [".toc"], "description": "L5 owns no parser, listener, observer, timer, request, asset, focus manager, announcement, smooth-scroll behavior, controlled store, or neutral JavaScript." }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "In-flow or sticky presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".toc", "source": "variants" }] } },
-    { "name": "label", "type": "string", "required": false, "description": "Optional accessible name for the navigation landmark.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toc", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
-    { "name": "title", "type": "string", "required": false, "description": "Optional visible table-of-contents title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".toc__title" }] } },
-    { "name": "items", "type": "slot", "required": true, "description": "Target-owned hierarchy of heading links and active-state markers.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".toc__list", "classNames": [".toc__list"] }] } }
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when the accessible label is empty.",
+      "description": "Required localized accessible name that distinguishes this navigation landmark from other page navigation.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toc", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the visible title node; the required accessible label still names the navigation landmark.",
+      "description": "Optional visible localized title. Targets may map it to a contextual heading and aria-labelledby when they own a stable id and document rank.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".toc__title" }] }
+    },
+    {
+      "name": "items",
+      "type": "slot",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when no non-empty valid heading records are supplied.",
+      "description": "Ordered target-owned nested heading records. Every record requires a stable unique id, a complete localized label, and optional children; adapters compose them as canonical Links and nested ordered lists.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".toc__list", "classNames": [".toc__list", ".toc__item", ".toc__link", ".link", ".link--nav"] }] }
+    },
+    {
+      "name": "currentSectionId",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit aria-current from every Link; the table of contents remains complete static navigation.",
+      "description": "Optional controlled stable section id. When it matches one valid item record, that Link alone receives aria-current=location; an unmatched value produces no false current state.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".toc", "attribute": "data-current-section-id", "valueFrom": "property", "elements": ["nav"] }] }
+    },
+    {
+      "name": "placement",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "sticky",
+      "valuesFrom": "variants",
+      "description": "Semantic request for sticky or explicit flow presentation over the same canonical content. Incapable targets must degrade sticky to flow.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".toc", "source": "variants" }] }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
-      "easing": ["--easing-default"],
-      "typography": ["--font-family-heading", "--typo-body-size"],
+      "color": ["--color-border-subtle", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size"],
       "radius": ["--radius-md"],
-      "spacing": ["--space-layout-touch-target"],
-      "transition": ["--transition-fast"]
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"]
     }
   },
   "accessibility": [
-    "Use a nav landmark with a useful accessible name when the page contains more than one navigation region.",
-    "Keep list nesting aligned with the article heading hierarchy and ensure every fragment link resolves to a unique heading id.",
-    "Do not use aria-current or active styling unless the target keeps it synchronized with the reading position.",
-    "Preserve visible keyboard focus and touch-sized heading links."
+    "Require a non-empty accessible label and at least one valid unique heading record; omit the complete root when required data is absent or invalid.",
+    "Use a native nav landmark, native ordered and nested lists, and canonical anchors with href; do not apply menu, tree, selected, expanded, or roving-focus semantics.",
+    "Keep link labels, hierarchy, order, and fragments synchronized with the included document headings, and ensure every fragment resolves to one unique target.",
+    "Use aria-current=location on at most one Link only from a matching controlled currentSectionId; omit it for static or unmatched state and never announce continuous scroll changes through a live region.",
+    "Preserve canonical Link hover, focus-visible, wrapping, forced-color, and reduced-motion behavior; current location must not rely on color alone.",
+    "Keep ordinary content reflowing at narrow and zoomed widths with logical RTL nesting, complete text, and no document-level horizontal overflow.",
+    "Sticky and flow preserve identical semantics and source order. Sticky targets must bound tall content, keep focused Links visible, account for fixed chrome and safe areas, preserve page escape, and fall back to flow when those conditions are not proven.",
+    "Targets that add shared reading-state derivation, smooth scrolling, focus relocation, generated ids, or history changes own reduced motion, cleanup, offsets, and keyboard-versus-pointer policy."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Visual CSS is implemented; heading extraction and active-state behavior are target-owned pending a source decision." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Canonical Blog CSS and native target markup implement fail-closed structured records, nested canonical Links, controlled currentSectionId projection, default safely degrading sticky or explicit flow placement, and zero L5-owned runtime." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Expose L5 only when the article source supplies structured heading records and matching unique ids or verified preprocessing emits both atomically. Arbitrary merchant HTML is never parsed by neutral L5; the first article owner must map placement and any shared reading-state integration." },
+    "react": { "status": "planned", "kind": "component", "notes": "Thin controlled rendering from nested heading records; currentSectionId comes from target state and placement maps to native CSS without framework ownership in the base." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Represent flow/sticky presentation, nested records, long localized labels, and optional current location without encoding runtime behavior." },
+    "swiftui": { "status": "planned", "kind": "native-component", "notes": "Map structured records to native same-view destinations; the scroll container owns current-section derivation and sticky capability." },
+    "compose": { "status": "planned", "kind": "native-component", "notes": "Map structured records to native same-view destinations; the scroll container owns current-section derivation and sticky capability." }
   }
 }

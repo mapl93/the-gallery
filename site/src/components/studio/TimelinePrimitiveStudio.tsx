@@ -107,7 +107,7 @@ export default function TimelinePrimitiveStudio({
             'delayed-marker': '--color-feedback-warning-bg',
             'warning-marker': '--color-feedback-warning-default',
             'error-marker': '--color-feedback-error-default',
-            'date-color': '--color-text-disabled',
+            'date-color': '--color-text-secondary',
             'title-color': '--color-text-primary',
             'content-color': '--color-text-secondary',
           }}

@@ -4,6 +4,10 @@ Status: Accepted Initial Implementation
 
 Date: 2026-05-25
 
+Current delivery note: ADR 0273 supersedes the complete CSS/runtime bundles as
+the primary consumer unit. They remain generated compatibility outputs alongside
+dependency-closed CSS and runtime modules.
+
 ## Context
 
 The Gallery now has complete component contract coverage across the registry. The next architecture step is target adapter work.

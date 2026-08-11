@@ -1,37 +1,42 @@
 ## Overview
 
-Logo Bar presents an ordered set of target-owned logos or trust marks with an optional visible label. Marks may be passive or target-supplied native links.
+Logo Bar presents one ordered collection of target-owned logos or trust marks. It defaults to a static wrapping list and may explicitly compose canonical Marquee when continuous presentation is useful.
 
 ## Presentation
 
-<Preview html={'<section class="logo-bar" aria-labelledby="logo-bar-label"><p class="logo-bar__label" id="logo-bar-label">Selected partners</p><div class="logo-bar__logos"><svg viewBox="0 0 120 28" role="img" aria-label="Arc Studio"><text x="60" y="19" text-anchor="middle" fill="currentColor">ARC STUDIO</text></svg><svg viewBox="0 0 120 28" role="img" aria-label="Forma"><text x="60" y="19" text-anchor="middle" fill="currentColor">FORMA</text></svg><svg viewBox="0 0 120 28" role="img" aria-label="Kiln House"><text x="60" y="19" text-anchor="middle" fill="currentColor">KILN HOUSE</text></svg></div></section>'} label="Logo Bar" />
+<Preview html={'<section class="logo-bar logo-bar--static marquee marquee--static" aria-labelledby="logo-bar-label" data-marquee data-presentation="static" data-direction="forward" data-pace="default" data-marquee-state="static"><h2 class="logo-bar__label marquee__label" id="logo-bar-label">Presented with</h2><div class="logo-bar__viewport marquee__viewport"><div class="logo-bar__track marquee__track"><ul class="logo-bar__list marquee__group marquee__group--source"><li class="logo-bar__item marquee__item"><svg class="logo-bar__mark" viewBox="0 0 176 40" role="img" aria-label="Form Journal"><rect class="logo-bar__mark-frame" x="1" y="1" width="174" height="38" rx="19"></rect><text class="logo-bar__wordmark" x="88" y="25" text-anchor="middle">FORM JOURNAL</text></svg></li><li class="logo-bar__item marquee__item"><svg class="logo-bar__mark" viewBox="0 0 176 40" role="img" aria-label="Material Review"><rect class="logo-bar__mark-frame" x="1" y="1" width="174" height="38" rx="19"></rect><text class="logo-bar__wordmark" x="88" y="25" text-anchor="middle">MATERIAL REVIEW</text></svg></li><li class="logo-bar__item marquee__item"><a class="logo-bar__link" href="/components/marquee" aria-label="Visit Use Objects"><svg class="logo-bar__mark" viewBox="0 0 176 40" aria-hidden="true"><circle class="logo-bar__mark-frame" cx="29" cy="20" r="16"></circle><text class="logo-bar__wordmark logo-bar__wordmark--linked" x="101" y="25" text-anchor="middle">USE OBJECTS</text></svg></a></li></ul></div></div></section>'} label="Logo Bar" />
 
-`static` is the default wrapping presentation. `marquee` maps to `.logo-bar--marquee`; duplication, speed, direction, pause controls, and runtime motion are not semantic properties.
+`static` is the default and performs no component runtime work. `marquee` keeps the same source list and delegates motion, one inert visual copy, logical direction, semantic pace, Pause/Resume, focus and hover suspension, hidden-page suspension, reduced motion and no-JavaScript fallback to canonical Marquee.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use consistent mark dimensions and supply native links only when each logo has a meaningful destination.</Do>
-  <Dont>Do not use continuously moving logos for essential information or duplicate semantic content for animation.</Dont>
+  <Do>Keep marks in meaningful source order, verify every claim, and use a native link only when a mark has a real destination.</Do>
+  <Dont>Do not recolor arbitrary brand assets, fabricate alternative text, or use moving logos as the sole source of critical information.</Dont>
 </DoDont>
 
-Keep trust claims accurate and let each target own any destination and repeated visual copies.
+Assets, truthful alternative text, destinations, analytics and brand permissions remain target-owned. Dimensions, gaps, wrapping and color treatment are private composition details pending human review.
 
 ## Accessibility
 
-- Give informative marks accessible names; use empty alternatives for purely decorative marks.
-- If a logo links elsewhere, use a native link with a useful accessible name and visible focus.
-- Hide animation-only duplicates from assistive technology.
-- Respect reduced-motion preferences and preserve a static wrapping fallback.
+- Name informative marks for the represented entity; hide purely decorative marks from assistive technology.
+- Give functional linked marks a useful destination name and visible keyboard focus.
+- Keep generated marquee copies `aria-hidden`, inert and outside focus navigation.
+- Use localized Pause and Resume labels in marquee mode; reduced motion and missing JavaScript remain readable and static.
+- Omit the root when no valid marks exist; a one-mark marquee request falls back to static.
 
 ## References
 
-**Dependencies:** None.
+**Dependencies:** canonical Marquee, including its canonical Button dependency.
 
-**Anatomy:** `.logo-bar`, `.logo-bar__label`, and `.logo-bar__logos`.
+**Anatomy:** `.logo-bar` with `.logo-bar--static` or `.logo-bar--marquee`, optional `.logo-bar__label`, `.logo-bar__viewport`, `.logo-bar__track`, authoritative `.logo-bar__list`, `.logo-bar__item`, `.logo-bar__mark`, optional `.logo-bar__link`, generated `.marquee__group--copy`, and marquee-only `.logo-bar__control` / `.marquee__control`.
 
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`static`</td><td>`static` or `marquee`</td></tr>
-  <tr><td>`label`</td><td>string</td><td>optional</td><td>Visible label for the mark collection</td></tr>
-  <tr><td>`logos`</td><td>slot</td><td>required</td><td>Ordered target-owned logos or trust marks</td></tr>
+  <tr><td>`presentation`</td><td>enum</td><td>`static`</td><td>`static` or `marquee`</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Visible contextual label; target chooses heading rank</td></tr>
+  <tr><td>`marks`</td><td>slot</td><td>required</td><td>One ordered native list of target-owned mark compositions</td></tr>
+  <tr><td>`direction`</td><td>enum</td><td>`forward`</td><td>Marquee-only logical `forward` or `reverse`</td></tr>
+  <tr><td>`pace`</td><td>enum</td><td>`default`</td><td>Marquee-only `slow`, `default`, or `fast`</td></tr>
+  <tr><td>`pauseLabel`</td><td>string</td><td>required for marquee</td><td>Localized Pause action label</td></tr>
+  <tr><td>`resumeLabel`</td><td>string</td><td>required for marquee</td><td>Localized Resume action label</td></tr>
 </PropTable>

@@ -1,10 +1,10 @@
-<footer class="footer" role="contentinfo">
+<footer class="footer">
   <div class="footer__grid">
     {%- comment -%} Brand Column {%- endcomment -%}
-    <div>
-      <span class="footer__heading">{{ shop.name }}</span>
+    <div class="footer__brand">
+      <h2 class="footer__heading" id="footer-brand-{{ section.id }}">{{ shop.name }}</h2>
       {%- if section.settings.footer_text != blank -%}
-        <p style="font-size: calc(var(--typo-body-size) * 0.875); color: var(--color-text-secondary); margin-top: 8px;">
+        <p class="footer__copy">
           {{ section.settings.footer_text }}
         </p>
       {%- endif -%}
@@ -14,34 +14,37 @@
     {%- for block in section.blocks -%}
       {%- case block.type -%}
         {%- when 'menu' -%}
-          <div {{ block.shopify_attributes }}>
-            <p class="footer__heading">{{ block.settings.heading }}</p>
+          {%- assign group_heading = block.settings.heading | default: block.settings.menu.title -%}
+          <nav class="footer__group" aria-labelledby="footer-group-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
+            <h2 class="footer__heading" id="footer-group-{{ section.id }}-{{ block.id }}">{{ group_heading }}</h2>
             {%- if block.settings.menu != blank -%}
               <ul class="footer__links">
                 {%- for link in block.settings.menu.links -%}
-                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                  <li><a class="footer__link" href="{{ link.url }}">{{ link.title }}</a></li>
                 {%- endfor -%}
               </ul>
             {%- endif -%}
-          </div>
+          </nav>
       {%- endcase -%}
     {%- endfor -%}
   </div>
 
   <div class="footer__bottom">
-    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
-    <div style="display: flex; gap: 16px;">
-      {%- if section.settings.social_instagram != blank -%}
-        <a href="{{ section.settings.social_instagram }}" aria-label="Instagram" target="_blank" rel="noopener">
+    <p class="footer__meta">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}</p>
+    {%- if section.settings.social_instagram != blank -%}
+      <span class="footer__meta">
+        <a class="footer__meta-link" href="{{ section.settings.social_instagram }}" aria-label="Instagram" target="_blank" rel="noopener">
           {% render 'icon', name: 'instagram' %}
         </a>
-      {%- endif -%}
-      {%- if section.settings.social_pinterest != blank -%}
-        <a href="{{ section.settings.social_pinterest }}" aria-label="Pinterest" target="_blank" rel="noopener">
+      </span>
+    {%- endif -%}
+    {%- if section.settings.social_pinterest != blank -%}
+      <span class="footer__meta">
+        <a class="footer__meta-link" href="{{ section.settings.social_pinterest }}" aria-label="Pinterest" target="_blank" rel="noopener">
           {% render 'icon', name: 'pinterest' %}
         </a>
-      {%- endif -%}
-    </div>
+      </span>
+    {%- endif -%}
   </div>
 </footer>
 

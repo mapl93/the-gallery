@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "avatar",
   "name": "Avatar",
   "registryId": "A15",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Circular avatar primitive with image or initials anatomy and small, default, large, and extra-large size modifiers.",
+  "summary": "Passive circular identity thumbnail with explicit target-resolved native-image or initials composition and four fixed semantic size/type pairings.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/avatar",
@@ -22,13 +22,19 @@
       "selector": ".avatar",
       "className": ".avatar",
       "required": true,
-      "description": "Circular avatar container."
+      "description": "Passive fixed-size circular container for one explicit identity composition."
     },
     {
       "name": "image",
-      "selector": ".avatar img",
+      "selector": ".avatar > img",
       "required": false,
-      "description": "Optional image inside the avatar."
+      "description": "Optional target-authored native image with context-appropriate alternative text."
+    },
+    {
+      "name": "initials",
+      "selector": ".avatar",
+      "required": false,
+      "description": "Optional target-provided one- or two-grapheme initials text used instead of an image."
     }
   ],
   "variants": [
@@ -36,7 +42,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default avatar."
+      "description": "Neutral circular identity presentation."
     }
   ],
   "sizes": [
@@ -44,51 +50,76 @@
       "name": "sm",
       "className": ".avatar--sm",
       "default": false,
-      "description": "Small avatar size."
+      "description": "Small 32px avatar with Caption initials typography for dense supporting identity contexts."
     },
     {
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default avatar size."
+      "description": "Default 40px avatar with Body Small initials typography for general identity contexts."
     },
     {
       "name": "lg",
       "className": ".avatar--lg",
       "default": false,
-      "description": "Large avatar size."
+      "description": "Large 56px avatar with Body Default initials typography for emphasized identity contexts."
     },
     {
       "name": "xl",
       "className": ".avatar--xl",
       "default": false,
-      "description": "Extra-large avatar size."
+      "description": "Extra-large 80px avatar with Body Large initials typography for prominent identity contexts."
     }
   ],
   "states": [
     {
-      "name": "default",
+      "name": "initials",
       "selectors": [".avatar"],
-      "description": "Default avatar state."
+      "description": "Target-provided initials are the explicit rendered identity content."
     },
     {
       "name": "withImage",
-      "selectors": [".avatar img"],
-      "description": "Avatar image is present."
+      "selectors": [".avatar > img"],
+      "description": "A target-authored native image is the explicit rendered identity content."
     }
   ],
   "behavior": [
     {
-      "name": "imageAlternative",
-      "selectors": [".avatar img"],
-      "attributes": ["alt"],
-      "description": "Avatar images should include useful alt text or an empty alt when the adjacent text already names the person."
+      "name": "passiveIdentity",
+      "selectors": [".avatar"],
+      "description": "Avatar has no intrinsic focus, activation, disabled state, status, keyboard model, announcement, or widget role; an actionable identity composes a canonical Link or Button outside it."
     },
     {
-      "name": "initialsFallback",
+      "name": "imageAlternative",
+      "selectors": [".avatar > img"],
+      "attributes": ["alt"],
+      "description": "Native image alt is non-empty when the image uniquely conveys identity and empty when adjacent visible text already names the same entity."
+    },
+    {
+      "name": "initialsAlternative",
       "selectors": [".avatar"],
-      "attributes": ["aria-label", "title"],
-      "description": "Initials-only avatars should expose the represented person or entity name when it is not already visible."
+      "attributes": ["role=\"img\"", "aria-label", "aria-labelledby", "aria-hidden=\"true\""],
+      "description": "Standalone initials use one named image role with the full entity name; initials duplicated by adjacent visible identity text are hidden from assistive technology."
+    },
+    {
+      "name": "explicitComposition",
+      "selectors": [".avatar", ".avatar > img"],
+      "description": "The target explicitly authors either native image or pre-derived initials content. Image loading, failure, delay, responsive source selection, initials derivation, and automatic swapping are not neutral Avatar behavior."
+    },
+    {
+      "name": "fixedGeometry",
+      "selectors": [".avatar", ".avatar > img"],
+      "description": "The selected logical square does not flex-shrink; native image fills it with centered cover crop; invalid long initials are clipped rather than expanding layout."
+    },
+    {
+      "name": "semanticInitialsScale",
+      "selectors": [".avatar", ".avatar--sm", ".avatar--lg", ".avatar--xl"],
+      "description": "Each accepted diameter maps to one existing semantic typography step: Caption, Body Small, Body Default, and Body Large. The mapping is part of size, not a second public property."
+    },
+    {
+      "name": "forcedColorBoundary",
+      "selectors": [".avatar"],
+      "description": "Forced colors retains a system-color circular boundary without opting out of the user palette."
     }
   ],
   "properties": [
@@ -97,7 +128,7 @@
       "type": "enum",
       "required": false,
       "valuesFrom": "sizes",
-      "description": "Visual avatar diameter selected from the canonical size list; default is the classless contract size.",
+      "description": "Fixed semantic avatar diameter and its coupled initials typography step; Default is the classless 40px presentation.",
       "targetMappings": {
         "web": [
           {
@@ -119,25 +150,32 @@
         "--radius-full"
       ],
       "typography": [
-        "--font-family-body"
+        "--font-family-body",
+        "--tg-font-weight-semibold",
+        "--typo-caption-size",
+        "--typo-body-sm-size",
+        "--typo-body-size",
+        "--typo-body-lg-size"
       ]
     }
   },
   "accessibility": [
-    "Give avatar images descriptive alt text when the avatar conveys identity.",
-    "Use empty alt text when nearby visible text already identifies the person.",
-    "Expose an accessible name for initials-only avatars when identity is not otherwise present.",
-    "Do not use avatar color alone to communicate status."
+    "Use native img with contextual alt for image composition; do not add a second image role around it.",
+    "Give standalone initials one full identity name through aria-label or aria-labelledby; initials alone are not a sufficient accessible name.",
+    "Use empty alt or aria-hidden when adjacent visible text already identifies the same person or entity.",
+    "Keep Avatar passive and compose a canonical named Link or Button when the identity is actionable.",
+    "Do not use avatar color or an unlabeled badge as the only representation of status."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/primitives.css."
+      "notes": "Canonical CSS implements fixed logical geometry, native image crop, and the accepted semantic initials scale; targets author identity content, contextual names, and image-or-initials fallback selection."
     },
     "shopify": {
       "status": "implemented",
-      "kind": "liquid-css-class"
+      "kind": "liquid-css-class",
+      "notes": "Testimonials embeds the generated class around a Shopify image object and visible adjacent author name. Shopify remains responsible for choosing image or pre-derived initials; neutral Avatar owns no loading/error lifecycle."
     },
     "react": {
       "status": "planned",

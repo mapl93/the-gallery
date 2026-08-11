@@ -1,74 +1,74 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "sticky-atc",
   "name": "Sticky Add-to-Cart Bar",
   "registryId": "K9",
   "category": "cart",
   "status": "pilot",
-  "summary": "Fixed add-to-cart bar with visibility state, product image, title, price, and CTA.",
-  "dependencies": ["button", "price"],
+  "summary": "Target-controlled viewport-edge secondary submitter that reuses one canonical Product Form through canonical Button and target-formatted Price composition.",
+  "dependencies": ["button", "price", "product-form"],
   "source": {
     "registry": "registry.json#/components/sticky-atc",
     "css": { "file": "components/css/cart.css", "selector": ".sticky-atc" },
     "docs": "site/src/content/components/sticky-atc.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".sticky-atc", "className": ".sticky-atc", "required": true, "description": "Sticky add-to-cart bar." },
-    { "name": "inner", "selector": ".sticky-atc__inner", "className": ".sticky-atc__inner", "required": true, "description": "Centered bar content wrapper." },
-    { "name": "info", "selector": ".sticky-atc__info", "className": ".sticky-atc__info", "required": true, "description": "Product info group." },
-    { "name": "image", "selector": ".sticky-atc__image", "className": ".sticky-atc__image", "required": false, "description": "Product thumbnail." },
-    { "name": "title", "selector": ".sticky-atc__title", "className": ".sticky-atc__title", "required": true, "description": "Product title." },
-    { "name": "price", "selector": ".sticky-atc__price", "className": ".sticky-atc__price", "required": false, "description": "Product price." },
-    { "name": "action", "selector": ".sticky-atc__action", "className": ".sticky-atc__action", "required": true, "description": "Primary add-to-cart action." }
+    { "name": "root", "selector": ".sticky-atc", "className": ".sticky-atc", "required": true, "description": "Neutral viewport-edge composition; Web targets exclude the hidden subtree from interaction and the accessibility tree." },
+    { "name": "inner", "selector": ".sticky-atc__inner", "className": ".sticky-atc__inner", "required": true, "description": "Private intrinsic wrapper for product identity and purchase action." },
+    { "name": "info", "selector": ".sticky-atc__info", "className": ".sticky-atc__info", "required": true, "description": "Product identity and target-formatted Price group." },
+    { "name": "image", "selector": ".sticky-atc__image", "className": ".sticky-atc__image", "required": false, "description": "Optional target-owned product thumbnail." },
+    { "name": "title", "selector": ".sticky-atc__title", "className": ".sticky-atc__title", "required": true, "description": "Required non-empty product title plaintext." },
+    { "name": "price", "selector": ".sticky-atc__price", "className": ".sticky-atc__price", "required": false, "description": "Optional wrapper containing one canonical target-formatted Price." },
+    { "name": "action", "selector": ".sticky-atc__action", "className": ".sticky-atc__action", "required": true, "description": "Canonical Button that submits the existing Product Form rather than starting an independent cart path." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Hidden-by-default sticky add-to-cart bar." }
+    { "name": "default", "className": null, "default": true, "description": "One neutral viewport-edge purchase profile." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default fixed bottom bar size." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic container-responsive profile; geometry remains private." }
   ],
   "states": [
-    { "name": "hidden", "selectors": [".sticky-atc"], "description": "Hidden off-canvas state." },
-    { "name": "visible", "selectors": [".sticky-atc--visible"], "description": "Visible sticky bar state." }
+    { "name": "hidden", "selectors": [".sticky-atc:not(.sticky-atc--visible)"], "description": "Target-hidden state while the primary action remains useful or eligibility is unresolved; on Web the subtree is inert, accessibility-hidden, non-interactive, and translated outside the visual surface." },
+    { "name": "visible", "selectors": [".sticky-atc--visible"], "description": "Target-visible state after the primary Product Form action is no longer usefully visible and the target has resolved a coherent eligible product state." },
+    { "name": "unavailable", "selectors": [".sticky-atc__action"], "description": "The coordinated selection became unavailable while the surface is present; the target may instead omit K9, and a rendered canonical Button carries disabled without aria-busy=true." },
+    { "name": "pending", "selectors": [".sticky-atc__action"], "description": "Target purchase work is pending; the canonical Button carries aria-busy=true plus disabled, preserves the visible label, and blocks repeat submission." }
   ],
   "behavior": [
-    { "name": "visibility", "selectors": [".sticky-atc--visible"], "description": "Target logic owns when the bar appears, usually after primary product form scrolls out of view." },
-    { "name": "addToCart", "selectors": [".sticky-atc__inner"], "events": ["click"], "description": "CTA should use the same selected variant, quantity, and selling-plan state as Product Form." },
-    { "name": "pricing", "selectors": [".sticky-atc__price"], "description": "Price should be formatted by the commerce target or Price dependency." }
+    { "name": "visibility", "selectors": [".sticky-atc", ".sticky-atc--visible"], "attributes": ["inert when hidden", "aria-hidden=\"true\" when hidden"], "events": ["target show", "target hide", "transition completion"], "description": "The target owns observation, thresholds, hysteresis and lifecycle, and exposes K9 only when the primary action is no longer usefully visible and product eligibility is coherent. Hidden Web descendants remain unavailable rather than merely translated below the viewport." },
+    { "name": "externalFormSubmit", "selectors": [".sticky-atc__action", ".product-form"], "attributes": ["type=\"submit\"", "form", "name", "value"], "events": ["constraint validation", "submit", "formdata"], "description": "The canonical Button is an explicit external submitter for one existing native Product Form and preserves activated-submitter and successful-entry semantics." },
+    { "name": "dependencyComposition", "selectors": [".sticky-atc__price", ".price", ".sticky-atc__action", ".btn"], "description": "K9 contains one canonical Price slot when supplied and one canonical Button; it does not duplicate their markup, formatting, states, focus, or visual ownership." },
+    { "name": "targetProductCoordination", "selectors": [".sticky-atc__price", ".sticky-atc__action", ".product-form"], "description": "One target product coordinator synchronizes selected merchandise, quantity, selling plan, Price, media, availability, visibility eligibility, pending/result state, cart updates, deliberate feedback, analytics, focus and the stable Product Form reference." },
+    { "name": "targetCollisionManagement", "selectors": [".sticky-atc"], "description": "Every fixed target mapping accounts for safe-area insets, reserves sufficient block-end content or scroll space and coordinates virtual keyboards, Bottom Nav, Cookie Consent, Cart Drawer, chat and other fixed surfaces so focused and checkout-critical controls are not obscured." },
+    { "name": "intrinsicLayout", "selectors": [".sticky-atc", ".sticky-atc__inner", ".sticky-atc__info"], "description": "Stable source order responds to the K9 container, wraps localized and unbroken content, and avoids viewport-dependent internal composition or hidden semantic content." }
   ],
   "properties": [
-    { "name": "visible", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls target-owned sticky visibility.", "targetMappings": { "web": [{ "kind": "class", "selector": ".sticky-atc", "classNames": [".sticky-atc--visible"] }] } },
-    { "name": "image", "type": "slot", "required": false, "description": "Optional product thumbnail.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".sticky-atc__image", "classNames": [".sticky-atc__image"] }] } },
-    { "name": "imageAlt", "type": "string", "required": false, "description": "Product thumbnail alternative text.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__title" }] } },
-    { "name": "price", "type": "string", "required": false, "description": "Target-formatted product price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__price" }] } },
-    { "name": "actionLabel", "type": "string", "required": true, "description": "Add-to-cart action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__action" }] } },
-    { "name": "actionDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables add to cart when selection is unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+    { "name": "visible", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects target-owned semantic visibility after the primary action is no longer useful and product eligibility is coherent; observation mechanics remain outside K9.", "targetMappings": { "web": [{ "kind": "class", "selector": ".sticky-atc", "classNames": [".sticky-atc--visible"] }, { "kind": "attribute", "selector": ".sticky-atc", "attribute": "aria-hidden", "values": { "true": null, "false": "true" } }, { "kind": "attribute", "selector": ".sticky-atc", "attribute": "inert", "values": { "true": null, "false": "" } }] } },
+    { "name": "image", "type": "slot", "required": false, "description": "Optional target-owned product thumbnail with intrinsic dimensions and loading policy.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".sticky-atc__image", "classNames": [".sticky-atc__image"] }] } },
+    { "name": "imageAlt", "type": "string", "required": false, "description": "Target-authored alternative text; use empty text only when the adjacent title already communicates the same product identity.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Required non-empty localized product title plaintext.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__title" }] } },
+    { "name": "price", "type": "slot", "required": false, "description": "Optional slot containing one canonical target-formatted Price.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".sticky-atc__price", "classNames": [".sticky-atc__price"] }] } },
+    { "name": "actionLabel", "type": "string", "required": true, "description": "Required non-empty localized visible label for the canonical purchase Button.", "targetMappings": { "web": [{ "kind": "content", "selector": ".sticky-atc__action" }] } },
+    { "name": "productFormId", "type": "string", "required": true, "description": "Stable target Product Form reference; on Web it is the native form-owner id for the external submitter.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__action", "attribute": "form", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "actionDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects an unavailable resolved selection from the target coordinator to the canonical Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "pending", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects target-owned asynchronous purchase work to canonical Button busy and disabled semantics.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".sticky-atc__action", "attribute": "aria-busy", "values": { "true": "true", "false": null }, "elements": ["button"] }, { "kind": "attribute", "selector": ".sticky-atc__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
   ],
-  "tokens": {
-    "public": {
-      "z-index": ["--z-sticky"],
-      "color": ["--color-surface-primary", "--color-border-subtle", "--color-text-primary"],
-      "shadow": ["--shadow-lg"],
-      "spacing": ["--space-layout-container"],
-      "radius": ["--radius-sm"],
-      "transition": ["--transition-base"],
-      "easing": ["--easing-out"],
-      "typography": ["--typo-body-size"]
-    }
-  },
+  "tokens": { "public": {} },
   "accessibility": [
-    "Avoid covering focused content or checkout-critical controls.",
-    "Keep the sticky CTA name clear and consistent with the main add-to-cart action.",
-    "Do not duplicate live announcements when both sticky and primary forms update the same cart state."
+    "Use a real external submit button associated with the one canonical native Product Form; preserve its validation, activated submitter and FormData semantics.",
+    "Keep hidden Web content inert, accessibility-hidden and non-interactive rather than relying on visual translation or a single descendant tabIndex.",
+    "Keep Price target formatted, product title and action label visible, optional media alternatives correct, and unavailable reasons evident in adjacent product content.",
+    "Use canonical Button busy semantics for pending work, preserve the visible action label and prevent repeat submission.",
+    "Keep result status, focus, errors and announcements in the one target purchase/cart lifecycle; K9 is not a live region.",
+    "Account for safe-area insets and reserve enough block-end content or scroll space that the fixed surface never completely obscures focused or checkout-critical content.",
+    "Honor reduced motion, forced colors, safe areas, logical direction and effective 200 percent reflow without horizontal overflow or hidden product context."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should synchronize with selected Shopify variant and product form state." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css-form-association", "notes": "Canonical composition and intrinsic state CSS need no neutral runtime. Target-controlled eligibility, product coordination, purchase lifecycle and safe fixed-surface mapping remain consumer responsibilities." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Product-context Liquid may associate the external Button with the main product form, but a real Main Product consumer must still prove live option/quantity coordination, eligibility observation, Ajax/native purchase outcomes, feedback, focus, safe-area/collision handling and editor behavior." },
+    "react": { "status": "planned", "kind": "component", "notes": "Framework product feature controls visibility and projects one coordinator into Price, Button and the existing Product Form without a second cart path." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Visual profile composed from canonical Price and Button instances; registered generic Button shell is not K9 artwork or approval." },
     "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

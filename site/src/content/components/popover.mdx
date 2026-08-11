@@ -1,35 +1,55 @@
 ## Overview
 
-Floating content panel with arrow, triggered on click.
+Popover reveals concise non-modal content in a floating surface anchored to an
+explicit native Button trigger. It does not add a backdrop, inert the page,
+lock scroll, or trap focus.
 
 ## Presentation
 
-<Preview html={"<div class=\"tg-preview-anchor-stage tg-preview-anchor-stage--popover\"><button class=\"btn btn--outline\" type=\"button\" data-preview-trigger aria-haspopup=\"dialog\" aria-expanded=\"true\">Trigger</button><div class=\"popover popover--open tg-preview-anchor-popover\"><div class=\"popover__arrow\"></div><div class=\"popover__content\"><p class=\"popover__title\">Popover</p><p>Some additional content.</p></div></div></div>"} label="Popover" layout="anchored" interaction={{"selector":".popover","toggle":"popover--open","triggerLabel":"Toggle Popover","triggerSelector":"[data-preview-trigger]","startVisible":true}} />
+<Preview html={'<div class="tg-preview-anchor-stage tg-preview-anchor-stage--popover"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="true" aria-controls="preview-popover">Open popover</button><div class="popover popover--open tg-preview-anchor-popover" id="preview-popover" aria-hidden="false"><div class="popover__arrow" aria-hidden="true"></div><p class="popover__title">Dimensions</p><div class="popover__content"><p>Set the dimensions for the layer.</p><div><label for="preview-popover-width">Width</label><input class="input__field" id="preview-popover-width" value="100%" /><label for="preview-popover-max-width">Max. width</label><input class="input__field" id="preview-popover-max-width" value="300px" /><label for="preview-popover-height">Height</label><input class="input__field" id="preview-popover-height" value="25px" /><label for="preview-popover-max-height">Max. height</label><input class="input__field" id="preview-popover-max-height" value="none" /></div></div></div></div>'} label="Popover" layout="anchored" interaction={{ selector: '.popover', toggle: 'popover--open', triggerLabel: 'Toggle Popover', triggerSelector: '[data-preview-trigger]', startVisible: true }} />
+
+The trigger is the default visual anchor and stays available while the surface
+is open. Position, side, collision handling, portal/top-layer choice and any
+content-derived role remain target services rather than public v1 properties.
+
+## Marketing use
+
+A concise marketing explanation or small target-composed form may use Popover
+when it remains anchored, non-modal and easy to dismiss. A campaign that must
+block the page, demand a decision or contain a long workflow uses canonical
+[Modal](/components/modal). The deprecated [Popup](/components/popup) identity
+does not create a separate overlay component.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use popovers for short supplemental content tied to a trigger.</Do>
-  <Dont>Don't use popovers for blocking flows or complex forms. Use a modal or drawer instead.</Dont>
+  <Do>Use Popover for concise supplemental content or a small control group tied to a clearly labelled Button.</Do>
+  <Dont>Do not infer dialog, menu or modal behavior from a floating visual surface.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="warning">
-  Popovers are non-modal by default. They should close cleanly without trapping focus.
+  Popover has no default ARIA role. Choose semantics from its actual content and use Modal when page interaction must be blocked.
 </Callout>
 
-- Close on `Escape` key press.
-- Keep `aria-expanded` synchronized on the trigger.
-- Close on outside interaction.
+- Keep `aria-expanded` and `aria-controls` synchronized for class-driven
+  targets, or use native `popovertarget` where appropriate.
+- Close on `Escape`, outside interaction and repeated trigger activation.
+- Preserve natural Tab order. If keyboard dismissal occurs after focus moved
+  inside, restore focus to the trigger.
+- Closed interactive content must be hidden or inert and unavailable to Tab.
+- Capable Web targets may use `popover="auto"` and `:popover-open` for native
+  top-layer and light-dismiss behavior.
 
 ## References
 
 <PropTable>
-  <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Visible state of the popover panel</td></tr>
-  <tr><td>`.popover`</td><td>class</td><td>—</td><td>Base popover styles</td></tr>
-  <tr><td>`.popover--open`</td><td>modifier</td><td>—</td><td>Visible state</td></tr>
-  <tr><td>`.popover__arrow`</td><td>class</td><td>—</td><td>Optional arrow</td></tr>
-  <tr><td>`.popover__title`</td><td>class</td><td>—</td><td>Optional title</td></tr>
-  <tr><td>`.popover__content`</td><td>class</td><td>—</td><td>Content wrapper</td></tr>
+  <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Visible state of the canonical panel</td></tr>
+  <tr><td>`.popover`</td><td>class</td><td>—</td><td>Floating surface</td></tr>
+  <tr><td>`.popover--open`</td><td>modifier</td><td>—</td><td>Portable visible state</td></tr>
+  <tr><td>`.popover:popover-open`</td><td>state</td><td>—</td><td>Native Web visible state</td></tr>
+  <tr><td>`.popover__arrow`</td><td>class</td><td>—</td><td>Optional decorative anchor arrow</td></tr>
+  <tr><td>`.popover__title`</td><td>class</td><td>—</td><td>Optional contextual title</td></tr>
+  <tr><td>`.popover__content`</td><td>class</td><td>—</td><td>Concise arbitrary content</td></tr>
 </PropTable>

@@ -1,0 +1,128 @@
+{% liquid
+  assign artist_name = section.settings.name
+  if artist_name == blank
+    assign artist_name = 'artist_statement.default_name' | t
+  endif
+
+  assign heading_id = 'ArtistStatement-' | append: section.id | append: '-Name'
+
+  assign portrait_alt = section.settings.portrait.alt
+  if section.settings.portrait_decorative
+    assign portrait_alt = ''
+  endif
+
+  assign signature_alt = section.settings.signature_image.alt | default: artist_name
+  if section.settings.signature_decorative
+    assign signature_alt = ''
+  endif
+%}
+
+{% if section.settings.body != blank or request.design_mode %}
+<section class="artist-statement" aria-labelledby="{{ heading_id }}">
+  <div class="artist-statement__layout{% if section.settings.portrait != blank %} artist-statement__layout--with-portrait{% endif %}">
+    {% if section.settings.portrait != blank %}
+      <div class="artist-statement__portrait">
+        {{ section.settings.portrait | image_url: width: 1200 | image_tag:
+          alt: portrait_alt,
+          widths: '360, 540, 720, 960, 1200',
+          sizes: '(min-width: 672px) 33vw, 300px'
+        }}
+      </div>
+    {% endif %}
+
+    <div class="artist-statement__content">
+      {% if section.settings.eyebrow != blank %}
+        <p class="artist-statement__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {% endif %}
+
+      <h2 class="artist-statement__name" id="{{ heading_id }}">{{ artist_name | escape }}</h2>
+
+      {% if section.settings.quote != blank %}
+        <blockquote class="artist-statement__quote">
+          <p>{{ section.settings.quote | escape }}</p>
+        </blockquote>
+      {% endif %}
+
+      <div class="artist-statement__body">
+        {% if section.settings.body != blank %}
+          {{ section.settings.body }}
+        {% else %}
+          <p>{{ 'artist_statement.default_body' | t }}</p>
+        {% endif %}
+      </div>
+
+      {% if section.settings.signature_image != blank %}
+        <div class="artist-statement__signature">
+          {{ section.settings.signature_image | image_url: width: 400 | image_tag:
+            alt: signature_alt,
+            widths: '120, 200, 300, 400',
+            sizes: '200px'
+          }}
+        </div>
+      {% elsif section.settings.signature_text != blank %}
+        <p class="artist-statement__signature">{{ section.settings.signature_text | escape }}</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.artist_statement.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "portrait",
+      "label": "t:sections.artist_statement.settings.portrait"
+    },
+    {
+      "type": "checkbox",
+      "id": "portrait_decorative",
+      "label": "t:sections.artist_statement.settings.portrait_decorative",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:sections.artist_statement.settings.eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "t:sections.artist_statement.settings.name"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:sections.artist_statement.settings.quote"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "t:sections.artist_statement.settings.body"
+    },
+    {
+      "type": "text",
+      "id": "signature_text",
+      "label": "t:sections.artist_statement.settings.signature_text"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature_image",
+      "label": "t:sections.artist_statement.settings.signature_image"
+    },
+    {
+      "type": "checkbox",
+      "id": "signature_decorative",
+      "label": "t:sections.artist_statement.settings.signature_decorative",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.artist_statement.name"
+    }
+  ]
+}
+{% endschema %}

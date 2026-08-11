@@ -2,24 +2,28 @@
 
 Determinate bar or circle that represents a known value, plus an indeterminate bar for unknown completion.
 
-<Preview html={'<div class="progress tg-preview-frame tg-preview-frame--md" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65%"><div class="progress__label"><span class="progress__label-text">Uploading</span><span class="progress__value">65%</span></div><div class="progress__track"><div class="progress__bar tg-preview-w-70"></div></div></div>'} label="Progress" />
+<Preview html={'<div class="progress tg-preview-frame tg-preview-frame--md" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65 percent complete"><div class="progress__label"><span class="progress__label-text">Uploading</span><span class="progress__value">65%</span></div><div class="progress__track"><div class="progress__bar tg-preview-w-70"></div></div></div>'} label="Progress" />
 
 ## Presentation
 
 Bar and Circle are structural variants. Indeterminate is an orthogonal boolean state available only for Bar and omits `aria-valuenow`.
 
-<Preview html={'<div class="progress-circle" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65%"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="progress-circle__bg" cx="18" cy="18" r="15.9"/><circle class="progress-circle__fill" cx="18" cy="18" r="15.9" stroke-dasharray="65 35"/></svg><span class="progress-circle__text">65%</span></div>'} label="Circular progress" />
+<Preview html={'<div class="progress-circle" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65 percent complete"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="progress-circle__bg" cx="18" cy="18" r="15.9"/><circle class="progress-circle__fill" cx="18" cy="18" r="15.9" stroke-dasharray="65 35"/></svg><span class="progress-circle__text">65%</span></div>'} label="Circular progress" />
 
 ## Usage Guidelines
 
 <DoDont><Do>Use determinate progress when the target can calculate a meaningful range.</Do><Dont>Do not show a fabricated percentage when completion is unknown.</Dont></DoDont>
 
-Targets own calculations and localized value text. The component owns presentation and progressbar semantics.
+Targets own calculations and localized value content. The component owns presentation and progressbar semantics.
+
+Targets must keep `max` greater than `min` and clamp the current value into that range. Studio repairs an invalid edited range atomically so its preview never retains a stale fill. Enabling Indeterminate selects Bar; selecting Circle clears Indeterminate.
+
+`displayValue` is optional, visible, and intentionally compact for either Bar or the fixed-size Circle. `valueText` is independently optional and maps only to `aria-valuetext`, so it can carry a complete localized description. Neither falls back to, copies, truncates, scales, or derives from the other.
 
 ## Accessibility
 
-- Provide an accessible operation label and meaningful min/max/value attributes.
-- Omit `aria-valuenow` while indeterminate; do not announce every small update.
+- Provide a non-empty accessible operation label and meaningful finite min/max/value attributes. Invalid required composition emits no Progress root.
+- Omit `aria-valuenow`, `aria-valuetext`, and visible value text while indeterminate; do not announce every small update.
 - Use `aria-valuetext` when a localized phrase is clearer than the raw number.
 - Neutral web removes transitions and indeterminate animation under reduced motion.
 
@@ -29,6 +33,7 @@ Targets own calculations and localized value text. The component owns presentati
   <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Operation name</td></tr>
   <tr><td>`variant`</td><td>`bar | circle`</td><td>`bar`</td><td>Structural presentation</td></tr>
   <tr><td>`value` / `min` / `max`</td><td>number</td><td>conditional / `0` / `100`</td><td>Determinate range</td></tr>
-  <tr><td>`label` / `valueText`</td><td>string</td><td>optional</td><td>Visible operation and localized value text</td></tr>
+  <tr><td>`label` / `displayValue`</td><td>string</td><td>optional</td><td>Visible operation and compact value content</td></tr>
+  <tr><td>`valueText`</td><td>string</td><td>optional</td><td>Accessible localized value description only</td></tr>
   <tr><td>`indeterminate`</td><td>boolean</td><td>`false`</td><td>Unknown-duration Bar state</td></tr>
 </PropTable>

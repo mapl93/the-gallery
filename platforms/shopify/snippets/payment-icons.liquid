@@ -1,0 +1,40 @@
+{%- comment -%}
+  Snippet: payment-icons
+  Usage: {% render 'payment-icons' %}
+
+  Optional inputs:
+  - payment_types: current accepted payment-type identifiers; defaults to
+    shop.enabled_payment_types when omitted
+  - size: 'default' or 'sm'
+  - accessible_label: localized list name; defaults to the theme translation
+
+  Shopify owns current provider, region and currency availability plus official
+  SVG output. This passive adapter adds no component JavaScript.
+{%- endcomment -%}
+
+{%- liquid
+  assign resolved_payment_types = payment_types
+  if resolved_payment_types == nil
+    assign resolved_payment_types = shop.enabled_payment_types
+  endif
+
+  assign resolved_size = size | default: 'default'
+  assign resolved_label = accessible_label | strip
+  if resolved_label == blank
+    assign resolved_label = 'payment_icons.accepted_methods' | t
+  endif
+-%}
+
+{%- if resolved_payment_types != blank -%}
+  <ul
+    class="payment-icons{% if resolved_size == 'sm' %} payment-icons--sm{% endif %}"
+    role="list"
+    aria-label="{{ resolved_label | escape }}"
+  >
+    {%- for payment_type in resolved_payment_types -%}
+      <li class="payment-icons__item">
+        {{- payment_type | payment_type_svg_tag: class: 'payment-icons__mark' -}}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

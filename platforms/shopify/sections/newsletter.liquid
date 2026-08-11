@@ -1,29 +1,78 @@
-<section class="newsletter">
+{%- liquid
+  assign newsletter_title = section.settings.title | strip
+  if newsletter_title == blank
+    assign newsletter_title = 'newsletter.title' | t
+  endif
+  assign newsletter_description = section.settings.description | strip
+  assign newsletter_note = section.settings.note | strip
+  assign title_id = 'NewsletterTitle-' | append: section.id
+  assign form_id = 'NewsletterForm-' | append: section.id
+  assign email_id = 'NewsletterEmail-' | append: section.id
+  assign email_error_id = 'NewsletterEmailError-' | append: section.id
+  assign note_id = 'NewsletterNote-' | append: section.id
+-%}
+
+<section class="newsletter" aria-labelledby="{{ title_id }}">
   <div class="newsletter__content">
-    <h2 class="newsletter__title">{{ section.settings.title | default: 'From the Studio' }}</h2>
-    <p class="newsletter__description">
-      {{ section.settings.description | default: 'New pieces, process stories, and studio updates.' }}
-    </p>
-    {% form 'customer', id: 'newsletter-form' %}
+    <h2 class="newsletter__title" id="{{ title_id }}">{{ newsletter_title }}</h2>
+    {%- if newsletter_description != blank -%}
+      <p class="newsletter__description">{{ newsletter_description }}</p>
+    {%- endif -%}
+
+    {% form 'customer', id: form_id, class: 'newsletter__form', aria-labelledby: title_id %}
       <input type="hidden" name="contact[tags]" value="newsletter">
-      <div class="newsletter__form">
-        <input class="input__field newsletter__input" type="email"
-               name="contact[email]" placeholder="Your email"
-               aria-label="Email address" required autocomplete="email">
-        <button class="btn btn--primary" type="submit">Subscribe</button>
-      </div>
+
+      {%- if form.posted_successfully? -%}
+        <p class="newsletter__status" role="status">
+          {{- 'newsletter.success' | t -}}
+        </p>
+      {%- else -%}
+        <div class="input{% if form.errors %} input--error{% endif %}">
+          <label class="input__label" for="{{ email_id }}">
+            {{- 'newsletter.email_label' | t -}}
+          </label>
+          <div class="input__control">
+            <input
+              class="input__field newsletter__input"
+              id="{{ email_id }}"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email | escape }}"
+              placeholder="{{ 'newsletter.placeholder' | t }}"
+              required
+              autocomplete="email"
+              {%- if newsletter_note != blank or form.errors %}
+                aria-describedby="{% if newsletter_note != blank %}{{ note_id }}{% endif %}{% if form.errors %}{% if newsletter_note != blank %} {% endif %}{{ email_error_id }}{% endif %}"
+              {%- endif %}
+              {%- if form.errors %} aria-invalid="true"{% endif %}
+            >
+          </div>
+          {%- if form.errors -%}
+            <p class="input__message" id="{{ email_error_id }}" role="alert">
+              {{- form.errors.messages.email -}}
+            </p>
+          {%- endif -%}
+        </div>
+        <button class="btn" type="submit">
+          {{- 'newsletter.submit' | t -}}
+        </button>
+      {%- endif -%}
     {% endform %}
-    <p class="newsletter__note">No spam. Unsubscribe anytime.</p>
+
+    {%- if newsletter_note != blank -%}
+      <p class="newsletter__note" id="{{ note_id }}">{{ newsletter_note }}</p>
+    {%- endif -%}
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "Newsletter",
+  "name": "t:sections.newsletter.name",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "From the Studio" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "New pieces, process stories, and studio updates." }
+    { "type": "text", "id": "title", "label": "t:sections.newsletter.settings.title", "default": "From the Studio" },
+    { "type": "textarea", "id": "description", "label": "t:sections.newsletter.settings.description", "default": "New pieces, process stories, and studio updates." },
+    { "type": "textarea", "id": "note", "label": "t:sections.newsletter.settings.note", "default": "One concise studio update each month. Unsubscribe at any time." }
   ],
-  "presets": [{ "name": "Newsletter" }]
+  "presets": [{ "name": "t:sections.newsletter.name" }]
 }
 {% endschema %}

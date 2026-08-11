@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "newsletter",
   "name": "Newsletter Signup",
   "registryId": "G2",
@@ -25,7 +25,7 @@
       "selector": ".newsletter",
       "className": ".newsletter",
       "required": true,
-      "description": "Newsletter section root."
+      "description": "Title-labelled Newsletter section root omitted when required title or form composition is missing."
     },
     {
       "name": "content",
@@ -60,7 +60,7 @@
       "selector": ".newsletter__input",
       "className": ".newsletter__input",
       "required": true,
-      "description": "Newsletter sizing class composed onto the Input dependency's native field."
+      "description": "Newsletter sizing hook composed onto the Input dependency's native email field."
     },
     {
       "name": "note",
@@ -68,6 +68,13 @@
       "className": ".newsletter__note",
       "required": false,
       "description": "Optional privacy or frequency note."
+    },
+    {
+      "name": "status",
+      "selector": ".newsletter__status",
+      "className": ".newsletter__status",
+      "required": false,
+      "description": "Optional target-owned confirmed response hook; no neutral response state is implied."
     }
   ],
   "variants": [
@@ -112,7 +119,14 @@
       "events": [
         "submit"
       ],
-      "description": "The native form emits submission to the consuming target; this contract does not choose inline, replacement, redirect, or other response ownership."
+      "description": "The native form emits submission to the consuming target; this contract does not choose endpoint, pending, success, error, retry, replacement, redirect, or other response ownership."
+    },
+    {
+      "name": "responseBoundary",
+      "selectors": [
+        ".newsletter__status"
+      ],
+      "description": "A target may render a truthful confirmed result using timing-appropriate semantics; the result is form-level and must not be repurposed as the Email field's validation message."
     }
   ],
   "properties": [
@@ -180,27 +194,36 @@
     "public": {
       "color": [
         "--color-surface-secondary",
-        "--color-text-disabled",
         "--color-text-primary",
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-body-default-weight",
+        "--tg-typography-h3-weight",
+        "--typo-body-line-height",
         "--typo-body-size",
+        "--typo-caption-line-height",
+        "--typo-caption-size",
+        "--typo-h3-line-height",
         "--typo-h3-size"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
     "Render the signup as a native form and use a submit-capable Button dependency.",
-    "Compose the email control from Input with a visible label, associated message, native email semantics, and required state when the target requires it.",
+    "Compose the email control from Input with a visible label, native email semantics, stable submitted name, autocomplete, and required state when the target requires it.",
     "Preserve Input's default, error, success, and warning validation families; use aria-invalid only for error.",
     "Do not use placeholder text as the email field's only accessible name.",
-    "The consuming target must announce or navigate to a clear submission result without this contract assuming where that response lives."
+    "Keep form-level response feedback separate from field guidance and validation messages.",
+    "The consuming target must announce or navigate to a truthful submission result without this contract assuming where that response lives."
   ],
   "adapters": {
     "web": {
@@ -209,8 +232,9 @@
       "notes": "Implemented in components/css/marketing.css."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Localized customer form uses canonical Input/Button markup, unique ids, platform field names, server error association, confirmed success, merchant content settings, and zero Newsletter JavaScript."
     },
     "react": {
       "status": "planned",

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "context-menu",
   "name": "Context Menu",
   "registryId": "B12",
   "category": "layout",
   "status": "pilot",
-  "summary": "Context-triggered menu that reuses Dropdown Menu item anatomy while adding fixed positioning, contextmenu entry points, keyboard invocation, and dismissal behavior.",
+  "summary": "Context-triggered immediate-command menu that consumes canonical Dropdown Menu anatomy and adds pointer/keyboard invocation, target-owned positioning, viewport clamping, focus entry, and dismissal behavior.",
   "dependencies": ["dropdown-menu"],
   "source": {
     "registry": "registry.json#/components/context-menu",
@@ -25,11 +25,32 @@
       "description": "Fixed-position menu surface anchored to a context interaction point."
     },
     {
+      "name": "group",
+      "selector": ".dropdown__group",
+      "className": ".dropdown__group",
+      "required": false,
+      "description": "Inherited labelled group that owns related context commands."
+    },
+    {
       "name": "item",
       "selector": ".dropdown__item",
       "className": ".dropdown__item",
       "required": true,
       "description": "Inherited Dropdown Menu item used for context commands."
+    },
+    {
+      "name": "itemIcon",
+      "selector": ".dropdown__item-icon",
+      "className": ".dropdown__item-icon",
+      "required": false,
+      "description": "Inherited optional decorative command icon."
+    },
+    {
+      "name": "itemShortcut",
+      "selector": ".dropdown__item-shortcut",
+      "className": ".dropdown__item-shortcut",
+      "required": false,
+      "description": "Inherited optional hint for a shortcut that the target actually implements."
     },
     {
       "name": "separator",
@@ -72,6 +93,21 @@
       "name": "open",
       "selectors": [".context-menu--open"],
       "description": "Visible state controlled by the context-menu--open modifier."
+    },
+    {
+      "name": "highlighted",
+      "selectors": [".dropdown__item[data-highlighted]"],
+      "description": "Inherited pointer or roving-focus command highlight."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".dropdown__item[aria-disabled=\"true\"]", ".dropdown__item[data-disabled]"],
+      "description": "Inherited unavailable command state that cannot activate."
+    },
+    {
+      "name": "danger",
+      "selectors": [".dropdown__item--danger"],
+      "description": "Inherited destructive command treatment."
     }
   ],
   "behavior": [
@@ -91,8 +127,13 @@
     },
     {
       "name": "menuSemantics",
-      "attributes": ["role=\"menu\"", "role=\"menuitem\"", "aria-disabled"],
-      "description": "The inherited menu items must preserve menu semantics and disabled behavior."
+      "attributes": ["role=\"menu\"", "role=\"group\"", "role=\"menuitem\"", "role=\"separator\"", "aria-labelledby", "aria-disabled"],
+      "description": "The inherited groups, labels, items, separators and disabled behavior preserve the canonical Dropdown Menu semantics."
+    },
+    {
+      "name": "focusNavigation",
+      "events": ["ArrowDown", "ArrowUp", "Home", "End", "printable typeahead", "Tab", "Shift+Tab"],
+      "description": "Opening moves focus into one roving menuitem; arrows, Home, End and optional typeahead navigate, while Tab closes and continues document order."
     },
     {
       "name": "dismissal",
@@ -124,7 +165,9 @@
         "--color-surface-primary",
         "--color-surface-secondary",
         "--color-border-subtle",
+        "--color-border-focus",
         "--color-text-primary",
+        "--color-text-secondary",
         "--color-text-disabled",
         "--color-feedback-error-default"
       ],
@@ -145,7 +188,15 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-layout-touch-target"
       ]
     }
   },
@@ -153,14 +204,16 @@
     "Provide keyboard access through Shift+F10 or the Menu key when a context menu is available.",
     "Do not make critical actions available only through a context menu.",
     "Use the Dropdown Menu item semantics and disabled behavior for inherited menu items.",
-    "Move focus into the menu while it is open and restore focus to the invoking element when it closes.",
-    "Close on Escape and outside interaction."
+    "Move focus into one roving menuitem while open; support arrows, Home, End and optional printable typeahead.",
+    "Restore focus to the invoking element on Escape and completed commands; close safely on outside interaction, scroll and resize.",
+    "Keep disabled commands exposed according to target policy but never activatable, and do not advertise shortcut hints that are not implemented.",
+    "Use logical inherited item layout and clamp the surface without overflowing narrow or localized viewports."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css and inherited Dropdown Menu classes; invocation and positioning behavior must be provided by the consuming target."
+      "notes": "Implemented by bounded surface CSS plus inherited canonical Dropdown Menu classes; targets provide pointer/keyboard invocation, focus navigation, coordinates, collision and dismissal."
     },
     "shopify": {
       "status": "planned",

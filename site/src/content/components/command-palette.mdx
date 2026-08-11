@@ -1,10 +1,11 @@
 ## Overview
 
-⌘K command palette with search input and grouped results.
+Modal command surface with editable search, grouped active-descendant results,
+visible dismissal, and target-owned filtering and execution.
 
 ## Presentation
 
-<Preview html={"<div class=\"tg-preview-stage tg-preview-stage--overlay\"><button class=\"btn btn--outline\" type=\"button\" data-preview-trigger aria-expanded=\"true\">Open command palette</button><div class=\"command-palette command-palette--open tg-preview-overlay-layer\"><div class=\"command-palette__panel\"><div class=\"command-palette__input-wrapper\"><svg class=\"command-palette__search-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"9\" cy=\"9\" r=\"6\"/><path d=\"m14 14 4 4\"/></svg><input class=\"command-palette__input\" type=\"text\" placeholder=\"Type a command…\" value=\"pro\" /></div><div class=\"command-palette__results\"><div class=\"command-palette__group-label\">Products</div><button class=\"command-palette__item\" type=\"button\" data-highlighted data-preview-close><span class=\"command-palette__item-text\">Go to Products</span><span class=\"command-palette__item-shortcut\">G P</span></button><button class=\"command-palette__item\" type=\"button\" data-preview-close><span class=\"command-palette__item-text\">Create Product</span><span class=\"command-palette__item-shortcut\">C P</span></button></div></div></div></div>"} label="Command Palette" layout="overlay" interaction={{"selector":".command-palette","toggle":"command-palette--open","triggerLabel":"Open Palette","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
+<Preview html={"<div class=\"tg-preview-stage tg-preview-stage--overlay\"><button class=\"btn btn--outline\" type=\"button\" data-preview-trigger aria-expanded=\"true\" aria-controls=\"command-preview-dialog\">Open command palette</button><div class=\"modal-overlay command-palette command-palette--open tg-preview-overlay-layer\" aria-hidden=\"false\"><div class=\"modal command-palette__panel\" id=\"command-preview-dialog\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"command-preview-title\"><h2 class=\"modal__title visually-hidden\" id=\"command-preview-title\">Command palette</h2><div class=\"command-palette__input-wrapper\"><svg class=\"command-palette__search-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"6\"/><path d=\"m14 14 4 4\"/></svg><input class=\"command-palette__input\" type=\"text\" role=\"combobox\" aria-label=\"Search commands\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"command-preview-results\" aria-activedescendant=\"command-preview-products\" placeholder=\"Search commands\" value=\"pro\" /><button class=\"close-btn command-palette__close\" type=\"button\" aria-label=\"Close command palette\" data-preview-close>×</button></div><p class=\"command-palette__status visually-hidden\" role=\"status\" aria-live=\"polite\"></p><div class=\"command-palette__results\" id=\"command-preview-results\" role=\"listbox\" aria-label=\"Commands\"><div class=\"command-palette__group\" role=\"group\" aria-labelledby=\"command-preview-group\"><div class=\"command-palette__group-label\" id=\"command-preview-group\">Products</div><div class=\"command-palette__item\" id=\"command-preview-products\" role=\"option\" tabindex=\"-1\" aria-selected=\"true\" data-highlighted data-preview-close><span class=\"command-palette__item-text\">Go to Products</span></div><div class=\"command-palette__item\" role=\"option\" tabindex=\"-1\" aria-selected=\"false\" aria-disabled=\"true\"><span class=\"command-palette__item-text\">Export products</span></div></div></div><div class=\"command-palette__footer\"><span>↑↓ Navigate · Enter select</span><span>Esc close</span></div></div></div></div>"} label="Command Palette" layout="overlay" interaction={{"selector":".command-palette","toggle":"command-palette--open","triggerLabel":"Open Palette","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
 
 ## Usage Guidelines
 
@@ -16,13 +17,15 @@
 ## Accessibility
 
 <Callout type="warning">
-  The CSS adapter handles the visual overlay; the target owns shortcut handling, filtering, highlighted result state, and command execution.
+  Command Palette composes canonical Modal and Close Button presentation. The
+  target owns modality, shortcut scope, filtering, active-descendant focus,
+  announcements, restoration, and command execution.
 </Callout>
 
-- Trap focus inside the overlay while open. Return focus to the trigger on close.
-- Close on `Escape` key press.
-- Focus the search input when the palette opens.
-- Keep the highlighted command synchronized with `aria-activedescendant` or the target's equivalent native pattern.
+- Focus the named search input on open; keep result options outside the page Tab sequence.
+- Trap Tab among modal controls, close through the visible button or `Escape`, and restore logical prior focus.
+- Keep one enabled command synchronized with `aria-activedescendant`; support arrows, Home, End, and Enter.
+- Preserve native text editing and IME composition. Do not nest interactive controls inside an option.
 
 ### Dependencies
 
@@ -42,11 +45,14 @@ This component uses:
   <tr><td>`.command-palette__search-icon`</td><td>element</td><td>—</td><td>Optional search icon</td></tr>
   <tr><td>`.command-palette__input`</td><td>element</td><td>—</td><td>Command search input</td></tr>
   <tr><td>`.command-palette__results`</td><td>element</td><td>—</td><td>Scrollable results container</td></tr>
+  <tr><td>`.command-palette__group`</td><td>element</td><td>—</td><td>Named command option group</td></tr>
   <tr><td>`.command-palette__group-label`</td><td>element</td><td>—</td><td>Non-interactive result group label</td></tr>
   <tr><td>`.command-palette__item`</td><td>element</td><td>`data-highlighted`</td><td>Command result item</td></tr>
   <tr><td>`.command-palette__item-icon`</td><td>element</td><td>—</td><td>Optional command icon</td></tr>
   <tr><td>`.command-palette__item-text`</td><td>element</td><td>—</td><td>Command label text</td></tr>
   <tr><td>`.command-palette__item-shortcut`</td><td>element</td><td>—</td><td>Optional command shortcut hint</td></tr>
   <tr><td>`.command-palette__empty`</td><td>element</td><td>—</td><td>Empty-result message</td></tr>
+  <tr><td>`.command-palette__status`</td><td>element</td><td>—</td><td>Optional polite empty/result announcement</td></tr>
+  <tr><td>`.command-palette__close`</td><td>dependency</td><td>Close Button</td><td>Visible modal dismiss action</td></tr>
   <tr><td>`.command-palette__footer`</td><td>element</td><td>—</td><td>Optional footer metadata</td></tr>
 </PropTable>

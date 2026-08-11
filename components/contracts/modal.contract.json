@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.4.0",
   "slug": "modal",
   "name": "Modal",
   "registryId": "B2",
   "category": "layout",
   "status": "pilot",
-  "summary": "Dialog overlay with backdrop, dialog container, header, title, body, footer, open state, motion, and accessibility behavior requirements.",
-  "dependencies": [],
+  "summary": "Named modal-dialog composition with required content and dismiss action, canonical Button dependencies, bounded presentation, and target-owned focus, inertness, dismissal, and lifecycle.",
+  "dependencies": ["button", "close-button"],
   "source": {
     "registry": "registry.json#/components/modal",
     "css": {
@@ -35,15 +35,22 @@
       "name": "header",
       "selector": ".modal__header",
       "className": ".modal__header",
-      "required": false,
-      "description": "Optional top region for title and close affordance."
+      "required": true,
+      "description": "Top region for the required visible title and canonical dismiss action."
     },
     {
       "name": "title",
       "selector": ".modal__title",
       "className": ".modal__title",
-      "required": false,
-      "description": "Optional modal title used by aria-labelledby."
+      "required": true,
+      "description": "Required visible modal title used by aria-labelledby."
+    },
+    {
+      "name": "close",
+      "selector": ".modal__close",
+      "className": ".modal__close",
+      "required": true,
+      "description": "Required named dismiss action composed with canonical Close Button."
     },
     {
       "name": "body",
@@ -91,6 +98,11 @@
       "name": "entered",
       "selectors": [".modal-overlay[aria-hidden=\"false\"] .modal"],
       "description": "Dialog transform state after the overlay is open."
+    },
+    {
+      "name": "scrollingBody",
+      "selectors": [".modal__body"],
+      "description": "Long primary content scrolls independently while header and footer remain available."
     }
   ],
   "behavior": [
@@ -98,7 +110,7 @@
       "name": "visibility",
       "selectors": [".modal-overlay[aria-hidden=\"false\"]"],
       "attributes": ["aria-hidden"],
-      "description": "The overlay is hidden by default and becomes visible when aria-hidden is set to false."
+      "description": "The target keeps closed content unavailable and exposes the bounded overlay when aria-hidden is false."
     },
     {
       "name": "dialogSemantics",
@@ -108,21 +120,69 @@
     {
       "name": "focusManagement",
       "events": ["open", "close", "Tab", "Shift+Tab"],
-      "description": "Opening the modal moves focus inside it, traps tab navigation while open, and restores focus to the trigger on close."
+      "description": "Opening from an invoker moves focus to a content-appropriate descendant, contains Tab and Shift+Tab while modal, and restores focus logically on close."
     },
     {
       "name": "dismissal",
-      "events": ["Escape", "backdrop click", "close action"],
-      "description": "The modal must provide at least one visible close mechanism and should close on Escape."
+      "events": ["Escape", "backdrop request", "close action"],
+      "description": "The modal provides a visible named dismiss action and closes on Escape; backdrop dismissal remains target policy."
+    },
+    {
+      "name": "targetLifecycle",
+      "events": ["open", "cancel", "close"],
+      "description": "The target owns trigger relationships, inert background, scroll locking, mutual exclusion, exit completion, and cleanup; the neutral contract does not define a global overlay service."
     }
   ],
   "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Visible localized title that supplies the dialog accessible name.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".modal__title" }] }
+    },
+    {
+      "name": "content",
+      "type": "slot",
+      "required": true,
+      "description": "Primary task content composed inside the scrollable body.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".modal__body", "classNames": [".modal__body"] }] }
+    },
+    {
+      "name": "dismissAction",
+      "type": "slot",
+      "required": true,
+      "description": "Visible native dismiss action composed with canonical Close Button.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".modal__close", "classNames": [".modal__close"] }] }
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": true,
+      "description": "Contextual accessible name for the dismiss action.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".modal__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "descriptionId",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit aria-describedby for long or structurally rich dialog content.",
+      "description": "Optional id of a short simple description announced with the title.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".modal", "attribute": "aria-describedby", "valueFrom": "property" }] }
+    },
+    {
+      "name": "actions",
+      "type": "slot",
+      "required": false,
+      "description": "Optional canonical Button actions in the footer.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".modal__footer", "classNames": [".modal__footer"] }] }
+    },
     {
       "name": "open",
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Controls whether the modal overlay is visible. Consumer targets still own focus management and dismissal behavior.",
+      "description": "Controls whether the target presents the modal. Focus, inertness, dismissal, scroll locking, and lifecycle remain target-owned.",
       "targetMappings": {
         "web": [
           { "kind": "attribute", "selector": ".modal-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }
@@ -151,6 +211,7 @@
       ],
       "typography": [
         "--typo-h3-size",
+        "--typo-h3-line-height",
         "--font-family-body"
       ],
       "transition": [
@@ -166,18 +227,20 @@
     }
   },
   "accessibility": [
-    "Set aria-hidden=\"false\" on the overlay when open and aria-hidden=\"true\" when closed.",
+    "Keep closed content unavailable to keyboard and assistive technology; set aria-hidden consistently when a wrapper is retained.",
     "Use role=\"dialog\" and aria-modal=\"true\" on the modal container.",
-    "Provide a programmatic name with aria-labelledby or aria-label.",
-    "Trap keyboard focus inside the modal while it is open.",
-    "Return focus to the trigger element when the modal closes.",
-    "Close on Escape and provide a visible close or cancel action."
+    "Use the required visible title through aria-labelledby; add aria-describedby only for short simple descriptions.",
+    "Move focus to a content-appropriate descendant and contain Tab and Shift+Tab while modal.",
+    "Return focus to the invoker or another logical workflow target when the modal closes.",
+    "Close on Escape and provide a visible named dismiss action.",
+    "Make outside content genuinely inert before asserting aria-modal=true.",
+    "Honor reduced motion and preserve system boundaries in forced-colors mode."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; behavior must be provided by the consuming target."
+      "kind": "css-target-behavior",
+      "notes": "Canonical CSS implements the bounded surface. The Web target maps modality through native dialog or equivalent focus/inert/dismiss behavior; the docs target demonstrates that lifecycle without defining a global overlay service."
     },
     "shopify": {
       "status": "implemented",

@@ -278,6 +278,10 @@ function hasOpenState(html) {
   return statePatterns.some((pattern) => pattern.test(html));
 }
 
+function hasCanonicalRuntimeInteraction(html) {
+  return ['combobox', 'datepicker'].some((className) => classExists(html, className));
+}
+
 function hasTrigger(html, interaction) {
   const triggerSelector = propValue(interaction, 'triggerSelector') ?? attrValue(html, 'data-preview-trigger-selector') ?? '[data-preview-trigger]';
   return selectorExists(html, triggerSelector);
@@ -317,6 +321,7 @@ function auditMdx() {
       const html = normalizeHtml(extractHtml(block));
       const interaction = extractInteraction(block);
       const hasInteraction = Boolean(interaction.trim()) || html.includes('data-preview-selector=');
+      const hasRuntimeInteraction = hasCanonicalRuntimeInteraction(html);
       const label = previewLabel(block);
       const layout = previewLayout(block);
       const line = lineForOffset(source, preview.offset);
@@ -355,11 +360,20 @@ function auditMdx() {
         return;
       }
 
+      if (hasRuntimeInteraction) {
+        interactiveCount += 1;
+      }
+
       if (html.includes('data-preview-trigger')) {
         issues.push(issue('error', filePath, line, label, 'Preview has a data-preview-trigger but no interaction config.'));
       }
 
-      if (index === 0 && hasOpenState(html) && !html.includes('data-preview-static-artwork')) {
+      if (
+        index === 0
+        && hasOpenState(html)
+        && !html.includes('data-preview-static-artwork')
+        && !hasRuntimeInteraction
+      ) {
         issues.push(issue('error', filePath, line, label, 'Primary preview is rendered in an open/visible state without direct interaction.'));
       } else if (index > 0 && hasOpenState(html)) {
         issues.push(issue('info', filePath, line, label, 'Variant preview uses an open/visible state. Keep only if this is intentionally static documentation.'));
@@ -400,11 +414,18 @@ function auditCss() {
       const selector = match[1].trim().replace(/\s+/g, ' ');
       const body = match[2];
       const line = lineForOffset(source, match.index);
+      const isFullSurfaceNativeFileInput = /\.file-upload__input\b/.test(selector)
+        && /position\s*:\s*absolute/.test(body)
+        && /inset\s*:\s*0/.test(body)
+        && /width\s*:\s*100%/.test(body)
+        && /height\s*:\s*100%/.test(body)
+        && /cursor\s*:\s*pointer/.test(body);
 
       if (
         /opacity\s*:\s*0(?:\s*!important)?\s*(?:;|$)/.test(body) &&
         !/pointer-events\s*:/.test(body) &&
         !/visibility\s*:/.test(body) &&
+        !isFullSurfaceNativeFileInput &&
         !/from\s*$|to\s*$|^\d+%$/.test(selector) &&
         !/\.opacity-0\b/.test(selector)
       ) {

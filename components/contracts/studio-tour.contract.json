@@ -1,11 +1,382 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "studio-tour", "name": "Studio Tour Section", "registryId": "R13", "category": "ceramics", "status": "pilot", "summary": "Numbered steps walkthrough of the studio with images and optional video.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/studio-tour", "css": { "file": "components/css/ceramics.css", "selector": ".studio-tour" }, "docs": "site/src/content/components/studio-tour.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".studio-tour", "className": ".studio-tour", "required": true, "description": "Studio tour editorial section." }, { "name": "header", "selector": ".studio-tour__header", "className": ".studio-tour__header", "required": false, "description": "Optional section introduction." }, { "name": "eyebrow", "selector": ".studio-tour__eyebrow", "className": ".studio-tour__eyebrow", "required": false, "description": "Optional editorial label." }, { "name": "heading", "selector": ".studio-tour__heading", "className": ".studio-tour__heading", "required": false, "description": "Tour heading." }, { "name": "intro", "selector": ".studio-tour__intro", "className": ".studio-tour__intro", "required": false, "description": "Optional tour introduction." }, { "name": "steps", "selector": ".studio-tour__steps", "className": ".studio-tour__steps", "required": true, "description": "Repeated tour-step region." }, { "name": "step", "selector": ".studio-tour__step", "className": ".studio-tour__step", "required": true, "description": "Single ordered studio-tour step." }, { "name": "stepMedia", "selector": ".studio-tour__step-media", "className": ".studio-tour__step-media", "required": false, "description": "Optional step media." }, { "name": "stepNumber", "selector": ".studio-tour__step-number", "className": ".studio-tour__step-number", "required": false, "description": "Visible target-formatted step number." }, { "name": "stepTitle", "selector": ".studio-tour__step-title", "className": ".studio-tour__step-title", "required": true, "description": "Step heading." }, { "name": "stepDescription", "selector": ".studio-tour__step-desc", "className": ".studio-tour__step-desc", "required": false, "description": "Optional step description." }, { "name": "video", "selector": ".studio-tour__video", "className": ".studio-tour__video", "required": false, "description": "Optional target-owned tour media region." }, { "name": "videoPoster", "selector": ".studio-tour__video-poster", "className": ".studio-tour__video-poster", "required": false, "description": "Optional media poster." }, { "name": "videoPlay", "selector": ".studio-tour__video-play", "className": ".studio-tour__video-play", "required": false, "description": "Existing target-owned media action surface." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Responsive studio-tour grid." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained responsive tour layout." }], "states": [{ "name": "default", "selectors": [".studio-tour"], "description": "Passive editorial tour presentation." }],
-  "behavior": [{ "name": "orderedTour", "selectors": [".studio-tour__steps", ".studio-tour__step"], "description": "Targets preserve meaningful tour-step order and own all step records and destinations." }, { "name": "mediaOwnership", "selectors": [".studio-tour__video", ".studio-tour__video-play"], "description": "The media slot does not choose video providers, consent/loading policy, playback controls, poster behavior, modal treatment, or analytics." }],
-  "properties": [{ "name": "eyebrow", "type": "string", "required": false, "description": "Optional editorial label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".studio-tour__eyebrow" }] } }, { "name": "heading", "type": "string", "required": false, "description": "Optional tour heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".studio-tour__heading" }] } }, { "name": "intro", "type": "string", "required": false, "description": "Optional tour introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".studio-tour__intro" }] } }, { "name": "steps", "type": "slot", "required": true, "description": "Target-owned ordered tour steps.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".studio-tour__steps", "classNames": [".studio-tour__steps"] }] } }, { "name": "media", "type": "slot", "required": false, "description": "Optional target-owned tour media; no playback behavior is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".studio-tour__video", "classNames": [".studio-tour__video"] }] } }],
-  "tokens": { "public": { "color": ["--color-border-focus", "--color-surface-statement", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-body-sm-size", "--typo-h2-size", "--typo-h4-size"], "radius": ["--radius-full", "--radius-lg", "--radius-md"], "spacing": ["--section-spacing-y", "--space-layout-touch-target"], "transition": ["--transition-default", "--transition-fast"], "easing": ["--easing-default"] } },
-  "accessibility": ["Preserve tour steps in logical source order.", "Provide alternative text for informative studio imagery.", "If a target supplies video, provide native or equivalent controls, captions where needed, and an accessible name for playback actions.", "Do not autoplay or load third-party media by contract assumption."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "CSS layout and media slots are implemented; media behavior remains target-owned." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "studio-tour",
+  "name": "Studio Tour Section",
+  "registryId": "R13",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Contextual studio walkthrough profile composed from Process Timeline with optional introduction and target-owned supplementary media.",
+  "dependencies": [
+    "process-timeline"
+  ],
+  "source": {
+    "registry": "registry.json#/components/studio-tour",
+    "css": {
+      "file": "components/css/ceramics.css",
+      "selector": ".studio-tour"
+    },
+    "docs": "site/src/content/components/studio-tour.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "rootProfile",
+      "selector": ".studio-tour",
+      "className": ".studio-tour",
+      "required": true,
+      "description": "Studio-tour context hook layered on the required canonical Process Timeline section and named by its visible contextual heading."
+    },
+    {
+      "name": "header",
+      "selector": ".studio-tour__header",
+      "className": ".studio-tour__header",
+      "required": true,
+      "description": "Contextual introduction containing the required heading and any optional eyebrow or intro."
+    },
+    {
+      "name": "eyebrow",
+      "selector": ".studio-tour__eyebrow",
+      "className": ".studio-tour__eyebrow",
+      "required": false,
+      "description": "Optional editorial label that never substitutes for the required heading."
+    },
+    {
+      "name": "heading",
+      "selector": ".studio-tour__heading",
+      "className": ".studio-tour__heading",
+      "required": true,
+      "description": "Required visible contextual heading using canonical Process Timeline title presentation and labelling the root and ordered lane."
+    },
+    {
+      "name": "intro",
+      "selector": ".studio-tour__intro",
+      "className": ".studio-tour__intro",
+      "required": false,
+      "description": "Optional concise introduction to the ordered studio walkthrough."
+    },
+    {
+      "name": "track",
+      "selector": ".process-timeline__track",
+      "className": ".process-timeline__track",
+      "required": true,
+      "description": "Required canonical Process Timeline native ordered lane labelled by the visible tour heading."
+    },
+    {
+      "name": "step",
+      "selector": ".process-step",
+      "className": ".process-step",
+      "required": true,
+      "description": "Direct repeated canonical Process Timeline list item supplied by the target."
+    },
+    {
+      "name": "stepNumber",
+      "selector": ".process-step__number",
+      "className": ".process-step__number",
+      "required": true,
+      "description": "Canonical visible sequence marker hidden from assistive technology because native ordered-list semantics expose position."
+    },
+    {
+      "name": "stepImage",
+      "selector": ".process-step__image",
+      "className": ".process-step__image",
+      "required": false,
+      "description": "Optional canonical passive step-media region omitted completely when absent."
+    },
+    {
+      "name": "stepTitle",
+      "selector": ".process-step__title",
+      "className": ".process-step__title",
+      "required": true,
+      "description": "Required contextual heading for one tour stop."
+    },
+    {
+      "name": "stepDescription",
+      "selector": ".process-step__description",
+      "className": ".process-step__description",
+      "required": false,
+      "description": "Optional concise description of one tour stop."
+    },
+    {
+      "name": "media",
+      "selector": ".studio-tour__media",
+      "className": ".studio-tour__media",
+      "required": false,
+      "description": "Optional target-owned supplementary-media composition; the neutral fixture is a passive native figure."
+    },
+    {
+      "name": "mediaAsset",
+      "selector": ".studio-tour__media-asset",
+      "className": ".studio-tour__media-asset",
+      "required": false,
+      "description": "Optional native media asset whose type, source, alternative, loading and interaction are supplied by the target."
+    },
+    {
+      "name": "mediaCaption",
+      "selector": ".studio-tour__media-caption",
+      "className": ".studio-tour__media-caption",
+      "required": false,
+      "description": "Optional target-authored caption for the self-contained supplementary media."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default contextual Studio Tour profile of canonical Process Timeline."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Canonical Process Timeline tracks distribute available inline space and overflow natively only when required."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".studio-tour"
+      ],
+      "description": "Required visible heading and ordered steps with any accepted optional introduction, step content and supplementary media."
+    },
+    {
+      "name": "trackFocus",
+      "selectors": [
+        ".process-timeline__track:focus-visible"
+      ],
+      "description": "Canonical visible keyboard focus on the native lane when overflowing steps require keyboard scrolling."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "processTimelineComposition",
+      "selectors": [
+        ".studio-tour",
+        ".process-timeline__title",
+        ".process-timeline__track",
+        ".process-step",
+        ".process-step__number",
+        ".process-step__image",
+        ".process-step__title",
+        ".process-step__description"
+      ],
+      "description": "Studio Tour consumes canonical Process Timeline anatomy, ordered semantics, numbering, optional step media/descriptions, intrinsic overflow, focus, RTL, forced colors and zero-runtime behavior without recreating them."
+    },
+    {
+      "name": "requiredComposition",
+      "selectors": [
+        ".studio-tour",
+        ".studio-tour__heading",
+        ".process-timeline__track"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "Targets render the profile only with a non-empty visible heading and at least one ordered step. The root and lane reference one target-unique heading id; invalid required composition is omitted."
+    },
+    {
+      "name": "orderedTour",
+      "selectors": [
+        ".process-timeline__track",
+        ".process-step"
+      ],
+      "description": "Targets use a native ordered list with direct list items and preserve meaningful authored tour order independently of available inline size."
+    },
+    {
+      "name": "optionalIntroduction",
+      "selectors": [
+        ".studio-tour__eyebrow",
+        ".studio-tour__intro"
+      ],
+      "description": "Optional eyebrow and intro parts are independently omitted without empty wrappers and never replace the required visible heading."
+    },
+    {
+      "name": "optionalStepContent",
+      "selectors": [
+        ".process-step__image",
+        ".process-step__description"
+      ],
+      "description": "Canonical optional image and description parts are independently omitted while required number/title order remains understandable."
+    },
+    {
+      "name": "mediaOwnership",
+      "selectors": [
+        ".studio-tour__media",
+        ".studio-tour__media-asset",
+        ".studio-tour__media-caption"
+      ],
+      "description": "The optional supplementary-media slot chooses no media type, provider, source, consent, loading, controls, captions, transcript, playback, modal, analytics or poster behavior. The neutral fixture remains passive."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".studio-tour__header",
+        ".studio-tour__heading",
+        ".studio-tour__intro",
+        ".process-timeline__track",
+        ".studio-tour__media-caption"
+      ],
+      "description": "Localized, unbroken, repeated, short, long and zoomed content remains contained; only the named canonical lane can scroll horizontally."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".studio-tour"
+      ],
+      "description": "Studio Tour owns no controlled or uncontrolled state, listener, observer, timer, request, player, custom key handling, live region, animation, icon, asset or network work. Data and media lifecycle remain target responsibilities."
+    }
+  ],
+  "properties": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "Optional editorial label shown above the required heading.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".studio-tour__eyebrow"
+          }
+        ]
+      }
+    },
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "Required non-empty visible tour heading used as the section and ordered-lane label; contextual native heading rank remains target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".studio-tour__heading"
+          }
+        ]
+      }
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "Optional concise contextual introduction.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".studio-tour__intro"
+          }
+        ]
+      }
+    },
+    {
+      "name": "steps",
+      "type": "slot",
+      "required": true,
+      "description": "Required target-owned canonical Process Timeline composition with at least one step title and optional step media/descriptions.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".process-timeline__track",
+            "classNames": [
+              ".process-timeline__track",
+              ".process-step",
+              ".process-step__number",
+              ".process-step__image",
+              ".process-step__title",
+              ".process-step__description"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "media",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned supplementary media and caption; no media type or playback behavior is implied.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".studio-tour__media",
+            "classNames": [
+              ".studio-tour__media",
+              ".studio-tour__media-asset",
+              ".studio-tour__media-caption"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-caption-size",
+        "--typo-caption-line-height",
+        "--tg-typography-body-caption-weight",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--tg-typography-body-default-weight",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height",
+        "--tg-typography-body-small-weight"
+      ],
+      "radius": [
+        "--radius-lg"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-layout-section-gap"
+      ]
+    }
+  },
+  "accessibility": [
+    "Render the profile only with a non-empty visible contextual heading and at least one direct ordered-list item; omit invalid required composition.",
+    "Associate the native section and canonical ordered lane with the same visible heading through a target-unique aria-labelledby/id pair.",
+    "Use canonical Process Timeline native ol/li semantics, preserve authored source order, keep native lane scrolling and do not add Timeline widget, progress, carousel, current-step or selection semantics.",
+    "Keep the visible decimal marker aria-hidden because native ordered-list semantics expose position; never rely on marker, connector, image or scroll position for sequence.",
+    "Give informative step and supplementary images useful target-authored alternative text, use alt=\"\" for decorative images, and omit empty optional wrappers.",
+    "Keep the neutral supplementary-media fixture passive with no focus stop. A target-supplied player needs complete keyboard-accessible controls, captions, descriptions and transcripts as applicable.",
+    "Do not autoplay or load third-party media by neutral-contract assumption; provider, privacy, consent, loading, playback, modal and analytics remain target-owned.",
+    "Allow localized, unbroken, repeated and 200-percent-zoom content to remain contained without page-level horizontal overflow."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented as a contextual profile of canonical Process Timeline with source-owned introduction and passive supplementary-media presentation; no neutral runtime."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "section-adapter",
+      "notes": "Can compose ordered Process Timeline blocks plus optional editorial settings/media after merchant record schema and media policy are selected; no generic Liquid player is authorized."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component-profile"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component-profile"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
 }

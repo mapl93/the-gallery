@@ -1,43 +1,103 @@
 ## Overview
 
-Swatches and pills for product variant selection.
+Variant Selector composes one or more product-option groups from native radios.
+The visual mode may use named swatches or text pills; the browser remains the
+owner of selection, keyboard behavior, form data, validity, events, and reset.
 
-<Preview html={"<div class=\"variant-selector\"><span class=\"variant-selector__label\">Size</span><div class=\"variant-pills\"><label class=\"variant-pill\"><input type=\"radio\" name=\"size\" value=\"s\" />S</label><label class=\"variant-pill\"><input type=\"radio\" name=\"size\" value=\"m\" checked />M</label><label class=\"variant-pill\"><input type=\"radio\" name=\"size\" value=\"l\" />L</label><span class=\"variant-pill variant-pill--unavailable\">XL</span></div></div>"} label="Variant Selector" />
+<Preview html={`
+<div class="variant-selector">
+  <fieldset class="variant-selector__group">
+    <legend class="variant-selector__legend"><span class="variant-selector__label" dir="auto">Glaze</span>: <span class="variant-selector__selection" aria-hidden="true" dir="auto">Celadon</span></legend>
+    <div class="variant-swatches">
+      <label class="variant-swatch"><input class="variant-swatch__input" type="radio" name="glaze" value="celadon" checked required><span class="variant-swatch__color tg-preview-swatch--celadon"></span><span class="variant-swatch__label" dir="auto">Celadon</span></label>
+      <label class="variant-swatch"><input class="variant-swatch__input" type="radio" name="glaze" value="ink"><span class="variant-swatch__color tg-preview-swatch--ink"></span><span class="variant-swatch__label" dir="auto">Ink</span></label>
+      <label class="variant-swatch variant-swatch--unavailable"><input class="variant-swatch__input" type="radio" name="glaze" value="porcelain"><span class="variant-swatch__color tg-preview-swatch--porcelain"></span><span class="variant-swatch__label" dir="auto">Porcelain</span><span class="variant-selector__option-status">, Sold out</span></label>
+      <label class="variant-swatch"><input class="variant-swatch__input" type="radio" name="glaze" value="ash" disabled><span class="variant-swatch__color tg-preview-swatch--ash"></span><span class="variant-swatch__label" dir="auto">Ash</span><span class="variant-selector__option-status">, Unavailable combination</span></label>
+    </div>
+  </fieldset>
+  <fieldset class="variant-selector__group">
+    <legend class="variant-selector__legend"><span class="variant-selector__label">Size</span>: <span class="variant-selector__selection" aria-hidden="true">M</span></legend>
+    <div class="variant-pills">
+      <label class="variant-pill"><input class="variant-pill__input" type="radio" name="size" value="S"><span class="variant-pill__label">S</span></label>
+      <label class="variant-pill"><input class="variant-pill__input" type="radio" name="size" value="M" checked><span class="variant-pill__label">M</span></label>
+      <label class="variant-pill"><input class="variant-pill__input" type="radio" name="size" value="L"><span class="variant-pill__label">L</span></label>
+      <label class="variant-pill variant-pill--unavailable"><input class="variant-pill__input" type="radio" name="size" value="XL"><span class="variant-pill__label">XL</span><span class="variant-selector__option-status">, Sold out</span></label>
+      <label class="variant-pill"><input class="variant-pill__input" type="radio" name="size" value="XXL" disabled><span class="variant-pill__label">XXL</span><span class="variant-selector__option-status">, Unavailable combination</span></label>
+    </div>
+  </fieldset>
+</div>
+`} label="Variant Selector" />
 
 ## Presentation
 
-Swatches and pills are composition choices for option groups. Native checked, disabled, focus, and unavailable states remain synchronized with visible labels.
+Every group has a stable visible option name and a derived visible selected value.
+Swatches keep a 44px target around a 36px color or image surface; pills keep the
+same minimum target and wrap from the component's available inline size. Selected,
+keyboard-focus, commercially unavailable, and native-disabled states remain
+visually distinct in light, dark, and forced-color environments.
+
+Swatch fill is target data, not a design token. The target may supply a color or
+image, but every swatch still needs a localized text name. The selected-value text
+is a projection of the checked radio, never a second editable value owner.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Optimize product images for web — use WebP format and responsive srcset.</Do>
-  <Dont>Don't overload product components with too many badges or CTAs — keep it clean.</Dont>
+  <Do>Render each product option as one native `fieldset`/`legend` with same-name radios, one initial checked value, localized option names, and explicit unavailable text.</Do>
+  <Dont>Do not add `radiogroup` roles, independent checked booleans, handle-derived colors, or an all-variants data engine to the neutral component.</Dont>
 </DoDont>
+
+Under accepted direction D4-A, commercial unavailability and native `disabled`
+are separate states. Sold-out values remain selectable so the target can explain
+their state, project truthful information, or offer Back In Stock. Nonexistent
+combinations and genuinely unusable values are natively disabled. Selection never
+makes unavailable merchandise purchasable. A parent commerce coordinator owns cross-group combination lookup,
+variant id, URL, Price, media, inventory, selling plan, submit state, and at most
+one localized product-update announcement.
 
 ## Accessibility
 
 <Callout type="tip">
-  Product components are designed to work together. The product page combines gallery, info, form, and related products.
+  Native radios already provide the expected one-stop group focus, Arrow and Space
+  behavior, `input`/`change`, required validity, FormData, and form reset.
 </Callout>
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
-- Use radio semantics for mutually exclusive variant choices.
-- Keep unavailable states synchronized with `disabled` or `aria-disabled`.
+- Use a first native `legend` to name each `fieldset`; do not recreate the Radio
+  Group APG pattern with ARIA and JavaScript around native radios.
+- Give every option a non-empty localized label independent from its color,
+  image, tooltip, selected state, or availability mark.
+- Hide only the redundant derived selected-value fragment from the accessible
+  group name. Keep the stable option name visible and exposed.
+- Pair unavailable styling with associated localized text and a non-color cue.
+  Do not use opacity, strikethrough, or native disabled state as the only status.
+- Preserve a target of at least 44 by 44 CSS pixels and separate visible selected
+  and `:focus-visible` indicators at 200% zoom and in forced colors.
+- A controlled framework adapter binds one group value. Static HTML uses
+  `checked` only for its initial uncontrolled value.
 
 ## References
 
+### Target translation
+
+- Neutral Web: canonical CSS plus authored native markup; no base JavaScript.
+- Shopify: render `product_option_value.selected`, exact associated variant,
+  stable ids, native swatch color/image, and option-value ids. The Main Product
+  coordinator performs high-variant Section Rendering and follows
+  `product_url` when a Combined Listing value points to a sibling product.
+- React and Angular: one controlled `value` or uncontrolled `defaultValue` per
+  group with native change semantics.
+- Figma and future native targets: preserve group label, option label, checked,
+  unavailable, and disabled concepts without copying DOM-specific internals.
+
 <PropTable>
-  <tr><td>`.variant-selector`</td><td>class</td><td>—</td><td>Base variant selector styles</td></tr>
-  <tr><td>`.variant-selector__group`</td><td>class</td><td>—</td><td>Single option group</td></tr>
-  <tr><td>`.variant-selector__label`</td><td>class</td><td>—</td><td>Option group label</td></tr>
-  <tr><td>`.variant-swatches`</td><td>class</td><td>—</td><td>Swatch option group</td></tr>
-  <tr><td>`.variant-swatch`</td><td>class</td><td>—</td><td>Single swatch option</td></tr>
-  <tr><td>`.variant-swatch--image`</td><td>modifier</td><td>—</td><td>Image-backed swatch</td></tr>
-  <tr><td>`.variant-swatch--unavailable`</td><td>state</td><td>—</td><td>Unavailable swatch</td></tr>
-  <tr><td>`.variant-swatch__color`</td><td>class</td><td>—</td><td>Swatch color or image surface</td></tr>
-  <tr><td>`.variant-swatch__ring`</td><td>class</td><td>—</td><td>Selected or focus ring layer</td></tr>
-  <tr><td>`.variant-pills`</td><td>class</td><td>—</td><td>Pill option group</td></tr>
-  <tr><td>`.variant-pill`</td><td>class</td><td>—</td><td>Single pill option</td></tr>
-  <tr><td>`.variant-pill--unavailable`</td><td>state</td><td>—</td><td>Unavailable pill option</td></tr>
+  <tr><td>`.variant-selector`</td><td>class</td><td>required</td><td>Collection of one or more product-option groups</td></tr>
+  <tr><td>`.variant-selector__group`</td><td>`fieldset`</td><td>required</td><td>One native radio group</td></tr>
+  <tr><td>`.variant-selector__legend`</td><td>`legend`</td><td>required</td><td>Stable group label and optional derived selected value</td></tr>
+  <tr><td>`.variant-swatches` / `.variant-pills`</td><td>container</td><td>one mode per group</td><td>Intrinsic wrapping option collection</td></tr>
+  <tr><td>`.variant-swatch__input` / `.variant-pill__input`</td><td>radio</td><td>required per option</td><td>Native value, checkedness, validity, events, FormData, and reset owner</td></tr>
+  <tr><td>`.variant-swatch__label` / `.variant-pill__label`</td><td>content</td><td>required per option</td><td>Localized option name</td></tr>
+  <tr><td>`.variant-selector__option-status`</td><td>content</td><td>when unavailable</td><td>Localized associated commercial status</td></tr>
+  <tr><td>`checked`</td><td>boolean</td><td>false</td><td>Initial static-Web checkedness; not an independent live boolean in controlled targets</td></tr>
+  <tr><td>`required` / `groupDisabled` / `disabled`</td><td>boolean</td><td>false</td><td>Native group and option semantics</td></tr>
+  <tr><td>`unavailable` / `unavailableText`</td><td>commerce state</td><td>false / target text</td><td>Commercial availability independent from native disabled</td></tr>
 </PropTable>

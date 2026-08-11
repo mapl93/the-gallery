@@ -1,39 +1,100 @@
 {%- comment -%}
   Snippet: price
-  Usage: {% render 'price', product: product, accessible_label: accessible_label %}
+  Usage: {% render 'price', product: product %}
+  Usage with an exact selected variant: {% render 'price', product: product, variant: current_variant %}
+  Usage with a cart/order line: {% render 'price', line_item: item %}
+
+  Optional localized label overrides:
+  - current_price_label
+  - compare_at_price_label
+  - unit_price_label
 
   Optional OpenType switches:
   - alternate_digits, slashed_zero, tabular_numbers
   - contextual_alternates, fractions
+
+  The owning product or cart surface controls dynamic update announcements.
+  This passive snippet does not add live-region semantics.
 {%- endcomment -%}
 
+{%- liquid
+  assign current_price = product.price
+  assign compare_at_price = product.compare_at_price
+  assign unit_price = blank
+  assign unit_price_measurement = blank
+  assign product_price_varies = false
+
+  if product and variant == blank and line_item == blank
+    assign product_price_varies = product.price_varies
+    if product_price_varies
+      assign compare_at_price = blank
+    endif
+  endif
+
+  if variant
+    assign current_price = variant.price
+    assign compare_at_price = variant.compare_at_price
+    assign unit_price = variant.unit_price
+    assign unit_price_measurement = variant.unit_price_measurement
+  endif
+
+  if line_item
+    assign current_price = line_item.final_line_price
+    assign compare_at_price = line_item.original_line_price
+    assign unit_price = line_item.unit_price
+    assign unit_price_measurement = line_item.unit_price_measurement
+  endif
+-%}
+
 {%- assign on_sale = false -%}
-{%- if product.compare_at_price > product.price -%}
+{%- if compare_at_price > current_price -%}
   {%- assign on_sale = true -%}
 {%- endif -%}
 
-<div
+{%- if current_price_label == blank -%}
+  {%- if product_price_varies -%}
+    {%- assign current_price_label = 'products.price.range' | t -%}
+  {%- elsif on_sale -%}
+    {%- assign current_price_label = 'products.price.sale' | t -%}
+  {%- else -%}
+    {%- assign current_price_label = 'products.price.current' | t -%}
+  {%- endif -%}
+{%- endif -%}
+{%- if compare_at_price_label == blank -%}
+  {%- assign compare_at_price_label = 'products.price.regular' | t -%}
+{%- endif -%}
+{%- if unit_price_label == blank -%}
+  {%- assign unit_price_label = 'products.price.unit' | t -%}
+{%- endif -%}
+
+<span
   class="price{% if on_sale %} price--on-sale{% endif %}"
   data-price-alternate-digits="{% if alternate_digits %}true{% else %}false{% endif %}"
   data-price-slashed-zero="{% if slashed_zero == false %}false{% else %}true{% endif %}"
   data-price-tabular-numbers="{% if tabular_numbers == false %}false{% else %}true{% endif %}"
   data-price-contextual-alternates="{% if contextual_alternates == false %}false{% else %}true{% endif %}"
   data-price-fractions="{% if fractions %}true{% else %}false{% endif %}"
-  {% if accessible_label != blank %}
-    role="group"
-    aria-label="{{ accessible_label | escape }}"
-  {% endif %}
 >
   {%- if on_sale -%}
-    <span class="price__compare">{{ product.compare_at_price | money }}</span>
-    <span class="price__current">{{ product.price | money }}</span>
-  {%- else -%}
-    <span class="price__current">{{ product.price | money }}</span>
+    <s class="price__compare">
+      <span class="price__label">{{ compare_at_price_label | escape }}: </span>
+      <bdi class="price__value">{{ compare_at_price | money }}</bdi>
+    </s>
   {%- endif -%}
-  {%- if product.selected_or_first_available_variant.unit_price -%}
+  <span class="price__current">
+    <span class="price__label">{{ current_price_label | escape }}: </span>
+    <bdi class="price__value">{{ current_price | money }}</bdi>
+    {%- if product_price_varies -%}
+      <span aria-hidden="true"> – </span>
+      <bdi class="price__value">{{ product.price_max | money }}</bdi>
+    {%- endif -%}
+  </span>
+  {%- if unit_price and unit_price_measurement -%}
     <span class="price__unit">
-      {{ product.selected_or_first_available_variant.unit_price | money }}
-      / {{ product.selected_or_first_available_variant.unit_price_measurement.reference_unit }}
+      <span class="price__label">{{ unit_price_label | escape }}: </span>
+      <bdi class="price__value">
+        {{- unit_price | money | unit_price_with_measurement: unit_price_measurement -}}
+      </bdi>
     </span>
   {%- endif -%}
-</div>
+</span>

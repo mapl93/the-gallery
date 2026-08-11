@@ -1,36 +1,47 @@
 ## Overview
 
-Cart Empty explains that no line items are present and may provide a primary recovery path back to shopping. Its icon, supporting message, and action are optional.
+Cart Empty is the cart-specific resolved-absence profile of canonical Empty State. It replaces the prior cart composition when the target authoritatively reports no line items and may provide one recovery destination back to shopping.
 
 <Preview
-  html={'<section class="cart-empty tg-preview-frame--md"><svg class="cart-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7Z" /><path d="M9 10V6a3 3 0 0 1 6 0v4" /></svg><h1 class="cart-empty__title">Your cart is empty</h1><p class="cart-empty__message">Discover objects made to live with.</p><a class="btn cart-empty__action" href="#">Continue shopping</a></section>'}
+  html={'<div class="empty-state cart-empty tg-preview-frame--md"><div class="empty-state__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z" /><path d="M9 10V6a3 3 0 0 1 6 0v4" /></svg></div><h2 class="empty-state__title">Your cart is empty</h2><p class="empty-state__message">Discover objects made to live with.</p><a class="btn" href="/components/product-card">Continue shopping</a></div>'}
   label="Cart Empty"
 />
 
 ## Presentation
 
-The required `title` is the empty-state identity. `icon` is an optional passive slot, `message` adds concise guidance, and the optional action is formed by `actionLabel` and `href` through the Button dependency.
+The `.cart-empty` class is a domain hook layered on `.empty-state`; it adds no independent visual API. Canonical Empty State owns the icon, title, message, container response, wrapping, colors, typography, spacing, and one action slot. The recovery destination is a native Link with canonical Button presentation.
 
-Cart Empty composes the shared Empty State concept but keeps cart-specific recovery copy and destination in target-owned properties.
+`title` is required and non-empty. `icon` and `message` are independently optional. `actionLabel` and `href` form one coherent optional pair: if either value is blank, no action renders and K7 does not invent a fallback destination.
+
+K7 exposes no public presentation tokens, variant, size, heading level, cart count, event, focus target, or announcement property. Customize the composed Empty State and Button rather than adding Cart Empty-specific visual controls.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show the empty state immediately after the final line item is removed.</Do>
-  <Dont>Do not leave stale totals or checkout actions visible beside an empty cart.</Dont>
+  <Do>Replace lines, totals, discount, and checkout controls with Cart Empty after authoritative cart state reaches zero items.</Do>
+  <Dont>Do not leave stale cart actions visible or render a label-only Link with an invented destination.</Dont>
 </DoDont>
 
-- Give the user a direct path back to shopping when a useful destination exists.
-- Keep the message concise and specific to the empty cart.
+- Keep the message concise, truthful, localized, and specific to the empty cart.
+- Provide one direct navigation path when a useful shopping destination exists.
 - Treat the icon as supporting presentation, not the only explanation.
+- Keep recommendations, personalization, cart mutation, loading, errors, and analytics outside K7.
 
 ## Accessibility
 
-- Use an appropriate heading level for `title` in the surrounding page.
-- Keep the recovery action keyboard reachable with a descriptive label.
-- Hide a decorative `icon` from assistive technology; provide an accessible alternative only when it adds meaning not present in text.
-- Move focus deliberately after the final removal only when required by the surrounding cart flow.
-- Announce the transition to an empty cart without duplicating the visible title.
+- Use the contextual native heading selected by the host under ADR 0236. The docs target uses H2 and Shopify main cart uses H1; heading rank is not a K7 property or visual control.
+- Keep the optional icon decorative and hidden because the visible title is text-complete.
+- Use a real native Link with non-empty `href`; preserve Tab, Enter, modified activation, history, and canonical Button focus treatment.
+- Do not add a role, landmark, focus, `tabindex`, live region, or custom keyboard model to the static root.
+- When removal of the final item creates this state dynamically, the parent cart coordinator owns any qualifying pre-existing localized Status output and deliberate focus recovery. Do not duplicate the visible title as an automatic announcement.
+- Remove stale line, total, discount, and checkout focus stops in the same state transition.
+
+## Target Mapping
+
+- Neutral Web: `div.empty-state.cart-empty`, canonical Empty State parts, and one optional `a.btn[href]`.
+- Shopify: authoritative cart state selects the branch; locale strings supply copy; `routes.all_products_collection_url` supplies the recovery destination; the existing Empty State snippet receives the `.cart-empty` profile hook.
+- React and future framework targets: one parent-controlled cart store selects the profile and owns replacement, status, focus, navigation, and analytics.
+- Figma: instance/profile of canonical Empty State. The recorded generic node IDs are traceability metadata, not component-specific visual approval.
 
 ## References
 
@@ -42,9 +53,9 @@ Cart Empty composes the shared Empty State concept but keeps cart-specific recov
 ### API Reference
 
 <PropTable>
-  <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Passive empty-cart icon</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Empty-cart heading</td></tr>
-  <tr><td>`message`</td><td>string</td><td>optional</td><td>Empty-cart guidance</td></tr>
-  <tr><td>`actionLabel`</td><td>string</td><td>optional</td><td>Primary recovery-action label</td></tr>
-  <tr><td>`href`</td><td>string</td><td>optional</td><td>Recovery destination</td></tr>
+  <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Decorative canonical Empty State icon</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible cart-empty title</td></tr>
+  <tr><td>`message`</td><td>string</td><td>optional</td><td>Concise localized recovery guidance</td></tr>
+  <tr><td>`actionLabel`</td><td>string</td><td>optional pair</td><td>Recovery Link label; requires `href`</td></tr>
+  <tr><td>`href`</td><td>string</td><td>optional pair</td><td>Target-owned recovery destination; requires `actionLabel`</td></tr>
 </PropTable>

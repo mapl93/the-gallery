@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "review-highlights",
   "name": "Review Highlights / Themes",
   "registryId": "V5",
   "category": "reviews",
   "status": "pilot",
-  "summary": "Wrapping collection of target-supplied review themes and optional counts without fixed filtering semantics.",
+  "summary": "Native list of target-supplied review themes and optional counts with passive neutral presentation and explicit target-owned navigation or selection projections.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/review-highlights",
@@ -14,46 +14,79 @@
     "docs": "site/src/content/components/review-highlights.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".review-highlights", "className": ".review-highlights", "required": true, "description": "Responsive collection boundary for target-supplied review themes." },
-    { "name": "tag", "selector": ".review-highlights__tag", "className": ".review-highlights__tag", "required": true, "description": "Repeated theme item; its native element and interaction semantics are chosen by the target." },
-    { "name": "count", "selector": ".review-highlights__count", "className": ".review-highlights__count", "required": false, "description": "Optional target-formatted count associated with one theme item." }
+    { "name": "root", "selector": ".review-highlights", "className": ".review-highlights", "required": true, "description": "Native unordered list containing the target-supplied review-theme collection; an optional localized name may identify it." },
+    { "name": "item", "selector": ".review-highlights__tag", "required": true, "description": "Repeated native list item preserving one theme and its optional count as a related unit; the child theme surface is its CSS contract anchor." },
+    { "name": "tag", "selector": ".review-highlights__tag", "className": ".review-highlights__tag", "required": true, "description": "Theme surface rendered as passive text by default or projected by a target as a truthful native link or button." },
+    { "name": "count", "selector": ".review-highlights__count", "className": ".review-highlights__count", "required": false, "description": "Optional visible target-formatted count whose accessible text includes the target-owned unit or context." }
   ],
   "properties": [
     {
       "name": "label",
       "type": "string",
       "required": false,
-      "description": "Optional accessible name for the themes region when surrounding context does not already name it.",
-      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-highlights", "attribute": "aria-label", "valueFrom": "property" }] }
+      "description": "Optional localized accessible name for the native themes list when surrounding content does not already identify it.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".review-highlights", "attribute": "aria-label", "valueFrom": "property", "elements": ["ul"] }]
+      }
     },
     {
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Target-owned repeated theme items and counts; selection mode and result synchronization are not implied.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-highlights__tag", "classNames": [".review-highlights__tag"] }] }
+      "description": "Target-owned repeated native list items containing theme surfaces and optional counts; item mode and result synchronization are not implied.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".review-highlights__tag", "classNames": [".review-highlights__tag", ".review-highlights__count"] }]
+      }
     }
   ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default wrapping theme collection." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Touch-sized theme items with contained long labels." }],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default wrapping native theme collection; semantic item mode remains target-owned." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Compact passive themes with touch-sized native interactive projections." }
+  ],
   "states": [
-    { "name": "default", "selectors": [".review-highlights"], "description": "Theme collection with target-owned item semantics." },
-    { "name": "itemHover", "selectors": [".review-highlights__tag:hover:not(:disabled)"], "description": "Fine-pointer feedback for an available native theme action." },
-    { "name": "itemFocusVisible", "selectors": [".review-highlights__tag:focus-visible"], "description": "Visible keyboard focus on an interactive theme item." },
-    { "name": "pressed", "selectors": [".review-highlights__tag[aria-pressed=\"true\"]"], "description": "Toggle-button selection hook when a target chooses in-place selection." },
-    { "name": "activeClass", "selectors": [".review-highlights__tag.is-active"], "description": "Presentation hook for a target-owned active item; it does not define semantics by itself." },
-    { "name": "disabled", "selectors": [".review-highlights__tag:disabled"], "description": "Unavailable native button item." }
+    { "name": "default", "selectors": [".review-highlights"], "description": "Passive native list with no interaction or selection state." },
+    { "name": "itemHover", "selectors": [".review-highlights__tag:is(a, button):hover:not(:disabled):not([aria-pressed=\"true\"]):not([aria-current])"], "description": "Fine-pointer feedback for an available unselected native target action." },
+    { "name": "itemFocusVisible", "selectors": [".review-highlights__tag:is(a, button):focus-visible"], "description": "Visible keyboard focus on a native link or button projection." },
+    { "name": "projectedSelection", "selectors": [".review-highlights__tag:is([aria-pressed=\"true\"], [aria-current]:not([aria-current=\"false\"]))"], "description": "Shared visual projection for either a target-owned pressed button or a truthful current navigation link." },
+    { "name": "disabled", "selectors": [".review-highlights__tag:disabled"], "description": "Unavailable native target-owned button." }
   ],
   "behavior": [
     {
-      "name": "itemSemanticsBoundary",
+      "name": "nativeCollection",
+      "selectors": [".review-highlights"],
+      "attributes": ["role=\"list\""],
+      "description": "The neutral structure is one unordered native list with one list item per theme. Explicit list role preserves the relationship when visual list markers are removed."
+    },
+    {
+      "name": "itemModeBoundary",
       "selectors": [".review-highlights__tag"],
-      "description": "Targets choose passive text, native navigation, or in-place selection. The neutral component does not define filtering, single versus multiple selection, URLs, or result announcements."
+      "description": "The shared neutral fixture is passive. A target may project native links or buttons only after choosing navigation or in-place selection; the component does not infer filtering, selection cardinality, URLs, result updates or announcements from pill styling."
+    },
+    {
+      "name": "toggleProjection",
+      "selectors": [".review-highlights__tag:is(a, button)"],
+      "attributes": ["type=\"button\"", "aria-pressed", "disabled"],
+      "events": ["click"],
+      "description": "A target-owned in-place selection uses a native button with a stable label and projected pressed state. Static authoring or the target owns initial state, request reconciliation, reset and persistence; Review Highlights adds no neutral state runtime."
+    },
+    {
+      "name": "navigationProjection",
+      "selectors": [".review-highlights__tag:is(a, button)"],
+      "attributes": ["href", "aria-current"],
+      "events": ["click"],
+      "description": "A navigation target supplies a real URL and may expose truthful current-destination state. Review Highlights does not own history, routing, loading or destination focus."
     },
     {
       "name": "countOwnership",
       "selectors": [".review-highlights__count"],
-      "description": "Counts are supplied and synchronized by the target data source rather than calculated by this component."
+      "description": "Visible counts, accessible units, formatting, freshness and synchronization are supplied by the target/provider rather than calculated or announced by this component."
+    },
+    {
+      "name": "emptyCollection",
+      "selectors": [".review-highlights"],
+      "description": "An empty native list is structurally valid. A surrounding review/results owner supplies any visible empty explanation instead of Review Highlights inventing one."
     }
   ],
   "tokens": {
@@ -61,21 +94,21 @@
       "color": ["--color-surface-secondary", "--color-border-subtle", "--color-text-secondary", "--color-border-default", "--color-surface-primary", "--color-text-primary", "--color-border-focus"],
       "radius": ["--radius-full"],
       "spacing": ["--space-layout-touch-target"],
-      "typography": ["--typo-body-sm-size", "--typo-caption-size"],
-      "motion": ["--motion-transition-micro"],
+      "typography": ["--tg-typography-body-small-weight", "--tg-typography-body-caption-weight", "--tg-font-weight-semibold", "--typo-body-sm-size", "--typo-body-sm-line-height", "--typo-caption-size", "--typo-caption-line-height", "--font-family-body"],
       "opacity": ["--opacity-disabled"]
     }
   },
   "accessibility": [
-    "Use native buttons for in-place selection and expose current toggle state with aria-pressed.",
-    "Use native links for navigation and an appropriate current-page attribute when applicable.",
-    "Do not apply interactive semantics or a pointer cursor to passive theme text.",
-    "Do not rely on color alone to communicate a target-owned active state.",
-    "Keep each count programmatically associated with its theme label."
+    "Render the collection as a native unordered list with native list items and preserve list semantics when visual markers are removed.",
+    "Use passive text for the neutral fixture, a native link with a real URL for navigation, or a native button for target-owned in-place selection.",
+    "Expose toggle selection with aria-pressed and a stable button label; use aria-current only for a truthful current navigation destination.",
+    "Do not use a semanticless active class, pointer behavior, focus treatment or action-sized geometry on passive theme text.",
+    "Keep every optional count inside its theme item and provide an accessible target-localized unit or context rather than exposing a bare ambiguous number.",
+    "A target-owned results controller handles loading, empty results, focus and complete localized status announcements without making Review Highlights a live region."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Wrapping, touch, focus, disabled, forced-color, and reduced-motion presentation is implemented; item effects remain target-owned." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must define theme data and item semantics before adding filtering behavior." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Native list/list-item anatomy, passive shared presentation and truthful native link/button state hooks are implemented without neutral component JavaScript or motion." },
+    "shopify": { "status": "planned", "kind": "theme-app-block-css", "notes": "A future review-provider theme app block supplies taxonomy, localized counts and any URLs/actions while consuming generated Gallery CSS; no provider-free Liquid is implied." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

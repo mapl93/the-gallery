@@ -1,0 +1,140 @@
+{% liquid
+  assign section_title = section.settings.title | strip
+  assign heading_id = 'GalleryGrid-' | append: section.id | append: '-Title'
+  assign variant_class = ''
+  assign image_sizes = '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 512px) 50vw, 100vw'
+  if section.settings.variant == 'masonry'
+    assign variant_class = ' gallery-grid--masonry'
+    assign image_sizes = '(min-width: 768px) 33vw, (min-width: 512px) 50vw, 100vw'
+  endif
+
+  assign valid_item_count = 0
+  for block in section.blocks
+    assign image_alt = block.settings.image_alt | strip
+    if image_alt == blank and block.settings.image != blank
+      assign image_alt = block.settings.image.alt | strip
+    endif
+
+    assign has_image_semantics = false
+    if block.settings.image_decorative or image_alt != blank
+      assign has_image_semantics = true
+    endif
+
+    if block.type == 'image' and block.settings.image != blank and has_image_semantics
+      assign valid_item_count = valid_item_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if valid_item_count > 0 %}
+  {% if section_title != blank %}
+    <section class="gallery-grid{{ variant_class }}" aria-labelledby="{{ heading_id }}">
+  {% else %}
+    <div class="gallery-grid{{ variant_class }}">
+  {% endif %}
+    {% if section_title != blank %}
+      <div class="gallery-grid__header">
+        <h2 class="gallery-grid__title" id="{{ heading_id }}">{{ section_title | escape }}</h2>
+      </div>
+    {% endif %}
+
+    <ul class="gallery-grid__items">
+      {% for block in section.blocks %}
+        {% liquid
+          assign image_alt = block.settings.image_alt | strip
+          if image_alt == blank and block.settings.image != blank
+            assign image_alt = block.settings.image.alt | strip
+          endif
+          if block.settings.image_decorative
+            assign image_alt = ''
+          endif
+
+          assign has_image_semantics = false
+          if block.settings.image_decorative or image_alt != blank
+            assign has_image_semantics = true
+          endif
+        %}
+
+        {% if block.type == 'image' and block.settings.image != blank and has_image_semantics %}
+          <li class="gallery-grid__item" {{ block.shopify_attributes }}>
+            {{ block.settings.image | image_url: width: 1800 | image_tag:
+              alt: image_alt,
+              class: 'gallery-grid__media',
+              loading: 'lazy',
+              widths: '320, 480, 640, 800, 1080, 1440, 1800',
+              sizes: image_sizes
+            }}
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% if section_title != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.gallery_grid.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.gallery_grid.settings.title"
+    },
+    {
+      "type": "select",
+      "id": "variant",
+      "label": "t:sections.gallery_grid.settings.variant",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:sections.gallery_grid.options.grid"
+        },
+        {
+          "value": "masonry",
+          "label": "t:sections.gallery_grid.options.masonry"
+        }
+      ],
+      "default": "grid"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.gallery_grid.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.gallery_grid.blocks.image.settings.image"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_decorative",
+          "label": "t:sections.gallery_grid.blocks.image.settings.image_decorative",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "t:sections.gallery_grid.blocks.image.settings.image_alt"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.gallery_grid.name",
+      "blocks": [
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

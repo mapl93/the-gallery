@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "urgency",
   "name": "Urgency Indicators",
   "registryId": "G8",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Passive urgency message with low-stock, selling-fast, viewers, or recent-sale visual treatment selected from truthful target data.",
+  "summary": "Passive text-complete commercial signal with an explicit target-backed claim type, an optional decorative cue, strict invalid omission, and no neutral runtime.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/urgency",
@@ -25,23 +25,18 @@
       "description": "Passive urgency message root."
     },
     {
-      "name": "lowStockIndicator",
-      "selector": ".urgency--low-stock::before",
+      "name": "cue",
+      "selector": ".urgency__cue",
+      "className": ".urgency__cue",
       "required": false,
-      "generated": true,
-      "description": "Generated visual pulse used by the low-stock presentation."
+      "description": "Optional decorative type-appropriate dot or icon that reinforces but never communicates or verifies the claim."
     },
     {
-      "name": "sellingFastIcon",
-      "selector": ".urgency--selling-fast svg",
-      "required": false,
-      "description": "Optional visual icon in the selling-fast presentation."
-    },
-    {
-      "name": "emphasis",
-      "selector": ".urgency--viewers strong",
-      "required": false,
-      "description": "Optional textual emphasis within the viewers presentation."
+      "name": "message",
+      "selector": ".urgency__message",
+      "className": ".urgency__message",
+      "required": true,
+      "description": "Non-empty visible localized wording that completely communicates the target-backed claim."
     }
   ],
   "variants": [
@@ -49,13 +44,13 @@
       "name": "low-stock",
       "className": ".urgency--low-stock",
       "default": true,
-      "description": "Warning-family presentation for a truthful low-stock claim; the required semantic property prevents this registry default marker from becoming an inferred data default."
+      "description": "Warning-family presentation for a truthful low-stock claim; the required semantic property prevents this technical registry default marker from becoming a runtime claim default."
     },
     {
       "name": "selling-fast",
       "className": ".urgency--selling-fast",
       "default": false,
-      "description": "Error-family presentation for a truthful selling-fast claim."
+      "description": "Warning-family presentation for a truthful selling-fast claim without treating promotional pressure as Error or Critical feedback."
     },
     {
       "name": "viewers",
@@ -84,15 +79,7 @@
       "selectors": [
         ".urgency"
       ],
-      "description": "Passive message presentation; variant classes represent meaning, not interaction state."
-    },
-    {
-      "name": "animatedCue",
-      "selectors": [
-        ".urgency--low-stock::before",
-        ".urgency--selling-fast svg"
-      ],
-      "description": "Optional motion cue disabled when reduced motion is requested."
+      "description": "Valid non-empty passive claim with an explicitly selected type, optional decorative cue, and no focus, interaction, live region, motion, controlled state, or neutral runtime."
     }
   ],
   "behavior": [
@@ -101,7 +88,7 @@
       "selectors": [
         ".urgency"
       ],
-      "description": "The target supplies and verifies the message and its semantic presentation; the source contract does not define thresholds, viewer counting, sale recency, or a runtime default."
+      "description": "The target supplies one already-qualified localized message and semantic claim type under ADR 0252; the source contract performs no inventory, velocity, session, sale-event, freshness, privacy, polling, expiry, or runtime-default work."
     }
   ],
   "properties": [
@@ -109,12 +96,13 @@
       "name": "message",
       "type": "string",
       "required": true,
-      "description": "Visible, self-contained urgency statement supplied from truthful target data.",
+      "unsetBehavior": "Trim the value and omit the complete component when the visible message is empty.",
+      "description": "Non-empty visible localized statement that completely communicates the target-backed claim without its decorative cue.",
       "targetMappings": {
         "web": [
           {
             "kind": "content",
-            "selector": ".urgency"
+            "selector": ".urgency__message"
           }
         ]
       }
@@ -124,7 +112,8 @@
       "type": "enum",
       "required": true,
       "valuesFrom": "variants",
-      "description": "Explicit semantic treatment selected from target data; required so the contract does not infer an urgency default.",
+      "unsetBehavior": "Omit the complete component when no valid explicit claim type is supplied; never fall back to low-stock at runtime.",
+      "description": "Explicit semantic claim type selected from target data; required so the contract does not infer an urgency default.",
       "targetMappings": {
         "web": [
           {
@@ -139,7 +128,6 @@
   "tokens": {
     "public": {
       "color": [
-        "--color-feedback-error-default",
         "--color-feedback-warning-default",
         "--color-text-primary",
         "--color-text-secondary"
@@ -147,26 +135,35 @@
       "radius": [
         "--radius-full"
       ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--tg-font-weight-semibold",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size"
       ]
     }
   },
   "accessibility": [
-    "Communicate the complete claim in text and do not rely on color, icon, or motion alone.",
-    "Do not expose unverified stock, sales, or viewer claims.",
-    "Keep the indicator passive and out of the keyboard focus order.",
-    "Disable pulse animation when the user requests reduced motion."
+    "Render one native paragraph with a required non-empty visible message and explicit valid claim type; omit invalid or blank composition.",
+    "Communicate the complete claim in visible text and hide every optional redundant cue from assistive technology.",
+    "Do not add alert, status, live-region, focus, keyboard, pointer, dismissal, or interaction semantics to the passive base.",
+    "Author no animation or transition; reduced motion causes no change because the component has no motion.",
+    "Permit long, localized, RTL, unbroken, and enlarged messages to wrap without clipping, truncation, overlap, or visual reordering.",
+    "Do not expose unverified or stale inventory, sales-velocity, viewer-count, or recent-sale claims; target truth and freshness are render preconditions."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Visual treatments are implemented; thresholds, data truth, and runtime defaults remain target-owned and unresolved."
+      "kind": "html-css-composition",
+      "notes": "Implemented as a conditionally rendered native paragraph with named decorative cue/message parts, complete semantic typography, intrinsic containment, explicit claim type, strict omission, zero motion/live behavior, and zero neutral runtime."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "liquid-css",
+      "notes": "A target adapter is deferred until that target documents and proves the ADR 0252 authoritative source, claim qualification, selected-variant/market scope where applicable, refresh/expiry, privacy, placement, and stale/error omission behavior."
     },
     "react": {
       "status": "planned",

@@ -1,0 +1,63 @@
+{%- comment -%}
+  Snippet: cart-summary
+  Usage: {% render 'cart-summary', summary_id: 'CartPageSummary', show_express: true %}
+
+  Render inside a native Shopify cart form. Cart Summary presents real cart
+  facts and the checkout submitter; Shopify owns calculation, money formatting,
+  provider availability, submission, redirect, errors, section refresh and
+  announcements. Provider-owned accelerated checkout markup remains opaque.
+{%- endcomment -%}
+
+{%- liquid
+  assign summary_id = summary_id | default: 'CartSummary'
+  assign note_key = 'cart.tax_note'
+  if cart.requires_shipping
+    assign note_key = 'cart.shipping_note'
+  endif
+  if cart.taxes_included
+    assign note_key = 'cart.taxes_included_note'
+    if cart.requires_shipping
+      assign note_key = 'cart.taxes_included_shipping_note'
+    endif
+  endif
+-%}
+
+<section class="cart-summary" aria-labelledby="{{ summary_id }}Title">
+  <h2 class="cart-summary__title" id="{{ summary_id }}Title">
+    {{ 'cart.summary_title' | t }}
+  </h2>
+
+  <dl class="cart-summary__rows">
+    <div class="cart-summary__row">
+      <dt class="cart-summary__label">{{ 'cart.subtotal' | t }}</dt>
+      <dd class="cart-summary__value"><bdi>{{ cart.items_subtotal_price | money }}</bdi></dd>
+    </div>
+
+    {%- for discount in cart.cart_level_discount_applications -%}
+      <div class="cart-summary__row">
+        <dt class="cart-summary__label">{{ discount.title | escape }}</dt>
+        <dd class="cart-summary__value"><bdi>−{{ discount.total_allocated_amount | money }}</bdi></dd>
+      </div>
+    {%- endfor -%}
+
+    <div class="cart-summary__row cart-summary__row--total">
+      <dt class="cart-summary__label">{{ 'cart.estimated_total' | t }}</dt>
+      <dd class="cart-summary__value"><bdi>{{ cart.total_price | money_with_currency }}</bdi></dd>
+    </div>
+  </dl>
+
+  <p class="cart-summary__note">{{ note_key | t }}</p>
+
+  <button type="submit" name="checkout" class="btn btn--full cart-summary__checkout">
+    {{ 'cart.checkout' | t }}
+  </button>
+
+  {%- if show_express and additional_checkout_buttons -%}
+    <div class="cart-summary__express">
+      <div class="cart-summary__divider"><span>{{ 'cart.express_separator' | t }}</span></div>
+      <div class="additional-checkout-buttons--vertical">
+        {{ content_for_additional_checkout_buttons }}
+      </div>
+    </div>
+  {%- endif -%}
+</section>

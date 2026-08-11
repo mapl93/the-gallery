@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildRuntimeSources, runtimeModulesForComponents } from './lib/runtime-modules.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = path.join(repoRoot, 'registry.json');
@@ -14,6 +15,8 @@ const outputPaths = {
   tokens: path.join(assetsDir, 'tokens.css'),
   base: path.join(assetsDir, 'base.css'),
   javascript: path.join(assetsDir, 'theme.js'),
+  runtimeLoader: path.join(assetsDir, 'runtime-loader.js'),
+  runtimeCore: path.join(assetsDir, 'tg-runtime-core.js'),
   manifest: path.join(shopifyDir, 'adapter.manifest.json'),
   summary: path.join(shopifyDir, 'adapter.summary.json')
 };
@@ -79,9 +82,11 @@ const shopifyDataObjects = [
   'cart',
   'collection',
   'customer',
+  'gift_card',
   'linklists',
   'localization',
   'page',
+  'policy',
   'product',
   'recommendations',
   'request',
@@ -185,10 +190,7 @@ function sourceNameForPath(filePath) {
 
 function classSetForLiquid(liquid) {
   const classes = new Set();
-
-  for (const match of liquid.matchAll(/class\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) {
-    const raw = match[1] ?? match[2] ?? '';
-
+  const addClasses = (raw) => {
     for (const token of raw.split(/\s+/)) {
       const normalized = token.replace(/[{}%]/g, '').trim();
 
@@ -196,13 +198,23 @@ function classSetForLiquid(liquid) {
         classes.add(normalized);
       }
     }
+  };
+
+  for (const match of liquid.matchAll(/class\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) {
+    addClasses(match[1] ?? match[2] ?? '');
+  }
+
+  for (const match of liquid.matchAll(/(?<!["'])\bclass\s*:\s*(?:"([^"]*)"|'([^']*)')/g)) {
+    addClasses(match[1] ?? match[2] ?? '');
   }
 
   return classes;
 }
 
 function stripLiquidComments(liquid) {
-  return liquid.replace(/{%-?\s*comment\s*-?%}[\s\S]*?{%-?\s*endcomment\s*-?%}/g, '');
+  return liquid
+    .replace(/{%-?\s*comment\s*-?%}[\s\S]*?{%-?\s*endcomment\s*-?%}/g, '')
+    .replace(/{%-?\s*doc\s*-?%}[\s\S]*?{%-?\s*enddoc\s*-?%}/g, '');
 }
 
 function uniqueSorted(values) {
@@ -795,6 +807,20 @@ function copyThemeJs() {
   write(outputPaths.javascript, read(jsSourcePath));
 }
 
+function buildModularRuntime() {
+  const runtime = buildRuntimeSources(repoRoot, {
+    moduleFile: (id) => `tg-runtime-${id}.js`,
+    coreImport: './tg-runtime-core.js',
+    loaderExpression: '`./tg-runtime-${definition.id}.js`',
+  });
+  write(outputPaths.runtimeCore, runtime.core);
+  for (const [fileName, source] of runtime.modules) {
+    write(path.join(assetsDir, fileName), source);
+  }
+  write(outputPaths.runtimeLoader, runtime.loader);
+  return runtime;
+}
+
 function buildLiquidInventory() {
   return liquidFiles().map((filePath) => {
     const liquid = read(filePath);
@@ -815,13 +841,11 @@ function buildLiquidInventory() {
   });
 }
 
-function liquidHitsForClass(liquidInventory, className) {
-  if (!className) {
-    return [];
-  }
-
-  return liquidInventory
-    .filter((file) => file.classes.includes(className));
+function liquidHitsForComponent(liquidInventory, className, slug) {
+  return liquidInventory.filter((file) => (
+    (className && file.classes.includes(className))
+    || file.name === slug
+  ));
 }
 
 function cssOutputForSource(sourceFile) {
@@ -833,7 +857,37 @@ function cssOutputForSource(sourceFile) {
   return asset ? `platforms/shopify/assets/${asset.output}` : null;
 }
 
-function buildManifest(registry, contracts) {
+function resolveComponentDependencies(registry, slug, resolved = new Set(), order = []) {
+  if (resolved.has(slug)) return order;
+  const component = registry.components[slug];
+  assert(component, `${slug} is missing from registry.json`);
+  for (const dependency of component.dependencies ?? []) {
+    resolveComponentDependencies(registry, dependency, resolved, order);
+  }
+  resolved.add(slug);
+  order.push(slug);
+  return order;
+}
+
+function installDescriptor(registry, runtimeConfig, slug) {
+  const dependencyClosure = resolveComponentDependencies(registry, slug);
+  const css = [
+    relative(outputPaths.tokens),
+    relative(outputPaths.base),
+    ...dependencyClosure.map((componentSlug) => cssOutputForSource(registry.components[componentSlug].file)),
+  ].filter(Boolean);
+  const runtimeIds = runtimeModulesForComponents(runtimeConfig, dependencyClosure);
+  return {
+    dependencyClosure,
+    css: [...new Set(css)],
+    runtime: runtimeIds.length === 0
+      ? []
+      : [relative(outputPaths.runtimeCore), ...runtimeIds.map((id) => `platforms/shopify/assets/tg-runtime-${id}.js`)],
+    runtimeLoader: runtimeIds.length > 0 ? relative(outputPaths.runtimeLoader) : null,
+  };
+}
+
+function buildManifest(registry, contracts, runtime) {
   const liquidInventory = buildLiquidInventory();
   const templateInventory = buildTemplateInventory();
   const compositionInventory = buildCompositionInventory(liquidInventory, templateInventory);
@@ -872,7 +926,7 @@ function buildManifest(registry, contracts) {
     assert(contract, `${slug} is missing a component contract`);
 
     const className = selectorClass(registryComponent.selector);
-    const liquidHits = liquidHitsForClass(liquidInventory, className);
+    const liquidHits = liquidHitsForComponent(liquidInventory, className, slug);
     const shopifyAdapter = contract.adapters?.shopify ?? { status: 'planned', kind: 'liquid-css' };
     const cssOutput = cssOutputForSource(registryComponent.file);
     const maturity = buildMaturity({ registryComponent, contract, shopifyAdapter, liquidHits, cssOutput, compositionInventory, renderApis });
@@ -974,6 +1028,7 @@ function buildManifest(registry, contracts) {
         docs: contract.source.docs
       },
       dependencies: registryComponent.dependencies ?? [],
+      install: installDescriptor(registry, runtime.config, slug),
       publicTokens: flattenPublicTokens(contract),
       contractAdapter: shopifyAdapter,
       maturity,
@@ -999,6 +1054,9 @@ function buildManifest(registry, contracts) {
     tokens: relative(outputPaths.tokens),
     base: relative(outputPaths.base),
     javascript: relative(outputPaths.javascript),
+    runtimeLoader: relative(outputPaths.runtimeLoader),
+    runtimeCore: relative(outputPaths.runtimeCore),
+    runtimeModules: [...runtime.modules.keys()].map((fileName) => `platforms/shopify/assets/${fileName}`),
     manifest: relative(outputPaths.manifest),
     summary: relative(outputPaths.summary),
     cssAssets: componentCssAssets.map((asset) => `platforms/shopify/assets/${asset.output}`)
@@ -1047,6 +1105,7 @@ function buildManifest(registry, contracts) {
     plannedWithLiquid,
     implementedMissingRequiredLiquid,
     cssAssets: componentCssAssets.length + 1,
+    runtimeModules: runtime.modules.size,
     liquidFiles: liquidInventory.length,
     templateJsonFiles: templateInventory.files.length
   };
@@ -1129,7 +1188,7 @@ function buildManifest(registry, contracts) {
 
   const manifest = {
     $schema: 'https://the-gallery.dev/schema/shopify-adapter-manifest.json',
-    manifestVersion: '0.1.0',
+    manifestVersion: '0.2.0',
     target: {
       id: 'shopify',
       name: 'Shopify',
@@ -1144,6 +1203,7 @@ function buildManifest(registry, contracts) {
       tokens: 'platforms/shopify/assets/tokens.css',
       css: 'components/css',
       javascript: 'components/js/theme.js',
+      runtimeModules: 'components/js/runtime-modules.json',
       liquid: [
         'platforms/shopify/layout',
         'platforms/shopify/blocks',
@@ -1164,6 +1224,7 @@ function buildManifest(registry, contracts) {
       tokenOwnership: 'tokens.css is generated from platforms/web/tokens.css and should not be edited directly.',
       baseOwnership: 'base.css is generated from reset, foundations, and utilities source CSS; it must not define token values.',
       componentCssOwnership: 'Component CSS assets are copied from components/css and should be regenerated from source.',
+      runtimeDelivery: 'runtime-loader.js imports only the progressive-enhancement modules matched by rendered Liquid; theme.js remains a compatibility and diagnostic aggregate.',
       liquidOwnership: 'Liquid files are Shopify adapter source and may map Shopify objects/settings into component contracts.',
       maturityOwnership: 'Shopify maturity is computed from contract status, CSS output, Liquid evidence, section/block schema, data mapping, template composition, editor-preview readiness, and behavior requirements. Class-level contracts do not require dedicated Liquid roots.',
       distribution: 'Consumer Shopify themes copy and own the generated adapter files locally.'
@@ -1207,7 +1268,7 @@ function buildManifest(registry, contracts) {
 
   const summary = {
     $schema: 'https://the-gallery.dev/schema/shopify-adapter-summary.json',
-    summaryVersion: '0.1.0',
+    summaryVersion: '0.2.0',
     target: manifest.target,
     outputs,
     loadOrder: manifest.loadOrder,
@@ -1265,7 +1326,8 @@ function main() {
   buildBaseCss();
   copyComponentCssAssets();
   copyThemeJs();
-  buildManifest(registry, contracts);
+  const runtime = buildModularRuntime();
+  buildManifest(registry, contracts, runtime);
 
   console.log(`Built Shopify adapter: ${relative(outputPaths.base)}, ${relative(outputPaths.javascript)}, ${relative(outputPaths.manifest)}, ${relative(outputPaths.summary)}.`);
 }

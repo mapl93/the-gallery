@@ -1,36 +1,70 @@
 ## Overview
 
-Comparison Table frames a target-owned native table with an optional visible section heading. The table slot retains caption, header, row, and cell semantics.
+Comparison Table frames one finite target-owned matrix using canonical Data Table. It can remain passive or expose controlled alternative selection through canonical Radio or Checkbox controls. The table stays native: ordinary cells are not grid widgets, selection controls live only in alternative headers, and optional CTA controls remain independent from selection.
+
+<Preview html={'<section class="comparison-table tg-preview-frame" aria-labelledby="comparison-table-title" data-interaction="selectable" data-selection-mode="single"><div class="comparison-table__inner"><h2 class="comparison-table__title" id="comparison-table-title">Choose your finish</h2><div class="comparison-table__scroll table-wrapper" tabindex="0" aria-label="Choose your finish table scroll area"><table class="comparison-table__table table"><caption class="visually-hidden" id="comparison-table-caption">Finish qualities and available actions for Satin and Gloss</caption><thead><tr><th scope="col">Quality</th><th class="comparison-table__highlight" scope="col"><span class="comparison-table__alternative"><label class="radio comparison-table__choice"><input class="radio__input" type="radio" name="finish" value="satin" checked aria-describedby="comparison-table-caption"/><span class="radio__label" dir="auto">Satin</span></label><span class="comparison-table__claim" dir="auto">Gallery choice</span></span></th><th scope="col"><span class="comparison-table__alternative"><label class="radio comparison-table__choice"><input class="radio__input" type="radio" name="finish" value="gloss" aria-describedby="comparison-table-caption"/><span class="radio__label" dir="auto">Gloss</span></label></span></th></tr></thead><tbody><tr><th scope="row">Soft reflection</th><td class="comparison-table__highlight"><span class="comparison-table__status"><span class="comparison-table__check" aria-hidden="true">&#10003;</span><span class="visually-hidden">Included</span></span></td><td><span class="comparison-table__status"><span class="comparison-table__cross" aria-hidden="true">&#215;</span><span class="visually-hidden">Not included</span></span></td></tr><tr><th scope="row">Surface character</th><td class="comparison-table__highlight">Low sheen</td><td>Reflective</td></tr></tbody><tfoot><tr><th scope="row">Actions</th><td class="comparison-table__highlight"><a class="link link--subtle comparison-table__action" href="/collections/satin-finish">View Satin</a></td><td><button class="btn btn--outline btn--sm comparison-table__action" type="button">Request sample</button></td></tr></tfoot></table></div></div></section>'} label="Comparison Table" />
 
 ## Presentation
 
-<Preview html={'<section class="comparison-table" tabindex="0" role="region" aria-labelledby="comparison-table-title"><h2 class="comparison-table__title" id="comparison-table-title">Collection comparison</h2><table><caption>Features included in the Core and Studio collections</caption><thead><tr><th scope="col">Feature</th><th scope="col">Core</th><th class="comparison-table__highlight" scope="col">Studio</th></tr></thead><tbody><tr><th scope="row">Hand finished</th><td><span class="comparison-table__check">Included</span></td><td class="comparison-table__highlight"><span class="comparison-table__check">Included</span></td></tr><tr><th scope="row">Signed certificate</th><td><span class="comparison-table__cross">Not included</span></td><td class="comparison-table__highlight"><span class="comparison-table__check">Included</span></td></tr><tr><th scope="row">Gift packaging</th><td><span class="comparison-table__cross">Not included</span></td><td class="comparison-table__highlight"><span class="comparison-table__check">Included</span></td></tr></tbody></table></section>'} label="Comparison Table" />
+`interaction="passive"` is the semantic default and omits selection controls; explicit target-composed links or buttons may still appear. `interaction="selectable"` adds controlled selection. `selectionMode="single"` uses one native named Radio group, while `multiple` uses independent native Checkboxes.
 
-The parent supplies overflow containment and optional title treatment. The `table` slot owns the complete native table, including any highlighted header or cells.
+The optional highlighted column is only visual emphasis. A recommendation, savings claim, “best value” label, availability statement, or other commercial meaning must be complete target-owned text. Checking an alternative never activates its CTA, and activating a CTA never silently changes selection.
 
-## Usage Guidelines
+The optional title remains outside horizontal scrolling. Canonical Data Table owns the native table surface, caption, headers, cell presentation, separators, overflow wrapper, wrapper focus, and responsive scroll. Every target must declare finite matrix bounds; Neutral Web intentionally does not impose a two-offering cap.
+
+## Guidelines
 
 <DoDont>
-  <Do>Use concise row headers, a descriptive caption, and consistent values that support direct comparison.</Do>
-  <Dont>Do not replace meaningful cell text with color or an unexplained icon alone.</Dont>
+  <Do>Use one native matrix with complete alternative labels, criterion labels, values, and explicit claims or actions.</Do>
+  <Dont>Do not turn ordinary cells into a grid, infer recommendations from highlight, or combine selection and CTA activation.</Dont>
 </DoDont>
 
-Use column highlighting sparingly and preserve the same information when custom colors are unavailable.
+- Use `scope` for simple row/column headers; use explicit `id`/`headers` associations for complex matrices.
+- Keep a real caption, even when visually hidden, and use it as concise selection context.
+- Use Radio for mutually exclusive choice and Checkbox for independent multiple choice.
+- Treat `selectedId` and `selectedIds` as controlled target state; update them from the emitted next selection.
+- Keep action destinations, button behavior, persistence, analytics, prices, units, localization, and claims in their owning target.
+- Preserve every essential column; horizontal scrolling is preferable to hiding data or creating an unrelated card layout.
+- Pair checks, crosses, abbreviations, prices, and quantities with meaningful text.
 
 ## Accessibility
 
-- Use a native `table` with a descriptive `caption` and correctly scoped row and column headers.
-- Keep inclusion and exclusion understandable as text, not color alone.
-- Make a horizontally overflowing region keyboard reachable and give it an accessible label.
-- Preserve visible focus and avoid changing logical cell order for responsive presentation.
+- A title creates a named native section; without a title, use a generic root.
+- Keep the canonical table wrapper keyboard reachable and visibly focused, while the title stays outside its horizontal scroll.
+- Native Radios share one non-empty name and support Tab, Space, and arrow-key movement. Native Checkboxes support independent Tab and Space activation.
+- Give every choice a visible alternative label and contextual description through the table caption.
+- Keep ordinary `th` and `td` cells passive and unfocusable; do not add `role="grid"`, roving tabindex, or directional cell navigation.
+- Keep highlight, checked state, explicit claim text, and CTA activation as four separate meanings.
+- Preserve source order, complete text, 200% text, user spacing, forced-color boundaries, and reduced-motion behavior.
 
-## References
+## Specification
 
-**Dependencies:** None.
+**Dependencies:** canonical Data Table, Radio, Checkbox, Link, and Button.
 
-**Anatomy:** `.comparison-table`, `.comparison-table__title`, native `table`, `th`, and `td` elements, `.comparison-table__highlight`, `.comparison-table__check`, and `.comparison-table__cross`.
+**Anatomy:** conditional `.comparison-table` root, `.comparison-table__inner`, optional title, required `.comparison-table__scroll.table-wrapper`, native `.comparison-table__table.table` with caption/headers/rows/cells, alternative headers, optional canonical choice controls, optional visual highlight and explicit claim text, text-complete status cells, and optional independent canonical actions.
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible comparison heading</td></tr>
-  <tr><td>`table`</td><td>slot</td><td>required</td><td>Target-owned native comparison table</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible contextual heading and section name</td></tr>
+  <tr><td>`table`</td><td>slot</td><td>required</td><td>Finite target-owned canonical Data Table composition</td></tr>
+  <tr><td>`interaction`</td><td>enum</td><td>`passive`</td><td>`passive` or `selectable`; controls selection only</td></tr>
+  <tr><td>`selectionMode`</td><td>enum</td><td>`single`</td><td>`single` Radio group or `multiple` Checkboxes when selectable</td></tr>
+  <tr><td>`selectedId`</td><td>string</td><td>optional</td><td>Controlled selected alternative id for single mode</td></tr>
+  <tr><td>`selectedIds`</td><td>string-list</td><td>optional</td><td>Controlled selected alternative ids for multiple mode</td></tr>
 </PropTable>
+
+## Shopify Translation
+
+Owner decision 66 selects a variable but finite metaobject-backed matrix for Shopify. A dedicated adapter will reference one matrix record plus ordered alternative, criterion, and cell records. It must declare numeric alternative/criterion/cell limits, validate stable ids and complete rectangular relationships, preserve localized display strings, and define selection persistence and CTA behavior before becoming target-ready.
+
+Custom or app-owned metaobject definitions cannot be used by a Theme Store-listed theme setting. The adapter must therefore distinguish custom storefront/app delivery from the Theme Store-safe profile rather than claiming one implementation covers both. Neutral Web keeps no Shopify schema or fixed two-offering limit.
+
+## Research References
+
+- [WAI Tables Tutorial](https://www.w3.org/WAI/tutorials/tables/)
+- [WAI Radio Group Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
+- [WAI Checkbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/)
+- [WAI Grouping Controls](https://www.w3.org/WAI/tutorials/forms/grouping/)
+- [Open UI Table](https://open-ui.org/components/table/)
+- [Shopify input settings: `metaobject_list`](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings)
+- [Shopify metaobject limits](https://shopify.dev/docs/apps/build/metaobjects/metaobject-limits)
+- [Shopify Theme Store requirements](https://shopify.dev/docs/storefronts/themes/store/requirements)

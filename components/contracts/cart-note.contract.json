@@ -1,60 +1,237 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "cart-note",
   "name": "Cart Note",
   "registryId": "K10",
   "category": "cart",
   "status": "pilot",
-  "summary": "Expandable order note area that composes a textarea for cart-level instructions.",
-  "dependencies": ["textarea"],
+  "summary": "Native order-note disclosure that composes one canonical Textarea while persistence remains target-owned.",
+  "dependencies": [
+    "textarea"
+  ],
   "source": {
     "registry": "registry.json#/components/cart-note",
-    "css": { "file": "components/css/cart.css", "selector": ".cart-note" },
+    "css": {
+      "file": "components/css/cart.css",
+      "selector": ".cart-note"
+    },
     "docs": "site/src/content/components/cart-note.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".cart-note", "className": ".cart-note", "required": true, "description": "Cart note wrapper." },
-    { "name": "toggle", "selector": ".cart-note__toggle", "className": ".cart-note__toggle", "required": true, "description": "Note disclosure toggle." },
-    { "name": "field", "selector": ".cart-note__field", "className": ".cart-note__field", "required": false, "description": "Textarea field wrapper or field hook." }
+    {
+      "name": "root",
+      "selector": ".cart-note",
+      "className": ".cart-note",
+      "required": true,
+      "description": "Native details disclosure for one cart-level note field."
+    },
+    {
+      "name": "toggle",
+      "selector": ".cart-note__toggle",
+      "className": ".cart-note__toggle",
+      "required": true,
+      "description": "Required native summary with a non-empty localized disclosure label."
+    },
+    {
+      "name": "field",
+      "selector": ".cart-note__field",
+      "className": ".cart-note__field",
+      "required": true,
+      "description": "Required complete canonical Textarea; its native field remains mounted when the disclosure closes."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default cart note field." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default cart-note disclosure."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default cart note size." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One intrinsic size governed by the parent width and canonical Textarea."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".cart-note"], "description": "Default cart note state." },
-    { "name": "collapsed", "selectors": [".cart-note[data-expanded=\"false\"] .cart-note__field"], "description": "Collapsed disclosure state emitted by the expanded property." },
-    { "name": "toggleFocus", "selectors": [".cart-note__toggle:focus-visible"], "description": "Visible note-disclosure focus state." }
+    {
+      "name": "closed",
+      "selectors": [
+        ".cart-note"
+      ],
+      "description": "Native closed disclosure; the mounted Textarea content is hidden by details without losing its live state."
+    },
+    {
+      "name": "open",
+      "selectors": [
+        ".cart-note__field"
+      ],
+      "description": "Native open disclosure exposing the complete canonical Textarea."
+    },
+    {
+      "name": "toggleFocus",
+      "selectors": [
+        ".cart-note__toggle:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the native disclosure summary."
+    }
   ],
   "behavior": [
-    { "name": "noteDisclosure", "selectors": [".cart-note__toggle"], "attributes": ["aria-expanded", "aria-controls"], "events": ["click"], "description": "Toggle should reveal or hide the order note textarea when collapsed by default." },
-    { "name": "notePersistence", "selectors": [".cart-note__field"], "events": ["change", "blur"], "description": "Order note content should persist to the target cart note field." }
+    {
+      "name": "nativeDisclosure",
+      "selectors": [
+        ".cart-note",
+        ".cart-note__toggle"
+      ],
+      "attributes": [
+        "open on details establishes the initial static state"
+      ],
+      "events": [
+        "toggle"
+      ],
+      "description": "Native details and summary own static Web disclosure semantics, keyboard activation, hidden-content behavior, and the uncontrolled live open state."
+    },
+    {
+      "name": "textareaComposition",
+      "selectors": [
+        ".cart-note__field",
+        ".input",
+        ".textarea__field"
+      ],
+      "description": "The required field contains one complete canonical Textarea and does not duplicate its label, value, native attributes, validation, message, resize, line bounds, or focus behavior."
+    },
+    {
+      "name": "nativeValuePreservation",
+      "selectors": [
+        ".cart-note",
+        ".textarea__field"
+      ],
+      "events": [
+        "toggle",
+        "input",
+        "change",
+        "form reset"
+      ],
+      "description": "Closing and reopening keeps the same mounted native Textarea, preserving its live value and control state."
+    },
+    {
+      "name": "targetPersistenceBoundary",
+      "selectors": [
+        ".textarea__field"
+      ],
+      "events": [
+        "input",
+        "change",
+        "blur",
+        "form submit"
+      ],
+      "description": "The target chooses submission, blur, debounced input, or another persistence policy and owns requests, stale responses, cart refresh, errors, retry, and confirmed state."
+    },
+    {
+      "name": "targetStatusOwnership",
+      "selectors": [
+        ".cart-note"
+      ],
+      "description": "Cart Note is not a live region. A target announces one contextual persistence result outside K10 only when an asynchronous outcome requires it."
+    }
   ],
   "properties": [
-    { "name": "toggleLabel", "type": "string", "required": true, "description": "Order-note disclosure label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-note__toggle" }] } },
-    { "name": "expanded", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls note field visibility and disclosure state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-note", "attribute": "data-expanded", "values": { "true": "true", "false": "false" } }, { "kind": "attribute", "selector": ".cart-note__toggle", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } },
-    { "name": "field", "type": "slot", "required": false, "description": "Textarea dependency that owns note value and validation semantics.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-note__field", "classNames": [".cart-note__field"] }] } }
+    {
+      "name": "toggleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Required non-empty localized disclosure label.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".cart-note__toggle"
+          }
+        ]
+      }
+    },
+    {
+      "name": "expanded",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Establishes the initial native open state in static Web or the controlled live state in a stateful adapter.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".cart-note",
+            "attribute": "open",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "details"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "field",
+      "type": "slot",
+      "required": true,
+      "description": "Required complete canonical Textarea that owns the sole note value, form, validation, resize, line-bound, and message semantics.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-note__field",
+            "classNames": [
+              ".cart-note__field"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
-    "public": {
-      "color": ["--color-text-accent", "--color-text-primary", "--color-border-focus"],
-      "typography": ["--typo-body-size"]
-    }
+    "public": {}
   },
   "accessibility": [
-    "Label the note textarea clearly.",
-    "Keep note save status understandable if updates happen asynchronously.",
-    "Do not erase note content when the field is collapsed."
+    "Use native details and summary semantics or preserve the APG disclosure relationship in non-Web adapters.",
+    "Compose one complete Textarea with a visible associated label.",
+    "Keep the mounted note value and field state when the disclosure closes.",
+    "If persistence is asynchronous, announce one contextual target result outside Cart Note without making the component a live region."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to Shopify cart note updates." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css-native-disclosure",
+      "notes": "Native details/summary plus one canonical Textarea needs no Cart Note runtime; persistence and status remain target-owned."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css",
+      "notes": "Optional editor-enabled cart-page snippet maps one canonical Textarea to cart.note and textarea[name=note] inside the native cart form; Ajax cart-drawer persistence remains target work."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component",
+      "notes": "Adapter may bind live open state while Textarea and the target cart store retain value and persistence ownership."
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component",
+      "notes": "Compose from a canonical Textarea instance with open and closed disclosure states; generic Button Studio nodes are not Cart Note artwork."
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

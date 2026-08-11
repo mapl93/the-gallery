@@ -1,64 +1,263 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "free-shipping-bar",
   "name": "Free Shipping Bar",
   "registryId": "K5",
   "category": "cart",
   "status": "pilot",
-  "summary": "Free-shipping progress indicator with threshold text, track, fill, and achieved state.",
-  "dependencies": ["progress"],
+  "summary": "Passive target-controlled free-shipping message composed with the determinate Bar profile of canonical Progress.",
+  "dependencies": [
+    "progress"
+  ],
   "source": {
     "registry": "registry.json#/components/free-shipping-bar",
-    "css": { "file": "components/css/cart.css", "selector": ".shipping-bar" },
+    "css": {
+      "file": "components/css/cart.css",
+      "selector": ".shipping-bar"
+    },
     "docs": "site/src/content/components/free-shipping-bar.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".shipping-bar", "className": ".shipping-bar", "required": true, "description": "Shipping progress container." },
-    { "name": "text", "selector": ".shipping-bar__text", "className": ".shipping-bar__text", "required": true, "description": "Threshold text." },
-    { "name": "track", "selector": ".shipping-bar__track", "className": ".shipping-bar__track", "required": true, "description": "Progress track." },
-    { "name": "fill", "selector": ".shipping-bar__fill", "className": ".shipping-bar__fill", "required": true, "description": "Progress fill." }
+    {
+      "name": "root",
+      "selector": ".shipping-bar",
+      "className": ".shipping-bar",
+      "required": true,
+      "description": "Passive grouping for the target message and canonical Progress composition."
+    },
+    {
+      "name": "message",
+      "selector": ".shipping-bar__message",
+      "className": ".shipping-bar__message",
+      "required": true,
+      "description": "Complete localized below-threshold or achieved message."
+    },
+    {
+      "name": "progress",
+      "selector": ".shipping-bar__progress",
+      "className": ".shipping-bar__progress",
+      "required": true,
+      "description": "Determinate Bar profile of canonical Progress with a required accessible name."
+    },
+    {
+      "name": "track",
+      "selector": ".shipping-bar__progress .progress__track",
+      "className": ".progress__track",
+      "required": true,
+      "description": "Canonical Progress track; Free Shipping Bar does not duplicate its implementation."
+    },
+    {
+      "name": "bar",
+      "selector": ".shipping-bar__progress .progress__bar",
+      "className": ".progress__bar",
+      "required": true,
+      "description": "Canonical Progress bar projected from the clamped target range."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default free-shipping progress state." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One neutral free-shipping composition; Progress shape, tone, and motion are not K5 options."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default compact shipping bar." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One intrinsic block composition that consumes its parent inline size."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".shipping-bar"], "description": "Default progress state." },
-    { "name": "achieved", "selectors": [".shipping-bar--achieved .shipping-bar__text"], "description": "Free shipping achieved state." }
+    {
+      "name": "default",
+      "selectors": [
+        ".shipping-bar"
+      ],
+      "description": "Current qualifying value is below the target-owned threshold."
+    },
+    {
+      "name": "achieved",
+      "selectors": [
+        ".shipping-bar--achieved .shipping-bar__message"
+      ],
+      "description": "Derived when the clamped current value reaches max; the complete message must state eligibility."
+    }
   ],
   "behavior": [
-    { "name": "thresholdProgress", "selectors": [".shipping-bar__text", ".shipping-bar__fill"], "attributes": ["role=\"progressbar\"", "aria-valuenow"], "description": "Progress should reflect cart total relative to the free-shipping threshold." },
-    { "name": "achievedState", "selectors": [".shipping-bar--achieved .shipping-bar__text"], "description": "When threshold is reached, text should communicate the achieved state." }
+    {
+      "name": "canonicalDeterminateProgress",
+      "selectors": [
+        ".shipping-bar__progress",
+        ".shipping-bar__progress .progress__track",
+        ".shipping-bar__progress .progress__bar"
+      ],
+      "attributes": [
+        "role=\"progressbar\"",
+        "aria-label",
+        "aria-valuemin=\"0\"",
+        "aria-valuemax",
+        "aria-valuenow"
+      ],
+      "description": "Composes canonical determinate Progress, rejects a non-positive max, and clamps visual and accessible current values together to zero through max."
+    },
+    {
+      "name": "derivedThresholdState",
+      "selectors": [
+        ".shipping-bar--achieved",
+        ".shipping-bar__message"
+      ],
+      "description": "Achieved state is derived from value greater than or equal to max; no independent boolean can contradict the range."
+    },
+    {
+      "name": "targetAnnouncementBoundary",
+      "selectors": [
+        ".shipping-bar",
+        ".shipping-bar__message"
+      ],
+      "description": "K5 is not a live region; the cart target announces only meaningful authoritative eligibility transitions outside the component."
+    }
   ],
   "properties": [
-    { "name": "text", "type": "string", "required": true, "description": "Threshold or achieved-state message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".shipping-bar__text" }] } },
-    { "name": "value", "type": "number", "required": true, "min": 0, "defaultValue": 0, "description": "Current cart amount represented by the progressbar.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".shipping-bar__track", "attribute": "aria-valuenow", "valueFrom": "property" }] } },
-    { "name": "max", "type": "number", "required": true, "min": 1, "defaultValue": 100, "description": "Free-shipping threshold represented by the progressbar.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".shipping-bar__track", "attribute": "aria-valuemax", "valueFrom": "property" }] } },
-    { "name": "achieved", "type": "boolean", "required": false, "defaultValue": false, "description": "Communicates that the threshold has been reached.", "targetMappings": { "web": [{ "kind": "class", "selector": ".shipping-bar", "classNames": [".shipping-bar--achieved"] }] } }
+    {
+      "name": "message",
+      "type": "string",
+      "required": true,
+      "description": "Required non-empty complete localized below-threshold or achieved message.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".shipping-bar__message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Required non-empty localized accessible name for the canonical progressbar.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".shipping-bar__progress",
+            "attribute": "aria-label",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "value",
+      "type": "number",
+      "required": true,
+      "min": 0,
+      "defaultValue": 0,
+      "description": "Finite target-owned qualifying amount projected and clamped to the determinate range.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".shipping-bar__progress",
+            "attribute": "aria-valuenow",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "max",
+      "type": "number",
+      "required": true,
+      "min": 1,
+      "defaultValue": 100,
+      "description": "Finite positive target-owned free-shipping threshold in the same unit as value.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".shipping-bar__progress",
+            "attribute": "aria-valuemax",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "valueText",
+      "type": "string",
+      "required": false,
+      "description": "Optional localized human-readable interpretation of the raw determinate value, especially for money-like progress.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".shipping-bar__progress",
+            "attribute": "aria-valuetext",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-secondary", "--color-text-secondary", "--color-text-primary", "--color-border-subtle", "--color-feedback-success-default"],
-      "radius": ["--radius-md", "--radius-full"],
-      "transition": ["--transition-base"],
-      "easing": ["--easing-out"],
-      "typography": ["--typo-body-size"]
+      "color": [
+        "--color-surface-primary",
+        "--color-text-secondary",
+        "--color-text-primary",
+        "--color-border-subtle"
+      ],
+      "radius": [
+        "--radius-md"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "typography": [
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ]
     }
   },
   "accessibility": [
-    "Expose the amount remaining or achieved free-shipping state as text.",
-    "Do not rely on the fill width alone to communicate progress.",
-    "Keep progress values synchronized when cart totals change."
+    "Require a localized accessible name and keep aria-valuemin, aria-valuemax, aria-valuenow, optional aria-valuetext, and visual width synchronized.",
+    "Use complete visible text for below-threshold and achieved meaning; do not rely on width, color, or emphasis alone.",
+    "Keep the component passive and non-focusable; it has no keyboard or pointer interaction.",
+    "Do not make K5 a live region. Announce meaningful authoritative eligibility transitions once from the target cart status policy.",
+    "Inherit canonical Progress reduced-motion and forced-colors behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should compute threshold progress from Shopify cart subtotal and shop settings." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css-composition",
+      "notes": "Passive message composition using the determinate Bar profile from canonical Progress."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-class",
+      "notes": "Parameter-driven translation only; merchant/product policy must choose qualifying amount, threshold, placement, refresh, message, and announcement behavior."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
   }
 }

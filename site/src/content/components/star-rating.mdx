@@ -1,43 +1,26 @@
-## Overview
+## Deprecated identity
 
-Read-only projection of a target-supplied rating from zero through five in half-step increments. Star Rating does not collect a value or calculate an aggregate.
+Star Rating Display (`V2`) is deprecated as an independent component. ADR 0235
+consolidates its half-step value and `default | lg` presentation into canonical
+[Rating](/components/rating).
 
-<Preview html={'<div class="star-rating star-rating--lg tg-preview-frame" data-rating="4.5" aria-label="4.5 out of 5 stars"><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-half" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></div>'} label="Star Rating" />
+This migration page uses the same `RatingStudio`, `RatingArtwork`, fixture,
+contract shape and canonical `.rating` CSS as A11. It owns no `.star-rating`
+selector, CSS, renderer, fixture, behavior, token or target adapter.
 
-## Presentation
+<Preview html={'<span class="rating" data-rating="3.5"><span class="rating__stars" role="img" aria-label="3.5 out of 5 stars"><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--half" aria-hidden="true">☆</span><span class="rating__star" aria-hidden="true">☆</span></span><span class="rating__count" dir="auto">24 reviews</span></span>'} label="Deprecated Star Rating migration to Rating" />
 
-The root contains five decorative stars. Empty is the default star state; `.is-filled` or `data-filled="true"` marks a full star, and `.is-half` or `data-filled="half"` marks a half star. The default size is 16px and `.star-rating--lg` selects the 24px presentation.
+## Migration
 
-`ratingValue` is supplied by the target and maps to `data-rating`. The accessible `label` states both value and scale. Neither property implies aggregation, rounding, or normalization of provider data.
+- Replace `.star-rating` with `.rating`.
+- Replace V2 `label` with canonical `accessibleLabel`.
+- Keep the supplied `ratingValue`; use the canonical `.rating--lg` class for
+  the large presentation.
+- Optional complete localized `reviewCount` now belongs to the same canonical
+  Rating API.
+- Replace V2 star containers/icon layers with canonical
+  `.rating__stars > .rating__star` full/half/empty anatomy.
+- Update Review Summary, Review Card and custom consumers to depend on `rating`.
 
-## Usage Guidelines
-
-<DoDont>
-  <Do>Use Star Rating wherever a supplied rating is presented without value entry.</Do>
-  <Dont>Do not use Star Rating as an interactive picker or infer an aggregate from the decorative stars.</Dont>
-</DoDont>
-
-Use [Star Rating (Interactive)](/components/star-input) when a person must choose an integer rating. Whether non-five-point sources or increments other than half stars are supported remains a target product decision.
-
-## Accessibility
-
-<Callout type="info">
-  The root exposes the complete rating as accessible text; each repeated star is decorative.
-</Callout>
-
-- Include the supplied value and scale in the root label, such as `4.5 out of 5 stars`.
-- Hide individual stars from assistive technology with `aria-hidden="true"` when the root already names the rating.
-- Keep a readable value wherever color or fill alone would be ambiguous.
-- Do not add radio, slider, or button semantics to this passive component.
-
-## References
-
-**Anatomy:** required `.star-rating` root and repeated `.star-rating__star` elements. Filled and half-filled markers are decorative states.
-
-**Dependencies:** None.
-
-<PropTable>
-  <tr><td>`ratingValue`</td><td>number</td><td>required</td><td>Target-supplied value from `0` to `5` in `0.5` steps</td></tr>
-  <tr><td>`label`</td><td>string</td><td>required</td><td>Accessible value and scale</td></tr>
-  <tr><td>`size`</td><td>enum</td><td>`default`</td><td>`default` or `lg`</td></tr>
-</PropTable>
+Do not restore a compatibility selector alias. This registry entry remains only
+to make pre-v1 migration explicit and is never eligible for `stable`.

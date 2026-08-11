@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -6,6 +6,8 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import BadgeArtwork from './BadgeArtwork';
+import TagArtwork from './TagArtwork';
 
 interface LabelPrimitiveStudioProps {
   contract: ComponentContract;
@@ -68,10 +70,6 @@ function collectStudioTokens(definition: StudioDefinition, contract: ComponentCo
   )];
 }
 
-function optionClass(options: ComponentContract['variants'], value: StudioPropertyValue): string | null {
-  return options.find((option) => option.name === value)?.className?.replace(/^\./, '') ?? null;
-}
-
 function activeTokensFor(
   slug: string,
   variant: string
@@ -105,6 +103,9 @@ export default function LabelPrimitiveStudio({
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [removed, setRemoved] = useState(false);
+  const removeButtonRef = useRef<HTMLButtonElement>(null);
+  const restoreButtonRef = useRef<HTMLButtonElement>(null);
+  const focusRemoveAfterRestore = useRef(false);
 
   useEffect(() => {
     const readTokenValues = () => {
@@ -129,6 +130,16 @@ export default function LabelPrimitiveStudio({
     };
   }, [studioTokens]);
 
+  useEffect(() => {
+    if (contract.slug !== 'tag') return;
+    if (removed) {
+      restoreButtonRef.current?.focus();
+    } else if (focusRemoveAfterRestore.current) {
+      focusRemoveAfterRestore.current = false;
+      removeButtonRef.current?.focus();
+    }
+  }, [contract.slug, removed]);
+
   const tokenValues = useMemo(
     () => ({ ...baseTokenValues, ...tokenOverrides }),
     [baseTokenValues, tokenOverrides]
@@ -141,9 +152,10 @@ export default function LabelPrimitiveStudio({
   );
   const removeAction = values.removeAction === true;
   const removalDisabled = values.removalDisabled === true;
-  const removeLabel = typeof values.removeLabel === 'string' && values.removeLabel
-    ? values.removeLabel
-    : undefined;
+  const removeLabel = typeof values.removeLabel === 'string'
+    ? values.removeLabel.trim()
+    : '';
+  const hasValidRemoveAction = removeAction && removeLabel.length > 0;
 
   function handleStateChange(state: string) {
     setPreviewState(state);
@@ -199,33 +211,41 @@ export default function LabelPrimitiveStudio({
         >
           <div className="docs-studio__stage-inner">
             {contract.slug === 'badge' ? (
-              <span
-                className={[
-                  'badge',
-                  'docs-studio__preview-badge',
-                  optionClass(contract.variants, values.variant),
-                ].filter(Boolean).join(' ')}
-                role={values.announceChanges === true ? 'status' : undefined}
-              >
-                {label}
-              </span>
+              <BadgeArtwork
+                className="docs-studio__preview-badge"
+                label={label}
+                variant={variant as 'info' | 'success' | 'warning' | 'error'}
+                announceChanges={values.announceChanges === true}
+              />
             ) : removed ? (
-              <p className="docs-studio__preview-removal" role="status">Tag removed</p>
+              <div className="docs-studio__tag-removal-result">
+                <p className="docs-studio__preview-removal" role="status">
+                  {label || 'Tag'} removed
+                </p>
+                <button
+                  ref={restoreButtonRef}
+                  className="btn btn--outline btn--sm"
+                  type="button"
+                  onClick={() => {
+                    focusRemoveAfterRestore.current = true;
+                    setRemoved(false);
+                  }}
+                >
+                  Restore {label || 'tag'}
+                </button>
+              </div>
             ) : (
-              <span className="tag docs-studio__preview-tag">
-                <span className="tag__label">{label}</span>
-                {removeAction && (
-                  <button
-                    className="tag__remove"
-                    type="button"
-                    aria-label={removeLabel}
-                    disabled={removalDisabled}
-                    data-studio-state={previewState}
-                    style={removeStyle}
-                    onClick={() => setRemoved(true)}
-                  />
-                )}
-              </span>
+              <TagArtwork
+                label={label}
+                className="docs-studio__preview-tag"
+                removeAction={hasValidRemoveAction}
+                removeLabel={removeLabel}
+                removalDisabled={removalDisabled}
+                removeButtonRef={removeButtonRef}
+                removeState={previewState}
+                removeStyle={removeStyle}
+                onRemove={() => setRemoved(true)}
+              />
             )}
           </div>
         </section>

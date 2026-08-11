@@ -1,48 +1,69 @@
 ## Overview
 
-Account Dashboard is an authenticated account overview with a customer greeting, optional account-level actions, and a responsive grid of target-owned navigation cards.
+Account Dashboard is a passive, labelled account-navigation overview. It composes a native destination list from canonical Card and Link, accepts optional target-owned account actions, and leaves customer data, authorization, routes, sign-out, privacy, and lifecycle state to the target.
 
 <Preview
-  html={'<section class="account-dashboard tg-preview-frame tg-preview-frame--lg"><header class="account-dashboard__header"><h1 class="account-dashboard__greeting">Welcome back, Maria</h1><div class="account-dashboard__actions"><a class="btn btn--outline btn--sm" href="#">Sign out</a></div></header><div class="account-dashboard__grid"><article class="account-card"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 7h18v13H3zM7 7V4h10v3"/></svg><h2 class="account-card__title">Orders</h2><p class="account-card__description">Review purchases and delivery progress.</p><a class="account-card__link" href="#">View orders</a></article><article class="account-card"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></svg><h2 class="account-card__title">Addresses</h2><p class="account-card__description">Manage delivery and billing locations.</p><a class="account-card__link" href="#">Manage addresses</a></article><article class="account-card"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><h2 class="account-card__title">Profile</h2><p class="account-card__description">Update contact details and preferences.</p><a class="account-card__link" href="#">Open settings</a></article></div></section>'}
+  html={'<section class="account-dashboard tg-preview-frame tg-preview-frame--lg" aria-labelledby="account-dashboard-title"><header class="account-dashboard__header"><h2 class="account-dashboard__greeting" id="account-dashboard-title">Good afternoon, Alex</h2><div class="account-dashboard__actions"><button class="btn btn--outline btn--sm" type="button">Sign out</button></div></header><ul class="account-dashboard__grid"><li class="card account-card"><div class="card__body account-card__body"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 7h18v13H3zM7 7V4h10v3"/></svg><h3 class="account-card__title">Orders</h3><p class="account-card__description">Track recent purchases and view receipts.</p></div><div class="card__footer account-card__footer"><a class="link account-card__link" href="#orders">View orders</a></div></li><li class="card account-card"><div class="card__body account-card__body"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></svg><h3 class="account-card__title">Addresses</h3><p class="account-card__description">Manage shipping and billing destinations.</p></div><div class="card__footer account-card__footer"><a class="link account-card__link" href="#addresses">Manage addresses</a></div></li><li class="card account-card"><div class="card__body account-card__body"><svg class="account-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10Z"/></svg><h3 class="account-card__title">Saved works</h3><p class="account-card__description">Return to pieces you have collected here.</p></div><div class="card__footer account-card__footer"><a class="link account-card__link" href="#saved-works">View saved works</a></div></li></ul></section>'}
   label="Account Dashboard"
 />
 
 ## Presentation
 
-The header combines the required `greeting` with the optional `headerActions` slot. The example action is fixture content; authentication and navigation behavior come from the target.
+The non-empty `greeting` is the visible contextual heading and programmatic name of the native section. The optional `headerActions` slot is omitted without an empty wrapper and should contain complete semantic target controls. `cards` is one required, non-empty composition slot rather than a flat property for each repeated item.
 
-`cards` is one required slot. Card titles, descriptions, icons, destinations, count, and order remain repeated fixture or target data rather than top-level Dashboard properties. The canonical grid adapts from one to two and three columns at its existing breakpoints.
+Each destination is a native `li.card.account-card` with canonical Card body/footer and one explicit `a.link.account-card__link`. Titles, optional descriptions, decorative icons, destinations, count, order, permission filtering, and target records remain fixture or target data. Whole-card activation is not inferred.
+
+The root is a named inline-size container. Its private layout moves from one to two to three tracks according to available component width; columns are not a public semantic property.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use cards for clear destinations into distinct account areas.</Do>
-  <Dont>Do not expose sensitive customer or order details merely to fill the overview.</Dont>
+  <Do>Render only complete, available destinations derived from authenticated target state.</Do>
+  <Dont>Do not expose sensitive summaries, unavailable routes, or working-looking actions without target behavior.</Dont>
 </DoDont>
 
-- Derive the greeting and available destinations from authenticated target data.
-- Keep each card focused on one destination with descriptive link text.
-- Omit unavailable destinations instead of rendering empty cards.
-- Keep account-level actions separate from the card collection.
+- Use Link for account destinations and Button for commands such as sign-out; do not blur navigation and actions.
+- Keep each link label understandable in its card context and preserve native destination URLs.
+- Omit optional descriptions, icons, and header actions when unavailable. Omit the complete renderer when greeting or the required destination list is invalid.
+- Let the target own loading, authentication expiry, errors, no-destination policy, sign-out effects, redirection, feedback, focus, and analytics.
 
 ## Accessibility
 
-- Protect the dashboard route through the target authentication system.
-- Use a logical heading hierarchy for the greeting and card titles.
-- Give every card destination clear link text rather than relying on the surrounding card.
-- Keep decorative card icons hidden from assistive technology.
-- Do not expose sensitive data in summary copy without clear user intent.
+- Label the native section from the visible heading with `aria-labelledby`; choose heading rank from the surrounding page outline.
+- Preserve native `ul`/`li` semantics. CSS grid does not require `role="grid"`, roving focus, or arrow-key behavior.
+- Give every destination a real native Link with a descriptive visible label; preserve Tab, Enter, modified activation, history, and canonical focus treatment.
+- Keep text-complete icons decorative and hidden from assistive technology.
+- Do not add a live region, automatic focus move, landmark, or custom keyboard model to the passive shell.
+- Allow long, localized, bidirectional, and unbroken content to wrap in narrow and zoomed containers.
+
+## Target Notes
+
+- Neutral Web maps to the labelled section and native list shown above with zero U3 runtime.
+- Target-controlled account views project authorized data and real routes through canonical U3. Platform-owned non-replaceable screens use a documented native handoff and do not claim visual or functional parity.
+- Shopify v1 themes use the controlled `shopify-account` sheet and hosted account pages, so they intentionally omit a theme-owned U3 clone. Full-page extensions and headless Customer Account API views are distinct target-controlled projections; classic Liquid remains separately versioned compatibility.
+- React and future framework targets should keep data, routing, authorization, actions, feedback, and lifecycle state external while preserving native dependency semantics.
+- The registered Figma nodes resolve to generic Button documentation, not U3 artwork or visual approval.
 
 ## References
 
-### Composition
+### Dependencies
 
-The card collection is target-owned slot content. The repeated card data in the artwork is a fixture, not a canonical property schema for individual cards.
+- [Card](/components/card)
+- [Link](/components/link)
+- [Button](/components/button)
+
+### Standards And Platforms
+
+- [WAI page structure](https://www.w3.org/WAI/tutorials/page-structure/)
+- [WCAG link purpose in context](https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html)
+- [WAI-ARIA APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)
+- [Shopify account component](https://shopify.dev/docs/storefronts/themes/customer-engagement/account-component)
+- [Shopify customer-account apps](https://shopify.dev/docs/apps/build/customer-accounts)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`greeting`</td><td>string</td><td>required</td><td>Customer-facing dashboard greeting</td></tr>
-  <tr><td>`headerActions`</td><td>slot</td><td>optional</td><td>Account-level actions beside the greeting</td></tr>
-  <tr><td>`cards`</td><td>slot</td><td>required</td><td>Target-owned account navigation cards</td></tr>
+  <tr><td>`greeting`</td><td>string</td><td>required</td><td>Non-empty visible contextual heading that labels the section</td></tr>
+  <tr><td>`headerActions`</td><td>slot</td><td>optional</td><td>Complete target-owned semantic account actions</td></tr>
+  <tr><td>`cards`</td><td>slot</td><td>required</td><td>Non-empty native destination list composed from canonical Card and Link</td></tr>
 </PropTable>

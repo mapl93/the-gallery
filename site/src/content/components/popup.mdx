@@ -1,42 +1,32 @@
-## Overview
+## Deprecated identity
 
-Popup presents a dismissible dialog surface with Default, Split, and Slide treatments. Email capture is not part of the accepted Popup API.
+Popup (`G4`) is deprecated as an independent component. The owner-selected
+direction consolidates it into canonical [Popover](/components/popover): a
+non-modal floating surface anchored to the element that opened it.
 
-## Presentation
+This migration page renders the exact same Popover renderer, fixture and CSS as
+B9. It owns no backdrop, modal semantics, Close Button duplication, Split or
+Slide variants, visibility runtime, Studio implementation or Shopify adapter.
 
-<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger aria-expanded="true" aria-controls="popup-preview-dialog" hidden>Show popup</button><div class="popup-overlay tg-preview-overlay-layer" data-open><div class="popup popup--split" id="popup-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="popup-preview-title"><button class="popup__close" type="button" data-preview-close aria-label="Close popup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button><div class="popup__media"><div class="tg-preview-media tg-preview-media--portrait" aria-hidden="true"></div></div><div class="popup__body"><h2 class="popup__title" id="popup-preview-title">Private studio viewing</h2><p class="popup__text">Reserve a place for the next presentation of one-of-a-kind works.</p></div></div></div></div>'} label="Popup / Overlay" layout="overlay" interaction={{ selector: '.popup-overlay', toggle: 'attr:data-open=', triggerLabel: 'Show Popup', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
+<Preview html={'<div class="tg-preview-anchor-stage tg-preview-anchor-stage--popover"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="true" aria-controls="preview-popup-migration">Open popover</button><div class="popover popover--open tg-preview-anchor-popover" id="preview-popup-migration" aria-hidden="false"><div class="popover__arrow" aria-hidden="true"></div><p class="popover__title">Dimensions</p><div class="popover__content"><p>Set the dimensions for the layer.</p><div><label for="preview-popup-width">Width</label><input class="input__field" id="preview-popup-width" value="100%" /><label for="preview-popup-max-width">Max. width</label><input class="input__field" id="preview-popup-max-width" value="300px" /><label for="preview-popup-height">Height</label><input class="input__field" id="preview-popup-height" value="25px" /><label for="preview-popup-max-height">Max. height</label><input class="input__field" id="preview-popup-max-height" value="none" /></div></div></div></div>'} label="Deprecated Popup migration to Popover" layout="anchored" interaction={{ selector: '.popover', toggle: 'popover--open', triggerLabel: 'Toggle Popover', triggerSelector: '[data-preview-trigger]', startVisible: true }} />
 
-The primary Exhibit artwork starts visible. Its sibling trigger is hidden while the overlay is active, appears after dismissal, and can reopen the fixture. This staging and geometry are site-owned documentation behavior, not a Popup default or public property.
+## Migration
 
-Default uses `.popup`; Split adds `.popup--split`; Slide adds `.popup--slide`. Canonical CSS currently recognizes `data-open` on `.popup-overlay` and on `.popup--slide`, but the public visibility surface remains unresolved.
+- `.popup-overlay`, `.popup`, `.popup__*`, `.popup--split` and `.popup--slide`
+  are removed from canonical source.
+- Use `.popover`, optional `.popover__arrow` / `.popover__title`, required
+  `.popover__content`, and the canonical `open` state.
+- Connect a native Button trigger with `aria-expanded` / `aria-controls`, or use
+  the native Web Popover relationship in a capable target.
+- Preserve Escape, outside and repeated-trigger dismissal, natural Tab order
+  and keyboard focus restoration.
 
-## Usage Guidelines
+## Modal marketing campaigns
 
-<DoDont>
-  <Do>Use Popup for a concise, focused message with a clear visible way to leave.</Do>
-  <Dont>Do not add an email property or Input dependency until email-capture ownership is accepted.</Dont>
-</DoDont>
+Marketing content can live inside Popover when it is concise, anchored and
+non-modal. If a campaign must block page interaction, dim the background,
+contain focus or require an explicit decision, compose canonical
+[Modal](/components/modal). That is a recipe choice, not a reason to restore G4.
 
-The consuming target decides whether a use is modal or non-modal. It also owns visibility state, focus management, trigger timing, persistence, and dismissal behavior beyond this Exhibit fixture.
-
-## Accessibility
-
-- For modal use, apply `role="dialog"`, `aria-modal="true"`, and a programmatic name from the visible title.
-- Move focus into a modal popup, contain Tab and Shift+Tab navigation, and restore focus to its trigger after dismissal.
-- Provide a visible named dismiss button and support `Escape`.
-- Respect reduced-motion preferences for overlay and slide transitions.
-- Any target-composed form field must independently satisfy Input obligations; it does not become Popup anatomy.
-
-## References
-
-| Anatomy | Selector | Requirement |
-| --- | --- | --- |
-| Overlay | `.popup-overlay` | Required backdrop and centered containment layer |
-| Root | `.popup` | Required scrollable dialog surface |
-| Close | `.popup__close` | Optional named native dismiss button |
-| Media | `.popup__media` | Optional image region |
-| Body | `.popup__body` | Required primary content region |
-| Title | `.popup__title` | Required visible title and preferred label source |
-| Text | `.popup__text` | Optional supporting message |
-
-Dependency: [Close Button](/components/close-button).
+The temporary G4 contract mirrors only canonical `open` so existing references
+can be found and migrated. Its status is `deprecated`, never `stable`.

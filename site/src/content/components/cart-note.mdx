@@ -1,17 +1,17 @@
 ## Overview
 
-Cart Note is an optional disclosure for a target-owned order note. It delegates value entry, validation, resize behavior, and feedback to the Textarea dependency.
+Cart Note is a native disclosure for one target-owned order note. It composes a complete Textarea and leaves persistence, validation policy, and result feedback to the target.
 
 <Preview
-  html={'<div class="cart-note tg-preview-frame--sm" data-expanded="true"><button class="cart-note__toggle" type="button" aria-expanded="true" aria-controls="cart-note-preview-field">Add order note</button><div class="cart-note__field input" id="cart-note-preview-field"><label class="input__label" for="cart-note-preview-textarea">Order note</label><div class="input__control"><textarea class="input__field textarea__field" id="cart-note-preview-textarea" name="note" data-resize="vertical" data-min-lines="3" data-max-lines="8" placeholder="Special instructions for this order"></textarea></div></div></div>'}
+  html={'<details class="cart-note tg-preview-frame--sm" open><summary class="cart-note__toggle">Add an order note</summary><div class="input cart-note__field"><label class="input__label" for="cart-note-preview-textarea">Order note</label><div class="input__control"><textarea class="input__field textarea__field" id="cart-note-preview-textarea" name="note" rows="4" autocomplete="off" placeholder="Special instructions for this order"></textarea></div></div></details>'}
   label="Cart Note"
 />
 
 ## Presentation
 
-`expanded` defaults to `false` and synchronizes the disclosure state of the required toggle. The optional `field` slot composes the complete Textarea dependency at `.cart-note__field`.
+`expanded` defaults to `false` and maps to the initial native `open` state. Static Web becomes uncontrolled after parsing; a stateful adapter may bind the live `open` property and `toggle` event. The required `field` slot composes one complete Textarea at `.cart-note__field`.
 
-Cart Note owns only disclosure and target persistence boundaries. Textarea owns the native value field, label, validation family, line bounds, and resize direction.
+Cart Note owns only disclosure and target-persistence boundaries. Textarea owns the native value field, label, validation family, line bounds, and resize direction. Closing the disclosure hides but does not unmount the field, so its live value and control state remain intact.
 
 ## Usage Guidelines
 
@@ -21,12 +21,12 @@ Cart Note owns only disclosure and target persistence boundaries. Textarea owns 
 </DoDont>
 
 - Preserve the note value across cart quantity and totals updates.
-- Keep the field optional unless the surrounding flow explicitly establishes a requirement.
+- Keep the note value optional unless the surrounding flow explicitly establishes a requirement.
 - Use Textarea properties for resize direction, line bounds, validation, and disabled state.
 
 ## Accessibility
 
-- Connect the toggle to the field region with `aria-controls` and synchronize `aria-expanded`.
+- Use native `details` and a first-child `summary`; do not add duplicate disclosure ARIA to the native pair.
 - Give the composed Textarea a visible label.
 - Preserve Textarea keyboard, resize, validation, and feedback semantics.
 - Do not discard entered content when the disclosure collapses.
@@ -42,6 +42,6 @@ Cart Note owns only disclosure and target persistence boundaries. Textarea owns 
 
 <PropTable>
   <tr><td>`toggleLabel`</td><td>string</td><td>required</td><td>Order-note disclosure label</td></tr>
-  <tr><td>`expanded`</td><td>boolean</td><td>`false`</td><td>Controls note-field visibility and disclosure state</td></tr>
-  <tr><td>`field`</td><td>slot</td><td>optional</td><td>Textarea dependency that owns note value and validation semantics</td></tr>
+  <tr><td>`expanded`</td><td>boolean</td><td>`false`</td><td>Initial native open state or controlled adapter state</td></tr>
+  <tr><td>`field`</td><td>slot</td><td>required</td><td>Complete Textarea dependency that owns note value and field semantics</td></tr>
 </PropTable>

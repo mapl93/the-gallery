@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import RatingArtwork from './RatingArtwork';
 
 interface RatingStudioProps {
   contract: ComponentContract;
@@ -38,8 +39,10 @@ function initialRatingValues(contract: ComponentContract): StudioPropertyValues 
   ))) as StudioPropertyValues;
 
   // Preview content only; the component contract does not define rating data defaults.
-  values.accessibleLabel = '4.5 out of 5 stars, based on 24 reviews';
-  values.reviewCount = '(24)';
+  values.ratingValue = 3.5;
+  values.accessibleLabel = '3.5 out of 5 stars';
+  values.reviewCount = '24 reviews';
+  values.size = 'default';
   return values;
 }
 
@@ -79,12 +82,9 @@ export default function RatingStudio({ contract, definition }: RatingStudioProps
   }, [studioTokens]);
 
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
-  const accessibleLabel = String(values.accessibleLabel || '');
-  const reviewCount = String(values.reviewCount || '');
-  const starStates = ['filled', 'filled', 'filled', 'filled', 'half'] as const;
   const activeTokens = {
     'filled-color': '--color-text-accent',
-    'empty-color': '--color-border-subtle',
+    'empty-color': '--color-text-secondary',
     'count-color': '--color-text-secondary',
   };
 
@@ -120,19 +120,12 @@ export default function RatingStudio({ contract, definition }: RatingStudioProps
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <div className="rating" role="img" aria-label={accessibleLabel}>
-              <span className="rating__stars" aria-hidden="true">
-                {starStates.map((state, index) => (
-                  <span
-                    className={`rating__star rating__star--${state}`}
-                    key={`${state}-${index}`}
-                  >
-                    {'\u2605'}
-                  </span>
-                ))}
-              </span>
-              {reviewCount && <span className="rating__count">{reviewCount}</span>}
-            </div>
+            <RatingArtwork
+              ratingValue={typeof values.ratingValue === 'number' ? values.ratingValue : Number.NaN}
+              accessibleLabel={String(values.accessibleLabel || '')}
+              reviewCount={String(values.reviewCount || '')}
+              size={values.size === 'lg' ? 'lg' : 'default'}
+            />
           </div>
         </section>
       </div>

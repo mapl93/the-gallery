@@ -141,6 +141,7 @@ registry.json
 components/contracts/*.contract.json
 components/css/*.css
 components/js/theme.js
+components/js/runtime-modules.json
 platforms/shopify/**/*.liquid
 platforms/shopify/templates/*.json
 platforms/shopify/config/*.json
@@ -149,6 +150,8 @@ platforms/shopify/assets/tokens.css
   -> platforms/shopify/assets/base.css
   -> platforms/shopify/assets/*.css
   -> platforms/shopify/assets/theme.js
+  -> platforms/shopify/assets/runtime-loader.js
+  -> platforms/shopify/assets/tg-runtime-*.js
   -> platforms/shopify/adapter.manifest.json
   -> platforms/shopify/adapter.summary.json
 ```
@@ -160,7 +163,7 @@ npm run build:adapter:shopify
 npm run validate:adapter:shopify
 ```
 
-`platforms/shopify/assets/base.css` is generated from reset, foundations, and utilities CSS. It must not define token values; those come from `platforms/shopify/assets/tokens.css`.
+`platforms/shopify/assets/base.css` is generated from reset, foundations, and utilities CSS. It must not define token values; those come from `platforms/shopify/assets/tokens.css`. Shopify layouts load `runtime-loader.js`, which imports only behavior matched by rendered markup; `theme.js` remains an unreferenced compatibility aggregate.
 
 Shopify adapter maturity is computed per component in `adapter.manifest.json` with `shopify-maturity-v1`. CSS is required for every component, dedicated Liquid is required only for components using a target adapter strategy, and embedded class contracts can be target-ready without their own Liquid root. Section adapters also track schema/settings, data mapping, template composition, and editor-preview readiness. See `docs/decisions/0030-shopify-adapter-maturity-model.md` and `docs/decisions/0032-shopify-maturity-v1-schema-data-editor.md`.
 
@@ -221,10 +224,9 @@ components/contracts/cart-note.contract.json
 components/contracts/cart-page.contract.json
 components/contracts/cart-summary.contract.json
 components/contracts/cart-upsell.contract.json
-components/contracts/category-nav.contract.json
+components/contracts/filter-bar.contract.json
 components/contracts/ceramics-faq.contract.json
 components/contracts/ceramics-glossary.contract.json
-components/contracts/certificate-details.contract.json
 components/contracts/certificate.contract.json
 components/contracts/checkbox.contract.json
 components/contracts/checkout-progress.contract.json
@@ -263,7 +265,7 @@ components/contracts/featured-collection.contract.json
 components/contracts/field-wrapper.contract.json
 components/contracts/fieldset.contract.json
 components/contracts/file-upload.contract.json
-components/contracts/filters.contract.json
+components/contracts/filter-panel.contract.json
 components/contracts/firing-info.contract.json
 components/contracts/footer.contract.json
 components/contracts/form.contract.json
@@ -345,7 +347,8 @@ components/contracts/stat.contract.json
 components/contracts/stats-section.contract.json
 components/contracts/steps.contract.json
 components/contracts/sticky-atc.contract.json
-components/contracts/store-pickup.contract.json
+components/contracts/pickup-location-selector.contract.json
+components/contracts/store-locator.contract.json
 components/contracts/studio-tour.contract.json
 components/contracts/subscription-option.contract.json
 components/contracts/switch.contract.json
@@ -410,18 +413,22 @@ The neutral web adapter is now the first explicit component adapter output:
 ```text
 components/css/*.css
 components/js/theme.js
+components/js/runtime-modules.json
 components/contracts/*.contract.json
 registry.json
 platforms/web/tokens.css
   -> scripts/build-web-adapter.js
   -> platforms/web/index.css
   -> platforms/web/components.css
+  -> platforms/web/components/*.css
   -> platforms/web/theme.js
+  -> platforms/web/runtime-loader.js
+  -> platforms/web/runtime/{core,*.js}
   -> platforms/web/adapter.manifest.json
   -> platforms/web/adapter.summary.json
 ```
 
-The canonical component CSS still lives in `components/css/`. In the current adapter policy, CSS is hand-authored and contracts validate/describe the adapter; contracts do not generate component CSS yet.
+The canonical component CSS still lives in `components/css/`. In the current adapter policy, CSS is hand-authored and contracts validate/describe the adapter; contracts do not generate component CSS yet. Each manifest component now declares a dependency-closed install slice. `components.css` and `theme.js` remain complete compatibility bundles, while copied family CSS and the selective runtime are the primary copy-and-own delivery units described by ADR 0273.
 
 The documentation site consumes `platforms/web/index.css` as its document-level
 design-system entry. Shadow-root previews use the generated
@@ -473,7 +480,10 @@ For components without contracts yet, use `registry.json`, CSS, and MDX docs as 
 - `list`
 - `diff`
 
-The CLI copies CSS and token files into a consumer project and records local state in `tg.config.json`.
+The CLI reads the Web adapter manifest, resolves the transitive component graph,
+copies the exact base/family CSS and runtime modules for that graph, writes a
+local `runtime.js` module entry when behavior is needed, copies token source
+files, and records local state in `tg.config.json`.
 
 ## Documentation Site
 

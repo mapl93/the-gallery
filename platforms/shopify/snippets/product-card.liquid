@@ -1,29 +1,40 @@
-{%- comment -%}
-  Snippet: product-card
-  Usage: {% render 'product-card', product: product %}
-{%- endcomment -%}
+{% doc %}
+Renders one canonical Product Card from a Shopify product resource.
 
-<article class="product-card card">
+@param {product} product - Product resource rendered by the owning section.
+@param {string} [media_ratio] - Bounded canonical media ratio: square or portrait. Defaults to square.
+
+@example
+{% render 'product-card', product: product %}
+{% enddoc %}
+
+{%- assign product_image_alt = product.featured_image.alt | default: product.title -%}
+{%- assign product_card_media_ratio = media_ratio | default: 'square' -%}
+{%- unless product_card_media_ratio == 'portrait' -%}
+  {%- assign product_card_media_ratio = 'square' -%}
+{%- endunless -%}
+
+<article class="product-card card" data-media-ratio="{{ product_card_media_ratio }}">
   <div class="product-card__media">
     {% if product.available == false %}
       <div class="product-card__badges">
-        <span class="badge badge--error">Sold Out</span>
+        <span class="badge badge--error">{{ 'products.sold_out' | t }}</span>
       </div>
     {% elsif product.compare_at_price > product.price %}
       <div class="product-card__badges">
-        <span class="badge badge--warning">Sale</span>
+        <span class="badge badge--warning">{{ 'products.on_sale' | t }}</span>
       </div>
     {% endif %}
 
     {%- if product.featured_image != blank -%}
       {{ product.featured_image | image_url: width: 600 | image_tag:
          class: 'product-card__image product-card__image--primary',
-         alt: product.title, loading: 'lazy', widths: '300,450,600' }}
+         alt: product_image_alt, loading: 'lazy', widths: '300,450,600' }}
 
       {%- if product.images[1] != blank -%}
         {{ product.images[1] | image_url: width: 600 | image_tag:
            class: 'product-card__image product-card__image--hover',
-           alt: product.title, loading: 'lazy', widths: '300,450,600' }}
+           alt: '', loading: 'lazy', widths: '300,450,600' }}
       {%- endif -%}
     {%- else -%}
       {{ 'product-1' | placeholder_svg_tag: 'product-card__image product-card__image--primary' }}
@@ -31,31 +42,28 @@
 
     {% if product.available and product.variants.size == 1 %}
       <div class="product-card__quick-add">
-        <button class="btn btn--primary btn--full btn--sm"
+        <button class="btn btn--full btn--sm" type="button"
+                aria-label="{{ 'products.quick_add_named' | t: title: product.title | escape }}"
                 data-quick-add="{{ product.variants.first.id }}">
-          Quick Add
+          {{ 'products.quick_add' | t }}
         </button>
       </div>
     {% endif %}
   </div>
 
   <div class="product-card__body">
-    {% if product.vendor %}
-      <span class="product-card__vendor">{{ product.vendor }}</span>
+    {% if product.vendor != blank %}
+      <span class="product-card__vendor">{{ product.vendor | escape }}</span>
     {% endif %}
     <h3 class="product-card__title">
-      <a href="{{ product.url | within: collection }}">{{ product.title }}</a>
+      <a href="{{ product.url | within: collection }}">{{ product.title | escape }}</a>
     </h3>
     {% if product.metafields.custom.subtitle %}
-      <span class="product-card__subtitle">{{ product.metafields.custom.subtitle }}</span>
+      <span class="product-card__subtitle">{{ product.metafields.custom.subtitle | escape }}</span>
     {% endif %}
   </div>
 
   <div class="product-card__footer">
     {% render 'price', product: product %}
-    {% if product.metafields.reviews.rating %}
-      {% render 'rating', rating: product.metafields.reviews.rating,
-         count: product.metafields.reviews.rating_count %}
-    {% endif %}
   </div>
 </article>

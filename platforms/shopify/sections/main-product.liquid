@@ -1,27 +1,89 @@
 {%- comment -%}
   Section: Main Product
-  The primary product section for the product template.
-  Uses snippets: product-gallery, product-info, product-form,
-  variant-selector, price, rating, breadcrumb, certificate-of-authenticity
+
+  One target coordinator owns option resolution and atomically re-renders the
+  Product Gallery, Product Info, Variant Selector, Product Form, URL and
+  structured data. Product Info itself remains passive.
 {%- endcomment -%}
 
-<section class="section">
-  <div class="container">
+<script src="{{ 'product-coordinator.js' | asset_url }}" defer></script>
+<script src="{{ 'size-chart.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign update_message = 'products.variant.unavailable_combination' | t
+  if current_variant
+    assign update_message = 'products.variant.updated' | t: title: current_variant.title
+  endif
+-%}
+
+<section
+  class="section"
+  data-main-product
+  data-section-id="{{ section.id }}"
+  data-product-url="{{ product.url }}"
+  data-current-variant-id="{{ current_variant.id }}"
+  data-current-market-id="{{ localization.market.id }}"
+  data-product-update-message="{{ update_message | escape }}"
+  data-product-update-error="{{ 'products.variant.update_error' | t | escape }}"
+>
+  <div class="container" data-product-render>
     <div class="product-layout">
-      {%- comment -%} Gallery (Left) {%- endcomment -%}
       <div class="product-layout__gallery">
-        {% render 'product-gallery', product: product %}
+        {% render 'product-gallery',
+          product: product,
+          image_detail: section.settings.gallery_image_detail,
+          loop: section.settings.gallery_loop
+        %}
       </div>
 
-      {%- comment -%} Info (Right) {%- endcomment -%}
       <div class="product-layout__info">
-        {% render 'product-info', product: product, collection: collection %}
+        {% for block in section.blocks %}
+          <div class="product-layout__block" {{ block.shopify_attributes }}>
+            {% case block.type %}
+              {% when 'breadcrumb' %}
+                {% render 'breadcrumb', product: product, collection: collection %}
 
-        {%- comment -%} Certificate of Authenticity {%- endcomment -%}
-        {% render 'certificate-of-authenticity', product: product %}
+              {% when 'product_info' %}
+                {% render 'product-info', product: product, variant: current_variant %}
+
+              {% when 'rating' %}
+                {% if product.metafields.reviews.rating %}
+                  {% render 'rating',
+                    rating: product.metafields.reviews.rating,
+                    count: product.metafields.reviews.rating_count
+                  %}
+                {% endif %}
+
+              {% when 'product_form' %}
+                {% render 'product-form',
+                  product: product,
+                  section_id: section.id,
+                  current_variant: current_variant,
+                  show_quantity: block.settings.show_quantity
+                %}
+
+              {% when 'size_chart' %}
+                {% assign size_chart_id = 'size-chart-' | append: section.id | append: '-' | append: block.id %}
+                {% render 'size-chart', product: product, size_chart_id: size_chart_id %}
+
+              {% when 'certificate' %}
+                {% render 'certificate-of-authenticity', product: product %}
+
+              {% when '@app' %}
+                {% render block %}
+            {% endcase %}
+          </div>
+        {% endfor %}
       </div>
     </div>
+
+    <script type="application/ld+json" data-product-structured-data>
+      {{ product | structured_data }}
+    </script>
   </div>
+
+  <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-product-update-status></p>
 </section>
 
 <style>
@@ -31,11 +93,9 @@
     gap: var(--space-layout-grid-gap);
   }
 
-  @media (min-width: 768px) {
-    .product-layout {
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-layout-section-gap);
-    }
+  .product-layout__info,
+  .product-layout__block {
+    min-inline-size: 0;
   }
 
   .product-layout__info {
@@ -44,7 +104,16 @@
     gap: var(--space-layout-section-gap);
   }
 
+  .product-layout__block:empty {
+    display: none;
+  }
+
   @media (min-width: 768px) {
+    .product-layout {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-layout-section-gap);
+    }
+
     .product-layout__info {
       position: sticky;
       top: 100px;
@@ -56,6 +125,44 @@
 {% schema %}
 {
   "name": "Product Page",
-  "settings": []
+  "settings": [
+    {
+      "type": "select",
+      "id": "gallery_image_detail",
+      "label": "Image detail",
+      "default": "lightbox",
+      "options": [
+        { "value": "lightbox", "label": "Lightbox" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "gallery_loop",
+      "label": "Loop product media",
+      "default": false
+    }
+  ],
+  "blocks": [
+    { "type": "breadcrumb", "name": "Breadcrumb", "limit": 1 },
+    { "type": "product_info", "name": "Product information", "limit": 1 },
+    { "type": "rating", "name": "Rating", "limit": 1 },
+    {
+      "type": "product_form",
+      "name": "Product form",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_quantity",
+          "label": "Show quantity selector",
+          "default": true
+        }
+      ]
+    },
+    { "type": "size_chart", "name": "Size chart", "limit": 1 },
+    { "type": "certificate", "name": "Certificate", "limit": 1 },
+    { "type": "@app" }
+  ]
 }
 {% endschema %}

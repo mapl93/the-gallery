@@ -1,50 +1,112 @@
 ## Overview
 
-Cart Page composes the ordered line items and the order summary into the full cart experience. It also provides the page title, optional item count, and optional continue-shopping link.
+Cart Page is the named populated-cart composition. It combines one ordered
+canonical Cart Line Item collection and one canonical Cart Summary from the
+same target-confirmed cart snapshot, plus a required visible title, optional
+target-formatted count, and optional complete continue-shopping link.
 
 <Preview
-  html={'<section class="cart-page tg-preview-cart-page tg-preview-frame--lg"><section class="cart-page__items"><div class="cart-page__header"><h1 class="cart-page__title">Your Cart</h1><span class="cart-page__count">1 item</span></div><a class="cart-page__continue" href="#">Continue shopping</a><article class="cart-line"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /><div class="cart-line__info"><a class="cart-line__title" href="#">Artisan Ceramic Vase</a><span class="cart-line__variant">Large / White</span></div><div class="cart-line__prices"><span class="cart-line__price">$120.00</span></div></article></section><aside class="cart-page__summary"><div class="cart-summary"><h2 class="cart-summary__title">Order Summary</h2><div class="cart-summary__row"><span>Subtotal</span><span class="cart-summary__value">$120.00</span></div><div class="cart-summary__row cart-summary__row--total"><span>Total</span><span class="cart-summary__value">$120.00</span></div><button class="btn cart-summary__checkout" type="button">Checkout</button></div></aside></section>'}
+  html={'<section class="cart-page tg-preview-cart-page tg-preview-frame--lg" aria-labelledby="cart-page-title"><header class="cart-page__header"><h1 class="cart-page__title" id="cart-page-title">Your cart</h1><p class="cart-page__count"><bdi>1 item</bdi></p><a class="cart-page__continue" href="#collection">Continue shopping</a></header><div class="cart-page__layout"><div class="cart-page__items"><ul class="cart-lines"><li class="cart-line"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" /><div class="cart-line__info"><a class="cart-line__title" href="#celadon-study">Celadon Study No. 4</a><div class="cart-line__details">Stoneware · satin celadon</div></div><div class="cart-line__price"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$120.00</bdi></span></span></div></li></ul></div><div class="cart-page__summary"><section class="cart-summary" aria-labelledby="cart-summary-title"><h2 class="cart-summary__title" id="cart-summary-title">Order summary</h2><dl class="cart-summary__rows"><div class="cart-summary__row"><dt>Subtotal</dt><dd class="cart-summary__value"><bdi>$120.00</bdi></dd></div><div class="cart-summary__row cart-summary__row--total"><dt>Estimated total</dt><dd class="cart-summary__value"><bdi>$120.00 USD</bdi></dd></div></dl><p class="cart-summary__note">Taxes and shipping calculated at checkout.</p><button class="btn cart-summary__checkout" type="button">Checkout</button></section></div></div></section>'}
   label="Cart Page"
 />
 
 ## Presentation
 
-The root presents one column at narrow widths and places the summary beside the line-item region at the desktop breakpoint. `lineItems` and `summary` are required composition slots; Cart Page does not replace the behavior owned by Cart Line Item or Cart Summary.
+The root is a native `section` named by its visible title. Its `header` owns
+only Cart Page context. A private neutral layout wrapper keeps the native line
+list before the named summary in source order; neither wrapper adds a second
+section or complementary landmark.
 
-The header contains the required title and may include a target-formatted item count. The continue-shopping link is optional and requires both its label and destination when present.
+The layout responds to the Cart Page container, not the page viewport. Narrow
+containers preserve one flow; a private wide threshold introduces a flexible
+line-item track and a bounded summary track. `summaryPlacement` requests either
+the default `sticky` presentation or explicit `flow` while preserving the same
+source order and canonical Cart Summary. Sticky automatically degrades to flow
+in narrow or short contexts. Page gutters and maximum width remain target-shell
+decisions.
+
+Cart Page represents a populated cart only. Cart Empty remains a separate
+canonical component; the target atomically branches between them.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Update the item count, line items, and summary from the same cart state.</Do>
-  <Dont>Do not let totals or quantities become stale after a cart mutation.</Dont>
+  <Do>Replace the count, canonical line collection, and canonical summary together from one target-confirmed cart state.</Do>
+  <Dont>Do not let Cart Page calculate prices, invent destinations, reimplement dependencies, or coordinate mutations independently.</Dont>
 </DoDont>
 
-- Keep the line-item order consistent with the commerce target.
-- Preserve a direct path back to shopping when the continue link is included.
-- Let the target own loading, persistence, and checkout handoff behavior.
+- Supply a non-empty title, at least one canonical Cart Line Item, and one
+  complete canonical Cart Summary. An invalid required composition omits the
+  complete renderer.
+- Include continue shopping only when both a descriptive label and real
+  target-owned destination exist. There is no fallback URL.
+- Treat `count` as localized snapshot text. Do not parse it as commerce data or
+  make it a live region by default.
+- Let one target coordinator own cart identity, persistence, inventory,
+  pricing, quantity/removal transport, pending/error/rollback/retry, empty
+  transition, checkout, focus, analytics, and cross-surface synchronization.
+- Use `sticky` only in a target that owns the real header/safe-area offset,
+  available height, collision boundary, zoom behavior and focused-control
+  visibility. Degrade to `flow` whenever those guarantees cannot be met.
 
 ## Accessibility
 
-- Use a page-level heading for `title`.
-- Announce item-count and total changes when quantity or removal actions update the cart.
-- Preserve logical reading order between the line-item region and the summary.
-- Keep the continue-shopping link keyboard reachable with a visible focus indicator.
+- Name the native section from the required visible heading through a
+  target-unique id. The target chooses the heading rank from the surrounding
+  document outline; the docs renderer uses `h2`.
+- Preserve Cart Line Item's native list, product identity, contextual controls
+  and focus behavior, and Cart Summary's named native description list and
+  canonical checkout Button.
+- Keep the logical order title, optional context, lines, then summary even when
+  the visual layout has two tracks.
+- Keep continue shopping as a native link with ordinary Tab, Enter, modified
+  activation, history, and context-menu behavior.
+- After a confirmed mutation that changes content without navigation or focus
+  context, announce one complete target-owned result such as “Quantity updated.
+  Cart now has 2 items. Estimated total $240.” Do not make count, every line,
+  and every total competing live regions.
+- Preserve usability with keyboard-only operation, narrow containers, 200%
+  zoom, user text spacing, long/localized content, RTL, dark mode, forced
+  colors, and reduced motion.
+
+## Target Translation
+
+- **Web:** map `summaryPlacement` to the default sticky presentation or the
+  `.cart-page--summary-flow` modifier. Canonical CSS handles width/height
+  fallback and bounded overflow; a host with sticky chrome owns its real safe
+  offset. No neutral JavaScript is required.
+- **Shopify:** map `cart.items`, localized `cart.item_count`, the canonical
+  Liquid line/summary snippets, the editor placement setting, native cart
+  update form, checkout and a real collection route. Shopify remains
+  responsible for its Header offset, server-authoritative refresh, errors,
+  empty branching, editor behavior, accelerated checkout and live-store proof.
+- **React and Angular:** expose a controlled composition over canonical
+  dependencies. Framework state is a target concern, not a second Cart Page
+  store.
+- **Figma:** compose approved Cart Line Item and Cart Summary instances for the
+  populated state after visual review. Registered generic nodes are
+  traceability metadata, not final Cart Page artwork.
+- **SwiftUI and Compose:** use target-native list, summary and navigation
+  semantics while preserving the same data/lifecycle boundary.
 
 ## References
 
-### Dependencies
-
 - [Cart Line Item](/components/cart-line-item)
 - [Cart Summary](/components/cart-summary)
+- [Cart Empty](/components/cart-empty)
+- [WHATWG section semantics](https://html.spec.whatwg.org/dev/sections.html#the-section-element)
+- [WAI status-message guidance](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+- [Shopify cart template](https://shopify.dev/docs/storefronts/themes/architecture/templates/cart)
+- [Shopify Theme Store cart requirements](https://shopify.dev/docs/storefronts/themes/store/requirements#cart-page-requirements)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Cart page title</td></tr>
-  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted cart item count</td></tr>
-  <tr><td>`continueLabel`</td><td>string</td><td>optional</td><td>Continue-shopping link label</td></tr>
-  <tr><td>`continueHref`</td><td>string</td><td>optional</td><td>Continue-shopping destination</td></tr>
-  <tr><td>`lineItems`</td><td>slot</td><td>required</td><td>Ordered Cart Line Item dependencies</td></tr>
-  <tr><td>`summary`</td><td>slot</td><td>required</td><td>Cart Summary dependency</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible cart title and section-name source</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Localized target-formatted snapshot coherent with lines and summary</td></tr>
+  <tr><td>`continueLabel`</td><td>string</td><td>optional pair</td><td>Descriptive continue-shopping link text</td></tr>
+  <tr><td>`continueHref`</td><td>string</td><td>optional pair</td><td>Real target-owned continue-shopping destination</td></tr>
+  <tr><td>`lineItems`</td><td>slot</td><td>required</td><td>Non-empty ordered canonical Cart Line Item list</td></tr>
+  <tr><td>`summary`</td><td>slot</td><td>required</td><td>Complete canonical Cart Summary from the same cart snapshot</td></tr>
+  <tr><td>`summaryPlacement`</td><td>`sticky | flow`</td><td>`sticky`</td><td>Semantic presentation request for the same summary; incapable contexts degrade safely to flow</td></tr>
 </PropTable>

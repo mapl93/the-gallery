@@ -4,7 +4,7 @@ import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import { getStudioLucideIcon, studioLucideIcons } from './lucideCatalogue';
 
-export type StudioPropertyValue = string | boolean | number | null;
+export type StudioPropertyValue = string | string[] | boolean | number | null;
 export type StudioPropertyValues = Record<string, StudioPropertyValue>;
 export interface StudioSlotIconValues {
   leading: string;
@@ -185,6 +185,17 @@ export default function StudioInspector({
       );
     }
 
+    if (control.kind === 'collection' && property?.type === 'string-list') {
+      const selectedValues = Array.isArray(values[property.name])
+        ? values[property.name] as string[]
+        : [];
+      return (
+        <span id={id} className="docs-studio__collection-value">
+          {selectedValues.length > 0 ? selectedValues.join(', ') : 'None'}
+        </span>
+      );
+    }
+
     if (control.kind === 'number' && property) {
       const value = values[property.name];
       return (
@@ -314,7 +325,8 @@ export default function StudioInspector({
               id={id}
               className="switch__input"
               type="checkbox"
-              checked={values[slot.name] === true}
+              checked={slot.required || values[slot.name] === true}
+              disabled={slot.required}
               onChange={(event) => onPropertiesChange({ [slot.name]: event.target.checked })}
             />
             <span className="switch__track" aria-hidden="true">
@@ -508,6 +520,7 @@ export default function StudioInspector({
               {controls.map((control) => {
                 const id = `${baseId}-${control.id}`;
                 const groupedControl = control.kind === 'segmented'
+                  || control.kind === 'collection'
                   || control.kind === 'token-pair';
                 return (
                   <div className="docs-studio__control-group" key={control.id}>

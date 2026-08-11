@@ -1,48 +1,54 @@
 ## Overview
 
-Gift Wrap Option composes a native Checkbox with a target-formatted optional price. Selection changes target cart state; the component does not define the sellable gift-wrap item or pricing rule.
+Gift Wrap Option is one optional native order-level cart choice. It composes the canonical Checkbox and an optional canonical target-formatted Price; targets map confirmed selection to one explicit sellable gift-wrap service line at quantity one.
 
 <Preview
-  html={'<div class="gift-wrap tg-preview-frame--sm"><label class="checkbox gift-wrap__control"><input class="checkbox__input" type="checkbox" name="gift-wrap" value="gift-wrap" /><span class="checkbox__label gift-wrap__label">Add gift wrapping</span></label><span class="gift-wrap__info"><span class="gift-wrap__price">+$5.00</span></span></div>'}
+  html={'<label class="checkbox gift-wrap tg-preview-frame--sm"><input class="checkbox__input" type="checkbox" name="gift_wrap" value="selected" /><span class="checkbox__label gift-wrap__info"><span class="gift-wrap__label">Add gift wrapping</span><span class="gift-wrap__price"><span class="price" data-price-alternate-digits="false" data-price-slashed-zero="true" data-price-tabular-numbers="true" data-price-contextual-alternates="true" data-price-fractions="false"><span class="price__current"><span class="price__label">Gift wrapping surcharge: </span><bdi class="price__value">+$8.00</bdi></span></span></span></span></label>'}
   label="Gift Wrap Option"
 />
 
 ## Presentation
 
-`label` is required and supplies the visible accessible option name. `selected` and `disabled` default to `false` and map to the composed native Checkbox. `price` is optional and remains target-formatted.
+`label` is required and supplies visible accessible-name content. `selected` establishes initial native checkedness in static Web; a stateful commerce adapter controls the live property from its authoritative cart snapshot through the native `change` event. The optional `price` slot contains one complete Price and is omitted without implying that the service is free. A configured zero price remains explicit.
 
-Gift Wrap Option owns the cart-specific label and price arrangement. Checkbox retains native selection, disabled, keyboard, and form semantics.
+Gift Wrap owns only the cart-specific arrangement and target-mutation boundary. Checkbox owns selection, disabled state, keyboard, form value, focus, forced colors, and reduced motion. Price owns monetary parts, localization, bidirectional isolation, and formatting.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Synchronize selection and price with the target's gift-wrap cart state.</Do>
-  <Dont>Do not imply that gift wrapping is free or available when the target says otherwise.</Dont>
+  <Do>Reconcile checkedness and totals from one confirmed sellable gift-wrap line at quantity one.</Do>
+  <Dont>Do not hide the charge in an attribute, create per-item wrapping implicitly, or treat optimistic checkedness as confirmed.</Dont>
 </DoDont>
 
-- Keep the option independent unless the target defines additional required choices.
-- Update cart totals after selection changes.
-- Explain unavailability in surrounding content when `disabled` is active.
+- Keep the option independent unless the product model explicitly introduces additional choices.
+- Configure one dedicated target product or variant whose real Price, tax, inventory, shipping, fulfillment, discounts, refunds, and localization remain authoritative.
+- Omit the complete component when the service is unavailable; use `disabled` only when a nearby explanation is useful.
+- Use `name` and `value` only in targets whose native form mapping represents the accepted sellable-line request; Shopify's Ajax adapter uses variant identity instead.
+- Keep pending, error, retry, status, focus, stale-response, and analytics behavior in the target cart lifecycle.
 
 ## Accessibility
 
-- Keep the native checkbox and visible `label` inside the same wrapping label.
-- Preserve the native selected and disabled states on `.checkbox__input`.
-- Include the price in nearby readable content without making it the checkbox's only name.
-- Announce resulting cart-total changes after selection.
-- Do not rely on the check indicator or price color alone to communicate state.
+- Keep one native checkbox and all non-interactive visible label content inside the wrapping label.
+- Preserve Checkbox Space, checked, disabled, focus-visible, form-submit, and reset behavior.
+- Keep the visible option label when Price is present; a price alone is not an accessible name.
+- Reference external explanatory or unavailable content through `describedBy` when needed.
+- Announce confirmed total or cart changes from the owning target region, not from K11 itself, and reconcile every rendered surface from the same cart snapshot.
 
 ## References
 
 ### Dependencies
 
 - [Checkbox](/components/checkbox)
+- [Price](/components/price)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`selected`</td><td>boolean</td><td>`false`</td><td>Gift-wrap Checkbox selection state</td></tr>
-  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible accessible gift-wrap option label</td></tr>
-  <tr><td>`price`</td><td>string</td><td>optional</td><td>Target-formatted gift-wrap price</td></tr>
-  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the composed native Checkbox</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Non-empty localized visible option label</td></tr>
+  <tr><td>`selected`</td><td>boolean</td><td>`false`</td><td>Initial native checkedness or target-controlled live selection</td></tr>
+  <tr><td>`price`</td><td>slot</td><td>optional</td><td>One complete canonical target-formatted Price</td></tr>
+  <tr><td>`name`</td><td>string</td><td>optional</td><td>Target-selected native form field name</td></tr>
+  <tr><td>`value`</td><td>string</td><td>`on`</td><td>Successful native form value when selected</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Canonical native Checkbox unavailability</td></tr>
+  <tr><td>`describedBy`</td><td>string</td><td>optional</td><td>ID reference to target-owned explanatory content</td></tr>
 </PropTable>

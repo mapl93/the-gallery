@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "toggle",
   "name": "Toggle / Toggle Group",
   "registryId": "A19",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Toggle button group primitive for mutually exclusive or pressed state actions such as grid/list view.",
+  "summary": "Named exclusive mode-selection group whose target-owned native buttons expose synchronized boolean pressed state with normal tab order.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/toggle",
@@ -31,7 +31,11 @@
     { "name": "disabled", "selectors": [".toggle:disabled"], "description": "Unavailable native toggle state." }
   ],
   "behavior": [
-    { "name": "pressedState", "selectors": [".toggle[aria-pressed=\"true\"]", ".toggle--active"], "attributes": ["aria-pressed", "role=\"group\"", "aria-label"], "events": ["click", "Space", "Enter"], "description": "Each slotted native button exposes aria-pressed. Neutral web progressively synchronizes exactly one pressed item after pointer or keyboard activation." }
+    { "name": "pressedState", "selectors": [".toggle[aria-pressed=\"true\"]", ".toggle--active"], "attributes": ["aria-pressed", "role=\"group\"", "aria-label"], "events": ["click", "Space", "Enter"], "description": "Each slotted native button exposes a boolean aria-pressed value. Neutral web progressively synchronizes exactly one pressed item after pointer or keyboard activation and preserves the native bubbling click." },
+    { "name": "stateOwnership", "selectors": [".toggle-group", ".toggle"], "description": "Targets own option labels, values, initial selection, selection effects, and persistence. Neutral web is uncontrolled after reading authored initial state; framework targets may control the value while updating every item atomically." },
+    { "name": "keyboardModel", "selectors": [".toggle"], "description": "Every item remains a normal Tab stop; arrow keys and roving focus are not captured by this pressed-button pattern." },
+    { "name": "motionPreference", "selectors": [".toggle"], "description": "Decorative surface, text, and border transitions are removed when reduced motion is requested without changing selection." },
+    { "name": "contentResilience", "selectors": [".toggle-group", ".toggle"], "description": "The group can shrink to its container and localized or indivisible item labels wrap rather than forcing page-level horizontal overflow." }
   ],
   "properties": [
     {
@@ -63,10 +67,14 @@
   "accessibility": [
     "Expose pressed state with aria-pressed or native radio semantics depending on the target pattern.",
     "Provide a group label when multiple toggles represent one setting.",
-    "Keep keyboard focus visible."
+    "Keep exactly one item aria-pressed=true for the accepted exclusive pattern.",
+    "Preserve normal Tab order and do not add Toolbar arrow-key behavior.",
+    "Keep keyboard focus visible.",
+    "Honor reduced-motion preferences for decorative transitions.",
+    "Allow localized or unbroken labels to wrap without page overflow."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css-js", "notes": "CSS owns presentation; shared progressive enhancement synchronizes exclusive aria-pressed state." },
+    "web": { "status": "implemented", "kind": "css-js", "notes": "CSS owns resilient presentation and reduced motion; shared progressive enhancement normalizes and synchronizes one exclusive aria-pressed state while preserving native activation." },
     "shopify": { "status": "implemented", "kind": "liquid-css-js" },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

@@ -1,0 +1,128 @@
+{% doc %}
+Renders one canonical Article Card from a Shopify article resource.
+
+@param {article} article - Article resource rendered by the owning blog composition.
+@param {string} [variant] - standard, featured, minimal, horizontal, or editorial layout.
+@param {string} [surface] - default, flat, or elevated canonical Card surface.
+@param {string} [excerpt_lines] - none, 2, 3, or 4 visual lines; source excerpt remains intact.
+@param {number} [heading_level] - Contextual heading rank from 2 through 6.
+@param {boolean} [show_image] - Whether available article media is rendered.
+@param {boolean} [show_date] - Whether the published date is rendered.
+@param {boolean} [show_excerpt] - Whether an available excerpt is rendered.
+@param {boolean} [show_author] - Whether an available author name is rendered outside the primary Link.
+@param {string} [blog_label] - Optional passive canonical Badge outside the primary Link.
+@param {string} [image_loading] - lazy by default; eager for an explicitly prioritized card.
+
+@example
+{% render 'article-card', article: article, variant: 'standard', surface: 'default', excerpt_lines: 'none', heading_level: 3, blog_label: blog.title %}
+{% enddoc %}
+
+{%- liquid
+  assign article_card_variant = 'standard'
+  case variant
+    when 'featured', 'minimal', 'horizontal', 'editorial'
+      assign article_card_variant = variant
+  endcase
+
+  assign article_card_surface = 'default'
+  case surface
+    when 'flat', 'elevated'
+      assign article_card_surface = surface
+  endcase
+
+  assign article_card_excerpt_lines = 'none'
+  case excerpt_lines
+    when 2, 3, 4, '2', '3', '4'
+      assign article_card_excerpt_lines = excerpt_lines
+  endcase
+
+  assign article_card_heading_level = heading_level | default: 3 | plus: 0
+  case article_card_heading_level
+    when 2
+      assign article_card_heading = 'h2'
+    when 4
+      assign article_card_heading = 'h4'
+    when 5
+      assign article_card_heading = 'h5'
+    when 6
+      assign article_card_heading = 'h6'
+    else
+      assign article_card_heading = 'h3'
+  endcase
+
+  assign article_card_show_image = true
+  assign article_card_show_date = true
+  assign article_card_show_excerpt = true
+  assign article_card_show_author = true
+  if show_image == false
+    assign article_card_show_image = false
+  endif
+  if show_date == false
+    assign article_card_show_date = false
+  endif
+  if show_excerpt == false
+    assign article_card_show_excerpt = false
+  endif
+  if show_author == false
+    assign article_card_show_author = false
+  endif
+
+  assign article_card_loading = 'lazy'
+  if image_loading == 'eager'
+    assign article_card_loading = 'eager'
+  endif
+
+  assign article_card_has_media = false
+  if article_card_show_image and article.image != blank and article_card_variant != 'minimal'
+    assign article_card_has_media = true
+  endif
+
+  assign article_card_image_alt = article.image.alt | default: ''
+-%}
+
+{%- if article != blank and article.title != blank and article.url != blank -%}
+  <article
+    class="card article-card{% if article_card_surface == 'flat' %} card--flat{% elsif article_card_surface == 'elevated' %} card--elevated{% endif %}{% unless article_card_variant == 'standard' %} article-card--{{ article_card_variant }}{% endunless %}"
+    data-surface="{{ article_card_surface }}"
+    data-excerpt-lines="{{ article_card_excerpt_lines }}"
+  >
+    {%- if blog_label != blank -%}
+      <div class="article-card__category-slot{% if article_card_has_media %} article-card__category-slot--overlay{% endif %}">
+        <span class="badge article-card__category">{{ blog_label | escape }}</span>
+      </div>
+    {%- endif -%}
+
+    <a class="article-card__primary-link" href="{{ article.url }}">
+      <div class="article-card__layout">
+        {%- if article_card_has_media -%}
+          <div class="card__media article-card__media">
+            {{ article.image | image_url: width: 1200 | image_tag:
+              alt: article_card_image_alt,
+              loading: article_card_loading,
+              widths: '320, 480, 720, 960, 1200' }}
+          </div>
+        {%- endif -%}
+
+        <div class="card__body article-card__body">
+          {%- if article_card_show_date and article.published_at != blank -%}
+            <div class="article-card__meta">
+              <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'date' }}</time>
+            </div>
+          {%- endif -%}
+
+          <{{ article_card_heading }} class="article-card__title">{{ article.title | escape }}</{{ article_card_heading }}>
+
+          {%- if article_card_show_excerpt and article.excerpt != blank -%}
+            <p class="article-card__excerpt">{{ article.excerpt | strip_html | escape }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    </a>
+
+    {%- if article_card_show_author and article.author != blank -%}
+      <footer class="card__footer article-card__author">
+        <span class="article-card__author-name">{{ article.author | escape }}</span>
+      </footer>
+    {%- endif -%}
+  </article>
+{%- endif -%}

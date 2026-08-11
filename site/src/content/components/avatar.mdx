@@ -1,55 +1,75 @@
 ## Overview
 
-Circular identity primitive composed with an image or initials and available in four sizes.
+Passive circular identity thumbnail with explicit native-image or target-provided-initials composition and four fixed sizes.
 
 <Preview html={"<span class=\"avatar\" role=\"img\" aria-label=\"Maria Pacheco\">MP</span>"} label="Avatar" />
 
 ## Presentation
 
-`size` changes the avatar diameter without changing its content or identity semantics. Default is the classless size.
+`size` selects a fixed identity-thumbnail diameter and its intentional semantic initials typography step. Default is the classless 40px presentation. All sample names and initials are fixtures, not defaults.
 
 <Preview html={"<div class=\"tg-preview-inline\" aria-hidden=\"true\"><span class=\"avatar avatar--sm\">SM</span><span class=\"avatar\">MD</span><span class=\"avatar avatar--lg\">LG</span><span class=\"avatar avatar--xl\">XL</span></div>"} label="Sizes" />
 
-| Property | Value | Web mapping |
-| --- | --- | --- |
-| `size` | `sm` | `.avatar.avatar--sm` |
-| `size` | `default` | `.avatar` |
-| `size` | `lg` | `.avatar.avatar--lg` |
-| `size` | `xl` | `.avatar.avatar--xl` |
+| Property | Value | Diameter | Initials type | Web mapping |
+| --- | --- | ---: | --- | --- |
+| `size` | `sm` | 32px | Caption | `.avatar.avatar--sm` |
+| `size` | `default` | 40px | Body Small | `.avatar` |
+| `size` | `lg` | 56px | Body Default | `.avatar.avatar--lg` |
+| `size` | `xl` | 80px | Body Large | `.avatar.avatar--xl` |
 
-Image content is composed as a native `img` inside the avatar. Initials are direct text content. The current contract does not automate image loading failure or initials fallback.
+Image content is an explicit native `img` child. Initials are explicit short text content supplied by the target. The neutral component does not fetch an image, derive initials, listen for failure, delay fallback, or swap between the two.
+
+<Preview html={'<div class="tg-preview-inline"><span class="avatar avatar--lg"><img src="/media/editorial/artist-in-studio.jpg" alt="" /></span><span>Maria Pacheco</span></div>'} label="Avatar beside visible identity" />
+
+The adjacent visible name already identifies the person, so the native image uses `alt=""`. A standalone image instead needs contextual alternative text. A standalone initials composition uses one named image role with the full identity name; adjacent redundant initials use `aria-hidden="true"`.
+
+The semantic initials step is coupled to `size`; it is not a second public property. The target chooses image or pre-derived initials before rendering and owns image delivery/failure policy. Studio therefore exposes only `size` and does not imply a loading lifecycle or a public image-source string.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep the represented person's name available through nearby text, image alt text, or an accessible name.</Do>
-  <Dont>Don't treat initials as a sufficient accessible name on their own.</Dont>
+  <Do>Use Avatar for a person, organization, account, or other identity-bearing entity.</Do>
+  <Dont>Do not use it as a generic product thumbnail, media crop, uploader, or status indicator.</Dont>
 </DoDont>
 
 <DoDont>
-  <Do>Choose an image or initials composition explicitly in the consuming markup.</Do>
-  <Dont>Do not assume Avatar derives initials or swaps content when an image fails.</Dont>
+  <Do>Provide native image markup or one to two target-derived user-perceived initials explicitly.</Do>
+  <Dont>Do not assume Avatar derives, transliterates, truncates, loads, or swaps identity content.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Wrap the passive Avatar in a canonical named Link or Button when the identity is actionable.</Do>
+  <Dont>Do not add click handlers or focus to a non-interactive Avatar Span or Div.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Avatar supports image or initials composition. Identity text should be available either through alt text, nearby visible text, or an accessible name.
+  Identity naming depends on context. A standalone representation needs the full entity name; an avatar beside the same visible name should not repeat it.
 </Callout>
 
-- Give avatar images descriptive alt text when the avatar conveys identity.
-- Use empty alt text when nearby visible text already identifies the person.
-- Expose an accessible name for initials-only avatars when identity is not otherwise present.
+- Use native `img` with contextual `alt` for image content. Do not add a second `role="img"` around it.
+- Give standalone initials one full identity name through `aria-label` or `aria-labelledby`; the letters alone are not a sufficient name.
+- Use `alt=""` or `aria-hidden="true"` when adjacent visible text already names the same identity.
+- Keep status text/semantics separate. Avatar color alone must not communicate presence, verification, or account state.
+- Avatar has no keyboard, focus, disabled, live-region, loading, error, or controlled/uncontrolled behavior.
+
+## Responsive And Targets
+
+The selected square does not shrink in Flex rows and uses logical inline/block dimensions. Native images fill the circle with a private centered cover crop. Consumers choose a semantic size for their density; Avatar adds no breakpoint or container query.
+
+Web and Shopify consume the same generated CSS and semantic size/type pairings. Shopify Testimonials owns its image object, CDN transformation, lazy loading and visible adjacent name; the image is null-alt in that composition. Framework and native targets own image loading/failure policy and choose image or initials explicitly. Figma maps the four accepted pairings but does not define an automatic fallback state.
 
 ## References
 
 <PropTable>
-  <tr><td>`size`</td><td>`sm | default | lg | xl`</td><td>`default`</td><td>Visual avatar diameter</td></tr>
-  <tr><td>`.avatar`</td><td>class</td><td>—</td><td>Circular avatar container</td></tr>
-  <tr><td>`.avatar img`</td><td>element</td><td>—</td><td>Optional image inside the avatar</td></tr>
-  <tr><td>`.avatar--sm`</td><td>modifier</td><td>—</td><td>Small avatar size</td></tr>
-  <tr><td>`.avatar--lg`</td><td>modifier</td><td>—</td><td>Large avatar size</td></tr>
-  <tr><td>`.avatar--xl`</td><td>modifier</td><td>—</td><td>Extra-large avatar size</td></tr>
+  <tr><td>`size`</td><td>`sm | default | lg | xl`</td><td>`default`</td><td>Fixed semantic diameter and initials type step</td></tr>
+  <tr><td>`.avatar`</td><td>class</td><td>—</td><td>Passive circular identity container</td></tr>
+  <tr><td>`.avatar &gt; img`</td><td>native element</td><td>—</td><td>Optional explicit image content</td></tr>
+  <tr><td>initials</td><td>text content</td><td>—</td><td>Optional explicit target-provided content</td></tr>
+  <tr><td>`.avatar--sm`</td><td>modifier</td><td>—</td><td>32px Small</td></tr>
+  <tr><td>`.avatar--lg`</td><td>modifier</td><td>—</td><td>56px Large</td></tr>
+  <tr><td>`.avatar--xl`</td><td>modifier</td><td>—</td><td>80px Extra Large</td></tr>
 </PropTable>
 
-The image URL, alternative text, represented name, and initials in these examples are content fixtures. They are not component defaults.
+The image URL, alternative text, represented name, initials, crop source, loading policy, and future fallback behavior are target content or fixtures. They are not component defaults.

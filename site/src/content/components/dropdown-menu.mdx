@@ -1,36 +1,38 @@
 ## Overview
 
-Action menu with items, separators, labels, and keyboard shortcuts.
+Button-triggered action menu with labelled groups, roving focus, disabled and destructive commands, separators, and shortcut hints.
 
 ## Presentation
 
-<Preview html={"<div class=\"dropdown dropdown--open tg-preview-anchor-stage tg-preview-anchor-stage--menu\"><button class=\"btn btn--outline\" type=\"button\" data-preview-trigger aria-haspopup=\"menu\" aria-expanded=\"true\">Menu ▾</button><div class=\"dropdown__menu\"><button class=\"dropdown__item\" type=\"button\">Edit</button><button class=\"dropdown__item\" type=\"button\">Duplicate</button><div class=\"dropdown__separator\"></div><button class=\"dropdown__item\" type=\"button\">Delete</button></div></div>"} label="Dropdown Menu" layout="anchored" interaction={{"selector":".dropdown","toggle":"dropdown--open","triggerLabel":"Open Menu","triggerSelector":"[data-preview-trigger]","startVisible":true}} />
+<Preview html={"<div class=\"dropdown dropdown--open tg-preview-anchor-stage tg-preview-anchor-stage--menu\"><button class=\"btn btn--outline\" id=\"preview-menu-trigger\" type=\"button\" data-preview-trigger aria-haspopup=\"menu\" aria-expanded=\"true\" aria-controls=\"preview-menu\">Actions</button><div class=\"dropdown__menu\" id=\"preview-menu\" role=\"menu\" aria-labelledby=\"preview-menu-trigger\"><div class=\"dropdown__group\" role=\"group\" aria-labelledby=\"preview-menu-label\"><div class=\"dropdown__label\" id=\"preview-menu-label\">Artwork</div><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"0\">Edit artwork</button><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"-1\">Duplicate</button><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"-1\" aria-disabled=\"true\" data-disabled>Export certificate</button></div><div class=\"dropdown__separator\" role=\"separator\"></div><div class=\"dropdown__group\" role=\"group\" aria-label=\"Destructive actions\"><button class=\"dropdown__item dropdown__item--danger\" type=\"button\" role=\"menuitem\" tabindex=\"-1\">Delete</button></div></div></div>"} label="Dropdown Menu" layout="anchored" interaction={{"selector":".dropdown","toggle":"dropdown--open","triggerLabel":"Open Menu","triggerSelector":"[data-preview-trigger]","startVisible":true}} />
 
 ### Default
 
-<Preview html={"<div class=\"dropdown dropdown--open tg-preview-anchor-stage tg-preview-anchor-stage--menu tg-preview-static\"><button class=\"btn btn--outline\" type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"true\">Actions</button><div class=\"dropdown__menu\"><button class=\"dropdown__item\" type=\"button\">Edit</button><button class=\"dropdown__item\" type=\"button\">Share</button></div></div>"} label="Default" />
+<Preview html={"<div class=\"dropdown dropdown--open tg-preview-anchor-stage tg-preview-anchor-stage--menu tg-preview-static\"><button class=\"btn btn--outline\" id=\"default-menu-trigger\" type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"true\" aria-controls=\"default-menu\">Actions</button><div class=\"dropdown__menu\" id=\"default-menu\" role=\"menu\" aria-labelledby=\"default-menu-trigger\"><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"0\">Edit</button><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"-1\">Share</button></div></div>"} label="Default" />
 
 ### Danger Item
 
-<Preview html={"<div class=\"dropdown dropdown--open tg-preview-anchor-stage tg-preview-anchor-stage--menu tg-preview-static\"><button class=\"btn btn--outline\" type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"true\">Actions</button><div class=\"dropdown__menu\"><button class=\"dropdown__item dropdown__item--danger\" type=\"button\">Delete</button></div></div>"} label="Danger" />
+<Preview html={"<div class=\"dropdown dropdown--open tg-preview-anchor-stage tg-preview-anchor-stage--menu tg-preview-static\"><button class=\"btn btn--outline\" id=\"danger-menu-trigger\" type=\"button\" aria-haspopup=\"menu\" aria-expanded=\"true\" aria-controls=\"danger-menu\">Actions</button><div class=\"dropdown__menu\" id=\"danger-menu\" role=\"menu\" aria-labelledby=\"danger-menu-trigger\"><button class=\"dropdown__item dropdown__item--danger\" type=\"button\" role=\"menuitem\" tabindex=\"0\">Delete artwork</button></div></div>"} label="Danger" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use dropdown menu for compact action lists that open from a button trigger.</Do>
-  <Dont>Don't use dropdown menu for primary navigation when visible links would be clearer.</Dont>
+  <Do>Use Dropdown Menu for a compact set of immediate, related commands opened from a clearly labelled Button.</Do>
+  <Dont>Don't use it for primary navigation, value selection, arbitrary content, or unaccepted nested/checkable menu APIs.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="warning">
-  The CSS adapter provides the visual states; the target implementation owns open state, focus movement, and keyboard behavior.
+  The CSS adapter provides visual and semantic state hooks; every target must implement the Menu Button focus and keyboard contract.
 </Callout>
 
 - Use a button trigger with `aria-haspopup="menu"`, `aria-expanded`, and `aria-controls`.
-- Support ArrowUp, ArrowDown, Home, End, Enter, Space, and Escape.
-- Close on `Escape` key press.
-- Skip disabled items during keyboard activation.
+- Move focus to the first command on Enter/Space open; optional ArrowDown/ArrowUp open first/last.
+- Maintain one roving `tabindex`; support ArrowUp/Down, Home/End, optional printable typeahead, Enter/Space, Escape, and non-trapping Tab exit.
+- Close on Escape/outside/select and restore trigger focus after keyboard dismissal.
+- Use labelled `role="group"` wrappers and `role="separator"` for menu structure.
+- Expose disabled state through native, ARIA, or adapter data mapping and never activate unavailable commands.
 
 ## References
 
@@ -41,6 +43,7 @@ Action menu with items, separators, labels, and keyboard shortcuts.
   <tr><td>`.dropdown--open`</td><td>modifier</td><td>—</td><td>Open menu state</td></tr>
   <tr><td>`.dropdown__menu`</td><td>element</td><td>—</td><td>Floating menu surface</td></tr>
   <tr><td>`.dropdown__item`</td><td>element</td><td>—</td><td>Menu command item</td></tr>
+  <tr><td>`.dropdown__group`</td><td>element</td><td>—</td><td>Optional labelled command group</td></tr>
   <tr><td>`.dropdown__item--danger`</td><td>modifier</td><td>—</td><td>Destructive item styling</td></tr>
   <tr><td>`.dropdown__item-icon`</td><td>element</td><td>—</td><td>Optional item icon</td></tr>
   <tr><td>`.dropdown__item-shortcut`</td><td>element</td><td>—</td><td>Optional shortcut hint</td></tr>

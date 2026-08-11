@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "review-form",
   "name": "Write-a-Review Form",
   "registryId": "V7",
   "category": "reviews",
   "status": "pilot",
   "summary": "Native review-form composition that delegates rating and field semantics to Star Input, Input, Textarea, File Upload, Select, and Button.",
-  "dependencies": ["star-input"],
+  "dependencies": ["star-input", "input", "textarea", "file-upload", "select", "button"],
   "source": {
     "registry": "registry.json#/components/review-form",
     "css": { "file": "components/css/reviews.css", "selector": ".review-form" },
@@ -16,7 +16,7 @@
   "anatomy": [
     { "name": "root", "selector": ".review-form", "className": ".review-form", "required": true, "description": "Native form boundary that owns layout and emits a submit request without defining transport or workflow." },
     { "name": "fields", "selector": ".review-form__fields", "className": ".review-form__fields", "required": false, "description": "Optional structural group for composed form fields." },
-    { "name": "group", "selector": ".review-form__group", "className": ".review-form__group", "required": false, "description": "Compatibility layout wrapper; it does not own labels, controls, messages, or validation." },
+    { "name": "group", "selector": ".review-form__group", "className": ".review-form__group", "required": false, "description": "Optional layout wrapper; it does not own labels, controls, messages, or validation." },
     { "name": "rating", "selector": ".review-form .star-input", "className": ".star-input", "required": true, "description": "Composed Star Input that owns the native rating question and radio behavior." },
     { "name": "input", "selector": ".review-form .input", "className": ".input", "required": false, "description": "Optional composed Input that owns its label, value, message, validation variant, focus, and disabled state." },
     { "name": "textarea", "selector": ".review-form .textarea__field", "className": ".textarea__field", "required": true, "description": "Composed Textarea field that retains Input validation composition and multi-line behavior." },
@@ -110,11 +110,17 @@
       "name": "buttonComposition",
       "selectors": [".review-form .btn"],
       "description": "Button retains native submit, disabled, busy, focus-visible, and loading-indicator behavior; Review Form does not create a parallel submit-button state model."
+    },
+    {
+      "name": "stateOwnership",
+      "selectors": [".review-form"],
+      "events": ["reset", "formdata"],
+      "description": "Static Web preserves child-native initial values, reset, and FormData. Framework targets may control one value per child or use child defaults, but must not keep a second Review Form copy of child state."
     }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-primary", "--color-text-secondary"],
+      "color": ["--color-text-secondary"],
       "spacing": ["--space-layout-element-gap", "--space-input-margin-bottom", "--space-button-gap"],
       "typography": ["--typo-body-sm-size"]
     }

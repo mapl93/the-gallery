@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "lightbox",
   "name": "Lightbox",
   "registryId": "B17",
   "category": "layout",
   "status": "pilot",
-  "summary": "Modal image viewer contract with open state, content, image, close, previous and next navigation, counter, caption, focus trapping, and gallery keyboard behavior.",
-  "dependencies": ["modal"],
+  "summary": "Canonical modal image viewer with stable dialog naming, synchronized image/caption/status, finite or looping navigation, direct swipe, bounded zoom/pan, fallback media, focus containment, dismissal, RTL, and reduced-motion behavior.",
+  "dependencies": ["modal", "close-button", "icon-button"],
   "source": {
     "registry": "registry.json#/components/lightbox",
     "css": {
@@ -22,14 +22,14 @@
       "selector": ".lightbox",
       "className": ".lightbox",
       "required": true,
-      "description": "Fixed full-screen overlay that owns backdrop and visibility state."
+      "description": "Modal Overlay composition root that owns backdrop and visibility state."
     },
     {
       "name": "content",
       "selector": ".lightbox__content",
       "className": ".lightbox__content",
       "required": true,
-      "description": "Image stage and positioning context."
+      "description": "Figure containing the current image, counter, and optional figcaption."
     },
     {
       "name": "image",
@@ -39,18 +39,32 @@
       "description": "Displayed image."
     },
     {
+      "name": "viewport",
+      "selector": ".lightbox__viewport",
+      "className": ".lightbox__viewport",
+      "required": true,
+      "description": "Clipped gesture surface that contains bounded image zoom and pan."
+    },
+    {
+      "name": "title",
+      "selector": ".lightbox__title",
+      "className": ".lightbox__title",
+      "required": true,
+      "description": "Stable dialog title independent of the current image caption."
+    },
+    {
       "name": "close",
       "selector": ".lightbox__close",
       "className": ".lightbox__close",
       "required": true,
-      "description": "Dismiss control."
+      "description": "Canonical Close Button that dismisses the modal viewer."
     },
     {
       "name": "nav",
       "selector": ".lightbox__nav",
       "className": ".lightbox__nav",
       "required": false,
-      "description": "Previous or next image navigation control."
+      "description": "Canonical round Icon Button for previous or next image navigation."
     },
     {
       "name": "counter",
@@ -60,11 +74,32 @@
       "description": "Current image position indicator."
     },
     {
+      "name": "zoom",
+      "selector": ".lightbox__zoom",
+      "className": ".lightbox__zoom",
+      "required": true,
+      "description": "Named canonical Icon Button group for zoom out, reset, and zoom in."
+    },
+    {
       "name": "caption",
       "selector": ".lightbox__caption",
       "className": ".lightbox__caption",
       "required": false,
       "description": "Visible image caption."
+    },
+    {
+      "name": "fallback",
+      "selector": ".lightbox__fallback",
+      "className": ".lightbox__fallback",
+      "required": false,
+      "description": "Named fallback presented when the current media asset cannot render."
+    },
+    {
+      "name": "status",
+      "selector": ".lightbox__status",
+      "className": ".lightbox__status",
+      "required": false,
+      "description": "Polite current-position and current-caption announcement."
     }
   ],
   "variants": [
@@ -103,18 +138,33 @@
       "name": "nextNav",
       "selectors": [".lightbox__nav--next"],
       "description": "Next image navigation placement."
+    },
+    {
+      "name": "navDisabled",
+      "selectors": [".lightbox__nav:disabled"],
+      "description": "Finite collection boundary on previous or next navigation."
+    },
+    {
+      "name": "mediaError",
+      "selectors": [".lightbox__fallback"],
+      "description": "Current media failed while the modal and its navigation remain operable."
+    },
+    {
+      "name": "zoomed",
+      "selectors": [".lightbox__viewport[data-zoomed]"],
+      "description": "Image is above 1x and accepts bounded direct panning."
     }
   ],
   "behavior": [
     {
       "name": "visibility",
       "selectors": [".lightbox--open"],
-      "description": "The lightbox is hidden by default and becomes visible when lightbox--open is applied."
+      "description": "The lightbox shares Modal Overlay visibility through aria-hidden=false while lightbox--open remains the public compatibility modifier."
     },
     {
       "name": "modalSemantics",
       "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby", "aria-describedby"],
-      "description": "The lightbox inherits modal dialog semantics and must describe the current image or gallery context."
+      "description": "The lightbox inherits modal dialog semantics, uses a stable title, and optionally describes itself with the current visible figcaption."
     },
     {
       "name": "focusManagement",
@@ -130,7 +180,28 @@
       "name": "galleryNavigation",
       "selectors": [".lightbox__nav--prev", ".lightbox__nav--next"],
       "events": ["ArrowLeft", "ArrowRight", "previous image", "next image"],
-      "description": "Previous and next controls should update the image, counter, caption, and accessible description together."
+      "description": "Logical previous/next controls, direct horizontal swipe, and direction-aware arrow keys update image, counter, caption, alt text, current id, and polite status together."
+    },
+    {
+      "name": "finiteOrLoop",
+      "attributes": ["disabled", "data-loop"],
+      "description": "Finite mode disables navigation at real bounds; loop wraps logical state without cloning images or focusable controls."
+    },
+    {
+      "name": "boundedZoomPan",
+      "selectors": [".lightbox__viewport", ".lightbox__image", ".lightbox__zoom"],
+      "events": ["zoom in", "zoom out", "reset zoom", "+", "-", "0", "pointer pan"],
+      "description": "Explicit controls and keyboard shortcuts constrain zoom from 1x to 3x; direct pan is clamped and changing image or closing resets the transform."
+    },
+    {
+      "name": "mediaFallback",
+      "selectors": [".lightbox__fallback"],
+      "description": "A failed image maps to an equivalent named fallback without closing the viewer or losing navigation."
+    },
+    {
+      "name": "motionAndContrast",
+      "events": ["prefers-reduced-motion", "forced-colors"],
+      "description": "Reduced motion removes overlay transition; forced colors replaces the fixed media scrim/control palette with system colors."
     }
   ],
   "properties": [
@@ -142,7 +213,20 @@
       "description": "Controls whether the lightbox overlay is visible; focus management and dismissal remain target behavior.",
       "targetMappings": {
         "web": [
-          { "kind": "class", "selector": ".lightbox", "classNames": [".lightbox--open"] }
+          { "kind": "class", "selector": ".lightbox", "classNames": [".lightbox--open"] },
+          { "kind": "attribute", "selector": ".lightbox", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }
+        ]
+      }
+    },
+    {
+      "name": "loop",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Wraps previous/next, arrow keys, and swipe at collection bounds without cloning images.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".lightbox", "attribute": "data-loop", "values": { "true": "true", "false": "false" } }
         ]
       }
     },
@@ -171,14 +255,14 @@
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-text-inverse"
+      "spacing": [
+        "--space-layout-element-gap"
       ],
       "radius": [
         "--radius-sm"
       ],
       "z-index": [
-        "--z-modal"
+        "--z-overlay"
       ],
       "transition": [
         "--transition-base"
@@ -187,30 +271,36 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--typo-body-size",
+        "--typo-body-sm-size"
       ]
     }
   },
   "accessibility": [
-    "Trap focus inside the lightbox while it is open and restore focus to the invoking element on close.",
-    "Close on Escape and provide a visible close control.",
+    "Use a stable dialog title, trap focus inside the lightbox while open, and restore focus to the invoking element on close.",
+    "Close on Escape, documented backdrop interaction, or the visible canonical Close Button.",
     "Provide descriptive alt text for every image.",
-    "Keep counter, caption, and accessible description synchronized when navigating images.",
-    "Respect reduced motion preferences for image transitions."
+    "Keep image, alt text, counter, figcaption, and polite status synchronized when navigating images.",
+    "Disable previous and next at finite bounds or wrap all navigation consistently when loop is true; interpret arrows and swipe in logical RTL direction.",
+    "Expose named zoom controls, keep keyboard shortcuts supplementary, constrain zoom and pan, and reset the transform on image change and close.",
+    "Keep the modal operable when media fails by providing a named fallback.",
+    "Respect reduced motion and forced-colors preferences."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; modal behavior, focus trapping, image navigation, and state synchronization must be provided by the consuming target."
+      "kind": "css-js",
+      "notes": "Presentation composes Modal, Close Button, and Icon Button; shared controlled renderer and opt-in Product Gallery enhancement implement focus lifecycle, finite/loop navigation, swipe, bounded zoom/pan, synchronized media text, and fallback state."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "liquid-css-js",
+      "notes": "Product Gallery Liquid composes canonical Lightbox over its image subset with stable-id synchronization, focus lifecycle, finite/loop navigation, swipe, bounded zoom/pan, and localized controls."
     },
     "react": {
-      "status": "planned",
-      "kind": "component"
+      "status": "implemented",
+      "kind": "component",
+      "notes": "Shared LightboxArtwork composes ModalArtwork and is used by standalone Lightbox Studio and Product Gallery."
     },
     "figma": {
       "status": "planned",

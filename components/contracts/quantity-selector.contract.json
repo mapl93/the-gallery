@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "quantity-selector",
   "name": "Quantity Selector",
   "registryId": "A10",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Quantity stepper primitive with decrement and increment controls, native number input, hidden browser spinner, and min/max/step behavior.",
+  "summary": "Editable native quantity spinbutton with named step actions, form constraints, read-only and disabled behavior, and target-owned inventory persistence.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/quantity-selector",
@@ -112,6 +112,11 @@
       "description": "Unavailable selector state driven by the native input disabled attribute."
     },
     {
+      "name": "readOnly",
+      "selectors": [".qty__input:read-only:not(:disabled)"],
+      "description": "Focusable and submittable native value with both step actions unavailable."
+    },
+    {
       "name": "errorFocusWithin",
       "selectors": [".qty--error:focus-within"],
       "description": "Focused error variant state."
@@ -136,26 +141,40 @@
     {
       "name": "nativeNumber",
       "selectors": [".qty__input"],
-      "attributes": ["type=\"number\"", "min", "max", "step", "value", "disabled", "aria-label", "aria-describedby", "aria-invalid"],
-      "description": "The input should preserve native number semantics, constraints, and mobile keyboard support."
+      "attributes": ["type=\"number\"", "name", "min", "max", "step", "value", "required", "readonly", "disabled", "aria-label", "aria-describedby", "aria-invalid"],
+      "events": ["input", "change", "form submission", "form reset", "constraint validation"],
+      "description": "The input preserves native number semantics, live editing, constraints, form ownership, and mobile keyboard support."
     },
     {
       "name": "incrementDecrement",
       "selectors": [".qty__btn--decrement", ".qty__btn--increment", ".qty__input"],
       "events": ["click on step buttons", "input", "change", "ArrowUp and ArrowDown on the native field"],
-      "description": "Shared progressive enhancement updates by step, clamps to min and max, emits input and change, and preserves native keyboard stepping."
+      "description": "Shared progressive enhancement calls native stepDown or stepUp, emits input and change only when value changes, and preserves native keyboard stepping."
     },
     {
       "name": "buttonAvailability",
       "selectors": [".qty__btn:disabled"],
       "attributes": ["disabled"],
-      "description": "Progressive enhancement disables decrement and increment at their respective boundaries and disables both when the field is unavailable."
+      "description": "Progressive enhancement disables decrement and increment at their respective boundaries and disables both when the field is disabled or read-only."
     },
     {
       "name": "validationComposition",
       "selectors": [".qty--error", ".qty--success", ".qty--warning", ".qty__input"],
       "attributes": ["aria-invalid=\"true\" only for error", "aria-describedby references associated feedback"],
       "description": "The selector owns validation treatment for its control; a composing field wrapper owns visible label and feedback text."
+    },
+    {
+      "name": "valueOwnership",
+      "selectors": [".qty__input"],
+      "attributes": ["value establishes the initial value in static HTML", "live value or defaultValue in framework adapters"],
+      "events": ["input", "change", "form reset"],
+      "description": "The native input is the sole quantity owner; buttons and adapters never maintain a hidden mirror value."
+    },
+    {
+      "name": "stepFallback",
+      "selectors": [".qty__input"],
+      "attributes": ["positive step", "invalid or non-positive step falls back to 1"],
+      "description": "Adapters preserve HTML step-base alignment and normalize unsupported step input without expanding the public API."
     }
   ],
   "properties": [
@@ -163,7 +182,7 @@
       "name": "value",
       "type": "number",
       "required": true,
-      "description": "Current quantity represented by the native number field.",
+      "description": "Initial quantity represented by the native number field; native Web owns subsequent editing and framework adapters may bind the live value.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }]
       }
@@ -195,7 +214,7 @@
       "minimum": 0,
       "step": 1,
       "defaultValue": 1,
-      "description": "Positive increment used by native and enhanced stepping; native number inputs default to one.",
+      "description": "Positive increment used by native and enhanced stepping; absent, invalid, or non-positive values fall back to one.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "step", "valueFrom": "property", "elements": ["input"] }]
       }
@@ -219,6 +238,38 @@
       "targetMappings": {
         "web": [
           { "kind": "attribute", "selector": ".qty__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] },
+          { "kind": "attribute", "selector": ".qty__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }
+        ]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name used when the quantity participates in submission.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Requires a non-empty valid numeric quantity through native constraint validation.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".qty__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Keeps the value focusable and submittable while preventing typing and both step actions.",
+      "targetMappings": {
+        "web": [
+          { "kind": "attribute", "selector": ".qty__input", "attribute": "readonly", "values": { "true": "", "false": null }, "elements": ["input"] },
           { "kind": "attribute", "selector": ".qty__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }
         ]
       }
@@ -311,13 +362,15 @@
     "Name increment and decrement buttons clearly.",
     "Respect min, max, step, disabled, and inventory constraints.",
     "Do not rely on hidden browser spin buttons as the only way to change the value.",
-    "Keep typed values and button updates synchronized."
+    "Keep typed values and button updates synchronized through the sole native input.",
+    "Read-only quantity remains focusable and submittable while decrement and increment are unavailable.",
+    "Use native input and change events for controlled adapters and preserve form reset behavior."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css-js",
-      "notes": "Canonical CSS and shared progressive enhancement implement validation, step updates, boundaries, and state synchronization."
+      "notes": "Canonical CSS and shared progressive enhancement preserve native step alignment, form/value ownership, validation, boundaries, read-only, and state synchronization."
     },
     "shopify": {
       "status": "implemented",

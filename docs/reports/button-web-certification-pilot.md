@@ -214,3 +214,23 @@ Final adapter-entry verification additionally confirmed:
 The owner approved the final Exhibit and Studio behavior, including the Lucide
 catalogue integration, on 2026-07-11. Button is the first contract promoted to
 `stable`; certification remains specific to the neutral web target.
+
+## Expanded v1 Refinement Evidence — 2026-07-13
+
+The v1 refinement program preserved the accepted implementation and added the
+evidence that was not part of the original pilot package.
+
+- Exhibit and Studio were captured at `390 x 844`, `768 x 1024`, `1280 x 800`,
+  and `1600 x 1000`; all eight images are under
+  `output/playwright/refinement-calibration/`.
+- The XL Studio viewport has no horizontal page overflow (`scrollWidth` equals
+  `1600px`).
+- In combined forced-colors and reduced-motion mode, keyboard focus retains a
+  `2px` solid outline with `2px` offset.
+- The busy indicator remains visible; Button transition duration resolves to
+  `0s`, spinner animation name to `none`, and animation duration to `0s`.
+- The neutral component bundle measures `56,481 B` gzip and shared runtime
+  `5,180 B` gzip, both inside the v1 budgets.
+
+This is an evidence refresh, not a new promotion or a reopening of the approved
+Button visual direction.

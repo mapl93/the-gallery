@@ -1,68 +1,80 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "order-history",
   "name": "Order History",
   "registryId": "U4",
   "category": "account",
   "status": "pilot",
-  "summary": "Order list with order number, date, status badge variants, and total.",
-  "dependencies": ["badge"],
+  "summary": "Passive optionally named native order list composed from canonical Link and Badge while targets own order data, status truth, formatting, navigation, authentication, pagination, and lifecycle.",
+  "dependencies": ["link", "badge"],
   "source": {
     "registry": "registry.json#/components/order-history",
     "css": { "file": "components/css/account.css", "selector": ".order-list" },
     "docs": "site/src/content/components/order-history.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".order-list", "className": ".order-list", "required": true, "description": "Order list container." },
-    { "name": "row", "selector": ".order-row", "className": ".order-row", "required": true, "description": "Single order row." },
-    { "name": "number", "selector": ".order-row__number", "className": ".order-row__number", "required": true, "description": "Order number link." },
-    { "name": "date", "selector": ".order-row__date", "className": ".order-row__date", "required": true, "description": "Order date." },
-    { "name": "status", "selector": ".order-row__status", "className": ".order-row__status", "required": true, "description": "Order status badge." },
-    { "name": "total", "selector": ".order-row__total", "className": ".order-row__total", "required": true, "description": "Order total." }
+    { "name": "root", "selector": ".order-list", "className": ".order-list", "required": true, "description": "Conditional native section when label is non-empty or ordinary div when no region name is supplied; owns the named inline-size container." },
+    { "name": "items", "selector": ".order-list__items", "className": ".order-list__items", "required": true, "description": "Required non-empty native unordered list of complete target-owned order summaries." },
+    { "name": "row", "selector": ".order-row", "className": ".order-row", "required": true, "description": "Native list item whose CSS areas arrange one complete order summary without changing DOM reading order." },
+    { "name": "number", "selector": ".order-row__number", "className": ".order-row__number", "required": true, "description": "Required native canonical Link with descriptive visible localized text and a real target-owned order-detail destination." },
+    { "name": "date", "selector": ".order-row__date", "className": ".order-row__date", "required": true, "description": "Native time element containing localized visible text and a target-provided machine-readable datetime value." },
+    { "name": "status", "selector": ".order-row__status", "className": ".order-row__status", "required": true, "description": "Required passive canonical Badge with readable target status text and a target-selected semantic visual projection." },
+    { "name": "total", "selector": ".order-row__total", "className": ".order-row__total", "required": true, "description": "Required already-formatted target total, isolated bidirectionally in Web markup." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default order history list." }
+    { "name": "default", "className": null, "default": true, "description": "One passive order-history profile; target status taxonomy and Badge projection are not U4 variants." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default responsive order row layout." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic container-responsive profile; row-area changes are private composition rather than public size." }
   ],
   "states": [
-    { "name": "default", "selectors": [".order-list"], "description": "Default order list state." },
-    { "name": "numberHover", "selectors": [".order-row__number:hover"], "description": "Order link hover state." },
-    { "name": "numberFocus", "selectors": [".order-row__number:focus-visible"], "description": "Visible keyboard focus on order navigation." },
-    { "name": "pending", "selectors": [".order-row__status--pending"], "description": "Pending status state." },
-    { "name": "shipped", "selectors": [".order-row__status--shipped"], "description": "Shipped status state." },
-    { "name": "delivered", "selectors": [".order-row__status--delivered"], "description": "Delivered status state." },
-    { "name": "cancelled", "selectors": [".order-row__status--cancelled"], "description": "Cancelled status state." }
+    { "name": "default", "selectors": [".order-list", ".order-list__items", ".order-row"], "description": "Valid non-empty order collection with optional accessible container name." },
+    { "name": "unnamedContainer", "selectors": [".order-list"], "description": "Blank or omitted label uses an ordinary div root without aria-label rather than an unnamed section." },
+    { "name": "containerAreas", "selectors": [".order-list", ".order-row"], "description": "Private one-, two-, and four-area layouts follow actual U4 container width while preserving DOM order." },
+    { "name": "dependencyInteraction", "selectors": [".link:hover", ".link:focus-visible", ".badge"], "description": "Canonical Link owns navigation interaction/focus/motion and canonical Badge owns passive semantic visual variants; U4 does not duplicate them." },
+    { "name": "requiredContentOmitted", "selectors": [".order-list"], "description": "The complete renderer is absent when orders is missing, empty, duplicated by identifier, or contains an incomplete record." }
   ],
   "behavior": [
-    { "name": "orderNavigation", "selectors": [".order-row__number"], "attributes": ["href"], "events": ["click"], "description": "Order number should navigate to order detail." },
-    { "name": "statusFormatting", "selectors": [".order-row__status"], "description": "Order status should map target order state to a readable label and badge style." },
-    { "name": "totalFormatting", "selectors": [".order-row__total"], "description": "Totals should be formatted by the commerce target." }
+    { "name": "optionalNamedContainer", "selectors": [".order-list"], "attributes": ["aria-label only on a section when label is non-empty"], "description": "A trimmed non-empty label selects a named native section; otherwise U4 remains ordinary grouped flow content." },
+    { "name": "nativeCollection", "selectors": [".order-list__items", ".order-row"], "description": "Use native ul/li relationships without table/grid roles, roving tabindex, arrow-key handling, or a custom collection widget model." },
+    { "name": "orderNavigation", "selectors": [".order-row__number"], "attributes": ["href"], "events": ["click"], "description": "Canonical native Link preserves descriptive text, normal Tab/Enter, modified activation, history, and target-owned order-detail navigation." },
+    { "name": "dateSemantics", "selectors": [".order-row__date"], "attributes": ["datetime"], "description": "Target supplies a conforming machine-readable date/time plus independently localized visible text." },
+    { "name": "statusProjection", "selectors": [".order-row__status", ".badge"], "description": "Target preserves authoritative financial and fulfillment facts, authors one truthful localized summary for the readable canonical Badge, and selects an appropriate semantic variant. U4 defines no commerce taxonomy; richer multi-fact status composition belongs outside U4 when one summary is insufficient." },
+    { "name": "totalFormatting", "selectors": [".order-row__total"], "description": "Target supplies final localized total text and currency/tax/refund precision; U4 only places and bidirectionally isolates it." },
+    { "name": "externalLifecycle", "selectors": [".order-list"], "description": "Authentication, authorization, fetching, sorting, filtering, pagination, loading, empty/error/expired states, live updates, announcements, focus, routes, and analytics remain outside passive U4." },
+    { "name": "containerResponse", "selectors": [".order-list", ".order-row"], "description": "Named inline-size container selects private row areas from actual available width rather than viewport width." },
+    { "name": "contentResilience", "selectors": [".order-list", ".order-row__number", ".order-row__date", ".order-row__status", ".order-row__total"], "description": "Short, long, localized, bidirectional, unbroken, narrow, and effective-200-percent content wraps without clipping or page-level overflow." }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": false, "description": "Accessible name for the order-history region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".order-list", "attribute": "aria-label", "valueFrom": "property" }] } },
-    { "name": "orders", "type": "slot", "required": true, "description": "Target-owned collection of order rows.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-list", "classNames": [".order-list"] }] } }
+    { "name": "label", "type": "string", "required": false, "description": "Optional accessible name. A trimmed non-empty value selects section[aria-label]; blank or omitted content selects an ordinary div without region semantics.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".order-list", "attribute": "aria-label", "valueFrom": "property" }] } },
+    { "name": "orders", "type": "slot", "required": true, "description": "Complete non-empty target-owned native order-list composition. Each authoritative target-formatted item contains one descriptive canonical Link, one semantic date, one readable canonical Badge summary, and one formatted total; record schema, count, order, URLs, financial/fulfillment truth, variants, and formatting remain target-owned.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-list__items", "classNames": [".order-list__items", ".order-row", ".link", ".order-row__number", ".order-row__date", ".badge", ".order-row__status", ".order-row__total"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-accent", "--color-text-secondary", "--color-feedback-warning-default", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-error-default", "--color-text-primary"],
-      "radius": ["--radius-full"],
-      "typography": ["--typo-body-size"]
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--tg-space-stack-md", "--tg-space-stack-xs"],
+      "typography": ["--font-family-body", "--tg-font-weight-semibold", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Expose order status as readable text, not only color.",
-    "Order numbers should be links with clear destination context.",
-    "Protect order history behind authentication."
+    "Omit the complete renderer when orders is absent, empty, duplicated by identifier, or contains an incomplete record; targets compose a truthful empty/loading/error alternative outside U4.",
+    "Use section[aria-label] only when label is non-empty. With no label, render an ordinary div so optional naming never creates an unnamed section.",
+    "Use a native ul/li collection. Do not add role=list, role=table, role=grid, roving tabindex, arrow-key navigation, or a custom keyboard model merely because CSS uses visual areas.",
+    "Use one native canonical Link with a real target-owned href and descriptive visible localized label per order; preserve Tab, Enter, modified activation, history, and canonical Link focus behavior.",
+    "Use a native time element with target-provided conforming datetime and independently localized visible text.",
+    "Expose every order status through readable localized Badge text, never color alone. Static history badges are not live regions.",
+    "Preserve financial and fulfillment state as separate authoritative target facts. If one localized Badge summary cannot communicate the required distinctions truthfully, use a richer target composition outside U4 rather than inventing a U4 enum or additional hidden status controls.",
+    "Keep number, date, status, and total DOM/reading order stable while CSS rearranges visual areas; isolate already-formatted totals bidirectionally.",
+    "Protect order data and detail destinations with target authentication and authorization. Keep fetching, pagination, live updates, errors, announcements, and post-navigation focus outside passive U4.",
+    "Allow long/localized and unbroken content, narrow containers, effective 200 percent, forced colors, reduced motion, and theme modes through logical sizing and canonical dependency behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer orders, financial status, fulfillment status, and order URLs." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "css-html-composition", "notes": "Conditional named container and native list implemented with canonical Link/Badge, semantic time, formatted total, intrinsic row areas, zero U4 runtime, and target-owned data/lifecycle." },
+    "shopify": { "status": "planned", "kind": "canonical-or-native-order-history-handoff", "notes": "Shopify v1 themes use the hosted current-account Order index as an intentional native handoff with no U4 parity claim. Target-controlled full-page extensions or headless storefronts may project authoritative U4 summaries with native components and Customer Account data. Classic Liquid is separately versioned compatibility; copied CSS is not a universal order-history implementation." },
+    "react": { "status": "planned", "kind": "target-owned-list-composition", "notes": "Render complete target records through native Link/Badge composition; query, router, auth, formatting, status mapping, pagination, feedback, and lifecycle stay external." },
+    "figma": { "status": "planned", "kind": "component-composition", "notes": "Compose canonical Link and Badge instances in auto layout. Registered generic Button nodes are traceability metadata, not U4 artwork or visual approval." },
+    "swiftui": { "status": "planned", "kind": "native-order-list-composition" },
+    "compose": { "status": "planned", "kind": "native-order-list-composition" }
   }
 }

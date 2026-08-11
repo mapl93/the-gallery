@@ -1,267 +1,111 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "hero",
-  "name": "Hero Banner",
+  "name": "Hero",
   "registryId": "G1",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Full-width editorial hero with optional media and overlay, required named content, and Button-composed actions.",
-  "dependencies": [
-    "button"
-  ],
+  "summary": "Unified container-responsive editorial Hero with full, split, and text-only layouts; optional fullscreen sizing; classified media, canonical actions, complete parallax or slideshow behavior, accessible controls, optional autoplay, loop policy, and visual timing feedback.",
+  "dependencies": ["button", "icon-button", "carousel"],
   "source": {
     "registry": "registry.json#/components/hero",
-    "css": {
-      "file": "components/css/marketing.css",
-      "selector": ".hero"
-    },
+    "css": { "file": "components/css/marketing.css", "selector": ".hero" },
     "docs": "site/src/content/components/hero.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".hero",
-      "className": ".hero",
-      "required": true,
-      "description": "Hero section root that owns containment, vertical alignment, and responsive minimum height."
-    },
-    {
-      "name": "media",
-      "selector": ".hero__media",
-      "className": ".hero__media",
-      "required": false,
-      "description": "Optional background image or video layer."
-    },
-    {
-      "name": "overlay",
-      "selector": ".hero__overlay",
-      "className": ".hero__overlay",
-      "required": false,
-      "description": "Optional contrast layer between media and content."
-    },
-    {
-      "name": "content",
-      "selector": ".hero__content",
-      "className": ".hero__content",
-      "required": true,
-      "description": "Foreground content wrapper."
-    },
-    {
-      "name": "label",
-      "selector": ".hero__label",
-      "className": ".hero__label",
-      "required": false,
-      "description": "Optional short context label."
-    },
-    {
-      "name": "title",
-      "selector": ".hero__title",
-      "className": ".hero__title",
-      "required": true,
-      "description": "Primary hero heading."
-    },
-    {
-      "name": "description",
-      "selector": ".hero__description",
-      "className": ".hero__description",
-      "required": false,
-      "description": "Optional supporting copy."
-    },
-    {
-      "name": "actions",
-      "selector": ".hero__actions",
-      "className": ".hero__actions",
-      "required": false,
-      "description": "Optional Button-composed action group."
-    }
+    { "name": "root", "selector": ".hero", "className": ".hero", "required": true, "description": "Named section, container and positioning context; omitted when the required title is empty." },
+    { "name": "inner", "selector": ".hero__inner", "className": ".hero__inner", "required": true, "description": "Required internal layout owner for container-responsive full, split and text-only composition." },
+    { "name": "media", "selector": ".hero__media", "className": ".hero__media", "required": false, "description": "Optional classified single-media or slideshow region, omitted for text-only presentation." },
+    { "name": "track", "selector": ".hero__track", "className": ".hero__track", "required": false, "description": "Slideshow-only native horizontal scroll-snap track that composes canonical Carousel." },
+    { "name": "slide", "selector": ".hero__slide", "className": ".hero__slide", "required": false, "description": "Ordered real slide group; slides are never cloned for looping." },
+    { "name": "overlay", "selector": ".hero__overlay", "className": ".hero__overlay", "required": false, "description": "Optional visual contrast layer nested within media and omitted without media." },
+    { "name": "content", "selector": ".hero__content", "className": ".hero__content", "required": true, "description": "Foreground content region." },
+    { "name": "label", "selector": ".hero__label", "className": ".hero__label", "required": false, "description": "Optional short contextual eyebrow." },
+    { "name": "title", "selector": ".hero__title", "className": ".hero__title", "required": true, "description": "Required non-empty primary heading whose native rank follows the host document." },
+    { "name": "description", "selector": ".hero__description", "className": ".hero__description", "required": false, "description": "Optional supporting copy." },
+    { "name": "actions", "selector": ".hero__actions", "className": ".hero__actions", "required": false, "description": "Optional Button-composed action group." },
+    { "name": "controls", "selector": ".hero__controls", "className": ".hero__controls", "required": false, "description": "Slideshow-only control region containing canonical Icon Buttons and/or indicators." },
+    { "name": "previous", "selector": ".hero__previous", "className": ".hero__previous", "required": false, "description": "Optional previous-slide Icon Button." },
+    { "name": "next", "selector": ".hero__next", "className": ".hero__next", "required": false, "description": "Optional next-slide Icon Button." },
+    { "name": "indicators", "selector": ".hero__indicators", "className": ".hero__indicators", "required": false, "description": "Optional set of direct slide-selection buttons." },
+    { "name": "rotationControl", "selector": ".hero__rotation-control", "className": ".hero__rotation-control", "required": false, "description": "Visible Pause/Play Icon Button whenever autoplay is enabled." },
+    { "name": "progress", "selector": ".hero__progress", "className": ".hero__progress", "required": false, "description": "Autoplay-only visual current-slide timing bar; hidden from assistive technology." },
+    { "name": "status", "selector": ".hero__status", "className": ".hero__status", "required": false, "description": "Polite slideshow position status updated only when the selected slide changes." }
   ],
   "variants": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Single editorial hero presentation."
-    }
+    { "name": "full", "className": null, "default": true, "description": "Centered foreground content over optional full-bleed media." },
+    { "name": "split", "className": ".hero--split", "default": false, "description": "Media and content columns that stack from Hero container width." },
+    { "name": "text-only", "className": ".hero--text-only", "default": false, "description": "Text-only presentation that derives media, overlay, slideshow and motion as absent." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Responsive minimum height supplied by canonical CSS."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic container-responsive hero height." },
+    { "name": "fullscreen", "className": ".hero--fullscreen", "default": false, "description": "Viewport-height presentation independent from layout and media behavior." }
   ],
   "states": [
-    {
-      "name": "default",
-      "selectors": [
-        ".hero"
-      ],
-      "description": "Resting hero presentation."
-    }
+    { "name": "default", "selectors": [".hero"], "description": "Resting single-media, text-only or non-autoplay slideshow presentation." },
+    { "name": "currentSlide", "selectors": [".hero__slide[aria-current=\"true\"]"], "description": "Exactly one real slide is current." },
+    { "name": "autoplayPlaying", "selectors": [".hero[data-autoplay-state=\"playing\"]"], "description": "Autoplay timer and visual timing bar are both advancing." },
+    { "name": "autoplayPaused", "selectors": [".hero[data-autoplay-state=\"paused\"]"], "description": "Autoplay and visual timing bar are frozen by the user, hover, focus, hidden document or another pause reason." },
+    { "name": "reducedMotion", "selectors": [".hero[data-reduced-motion=\"true\"]"], "description": "Automatic rotation, timing feedback, smooth scrolling and parallax are suppressed." }
   ],
   "behavior": [
-    {
-      "name": "mediaSemantics",
-      "selectors": [
-        ".hero__media"
-      ],
-      "description": "Targets decide whether media is informative or decorative and supply image alternative text, video controls, captions, or hidden semantics accordingly."
-    },
-    {
-      "name": "actionComposition",
-      "selectors": [
-        ".hero__actions"
-      ],
-      "description": "Actions compose Button instances and preserve each Button's native action or navigation semantics."
-    }
+    { "name": "requiredTitleComposition", "selectors": [".hero", ".hero__title"], "description": "A non-empty title is a render precondition; invalid composition is omitted instead of emitting an empty heading." },
+    { "name": "coherentMediaComposition", "selectors": [".hero__media", ".hero__overlay", ".hero--text-only"], "description": "Overlay is nested inside media and omitted without it; text-only derives media, overlay, slides, controls and motion as absent even when stale target data exists." },
+    { "name": "slideshowSelection", "selectors": [".hero__track", ".hero__slide", ".hero__previous", ".hero__next", ".hero__indicator"], "events": ["click", "scroll"], "description": "Previous, next, direct indicators and supplementary touch scrolling select one real slide, synchronize aria-current and update a polite position status. Root-wide arrow interception and cloned loop slides are forbidden." },
+    { "name": "loopPolicy", "selectors": [".hero[data-loop=\"false\"]", ".hero__previous", ".hero__next"], "description": "Loop defaults to true and wraps through logical index changes. With loop false, endpoint controls become disabled instead of cloning or wrapping slides." },
+    { "name": "autoplayLifecycle", "selectors": [".hero[data-autoplay=\"true\"]", ".hero__rotation-control"], "events": ["click", "pointerenter", "pointerleave", "focusin", "focusout", "visibilitychange"], "description": "Autoplay is opt-in and defaults off. It exposes one visible Pause/Play control, pauses on hover and focus-within, performs no hidden-document work, is disabled by reduced motion, and does not implicitly restart after manual slide navigation." },
+    { "name": "timingFeedback", "selectors": [".hero__progress", ".hero__progress-value"], "description": "One visual current-slide bar resets after navigation and freezes for every autoplay pause. It is aria-hidden and never announces changing percentages." },
+    { "name": "parallaxLifecycle", "selectors": [".hero[data-media-behavior=\"parallax\"] .hero__media-item"], "description": "Progressive CSS scroll-driven translation applies only to classified single media; unsupported browsers retain a static image and reduced motion removes animation and transform." },
+    { "name": "mediaSemantics", "selectors": [".hero__media", ".hero__slide"], "description": "Targets classify each image or video as informative or decorative and supply alternative text, native controls, captions, transcripts, consent and loading policy." },
+    { "name": "actionComposition", "selectors": [".hero__actions"], "description": "Actions compose canonical Button instances and preserve native navigation or command semantics." },
+    { "name": "ownershipStrategy", "selectors": [".hero"], "events": ["herochange", "heroplaybackchange"], "description": "Static Web owns current-slide and optional autoplay state after initialization. Stateful adapters may control those same semantic values and events without replacing the real controls, track or slides." }
   ],
   "properties": [
-    {
-      "name": "label",
-      "type": "string",
-      "required": false,
-      "description": "Optional short context above the title.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".hero__label"
-          }
-        ]
-      }
-    },
-    {
-      "name": "title",
-      "type": "string",
-      "required": true,
-      "description": "Primary hero heading.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".hero__title"
-          }
-        ]
-      }
-    },
-    {
-      "name": "description",
-      "type": "string",
-      "required": false,
-      "description": "Optional supporting hero copy.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".hero__description"
-          }
-        ]
-      }
-    },
-    {
-      "name": "media",
-      "type": "slot",
-      "required": false,
-      "description": "Optional target-owned image or video layer.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".hero__media",
-            "classNames": [
-              ".hero__media"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "overlay",
-      "type": "slot",
-      "required": false,
-      "description": "Optional contrast layer rendered only when media needs it.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".hero__overlay",
-            "classNames": [
-              ".hero__overlay"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "actions",
-      "type": "slot",
-      "required": false,
-      "description": "Optional group of Button-composed actions.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".hero__actions",
-            "classNames": [
-              ".hero__actions"
-            ]
-          }
-        ]
-      }
-    }
+    { "name": "layout", "type": "enum", "required": false, "defaultValue": "full", "valuesFrom": "variants", "description": "Full, split or text-only layout profile.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".hero", "source": "variants" }] } },
+    { "name": "height", "type": "enum", "required": false, "defaultValue": "default", "valuesFrom": "sizes", "description": "Intrinsic or fullscreen height independent from layout and media behavior.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".hero", "source": "sizes" }] } },
+    { "name": "mediaBehavior", "type": "enum", "required": false, "defaultValue": "none", "values": ["none", "parallax", "slideshow"], "description": "Mutually exclusive single-media, parallax or slideshow behavior; text-only derives none.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero", "attribute": "data-media-behavior", "values": { "none": "none", "parallax": "parallax", "slideshow": "slideshow" } }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Optional short context above the title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".hero__label" }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Required non-empty primary hero heading; targets choose the native rank and omit the component when empty.", "targetMappings": { "web": [{ "kind": "content", "selector": ".hero__title" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional supporting hero copy.", "targetMappings": { "web": [{ "kind": "content", "selector": ".hero__description" }] } },
+    { "name": "media", "type": "slot", "required": false, "description": "Target-owned classified single media; omitted for text-only and replaced by slides in slideshow behavior.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".hero__media", "classNames": [".hero__media", ".hero__media-item"] }] } },
+    { "name": "overlay", "type": "slot", "required": false, "description": "Optional visual scrim nested in existing media.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".hero__overlay", "classNames": [".hero__overlay"] }] } },
+    { "name": "actions", "type": "slot", "required": false, "description": "Optional group of canonical Button actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".hero__actions", "classNames": [".hero__actions"] }] } },
+    { "name": "slides", "type": "slot", "required": false, "description": "Ordered target-owned media slide groups used only by slideshow behavior.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".hero__track", "classNames": [".hero__track", ".hero__slide"] }] } },
+    { "name": "autoplay", "type": "boolean", "required": false, "defaultValue": false, "description": "Enables optional timed rotation and requires visible Pause/Play plus visual timing feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero", "attribute": "data-autoplay", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "loop", "type": "boolean", "required": false, "defaultValue": true, "description": "Wraps previous/next through real slide indices without DOM clones.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero", "attribute": "data-loop", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "navigation", "type": "enum", "required": false, "defaultValue": "both", "values": ["both", "arrows", "indicators"], "description": "Visible slideshow navigation controls; direct touch scrolling remains supplementary.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero", "attribute": "data-navigation", "values": { "both": "both", "arrows": "arrows", "indicators": "indicators" } }] } },
+    { "name": "autoplayInterval", "type": "number", "required": false, "defaultValue": 6000, "minimum": 3000, "maximum": 12000, "step": 1000, "description": "Autoplay interval in milliseconds; read only when autoplay is enabled.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero", "attribute": "data-autoplay-interval", "valueFrom": "property" }] } },
+    { "name": "previousLabel", "type": "string", "required": true, "description": "Localized accessible label for the previous-slide Icon Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero__previous", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "nextLabel", "type": "string", "required": true, "description": "Localized accessible label for the next-slide Icon Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero__next", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "pauseLabel", "type": "string", "required": true, "description": "Localized accessible label while the rotation control pauses autoplay.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero__rotation-control", "attribute": "data-pause-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "playLabel", "type": "string", "required": true, "description": "Localized accessible label while the rotation control resumes autoplay.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero__rotation-control", "attribute": "data-play-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "statusTemplate", "type": "string", "required": true, "description": "Localized position template containing {current} and {total} placeholders.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".hero__status", "attribute": "data-status-template", "valueFrom": "property" }] } }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-text-inverse"
-      ],
-      "typography": [
-        "--font-family-heading",
-        "--typo-article-line-height",
-        "--typo-article-size",
-        "--typo-body-size",
-        "--typo-display-line-height",
-        "--typo-display-size"
-      ],
-      "spacing": [
-        "--space-layout-container",
-        "--space-layout-section-gap"
-      ]
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-text-primary", "--color-text-inverse"],
+      "opacity": ["--opacity-overlay"],
+      "typography": ["--font-family-heading", "--font-family-body", "--typo-h1-size", "--typo-h1-line-height", "--typo-h1-tracking", "--typo-body-lg-size", "--tg-typography-body-large-line-height", "--typo-caption-size", "--typo-caption-line-height", "--tg-font-weight-semibold", "--tg-typography-h1-weight", "--tg-typography-body-large-weight"],
+      "spacing": ["--space-layout-container", "--space-layout-section-gap", "--space-layout-element-gap"]
     }
   },
   "accessibility": [
-    "Use a heading level appropriate to the surrounding page hierarchy.",
-    "Do not rely on background media for essential meaning; provide alternative text or equivalent visible copy when media is informative.",
-    "Ensure the optional overlay preserves readable text contrast across the selected media.",
-    "Render calls to action with the Button dependency and preserve native button or link semantics."
+    "Use a heading level appropriate to the surrounding page hierarchy and omit the component when its required title is empty.",
+    "Classify media as informative or decorative; provide alternative text, controls, captions, transcripts and consent when required.",
+    "Keep overlay inside media and verify text contrast across every authored slide.",
+    "Name the slideshow region and each real slide group, expose current position politely, and keep previous, next, indicators and Pause/Play as native buttons.",
+    "Do not intercept horizontal arrows on the Hero root; keyboard operation belongs to focused controls and the scroll viewport.",
+    "Pause autoplay for hover, focus-within and hidden documents; suppress autoplay, timing feedback, smooth scrolling and parallax for reduced motion.",
+    "Keep the continuously changing timing bar visual and aria-hidden.",
+    "Compose actions with canonical Button and controls with canonical Icon Button and Carousel anatomy."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/marketing.css."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "native-component"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "native-component"
-    }
+    "web": { "status": "implemented", "kind": "css-js", "notes": "Canonical CSS plus shared theme.js implement container layouts, progressive parallax, real-slide navigation, optional looping/autoplay, pause policy, reduced motion, timing feedback and native events." },
+    "shopify": { "status": "implemented", "kind": "section-liquid-css-js", "notes": "The canonical Hero section maps editor settings and slide blocks to the same contract and shared runtime." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

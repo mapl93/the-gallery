@@ -1,360 +1,78 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "popup",
-  "name": "Popup / Overlay",
+  "name": "Popup (deprecated)",
   "registryId": "G4",
   "category": "marketing",
-  "status": "pilot",
-  "summary": "Marketing dialog surface with overlay, content, optional media, Close Button composition, and default, split, or slide presentation.",
-  "dependencies": [
-    "close-button"
-  ],
+  "status": "deprecated",
+  "summary": "Deprecated G4 identity retained only as a pre-v1 migration record to canonical B9 Popover; it owns no overlay, modal semantics, CSS, renderer, fixture, behavior or target adapter.",
+  "dependencies": ["popover"],
   "source": {
     "registry": "registry.json#/components/popup",
-    "css": {
-      "file": "components/css/marketing.css",
-      "selector": ".popup"
-    },
+    "css": { "file": "components/css/layout.css", "selector": ".popover" },
     "docs": "site/src/content/components/popup.mdx"
   },
   "anatomy": [
-    {
-      "name": "overlay",
-      "selector": ".popup-overlay",
-      "className": ".popup-overlay",
-      "required": true,
-      "description": "Backdrop and centered containment layer for popup presentation."
-    },
-    {
-      "name": "root",
-      "selector": ".popup",
-      "className": ".popup",
-      "required": true,
-      "description": "Scrollable dialog surface."
-    },
-    {
-      "name": "close",
-      "selector": ".popup__close",
-      "className": ".popup__close",
-      "required": false,
-      "description": "Optional named native dismiss button that follows Close Button obligations."
-    },
-    {
-      "name": "media",
-      "selector": ".popup__media",
-      "className": ".popup__media",
-      "required": false,
-      "description": "Optional image region."
-    },
-    {
-      "name": "body",
-      "selector": ".popup__body",
-      "className": ".popup__body",
-      "required": true,
-      "description": "Primary popup content region."
-    },
-    {
-      "name": "title",
-      "selector": ".popup__title",
-      "className": ".popup__title",
-      "required": true,
-      "description": "Visible popup title and preferred dialog label source."
-    },
-    {
-      "name": "text",
-      "selector": ".popup__text",
-      "className": ".popup__text",
-      "required": false,
-      "description": "Optional supporting message."
-    }
+    { "name": "root", "selector": ".popover", "className": ".popover", "required": true, "description": "Canonical non-modal floating panel owned by B9 Popover." },
+    { "name": "arrow", "selector": ".popover__arrow", "className": ".popover__arrow", "required": false, "description": "Optional decorative arrow pointing toward the trigger." },
+    { "name": "title", "selector": ".popover__title", "className": ".popover__title", "required": false, "description": "Optional contextual title inside canonical Popover." },
+    { "name": "content", "selector": ".popover__content", "className": ".popover__content", "required": true, "description": "Concise arbitrary Popover content, including a small target-composed control group." }
   ],
   "variants": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Centered single-column dialog surface."
-    },
-    {
-      "name": "split",
-      "className": ".popup--split",
-      "default": false,
-      "description": "Two-column media and content surface that collapses to one column on narrow viewports."
-    },
-    {
-      "name": "slide",
-      "className": ".popup--slide",
-      "default": false,
-      "description": "Bottom-docked surface with slide presentation."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Canonical Popover surface; former Split and Slide popup variants are removed." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Viewport-contained popup width and height."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Canonical bounded Popover size." }
   ],
   "states": [
-    {
-      "name": "overlayHidden",
-      "selectors": [
-        ".popup-overlay"
-      ],
-      "description": "Overlay is visually hidden by default."
-    },
-    {
-      "name": "overlayOpen",
-      "selectors": [
-        ".popup-overlay[data-open]"
-      ],
-      "description": "Existing overlay visibility selector."
-    },
-    {
-      "name": "slideHidden",
-      "selectors": [
-        ".popup--slide"
-      ],
-      "description": "Slide presentation is translated below the viewport by default."
-    },
-    {
-      "name": "slideOpen",
-      "selectors": [
-        ".popup--slide[data-open]"
-      ],
-      "description": "Existing slide visibility selector."
-    },
-    {
-      "name": "closeHover",
-      "selectors": [
-        ".popup__close:hover"
-      ],
-      "description": "Pointer hover on the optional dismiss action."
-    },
-    {
-      "name": "closeFocusVisible",
-      "selectors": [
-        ".popup__close:focus-visible"
-      ],
-      "description": "Visible keyboard focus on the optional dismiss action."
-    }
+    { "name": "closed", "selectors": [".popover"], "description": "Hidden resting state." },
+    { "name": "open", "selectors": [".popover--open", ".popover:popover-open"], "description": "Visible canonical portable or native Web state." }
   ],
   "behavior": [
-    {
-      "name": "visibilitySurface",
-      "selectors": [
-        ".popup-overlay[data-open]",
-        ".popup--slide[data-open]"
-      ],
-      "attributes": [
-        "data-open"
-      ],
-      "description": "Canonical CSS currently recognizes data-open on the overlay and on the slide surface; the contract does not select a single public open-property surface while that ownership remains unresolved."
-    },
-    {
-      "name": "dialogSemantics",
-      "selectors": [
-        ".popup"
-      ],
-      "attributes": [
-        "role=\"dialog\"",
-        "aria-modal=\"true\"",
-        "aria-labelledby"
-      ],
-      "description": "Modal popup use requires a programmatically named dialog. Non-modal use requires an explicit target decision rather than silently reusing modal semantics."
-    },
-    {
-      "name": "focusManagement",
-      "selectors": [
-        ".popup"
-      ],
-      "events": [
-        "open",
-        "close",
-        "Tab",
-        "Shift+Tab"
-      ],
-      "description": "The consuming target moves focus into a modal popup, contains tab navigation, and restores focus to its trigger after dismissal."
-    },
-    {
-      "name": "dismissal",
-      "selectors": [
-        ".popup__close"
-      ],
-      "events": [
-        "click",
-        "Escape"
-      ],
-      "description": "A modal popup provides a visible dismiss action and Escape dismissal; Close Button composition owns native button activation while the popup target owns visibility and focus restoration."
-    }
+    { "name": "visibility", "selectors": [".popover--open", ".popover:popover-open"], "description": "The canonical panel is hidden by default and visible only in the portable or native open state." },
+    { "name": "triggerRelationship", "attributes": ["aria-expanded", "aria-controls", "popovertarget"], "description": "A native Button owns the accessible name, expanded state and stable panel relationship; the trigger is also the default visual anchor." },
+    { "name": "contentSemantics", "attributes": ["role", "aria-labelledby", "aria-label"], "description": "Popover has no default ARIA role. Semantics derive from actual content; the deprecated Popup identity does not reintroduce dialog or modal semantics." },
+    { "name": "dismissal", "events": ["Escape", "outside click", "trigger click"], "description": "Repeated trigger activation, Escape and outside interaction close the transient surface." },
+    { "name": "focusManagement", "events": ["open", "close", "Tab"], "description": "The non-modal surface preserves natural Tab order, never traps focus or inerts the page, and restores trigger focus after keyboard dismissal when focus moved inside." },
+    { "name": "stateOwnership", "events": ["openChange"], "description": "Targets may control open state or provide an uncontrolled default while preserving canonical Popover meaning." }
   ],
   "properties": [
     {
-      "name": "variant",
-      "type": "enum",
+      "name": "open",
+      "type": "boolean",
       "required": false,
-      "valuesFrom": "variants",
-      "description": "Canonical default, split, or slide presentation.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "optionClass",
-            "selector": ".popup",
-            "source": "variants"
-          }
-        ]
-      }
-    },
-    {
-      "name": "media",
-      "type": "slot",
-      "required": false,
-      "description": "Optional popup image region.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".popup__media",
-            "classNames": [
-              ".popup__media"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "title",
-      "type": "string",
-      "required": true,
-      "description": "Visible popup title used to name the dialog.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".popup__title"
-          }
-        ]
-      }
-    },
-    {
-      "name": "text",
-      "type": "string",
-      "required": false,
-      "description": "Optional supporting popup message.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".popup__text"
-          }
-        ]
-      }
-    },
-    {
-      "name": "dismissAction",
-      "type": "slot",
-      "required": false,
-      "description": "Optional native button that requests popup dismissal.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".popup__close",
-            "classNames": [
-              ".popup__close"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "dismissLabel",
-      "type": "string",
-      "required": false,
-      "description": "Contextual accessible name for the optional dismiss button.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "attribute",
-            "selector": ".popup__close",
-            "attribute": "aria-label",
-            "valueFrom": "property",
-            "elements": [
-              "button"
-            ]
-          }
-        ]
-      }
+      "defaultValue": false,
+      "description": "Canonical Popover visibility; content and trigger are composition, while positioning, collision and focus details remain target services.",
+      "targetMappings": { "web": [{ "kind": "class", "selector": ".popover", "classNames": [".popover--open"] }] }
     }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-border-focus",
-        "--color-surface-primary",
-        "--color-text-primary",
-        "--color-text-secondary"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
-      "typography": [
-        "--font-family-heading",
-        "--typo-body-size",
-        "--typo-h3-size"
-      ],
-      "radius": [
-        "--radius-lg"
-      ],
-      "shadow": [
-        "--shadow-xl"
-      ],
-      "spacing": [
-        "--space-layout-container",
-        "--space-layout-touch-target"
-      ],
-      "transition": [
-        "--transition-default"
-      ],
-      "z-index": [
-        "--z-overlay"
-      ]
+      "color": ["--color-surface-primary", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-md"],
+      "shadow": ["--shadow-lg"],
+      "z-index": ["--z-dropdown"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-body", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"],
+      "spacing": ["--space-layout-element-gap"]
     }
   },
   "accessibility": [
-    "Use role=\"dialog\" and aria-modal=\"true\" for modal popup use and name it from the visible title.",
-    "Move focus into a modal popup when it opens, contain focus while open, and restore focus to the trigger when it closes.",
-    "Provide a visible named dismiss action and support Escape dismissal.",
-    "Do not add an email field API until popup email-capture ownership is accepted; any composed field must independently satisfy Input obligations.",
-    "Respect reduced-motion preferences for overlay and slide transitions."
+    "Use canonical Popover for concise non-modal supplemental content anchored to an explicit native Button trigger.",
+    "Connect trigger and panel with aria-controls/aria-expanded or native popovertarget behavior.",
+    "Do not add aria-modal, a backdrop, focus trap, scroll lock or default role=dialog.",
+    "Close on Escape, outside interaction and repeated trigger activation without blocking page interaction.",
+    "Preserve natural Tab order and restore trigger focus after keyboard dismissal when focus moved inside.",
+    "Use canonical Modal for page-blocking marketing campaigns and Dropdown Menu for menu semantics."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/marketing.css; runtime dialog behavior remains target-owned."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "native-component"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "native-component"
-    }
+    "web": { "status": "implemented", "kind": "deprecated-forward", "notes": "Temporary migration records render canonical B9 Popover source and target-owned anchored lifecycle; G4 owns no independent Web output." },
+    "shopify": { "status": "unsupported", "kind": "deprecated", "notes": "Compose canonical Popover or Modal according to campaign semantics; G4 owns no Shopify adapter." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

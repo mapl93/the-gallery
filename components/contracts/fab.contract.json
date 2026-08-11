@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "fab",
   "name": "FAB / Back-to-Top",
   "registryId": "A20",
@@ -31,8 +31,10 @@
     { "name": "disabled", "selectors": [".fab:disabled"], "description": "Unavailable visible action state." }
   ],
   "behavior": [
-    { "name": "scrollVisibility", "selectors": [".fab--visible"], "events": ["scroll"], "description": "Targets own when the FAB becomes visible based on scroll or context." },
-    { "name": "action", "selectors": [".fab"], "attributes": ["aria-label", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "The button should expose a clear action name and preserve native button behavior." }
+    { "name": "controlledVisibility", "selectors": [".fab", ".fab--visible"], "events": ["scroll", "context change"], "description": "Visible is a controlled target input. Targets own thresholds, contextual relevance, safe-area/fixed-chrome collision handling, and synchronization; the primitive does not observe scroll." },
+    { "name": "hiddenFocusExclusion", "selectors": [".fab"], "description": "After the exit transition completes, the hidden base state uses visibility:hidden and cannot receive keyboard or programmatic focus." },
+    { "name": "action", "selectors": [".fab"], "attributes": ["aria-label", "type=\"button\"", "disabled"], "events": ["click", "Space", "Enter"], "description": "The named native button emits activation. The target owns the action result, scroll behavior, focus result, and persistence." },
+    { "name": "motionPreference", "selectors": [".fab"], "description": "Visibility, transform, opacity, and hover transitions are removed when reduced motion is requested; target-owned smooth scrolling must honor the same preference." }
   ],
   "properties": [
     {
@@ -80,10 +82,13 @@
   "accessibility": [
     "Provide a clear accessible name for the floating action.",
     "Do not make the FAB the only way to complete critical navigation.",
-    "Keep the control reachable by keyboard when visible."
+    "Keep the control reachable by keyboard when visible and excluded from focus after it becomes hidden.",
+    "Treat the icon as decorative when the button already has an accessible name.",
+    "Use a target at least 24 by 24 CSS pixels.",
+    "Honor reduced-motion preferences for visibility and target-owned scrolling."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css; scroll visibility is target-owned." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented as a native named button with controlled hidden/visible classes, native disabled/focus behavior, and reduced-motion CSS; visibility thresholds and action effects are target-owned." },
     "shopify": { "status": "implemented", "kind": "liquid-css-js" },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "button-group",
   "name": "Button Group",
   "registryId": "A16",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Button grouping primitive that composes Button children with shared borders and an optional full-width layout.",
+  "summary": "Named button grouping primitive that composes canonical Button children with logical joined borders and an optional content-resilient full-width layout.",
   "dependencies": ["button"],
   "source": {
     "registry": "registry.json#/components/button-group",
@@ -29,7 +29,9 @@
     { "name": "full", "selectors": [".btn-group--full", ".btn-group--full .btn"], "description": "Full-width distribution state." }
   ],
   "behavior": [
-    { "name": "buttonComposition", "selectors": [".btn-group .btn"], "attributes": ["role=\"group\"", "aria-label or aria-labelledby on the group"], "description": "The group composes Button children without changing their native button or link semantics, names, disabled states, or tab order." }
+    { "name": "buttonComposition", "selectors": [".btn-group .btn"], "attributes": ["role=\"group\"", "aria-label or aria-labelledby on the group"], "description": "The group composes Button children without changing their native button or link semantics, names, disabled states, activation, or normal tab order; arrow keys are not captured." },
+    { "name": "logicalJoining", "selectors": [".btn-group .btn:first-child", ".btn-group .btn:last-child"], "description": "Joined borders and outer radii follow logical inline start and end so visual grouping remains correct in LTR and RTL." },
+    { "name": "fullWidthContentResilience", "selectors": [".btn-group--full .btn"], "description": "Full distributes available width equally and allows localized or unbroken child labels to wrap instead of creating page-level horizontal overflow." }
   ],
   "properties": [
     {
@@ -52,10 +54,12 @@
   "accessibility": [
     "Preserve the accessible names and semantics of each child button.",
     "Use a group label when the set of buttons needs a shared accessible context.",
-    "Do not change tab order to match visual grouping."
+    "Do not change tab order or add Toolbar arrow-key behavior to match visual grouping.",
+    "Preserve logical joined corners and border overlap in both LTR and RTL.",
+    "Allow labels in the full-width variant to wrap without clipping focus indicators or creating page overflow."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by named group markup, canonical Button composition, logical border joining, and resilient full-width class composition in components/css/primitives.css." },
     "shopify": { "status": "implemented", "kind": "liquid-css-class" },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "rating",
   "name": "Rating Stars",
   "registryId": "A11",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Read-only star rating primitive with filled and half-star anatomy, review count text, and accessible rating-label requirements.",
+  "summary": "Canonical passive half-step rating projection with one named star image, default or large presentation, shape-distinct states, and optional localized review-count text.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/rating",
@@ -22,35 +22,35 @@
       "selector": ".rating",
       "className": ".rating",
       "required": true,
-      "description": "Inline read-only rating wrapper."
+      "description": "Ordinary inline layout root with no widget, image, group, live-region, or interactive semantics."
     },
     {
       "name": "stars",
       "selector": ".rating__stars",
       "className": ".rating__stars",
       "required": true,
-      "description": "Star icon group."
+      "description": "Single named image representing the complete target-supplied rating value and scale."
     },
     {
       "name": "star",
       "selector": ".rating__star",
       "className": ".rating__star",
       "required": true,
-      "description": "Single star glyph or icon."
+      "description": "Repeated decorative full, half, or empty glyph/SVG hidden from assistive technology."
     },
     {
       "name": "count",
       "selector": ".rating__count",
       "className": ".rating__count",
       "required": false,
-      "description": "Optional review count text."
+      "description": "Optional complete localized review-count text that remains independently readable outside the star image."
     },
     {
       "name": "halfFill",
       "selector": ".rating__star--half::before",
       "required": false,
       "generated": true,
-      "description": "Generated half-fill layer for a half-star."
+      "description": "Private inline-start half-fill layer for text-glyph anatomy; target SVGs may supply equivalent partial geometry."
     }
   ],
   "variants": [
@@ -58,7 +58,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default read-only rating."
+      "description": "Canonical passive presentation."
     }
   ],
   "sizes": [
@@ -66,50 +66,102 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default star size."
+      "description": "Default body-sized star presentation."
+    },
+    {
+      "name": "lg",
+      "className": ".rating--lg",
+      "default": false,
+      "description": "Large 1.5rem star presentation migrated from deprecated V2 Star Rating."
     }
   ],
   "states": [
     {
       "name": "default",
-      "selectors": [".rating"],
-      "description": "Default rating state."
+      "selectors": [".rating", ".rating__star"],
+      "description": "Passive root and default outlined empty-star anatomy."
     },
     {
       "name": "filled",
       "selectors": [".rating__star--filled"],
-      "description": "Filled star state."
+      "description": "Solid full-star visual state supplied by the target adapter."
     },
     {
       "name": "half",
       "selectors": [".rating__star--half", ".rating__star--half::before"],
-      "description": "Half-star state."
+      "description": "Outlined star plus inline-start partial fill supplied by target SVG or private text-glyph composition."
     }
   ],
   "behavior": [
     {
-      "name": "readOnlyRating",
-      "selectors": [".rating", ".rating__stars"],
-      "attributes": ["aria-label", "role=\"img\""],
-      "description": "Read-only ratings should expose a text alternative such as \"4.5 out of 5 stars\"."
+      "name": "passiveRoot",
+      "selectors": [".rating"],
+      "description": "The root does not receive focus, expose interaction, announce updates, or override the semantics of its independently readable count."
+    },
+    {
+      "name": "ratingImage",
+      "selectors": [".rating__stars"],
+      "attributes": ["role=\"img\"", "aria-label"],
+      "description": "The star sequence is exposed once as one localized image name containing the target-supplied value and scale."
+    },
+    {
+      "name": "decorativeStars",
+      "selectors": [".rating__star"],
+      "attributes": ["aria-hidden=\"true\""],
+      "description": "Individual visual stars are decorative and never announced as five redundant images or characters."
+    },
+    {
+      "name": "shapeDistinctStates",
+      "selectors": [".rating__star", ".rating__star--filled", ".rating__star--half"],
+      "description": "Full, half, and empty stars use solid, partial-fill, and outline form in addition to color so rating meaning survives monochrome and forced colors."
     },
     {
       "name": "reviewCount",
       "selectors": [".rating__count"],
-      "description": "Review count text should be visible and included in the surrounding product or review context."
+      "attributes": ["dir=\"auto\""],
+      "description": "Optional count is complete localized ordinary text, such as 24 reviews, and is omitted when not supplied."
+    },
+    {
+      "name": "adapterOwnedProjection",
+      "selectors": [".rating", ".rating__stars"],
+      "description": "The target resolves raw provider data, scale, rounding, missing data and localized count before supplying a valid half-step value; neutral Web performs no browser calculation or normalization."
+    },
+    {
+      "name": "strictComposition",
+      "selectors": [".rating"],
+      "description": "A non-empty localized accessibleLabel and a finite 0..5 value aligned to 0.5 are required; invalid required composition emits no Rating root."
     }
   ],
   "properties": [
     {
-      "name": "accessibleLabel",
-      "type": "string",
+      "name": "ratingValue",
+      "type": "number",
       "required": true,
-      "description": "Localized text alternative that communicates the displayed rating value and scale.",
+      "minimum": 0,
+      "maximum": 5,
+      "step": 0.5,
+      "description": "Target-supplied normalized half-step rating represented by the decorative stars; Rating does not calculate, normalize, or round provider data.",
       "targetMappings": {
         "web": [
           {
             "kind": "attribute",
             "selector": ".rating",
+            "attribute": "data-rating",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": true,
+      "description": "Complete localized text alternative containing the target-supplied rating value and scale; it must agree with the visual star anatomy.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".rating__stars",
             "attribute": "aria-label",
             "valueFrom": "property"
           }
@@ -120,13 +172,29 @@
       "name": "reviewCount",
       "type": "string",
       "required": false,
-      "unsetBehavior": "Omit the count element when no localized review-count text is supplied.",
-      "description": "Optional localized review-count text displayed beside the stars.",
+      "unsetBehavior": "Omit the count element when no complete localized review-count text is supplied.",
+      "description": "Optional complete localized visible count text, including its review noun rather than punctuation or a raw number alone.",
       "targetMappings": {
         "web": [
           {
             "kind": "content",
             "selector": ".rating__count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "sizes",
+      "description": "Default or large visual presentation; size does not change semantics or content.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".rating",
+            "source": "sizes"
           }
         ]
       }
@@ -136,30 +204,34 @@
     "public": {
       "color": [
         "--color-text-accent",
-        "--color-border-subtle",
         "--color-text-secondary"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
       ]
     }
   },
   "accessibility": [
-    "Provide a text alternative for the numeric rating value.",
-    "Do not expose every decorative star as separate assistive technology content.",
-    "Use Star Input for interactive rating input; Rating Stars is display-only.",
-    "Do not rely on color alone to communicate rating value."
+    "Expose the complete rating value and scale once on the star image; do not expose every decorative star separately.",
+    "Keep optional review-count text independently readable outside the star image and include a localized review noun.",
+    "Use solid, partial-fill, and outline form in addition to color for full, half, and empty states.",
+    "Require a valid target-normalized half-step value and a complete localized accessible label that agrees with the visual sequence.",
+    "Keep the component passive and unfocusable; use Star Input for interactive value entry.",
+    "Do not add live-region semantics; the consuming target owns any dynamic rating/count announcement."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/primitives.css."
+      "notes": "Canonical passive anatomy, default/large geometry, and visual states are implemented by components/css/primitives.css; each target supplies the truthful sequence with no neutral browser runtime."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid can render product rating metadata and count text with the same class contract."
+      "notes": "Dedicated Liquid maps Shopify Rating metadata and localized count text without owning aggregation or review-provider policy."
     },
     "react": {
       "status": "planned",

@@ -1,0 +1,49 @@
+## Overview
+
+Pickup Location Selector finds eligible pickup locations for the exact current product, variant, and market, then records one stable location id as pickup intent. It does not reserve inventory or promise fulfilment; Product Form, Cart, or Checkout owns final confirmation and stale-selection recovery.
+
+<Preview html={'<section class="location-search pickup-location-selector tg-preview-frame--lg" aria-labelledby="pickup-preview-heading" data-status="ready"><header class="location-search__header"><h2 class="location-search__heading" id="pickup-preview-heading">Choose a pickup location</h2><p class="location-search__description">Search locations eligible for the selected piece in your current market.</p></header><form class="location-search__form" role="search"><div class="input location-search__query"><label class="input__label" for="pickup-preview-query">City, region, or postal code</label><div class="input__control"><input class="input__field" id="pickup-preview-query" type="search" name="location-query" placeholder="Try Palermo" autocomplete="postal-code"/></div></div><button class="btn location-search__submit" type="submit">Search</button></form><button class="btn btn--link btn--sm location-search__geolocate" type="button">Use my location</button><p class="location-search__status" role="status">2 eligible pickup locations.</p><fieldset class="pickup-location-selector__group"><legend class="pickup-location-selector__legend">Eligible pickup locations</legend><ul class="location-search__results pickup-location-selector__results"><li class="location-search__result pickup-location-selector__result" data-selected><label class="radio pickup-location-selector__choice"><input class="radio__input" type="radio" name="pickup-location" value="palermo-gallery" checked aria-describedby="pickup-preview-palermo-details"/><span class="radio__label">Palermo Gallery</span></label><div class="location-search__result-details" id="pickup-preview-palermo-details"><p class="location-search__address">Costa Rica 4827, Buenos Aires</p><p class="pickup-location-selector__availability">Pickup available for this selection</p><p class="location-search__meta">Usually ready within two hours</p></div></li></ul></fieldset></section>'} label="Pickup Location Selector" />
+
+## Presentation
+
+The required workflow is list-first: a canonical Input and Button submit manual search, an optional explicit Button requests location, and a native Fieldset of canonical Radios exposes eligible results. The quiet bordered records emphasize readable identity, address, availability, readiness, hours, and distance. A target may add a synchronized map, but the list remains complete when maps are unavailable or fail.
+
+The surface responds to its own container. Below the private threshold, the search action stacks to full width; location content wraps through logical properties without hiding actions or requiring horizontal scrolling.
+
+## Usage Guidelines
+
+<DoDont>
+  <Do>Bind selection to the exact current product, variant, and market, and emit the selected stable location id to the shared product or fulfilment coordinator.</Do>
+  <Dont>Do not call selection a reservation, infer eligibility from quantity, request geolocation on mount, or make a map the only way to choose.</Dont>
+</DoDont>
+
+- Manual search by supported address, city, region, or postal code remains available under permission denial, timeout, browser incompatibility, or map failure.
+- The target owns provider truth, geocoding, ordering, loading, empty/error/retry, stale suppression, localization, privacy, analytics, and transaction reconciliation.
+- Supply eligible records only. When context changes, remove stale choices atomically before publishing the new result set.
+- Use Store Locator for general branch discovery that does not choose a transactional pickup location.
+
+## Accessibility
+
+- Name the surface with a visible heading and the native search field with its own visible label; a placeholder is only a hint.
+- Group location choices with a native Fieldset and first Legend. Each canonical Radio uses one shared name and the stable location id as its value.
+- Associate every Radio with text-complete name, address, availability, and relevant readiness details; color, border, pins, and maps are supplemental.
+- Preserve native Tab, Space, arrows, checkedness, focus, FormData, and reset behavior. Controlled targets own one `selectedLocationId`, not independent item booleans.
+- Use one coherent `role=status` result channel and `role=alert` only for a newly presented error. Do not announce ordinary typing or map movement redundantly.
+- Geolocation requires an explicit user action and target privacy disclosure. Selection must not announce inventory reservation or fulfilment confirmation.
+
+## References
+
+The direction follows the [WAI-ARIA Radio Group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), native [HTML radio-button and search-input semantics](https://html.spec.whatwg.org/), the [W3C Geolocation permission model](https://www.w3.org/TR/geolocation/), Radix Radio Group's controlled/uncontrolled single-value API, Polaris choice-list guidance, Open UI combobox research for typed filtering, and Shopify's variant-scoped pickup-availability model.
+
+<PropTable>
+  <tr><td>`heading`</td><td>string</td><td>required</td><td>Visible section heading and accessible root name</td></tr>
+  <tr><td>`queryLabel`, `query`, `queryPlaceholder`</td><td>string</td><td>label required</td><td>Canonical manual-search Input contract</td></tr>
+  <tr><td>`searchLabel`, `useLocationLabel`</td><td>string</td><td>search required</td><td>Canonical search and optional explicit geolocation Buttons</td></tr>
+  <tr><td>`selectionLabel`</td><td>string</td><td>required</td><td>Native Fieldset Legend</td></tr>
+  <tr><td>`locations`</td><td>slot</td><td>required when ready</td><td>Target-ordered eligible Radio records with stable ids and complete text</td></tr>
+  <tr><td>`selectedLocationId`</td><td>string</td><td>optional</td><td>One current pickup intent; empty means no selection</td></tr>
+  <tr><td>`status`, `statusMessage`</td><td>enum/string</td><td>`ready`/optional</td><td>Ready, loading, empty, or error lifecycle and concise truthful copy</td></tr>
+  <tr><td>`map`</td><td>slot</td><td>optional</td><td>Target-owned synchronized progressive map</td></tr>
+</PropTable>
+
+Stateful adapters expose controlled `query/onQueryChange`, `selectedLocationId/onLocationSelect`, and `status`, with uncontrolled native initial values where useful. Provider requests, geolocation, map services, transaction persistence, inventory reservation, and final fulfilment confirmation remain target responsibilities.

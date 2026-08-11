@@ -6,7 +6,7 @@
   "registryId": "H10",
   "category": "forms",
   "status": "pilot",
-  "summary": "Universal field wrapper contract with label, description, error, success, required indicator, and input-message association requirements.",
+  "summary": "Control-agnostic field composition with a visible label, required canonical control slot, optional helper text, one current feedback message, and explicit association boundaries.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/field-wrapper",
@@ -40,11 +40,25 @@
       "description": "Generated visual required marker."
     },
     {
+      "name": "control",
+      "selector": ".field__control",
+      "className": ".field__control",
+      "required": true,
+      "description": "Canonical composed form-control root; Field Wrapper does not copy or own its value behavior."
+    },
+    {
       "name": "description",
       "selector": ".field__description",
       "className": ".field__description",
       "required": false,
       "description": "Helper text that describes expected input."
+    },
+    {
+      "name": "feedback",
+      "selector": ".field__feedback",
+      "className": ".field__feedback",
+      "required": false,
+      "description": "One current validation or confirmation message after the control and helper text."
     },
     {
       "name": "error",
@@ -98,12 +112,22 @@
     {
       "name": "default",
       "selectors": [".field"],
-      "description": "Default wrapper state."
+      "description": "Label and canonical control are present with no current feedback."
     },
     {
       "name": "required",
       "selectors": [".field__label--required::after"],
       "description": "Visible required indicator state."
+    },
+    {
+      "name": "withDescription",
+      "selectors": [".field__description"],
+      "description": "Optional helper text is present and referenced by the composed control."
+    },
+    {
+      "name": "withFeedback",
+      "selectors": [".field__feedback"],
+      "description": "One current feedback message is present and referenced by the composed control."
     },
     {
       "name": "error",
@@ -130,21 +154,30 @@
     },
     {
       "name": "messageAssociation",
-      "selectors": [".field__description", ".field__error", ".field__success", ".field__warning"],
+      "selectors": [".field__description", ".field__feedback", ".field__error", ".field__success", ".field__warning"],
       "attributes": ["aria-describedby", "aria-invalid", "aria-live"],
-      "description": "Helper, error, and success messages should be programmatically associated with the form control when present."
+      "description": "Helper text and the one current feedback message are programmatically associated with the composed control when present."
     },
     {
       "name": "requiredState",
       "selectors": [".field__label--required::after"],
       "attributes": ["required", "aria-required=\"true\""],
       "description": "Required visuals must stay synchronized with native or ARIA required state."
+    },
+    {
+      "name": "controlOwnership",
+      "selectors": [".field__control"],
+      "attributes": ["id", "name", "value", "required", "disabled", "aria-invalid", "aria-describedby"],
+      "events": ["input", "change", "invalid", "reset"],
+      "description": "The composed canonical control owns value, validity, events, disabled state, reset, and controlled/uncontrolled strategy; the wrapper owns only composition."
     }
   ],
   "properties": [
     { "name": "label", "type": "string", "required": true, "description": "Visible field label text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__label" }] } },
+    { "name": "control", "type": "slot", "required": true, "description": "One canonical form-control root whose value and behavior remain independently owned.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".field__control", "classNames": [".field__control"] }] } },
     { "name": "description", "type": "string", "required": false, "description": "Optional helper text placed after the control.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__description" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Feedback family used by the label and composed message.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".field", "source": "variants" }] } },
+    { "name": "feedback", "type": "string", "required": false, "description": "One current feedback message; the selected variant determines its Error, Success, or Warning presentation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__feedback" }] } },
     { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows the visual required marker; consumers must synchronize the control's native required state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".field__label", "classNames": [".field__label--required"] }] } }
   ],
   "tokens": {
@@ -157,23 +190,30 @@
         "--color-feedback-warning-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-sm-line-height"
+      ],
+      "spacing": [
+        "--space-input-label-size",
+        "--space-input-message-size",
+        "--space-input-margin-bottom"
       ]
     }
   },
   "accessibility": [
     "Pair every form control with a visible label whenever possible.",
-    "Use aria-describedby to connect descriptions, errors, or success messages to the control.",
+    "Use aria-describedby to connect the helper text and one current feedback message to the control.",
     "Use aria-invalid=\"true\" when the field has an error.",
     "Do not expose aria-invalid for Success or Warning feedback.",
     "Do not rely on the generated required marker as the only required-state signal.",
-    "Keep message order predictable: label, control, helper text, then validation feedback."
+    "Keep message order predictable: label, canonical control, helper text, then current feedback.",
+    "Do not copy the composed control's DOM, value state, validation logic, or runtime behavior into Field Wrapper."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by the .field class family in components/css/forms.css; the component slug remains field-wrapper for registry and docs clarity."
+      "notes": "Implemented by the .field class family and a .field__control composition class in components/css/forms.css; no runtime or value owner is introduced."
     },
     "shopify": {
       "status": "implemented",

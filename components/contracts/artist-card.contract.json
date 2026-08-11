@@ -1,64 +1,68 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "artist-card",
   "name": "Artist Card",
   "registryId": "F6a",
   "category": "storytelling",
   "status": "pilot",
-  "summary": "Artist card with portrait, identity, medium, location, and piece count.",
-  "dependencies": [],
+  "summary": "Passive artist summary with optional portrait, canonical Badge, and target-formatted metadata.",
+  "dependencies": ["badge"],
   "source": {
     "registry": "registry.json#/components/artist-card",
     "css": { "file": "components/css/storytelling.css", "selector": ".artist-card" },
     "docs": "site/src/content/components/artist-card.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".artist-card", "className": ".artist-card", "required": true, "description": "Artist card container; the target may keep it passive or provide native interactive markup." },
-    { "name": "portrait", "selector": ".artist-card__portrait", "className": ".artist-card__portrait", "required": false, "description": "Optional artist portrait region." },
-    { "name": "portraitImage", "selector": ".artist-card__portrait img", "className": null, "required": false, "description": "Portrait image supplied by the target." },
-    { "name": "badge", "selector": ".artist-card__badge", "className": ".artist-card__badge", "required": false, "description": "Optional artist badge over the portrait." },
+    { "name": "root", "selector": ".artist-card", "className": ".artist-card", "required": true, "description": "Passive artist summary by default; a target may use one native link or button root only when it owns a coherent activation boundary." },
+    { "name": "portrait", "selector": ".artist-card__portrait", "className": ".artist-card__portrait", "required": false, "description": "Optional target-owned artist portrait region." },
+    { "name": "portraitImage", "selector": ".artist-card__portrait img", "className": null, "required": false, "description": "Optional portrait image whose source, intrinsic dimensions, loading, crop and alternative-text purpose are target-owned." },
+    { "name": "badge", "selector": ".artist-card__badge", "className": ".artist-card__badge", "required": false, "description": "Optional canonical Badge composition over an existing portrait; rendered with both .badge and .artist-card__badge." },
     { "name": "name", "selector": ".artist-card__name", "className": ".artist-card__name", "required": true, "description": "Artist display name." },
-    { "name": "medium", "selector": ".artist-card__medium", "className": ".artist-card__medium", "required": false, "description": "Optional artist medium." },
-    { "name": "location", "selector": ".artist-card__location", "className": ".artist-card__location", "required": false, "description": "Optional artist location." },
-    { "name": "pieceCount", "selector": ".artist-card__piece-count", "className": ".artist-card__piece-count", "required": false, "description": "Optional target-formatted piece count." }
+    { "name": "medium", "selector": ".artist-card__medium", "className": ".artist-card__medium", "required": false, "description": "Optional artist medium or practice; omit the element when empty." },
+    { "name": "location", "selector": ".artist-card__location", "className": ".artist-card__location", "required": false, "description": "Optional artist location; omit the element when empty." },
+    { "name": "pieceCount", "selector": ".artist-card__piece-count", "className": ".artist-card__piece-count", "required": false, "description": "Optional target-localized piece count; omit the element when empty." }
   ],
   "variants": [{ "name": "default", "className": null, "default": true, "description": "Default artist card." }],
   "sizes": [{ "name": "default", "className": null, "default": true, "description": "Card width follows its containing layout." }],
   "states": [
-    { "name": "default", "selectors": [".artist-card"], "description": "Default artist card state." },
-    { "name": "hover", "selectors": [".artist-card:hover .artist-card__portrait img"], "description": "Fine-pointer portrait emphasis." },
-    { "name": "focus", "selectors": [".artist-card:is(a, button):focus-visible", ".artist-card:focus-within"], "description": "Visible keyboard focus when the target makes the card or its content interactive." }
+    { "name": "default", "selectors": [".artist-card"], "description": "Passive default with no interaction affordance." },
+    { "name": "interactiveHover", "selectors": [".artist-card:is(a[href], button:not(:disabled)):hover .artist-card__portrait img"], "description": "Optional fine-pointer portrait emphasis only when a target supplies one enabled native interactive root." },
+    { "name": "interactiveFocus", "selectors": [".artist-card:is(a[href], button):focus-visible"], "description": "Visible keyboard focus only on a target-supplied native interactive root." },
+    { "name": "interactiveDisabled", "selectors": ["button.artist-card:disabled"], "description": "Optional native button root preserves native disabled semantics, leaves the sequential focus order, suppresses portrait emphasis, and shows an unavailable cursor." }
   ],
   "behavior": [
-    { "name": "interactionBoundary", "selectors": [".artist-card"], "description": "This contract does not decide whether every Artist Card is a link or passive. Targets that add activation must use native interactive semantics, an accessible name, and visible focus." }
+    { "name": "passiveDefault", "selectors": [".artist-card"], "description": "The shared component is passive and does not add tabindex, click handling, keyboard handling, listeners, state, or hover affordance." },
+    { "name": "nativeInteractionBoundary", "selectors": [".artist-card:is(a[href], button)"], "description": "A target that adds one coherent activation must use a native link or button root with an accessible name, visible focus, and no nested interactive descendants." },
+    { "name": "optionalContent", "selectors": [".artist-card__portrait", ".artist-card__badge", ".artist-card__medium", ".artist-card__location", ".artist-card__piece-count"], "description": "Optional parts are omitted when absent; Badge is valid only inside a present portrait and piece-count grammar remains target-owned." },
+    { "name": "mediaOwnership", "selectors": [".artist-card__portrait img"], "description": "Targets own portrait source, intrinsic size, responsive candidates, crop/focal data, loading priority, and informative-versus-decorative alternative text." }
   ],
   "properties": [
-    { "name": "portrait", "type": "slot", "required": false, "description": "Target-owned portrait media with appropriate alternative text.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".artist-card__portrait", "classNames": [".artist-card__portrait"] }] } },
-    { "name": "badge", "type": "string", "required": false, "description": "Optional short artist badge.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__badge" }] } },
+    { "name": "portrait", "type": "slot", "required": false, "description": "Target-owned portrait media with source, intrinsic dimensions, loading and alternative text appropriate to its context.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".artist-card__portrait", "classNames": [".artist-card__portrait"] }] } },
+    { "name": "badge", "type": "string", "required": false, "description": "Optional short canonical Badge label shown only when portrait is present.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__badge", "classNames": [".badge", ".artist-card__badge"] }] } },
     { "name": "name", "type": "string", "required": true, "description": "Artist display name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__name" }] } },
-    { "name": "medium", "type": "string", "required": false, "description": "Optional artist medium.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__medium" }] } },
-    { "name": "location", "type": "string", "required": false, "description": "Optional human-readable location.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__location" }] } },
-    { "name": "pieceCount", "type": "string", "required": false, "description": "Optional target-formatted piece count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__piece-count" }] } }
+    { "name": "medium", "type": "string", "required": false, "description": "Optional artist medium or practice; omitted when empty.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__medium" }] } },
+    { "name": "location", "type": "string", "required": false, "description": "Optional human-readable location; omitted when empty.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__location" }] } },
+    { "name": "pieceCount", "type": "string", "required": false, "description": "Optional target-localized piece-count string; omitted when empty.", "targetMappings": { "web": [{ "kind": "content", "selector": ".artist-card__piece-count" }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-focus", "--color-button-primary-bg-default", "--color-button-primary-text-default", "--color-text-primary", "--color-text-secondary"],
+      "color": ["--color-border-focus", "--color-text-primary", "--color-text-secondary"],
       "motion": ["--motion-transition-media"],
-      "typography": ["--font-family-heading", "--typo-body-sm-size", "--typo-caption-size", "--typo-h4-size"],
-      "radius": ["--radius-md", "--radius-sm"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-font-weight-medium", "--tg-typography-body-caption-weight", "--tg-typography-body-small-weight", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-caption-line-height", "--typo-caption-size", "--typo-h4-line-height", "--typo-h4-size"],
+      "radius": ["--radius-md"],
       "spacing": ["--space-layout-element-gap"]
     }
   },
   "accessibility": [
-    "Give meaningful portraits useful alternative text and mark decorative portraits accordingly.",
-    "When the target makes the card interactive, use native link or button markup instead of click handling on a passive container.",
+    "Choose portrait alternative text from its purpose: describe informative portraits concisely and use empty alternative text when the image is decorative or redundant with the adjacent artist name.",
+    "Keep the shared root passive. When a target makes the whole card interactive, use one native link or button root instead of click handling or tabindex on a passive container.",
     "Ensure an interactive card has a descriptive accessible name, visible focus, and no nested interactive controls.",
-    "Do not rely on portrait hover motion to communicate identity or availability."
+    "Choose the artist-name heading level from the containing document outline, omit empty optional elements, and do not rely on portrait hover motion to communicate identity or availability."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "web": { "status": "implemented", "kind": "css", "notes": "Passive CSS-only composition with canonical Badge and conditional native-root interaction hooks in components/css/storytelling.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Generated CSS and canonical Badge class are available; dedicated Liquid, artist data, destination, responsive portrait markup and merchant schema await target decisions. No component JavaScript is required by the neutral contract." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

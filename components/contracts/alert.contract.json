@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "alert",
   "name": "Alert / Banner",
   "registryId": "A21",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Inline feedback banner with info, success, warning, and error variants plus optional dismiss action.",
+  "summary": "Inline visible feedback with four semantic variants, explicit dynamic announcement priority, resilient text, and optional canonical Close Button dismissal.",
   "dependencies": ["close-button"],
   "source": {
     "registry": "registry.json#/components/alert",
@@ -34,8 +34,10 @@
     { "name": "default", "selectors": [".alert"], "description": "Visible alert; semantic severity is selected through its variant." }
   ],
   "behavior": [
-    { "name": "announcement", "selectors": [".alert"], "attributes": ["role=\"alert\"", "aria-live=\"polite\"", "aria-live=\"assertive\""], "description": "Targets choose live-region priority based on severity and timing." },
-    { "name": "dismiss", "selectors": [".alert__dismiss"], "attributes": ["aria-label", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "Dismissible alerts should use a named close action." }
+    { "name": "announcement", "selectors": [".alert"], "attributes": ["role=\"status\"", "role=\"alert\"", "aria-live=\"polite\"", "aria-live=\"assertive\""], "description": "Static content uses no live-region semantics. Targets choose polite status or assertive alert only when dynamically inserted timing and urgency require it; the visual Banner name never maps to the ARIA banner landmark." },
+    { "name": "dismiss", "selectors": [".alert__dismiss", ".close-btn"], "attributes": ["aria-label", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "Dismissible alerts compose a named canonical Close Button. When dismissAction is present, dismissLabel is conditionally required; the consumer owns removal, persistence, motion, focus, and follow-up announcements." },
+    { "name": "contentResilience", "selectors": [".alert__title", ".alert__message"], "description": "Localized and indivisible title/message content wraps rather than creating page-level horizontal overflow." },
+    { "name": "semanticAccent", "selectors": [".alert--info", ".alert--success", ".alert--warning", ".alert--error"], "description": "Background tints use the semantic feedback token directly; border and decorative icon derive a stronger private theme-aware accent from that family and primary text without creating a new public token." }
   ],
   "properties": [
     { "name": "title", "type": "string", "required": false, "description": "Optional concise alert heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".alert__title" }] } },
@@ -50,17 +52,20 @@
     "public": {
       "color": ["--color-surface-secondary", "--color-border-default", "--color-text-primary", "--color-text-secondary", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-warning-default", "--color-feedback-error-default"],
       "radius": ["--radius-md"],
-      "typography": ["--typo-body-size"]
+      "typography": ["--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
     "Use live-region semantics only for alerts inserted dynamically.",
     "Provide visible text for the message; do not rely on icon or color alone.",
-    "Name dismiss controls clearly.",
-    "Choose assertive announcements only for urgent failures."
+    "Do not map the visual Banner name to the ARIA banner landmark role.",
+    "Name dismiss controls clearly whenever the optional Close Button is present.",
+    "Choose assertive announcements only for urgent failures.",
+    "Do not move focus merely because an alert is announced.",
+    "Allow long localized or unbroken title/message content to wrap without clipping or page overflow."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by semantic variant classes, resilient typography, optional live-region attributes, and canonical Close Button composition in components/css/primitives.css." },
     "shopify": { "status": "implemented", "kind": "liquid-css-js" },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

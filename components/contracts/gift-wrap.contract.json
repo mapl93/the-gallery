@@ -1,62 +1,70 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "gift-wrap",
   "name": "Gift Wrap Option",
   "registryId": "K11",
   "category": "cart",
   "status": "pilot",
-  "summary": "Gift-wrap cart option that composes a checkbox with label, price, and optional details.",
-  "dependencies": ["checkbox"],
+  "summary": "Native order-level gift-wrap request composing canonical Checkbox and optional target-formatted Price while targets own one authoritative sellable-service line.",
+  "dependencies": ["checkbox", "price"],
   "source": {
     "registry": "registry.json#/components/gift-wrap",
     "css": { "file": "components/css/cart.css", "selector": ".gift-wrap" },
     "docs": "site/src/content/components/gift-wrap.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".gift-wrap", "className": ".gift-wrap", "required": true, "description": "Gift-wrap option container." },
-    { "name": "control", "selector": ".gift-wrap__control", "className": ".gift-wrap__control", "required": true, "description": "Checkbox dependency wrapper." },
-    { "name": "info", "selector": ".gift-wrap__info", "className": ".gift-wrap__info", "required": false, "description": "Gift-wrap text wrapper." },
-    { "name": "label", "selector": ".gift-wrap__label", "className": ".gift-wrap__label", "required": true, "description": "Gift-wrap option label." },
-    { "name": "price", "selector": ".gift-wrap__price", "className": ".gift-wrap__price", "required": false, "description": "Gift-wrap price." }
+    { "name": "root", "selector": ".gift-wrap", "className": ".gift-wrap", "required": true, "description": "Wrapping label that also carries the complete canonical Checkbox root and pointer activation area." },
+    { "name": "control", "selector": ".checkbox__input", "className": ".checkbox__input", "required": true, "description": "Canonical native Checkbox input owning selection, keyboard, disabled, form-value, and reset behavior." },
+    { "name": "info", "selector": ".gift-wrap__info", "className": ".gift-wrap__info", "required": true, "description": "Canonical Checkbox label part containing the option label and optional Price slot." },
+    { "name": "label", "selector": ".gift-wrap__label", "className": ".gift-wrap__label", "required": true, "description": "Required non-empty localized option text contributing the accessible name." },
+    { "name": "price", "selector": ".gift-wrap__price", "className": ".gift-wrap__price", "required": false, "description": "Optional wrapper containing one complete canonical target-formatted Price." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default gift-wrap option." }
+    { "name": "default", "className": null, "default": true, "description": "One neutral optional gift-wrap choice." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default gift-wrap option size." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic container-responsive profile; geometry remains private." }
   ],
   "states": [
-    { "name": "default", "selectors": [".gift-wrap"], "description": "Default gift-wrap option state." }
+    { "name": "default", "selectors": [".gift-wrap"], "description": "Available unchecked native state." },
+    { "name": "hover", "selectors": [".checkbox:hover .checkbox__input:not(:disabled)"], "description": "Canonical Checkbox hover across the complete wrapping label." },
+    { "name": "focusVisible", "selectors": [".checkbox__input:focus-visible"], "description": "Canonical keyboard focus on the native input." },
+    { "name": "selected", "selectors": [".checkbox__input:checked"], "description": "Selected native checked state." },
+    { "name": "disabled", "selectors": [".checkbox:has(.checkbox__input:disabled)", ".checkbox__input:disabled"], "description": "Unavailable unchecked or selected native state." }
   ],
   "behavior": [
-    { "name": "selection", "selectors": [".gift-wrap"], "attributes": ["checked", "name", "value"], "events": ["change"], "description": "Checkbox state should add, remove, or update gift-wrap cart state." },
-    { "name": "pricing", "selectors": [".gift-wrap__price"], "description": "Gift-wrap price should be formatted by the target commerce layer." }
+    { "name": "nativeSelection", "selectors": [".gift-wrap", ".checkbox__input", ".checkbox__input:checked"], "attributes": ["checked content attribute establishes defaultChecked in static HTML", "checked IDL property represents live selection"], "events": ["click", "Space", "input", "change", "form reset"], "description": "The canonical native Checkbox owns pointer, keyboard, live checkedness, form reset, and disabled behavior; K11 adds no neutral controller." },
+    { "name": "formValue", "selectors": [".checkbox__input"], "attributes": ["name", "value", "checked"], "events": ["form submit", "formdata", "form reset"], "description": "When a target supplies a name and value, the checked native input is the sole successful form entry; the target still decides what that entry means." },
+    { "name": "dependencyComposition", "selectors": [".gift-wrap", ".checkbox", ".gift-wrap__price", ".price"], "description": "K11 is the canonical Checkbox root and optionally contains one canonical Price; it does not duplicate their state, indicator, formatting, accessibility, or runtime." },
+    { "name": "targetMutation", "selectors": [".gift-wrap", ".checkbox__input"], "events": ["target add", "target update", "target remove", "target result"], "description": "The commerce target maps checkedness to one order-level sellable gift-wrap line at quantity one, then reconciles confirmed checkedness and totals from its authoritative cart snapshot while owning eligibility, idempotency, pending, error, retry, status, focus, stale-response, and analytics behavior." },
+    { "name": "intrinsicLayout", "selectors": [".gift-wrap", ".gift-wrap__info", ".gift-wrap__label", ".gift-wrap__price"], "description": "Source order remains control, required label, then optional price; localized and unbroken text wrap inside the owning container without viewport-dependent markup." }
   ],
   "properties": [
-    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Gift-wrap Checkbox selection state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".gift-wrap__control .checkbox__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "label", "type": "string", "required": true, "description": "Gift-wrap option label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-wrap__label" }] } },
-    { "name": "price", "type": "string", "required": false, "description": "Target-formatted gift-wrap price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-wrap__price" }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables the composed native Checkbox.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".gift-wrap__control .checkbox__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } }
+    { "name": "label", "type": "string", "required": true, "description": "Required non-empty localized visible option text and accessible-name content.", "targetMappings": { "web": [{ "kind": "content", "selector": ".gift-wrap__label" }] } },
+    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Initial native checkedness in static Web or authoritative cart-confirmed live selection in stateful commerce adapters.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".checkbox__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "price", "type": "slot", "required": false, "unsetBehavior": "Omit the price wrapper without implying that gift wrapping is free.", "description": "Optional slot containing one complete canonical target-formatted Price.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".gift-wrap__price", "classNames": [".gift-wrap__price", ".price"] }] } },
+    { "name": "name", "type": "string", "required": false, "description": "Native form field name selected by the target persistence model.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".checkbox__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": false, "defaultValue": "on", "description": "Native successful value submitted with name when selected.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".checkbox__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects target unavailability to the canonical native Checkbox.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".checkbox__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "ID reference to target-owned explanatory or unavailable content outside K11.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".checkbox__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
   ],
-  "tokens": {
-    "public": {
-      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
-      "radius": ["--radius-md"],
-      "typography": ["--typo-body-size"]
-    }
-  },
+  "tokens": { "public": {} },
   "accessibility": [
-    "Use native checkbox semantics or equivalent target-native checked state.",
-    "Expose any additional price as readable text.",
-    "Keep gift-wrap state synchronized with cart totals."
+    "Use one native checkbox inside the wrapping label so its complete visible label and optional Price remain one activation target and accessible name.",
+    "Preserve canonical Checkbox checked, disabled, Space, focus-visible, forced-colors, reduced-motion, form submission, and reset behavior.",
+    "Keep a non-empty visible option label even when Price is present; price alone is not an accessible name and absence does not mean free.",
+    "Use describedBy for target-owned unavailability or explanatory content instead of inserting interactive descendants inside the wrapping label.",
+    "Announce confirmed cart-total or mutation results from the target cart lifecycle only when the asynchronous outcome meets the status-message criterion; K11 is not a live region.",
+    "Keep target request failure from silently reverting or confirming selection without an error, retry, and checkedness reconciliation policy.",
+    "Map confirmed selection to exactly one explicit sellable gift-wrap service line at quantity one, including a truthful canonical zero Price when configured."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to gift-wrap line item, cart attribute, or target-specific gift option." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css-native-checkbox", "notes": "Native Checkbox and optional canonical Price composition require zero K11 runtime. Form meaning, mutation, totals, result feedback, and reconciliation remain target-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A target-native snippet, global dedicated single-variant product setting, and Ajax coordinator implement the accepted sellable-line candidate. Live merchant configuration, eligibility, Cart Page/Drawer refresh, inventory/tax/fulfillment policy, errors, focus, and editor proof remain required before target readiness." },
+    "react": { "status": "planned", "kind": "component", "notes": "Controlled or uncontrolled Checkbox composition may project target mutation state without introducing React into base source." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Visual profile should compose canonical Checkbox and Price instances; registered nodes are generic Button Studio shells, not K11 artwork or approval." },
     "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

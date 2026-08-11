@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "trust-badges",
   "name": "Trust Badges",
   "registryId": "G5",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Passive wrapping collection of factual trust or guarantee statements with optional decorative icons.",
+  "summary": "Passive native list of short text-complete commercial assurances with optional decorative visuals and target-owned claims.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/trust-badges",
@@ -22,20 +22,28 @@
       "selector": ".trust-badges",
       "className": ".trust-badges",
       "required": true,
-      "description": "Wrapping trust-statement collection."
+      "description": "Native unordered list containing one or more valid assurance statements and an optional localized accessible name."
     },
     {
-      "name": "badge",
+      "name": "item",
       "selector": ".trust-badge",
       "className": ".trust-badge",
       "required": true,
-      "description": "Repeated passive trust statement."
+      "description": "Repeated native list item for one independent target-supplied assurance."
     },
     {
       "name": "icon",
-      "selector": ".trust-badge svg",
+      "selector": ".trust-badge__icon",
+      "className": ".trust-badge__icon",
       "required": false,
-      "description": "Optional icon supporting a trust statement."
+      "description": "Optional decorative visual that reinforces but never carries or verifies the visible statement."
+    },
+    {
+      "name": "text",
+      "selector": ".trust-badge__text",
+      "className": ".trust-badge__text",
+      "required": true,
+      "description": "Non-empty visible text that completely communicates the target-owned assurance."
     }
   ],
   "variants": [
@@ -43,13 +51,13 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default wrapping spacing and text size."
+      "description": "Body Small statement typography and default wrapping gaps."
     },
     {
       "name": "compact",
       "className": ".trust-badges--compact",
       "default": false,
-      "description": "Reduced gaps and statement text size for dense product or cart contexts."
+      "description": "Caption statement typography and reduced wrapping gaps for dense product or cart contexts."
     }
   ],
   "sizes": [
@@ -57,7 +65,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Content-sized wrapping collection."
+      "description": "One intrinsic content-sized collection whose wrapping responds to its own available inline space."
     }
   ],
   "states": [
@@ -66,26 +74,57 @@
       "selectors": [
         ".trust-badges"
       ],
-      "description": "Passive resting presentation."
+      "description": "Populated passive assurance list with no focus, live-region, motion, controlled state, or neutral runtime."
     }
   ],
   "behavior": [
     {
-      "name": "passiveStatements",
+      "name": "nativeCollection",
       "selectors": [
+        ".trust-badges",
         ".trust-badge"
       ],
-      "description": "Trust badges are passive claims, not controls; targets must provide truthful text and must not imply interaction through focus or click behavior."
+      "attributes": [
+        "role=\"list\" when marker removal would otherwise weaken list exposure"
+      ],
+      "description": "The collection uses native ul/li semantics, preserves target source order, and adds no widget role or keyboard model."
     },
     {
-      "name": "iconSemantics",
+      "name": "textCompleteItems",
       "selectors": [
-        ".trust-badge svg"
+        ".trust-badge__icon",
+        ".trust-badge__text"
       ],
       "attributes": [
-        "aria-hidden=\"true\" for decorative icons"
+        "aria-hidden=\"true\" for decorative visuals",
+        "alt=\"\" for decorative images"
       ],
-      "description": "Icons that repeat the visible statement are hidden from assistive technology."
+      "description": "Every valid item has non-empty visible text that stands alone; optional visuals are redundant, decorative, and excluded from the accessibility tree."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".trust-badges",
+        ".trust-badge",
+        ".trust-badge__text"
+      ],
+      "description": "Targets omit blank or icon-only items and omit the complete root when no valid visible statement remains."
+    },
+    {
+      "name": "intrinsicWrapping",
+      "selectors": [
+        ".trust-badges",
+        ".trust-badge",
+        ".trust-badge__text"
+      ],
+      "description": "Items wrap from the component content box without viewport queries, visual reordering, truncation, or Studio-only layout repair."
+    },
+    {
+      "name": "targetClaimOwnership",
+      "selectors": [
+        ".trust-badges"
+      ],
+      "description": "Targets own claim truth, evidence, qualifications, localization, jurisdiction, publication, updates, and any related policy destination; presentation never certifies a claim."
     }
   ],
   "properties": [
@@ -94,7 +133,7 @@
       "type": "enum",
       "required": false,
       "valuesFrom": "variants",
-      "description": "Default or compact collection presentation.",
+      "description": "Default or compact presentation density.",
       "targetMappings": {
         "web": [
           {
@@ -109,14 +148,36 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Repeated factual trust statements supplied by the target.",
+      "description": "One or more target-owned native list-item compositions containing required non-empty visible statement text and an optional decorative visual.",
       "targetMappings": {
         "web": [
           {
             "kind": "slot",
             "selector": ".trust-badges",
             "classNames": [
-              ".trust-badges"
+              ".trust-badges",
+              ".trust-badge",
+              ".trust-badge__text"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit aria-label when surrounding visible context already identifies the collection.",
+      "description": "Optional localized accessible list name used only when surrounding visible context does not already identify the assurances.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".trust-badges",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "ul"
             ]
           }
         ]
@@ -129,26 +190,39 @@
         "--color-feedback-success-default",
         "--color-text-secondary"
       ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-body-small-weight",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-caption-line-height",
+        "--typo-caption-size"
       ]
     }
   },
   "accessibility": [
-    "Keep every guarantee or trust claim available as text rather than icon alone.",
-    "Hide decorative icons from assistive technology and name informative icons only when they add meaning beyond the text.",
-    "Do not make passive trust statements keyboard-focusable.",
-    "Use list semantics when the collection is meaningfully a list of independent statements."
+    "Render the collection as a native ul/li list, preserving source order and adding role=list only as a marker-removal exposure safeguard.",
+    "Require every item to communicate its complete assurance through non-empty visible text; icon-only items are invalid.",
+    "Hide every redundant icon or image from assistive technology with aria-hidden or empty alt so it does not duplicate the statement.",
+    "Use an optional localized accessibleLabel only when surrounding visible context does not already identify the collection.",
+    "Do not add focus stops, controls, widget roles, live regions, keyboard behavior, motion, controlled state, or neutral runtime to passive assurances.",
+    "Permit long, localized, RTL, unbroken, and enlarged statement text to wrap without clipping, truncation, overlap, or visual reordering.",
+    "Leave claim truth, evidence, qualifications, localization, jurisdiction, publication, updates, and related policy navigation with the target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/marketing.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented as a conditionally rendered native list with text-complete items, optional decorative visuals, semantic typography, intrinsic wrapping, and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant section maps non-empty statement blocks to canonical native list anatomy, optional decorative target images, localized schema metadata, strict empty omission, and no component runtime."
     },
     "react": {
       "status": "planned",

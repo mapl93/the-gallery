@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "product-info",
   "name": "Product Info",
   "registryId": "D3",
   "category": "product",
   "status": "pilot",
-  "summary": "Product detail information block for vendor, title, subtitle, description, price dependency, and metadata.",
+  "summary": "Passive product identity, canonical Price, rich description, and truthful product-level or selected-variant metadata projection under one target coordinator.",
   "dependencies": ["price"],
   "source": {
     "registry": "registry.json#/components/product-info",
@@ -14,50 +14,66 @@
     "docs": "site/src/content/components/product-info.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".product-info", "className": ".product-info", "required": true, "description": "Product information container." },
+    { "name": "root", "selector": ".product-info", "className": ".product-info", "required": true, "description": "Passive product information container; the target chooses whether its page context warrants a sectioning element." },
+    { "name": "identity", "selector": ".product-info__identity", "className": ".product-info__identity", "required": true, "description": "Identity cluster containing the optional vendor, required title, and optional subtitle." },
     { "name": "vendor", "selector": ".product-info__vendor", "className": ".product-info__vendor", "required": false, "description": "Vendor or brand line." },
-    { "name": "title", "selector": ".product-info__title", "className": ".product-info__title", "required": true, "description": "Product title." },
+    { "name": "title", "selector": ".product-info__title", "className": ".product-info__title", "required": true, "description": "Visible product title rendered at the native heading rank required by the target context." },
     { "name": "subtitle", "selector": ".product-info__subtitle", "className": ".product-info__subtitle", "required": false, "description": "Editorial subtitle or edition note." },
-    { "name": "description", "selector": ".product-info__description", "className": ".product-info__description", "required": false, "description": "Product description text." },
-    { "name": "meta", "selector": ".product-info__meta", "className": ".product-info__meta", "required": false, "description": "Product metadata description list." }
+    { "name": "price", "selector": ".product-info__price", "className": ".product-info__price", "required": true, "description": "Required slot wrapper containing one canonical Price composition." },
+    { "name": "description", "selector": ".product-info__description", "className": ".product-info__description", "required": false, "description": "Target-owned semantic rich product description." },
+    { "name": "meta", "selector": ".product-info__meta", "className": ".product-info__meta", "required": false, "description": "Product metadata description list containing one or more complete name-value groups." },
+    { "name": "metaGroup", "selector": ".product-info__meta > div", "className": null, "required": false, "description": "One metadata name-value group." },
+    { "name": "metaLabel", "selector": ".product-info__meta dt", "className": null, "required": false, "description": "Localized metadata name." },
+    { "name": "metaValue", "selector": ".product-info__meta dd", "className": null, "required": false, "description": "Target-formatted metadata value." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default stacked product info layout." }
+    { "name": "default", "className": null, "default": true, "description": "Default passive product information composition." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default product detail typography scale." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic, container-responsive information hierarchy." }
   ],
   "states": [
-    { "name": "default", "selectors": [".product-info"], "description": "Default product information state." }
+    { "name": "default", "selectors": [".product-info"], "description": "Passive content with no component-owned interaction state." }
   ],
   "behavior": [
-    { "name": "metadataSemantics", "selectors": [".product-info__meta dt", ".product-info__meta dd"], "attributes": ["<dl>", "<dt>", "<dd>"], "description": "Metadata should preserve description-list semantics." },
-    { "name": "priceComposition", "selectors": [".product-info"], "description": "Price formatting should be delegated to the Price dependency." }
+    { "name": "contextualHeading", "selectors": [".product-info__title"], "attributes": ["<h1>-<h6>"], "description": "The target renders one visible native title heading at the correct rank for the surrounding page or overlay; Product Info does not expose a decorative heading-level switch." },
+    { "name": "priceComposition", "selectors": [".product-info__price"], "description": "The required slot wrapper renders one canonical Price dependency. Product Info does not parse, format, calculate, or validate monetary data." },
+    { "name": "richDescription", "selectors": [".product-info__description"], "description": "The optional description preserves target-owned semantic headings, paragraphs, lists, links, emphasis, language, and direction instead of flattening rich content into one string." },
+    { "name": "metadataSemantics", "selectors": [".product-info__meta", ".product-info__meta > div", ".product-info__meta dt", ".product-info__meta dd"], "attributes": ["<dl>", "<div>", "<dt>", "<dd>"], "description": "Metadata uses one native description list with one or more complete localized name-value groups." },
+    { "name": "optionalContent", "selectors": [".product-info__vendor", ".product-info__subtitle", ".product-info__description", ".product-info__meta"], "description": "Targets omit optional parts and wrappers when their content is blank and never render an empty metadata list." },
+    { "name": "intrinsicLayout", "selectors": [".product-info", ".product-info__identity", ".product-info__meta"], "description": "Identity, rich content, and metadata wrap from the component's available inline size without viewport-specific DOM or reading-order changes." },
+    { "name": "truthfulProjection", "selectors": [".product-info", ".product-info__price", ".product-info__meta"], "attributes": ["data-product-info-projection=product|variant"], "description": "Before variant resolution, targets may project a formatted product Price range and truthful product-level metadata only. After resolution, canonical Price plus SKU, inventory, and availability represent the exact selected variant. The data attribute is target diagnostics, not neutral configuration." },
+    { "name": "passiveUpdateBoundary", "selectors": [".product-info"], "description": "Neutral Product Info adds no focus, keyboard model, listener, observer, request, formatter, timer, live region, or controlled state. One page or Quick View coordinator atomically owns variant resolution, Product Gallery, Product Info, Product Form, URL, structured data, and at most one localized update status outside this component." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Visible product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__title" }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Non-empty visible product title. Heading rank remains target-contextual.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__title" }] } },
     { "name": "vendor", "type": "string", "required": false, "description": "Optional vendor or brand line.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__vendor" }] } },
     { "name": "subtitle", "type": "string", "required": false, "description": "Optional editorial subtitle or edition note.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__subtitle" }] } },
-    { "name": "description", "type": "string", "required": false, "description": "Optional product description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-info__description" }] } },
-    { "name": "metadata", "type": "slot", "required": false, "description": "Optional description-list metadata composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-info__meta", "classNames": [".product-info__meta"] }] } }
+    { "name": "price", "type": "slot", "required": true, "description": "Required slot containing one canonical Price composition supplied with a target-formatted product range before resolution or the exact selected-variant value afterward.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-info__price", "classNames": [".product-info__price"] }] } },
+    { "name": "description", "type": "slot", "required": false, "description": "Optional target-owned semantic rich product description.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-info__description", "classNames": [".product-info__description"] }] } },
+    { "name": "metadata", "type": "slot", "required": false, "description": "Optional native description-list composition containing complete localized product-level groups and, only after resolution, exact selected-variant SKU, inventory, and availability groups.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-info__meta", "classNames": [".product-info__meta"] }] } }
   ],
   "tokens": {
     "public": {
       "color": ["--color-text-primary", "--color-text-secondary"],
       "spacing": ["--space-layout-element-gap"],
-      "typography": ["--font-family-heading", "--font-family-accent", "--typo-h2-size", "--typo-h4-size", "--typo-body-size", "--typo-article-size"]
+      "typography": ["--font-family-heading", "--font-family-accent", "--typo-h2-size", "--typo-h2-line-height", "--typo-h4-size", "--typo-h4-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--typo-article-size", "--typo-article-line-height"]
     }
   },
   "accessibility": [
-    "Use a single appropriate heading level for the product title in the page context.",
-    "Render metadata as a description list when pairing labels and values.",
-    "Do not communicate product status or pricing changes by color alone."
+    "Render one visible native title heading at the correct level for the target context; do not add a redundant ARIA name to the root or title.",
+    "Render metadata as a native description list with complete grouped dt/dd pairs, and omit the list when it has no pairs.",
+    "Preserve semantic headings, paragraphs, lists, links, emphasis, language, and text direction in target-supplied rich description content.",
+    "Use an appropriate known direction or dir=auto for unknown plaintext identity and scalar metadata values; canonical Price isolates formatted values with bdi.",
+    "Keep Product Info out of the tab order. Interactive descendants supplied by rich content retain their own native names, focus, and keyboard behavior.",
+    "Do not communicate price, availability, inventory, status, or variant changes by color alone, and let the owning target provide at most one deliberate localized update announcement.",
+    "Keep that update status outside Product Info so the passive component and canonical Price do not create duplicate announcements."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map product title, vendor, description, price, and metafields into the contract anatomy." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical CSS and semantic markup contract require no neutral runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js", "notes": "Dedicated Liquid accepts product-level or exact selected-variant projection. Merchant-reorderable Main Product blocks and one Section Rendering API coordinator update media, Price, SKU, inventory, availability, form, URL, structured data, and one status without serializing the variant catalogue." },
+    "react": { "status": "implemented", "kind": "component", "notes": "Shared Exhibit/Studio renderer proves the passive exact-variant projection. Framework product-page or Quick View parents own resolution, contextual heading rank, rich nodes, atomic dependent updates, and one announcement." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Visual anatomy only; target heading rank, CMS trust, data, and live updates remain annotations." },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }
   }

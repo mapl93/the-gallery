@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "review-summary",
   "name": "Review Summary",
   "registryId": "V1",
   "category": "reviews",
   "status": "pilot",
   "summary": "Read-only aggregate rating, review count, and optional target-supplied rating distribution.",
-  "dependencies": [],
+  "dependencies": ["rating"],
   "source": {
     "registry": "registry.json#/components/review-summary",
     "css": {
@@ -22,28 +22,28 @@
       "selector": ".review-summary",
       "className": ".review-summary",
       "required": true,
-      "description": "Read-only aggregate review summary container."
+      "description": "Self-contained native figure for the read-only aggregate and optional distribution."
     },
     {
       "name": "average",
       "selector": ".review-summary__average",
       "className": ".review-summary__average",
       "required": true,
-      "description": "Group containing the visible aggregate score, optional Star Rating composition, and review count."
+      "description": "Required native figcaption containing the visible exact aggregate score, canonical Rating composition, and review count."
     },
     {
       "name": "score",
       "selector": ".review-summary__score",
       "className": ".review-summary__score",
       "required": true,
-      "description": "Visible, target-formatted aggregate score text."
+      "description": "Visible, target-formatted exact aggregate score hidden from the accessibility tree because canonical Rating owns the target-projected accessible star value."
     },
     {
       "name": "rating",
-      "selector": ".review-summary .star-rating",
-      "className": ".star-rating",
-      "required": false,
-      "description": "Optional composed Star Rating that visualizes the same aggregate score without replacing readable text."
+      "selector": ".review-summary .rating",
+      "className": ".rating",
+      "required": true,
+      "description": "Required canonical Rating composition and single accessible owner of the target-supplied half-step star projection."
     },
     {
       "name": "count",
@@ -57,14 +57,14 @@
       "selector": ".review-summary__bars",
       "className": ".review-summary__bars",
       "required": false,
-      "description": "Optional target-supplied rating-distribution group."
+      "description": "Optional labelled native list of target-supplied rating-distribution rows."
     },
     {
       "name": "barRow",
       "selector": ".review-summary__bar-row",
       "className": ".review-summary__bar-row",
       "required": false,
-      "description": "Repeated distribution row for one target-defined rating bucket."
+      "description": "Native list item for one target-defined rating bucket."
     },
     {
       "name": "barLabel",
@@ -130,6 +130,25 @@
       }
     },
     {
+      "name": "ratingDisplayValue",
+      "type": "number",
+      "required": true,
+      "minimum": 0,
+      "maximum": 5,
+      "step": 0.5,
+      "description": "Target-supplied half-step projection passed to canonical Rating; it remains explicit and may differ from the exact aggregate rather than being rounded by neutral code.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".review-summary .rating",
+            "attribute": "data-rating",
+            "valueFrom": "property"
+          }
+        ]
+      }
+    },
+    {
       "name": "ratingLabel",
       "type": "string",
       "required": true,
@@ -138,7 +157,7 @@
         "web": [
           {
             "kind": "attribute",
-            "selector": ".review-summary",
+            "selector": ".rating__stars",
             "attribute": "aria-label",
             "valueFrom": "property"
           }
@@ -193,6 +212,22 @@
           }
         ]
       }
+    },
+    {
+      "name": "distributionLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized accessible name applied when the optional distribution list is rendered.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".review-summary__bars",
+            "attribute": "aria-label",
+            "valueFrom": "property"
+          }
+        ]
+      }
     }
   ],
   "variants": [
@@ -213,11 +248,18 @@
   ],
   "states": [
     {
-      "name": "default",
+      "name": "withoutDistribution",
       "selectors": [
         ".review-summary"
       ],
-      "description": "Read-only aggregate summary state."
+      "description": "Default passive aggregate with no distribution list."
+    },
+    {
+      "name": "withDistribution",
+      "selectors": [
+        ".review-summary__bars"
+      ],
+      "description": "Passive aggregate followed by a labelled target-supplied distribution list."
     }
   ],
   "behavior": [
@@ -230,12 +272,37 @@
       "description": "The summary displays supplied values only; calculation, moderation, filtering, and synchronization remain target responsibilities."
     },
     {
+      "name": "canonicalRatingComposition",
+      "selectors": [
+        ".review-summary .rating"
+      ],
+      "attributes": [
+        "aria-label"
+      ],
+      "description": "The composed canonical Rating is the single accessible owner of the target-projected half-step value and scale; neutral code never rounds the exact aggregate into that projection."
+    },
+    {
       "name": "distributionText",
       "selectors": [
         ".review-summary__bar-label",
         ".review-summary__bar-count"
       ],
       "description": "Every supplied distribution width has equivalent visible bucket and count text."
+    },
+    {
+      "name": "intrinsicResponsiveLayout",
+      "selectors": [
+        ".review-summary__average",
+        ".review-summary__bars"
+      ],
+      "description": "The average and optional distribution wrap from split to stacked presentation according to the component's available inline size without viewport state or source reordering."
+    },
+    {
+      "name": "passiveCore",
+      "selectors": [
+        ".review-summary"
+      ],
+      "description": "The neutral component owns no event, focus, controlled state, live announcement, transition, observer, request, or runtime calculation."
     }
   ],
   "tokens": {
@@ -245,7 +312,7 @@
         "--color-text-primary",
         "--color-text-secondary",
         "--color-surface-secondary",
-        "--color-button-primary-bg-default"
+        "--color-text-accent"
       ],
       "radius": [
         "--radius-full"
@@ -254,32 +321,37 @@
         "--space-layout-element-gap"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-h1-weight",
         "--typo-h1-size",
+        "--typo-h1-line-height",
+        "--tg-typography-body-small-weight",
         "--typo-body-sm-size",
-        "--typo-caption-size"
-      ],
-      "motion": [
-        "--motion-transition-standard"
+        "--typo-body-sm-line-height",
+        "--tg-typography-body-caption-weight",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
       ]
     }
   },
   "accessibility": [
     "Expose the aggregate score and total as readable text rather than only stars or bar widths.",
-    "Provide an accessible rating label that includes the value and scale.",
-    "Every distribution bar needs visible bucket and count text; do not rely on width or color alone.",
-    "Do not announce passive aggregate data as a live region unless the consuming target has a separate update requirement."
+    "Use one canonical Rating accessible label that includes the target-projected value and scale; do not repeat it on the figure root or visible score.",
+    "Render the optional distribution as a labelled list; every bar needs visible bucket and count text and cannot rely on width or color alone.",
+    "Keep the passive figure out of the focus order and do not announce aggregate data as a live region unless the consuming target owns a separate update requirement.",
+    "Preserve source order, readable text, separator visibility, and track/fill distinction in narrow containers, RTL, forced colors, and CSS-disabled contexts."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Canonical responsive presentation is implemented in components/css/reviews.css; aggregate data is target supplied."
+      "notes": "Native figure, figcaption and list semantics plus intrinsic component-width wrapping are implemented in components/css/reviews.css; aggregate and distribution data remain target supplied."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js",
-      "notes": "A future adapter must select a review data source without changing this passive display contract."
+      "kind": "liquid-css",
+      "notes": "Copied CSS is target-ready, but a future Liquid projection must select a truthful review provider or data model, locale labels, scale and distribution without adding neutral JavaScript or changing this passive display contract."
     },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "testimonials",
   "name": "Testimonials",
   "registryId": "G3",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Responsive testimonial collection with repeated quote cards and optional Avatar-composed authors.",
+  "summary": "Passive container-responsive collection of native attributed quotations with optional canonical Avatar composition.",
   "dependencies": [
     "avatar"
   ],
@@ -24,63 +24,84 @@
       "selector": ".testimonials",
       "className": ".testimonials",
       "required": true,
-      "description": "Testimonials section root."
+      "description": "Title-labelled thematic section or untitled generic root for one valid passive quotation collection."
     },
     {
       "name": "title",
       "selector": ".testimonials__title",
       "className": ".testimonials__title",
       "required": false,
-      "description": "Optional section heading."
+      "description": "Optional visible contextual heading that names the thematic root."
     },
     {
       "name": "grid",
       "selector": ".testimonials__grid",
       "className": ".testimonials__grid",
       "required": true,
-      "description": "Responsive repeated-card container."
+      "description": "Required native unordered list of valid attributed quotations."
+    },
+    {
+      "name": "item",
+      "selector": ".testimonials__item",
+      "className": ".testimonials__item",
+      "required": true,
+      "description": "Repeated native list item that owns placement and target editor metadata."
     },
     {
       "name": "testimonial",
       "selector": ".testimonial",
       "className": ".testimonial",
       "required": true,
-      "description": "Repeated testimonial card."
+      "description": "Native figure that relates one quotation to its attribution."
+    },
+    {
+      "name": "quoteMark",
+      "selector": ".testimonial__mark",
+      "className": ".testimonial__mark",
+      "required": false,
+      "description": "Optional target-localized decorative opening quotation mark explicitly hidden from assistive technology."
     },
     {
       "name": "quote",
       "selector": ".testimonial__quote",
       "className": ".testimonial__quote",
       "required": true,
-      "description": "Quoted testimonial text."
-    },
-    {
-      "name": "quoteMark",
-      "selector": ".testimonial__quote::before",
-      "required": false,
-      "generated": true,
-      "description": "Decorative generated opening quotation mark."
+      "description": "Native block quotation containing non-empty target-authored quoted words."
     },
     {
       "name": "author",
       "selector": ".testimonial__author",
       "className": ".testimonial__author",
       "required": true,
-      "description": "Author identity row that may compose Avatar."
+      "description": "Native figure caption that attributes the quotation outside its quoted content."
+    },
+    {
+      "name": "avatar",
+      "selector": ".avatar",
+      "className": ".avatar",
+      "required": false,
+      "description": "Optional complete canonical Avatar with target-authored image or initials semantics."
+    },
+    {
+      "name": "identity",
+      "selector": ".testimonial__identity",
+      "className": ".testimonial__identity",
+      "required": true,
+      "description": "Neutral wrapper that keeps visible author name and optional supporting detail grouped."
     },
     {
       "name": "name",
       "selector": ".testimonial__name",
       "className": ".testimonial__name",
       "required": true,
-      "description": "Visible author name."
+      "description": "Required visible non-empty author name; it is text rather than the title-of-work cite element."
     },
     {
       "name": "detail",
       "selector": ".testimonial__detail",
       "className": ".testimonial__detail",
       "required": false,
-      "description": "Optional author role or supporting detail."
+      "description": "Optional visible author role, location, organization, or other concise context."
     }
   ],
   "variants": [
@@ -88,7 +109,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Single responsive testimonial-grid presentation."
+      "description": "Single passive attributed-quotation presentation."
     }
   ],
   "sizes": [
@@ -96,7 +117,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "One, two, or three columns according to available viewport width."
+      "description": "Single intrinsic size whose one, two, or three-column density is private root-container composition."
     }
   ],
   "states": [
@@ -105,23 +126,81 @@
       "selectors": [
         ".testimonials"
       ],
-      "description": "Passive testimonial collection."
+      "description": "Populated passive quotation collection with no focus, animation, live-region behavior, or neutral runtime."
     }
   ],
   "behavior": [
     {
-      "name": "authorComposition",
+      "name": "rootSemantics",
       "selectors": [
-        ".testimonial__author"
+        ".testimonials",
+        ".testimonials__title"
       ],
-      "description": "Author rows may compose Avatar; the visible name remains text even when an avatar is present."
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty title produces a thematic section named by its visible heading; an untitled collection uses a generic root rather than an unnamed section."
     },
     {
-      "name": "quoteSemantics",
+      "name": "nativeCollection",
       "selectors": [
-        ".testimonial__quote"
+        ".testimonials__grid",
+        ".testimonials__item"
       ],
-      "description": "Targets should use quotation semantics appropriate to the document and keep the generated quote mark decorative."
+      "description": "The repeated collection uses native ul/li semantics and preserves target source order across responsive columns without redundant list roles."
+    },
+    {
+      "name": "quoteAttribution",
+      "selectors": [
+        ".testimonial",
+        ".testimonial__quote",
+        ".testimonial__author",
+        ".testimonial__name"
+      ],
+      "description": "Each native figure contains a non-empty blockquote and an external figcaption with a visible author name; a person's name is not marked up as cite."
+    },
+    {
+      "name": "decorativeQuoteMark",
+      "selectors": [
+        ".testimonial__mark"
+      ],
+      "attributes": [
+        "aria-hidden"
+      ],
+      "description": "The optional quotation mark is target-localized or omitted and is always excluded from the accessibility tree."
+    },
+    {
+      "name": "canonicalAvatarComposition",
+      "selectors": [
+        ".testimonial__author",
+        ".avatar",
+        ".testimonial__name"
+      ],
+      "description": "Optional Avatar consumes the canonical passive dependency; when the same identity is visible beside it, native image alt is empty and initials are aria-hidden."
+    },
+    {
+      "name": "targetRecordOwnership",
+      "selectors": [
+        ".testimonials__grid"
+      ],
+      "description": "Targets own records, ordering, source URLs, verification, consent, moderation, localization, publication, image delivery, loading, empty, error, and update policy."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".testimonials"
+      ],
+      "description": "Targets omit records missing non-empty quote or visible author name and omit the complete root when no valid record remains."
+    },
+    {
+      "name": "responsiveComposition",
+      "selectors": [
+        ".testimonials",
+        ".testimonials__grid",
+        ".testimonial"
+      ],
+      "description": "One, two, or three columns respond to the component root's inline space without viewport or Studio overrides, visual reordering, or clipped content."
     }
   ],
   "properties": [
@@ -129,7 +208,7 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional section heading.",
+      "description": "Optional non-empty visible contextual heading; when present it names the thematic root.",
       "targetMappings": {
         "web": [
           {
@@ -143,14 +222,20 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Repeated testimonial cards supplied by the target or CMS.",
+      "description": "One or more target-owned native list-item compositions, each containing a complete figure, non-empty blockquote, external attribution, and visible author name.",
       "targetMappings": {
         "web": [
           {
             "kind": "slot",
             "selector": ".testimonials__grid",
             "classNames": [
-              ".testimonials__grid"
+              ".testimonials__grid",
+              ".testimonials__item",
+              ".testimonial",
+              ".testimonial__quote",
+              ".testimonial__author",
+              ".testimonial__identity",
+              ".testimonial__name"
             ]
           }
         ]
@@ -166,10 +251,19 @@
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-font-weight-semibold",
+        "--tg-typography-article-body-weight",
+        "--tg-typography-body-small-weight",
+        "--tg-typography-h2-weight",
         "--typo-article-line-height",
         "--typo-article-size",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-line-height",
         "--typo-body-size",
+        "--typo-h2-line-height",
         "--typo-h2-size"
       ],
       "radius": [
@@ -177,26 +271,32 @@
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Use semantic quotation markup and do not include the generated decorative quote mark in the accessible name.",
-    "Keep every author name visible when an Avatar dependency is present.",
-    "Treat testimonials as passive content unless a separately contracted control is composed.",
-    "Do not present fabricated, unattributed, or misleading endorsements."
+    "When title is present, render a thematic section associated with the visible contextual heading through aria-labelledby; use a generic root when title is absent.",
+    "Render parallel testimonials as a native ul/li list and preserve target source order across responsive columns.",
+    "Use figure with blockquote and external figcaption so quoted words remain distinct from attribution; do not use cite for a person's name.",
+    "Require a visible non-empty author name even when Avatar is present; adjacent redundant Avatar images use empty alt and adjacent redundant initials are aria-hidden.",
+    "Hide the optional decorative quotation mark with aria-hidden and allow targets to localize or omit it.",
+    "Do not add list-widget roles, focus stops, keyboard behavior, auto-rotation, live regions, motion, or neutral runtime to the passive collection.",
+    "Omit invalid records and the empty collection rather than exposing blank quotations, unnamed authors, or empty list/section structures.",
+    "Leave record verification, consent, moderation, source, legal disclosure, update announcements, and child Avatar lifecycle with their owning targets."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/marketing.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by conditional titled-section semantics, a native list of figure/blockquote/figcaption items, canonical optional Avatar composition, intrinsic container-responsive CSS, strict required-slot omission, and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant section maps valid blocks to the canonical native quotation anatomy with optional heading, editor attributes, target-native image delivery, localized schema metadata, and zero component runtime."
     },
     "react": {
       "status": "planned",

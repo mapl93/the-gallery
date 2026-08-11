@@ -4,9 +4,9 @@ Newsletter Signup combines a native subscription form with Input and Button whil
 
 ## Presentation
 
-<Preview html={'<section class="newsletter tg-preview-frame--md" aria-labelledby="newsletter-preview-title"><div class="newsletter__content"><h2 class="newsletter__title" id="newsletter-preview-title">Stay in the loop</h2><p class="newsletter__description">Receive new collection notes and studio stories.</p><form class="newsletter__form"><div class="input"><label class="input__label" for="newsletter-preview-email">Email address</label><div class="input__control"><input class="input__field newsletter__input" id="newsletter-preview-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" aria-describedby="newsletter-preview-message" required /></div><span class="input__message" id="newsletter-preview-message">One concise studio update each month.</span></div><button class="btn" type="submit">Subscribe</button></form><p class="newsletter__note">Unsubscribe at any time.</p></div></section>'} label="Newsletter Signup" />
+<Preview html={'<section class="newsletter tg-preview-frame--md" aria-labelledby="newsletter-preview-title"><div class="newsletter__content"><h2 class="newsletter__title" id="newsletter-preview-title">Stay in the loop</h2><p class="newsletter__description">Receive new collection notes and studio stories.</p><form class="newsletter__form" aria-labelledby="newsletter-preview-title"><div class="input"><label class="input__label" for="newsletter-preview-email">Email address</label><div class="input__control"><input class="input__field newsletter__input" id="newsletter-preview-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" aria-describedby="newsletter-preview-note" required /></div></div><button class="btn" type="submit">Subscribe</button></form><p class="newsletter__note" id="newsletter-preview-note">One concise studio update each month. Unsubscribe at any time.</p></div></section>'} label="Newsletter Signup" />
 
-The form composes the complete Input anatomy: root, visible label, control, native field, and associated message. `.newsletter__input` is applied to the native Input field for Newsletter sizing, while Button remains submit-capable.
+The form composes the complete Input anatomy: root, visible label, control, and native field. `.newsletter__input` is only a sizing hook on that native field; canonical CSS places the Input root and submit-capable Button. Optional field validation messages remain owned by Input.
 
 ## Usage Guidelines
 
@@ -15,7 +15,9 @@ The form composes the complete Input anatomy: root, visible label, control, nati
   <Dont>Do not use placeholder text as the email field's only label or imply a submission outcome before the target provides one.</Dont>
 </DoDont>
 
-Pending, success, error, retry, duplicate-submission, replacement, inline, and navigation responses remain unresolved product ownership. The consuming target must choose and implement that response without treating this preview as a default.
+Pending, success, error, retry, duplicate-submission and confirmed-result placement are target-owned under ADR 0251. The consuming target must implement and announce only its real outcome without treating this preview as a neutral default.
+
+The shared Exhibit/Studio fixture intercepts a valid submission only to state `Preview only: no subscription was sent.` That truthful target-local message is not a neutral success state or service implementation.
 
 ## Accessibility
 
@@ -23,6 +25,7 @@ Pending, success, error, retry, duplicate-submission, replacement, inline, and n
 - Associate the visible label with the field and connect supporting or validation text with `aria-describedby`.
 - Preserve Input's Default, Error, Success, Warning, hover, focus-visible, and disabled obligations.
 - Use `aria-invalid="true"` only for Error; Success and Warning keep descriptive messages without `aria-invalid`.
+- Keep form-level submission results separate from the Email field's guidance or validation message.
 - Announce or navigate to a clear submission result once the consuming target defines where that result lives.
 
 ## References
@@ -36,5 +39,6 @@ Pending, success, error, retry, duplicate-submission, replacement, inline, and n
 | Form | `.newsletter__form` | Required native form composing Input and Button |
 | Input field | `.newsletter__input` | Required sizing class on the native Input field |
 | Note | `.newsletter__note` | Optional privacy or frequency note |
+| Response | `.newsletter__status` | Optional target-owned confirmed form result |
 
 Dependencies: [Input](/components/input) and [Button](/components/button).

@@ -1,10 +1,11 @@
 ## Overview
 
-Right-click context menu. Shares dropdown-menu styles.
+Pointer- or keyboard-invoked immediate-command menu that consumes the canonical
+Dropdown Menu anatomy and behavior.
 
 ## Presentation
 
-<Preview html={"<div class=\"tg-preview-context-stage\"><button class=\"btn btn--outline\" type=\"button\" data-preview-trigger aria-expanded=\"true\">Open context menu</button><div class=\"context-menu context-menu--open tg-preview-context-layer\"><button class=\"dropdown__item\" type=\"button\" data-preview-close>Copy</button><button class=\"dropdown__item\" type=\"button\" data-preview-close>Paste</button><div class=\"dropdown__separator\"></div><button class=\"dropdown__item\" type=\"button\" data-preview-close>Inspect</button></div></div>"} label="Context Menu" layout="anchored" interaction={{"selector":".context-menu","toggle":"context-menu--open","triggerLabel":"Show Menu","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
+<Preview html={"<div class=\"tg-preview-context-stage\"><button class=\"btn btn--outline\" id=\"context-preview-trigger\" type=\"button\" data-preview-trigger aria-haspopup=\"menu\" aria-expanded=\"true\" aria-controls=\"context-preview-menu\">Artwork actions</button><div class=\"context-menu context-menu--open tg-preview-context-layer\" id=\"context-preview-menu\" role=\"menu\" aria-labelledby=\"context-preview-trigger\" aria-hidden=\"false\"><div class=\"dropdown__group\" role=\"group\" aria-labelledby=\"context-preview-label\"><div class=\"dropdown__label\" id=\"context-preview-label\">Artwork</div><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"0\" data-highlighted data-preview-close>Copy reference</button><button class=\"dropdown__item\" type=\"button\" role=\"menuitem\" tabindex=\"-1\" aria-disabled=\"true\">Export record</button></div><div class=\"dropdown__separator\" role=\"separator\"></div><div class=\"dropdown__group\" role=\"group\" aria-label=\"Destructive actions\"><button class=\"dropdown__item dropdown__item--danger\" type=\"button\" role=\"menuitem\" tabindex=\"-1\" data-preview-close>Remove record</button></div></div></div>"} label="Context Menu" layout="anchored" interaction={{"selector":".context-menu","toggle":"context-menu--open","triggerLabel":"Show Menu","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
 
 ## Usage Guidelines
 
@@ -16,13 +17,15 @@ Right-click context menu. Shares dropdown-menu styles.
 ## Accessibility
 
 <Callout type="warning">
-  Context Menu reuses Dropdown Menu item anatomy, but the target must provide invocation, positioning, and focus behavior.
+  Context Menu reuses the canonical Dropdown Menu group, item, disabled, danger,
+  separator, focus, and typeahead behavior. The target owns invocation coordinates,
+  viewport clamping, dismissal, and restoration.
 </Callout>
 
 - Support pointer `contextmenu` and keyboard invocation with Shift+F10 or the Menu key.
-- Close on `Escape` key press.
-- Restore focus to the invoking element when the menu closes.
-- Clamp the positioned menu inside the viewport.
+- Move focus to one roving menuitem; support arrows, Home, End, and optional printable typeahead.
+- Close on selection, `Escape`, outside interaction, scroll, or resize. Restore focus when appropriate.
+- Clamp the positioned menu inside the owning viewport and retain a visible path to critical actions.
 
 ### Dependencies
 
@@ -37,6 +40,7 @@ This component uses:
   <tr><td>`.context-menu`</td><td>class</td><td>—</td><td>Fixed-position context menu surface</td></tr>
   <tr><td>`.context-menu--open`</td><td>modifier</td><td>—</td><td>Visible context menu state</td></tr>
   <tr><td>`.dropdown__item`</td><td>dependency</td><td>Dropdown Menu</td><td>Inherited context command item</td></tr>
+  <tr><td>`.dropdown__group`</td><td>dependency</td><td>Dropdown Menu</td><td>Inherited labelled command group</td></tr>
   <tr><td>`.dropdown__separator`</td><td>dependency</td><td>Dropdown Menu</td><td>Inherited command group divider</td></tr>
   <tr><td>`.dropdown__label`</td><td>dependency</td><td>Dropdown Menu</td><td>Inherited command group label</td></tr>
 </PropTable>

@@ -6,6 +6,10 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import CertificateArtwork, {
+  buildCertificateFixture,
+  CertificateVerificationFixtureMedia,
+} from './CertificateArtwork';
 import { editorialImage } from './editorialMedia';
 
 interface StorytellingStudioProps {
@@ -14,6 +18,7 @@ interface StorytellingStudioProps {
 }
 
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
+const certificateFixture = buildCertificateFixture();
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
   'artist-profile': {
@@ -30,9 +35,9 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     steps: true,
   },
   certificate: {
-    label: 'Certificate of authenticity',
-    title: 'Moon Jar No. 07',
-    artist: 'Marina Paz',
+    label: certificateFixture.label,
+    title: certificateFixture.title,
+    artist: certificateFixture.artist,
     details: true,
     signature: true,
     verification: true,
@@ -50,7 +55,7 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
   'artist-index': {
     title: 'Artists in residence',
     introduction: 'Meet the makers exploring clay, fiber, pigment, and form across the current programme.',
-    filters: true,
+    filters: false,
     results: true,
   },
   'artist-card': {
@@ -89,11 +94,11 @@ const artistFixtures = [
 ];
 
 const galleryFixtures = [
-  { title: 'Moon Jar No. 07', price: '$680', alt: 'Rounded white stoneware vessel with an irregular hand-finished rim', tone: 4 },
-  { title: 'Terrace Study', price: '$420', alt: 'Low rust-colored ceramic bowl with a carved linear surface', tone: 5 },
-  { title: 'Still Water Pair', price: '$540', alt: 'Pair of pale blue glazed cups arranged at different heights', tone: 6 },
-  { title: 'Field Notes', price: '$760', alt: 'Tall charcoal vessel with a softly faceted profile', tone: 2 },
-  { title: 'Morning Fold', price: '$390', alt: 'Folded cream textile sculpture resting on a low plinth', tone: 3 },
+  { title: 'Studio Shelves', price: '', alt: 'Shelves lined with white ceramic vessels and working studies', tone: 4 },
+  { title: 'Gallery Interior', price: '', alt: 'Sunlit gallery interior with artworks and a long wooden bench', tone: 5 },
+  { title: 'Textured Vessel', price: '$760', alt: 'Tall dark vessel built from closely stacked horizontal clay rings', tone: 6 },
+  { title: 'Pastel Tableware', price: '$420', alt: 'Overhead arrangement of pastel ceramic plates and bowls', tone: 2 },
+  { title: 'At the Wheel', price: '', alt: 'Ceramic artist shaping a pale vessel on a pottery wheel', tone: 3 },
 ];
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
@@ -159,15 +164,15 @@ function ArtistCardFixture({
         <div className="artist-card__portrait">
           <StoryMedia
             tone={artist.tone}
-            alt={`Portrait of ${artist.name} in their studio`}
+            alt=""
           />
-          {badge && <span className="artist-card__badge">{badge}</span>}
+          {badge && <span className="badge artist-card__badge">{badge}</span>}
         </div>
       )}
       <h3 className="artist-card__name">{artist.name}</h3>
-      <p className="artist-card__medium">{artist.medium}</p>
-      <p className="artist-card__location">{artist.location}</p>
-      <p className="artist-card__piece-count">{artist.count}</p>
+      {artist.medium && <p className="artist-card__medium">{artist.medium}</p>}
+      {artist.location && <p className="artist-card__location">{artist.location}</p>}
+      {artist.count && <p className="artist-card__piece-count">{artist.count}</p>}
     </article>
   );
 }
@@ -185,7 +190,6 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
   const [values, setValues] = useState<StudioPropertyValues>(initialValues);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
-  const [fixtureArtistFilter, setFixtureArtistFilter] = useState('All');
 
   useEffect(() => {
     const read = () => {
@@ -206,34 +210,35 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
   function reset() {
     setValues({ ...initialValues });
     setTokenOverrides({});
-    setFixtureArtistFilter('All');
   }
 
   function renderArtistProfile() {
     return (
       <section className="artist-profile docs-studio__artist-profile" aria-labelledby="storytelling-artist-profile-name">
-        {values.portrait === true && (
-          <div className="artist-profile__portrait">
-            <StoryMedia tone={1} alt="Marina Paz standing beside shelves of unfinished ceramic vessels" />
-          </div>
-        )}
-        <div className="artist-profile__content">
-          {String(values.label || '') && <p className="artist-profile__label">{String(values.label)}</p>}
-          <h2 className="artist-profile__name" id="storytelling-artist-profile-name">{String(values.name)}</h2>
-          {String(values.location || '') && <p className="artist-profile__location">{String(values.location)}</p>}
-          {values.biography === true && (
-            <div className="artist-profile__bio">
-              <p>Marina works between wheel-thrown stoneware and hand-built forms, following the subtle shifts that arrive through repetition.</p>
-              <p>Her practice is grounded in local minerals, quiet utility, and the traces left by making.</p>
+        <div className={`artist-profile__layout${values.portrait === true ? ' artist-profile__layout--split' : ''}`}>
+          {values.portrait === true && (
+            <div className="artist-profile__portrait">
+              <StoryMedia tone={1} alt="Marina Paz standing beside shelves of unfinished ceramic vessels" />
             </div>
           )}
-          {String(values.philosophy || '') && <blockquote className="artist-profile__philosophy">{String(values.philosophy)}</blockquote>}
-          {values.actions === true && (
-            <nav className="artist-profile__actions" aria-label="Artist profile actions">
-              <a className="btn btn--primary" href="#artist-works" onClick={(event) => event.preventDefault()}>View works</a>
-              <a className="btn btn--outline" href="#artist-journal" onClick={(event) => event.preventDefault()}>Studio journal</a>
-            </nav>
-          )}
+          <div className="artist-profile__content">
+            {String(values.label || '') && <p className="artist-profile__label">{String(values.label)}</p>}
+            <h2 className="artist-profile__name" id="storytelling-artist-profile-name">{String(values.name)}</h2>
+            {String(values.location || '') && <p className="artist-profile__location">{String(values.location)}</p>}
+            {values.biography === true && (
+              <div className="artist-profile__bio">
+                <p>Marina works between wheel-thrown stoneware and hand-built forms, following the subtle shifts that arrive through repetition.</p>
+                <p>Her practice is grounded in local minerals, quiet utility, and the traces left by making.</p>
+              </div>
+            )}
+            {String(values.philosophy || '') && <blockquote className="artist-profile__philosophy">{String(values.philosophy)}</blockquote>}
+            {values.actions === true && (
+              <div className="artist-profile__actions">
+                <a className="btn" href="#artist-works" onClick={(event) => event.preventDefault()}>View works</a>
+                <a className="btn btn--outline" href="#artist-journal" onClick={(event) => event.preventDefault()}>Studio journal</a>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     );
@@ -249,7 +254,7 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
       <section className="process-timeline docs-studio__process-timeline" aria-labelledby="storytelling-process-title">
         <h2 className="process-timeline__title" id="storytelling-process-title">{String(values.title)}</h2>
         {values.steps === true && (
-          <ol className="process-timeline__track docs-studio__process-track" tabIndex={0} aria-label="Making process steps">
+          <ol className="process-timeline__track docs-studio__process-track" role="list" tabIndex={0} aria-labelledby="storytelling-process-title">
             {steps.map((step, index) => (
               <li className="process-step" key={step.title}>
                 <span className="process-step__number" aria-hidden="true">{index + 1}</span>
@@ -265,61 +270,50 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
   }
 
   function renderCertificate() {
-    const details = [
-      ['Medium', 'Stoneware and ash glaze'],
-      ['Dimensions', '28 x 24 x 24 cm'],
-      ['Edition', 'Unique work'],
-      ['Record', 'TG-MP-2026-007'],
-    ];
     return (
-      <article className="coa docs-studio__certificate" aria-labelledby="storytelling-certificate-title">
-        {String(values.label || '') && <p className="coa__header">{String(values.label)}</p>}
-        <h2 className="coa__title" id="storytelling-certificate-title">{String(values.title)}</h2>
-        {String(values.artist || '') && <p className="coa__artist">{String(values.artist)}</p>}
-        <div className="coa__divider" aria-hidden="true" />
-        {values.details === true && (
-          <dl className="coa__details">
-            {details.map(([label, value]) => (
-              <div key={label}>
-                <dt className="coa__detail-label">{label}</dt>
-                <dd className="coa__detail-value">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-        {values.signature === true && <p className="coa__signature" aria-label="Signed by Marina Paz">Marina Paz</p>}
-        {values.verification === true && (
-          <a className="coa__verify docs-studio__certificate-verify" href="#certificate-record" onClick={(event) => event.preventDefault()}>
-            Verify certificate record TG-MP-2026-007
-          </a>
-        )}
-      </article>
+      <CertificateArtwork
+        className="docs-studio__certificate"
+        titleId="storytelling-certificate-title"
+        label={String(values.label || '')}
+        title={String(values.title || '')}
+        artist={String(values.artist || '')}
+        details={values.details === true ? certificateFixture.details : []}
+        signature={values.signature === true ? certificateFixture.signature : undefined}
+        signatureLabel={values.signature === true ? `Signature: ${certificateFixture.signature}` : undefined}
+        verificationHref={values.verification === true ? certificateFixture.verificationHref : undefined}
+        verificationText={values.verification === true ? certificateFixture.verificationText : undefined}
+        verificationMedia={values.verification === true ? <CertificateVerificationFixtureMedia /> : undefined}
+        onVerificationClick={(event) => event.preventDefault()}
+      />
     );
   }
 
   function renderCollectionStory() {
+    const hasMedia = values.media === true;
     return (
       <section className={`collection-story docs-studio__collection-story${values.reversed === true ? ' collection-story--reversed' : ''}`} aria-labelledby="storytelling-collection-title">
-        {values.media === true && (
-          <div className="collection-story__media">
-            <StoryMedia tone={6} alt="Pale ceramic vessels arranged against a sunlit foothill landscape" />
-          </div>
-        )}
-        <div className="collection-story__content">
-          {String(values.label || '') && <p className="collection-story__label">{String(values.label)}</p>}
-          <h2 className="collection-story__title" id="storytelling-collection-title">{String(values.title)}</h2>
-          {values.body === true && (
-            <div className="collection-story__text">
-              <p>This collection follows the broad line of the Andes through low bowls, generous jars, and surfaces that gather light.</p>
-              <p>Every piece is made for use, carrying small variations as evidence of its passage through the studio.</p>
+        <div className={`collection-story__layout${hasMedia ? ' collection-story__layout--with-media' : ''}`}>
+          {hasMedia && (
+            <div className="collection-story__media">
+              <StoryMedia tone={6} alt="Pale ceramic vessels arranged against a sunlit foothill landscape" />
             </div>
           )}
-          {String(values.inspiration || '') && <blockquote className="collection-story__inspiration">{String(values.inspiration)}</blockquote>}
-          {values.actions === true && (
-            <nav className="collection-story__actions" aria-label="Collection story actions">
-              <a className="btn btn--primary" href="#collection-works" onClick={(event) => event.preventDefault()}>Explore works</a>
-            </nav>
-          )}
+          <div className="collection-story__content">
+            {String(values.label || '') && <p className="collection-story__label">{String(values.label)}</p>}
+            <h2 className="collection-story__title" id="storytelling-collection-title">{String(values.title)}</h2>
+            {values.body === true && (
+              <div className="collection-story__text">
+                <p>This collection follows the broad line of the Andes through low bowls, generous jars, and surfaces that gather light.</p>
+                <p>Every piece is made for use, carrying small variations as evidence of its passage through the studio.</p>
+              </div>
+            )}
+            {String(values.inspiration || '') && <blockquote className="collection-story__inspiration">{String(values.inspiration)}</blockquote>}
+            {values.actions === true && (
+              <div className="collection-story__actions">
+                <a className="btn" href="#collection-works" onClick={(event) => event.preventDefault()}>Explore works</a>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     );
@@ -327,14 +321,14 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
 
   function renderMasonryGallery() {
     return (
-      <ul className="masonry-gallery docs-studio__masonry-gallery" aria-label="Artwork gallery">
+      <ul className="masonry-gallery" aria-label="Artwork gallery">
         {values.items === true && galleryFixtures.map((piece) => (
           <li className="masonry-gallery__item" key={piece.title}>
-            <figure className="gallery-piece docs-studio__gallery-piece">
+            <figure className="gallery-piece">
               <StoryMedia tone={piece.tone} alt={piece.alt} />
               <figcaption className="gallery-piece__overlay">
                 <span className="gallery-piece__title">{piece.title}</span>
-                <span className="gallery-piece__price">{piece.price}</span>
+                {piece.price && <span className="gallery-piece__price">{piece.price}</span>}
               </figcaption>
             </figure>
           </li>
@@ -344,7 +338,6 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
   }
 
   function renderArtistIndex() {
-    const filterLabels = ['All', 'Ceramics', 'Fiber', 'Painting'];
     return (
       <section className="artist-index docs-studio__artist-index" aria-labelledby="storytelling-artist-index-title">
         <header className="artist-index__header">
@@ -352,24 +345,20 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
           {String(values.introduction || '') && <p className="artist-index__intro">{String(values.introduction)}</p>}
         </header>
         {values.filters === true && (
-          <div className="artist-index__filters" role="group" aria-label="Artist medium preview filter">
-            {filterLabels.map((label) => (
-              <button
-                className={`artist-index__filter-btn${fixtureArtistFilter === label ? ' is-active' : ''}`}
-                type="button"
-                aria-pressed={fixtureArtistFilter === label}
-                onClick={() => setFixtureArtistFilter(label)}
-                key={label}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="artist-index__filters">
+            <p className="docs-studio__artist-filter-note">
+              Target-owned filters compose here after their selection and result lifecycle is defined.
+            </p>
           </div>
         )}
         {values.results === true && (
-          <div className="artist-index__grid">
-            {artistFixtures.map((artist) => <ArtistCardFixture artist={artist} key={artist.name} />)}
-          </div>
+          <ul className="artist-index__grid">
+            {artistFixtures.map((artist) => (
+              <li className="artist-index__item" key={artist.name}>
+                <ArtistCardFixture artist={artist} />
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     );
@@ -400,7 +389,7 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
     ];
     return (
       <article className="exhibition-page docs-studio__exhibition-page" aria-labelledby="storytelling-exhibition-title">
-        <header className="exhibition-hero docs-studio__exhibition-hero">
+        <header className={`exhibition-hero docs-studio__exhibition-hero${values.heroMedia === true ? ' exhibition-hero--with-media' : ''}`}>
           {values.heroMedia === true && <div className="exhibition-hero__media"><StoryMedia tone={5} alt="Sculptural ceramic works displayed on low plinths in a bright gallery room" /></div>}
           {values.heroMedia === true && <div className="exhibition-hero__overlay" aria-hidden="true" />}
           <div className="exhibition-hero__content">
@@ -411,7 +400,7 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
           </div>
         </header>
         {(values.description === true || values.details === true) && (
-          <section className="exhibition-info" aria-label="Exhibition information">
+          <div className="exhibition-info">
             {values.description === true && (
               <div className="exhibition-info__description">
                 <p>A Measure of Quiet gathers artists whose work rewards sustained attention. Clay, fiber, and pigment become records of pressure, pause, and repetition.</p>
@@ -428,19 +417,21 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
                 ))}
               </dl>
             )}
-          </section>
+          </div>
         )}
         {values.works === true && (
           <section className="exhibition-works" aria-labelledby="storytelling-exhibition-works">
             <h3 className="exhibition-works__heading" id="storytelling-exhibition-works">Featured works</h3>
-            <div className="exhibition-works__grid">
+            <ul className="exhibition-works__grid">
               {galleryFixtures.slice(0, 3).map((piece) => (
-                <figure className="docs-studio__exhibition-work" key={piece.title}>
-                  <StoryMedia tone={piece.tone} alt={piece.alt} />
-                  <figcaption><strong>{piece.title}</strong><span>{piece.price}</span></figcaption>
-                </figure>
+                <li key={piece.title}>
+                  <figure className="docs-studio__exhibition-work">
+                    <StoryMedia tone={piece.tone} alt={piece.alt} />
+                    <figcaption><strong>{piece.title}</strong><span>{piece.price}</span></figcaption>
+                  </figure>
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
         )}
         {values.artists === true && (
@@ -449,8 +440,8 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
             <ul className="exhibition-artists__list docs-studio__exhibition-artist-list">
               {artistFixtures.map((artist) => (
                 <li className="exhibition-artists__item" key={artist.name}>
-                  <StoryMedia className="exhibition-artists__avatar" tone={artist.tone} alt={`Portrait of ${artist.name}`} />
-                  <span><span className="exhibition-artists__name">{artist.name}</span><span className="exhibition-artists__role">{artist.medium}</span></span>
+                  <StoryMedia className="exhibition-artists__avatar" tone={artist.tone} alt="" />
+                  <span className="exhibition-artists__content"><span className="exhibition-artists__name">{artist.name}</span><span className="exhibition-artists__role">{artist.medium}</span></span>
                 </li>
               ))}
             </ul>
@@ -463,23 +454,23 @@ export default function StorytellingStudio({ contract, definition }: Storytellin
   function renderArtistStatement() {
     return (
       <section className="artist-statement docs-studio__artist-statement" aria-labelledby="storytelling-artist-statement-name">
-        <div className="artist-statement__layout">
+        <div className={`artist-statement__layout${values.portrait === true ? ' artist-statement__layout--with-portrait' : ''}`}>
           {values.portrait === true && (
             <div className="artist-statement__portrait">
-              <StoryMedia tone={1} alt="Marina Paz seated at a worktable beside a group of unfired vessels" />
+              <StoryMedia tone={1} alt="Ceramic artist seated at a worktable beside a group of unfired vessels" />
             </div>
           )}
           <div className="artist-statement__content">
             {String(values.eyebrow || '') && <p className="artist-statement__eyebrow">{String(values.eyebrow)}</p>}
             <h2 className="artist-statement__name" id="storytelling-artist-statement-name">{String(values.name)}</h2>
-            {String(values.quote || '') && <blockquote className="artist-statement__quote">{String(values.quote)}</blockquote>}
+            {String(values.quote || '') && <blockquote className="artist-statement__quote"><p>{String(values.quote)}</p></blockquote>}
             {values.body === true && (
               <div className="artist-statement__body">
                 <p>I make objects at the scale of ordinary rituals: pouring, gathering, holding, and sharing. Their forms begin with use, then open toward memory.</p>
                 <p>Variation is not corrected away. A softened rim or a change in glaze records the decisions that made the work singular.</p>
               </div>
             )}
-            {values.signature === true && <p className="artist-statement__signature docs-studio__story-signature" aria-label="Signed by Marina Paz">Marina Paz</p>}
+            {values.signature === true && <p className="artist-statement__signature">Marina Paz</p>}
           </div>
         </div>
       </section>

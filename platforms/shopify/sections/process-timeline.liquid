@@ -1,48 +1,102 @@
-<section class="process-timeline">
-  <h2 class="process-timeline__title">{{ section.settings.title | default: 'From Earth to Art' }}</h2>
-  <div class="process-timeline__track">
-    {% for block in section.blocks %}
-      <div class="process-step" {{ block.shopify_attributes }}>
-        <span class="process-step__number">{{ forloop.index }}</span>
-        {% if block.settings.image %}
-          <div class="process-step__image">
-            {{ block.settings.image | image_url: width: 520 | image_tag:
-               alt: block.settings.title, loading: 'lazy', widths: '260,520' }}
-          </div>
-        {% endif %}
-        <h3 class="process-step__title">{{ block.settings.title }}</h3>
-        <p class="process-step__description">{{ block.settings.description }}</p>
-      </div>
-    {% endfor %}
-  </div>
+{% liquid
+  assign process_title = section.settings.title
+  if process_title == blank
+    assign process_title = 'process_timeline.default_title' | t
+  endif
+
+  assign heading_id = 'ProcessTimeline-' | append: section.id | append: '-Title'
+%}
+
+<section class="process-timeline" aria-labelledby="{{ heading_id }}">
+  <h2 class="process-timeline__title" id="{{ heading_id }}">{{ process_title | escape }}</h2>
+
+  {% if section.blocks.size > 0 %}
+    <ol class="process-timeline__track" role="list" tabindex="0" aria-labelledby="{{ heading_id }}">
+      {% for block in section.blocks %}
+        {% liquid
+          assign step_title = block.settings.title
+          if step_title == blank
+            assign step_title = 'process_timeline.default_step_title' | t: number: forloop.index
+          endif
+
+          assign step_alt = block.settings.image.alt | default: step_title
+          if block.settings.image_decorative
+            assign step_alt = ''
+          endif
+        %}
+        <li class="process-step" {{ block.shopify_attributes }}>
+          <span class="process-step__number" aria-hidden="true">{{ forloop.index }}</span>
+
+          {% if block.settings.image != blank %}
+            <div class="process-step__image">
+              {{ block.settings.image | image_url: width: 960 | image_tag:
+                alt: step_alt,
+                loading: 'lazy',
+                widths: '240, 360, 480, 720, 960',
+                sizes: '(min-width: 768px) 25vw, 70vw'
+              }}
+            </div>
+          {% endif %}
+
+          <h3 class="process-step__title">{{ step_title | escape }}</h3>
+
+          {% if block.settings.description != blank %}
+            <p class="process-step__description">{{ block.settings.description | escape }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  {% endif %}
 </section>
 
 {% schema %}
 {
-  "name": "Process Timeline",
+  "name": "t:sections.process_timeline.name",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "From Earth to Art" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.process_timeline.settings.heading"
+    }
   ],
   "blocks": [
     {
       "type": "step",
-      "name": "Step",
+      "name": "t:sections.process_timeline.blocks.step.name",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "title", "label": "Title" },
-        { "type": "textarea", "id": "description", "label": "Description" }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.process_timeline.blocks.step.settings.image"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_decorative",
+          "label": "t:sections.process_timeline.blocks.step.settings.image_decorative",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.process_timeline.blocks.step.settings.title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "t:sections.process_timeline.blocks.step.settings.description"
+        }
       ]
     }
   ],
-  "presets": [{
-    "name": "Process Timeline",
-    "blocks": [
-      { "type": "step", "settings": { "title": "Clay Preparation" } },
-      { "type": "step", "settings": { "title": "Wheel Throwing" } },
-      { "type": "step", "settings": { "title": "Bisque Firing" } },
-      { "type": "step", "settings": { "title": "Glazing" } },
-      { "type": "step", "settings": { "title": "Final Kiln Firing" } }
-    ]
-  }]
+  "presets": [
+    {
+      "name": "t:sections.process_timeline.name",
+      "blocks": [
+        { "type": "step" },
+        { "type": "step" },
+        { "type": "step" }
+      ]
+    }
+  ]
 }
 {% endschema %}

@@ -1,5 +1,9 @@
 # 0029. Shopify Adapter Manifest And Validation
 
+Current delivery note: ADR 0273 supersedes layout loading of the complete
+`theme.js` aggregate. Shopify now loads the generated selective runtime while
+retaining `theme.js` as compatibility output.
+
 Status: Accepted Initial Implementation
 
 Date: 2026-05-25

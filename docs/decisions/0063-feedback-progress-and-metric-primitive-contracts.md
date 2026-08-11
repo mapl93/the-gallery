@@ -17,6 +17,9 @@ Date: 2026-07-12
 - Spinner graphics are decorative. Loading regions or visible status text own
   announcements; Spinner exposes size and optional overlay label.
 - Progress and Spinner stop animation under reduced motion.
+- ADR 0234 later separates optional compact visible `displayValue` from the
+  complete localized `valueText` exposed through `aria-valuetext`; neither is an
+  implicit fallback for the other.
 - Stat receives target-formatted strings. Direction is explicit metadata on the
   change element, while business meaning remains target-owned.
 - Stat value and change use the body family (Inter in the base system) and expose

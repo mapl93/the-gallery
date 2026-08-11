@@ -1,67 +1,88 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "product-gallery",
   "name": "Product Gallery",
   "registryId": "D2",
   "category": "product",
   "status": "pilot",
-  "summary": "Product image gallery with main media, thumbnails, mobile dots, selected state, and desktop zoom behavior.",
-  "dependencies": [],
+  "summary": "Controlled rich-media product collection for images, hosted video, external video, and models, with explicit native activation, stable-id selection, optional looping, swipe, and canonical Lightbox image detail.",
+  "dependencies": ["button", "badge", "icon-button", "lightbox"],
   "source": {
     "registry": "registry.json#/components/product-gallery",
     "css": { "file": "components/css/product.css", "selector": ".product-gallery" },
     "docs": "site/src/content/components/product-gallery.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".product-gallery", "className": ".product-gallery", "required": true, "description": "Gallery container." },
-    { "name": "main", "selector": ".product-gallery__main", "className": ".product-gallery__main", "required": true, "description": "Main selected media frame." },
-    { "name": "mainImage", "selector": ".product-gallery__main img", "required": true, "description": "Current product image." },
-    { "name": "thumbs", "selector": ".product-gallery__thumbs", "className": ".product-gallery__thumbs", "required": false, "description": "Thumbnail rail." },
-    { "name": "thumb", "selector": ".product-gallery__thumb", "className": ".product-gallery__thumb", "required": false, "description": "Thumbnail trigger." },
-    { "name": "thumbImage", "selector": ".product-gallery__thumb img", "required": false, "description": "Thumbnail image." },
-    { "name": "dots", "selector": ".product-gallery__dots", "className": ".product-gallery__dots", "required": false, "description": "Mobile dot navigation." },
-    { "name": "dot", "selector": ".product-gallery__dot", "className": ".product-gallery__dot", "required": false, "description": "Mobile dot trigger." }
+    { "name": "root", "selector": ".product-gallery", "className": ".product-gallery", "required": true, "description": "Container and controlled-current projection boundary." },
+    { "name": "layout", "selector": ".product-gallery__layout", "className": ".product-gallery__layout", "required": true, "description": "Container-responsive featured-media and selector composition." },
+    { "name": "main", "selector": ".product-gallery__main", "className": ".product-gallery__main", "required": true, "description": "Swipe surface and bounded frame for one current media item." },
+    { "name": "media", "selector": ".product-gallery__media", "className": ".product-gallery__media", "required": true, "description": "Stable-id discriminated image, video, external-video, or model record projection." },
+    { "name": "imageAction", "selector": ".product-gallery__image-action", "className": ".product-gallery__image-action", "required": false, "description": "Named Button that opens canonical Lightbox only when imageDetail is lightbox." },
+    { "name": "poster", "selector": ".product-gallery__poster", "className": ".product-gallery__poster", "required": false, "description": "Inactive video or model preview retained until explicit activation." },
+    { "name": "activate", "selector": ".product-gallery__activate", "className": ".product-gallery__activate", "required": false, "description": "Canonical Button for explicit Play or View in 3D activation." },
+    { "name": "nativeContent", "selector": ".product-gallery__interactive", "className": ".product-gallery__interactive", "required": false, "description": "Target-native video, provider, or model viewer lifecycle slot." },
+    { "name": "arAction", "selector": ".product-gallery__ar", "className": ".product-gallery__ar", "required": false, "description": "Adapter capability action for eligible models; AR is not a media type." },
+    { "name": "navigation", "selector": ".product-gallery__nav", "className": ".product-gallery__nav", "required": false, "description": "Canonical previous and next Icon Buttons." },
+    { "name": "thumbs", "selector": ".product-gallery__thumbs", "className": ".product-gallery__thumbs", "required": false, "description": "Named ordinary Button group for rich-media thumbnail selection." },
+    { "name": "thumb", "selector": ".product-gallery__thumb", "className": ".product-gallery__thumb", "required": false, "description": "Named direct-selection Button with decorative preview and optional canonical media-type Badge." },
+    { "name": "mediaBadge", "selector": ".product-gallery__media-badge", "className": ".product-gallery__media-badge", "required": false, "description": "Context-sized canonical Badge identifying video, external video, or 3D media." },
+    { "name": "dots", "selector": ".product-gallery__dots", "className": ".product-gallery__dots", "required": false, "description": "Named ordinary Button group for compact direct selection." },
+    { "name": "status", "selector": ".product-gallery__status", "className": ".product-gallery__status", "required": true, "description": "Polite current media position and label announcement." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive gallery with thumbnails and optional dots." }
+    { "name": "default", "className": null, "default": true, "description": "Manual rich-media selection with image detail delegated to Lightbox." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive gallery size determined by parent layout." }
+    { "name": "default", "className": null, "default": true, "description": "Parent-sized gallery whose internal rail mode responds at its 48rem container threshold." }
   ],
   "states": [
-    { "name": "default", "selectors": [".product-gallery"], "description": "Default gallery state." },
-    { "name": "selectedThumb", "selectors": [".product-gallery__thumb[aria-selected=\"true\"]"], "description": "Selected thumbnail state." },
-    { "name": "selectedDot", "selectors": [".product-gallery__dot[aria-selected=\"true\"]"], "description": "Selected mobile dot state." },
-    { "name": "desktopZoom", "selectors": [".product-gallery__main:hover img"], "description": "Hover zoom behavior on desktop viewports." }
+    { "name": "default", "selectors": [".product-gallery"], "description": "Exactly one stable media id is current." },
+    { "name": "currentMedia", "selectors": [".product-gallery__media:not([hidden])"], "description": "Visible discriminated record; all noncurrent records are natively hidden." },
+    { "name": "currentControl", "selectors": [".product-gallery__thumb[aria-current=\"true\"]", ".product-gallery__dot[aria-current=\"true\"]"], "description": "Every rendered selector group reflects the same current id." },
+    { "name": "inactiveRichMedia", "selectors": [".product-gallery__poster"], "description": "Poster plus explicit activation before any video/provider/model lifecycle is created." },
+    { "name": "activeRichMedia", "selectors": [".product-gallery__interactive:not([hidden])"], "description": "Target-native controls after explicit activation." },
+    { "name": "finiteBoundary", "selectors": [".product-gallery__nav:disabled"], "description": "Real collection boundary when loop is false." },
+    { "name": "imageDetail", "selectors": [".product-gallery__image-action", ".lightbox"], "description": "Current image can open canonical synchronized Lightbox when enabled." }
   ],
   "behavior": [
-    { "name": "selection", "selectors": [".product-gallery__thumb[aria-selected=\"true\"]", ".product-gallery__dot[aria-selected=\"true\"]"], "attributes": ["aria-selected"], "events": ["click"], "description": "Thumbnail and dot selection should update the main image and selected state." },
-    { "name": "zoom", "selectors": [".product-gallery__main:hover img"], "description": "Desktop targets may update zoom origin with private CSS variables while preserving image semantics." },
-    { "name": "mediaAltText", "selectors": [".product-gallery__main img", ".product-gallery__thumb img"], "attributes": ["alt"], "description": "Every product image should include useful alt text unless intentionally decorative." }
+    { "name": "controlledCurrentId", "selectors": [".product-gallery", ".product-gallery__media"], "attributes": ["data-gallery-current-id", "data-gallery-media-id", "aria-current"], "events": ["tg:product-gallery-select", "tg:product-gallery-change"], "description": "The product coordinator owns one stable current media id and variant synchronization. An adapter may expose an uncontrolled initial id over the same state but must not run a second enhancer." },
+    { "name": "discriminatedCollection", "selectors": [".product-gallery__media"], "attributes": ["data-gallery-media-type"], "description": "Neutral records discriminate image, video, external-video, and model. Source objects, URLs, responsive delivery, provider configuration, model capability, and localization remain target data." },
+    { "name": "manualSelection", "selectors": [".product-gallery__thumb", ".product-gallery__dot", ".product-gallery__nav"], "events": ["click", "pointer swipe"], "description": "Named Buttons and horizontal swipe change only the current id; media items never advance automatically." },
+    { "name": "finiteOrLoop", "selectors": [".product-gallery", ".product-gallery__nav"], "attributes": ["data-loop", "disabled"], "description": "Finite mode disables real bounds; loop mode wraps logical state without cloning media records or controls." },
+    { "name": "explicitRichActivation", "selectors": [".product-gallery__poster", ".product-gallery__activate", ".product-gallery__interactive"], "events": ["Play", "View in 3D"], "description": "Selection retains the poster. Hosted/provider video and models load or play only after an explicit action; changing current pauses and releases the previous lifecycle." },
+    { "name": "nativeMediaBoundary", "selectors": [".product-gallery__interactive", ".product-gallery__ar"], "description": "Video/provider controls, model viewer/fullscreen, and eligible explicit AR remain native adapter capabilities and are never treated as image zoom." },
+    { "name": "imageDetail", "selectors": [".product-gallery__image-action", ".lightbox"], "events": ["open", "close", "swipe", "zoom", "pan"], "description": "lightbox mode composes canonical Lightbox over the image subset and synchronizes the same current id; none keeps the image passive for already-modal contexts such as Quick View." },
+    { "name": "mediaText", "selectors": [".product-gallery__media img", ".product-gallery__thumb img", ".product-gallery__status"], "attributes": ["alt", "aria-label", "aria-live"], "description": "Informative images and posters use item-specific alternatives; decorative thumbnail previews use null alt; selection controls and status remain localized." },
+    { "name": "containerLayout", "selectors": [".product-gallery", ".product-gallery__layout"], "description": "The side thumbnail rail responds to the gallery container, not the page viewport." }
   ],
   "properties": [
-    { "name": "mainAlt", "type": "string", "required": true, "description": "Alternative text synchronized with the selected main media.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery__main img", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
-    { "name": "controlLabel", "type": "string", "required": true, "description": "Accessible name for an individual thumbnail or dot control.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery__thumb", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }, { "kind": "attribute", "selector": ".product-gallery__dot", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
-    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Selected state for an individual thumbnail or dot control.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery__thumb", "attribute": "aria-selected", "values": { "true": "true", "false": "false" }, "elements": ["button"] }, { "kind": "attribute", "selector": ".product-gallery__dot", "attribute": "aria-selected", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } }
+    { "name": "imageDetail", "type": "enum", "required": false, "defaultValue": "lightbox", "values": ["lightbox", "none"], "description": "Semantic image-detail mode. lightbox composes canonical Lightbox; none leaves featured images passive.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery", "attribute": "data-image-detail", "values": { "lightbox": "lightbox", "none": "none" } }] } },
+    { "name": "loop", "type": "boolean", "required": false, "defaultValue": false, "description": "Wraps previous/next and swipe across collection bounds without cloning records.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-gallery", "attribute": "data-loop", "values": { "true": "true", "false": "false" } }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-secondary", "--color-border-focus", "--color-border-subtle", "--color-text-primary"],
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-border-focus", "--color-border-subtle", "--color-text-primary"],
       "radius": ["--radius-md", "--radius-sm", "--radius-full"],
-      "transition": ["--transition-slow", "--transition-fast"],
-      "easing": ["--easing-out", "--easing-default"]
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"],
+      "typography": ["--typo-caption-size"],
+      "shadow": ["--shadow-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
     }
   },
   "accessibility": [
-    "Use buttons for thumbnail and dot controls.",
-    "Expose the selected media state with aria-selected or an equivalent target-native selected state.",
-    "Keep image alt text synchronized with the selected product media."
+    "Keep one current stable id and synchronize hidden media, every aria-current selector, navigation bounds, and polite status together.",
+    "Use native named Buttons for direct selection and previous/next; swipe is supplementary and never the only navigation path.",
+    "Keep video/provider controls native, require explicit Play, require explicit View in 3D and AR, and release inactive media lifecycles.",
+    "Use item-specific alt for informative images/posters, null alt for previews inside named controls, visible media-type Badges, and localized action names.",
+    "Delegate image modal focus, dismissal, restoration, swipe, zoom, pan, reduced motion, forced colors, and RTL behavior to canonical Lightbox.",
+    "Preserve visible focus and semantic touch targets; do not claim Tabs or Listbox without their complete relationships and keyboard models."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map product media arrays to main image, thumbnails, and mobile dots." },
-    "react": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css-js", "notes": "Canonical CSS and opt-in stable-id enhancer support rich records, explicit deferred activation, release, swipe, loop and synchronized Lightbox. Controlled framework renderers omit the enhancer." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js", "notes": "Maps product.media image/video/external_video/model with native filters, deferred explicit activation, media badges, eligible Shopify XR action, controlled current-id event surface, and imageDetail none/lightbox." },
+    "react": { "status": "implemented", "kind": "component", "notes": "Shared Exhibit/Studio renderer accepts a discriminated collection and controlled current id; targets inject native rich-media content." },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }

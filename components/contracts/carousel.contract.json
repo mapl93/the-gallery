@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "carousel",
   "name": "Carousel / Slider",
   "registryId": "B15",
   "category": "layout",
   "status": "pilot",
-  "summary": "Horizontal scroll-snap carousel with track, slide, navigation controls, dots, disabled navigation, active dot state, and gallery accessibility requirements.",
-  "dependencies": [],
+  "summary": "Finite, user-controlled horizontal scroll-snap carousel with named slide groups, canonical Icon Button navigation, synchronized pagination and status, native direct scrolling, and no implicit autoplay or looping.",
+  "dependencies": ["icon-button"],
   "source": {
     "registry": "registry.json#/components/carousel",
     "css": {
@@ -22,21 +22,21 @@
       "selector": ".carousel",
       "className": ".carousel",
       "required": true,
-      "description": "Carousel viewport and positioning context."
+      "description": "Named carousel region and positioning context."
     },
     {
       "name": "track",
       "selector": ".carousel__track",
       "className": ".carousel__track",
       "required": true,
-      "description": "Horizontal scroll-snap track."
+      "description": "Keyboard-focusable native horizontal scroll-snap track."
     },
     {
       "name": "slide",
       "selector": ".carousel__slide",
       "className": ".carousel__slide",
       "required": true,
-      "description": "Single scroll-snapped slide."
+      "description": "Single named group with slide roledescription and position in set."
     },
     {
       "name": "nav",
@@ -50,7 +50,7 @@
       "selector": ".carousel__nav-btn",
       "className": ".carousel__nav-btn",
       "required": false,
-      "description": "Previous or next slide control."
+      "description": "Canonical Icon Button for previous or next slide navigation."
     },
     {
       "name": "dots",
@@ -65,6 +65,13 @@
       "className": ".carousel__dot",
       "required": false,
       "description": "Slide pagination dot."
+    },
+    {
+      "name": "status",
+      "selector": ".carousel__status",
+      "className": ".carousel__status",
+      "required": false,
+      "description": "Polite status text synchronized with the visible slide."
     }
   ],
   "variants": [
@@ -110,6 +117,16 @@
       "description": "Unavailable navigation control state."
     },
     {
+      "name": "trackFocus",
+      "selectors": [".carousel__track:focus-visible"],
+      "description": "Visible keyboard focus on the native scroll viewport."
+    },
+    {
+      "name": "dotFocus",
+      "selectors": [".carousel__dot:focus-visible"],
+      "description": "Visible keyboard focus on a pagination control."
+    },
+    {
       "name": "dotActive",
       "selectors": [".carousel__dot--active", ".carousel__dot[aria-current=\"true\"]"],
       "description": "Current slide pagination dot state."
@@ -124,8 +141,8 @@
     {
       "name": "navigation",
       "selectors": [".carousel__nav--prev", ".carousel__nav--next"],
-      "events": ["previous slide", "next slide", "ArrowLeft", "ArrowRight"],
-      "description": "Navigation controls and keyboard shortcuts should move to adjacent slides."
+      "events": ["previous slide", "next slide"],
+      "description": "Canonical Icon Buttons move to adjacent slides and are disabled at finite collection bounds; the root does not intercept arrow keys from descendant content."
     },
     {
       "name": "pagination",
@@ -134,9 +151,19 @@
       "description": "Dots should expose and synchronize the current slide."
     },
     {
+      "name": "directScrolling",
+      "selectors": [".carousel__track"],
+      "events": ["scroll", "touch scroll", "keyboard scroll"],
+      "description": "Native direct scrolling synchronizes the current dot, disabled navigation, and polite status after the nearest slide changes."
+    },
+    {
+      "name": "finiteCollection",
+      "description": "The v1 primitive does not autoplay or loop. A future autoplay option requires an explicit pause control and a new accepted contract decision."
+    },
+    {
       "name": "motionControl",
-      "events": ["pause", "resume"],
-      "description": "Auto-advancing carousels must provide pause controls and respect reduced motion preferences."
+      "events": ["prefers-reduced-motion"],
+      "description": "Reduced motion disables authored smooth scrolling and dot transitions."
     }
   ],
   "properties": [
@@ -172,10 +199,12 @@
         "--color-surface-primary",
         "--color-surface-secondary",
         "--color-border-subtle",
+        "--color-border-focus",
         "--color-text-primary"
       ],
       "spacing": [
-        "--space-layout-element-gap"
+        "--space-layout-element-gap",
+        "--space-layout-touch-target"
       ],
       "radius": [
         "--radius-full"
@@ -195,21 +224,23 @@
     }
   },
   "accessibility": [
+    "Name the carousel region and expose each slide as a named group with its position in the finite collection.",
     "Provide descriptive alt text for images and accessible names for previous, next, and pagination controls.",
-    "Expose the current slide through aria-current or equivalent target semantics.",
-    "Do not auto-advance without a pause mechanism.",
-    "Respect reduced motion preferences for animated slide transitions.",
-    "Ensure keyboard users can reach slide content and controls in a logical order."
+    "Synchronize the visible slide, aria-current dot, finite navigation bounds, and polite status after buttons, dots, touch, wheel, or keyboard scrolling.",
+    "Do not intercept arrow keys at the root when focus belongs to descendant content.",
+    "Do not auto-advance or loop in v1, and respect reduced motion for authored transitions.",
+    "Preserve visible focus and native scrolling in forced-colors and RTL contexts."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; slide index, navigation, pagination state, and optional autoplay must be provided by the consuming target."
+      "notes": "Implemented by class composition in components/css/layout.css with canonical Icon Button controls; the target owns slide data/current index and synchronizes native scroll, buttons, dots, status, RTL, and finite bounds."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "liquid-css-js",
+      "notes": "Liquid owns the finite collection while target JavaScript synchronizes native scroll state and uses the shared Icon Button class contract."
     },
     "react": {
       "status": "planned",

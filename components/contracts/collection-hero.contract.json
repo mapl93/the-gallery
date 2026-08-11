@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "collection-hero",
   "name": "Collection Hero",
   "registryId": "E1",
   "category": "collection",
   "status": "pilot",
-  "summary": "Collection header with title, description, product count, and optional background image variant.",
+  "summary": "Passive collection introduction with a contextual heading, optional concise copy and count, and image-derived contrast presentation.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/collection-hero",
@@ -14,52 +14,57 @@
     "docs": "site/src/content/components/collection-hero.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".collection-hero", "className": ".collection-hero", "required": true, "description": "Collection hero container." },
-    { "name": "image", "selector": ".collection-hero__image", "className": ".collection-hero__image", "required": false, "description": "Optional background image." },
-    { "name": "overlay", "selector": ".collection-hero--with-image::before", "generated": true, "required": false, "description": "Generated image overlay." },
-    { "name": "content", "selector": ".collection-hero__content", "className": ".collection-hero__content", "required": true, "description": "Centered content wrapper." },
-    { "name": "title", "selector": ".collection-hero__title", "className": ".collection-hero__title", "required": true, "description": "Collection title." },
-    { "name": "description", "selector": ".collection-hero__description", "className": ".collection-hero__description", "required": false, "description": "Collection description." },
-    { "name": "count", "selector": ".collection-hero__count", "className": ".collection-hero__count", "required": false, "description": "Product count text." }
+    { "name": "root", "selector": ".collection-hero", "className": ".collection-hero", "required": true, "description": "Passive collection introduction container." },
+    { "name": "image", "selector": ".collection-hero__image", "className": ".collection-hero__image", "required": false, "description": "Optional real collection image whose presence derives image-backed presentation." },
+    { "name": "overlay", "selector": ".collection-hero--with-image::before", "generated": true, "required": false, "description": "Generated semantic contrast layer when image media exists." },
+    { "name": "content", "selector": ".collection-hero__content", "className": ".collection-hero__content", "required": true, "description": "Centered readable content stack above optional media." },
+    { "name": "title", "selector": ".collection-hero__title", "className": ".collection-hero__title", "required": true, "description": "One visible native collection heading at the surrounding document rank." },
+    { "name": "description", "selector": ".collection-hero__description", "className": ".collection-hero__description", "required": false, "description": "Optional concise plain-text collection summary." },
+    { "name": "count", "selector": ".collection-hero__count", "className": ".collection-hero__count", "required": false, "description": "Optional target-formatted readable product count." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Text-only collection hero." },
-    { "name": "with-image", "className": ".collection-hero--with-image", "default": false, "description": "Hero with background image and overlay." }
+    { "name": "default", "className": null, "default": true, "description": "Text-only composition when no image is supplied." },
+    { "name": "with-image", "className": ".collection-hero--with-image", "default": false, "description": "Image-backed composition derived from image-slot presence, never selected independently." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default full-width hero spacing." }
+    { "name": "default", "className": null, "default": true, "description": "Single intrinsic composition that fills its containing inline size." }
   ],
   "states": [
-    { "name": "default", "selectors": [".collection-hero"], "description": "Default text-only hero state." },
-    { "name": "withImage", "selectors": [".collection-hero--with-image", ".collection-hero--with-image .collection-hero__content", ".collection-hero--with-image::before"], "description": "Image-backed hero state." }
+    { "name": "textOnly", "selectors": [".collection-hero"], "description": "Archival-surface composition when no image exists." },
+    { "name": "withImage", "selectors": [".collection-hero--with-image", ".collection-hero__image", ".collection-hero--with-image::before"], "description": "Image-backed composition derived from supplied image media with theme-paired contrast." }
   ],
   "behavior": [
-    { "name": "collectionData", "selectors": [".collection-hero__title", ".collection-hero__description", ".collection-hero__count"], "description": "Adapters should map collection title, description, and product count from target data." },
-    { "name": "imageSemantics", "selectors": [".collection-hero__image"], "attributes": ["alt"], "description": "Background imagery should be decorative or have useful alt text depending on target markup." }
+    { "name": "contextualHeading", "selectors": [".collection-hero__title"], "attributes": ["<h1>-<h6>"], "description": "The target renders exactly one visible native title heading at the surrounding page rank; heading rank is not a decorative property." },
+    { "name": "collectionData", "selectors": [".collection-hero__title", ".collection-hero__description", ".collection-hero__count"], "description": "Adapters map collection identity and already localized count text while omitting absent optional nodes." },
+    { "name": "imageDerivedPresentation", "selectors": [".collection-hero__image", ".collection-hero--with-image", ".collection-hero--with-image::before"], "description": "Supplying image media derives the with-image class and contrast layer; consumers cannot select a contradictory independent variant." },
+    { "name": "imageSemantics", "selectors": [".collection-hero__image"], "attributes": ["alt"], "description": "Informative images receive useful contextual alt text; decorative atmosphere preserves an empty alt attribute rather than copying the title." },
+    { "name": "passiveContent", "selectors": [".collection-hero"], "description": "The component owns no interaction, focus, motion, live-region, fetching, or controlled/uncontrolled lifecycle." }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Text-only or image-backed presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".collection-hero", "source": "variants" }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Visible collection title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-hero__title" }] } },
-    { "name": "description", "type": "string", "required": false, "description": "Optional collection description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-hero__description" }] } },
-    { "name": "count", "type": "string", "required": false, "description": "Target-formatted product count text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-hero__count" }] } },
-    { "name": "image", "type": "slot", "required": false, "description": "Optional collection media for the image-backed variant.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-hero__image", "classNames": [".collection-hero__image"] }] } },
-    { "name": "imageAlt", "type": "string", "required": false, "description": "Alternative text when collection media conveys content.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".collection-hero__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Visible collection identity rendered in one context-ranked native heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-hero__title" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional concise plain-text collection summary.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-hero__description" }] } },
+    { "name": "count", "type": "string", "required": false, "description": "Optional already localized and target-formatted product count; not an implicit live region.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-hero__count" }] } },
+    { "name": "image", "type": "slot", "required": false, "description": "Optional real collection media whose presence makes the target derive image-backed presentation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-hero__image", "classNames": [".collection-hero__image"] }] } },
+    { "name": "imageAlt", "type": "string", "required": false, "unsetBehavior": "Use an empty alt attribute when supplied image media is decorative.", "description": "Contextual image alternative when media is informative; empty string remains a valid decorative decision.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".collection-hero__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } }
   ],
   "tokens": {
     "public": {
       "color": ["--color-surface-archival", "--color-text-primary", "--color-text-inverse"],
-      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
-      "typography": ["--typo-display-size", "--typo-display-line-height", "--typo-article-size", "--typo-body-size", "--font-family-heading"]
+      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--space-layout-element-gap"],
+      "opacity": ["--opacity-overlay"],
+      "typography": ["--typo-display-size", "--typo-display-line-height", "--typo-article-size", "--typo-article-line-height", "--font-family-heading"]
     }
   },
   "accessibility": [
-    "Use a page-appropriate heading level for the collection title.",
-    "Ensure text over images meets contrast requirements.",
-    "Expose product count as readable text when shown."
+    "Render exactly one visible native collection-title heading at the page-appropriate rank; do not expose heading rank as a decorative switch.",
+    "Give informative image media useful contextual alt text and preserve alt=\"\" for decorative atmosphere; never inject the collection title merely to avoid an empty value.",
+    "Verify image-backed text contrast against every supplied frame in light and dark themes; forced colors must not depend on image pixels.",
+    "Expose optional count as localized readable text, not an implicit live region; filters or results own synchronized announcements.",
+    "Preserve passive semantics with no widget role, focus model, keyboard behavior, or reduced-motion requirement."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map collection title, description, image, and product count." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Canonical CSS implements intrinsic layout, image-derived contrast, theme pairing, overflow safety, and forced-colors behavior without runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The collection-template section maps native collection data, merchant-visible optional parts, image alt semantics, localized count copy, and image-derived presentation." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

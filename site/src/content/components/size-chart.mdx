@@ -1,45 +1,86 @@
 ## Overview
 
-Size chart modal/drawer with unit toggle and measurement table.
+Size Chart is an on-demand product reference composed from canonical Modal, Data Table, and optional Segmented Control. It presents one complete target-authored measurement matrix without defining a universal product schema or conversion service. Web preserves this centered Modal at every viewport.
 
-<Preview html={"<div class=\"size-chart tg-preview-stage tg-preview-stage--overlay tg-preview-stage--tall\"><button class=\"size-chart__trigger\" type=\"button\" data-preview-trigger aria-expanded=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><rect x=\"1\" y=\"4\" width=\"14\" height=\"8\" fill=\"none\" stroke=\"currentColor\"/></svg> Size Guide</button><div class=\"size-chart__drawer is-open tg-preview-overlay-layer\"><div class=\"size-chart__panel\"><div class=\"size-chart__header\"><h3 class=\"size-chart__title\">Size Guide</h3><button class=\"size-chart__close\" type=\"button\" data-preview-close aria-label=\"Close size chart\">&times;</button></div><table class=\"size-chart__table\"><thead><tr><th>Size</th><th>Chest</th><th>Length</th></tr></thead><tbody><tr><td>S</td><td>36\"</td><td>27\"</td></tr><tr><td>M</td><td>38\"</td><td>28\"</td></tr><tr><td>L</td><td>40\"</td><td>29\"</td></tr></tbody></table></div></div></div>"} label="Size Chart" layout="overlay" interaction={{"selector":".size-chart__drawer","toggle":"is-open","triggerLabel":"Open Size Chart","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
+<Preview
+  html={'<div class="size-chart tg-preview-stage tg-preview-stage--overlay tg-preview-stage--tall"><button class="btn btn--link size-chart__trigger" type="button" data-preview-trigger aria-haspopup="dialog" aria-controls="size-chart-preview" aria-expanded="true">Size guide</button><div class="modal-overlay size-chart__overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal size-chart__dialog" id="size-chart-preview" role="dialog" aria-modal="true" aria-labelledby="size-chart-preview-title"><div class="modal__header"><h2 class="modal__title" id="size-chart-preview-title" tabindex="-1">Size guide</h2><button class="close-btn modal__close" type="button" data-preview-close aria-label="Close size guide"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button></div><div class="modal__body size-chart__content"><fieldset class="segmented size-chart__units"><legend class="segmented__legend">Measurement unit</legend><div class="segmented__options"><label class="segmented__item"><input class="segmented__input" type="radio" name="size-chart-preview-unit" value="metric" checked /><span class="segmented__label">CM</span></label><label class="segmented__item"><input class="segmented__input" type="radio" name="size-chart-preview-unit" value="imperial" /><span class="segmented__label">IN</span></label></div></fieldset><div class="table-wrapper size-chart__chart" tabindex="0" aria-label="Framed textile size chart scroll area"><table class="table"><caption class="visually-hidden">Framed textile measurements by size</caption><thead><tr><th scope="col">Size</th><th scope="col">Width</th><th scope="col">Height</th></tr></thead><tbody><tr><th scope="row"><bdi>S</bdi></th><td><bdi>24&nbsp;cm</bdi></td><td><bdi>18&nbsp;cm</bdi></td></tr><tr><th scope="row"><bdi>M</bdi></th><td><bdi>28&nbsp;cm</bdi></td><td><bdi>22&nbsp;cm</bdi></td></tr><tr><th scope="row"><bdi>L</bdi></th><td><bdi>32&nbsp;cm</bdi></td><td><bdi>26&nbsp;cm</bdi></td></tr></tbody></table></div><div class="size-chart__notes"><p>Measurements are approximate because each work is finished by hand.</p></div></div></div></div></div>'}
+  label="Size Chart"
+  layout="overlay"
+  interaction={{ selector: '.size-chart__overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Size Chart', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', dismissSelector: '.size-chart__overlay', startVisible: true }}
+/>
 
 ## Presentation
 
-Open state, unit selection, table data, and fit notes are independent. Exhibit starts open while the consumer contract defaults to closed.
+The root is a thin product profile. Its closed state contains a canonical link-style Button. Its open state contains the canonical Modal title, Close Button, scrollable body, optional unit choice, required Data Table, and optional notes.
+
+The target supplies the complete table: caption, column and row headers, values, units, qualifiers, and source order. The first column should use row headers when it names each size. Keep the table static; do not add grid roles or keyboard navigation to passive values.
+
+Unit choice is optional. When present, it is one canonical Segmented Control with a visible legend, same-name native radios, and exactly one checked value. A target replaces the complete authored chart for the selected option. Size Chart does not derive inches from centimetres, round values, select locale, or own a second `activeUnit` state.
+
+The Web contract uses the canonical centered Modal at every viewport; it does not silently become a Sheet on narrow containers. A Sheet, full-screen surface, or inline chart is a different target composition rather than a D7 variant.
+
+Shopify uses the merchant-owned `custom.size_chart` product metafield. Its referenced record supplies one required primary table and at most one optional secondary table, each independently authored and localized. The target adapter bounds each table to one row-header column, two measurement columns, and twenty valid rows. Larger or structurally different matrices require another target presentation instead of changing the neutral contract.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Optimize product images for web — use WebP format and responsive srcset.</Do>
-  <Dont>Don't overload product components with too many badges or CTAs — keep it clean.</Dont>
+  <Do>Provide concise headings, one complete measurement matrix, visible units, and any method or approximation note needed to interpret the values.</Do>
+  <Dont>Do not force apparel, footwear, framed art, ceramics, furniture, or packaging into one fixed D7 row-and-column schema.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Supply separately verified complete tables when users can choose among unit presentations.</Do>
+  <Dont>Do not treat fixture strings as a neutral conversion algorithm or infer precision, rounding, tolerance, or locale.</Dont>
+</DoDont>
+
+- Keep Size Chart secondary to the main product decision. If the matrix is the primary task or becomes very large, use a dedicated or inline presentation.
+- Put each independent datum in its own cell and keep its row/column relationship explicit.
+- Use notes for fit, measurement method, approximation, tolerance, or handmade variation only when the target can verify and localize that content.
+- Keep selected variant, Size Chart content, Dimensions, preference persistence, and analytics coordinated by a target product service when those relationships are required.
+- Do not expose modal width, overlay opacity, close placement, sticky headers, row hover, column count, breakpoint, conversion, or persistence as D7 public properties.
 
 ## Accessibility
 
-<Callout type="tip">
-  Product components are designed to work together. The product page combines gallery, info, form, and related products.
+<Callout type="warning">
+  Modal CSS alone is not modality. The target must make outside content inert, move focus inside, contain Tab and Shift+Tab, close on Escape, and restore focus before asserting `aria-modal="true"`.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
-- Use dialog semantics and focus management for the open chart.
-- Keep unit toggle state synchronized with `aria-pressed` or native pressed state.
-- Preserve table semantics for measurement matrices.
+- Give the dialog a required visible title through `aria-labelledby` and a visible named Close Button.
+- Initially focus the static title because the body contains a table and may contain multiple paragraphs. Omit `aria-describedby` by default so assistive technology users can explore the structure rather than hear one flattened announcement.
+- Give the native table a meaningful caption and use `scope="col"` and `scope="row"` for simple header relationships.
+- Keep the optional overflow wrapper keyboard focusable, contextually named, and visibly focused so narrow or enlarged content remains reachable.
+- Use a visible Segmented Control legend and same-name native radios for optional unit choice. Native Tab, Arrow, and Space behavior belongs to that dependency.
+- Keep visible units and qualifiers in the cells. Use `bdi` when independently formatted values can contain bidirectional text.
+- Do not announce the complete table on every unit change. A target with evidence for additional feedback should provide one concise non-duplicative status.
+- Preserve dark-mode contrast, forced-color boundaries, reduced motion, logical direction, long localization, user spacing, and effective 200 percent text.
 
 ## References
 
+### Dependencies
+
+- [Modal](/components/modal)
+- [Segmented Control](/components/segmented-control)
+- [Data Table](/components/data-table)
+
+### API Reference
+
 <PropTable>
-  <tr><td>`.size-chart`</td><td>class</td><td>—</td><td>Base size chart styles</td></tr>
-  <tr><td>`.size-chart__trigger`</td><td>class</td><td>—</td><td>Trigger button</td></tr>
-  <tr><td>`.size-chart__drawer`</td><td>class</td><td>—</td><td>Overlay drawer or modal layer</td></tr>
-  <tr><td>`.size-chart__drawer.is-open`</td><td>state</td><td>—</td><td>Open drawer state</td></tr>
-  <tr><td>`.size-chart__panel`</td><td>class</td><td>—</td><td>Dialog panel</td></tr>
-  <tr><td>`.size-chart__header`</td><td>class</td><td>—</td><td>Dialog header</td></tr>
-  <tr><td>`.size-chart__title`</td><td>class</td><td>—</td><td>Dialog title</td></tr>
-  <tr><td>`.size-chart__close`</td><td>class</td><td>—</td><td>Close action</td></tr>
-  <tr><td>`.size-chart__unit-toggle`</td><td>class</td><td>—</td><td>Unit toggle group</td></tr>
-  <tr><td>`.size-chart__unit-btn`</td><td>class</td><td>—</td><td>Single unit option</td></tr>
-  <tr><td>`.size-chart__unit-btn[aria-pressed="true"]`</td><td>state</td><td>—</td><td>Active unit option</td></tr>
-  <tr><td>`.size-chart__table`</td><td>class</td><td>—</td><td>Measurement table</td></tr>
-  <tr><td>`.size-chart__notes`</td><td>class</td><td>—</td><td>Fit guide notes</td></tr>
+  <tr><td>`triggerLabel`</td><td>string</td><td>required</td><td>Visible localized label for the canonical modal invoker</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible localized Modal title and accessible-name source</td></tr>
+  <tr><td>`dismissLabel`</td><td>string</td><td>required</td><td>Contextual accessible name for the canonical visible dismiss action</td></tr>
+  <tr><td>`chart`</td><td>slot</td><td>required</td><td>Complete canonical Data Table supplied by the target</td></tr>
+  <tr><td>`unitControls`</td><td>slot</td><td>optional</td><td>Canonical Segmented Control; target coordinates selected value and complete chart replacement</td></tr>
+  <tr><td>`notes`</td><td>slot</td><td>optional</td><td>Target-authored fit, method, approximation, tolerance, or variation prose</td></tr>
+  <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Semantic presentation state; complete Modal lifecycle remains target-owned</td></tr>
 </PropTable>
+
+### Standards and system evidence
+
+- [WAI-ARIA APG Modal Dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/)
+- [WAI Tables tutorial](https://www.w3.org/WAI/tutorials/tables/)
+- [WAI-ARIA APG Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
+- [Open UI Dialog research](https://open-ui.org/components/dialog.research/)
+- [Open UI Table draft](https://open-ui.org/components/table/)
+- [Radix Dialog](https://www.radix-ui.com/primitives/docs/components/dialog)
+- [Radix Radio Group](https://www.radix-ui.com/primitives/docs/components/radio-group)
+- [Shopify metaobjects](https://shopify.dev/docs/apps/build/metaobjects)

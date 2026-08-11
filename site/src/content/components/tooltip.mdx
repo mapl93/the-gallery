@@ -1,33 +1,47 @@
 ## Overview
 
-Hover tooltip using aria-label.
+Tooltip supplies short, non-essential context for one focusable trigger. Its
+explicit content describes the trigger without replacing the trigger's own name.
 
 ## Presentation
 
-<Preview html={"<button class=\"btn btn--outline tooltip\" type=\"button\" aria-label=\"View material details\">Material details</button>"} label="Tooltip" />
+<Preview html={'<span class="tooltip"><button class="btn btn--outline tooltip__trigger" type="button" aria-describedby="material-tooltip">Material details</button><span class="tooltip__content" id="material-tooltip" role="tooltip">View material details</span></span>'} label="Tooltip" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use tooltip for short supplemental text attached to a focusable trigger.</Do>
-  <Dont>Don't put interactive content or required instructions inside a tooltip.</Dont>
+  <Do>Use Tooltip for a brief definition, icon explanation, or optional keyboard hint.</Do>
+  <Dont>Don't hide required instructions, validation, actions, links, or touch-essential information in Tooltip.</Dont>
 </DoDont>
+
+The trigger may compose Button, Link, or another focusable consumer element.
+Tooltip owns only the explicit content presentation. Targets own ids, Escape
+dismissal, optional delay, placement collision, portals, and open-state events.
 
 ## Accessibility
 
-<Callout type="tip">
-  The current web adapter renders the visual bubble from `aria-label`.
+<Callout type="warning">
+  Tooltip content supplements a trigger through `aria-describedby`; it must not
+  become the trigger's `aria-label`.
 </Callout>
 
-- Make the trigger keyboard focusable so the tooltip can appear on focus as well as hover.
-- Keep tooltip text short and non-interactive.
-- Use Popover when the floating content needs links, buttons, or richer structure.
+- Give the trigger its own visible and accessible name.
+- Link the trigger to one `role="tooltip"` node with a stable unique id.
+- Reveal on hover and focus, keep the content hoverable and persistent, and let
+  Escape dismiss it without moving focus.
+- Keep content short and non-interactive. Use Popover for links, buttons, or rich
+  structure, and visible helper text for required information.
+- Do not depend on hover-only access on touch devices.
 
 ## References
 
 <PropTable>
-  <tr><td>`label`</td><td>string</td><td>required</td><td>Short text mapped to `aria-label`</td></tr>
-  <tr><td>`.tooltip`</td><td>class</td><td>—</td><td>Base tooltip styles</td></tr>
-  <tr><td>`.tooltip::before`</td><td>generated</td><td>`aria-label`</td><td>Generated tooltip bubble</td></tr>
-  <tr><td>`.tooltip::after`</td><td>generated</td><td>—</td><td>Generated tooltip arrow</td></tr>
+  <tr><td>`content`</td><td>string</td><td>required</td><td>Short supplemental plain text</td></tr>
+  <tr><td>`trigger`</td><td>slot</td><td>required</td><td>Exactly one focusable consumer-owned trigger</td></tr>
+  <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Optional target-controlled visible state</td></tr>
+  <tr><td>`.tooltip`</td><td>class</td><td>—</td><td>Positioning and hover/focus root</td></tr>
+  <tr><td>`.tooltip__trigger`</td><td>class</td><td>—</td><td>Relationship hook; does not restyle the trigger</td></tr>
+  <tr><td>`.tooltip__content`</td><td>class</td><td>—</td><td>Explicit `role="tooltip"` content</td></tr>
+  <tr><td>`.is-open`</td><td>class</td><td>—</td><td>Controlled open state</td></tr>
+  <tr><td>`.is-dismissed`</td><td>class</td><td>—</td><td>Temporary Escape-dismissed state</td></tr>
 </PropTable>

@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import PriceArtwork from './PriceArtwork';
 
 interface PriceStudioProps {
   contract: ComponentContract;
@@ -43,10 +44,12 @@ function initialPriceValues(contract: ComponentContract): StudioPropertyValues {
 
   // These values belong to the Studio fixture, not to the component contract.
   values.currentPrice = '$120.00';
+  values.currentPriceLabel = 'Sale price';
   values.compareAtPrice = '$150.00';
+  values.compareAtPriceLabel = 'Regular price';
   values.unitPrice = '$12.00 / 100 g';
+  values.unitPriceLabel = 'Unit price';
   values.variant = 'on-sale';
-  values.accessibleLabel = 'Sale price $120.00, previously $150.00';
   return values;
 }
 
@@ -113,20 +116,22 @@ export default function PriceStudio({ contract, definition }: PriceStudioProps) 
   );
   const variant = typeof values.variant === 'string' ? values.variant : 'default';
   const currentPrice = typeof values.currentPrice === 'string' ? values.currentPrice : '';
+  const currentPriceLabel = typeof values.currentPriceLabel === 'string'
+    ? values.currentPriceLabel
+    : '';
   const compareAtPrice = typeof values.compareAtPrice === 'string' ? values.compareAtPrice : '';
+  const compareAtPriceLabel = typeof values.compareAtPriceLabel === 'string'
+    ? values.compareAtPriceLabel
+    : '';
   const unitPrice = typeof values.unitPrice === 'string' ? values.unitPrice : '';
-  const accessibleLabel = typeof values.accessibleLabel === 'string'
-    ? values.accessibleLabel
+  const unitPriceLabel = typeof values.unitPriceLabel === 'string'
+    ? values.unitPriceLabel
     : '';
   const activeTokens = {
     'current-color': '--color-text-primary',
-    'compare-color': '--color-text-disabled',
-    'unit-color': '--color-text-secondary',
+    'supporting-color': '--color-text-secondary',
   };
-  const classes = [
-    'price',
-    optionClass(contract.variants, values.variant),
-  ].filter(Boolean).join(' ');
+  const priceClass = optionClass(contract.variants, values.variant);
 
   function handleReset() {
     setValues({ ...initialValues });
@@ -162,22 +167,21 @@ export default function PriceStudio({ contract, definition }: PriceStudioProps) 
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <span
-              className={classes}
-              role={accessibleLabel ? 'group' : undefined}
-              aria-label={accessibleLabel || undefined}
-              data-price-alternate-digits={String(values.alternateDigits === true)}
-              data-price-slashed-zero={String(values.slashedZero !== false)}
-              data-price-tabular-numbers={String(values.tabularNumbers !== false)}
-              data-price-contextual-alternates={String(values.contextualAlternates !== false)}
-              data-price-fractions={String(values.fractions === true)}
-            >
-              {variant === 'on-sale' && compareAtPrice && (
-                <span className="price__compare">{compareAtPrice}</span>
-              )}
-              <span className="price__current">{currentPrice}</span>
-              {unitPrice && <span className="price__unit">{unitPrice}</span>}
-            </span>
+            <PriceArtwork
+              className={priceClass}
+              variant={variant}
+              currentPrice={currentPrice}
+              currentPriceLabel={currentPriceLabel}
+              compareAtPrice={compareAtPrice}
+              compareAtPriceLabel={compareAtPriceLabel}
+              unitPrice={unitPrice}
+              unitPriceLabel={unitPriceLabel}
+              alternateDigits={values.alternateDigits === true}
+              slashedZero={values.slashedZero !== false}
+              tabularNumbers={values.tabularNumbers !== false}
+              contextualAlternates={values.contextualAlternates !== false}
+              fractions={values.fractions === true}
+            />
           </div>
         </section>
       </div>

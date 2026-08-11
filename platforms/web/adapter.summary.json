@@ -1,6 +1,6 @@
 {
   "$schema": "https://the-gallery.dev/schema/web-adapter-summary.json",
-  "summaryVersion": "0.1.0",
+  "summaryVersion": "0.2.0",
   "target": {
     "id": "web",
     "name": "Neutral Web",
@@ -12,7 +12,31 @@
     "entry": "platforms/web/index.css",
     "tokens": "platforms/web/tokens.css",
     "components": "platforms/web/components.css",
+    "cssModuleDirectory": "platforms/web/components",
     "javascript": "platforms/web/theme.js",
+    "runtimeDirectory": "platforms/web/runtime",
+    "runtimeLoader": "platforms/web/runtime-loader.js",
+    "runtimeCore": "platforms/web/runtime/core.js",
+    "runtimeModules": [
+      "platforms/web/runtime/mobile-navigation.js",
+      "platforms/web/runtime/select.js",
+      "platforms/web/runtime/textarea.js",
+      "platforms/web/runtime/checkbox.js",
+      "platforms/web/runtime/quantity.js",
+      "platforms/web/runtime/slider.js",
+      "platforms/web/runtime/combobox.js",
+      "platforms/web/runtime/date-picker.js",
+      "platforms/web/runtime/toggle-group.js",
+      "platforms/web/runtime/pin-input.js",
+      "platforms/web/runtime/countdown.js",
+      "platforms/web/runtime/marquee.js",
+      "platforms/web/runtime/carousel-rotation.js",
+      "platforms/web/runtime/reading-progress.js",
+      "platforms/web/runtime/file-upload.js",
+      "platforms/web/runtime/product-gallery.js",
+      "platforms/web/runtime/filter-panel.js"
+    ],
+    "firingSchedule": "platforms/web/firing-schedule.js",
     "manifest": "platforms/web/adapter.manifest.json",
     "summary": "platforms/web/adapter.summary.json"
   },
@@ -30,23 +54,38 @@
       "reason": "Provides the current hand-authored web component implementation."
     },
     {
+      "type": "module",
+      "path": "platforms/web/runtime-loader.js",
+      "required": false,
+      "reason": "Detects component markup and loads only the progressive-enhancement modules in use."
+    },
+    {
       "type": "script",
       "path": "platforms/web/theme.js",
       "required": false,
-      "reason": "Adds progressive enhancement for current shared web interactions."
+      "compatibility": true,
+      "reason": "Complete compatibility aggregate for existing consumers and diagnostics; do not load together with runtime-loader.js."
+    },
+    {
+      "type": "module",
+      "path": "platforms/web/firing-schedule.js",
+      "required": false,
+      "reason": "Pure normalized-program model imported only by Firing Schedule renderers."
     }
   ],
   "policy": {
-    "componentImplementation": "Hand-authored CSS from components/css is the current neutral web adapter implementation.",
+    "componentImplementation": "Hand-authored CSS from components/css is copied as independently installable family modules; components.css remains the complete compatibility bundle.",
     "contractRole": "Component contracts validate and describe the adapter; they do not generate component CSS yet.",
-    "distribution": "Consumer projects copy and own these files locally."
+    "runtimeDelivery": "runtime-loader.js detects present markup and imports only matching progressive-enhancement modules; theme.js remains a compatibility and diagnostic aggregate.",
+    "distribution": "Consumer projects copy and own dependency-closed CSS and runtime slices locally."
   },
   "stats": {
     "components": 183,
     "implementedComponents": 183,
     "componentsWithBehavior": 183,
     "cssFiles": 19,
-    "uniquePublicTokens": 175
+    "runtimeModules": 17,
+    "uniquePublicTokens": 205
   },
   "categoryCoverage": [
     {
@@ -63,7 +102,7 @@
     },
     {
       "category": "ceramics",
-      "count": 14
+      "count": 13
     },
     {
       "category": "collection",
@@ -95,7 +134,7 @@
     },
     {
       "category": "product",
-      "count": 10
+      "count": 11
     },
     {
       "category": "reviews",
@@ -140,7 +179,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css",
-        "notes": "Implemented by class composition in components/css/primitives.css."
+        "notes": "Canonical CSS styles the native input; static HTML is uncontrolled after its initial value while adapters may bind the live value property and native events."
       }
     },
     {
@@ -172,7 +211,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css",
-        "notes": "Composes canonical Input classes with textarea__field in components/css/primitives.css."
+        "notes": "Composes canonical Input classes with a native textarea; static HTML is uncontrolled after its initial text content while adapters may bind the live value property and native events."
       }
     },
     {
@@ -188,7 +227,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css-js",
-        "notes": "Canonical CSS styles native states and shared theme.js initializes data-indeterminate as the native mixed property."
+        "notes": "Canonical CSS styles native states and shared theme.js initializes data-indeterminate; static HTML remains uncontrolled after initial checkedness."
       }
     },
     {
@@ -204,7 +243,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css",
-        "notes": "Implemented by native radio markup and class composition in components/css/primitives.css."
+        "notes": "Implemented by native named-radio markup and class composition in components/css/primitives.css; browser selection and form behavior remain authoritative."
       }
     },
     {
@@ -251,8 +290,8 @@
       },
       "adapter": {
         "status": "implemented",
-        "kind": "css",
-        "notes": "Implemented by class composition in components/css/primitives.css; targets provide formatted string content."
+        "kind": "css-html",
+        "notes": "Canonical CSS and semantic HTML parts consume complete target-formatted strings without neutral runtime."
       }
     },
     {
@@ -268,7 +307,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css-js",
-        "notes": "Canonical CSS and shared progressive enhancement implement validation, step updates, boundaries, and state synchronization."
+        "notes": "Canonical CSS and shared progressive enhancement preserve native step alignment, form/value ownership, validation, boundaries, read-only, and state synchronization."
       }
     },
     {
@@ -284,7 +323,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css",
-        "notes": "Implemented by class composition in components/css/primitives.css."
+        "notes": "Canonical passive anatomy, default/large geometry, and visual states are implemented by components/css/primitives.css; each target supplies the truthful sequence with no neutral browser runtime."
       }
     },
     {
@@ -300,7 +339,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css",
-        "notes": "Implemented by class composition and keyframes in components/css/primitives.css."
+        "notes": "Canonical decorative variants, bounded shimmer, static preference modes, and container-safe geometry are implemented in components/css/primitives.css; the consumer owns lifecycle and content."
       }
     },
     {
@@ -315,8 +354,8 @@
       },
       "adapter": {
         "status": "implemented",
-        "kind": "css",
-        "notes": "Implemented by class composition in components/css/primitives.css."
+        "kind": "css-composition",
+        "notes": "Canonical CSS implements passive container-responsive composition. Target markup owns contextual heading, lifecycle, announcement, focus, and one Button-or-Link action slot."
       }
     },
     {
@@ -348,7 +387,7 @@
       "adapter": {
         "status": "implemented",
         "kind": "css",
-        "notes": "Implemented by class composition in components/css/primitives.css."
+        "notes": "Canonical CSS implements fixed logical geometry, native image crop, and the accepted semantic initials scale; targets author identity content, contextual names, and image-or-initials fallback selection."
       }
     },
     {
@@ -379,8 +418,8 @@
       },
       "adapter": {
         "status": "implemented",
-        "kind": "css",
-        "notes": "Implemented by class composition in components/css/layout.css; behavior must be provided by the consuming target."
+        "kind": "css-target-behavior",
+        "notes": "Canonical CSS implements the bounded surface. The Web target maps modality through native dialog or equivalent focus/inert/dismiss behavior; the docs target demonstrates that lifecycle without defining a global overlay service."
       }
     },
     {
@@ -395,8 +434,8 @@
       },
       "adapter": {
         "status": "implemented",
-        "kind": "css",
-        "notes": "Implemented by class composition in components/css/layout.css; behavior must be provided by the consuming target."
+        "kind": "css-target-behavior",
+        "notes": "Canonical CSS implements physical side placement and scroll partition. The Web target maps modality through native dialog or equivalent focus/inert/dismiss behavior; the docs target demonstrates the lifecycle."
       }
     },
     {
@@ -411,8 +450,8 @@
       },
       "adapter": {
         "status": "implemented",
-        "kind": "css",
-        "notes": "Implemented by class composition in components/css/layout.css; visibility and timing behavior must be provided by the consuming target."
+        "kind": "css-target-behavior",
+        "notes": "Canonical CSS implements one notification item and semantic hidden state. Target services own insertion, live timing, viewport placement, queueing, pause/resume, duration, and removal."
       }
     },
     {
@@ -427,8 +466,8 @@
       },
       "adapter": {
         "status": "implemented",
-        "kind": "css",
-        "notes": "Implemented with generated pseudo-elements in components/css/layout.css."
+        "kind": "css-target-behavior",
+        "notes": "Canonical CSS owns presentation; the consuming target owns ids, Escape state, delay, and collision behavior."
       }
     }
   ]

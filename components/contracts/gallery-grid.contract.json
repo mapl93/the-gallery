@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "gallery-grid",
   "name": "Gallery Grid",
   "registryId": "S5",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive gallery shell with grid and masonry presentation while item activation remains target-owned.",
+  "summary": "Passive container-responsive list of target-owned media with regular-grid and source-flow masonry presentations.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/gallery-grid",
@@ -22,35 +22,35 @@
       "selector": ".gallery-grid",
       "className": ".gallery-grid",
       "required": true,
-      "description": "Gallery section root."
+      "description": "Titled thematic section or untitled generic root for one complete media-list composition."
     },
     {
       "name": "header",
       "selector": ".gallery-grid__header",
       "className": ".gallery-grid__header",
       "required": false,
-      "description": "Optional heading region."
+      "description": "Optional contextual-heading region."
     },
     {
       "name": "title",
       "selector": ".gallery-grid__title",
       "className": ".gallery-grid__title",
       "required": false,
-      "description": "Optional gallery heading."
+      "description": "Optional visible contextual heading that names the thematic root."
     },
     {
       "name": "items",
       "selector": ".gallery-grid__items",
       "className": ".gallery-grid__items",
       "required": true,
-      "description": "Ordered gallery-item composition region."
+      "description": "Required native list and responsive layout region for target-owned media items."
     },
     {
       "name": "item",
       "selector": ".gallery-grid__item",
       "className": ".gallery-grid__item",
       "required": false,
-      "description": "Repeated target-owned gallery item."
+      "description": "Repeated native list item containing one complete target-owned media composition."
     }
   ],
   "variants": [
@@ -58,13 +58,13 @@
       "name": "grid",
       "className": null,
       "default": true,
-      "description": "Default responsive grid presentation."
+      "description": "Regular row-major responsive grid with a private uniform media crop candidate."
     },
     {
       "name": "masonry",
       "className": ".gallery-grid--masonry",
       "default": false,
-      "description": "Responsive CSS-column masonry presentation."
+      "description": "Source-flow CSS-column presentation that preserves target media proportions."
     }
   ],
   "sizes": [
@@ -72,7 +72,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Intrinsic size whose private track counts and media geometry respond to component space."
     }
   ],
   "states": [
@@ -84,28 +84,66 @@
       "description": "Resting gallery presentation."
     },
     {
-      "name": "itemHover",
+      "name": "targetInteractiveFocus",
       "selectors": [
-        ".gallery-grid__item:hover img"
+        ".gallery-grid__item :where(a, button):focus-visible"
       ],
-      "description": "Pointer emphasis for a gallery item without implying activation."
-    },
-    {
-      "name": "itemFocusWithin",
-      "selectors": [
-        ".gallery-grid__item:focus-visible",
-        ".gallery-grid__item:focus-within img"
-      ],
-      "description": "Equivalent emphasis when target-owned interactive content receives keyboard focus."
+      "description": "Visible native focus when target-owned interaction receives keyboard focus."
     }
   ],
   "behavior": [
+    {
+      "name": "rootSemantics",
+      "selectors": [
+        ".gallery-grid",
+        ".gallery-grid__title"
+      ],
+      "description": "A non-empty title produces a thematic section named by its visible heading; an untitled composition uses a generic root."
+    },
+    {
+      "name": "sourceOrder",
+      "selectors": [
+        ".gallery-grid__items",
+        ".gallery-grid__item"
+      ],
+      "description": "Native list order remains authoritative in regular Grid and source-flow Masonry; no dense packing or visual reordering is allowed."
+    },
+    {
+      "name": "variantComposition",
+      "selectors": [
+        ".gallery-grid__items",
+        ".gallery-grid--masonry .gallery-grid__items"
+      ],
+      "description": "Grid uses a regular private crop and row-major tracks; Masonry uses natural media proportions and intact source-flow columns."
+    },
     {
       "name": "itemOwnership",
       "selectors": [
         ".gallery-grid__item"
       ],
-      "description": "Gallery items may remain passive or contain target-owned native links or controls; this contract does not choose navigation, selection, or Lightbox behavior."
+      "description": "The target supplies one or more complete media items and owns sources, dimensions, alternatives, loading, optional content and editor data."
+    },
+    {
+      "name": "interactionBoundary",
+      "selectors": [
+        ".gallery-grid__item",
+        ".gallery-grid__item :where(a, button):focus-visible"
+      ],
+      "description": "Items are passive by default; only a target-owned native link or button may add focus and activation. This contract does not choose navigation, selection or Lightbox behavior."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".gallery-grid"
+      ],
+      "description": "Missing required items omits the root; an empty optional title omits only the header and selects generic root semantics."
+    },
+    {
+      "name": "runtimeBoundary",
+      "selectors": [
+        ".gallery-grid"
+      ],
+      "description": "Neutral Web uses no component JavaScript, observer, listener, request, timer, layout measurement or focus manager."
     }
   ],
   "properties": [
@@ -124,7 +162,7 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible gallery heading.",
+      "description": "Optional non-empty visible contextual heading; when present it names the thematic root.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".gallery-grid__title" }]
       }
@@ -133,7 +171,7 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned media items with target-selected semantics.",
+      "description": "One or more source-ordered target-owned native list-item compositions containing complete media semantics.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".gallery-grid__items", "classNames": [".gallery-grid__items"] }]
       }
@@ -145,40 +183,42 @@
         "--color-border-focus",
         "--color-text-primary"
       ],
-      "easing": [
-        "--easing-default"
-      ],
       "typography": [
         "--font-family-heading",
-        "--typo-h2-size"
+        "--tg-typography-h2-weight",
+        "--typo-h2-size",
+        "--typo-h2-line-height"
       ],
       "radius": [
         "--radius-sm"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
-      ],
-      "transition": [
-        "--transition-default"
       ]
     }
   },
   "accessibility": [
-    "Provide useful image alternatives or hide decorative images, and preserve source order across grid and masonry presentation.",
-    "Do not add button or link semantics to passive items; interactive items use native target-owned controls with visible focus and descriptive names.",
-    "Hover-only image emphasis is supplemental and has an equivalent focus-within treatment when a target adds interaction.",
-    "Reduced motion removes image scaling transitions."
+    "When title is present, render a thematic section associated with the visible contextual heading through aria-labelledby; use a generic root when title is absent.",
+    "Render the finite media collection as native ul/li content without APG grid, row or gridcell roles and preserve target-authored source order across both variants.",
+    "Require at least one complete item, omit invalid empty composition, and give informative target media contextual alternatives while hiding decorative or redundant media appropriately.",
+    "Do not focus, hover-emphasize, click, select or announce passive items; only target-owned native links or buttons may add activation and visible native focus.",
+    "Keep captions and essential target content persistently available without hover and do not use crop, position, color or item order as the only meaning cue.",
+    "Gallery Grid adds no authored motion or runtime; target-owned interactive descendants remain responsible for any separate reversible motion policy.",
+    "Leave native heading rank, media delivery/loading, caption composition, Lightbox lifecycle, analytics and editor data with the owning target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by conditional titled-section semantics, native list fixture composition, strict required-slot omission, component-responsive Grid/Masonry CSS and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps optional title/variant and reorderable image blocks with explicit passive media semantics and no component runtime."
     },
     "react": {
       "status": "planned",

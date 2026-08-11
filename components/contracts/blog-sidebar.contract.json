@@ -1,66 +1,90 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "blog-sidebar",
-  "name": "Blog Sidebar / Tag Cloud",
+  "name": "Blog Sidebar",
   "registryId": "L8",
   "category": "blog",
   "status": "pilot",
-  "summary": "Sidebar with tag cloud, search, categories, and recent posts.",
-  "dependencies": ["tag"],
+  "summary": "Passive fail-closed named complementary container for target-authored modules, with an initial Recent Articles and Topics Link-list profile, intrinsic layout, and zero neutral runtime.",
+  "dependencies": ["link"],
   "source": {
     "registry": "registry.json#/components/blog-sidebar",
     "css": { "file": "components/css/blog.css", "selector": ".blog-sidebar" },
     "docs": "site/src/content/components/blog-sidebar.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".blog-sidebar", "className": ".blog-sidebar", "required": true, "description": "Blog complementary-content container." },
-    { "name": "section", "selector": ".blog-sidebar__section", "className": ".blog-sidebar__section", "required": true, "description": "Repeatable target-owned sidebar section." },
-    { "name": "title", "selector": ".blog-sidebar__title", "className": ".blog-sidebar__title", "required": false, "description": "Optional sidebar section title." },
-    { "name": "list", "selector": ".blog-sidebar__list", "className": ".blog-sidebar__list", "required": false, "description": "Optional category or article link list." },
-    { "name": "listItem", "selector": ".blog-sidebar__list-item", "className": ".blog-sidebar__list-item", "required": false, "description": "Sidebar list item." },
-    { "name": "link", "selector": ".blog-sidebar__link", "className": ".blog-sidebar__link", "required": false, "description": "Sidebar navigation link." },
-    { "name": "tagCloud", "selector": ".tag-cloud", "className": ".tag-cloud", "required": false, "description": "Optional wrapping target-owned tag collection." },
-    { "name": "tag", "selector": ".tag-cloud__item", "className": ".tag-cloud__item", "required": false, "description": "Target-owned tag destination." }
+    { "name": "root", "selector": ".blog-sidebar", "className": ".blog-sidebar", "required": true, "description": "Native named aside for content that is genuinely complementary to the surrounding main content; omitted when its label or sections are empty." },
+    { "name": "section", "selector": ".blog-sidebar__section", "className": ".blog-sidebar__section", "required": true, "description": "Repeatable target-authored thematic section whose content and heading rank remain contextual." },
+    { "name": "title", "selector": ".blog-sidebar__title", "className": ".blog-sidebar__title", "required": true, "description": "Visible complete localized heading for one sidebar section; the target chooses the truthful heading element and rank." },
+    { "name": "list", "selector": ".blog-sidebar__list", "className": ".blog-sidebar__list", "required": false, "description": "Optional native list for recent-post, category, archive, or other destinations." },
+    { "name": "listItem", "selector": ".blog-sidebar__list-item", "className": ".blog-sidebar__list-item", "required": false, "description": "Native list item for one destination." },
+    { "name": "link", "selector": ".blog-sidebar__link", "className": ".blog-sidebar__link", "required": false, "description": "Full-row destination composed from canonical Link." },
+    { "name": "topicList", "selector": ".blog-sidebar__topics", "className": ".blog-sidebar__topics", "required": false, "description": "Optional wrapping native list of topic destinations in the initial v1 profile; it does not compose passive Tag." },
+    { "name": "topicEntry", "selector": ".blog-sidebar__topic", "className": ".blog-sidebar__topic", "required": false, "description": "Native list item containing one topic destination." },
+    { "name": "topicLink", "selector": ".blog-sidebar__topic-link", "className": ".blog-sidebar__topic-link", "required": false, "description": "Pill-presented topic destination composed from canonical Link, never an interactive Tag." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default stacked sidebar sections." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic stacked complementary composition." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Fluid width controlled by the containing blog layout." }
+    { "name": "default", "className": null, "default": true, "description": "One fluid container-responsive size controlled by the surrounding blog layout." }
   ],
   "states": [
-    { "name": "default", "selectors": [".blog-sidebar"], "description": "Default blog sidebar state." },
-    { "name": "linkHover", "selectors": [".blog-sidebar__link:hover"], "description": "Sidebar link hover state." },
-    { "name": "linkFocus", "selectors": [".blog-sidebar__link:focus-visible"], "description": "Visible keyboard focus for sidebar links." },
-    { "name": "tagHover", "selectors": [".tag-cloud__item:hover"], "description": "Tag destination hover state." },
-    { "name": "tagFocus", "selectors": [".tag-cloud__item:focus-visible"], "description": "Visible keyboard focus for tag destinations." }
+    { "name": "default", "selectors": [".blog-sidebar"], "description": "Passive named complementary content with no selection, loading, disabled, expanded, controlled, or uncontrolled root state." },
+    { "name": "destinationHover", "selectors": [".link:hover", ".blog-sidebar__topic-link:hover"], "description": "Canonical Link owns ordinary destination hover; the topic presentation adds only its local pill-surface response." },
+    { "name": "destinationFocusVisible", "selectors": [".link:focus-visible"], "description": "Canonical Link owns visible keyboard focus for every destination." }
   ],
   "behavior": [
-    { "name": "targetSections", "selectors": [".blog-sidebar__section", ".blog-sidebar__list", ".tag-cloud"], "description": "The target supplies sidebar sections, links, search composition, categories, recent posts, and tags; search and Tag dependency ownership remain unresolved." }
+    { "name": "requiredComposition", "selectors": [".blog-sidebar", ".blog-sidebar__section"], "attributes": ["aria-label"], "description": "A non-empty localized accessible label and non-empty semantic sections are required. Missing either omits the complete root instead of emitting an unnamed or empty complementary landmark." },
+    { "name": "complementarySemantics", "selectors": [".blog-sidebar"], "attributes": ["aria-label"], "description": "Neutral Web uses a native aside only for content tangential to but supportive of the surrounding main content. Repeated complementary regions require distinct useful names." },
+    { "name": "semanticSections", "selectors": [".blog-sidebar__section", ".blog-sidebar__title", ".blog-sidebar__list", ".blog-sidebar__topics"], "description": "Targets author thematic sections with contextual heading elements and ranks, native lists for grouped destinations, complete localized labels, and truthful module order." },
+    { "name": "initialV1Profile", "selectors": [".blog-sidebar__list", ".blog-sidebar__topics"], "description": "The initial v1 composition profile contains Recent Articles and Topics as native Link lists. Their headings, item records, order and limits are supplied by the target page composition rather than fixed root properties." },
+    { "name": "canonicalDestinations", "selectors": [".blog-sidebar__link", ".blog-sidebar__topic-link"], "attributes": ["href"], "events": ["click"], "description": "Recent-article and topic destinations are canonical native Links. Tag remains a passive/removable value label and is not used for navigation." },
+    { "name": "optionalModules", "selectors": [".blog-sidebar__section"], "description": "Search renders only when a real target owner supplies its complete search Form and result lifecycle. Newsletter and Search remain separate canonical or target compositions rather than L8 root booleans." },
+    { "name": "migrationAliases", "selectors": [".tag-cloud", ".tag-cloud__entry", ".tag-cloud__item"], "description": "Legacy Tag Cloud selectors are temporary source-compatibility aliases only. They do not define public identity or Tag composition and must be removed before the public v1 contract freezes." },
+    { "name": "targetOwnership", "selectors": [".blog-sidebar__section"], "description": "Module inventory and order, target data, routes, current state, query/submission/result lifecycle, localization, sanitization, SEO, analytics, privacy, caching, pagination and editorial policy remain target-owned." },
+    { "name": "intrinsicResponse", "selectors": [".blog-sidebar", ".blog-sidebar__section", ".blog-sidebar__link", ".blog-sidebar__topics"], "description": "The composition responds to its containing inline size, uses logical geometry, wraps complete localized and unbroken labels, and does not own viewport breakpoints, sticky placement, hiding, collapsing or page-column dimensions." },
+    { "name": "passiveRuntime", "selectors": [".blog-sidebar"], "description": "L8 owns no controlled or uncontrolled value, listener, observer, timer, request, storage, disclosure, selection, search, form, focus manager, live region, asset, animation or neutral JavaScript." }
   ],
   "properties": [
-    { "name": "sections", "type": "slot", "required": true, "description": "Target-owned sidebar sections, including any search, category, recent-post, or tag composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".blog-sidebar", "classNames": [".blog-sidebar"] }] } }
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when the trimmed accessible label is empty.",
+      "description": "Required localized accessible name that identifies this complementary region and distinguishes it from other asides.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".blog-sidebar", "attribute": "aria-label", "valueFrom": "property", "elements": ["aside"] }] }
+    },
+    {
+      "name": "sections",
+      "type": "slot",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when no non-empty semantic sections are supplied.",
+      "description": "Target-authored semantic sections. Each module retains its own heading, list, form, navigation, content, state, canonical dependencies and target integration.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".blog-sidebar", "classNames": [".blog-sidebar", ".blog-sidebar__section", ".blog-sidebar__title", ".blog-sidebar__list", ".blog-sidebar__list-item", ".blog-sidebar__link", ".blog-sidebar__topics", ".blog-sidebar__topic", ".blog-sidebar__topic-link", ".tag-cloud", ".tag-cloud__entry", ".tag-cloud__item", ".link", ".link--subtle"] }] }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-focus", "--color-border-subtle", "--color-surface-secondary", "--color-surface-statement", "--color-text-accent", "--color-text-inverse", "--color-text-primary", "--color-text-secondary"],
-      "easing": ["--easing-default"],
-      "typography": ["--font-family-heading", "--typo-body-size"],
+      "color": ["--color-border-subtle", "--color-surface-secondary", "--color-surface-statement", "--color-text-primary"],
+      "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size"],
       "radius": ["--radius-full"],
-      "spacing": ["--space-layout-touch-target"],
-      "transition": ["--transition-fast"]
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target", "--tg-space-stack-sm", "--tg-space-stack-xs"]
     }
   },
   "accessibility": [
-    "Use an aside or complementary landmark only when the sidebar content is complementary to the main article or blog listing.",
-    "Give repeated sections semantic headings and preserve list markup for grouped destinations.",
-    "Preserve visible keyboard focus and touch-sized links and tags.",
-    "Any composed search field retains its owning field contract, label, and validation semantics."
+    "Require a non-empty accessible label and non-empty semantic sections; omit the complete root when either is absent.",
+    "Use a native aside only when the complete composition is complementary to the surrounding main content, and uniquely name repeated complementary landmarks.",
+    "Give every thematic section a visible contextual heading, preserve native lists and list items for grouped destinations, and do not choose heading rank from the reusable component. The initial v1 profile is Recent Articles plus Topics.",
+    "Compose canonical native Links with href for recent-post, category, archive and topic navigation; do not place the passive Tag component on an anchor or use Button for destinations.",
+    "Let composed search, newsletter or filtering modules retain their own canonical landmark, form, label, input, button, Tag, validation, result, focus and announcement semantics.",
+    "Preserve canonical Link focus-visible, hover, reduced-motion and forced-color behavior, touch-sized destinations, complete labels, logical RTL flow, 320 CSS-pixel reflow, 200-percent text and user text spacing.",
+    "Do not add menu, tab, listbox, selection, current, expanded, live-region, sticky, responsive hiding or collapse semantics to the passive L8 root."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Visual CSS is implemented; search and tag ownership remain target-owned pending a source decision." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Canonical Blog CSS and shared Exhibit/Studio renderer implement a fail-closed named native aside, semantic target sections, canonical Link destinations, intrinsic wrapping, and zero neutral runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "A reusable snippet maps an explicit Shopify blog to Recent Articles and Topics Link lists with host-supplied label, headings, rank, order switches and limits. Search and Newsletter remain separate compositions; first template placement and editor exposure remain target-owned." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "segmented-control",
   "name": "Segmented Control",
   "registryId": "H9",
   "category": "forms",
   "status": "pilot",
-  "summary": "Radio-backed segmented control with inline options, checked, hover, and focus-visible states, plus mutually exclusive choice semantics.",
+  "summary": "Native radio-backed single-choice field with a visible group label, compact segmented presentation, form lifecycle ownership, and independent validation styling.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/segmented-control",
@@ -22,7 +22,21 @@
       "selector": ".segmented",
       "className": ".segmented",
       "required": true,
-      "description": "Inline segmented choice group."
+      "description": "Native fieldset that labels and groups one mutually exclusive choice."
+    },
+    {
+      "name": "legend",
+      "selector": ".segmented__legend",
+      "className": ".segmented__legend",
+      "required": true,
+      "description": "Visible native legend naming the complete choice group."
+    },
+    {
+      "name": "options",
+      "selector": ".segmented__options",
+      "className": ".segmented__options",
+      "required": true,
+      "description": "Compact visual surface containing the authored radio options."
     },
     {
       "name": "item",
@@ -68,8 +82,8 @@
   "states": [
     {
       "name": "default",
-      "selectors": [".segmented"],
-      "description": "Default segmented control state."
+      "selectors": [".segmented__options"],
+      "description": "Available group with one current native value."
     },
     {
       "name": "hover",
@@ -83,15 +97,31 @@
     },
     {
       "name": "focusVisible",
-      "selectors": [".segmented__input:focus-visible + .segmented__label"],
-      "description": "Keyboard focus indicator."
+      "selectors": [".segmented:has(.segmented__input:focus-visible) .segmented__options", ".segmented__input:focus-visible + .segmented__label"],
+      "description": "Outer group ring and inner focused-option indicator."
+    },
+    {
+      "name": "groupDisabled",
+      "selectors": [".segmented:disabled"],
+      "description": "Native fieldset disables every contained option."
+    },
+    {
+      "name": "optionDisabled",
+      "selectors": [".segmented__input:disabled + .segmented__label"],
+      "description": "One authored option is unavailable while the group remains usable."
+    },
+    {
+      "name": "requiredInvalid",
+      "selectors": [".segmented__input:required:invalid"],
+      "description": "No value is selected in a native required radio group; validation styling remains an independent choice."
     }
   ],
   "behavior": [
     {
       "name": "nativeRadioGroup",
-      "attributes": ["type=\"radio\"", "name", "checked", "disabled", "role=\"radiogroup\""],
-      "description": "Segments represent mutually exclusive options and should preserve native radio group behavior."
+      "selectors": [".segmented", ".segmented__legend", ".segmented__input"],
+      "attributes": ["<fieldset>", "<legend>", "type=\"radio\"", "name", "value", "checked", "required", "disabled"],
+      "description": "Native fieldset, legend, and same-name radios own grouping, naming, mutual exclusion, validity, and option state without redundant ARIA roles."
     },
     {
       "name": "selectionState",
@@ -101,17 +131,33 @@
     {
       "name": "keyboardNavigation",
       "events": ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space"],
-      "description": "Keyboard behavior should match radio group expectations for the target platform."
+      "description": "The native radio group owns Tab entry/exit, directional selection, wrapping, and Space activation."
+    },
+    {
+      "name": "formLifecycle",
+      "selectors": [".segmented__input"],
+      "events": ["input", "change", "submit", "reset", "invalid"],
+      "attributes": ["name", "value", "required", "checked"],
+      "description": "The checked native radio owns emitted events, FormData, constraint validation, and reset to authored checkedness."
+    },
+    {
+      "name": "controlledUncontrolled",
+      "selectors": [".segmented__input"],
+      "attributes": ["checked", "defaultChecked"],
+      "description": "Static checkedness is the uncontrolled default; controlled adapters synchronize one group value rather than independent item booleans."
     }
   ],
   "properties": [
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation independent from the selected option.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".segmented", "source": "variants" }] } },
+    { "name": "groupLabel", "type": "string", "required": true, "description": "Visible label naming the complete single-choice group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".segmented__legend" }] } },
     { "name": "label", "type": "string", "required": true, "description": "Visible label for an individual segment.", "targetMappings": { "web": [{ "kind": "content", "selector": ".segmented__label" }] } },
     { "name": "name", "type": "string", "required": true, "description": "Native radio group name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "value", "type": "string", "required": false, "defaultValue": "on", "description": "Native submitted value for an individual segment.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": true, "description": "Stable submitted value for an individual segment.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Native selected state for an individual segment.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes an individual segment unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for group validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Requires one option before native form submission.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the complete choice group unavailable through native fieldset propagation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }] } },
+    { "name": "optionDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes one authored segment unavailable while preserving the rest of the group.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for group help or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".segmented", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["fieldset"] }] } }
   ],
   "tokens": {
     "public": {
@@ -122,15 +168,19 @@
         "--color-text-primary",
         "--color-input-default-unfocused-inner-border",
         "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-inner-border",
         "--color-input-default-focused-outer-border",
         "--color-input-error-unfocused-inner-border",
         "--color-input-error-unfocused-label",
+        "--color-input-error-focused-inner-border",
         "--color-input-error-focused-outer-border",
         "--color-input-success-unfocused-inner-border",
         "--color-input-success-unfocused-label",
+        "--color-input-success-focused-inner-border",
         "--color-input-success-focused-outer-border",
         "--color-input-warning-unfocused-inner-border",
         "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-inner-border",
         "--color-input-warning-focused-outer-border"
       ],
       "radius": [
@@ -147,21 +197,31 @@
       ],
       "typography": [
         "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-line-height",
         "--font-family-body"
+      ],
+      "spacing": [
+        "--space-input-label-size",
+        "--space-layout-touch-target"
+      ],
+      "opacity": [
+        "--opacity-disabled"
       ]
     }
   },
   "accessibility": [
-    "Use native radio inputs for mutually exclusive segmented choices.",
-    "Provide a group label through fieldset/legend, aria-label, or aria-labelledby.",
+    "Use a native fieldset, visible legend, and same-name radio inputs for mutually exclusive segmented choices.",
     "Keep checked state synchronized with the visible selected segment.",
-    "Support keyboard navigation consistent with radio groups."
+    "Let native radios own Arrow and Space behavior, form submission, constraint validation, and reset.",
+    "Do not use Segmented Control as a tablist, multi-select toggle group, or toolbar of independent actions.",
+    "Keep option labels concise and provide text rather than icons alone."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css with hidden native radio inputs."
+      "notes": "Implemented by a native fieldset/legend, same-name radios, and class composition in components/css/forms.css; no runtime enhancer is required."
     },
     "shopify": {
       "status": "implemented",

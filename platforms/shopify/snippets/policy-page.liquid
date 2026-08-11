@@ -1,0 +1,44 @@
+{% doc %}
+  Renders one complete Shopify policy object through canonical Policy Page
+  anatomy. Shopify owns the policy route, inventory and legal content. The
+  object does not expose update dates or table-of-contents data, so this snippet
+  does not manufacture either optional region.
+
+  @param {policy} policy - One Shopify policy object with non-empty title and body.
+  @param {string} [heading_tag] - Contextual heading tag from h1 through h6; defaults to h1.
+  @param {string} [heading_id] - Optional target-unique id used to name the article.
+
+  @example
+  {% render 'policy-page', policy: shop.privacy_policy, heading_tag: 'h1' %}
+{% enddoc %}
+
+{%- liquid
+  assign policy_title = policy.title | strip
+  assign policy_body = policy.body
+  assign policy_body_text = policy_body | strip_html | strip
+
+  assign resolved_heading_tag = heading_tag | default: 'h1'
+  assign allowed_heading_tags = 'h1,h2,h3,h4,h5,h6' | split: ','
+  unless allowed_heading_tags contains resolved_heading_tag
+    assign resolved_heading_tag = 'h1'
+  endunless
+
+  assign resolved_heading_id = heading_id
+  if resolved_heading_id == blank
+    assign resolved_heading_id = 'PolicyPage-' | append: policy.id | append: '-Title'
+  endif
+-%}
+
+{% if policy_title != blank and policy_body_text != blank %}
+  <article class="policy-page" aria-labelledby="{{ resolved_heading_id | escape }}">
+    <header class="policy-page__header">
+      <{{ resolved_heading_tag }} class="policy-page__title" id="{{ resolved_heading_id | escape }}">
+        {{ policy_title | escape }}
+      </{{ resolved_heading_tag }}>
+    </header>
+
+    <div class="policy-page__body rte">
+      {{ policy_body }}
+    </div>
+  </article>
+{% endif %}

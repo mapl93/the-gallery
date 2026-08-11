@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "fieldset",
   "name": "Fieldset",
   "registryId": "H11",
   "category": "forms",
   "status": "pilot",
-  "summary": "Styled native fieldset contract for grouped form controls, legend text, optional description, disabled grouping, and accessible group semantics.",
+  "summary": "Native field grouping primitive with a first visible legend, optional associated description, required canonical-content slot, and native disabled propagation.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/fieldset",
@@ -37,6 +37,13 @@
       "className": ".fieldset__description",
       "required": false,
       "description": "Optional helper text that describes the group."
+    },
+    {
+      "name": "content",
+      "selector": ".fieldset__content",
+      "className": ".fieldset__content",
+      "required": true,
+      "description": "Canonical child controls or fields that retain their own names, values, validity, and behavior."
     }
   ],
   "variants": [
@@ -65,6 +72,11 @@
       "name": "withDescription",
       "selectors": [".fieldset__description"],
       "description": "Group helper text is present."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".fieldset:disabled"],
+      "description": "Native disabled propagation makes descendant controls unavailable and excludes them from submission."
     }
   ],
   "behavior": [
@@ -79,10 +91,18 @@
       "selectors": [".fieldset__description"],
       "attributes": ["aria-describedby"],
       "description": "Optional descriptions should be associated with the group when the target platform supports it."
+    },
+    {
+      "name": "descendantOwnership",
+      "selectors": [".fieldset__content"],
+      "attributes": ["name", "value", "required", "disabled", "aria-invalid"],
+      "events": ["input", "change", "invalid", "reset"],
+      "description": "Canonical descendants own values, validation, events, and reset; Fieldset owns only grouping, caption, description, and native group disabling."
     }
   ],
   "properties": [
     { "name": "legend", "type": "string", "required": true, "description": "Visible native group label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".fieldset__legend" }] } },
+    { "name": "content", "type": "slot", "required": true, "description": "Canonical related controls or fields contained by the group.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".fieldset__content", "classNames": [".fieldset__content"] }] } },
     { "name": "description", "type": "string", "required": false, "description": "Optional helper text for the complete control group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".fieldset__description" }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables every native control contained by the fieldset.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".fieldset", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }] } },
     { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for the optional group description.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".fieldset", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["fieldset"] }] } }
@@ -99,7 +119,15 @@
       ],
       "typography": [
         "--font-family-body",
-        "--typo-body-size"
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-line-height"
+      ],
+      "spacing": [
+        "--space-input-message-size"
+      ],
+      "opacity": [
+        "--opacity-disabled"
       ]
     }
   },
@@ -108,13 +136,15 @@
     "Keep the legend concise and visible.",
     "Use aria-describedby for group-level helper text when present.",
     "Use disabled on the fieldset to disable all grouped controls together.",
-    "Do not use fieldset only as a visual card when there is no form-control group."
+    "Remember that controls inside the first legend are exempt from native fieldset disabling.",
+    "Do not use fieldset only as a visual card when there is no form-control group.",
+    "Keep descendant labels self-explanatory because assistive technologies vary in how often they repeat the legend."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css over native fieldset and legend elements."
+      "notes": "Implemented by native fieldset/legend elements plus a canonical .fieldset__content slot in components/css/forms.css; no runtime is required."
     },
     "shopify": {
       "status": "implemented",

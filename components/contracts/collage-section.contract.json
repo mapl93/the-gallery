@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "collage-section",
   "name": "Collage Section",
   "registryId": "S19",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive art-directed media collage with item-level feature spans and target-owned activation.",
+  "summary": "Passive finite ordered media collection with native list and figure semantics, persistent captions, one item-level feature span, and target-owned activation.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/collage-section",
@@ -22,49 +22,70 @@
       "selector": ".collage-section",
       "className": ".collage-section",
       "required": true,
-      "description": "Collage section root."
+      "description": "Heading-labelled native section or untitled generic root, rendered only for a valid item collection."
     },
     {
       "name": "header",
       "selector": ".collage-section__header",
       "className": ".collage-section__header",
       "required": false,
-      "description": "Optional centered heading region."
+      "description": "Optional heading region omitted with empty heading content."
     },
     {
       "name": "heading",
       "selector": ".collage-section__heading",
       "className": ".collage-section__heading",
       "required": false,
-      "description": "Optional visible collage heading."
+      "description": "Visible contextual heading that names the native section."
     },
     {
       "name": "grid",
       "selector": ".collage-section__grid",
       "className": ".collage-section__grid",
       "required": true,
-      "description": "Responsive art-directed item composition."
+      "description": "Native unordered list preserving target-authored item order."
     },
     {
       "name": "item",
       "selector": ".collage-section__item",
       "className": ".collage-section__item",
-      "required": false,
-      "description": "Repeated target-owned media item."
+      "required": true,
+      "description": "Native list item containing one valid media figure."
     },
     {
       "name": "featureItem",
       "selector": ".collage-section__item--feature",
       "className": ".collage-section__item--feature",
       "required": false,
-      "description": "Item-level modifier that spans two columns and rows when space allows."
+      "description": "Item-level visual span modifier that does not change source order or semantics."
+    },
+    {
+      "name": "link",
+      "selector": ".collage-section__link",
+      "className": ".collage-section__link",
+      "required": false,
+      "description": "Target-owned native destination wrapping one figure only when a real URL exists."
+    },
+    {
+      "name": "figure",
+      "selector": ".collage-section__figure",
+      "className": ".collage-section__figure",
+      "required": true,
+      "description": "Native figure relating one target-owned media node and optional caption."
+    },
+    {
+      "name": "media",
+      "selector": ".collage-section__media",
+      "className": ".collage-section__media",
+      "required": true,
+      "description": "Target-owned informative or intentionally decorative media with explicit alternative-text intent."
     },
     {
       "name": "caption",
       "selector": ".collage-section__caption",
       "className": ".collage-section__caption",
       "required": false,
-      "description": "Optional caption disclosed on hover, focus within, and non-hover input."
+      "description": "Optional persistent native figcaption available without hover or focus."
     }
   ],
   "variants": [
@@ -72,7 +93,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "Single passive art-directed collection presentation."
     }
   ],
   "sizes": [
@@ -80,7 +101,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Single semantic size; track and row geometry remain private and container-responsive."
     }
   ],
   "states": [
@@ -89,33 +110,31 @@
       "selectors": [
         ".collage-section"
       ],
-      "description": "Resting collage presentation; feature is an item layout modifier rather than a state."
+      "description": "Passive visible collection; feature is item metadata rather than component state."
     },
     {
-      "name": "itemHover",
+      "name": "linkedItemFocus",
       "selectors": [
-        ".collage-section__item:hover img",
-        ".collage-section__item:hover .collage-section__caption"
+        ".collage-section__link:focus-visible",
+        ".collage-section__item :where(a, button):focus-visible"
       ],
-      "description": "Pointer emphasis and caption disclosure for one item."
-    },
-    {
-      "name": "itemFocusWithin",
-      "selectors": [
-        ".collage-section__item:focus-visible",
-        ".collage-section__item:focus-within img",
-        ".collage-section__item:focus-within .collage-section__caption"
-      ],
-      "description": "Equivalent emphasis and caption disclosure when target-owned interactive content receives focus."
+      "description": "Visible focus belongs only to target-owned native destinations or controls."
     }
   ],
   "behavior": [
     {
-      "name": "itemOwnership",
+      "name": "passiveMediaAndActivationBoundary",
       "selectors": [
-        ".collage-section__item"
+        ".collage-section__grid"
       ],
-      "description": "Targets supply ordered media, captions, and item-level feature spans and decide whether each item is passive or contains native navigation or another control."
+      "description": "The neutral base owns one finite native media collection, source order, persistent captions and feature geometry. Targets own real destinations, Lightbox or commerce controls, media delivery and analytics; passive items never enter the tab order."
+    },
+    {
+      "name": "strictRequiredItems",
+      "selectors": [
+        ".collage-section"
+      ],
+      "description": "The complete root is omitted when no valid target-owned item remains."
     }
   ],
   "properties": [
@@ -123,7 +142,7 @@
       "name": "heading",
       "type": "string",
       "required": false,
-      "description": "Optional visible collage heading.",
+      "description": "Optional trimmed visible heading; when present, its target-unique id names the native section.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".collage-section__heading" }]
       }
@@ -132,7 +151,7 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned collage items, including any feature span and caption composition.",
+      "description": "One or more ordered valid native list-item/figure compositions; target records own media, caption, feature metadata and any real destination.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".collage-section__grid", "classNames": [".collage-section__grid"] }]
       }
@@ -142,43 +161,47 @@
     "public": {
       "color": [
         "--color-border-focus",
+        "--color-text-inverse",
         "--color-text-primary"
       ],
-      "easing": [
-        "--easing-default"
-      ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-body-small-weight",
+        "--tg-typography-h3-weight",
+        "--typo-body-sm-line-height",
         "--typo-body-sm-size",
+        "--typo-h3-line-height",
         "--typo-h3-size"
       ],
       "radius": [
         "--radius-sm"
       ],
-      "other": [
-        "--section-spacing-y"
-      ],
-      "transition": [
-        "--transition-default",
-        "--transition-fast"
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
+        "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Provide useful alternatives for informative imagery and preserve source order when feature items span the visual grid.",
-    "Captions remain available on focus within and non-hover input rather than relying on pointer hover alone.",
-    "Passive items do not receive button or link semantics; target-owned interactive content uses native controls with visible focus and descriptive names.",
-    "Reduced motion removes image and caption transitions."
+    "Use native ul/li and figure/figcaption semantics with useful target-authored alternatives for informative media.",
+    "Preserve authored DOM order; feature spans never reorder speech, focus or collapsed presentation.",
+    "Captions remain visible without hover, focus, touch or motion.",
+    "Passive items receive no tabindex, role or click handler; target-owned interactive content uses native links or controls with visible focus and descriptive names.",
+    "Omit the complete component when no valid required item remains and avoid an unnamed section landmark when the optional heading is absent."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "notes": "Implemented with native semantic markup and components/css/sections.css."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "liquid-css",
+      "notes": "Target-native localized image-block section with strict omission and zero JavaScript."
     },
     "react": {
       "status": "planned",

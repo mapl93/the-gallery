@@ -32,20 +32,37 @@ behaviors to neutral web or to any future target adapter.
 - Reading Progress exposes its visual indicator as a target-owned slot. The
   contract does not define progress calculation, scroll synchronization, or
   whether the component is a progressbar or a decorative reading aid.
-- Table of Contents exposes in-flow and sticky presentation, an optional title
-  and accessible label, and target-owned heading items. Heading extraction and
-  active-section synchronization remain target-owned.
-- Author Card exposes full and compact presentation, author text, optional
-  Avatar composition, and target-owned profile or social links.
-- Category Nav exposes an accessible region label and target-owned category
-  items. It does not decide whether items navigate or filter in place.
-- Blog Sidebar exposes target-owned repeated sections rather than separate
-  search, category, recent-post, and tag APIs.
-- Share Buttons maps only the registry-backed `.share-buttons` inline and sticky
-  classes and exposes target-owned actions. This does not select a canonical
-  family between `.share-buttons` and `.share` or assign provider behavior.
-- Related Articles exposes its heading and Article Card collection. The adjacent
-  `.article-nav` family is not added to its semantic property surface.
+- Table of Contents originally exposed in-flow/sticky presentation, an optional
+  title/label, and opaque target-owned items. ADR 0196 and ADR 0270 supersede
+  that boundary with a required named native navigation, validated target-owned
+  nested heading records, canonical Links, controlled `currentSectionId`, and
+  safely degrading sticky-by-default or explicit flow placement.
+- Author Card originally exposed full/compact presentation, author text,
+  optional Avatar composition and target-owned profile/social links. ADR 0197
+  and owner decision 50 supersede that boundary with one fail-closed passive
+  singular identity, neutral host-owned semantics, canonical Avatar/Link
+  composition, repeated canonical cards for multiple authors, and privacy-safe
+  explicit destination supply.
+- Category Nav originally exposed an accessible region label and target-owned
+  category items without deciding whether they navigate or filter. ADR 0229
+  supersedes this boundary with the accepted Filter Bar identity and controlled
+  in-place choice composition.
+- Blog Sidebar originally exposed target-owned repeated sections rather than
+  separate search/category/recent/tag APIs. ADR 0198 and owner decision 51
+  supersede that boundary with the public Blog Sidebar identity, canonical
+  Topic-list selectors, temporary `.tag-cloud*` migration aliases, an initial
+  Recent Articles + Topics Link-list profile, target-owned order/limits/headings
+  and separately composed Search/Newsletter lifecycles.
+- Share Buttons originally mapped only the registry-backed `.share-buttons`
+  family without choosing between it and `.share`. ADR 0230 supersedes that
+  boundary: public Share Actions uses one named `.share-buttons`
+  inline/stacked group, canonical Button leaves, curated-plus-custom semantic
+  action ids, capability omission and target-owned provider/result behavior.
+- Related Articles exposes its heading and one-to-three curated Article Card
+  collection. ADR 0199 plus owner decision 52 fix current/duplicate exclusion,
+  curator order, no tag/personalized fallback, after-content/before-Comments
+  placement, and no registered Previous/Next Article Navigation in v1. The
+  adjacent `.article-nav` family is never L10.
 - Comments exposes its heading, target-formatted count, target-owned thread, and
   optional target-owned composer. Sorting, reply behavior, authentication,
   moderation, optimistic updates, and count synchronization remain outside the
@@ -64,19 +81,24 @@ This decision intentionally does not resolve:
 
 - Whether Article Card skeleton presentation belongs to Article Card or the
   standalone Skeleton component.
-- Whether Reading Progress and Table of Contents calculate reading state in a
-  shared neutral enhancement or receive state from each target, and whether
-  Reading Progress is semantic or decorative.
-- Whether Category Nav navigates to category pages or filters the current result
-  set and which layer synchronizes URLs and results.
-- Whether Blog Sidebar composes Input and Tag or owns independent search and tag
-  APIs.
+- Reading Progress identity is resolved by ADR 0228 and Table of Contents state
+  ownership by ADR 0270: L4 is decorative, L5 receives optional controlled
+  `currentSectionId`, and a capable target derives both from one bounded shared
+  reading-state service without a second L5 observer.
+- Filter Bar identity, selection semantics and target query/result ownership are
+  resolved by ADR 0229; final visuals and concrete target consumers remain open.
+- Blog Sidebar composition is resolved by ADR 0198 and owner decision 51:
+  navigation Topics use Link, Search appears only as a complete separately owned
+  composition, Newsletter stays separate, and L8 adds no per-module root API.
 - Which share family is canonical and which layer owns provider URLs, Web Share,
   copy feedback, and fallbacks.
-- Whether `.article-nav` belongs to Related Articles or becomes a separate
-  registered component.
-- Which Comments behaviors belong to the neutral component and which belong to
-  targets.
+- Related Articles source, limit, placement and Article Navigation boundaries
+  are resolved by ADR 0199 and owner decision 52; real consumer placement,
+  final visuals and explicit stability review remain pending.
+- Comments structure, two-level flattening, valid empty state, oldest-first
+  order, finite Pagination, controlled reaction arrays and target lifecycle
+  ownership are resolved by ADR 0200 and owner decision 53. Real provider,
+  authentication/moderation and final visual evidence remain target/human gates.
 
 ## Consequences
 

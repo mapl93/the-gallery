@@ -1,12 +1,12 @@
 ## Overview
 
-Bottom Navigation is a fixed mobile navigation region with target-owned destinations, visible labels, optional icons, current-page state, and optional badges.
+Bottom Navigation is a fixed mobile destination list with visible labels, optional decorative icons, current-page state, and optional target-owned counts.
 
-<Preview html={'<nav class="bottom-nav tg-preview-bottom-nav" aria-label="Primary mobile navigation"><a class="bottom-nav__item" href="#bottom-home" aria-current="page"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /></svg><span class="bottom-nav__label">Home</span></a><a class="bottom-nav__item" href="#bottom-search"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg><span class="bottom-nav__label">Search</span></a><a class="bottom-nav__item" href="#bottom-cart"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12l1 6H5l1-6Z" /><path d="M5 8h14l-1 13H6L5 8Z" /></svg><span class="bottom-nav__label">Cart</span><span class="bottom-nav__badge" aria-label="2 items in cart">2</span></a></nav>'} label="Bottom Navigation" />
+<Preview html={'<nav class="bottom-nav tg-preview-bottom-nav" aria-label="Primary mobile"><ul class="bottom-nav__list"><li class="bottom-nav__entry"><a class="bottom-nav__item" href="#bottom-home" aria-current="page"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 11 9-8 9 8" /><path d="M5 10v10h14V10" /></svg><span class="bottom-nav__label">Home</span></a></li><li class="bottom-nav__entry"><a class="bottom-nav__item" href="#bottom-search"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg><span class="bottom-nav__label">Search</span></a></li><li class="bottom-nav__entry"><a class="bottom-nav__item" href="#bottom-cart" aria-label="Cart, 2 items"><svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12l1 6H5l1-6Z" /><path d="M5 8h14l-1 13H6L5 8Z" /></svg><span class="bottom-nav__label">Cart</span><span class="bottom-nav__badge" aria-hidden="true">2</span></a></li></ul></nav>'} label="Bottom Navigation" />
 
 ## Presentation
 
-The root is fixed by canonical CSS on narrow viewports; the documentation helper contains it as the artwork. Each `.bottom-nav__item` remains a native link with required `.bottom-nav__label`, optional `.bottom-nav__icon`, optional `.bottom-nav__badge`, and target-owned current-page state.
+The root is fixed by canonical CSS on narrow viewports; the documentation helper contains it as the artwork. One `.bottom-nav__list` contains `.bottom-nav__entry` items and native `.bottom-nav__item` links with required visible labels, optional decorative icons/counts, and target-owned current-page state.
 
 Destinations, item count, order, icon source, badge values, and body-offset policy are target responsibilities rather than component defaults.
 
@@ -18,7 +18,7 @@ Destinations, item count, order, icon source, badge values, and body-offset poli
 </DoDont>
 
 - Keep the destination set stable enough to build user recognition.
-- Use badges only for concise target state that can remain synchronized.
+- Use compact counts only for concise target state that can remain synchronized with the containing link name.
 - Coordinate page-bottom spacing in the consuming layout so content is not obscured.
 
 ## Accessibility
@@ -26,8 +26,9 @@ Destinations, item count, order, icon source, badge values, and body-offset poli
 - Provide the required accessible navigation `label`.
 - Keep a visible text label for every item, even when an icon is present.
 - Use `aria-current="page"` for the active destination.
-- Hide decorative icons from assistive technology.
-- Announce dynamic badge changes according to target policy and preserve safe-area spacing and touch target size.
+- Hide decorative icons and visual count text from duplicate name calculation; include count meaning in the link's accessible name.
+- Preserve normal Link keyboard behavior; do not use tablist/menu/toolbar roles or arrow-key handling.
+- Announce dynamic count changes only according to target policy and preserve safe-area spacing and the 44px touch target.
 
 ## References
 
@@ -36,6 +37,6 @@ Destinations, item count, order, icon source, badge values, and body-offset poli
   <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned destinations, labels, optional icons, current-page state, and badges</td></tr>
 </PropTable>
 
-Anatomy: required `.bottom-nav`, `.bottom-nav__item`, and `.bottom-nav__label`, with optional `.bottom-nav__icon` and `.bottom-nav__badge`. Dependencies: none.
+Anatomy: required `.bottom-nav`, `.bottom-nav__list`, `.bottom-nav__entry`, `.bottom-nav__item`, and `.bottom-nav__label`, with optional `.bottom-nav__icon` and `.bottom-nav__badge`. Dependencies: none; the compact count is navigation metadata rather than standalone Badge composition.
 
 Destination priority, body-offset strategy, and dynamic badge announcement policy remain open target boundaries.

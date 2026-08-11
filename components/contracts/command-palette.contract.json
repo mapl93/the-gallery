@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "command-palette",
   "name": "Command Palette",
   "registryId": "B13",
   "category": "layout",
   "status": "pilot",
-  "summary": "Command-K overlay contract with modal-like surface, search input, grouped results, highlighted command state, shortcut hints, empty state, and keyboard command behavior.",
+  "summary": "Modal command surface composed from canonical Modal plus an editable Combobox, named grouped Listbox, active-descendant command options, visible dismissal, empty status, and target-owned filtering/execution.",
   "dependencies": ["modal"],
   "source": {
     "registry": "registry.json#/components/command-palette",
@@ -22,14 +22,21 @@
       "selector": ".command-palette",
       "className": ".command-palette",
       "required": true,
-      "description": "Fixed overlay that owns backdrop, visibility state, and vertical placement."
+      "description": "Canonical Modal overlay that owns backdrop, visibility state, modality, and vertical placement."
     },
     {
       "name": "panel",
       "selector": ".command-palette__panel",
       "className": ".command-palette__panel",
       "required": true,
-      "description": "Search and results surface."
+      "description": "Canonical Modal panel containing search and results."
+    },
+    {
+      "name": "title",
+      "selector": ".modal__title",
+      "className": ".modal__title",
+      "required": true,
+      "description": "Visible or visually hidden title that provides the dialog accessible name."
     },
     {
       "name": "inputWrapper",
@@ -53,11 +60,25 @@
       "description": "Text input used to filter commands."
     },
     {
+      "name": "close",
+      "selector": ".command-palette__close",
+      "className": ".command-palette__close",
+      "required": true,
+      "description": "Visible canonical Close Button that dismisses the modal command surface."
+    },
+    {
       "name": "results",
       "selector": ".command-palette__results",
       "className": ".command-palette__results",
       "required": true,
       "description": "Scrollable result list."
+    },
+    {
+      "name": "group",
+      "selector": ".command-palette__group",
+      "className": ".command-palette__group",
+      "required": false,
+      "description": "Named result group that owns related command options."
     },
     {
       "name": "groupLabel",
@@ -102,6 +123,13 @@
       "description": "Empty-result message."
     },
     {
+      "name": "status",
+      "selector": ".command-palette__status",
+      "className": ".command-palette__status",
+      "required": false,
+      "description": "Optional pre-existing polite status used for important empty or result changes."
+    },
+    {
       "name": "footer",
       "selector": ".command-palette__footer",
       "className": ".command-palette__footer",
@@ -138,13 +166,28 @@
     },
     {
       "name": "itemHover",
-      "selectors": [".command-palette__item:hover"],
+      "selectors": [".command-palette__item:not([aria-disabled=\"true\"]):not([data-disabled]):hover"],
       "description": "Pointer hover state on a command."
     },
     {
       "name": "itemHighlighted",
       "selectors": [".command-palette__item[data-highlighted]"],
       "description": "Keyboard-highlighted command state."
+    },
+    {
+      "name": "itemDisabled",
+      "selectors": [".command-palette__item[aria-disabled=\"true\"]", ".command-palette__item[data-disabled]"],
+      "description": "Unavailable command option that remains perceivable but cannot execute."
+    },
+    {
+      "name": "empty",
+      "selectors": [".command-palette__empty"],
+      "description": "Visible no-results state with optional polite status announcement."
+    },
+    {
+      "name": "inputFocus",
+      "selectors": [".command-palette__input-wrapper:focus-within"],
+      "description": "Focus treatment around the active search row."
     }
   ],
   "behavior": [
@@ -156,17 +199,27 @@
     {
       "name": "overlaySemantics",
       "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby"],
-      "description": "The overlay should behave like a modal command dialog and inherit modal focus expectations."
+      "description": "The panel composes canonical Modal and must implement actual modality, a stable accessible name, visible Close Button, focus containment, dismissal, and restoration."
     },
     {
       "name": "searchSemantics",
-      "attributes": ["role=\"combobox\"", "aria-expanded", "aria-controls", "aria-activedescendant"],
-      "description": "The search input should expose its relationship to the active command list when the target uses custom listbox behavior."
+      "attributes": ["role=\"combobox\"", "aria-label", "aria-autocomplete=\"list\"", "aria-expanded", "aria-controls", "aria-activedescendant"],
+      "description": "The named editable search input retains DOM focus and exposes its relationship to the active command Listbox option."
+    },
+    {
+      "name": "resultSemantics",
+      "attributes": ["role=\"listbox\"", "role=\"group\"", "role=\"option\"", "aria-labelledby", "aria-selected", "aria-disabled", "tabindex=\"-1\""],
+      "description": "The named Listbox contains named groups and flat command options that are excluded from the page Tab sequence and contain no nested interactive controls."
+    },
+    {
+      "name": "focusLifecycle",
+      "events": ["initial focus", "Tab", "Shift+Tab", "visible close", "outside interaction", "focus restoration"],
+      "description": "Opening focuses search, modal controls contain Tab, and every close path restores the invoking or logical prior focus."
     },
     {
       "name": "keyboardShortcuts",
-      "events": ["Command+K", "Control+K", "Escape", "ArrowDown", "ArrowUp", "Enter"],
-      "description": "The palette opens through a global shortcut, navigates results by keyboard, activates with Enter, and closes with Escape."
+      "events": ["Command+K", "Control+K", "Escape", "ArrowDown", "ArrowUp", "Home", "End", "Enter"],
+      "description": "A target-scoped shortcut may open the palette; arrows/Home/End navigate enabled options, Enter executes, and Escape closes without overriding native text editing."
     },
     {
       "name": "filtering",
@@ -211,6 +264,7 @@
         "--color-surface-primary",
         "--color-surface-secondary",
         "--color-border-subtle",
+        "--color-border-focus",
         "--color-text-primary",
         "--color-text-secondary",
         "--color-text-disabled"
@@ -223,34 +277,45 @@
         "--shadow-2xl"
       ],
       "z-index": [
-        "--z-modal"
+        "--z-overlay"
       ],
       "opacity": [
         "--opacity-overlay"
       ],
       "transition": [
-        "--transition-fast"
+        "--transition-fast",
+        "--transition-base"
       ],
       "easing": [
-        "--easing-default"
+        "--easing-default",
+        "--easing-out"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-layout-touch-target"
       ]
     }
   },
   "accessibility": [
-    "Treat the command palette as a modal dialog when it blocks the page behind it.",
-    "Focus the search input when the palette opens and restore focus to the invoking element when it closes.",
-    "Close on Escape and outside interaction.",
-    "Expose highlighted command state through aria-activedescendant or an equivalent native target pattern.",
-    "Support keyboard navigation and activation without requiring pointer interaction."
+    "Compose the accepted Modal and Close Button implementations; block outside interaction only when aria-modal is true.",
+    "Focus the named search input on open, contain Tab among modal controls, and restore the invoking or logical prior focus on every close path.",
+    "Keep DOM focus in the Combobox while aria-activedescendant references one enabled Listbox option; options remain outside the page Tab sequence.",
+    "Support ArrowUp, ArrowDown, Home, End and Enter without overriding native text editing or partial IME composition.",
+    "Do not place nested interactive controls inside a command option; disabled options never execute.",
+    "Provide visible empty feedback and announce important dynamic result changes without excessive per-keystroke speech."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; shortcut handling, filtering, focus management, and command activation must be provided by the consuming target."
+      "notes": "Implemented by canonical Modal/Close Button class composition plus command-specific search/result CSS; targets provide shortcut scope, filtering, active-descendant focus, announcements, command execution, modality and restoration."
     },
     "shopify": {
       "status": "planned",

@@ -1,92 +1,99 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "subscription-option",
   "name": "Subscription / Recurring Option",
   "registryId": "D10",
   "category": "product",
   "status": "pilot",
-  "summary": "Recurring purchase option with selected state, custom radio indicator, price, savings label, details, and frequency selector.",
-  "dependencies": [],
+  "summary": "Named purchase-options fieldset containing one optional one-time purchase and one canonical Radio for every eligible recurring allocation, with explicit checkout charge, per-delivery amount, cadence, verified savings, and selected inline terms.",
+  "dependencies": ["fieldset", "radio", "price", "badge"],
   "source": {
     "registry": "registry.json#/components/subscription-option",
     "css": { "file": "components/css/product.css", "selector": ".subscription-option" },
     "docs": "site/src/content/components/subscription-option.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".subscription-option", "className": ".subscription-option", "required": true, "description": "Subscription option container." },
-    { "name": "header", "selector": ".subscription-option__header", "className": ".subscription-option__header", "required": true, "description": "Option header row." },
-    { "name": "radio", "selector": ".subscription-option__radio", "className": ".subscription-option__radio", "required": true, "description": "Custom radio indicator." },
-    { "name": "label", "selector": ".subscription-option__label", "className": ".subscription-option__label", "required": true, "description": "Option label." },
-    { "name": "price", "selector": ".subscription-option__price", "className": ".subscription-option__price", "required": false, "description": "Option price." },
-    { "name": "savings", "selector": ".subscription-option__savings", "className": ".subscription-option__savings", "required": false, "description": "Savings badge." },
-    { "name": "details", "selector": ".subscription-option__details", "className": ".subscription-option__details", "required": false, "description": "Expanded subscription details." },
-    { "name": "frequency", "selector": ".subscription-option__frequency", "className": ".subscription-option__frequency", "required": false, "description": "Frequency control row." },
-    { "name": "frequencyLabel", "selector": ".subscription-option__frequency-label", "className": ".subscription-option__frequency-label", "required": false, "description": "Visible frequency field label." },
-    { "name": "frequencyControl", "selector": ".subscription-option__frequency-control", "className": ".subscription-option__frequency-control", "required": false, "description": "Frequency select and fixed indicator wrapper." },
-    { "name": "frequencySelect", "selector": ".subscription-option__frequency-select", "className": ".subscription-option__frequency-select", "required": false, "description": "Delivery frequency selector." },
-    { "name": "frequencyIndicator", "selector": ".subscription-option__frequency-indicator", "className": ".subscription-option__frequency-indicator", "required": false, "description": "Fixed passive frequency validation indicator." },
-    { "name": "frequencyMessage", "selector": ".subscription-option__frequency-message", "className": ".subscription-option__frequency-message", "required": false, "description": "Associated frequency guidance or validation message." },
-    { "name": "note", "selector": ".subscription-option__note", "className": ".subscription-option__note", "required": false, "description": "Supplemental note." }
+    { "name": "root", "selector": ".subscription-option", "className": ".subscription-option", "required": true, "description": "Canonical native Fieldset and complete purchase-options group." },
+    { "name": "legend", "selector": ".subscription-option__legend", "className": ".subscription-option__legend", "required": true, "description": "First visible Legend naming the purchase decision." },
+    { "name": "description", "selector": ".subscription-option__description", "className": ".subscription-option__description", "required": false, "description": "Optional associated group guidance." },
+    { "name": "choices", "selector": ".subscription-option__choices", "className": ".subscription-option__choices", "required": true, "description": "Ordered composition containing at least two valid purchase choices." },
+    { "name": "item", "selector": ".subscription-option__item", "className": ".subscription-option__item", "required": true, "description": "One quiet bordered one-time or recurring purchase choice; it is layout, not a second control." },
+    { "name": "choice", "selector": ".subscription-option__choice", "className": ".subscription-option__choice", "required": true, "description": "Canonical Radio whose native input owns the option value and checkedness." },
+    { "name": "label", "selector": ".subscription-option__choice .radio__label", "className": ".radio__label", "required": true, "description": "Visible localized label that names one concrete purchase choice." },
+    { "name": "summary", "selector": ".subscription-option__summary", "className": ".subscription-option__summary", "required": true, "description": "Always-visible checkout-price and optional savings description associated with the Radio." },
+    { "name": "priceLabel", "selector": ".subscription-option__price-label", "className": ".subscription-option__price-label", "required": true, "description": "Visible localized text distinguishing one-time price, checkout charge, and per-delivery amount." },
+    { "name": "checkoutPrice", "selector": ".subscription-option__checkout-price", "className": ".subscription-option__checkout-price", "required": true, "description": "Canonical Price with an explicit localized one-time-price or checkout-charge label." },
+    { "name": "savings", "selector": ".subscription-option__savings", "className": ".subscription-option__savings", "required": false, "description": "Optional passive canonical Badge containing only a verified localized target calculation." },
+    { "name": "recurring", "selector": ".subscription-option__recurring", "className": ".subscription-option__recurring", "required": false, "description": "Required always-visible per-delivery price and cadence description for every recurring record." },
+    { "name": "deliveryPrice", "selector": ".subscription-option__delivery-price", "className": ".subscription-option__delivery-price", "required": false, "description": "Canonical Price with an explicit localized per-delivery label." },
+    { "name": "cadence", "selector": ".subscription-option__cadence", "className": ".subscription-option__cadence", "required": false, "description": "Readable localized cadence for one recurring record." },
+    { "name": "details", "selector": ".subscription-option__details", "className": ".subscription-option__details", "required": false, "description": "Selected-only inline detail region; it contains no second purchase-plan selector." },
+    { "name": "terms", "selector": ".subscription-option__terms", "className": ".subscription-option__terms", "required": false, "description": "Optional target-authored renewal, billing, delivery, commitment, pause, or cancellation terms." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default subscription option." },
-    { "name": "error", "className": ".subscription-option--error", "default": false, "description": "Invalid frequency feedback family." },
-    { "name": "success", "className": ".subscription-option--success", "default": false, "description": "Valid frequency feedback family." },
-    { "name": "warning", "className": ".subscription-option--warning", "default": false, "description": "Cautionary frequency feedback family." }
+    { "name": "default", "className": null, "default": true, "description": "One stacked choice list with quiet boundaries and a stronger selected boundary." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default subscription option size." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic container-responsive size; choice metadata wraps from available inline space." }
   ],
   "states": [
-    { "name": "default", "selectors": [".subscription-option"], "description": "Default unselected state." },
-    { "name": "hover", "selectors": [".subscription-option:hover"], "description": "Hover state." },
-    { "name": "selected", "selectors": [".subscription-option[aria-checked=\"true\"]", ".subscription-option.is-selected"], "description": "Selected option state." },
-    { "name": "selectedRadio", "selectors": [".subscription-option[aria-checked=\"true\"] .subscription-option__radio", ".subscription-option.is-selected .subscription-option__radio"], "description": "Selected radio outline state." },
-    { "name": "selectedIndicator", "selectors": [".subscription-option[aria-checked=\"true\"] .subscription-option__radio::after", ".subscription-option.is-selected .subscription-option__radio::after"], "description": "Generated selected radio indicator." },
-    { "name": "detailsVisible", "selectors": [".subscription-option[aria-checked=\"true\"] .subscription-option__details", ".subscription-option.is-selected .subscription-option__details"], "description": "Details become visible when selected." },
-    { "name": "frequencyHover", "selectors": [".subscription-option__frequency-select:hover"], "description": "Frequency field hover preserving validation family." },
-    { "name": "frequencyFocus", "selectors": [".subscription-option__frequency-select:focus-visible"], "description": "Four-pixel zero-offset frequency field focus state." },
-    { "name": "frequencyDisabled", "selectors": [".subscription-option__frequency-select:disabled"], "description": "Unavailable frequency selector state." }
+    { "name": "unselected", "selectors": [".subscription-option"], "description": "No valid option is currently selected, permitted for a required subscription-only group awaiting user choice or after target stale-value repair." },
+    { "name": "selected", "selectors": [".subscription-option__item:has(.radio__input:checked)"], "description": "One one-time or concrete recurring allocation is selected; a selected recurring record exposes its optional terms inline." },
+    { "name": "hover", "selectors": [".subscription-option__item:has(.radio__input:not(:disabled)):hover"], "description": "An available choice receives a stronger boundary without turning the complete card into a second action." },
+    { "name": "focusVisible", "selectors": [".subscription-option__choice .radio__input:focus-visible"], "description": "Canonical Radio owns the visible keyboard focus ring." },
+    { "name": "disabled", "selectors": [".subscription-option:disabled"], "description": "Native Fieldset disabling propagates to every contained Radio and excludes the group from submission." },
+    { "name": "withSavings", "selectors": [".subscription-option__savings"], "description": "At least one recurring record includes a verified localized savings statement." },
+    { "name": "withTerms", "selectors": [".subscription-option__item:has(.radio__input:checked) > .subscription-option__details"], "description": "The selected record exposes target-authored terms inline." }
   ],
   "behavior": [
-    { "name": "radioSelection", "selectors": [".subscription-option[aria-checked=\"true\"]", ".subscription-option.is-selected"], "attributes": ["role=\"radio\"", "aria-checked"], "events": ["click", "Space", "Enter"], "description": "Selection state should behave like a radio option within purchase options." },
-    { "name": "sellingPlan", "selectors": [".subscription-option__frequency-select"], "attributes": ["name", "value"], "events": ["change"], "description": "Frequency changes should update the selected selling plan or target-native subscription value." },
-    { "name": "pricing", "selectors": [".subscription-option__price", ".subscription-option__savings"], "description": "Price and savings values should be formatted by the target's commerce layer." }
+    { "name": "nativeChoiceGroup", "selectors": [".subscription-option", ".subscription-option__legend", ".subscription-option__choice .radio__input"], "attributes": ["<fieldset>", "<legend>", "type=radio", "name", "value", "checked", "required", "disabled"], "events": ["Tab", "arrow keys", "Space", "input", "change", "invalid", "form submit", "form reset"], "description": "Fieldset, Legend, and same-name native Radios own grouping, naming, mutual exclusion, keyboard behavior, validity, FormData, events, and reset without a redundant ARIA Radio implementation." },
+    { "name": "optionRecords", "selectors": [".subscription-option__item", ".subscription-option__checkout-price", ".subscription-option__recurring"], "description": "Ordered target records have a unique stable id, oneTime or recurring kind, visible label, and target-formatted checkout price. Recurring records additionally require target-formatted per-delivery price and readable cadence; savings, terms, and per-option disabled state are optional." },
+    { "name": "minimumMeaningfulSet", "selectors": [".subscription-option__choices"], "description": "Omit the complete component when fewer than two valid choices remain. At most one one-time record is allowed; subscription-only merchandise therefore requires at least two recurring choices or a simpler non-Radio presentation." },
+    { "name": "defaultSelection", "selectors": [".subscription-option__choice .radio__input"], "attributes": ["checked, defaultChecked, or controlled selectedValue"], "description": "When a one-time record exists, the target initializes its Radio as selected. Subscription-only initial selection remains target policy and may begin unselected under native required validation." },
+    { "name": "selectionOwnership", "selectors": [".subscription-option__choice .radio__input"], "attributes": ["checked establishes static or uncontrolled initial state", "one controlled selectedValue in framework adapters"], "events": ["valueChange", "input", "change", "reset"], "description": "One group value is the only selection owner. Unknown or stale values resolve to no checked Radio rather than silently selecting a different plan; the product coordinator clears or replaces stale selection." },
+    { "name": "explicitRecurringCopy", "selectors": [".subscription-option__checkout-price", ".subscription-option__delivery-price", ".subscription-option__cadence"], "description": "Every recurring choice visibly and accessibly identifies checkout charge, per-delivery amount, and cadence even when the two monetary values happen to match." },
+    { "name": "selectedInlineTerms", "selectors": [".subscription-option__details", ".subscription-option__terms"], "description": "Optional terms are rendered inline only for the checked record through CSS derived from native checkedness; unchecked detail is display-none and unavailable to focus." },
+    { "name": "canonicalComposition", "selectors": [".fieldset", ".radio", ".price", ".badge"], "description": "Fieldset owns grouping, Radio owns selection, Price owns target-formatted amount anatomy, and passive Badge owns verified savings presentation. D10 contains no nested Select or private child clones." },
+    { "name": "targetCoordinator", "events": ["product or variant change", "selling-plan eligibility result", "purchase-option change", "price and CTA synchronization", "payload conversion"], "description": "The target product coordinator owns selling-plan groups, current product and variant, allocation eligibility, ordering, localized values, savings truth, terms, selected value, stale clearing, final target payload, loading and error policy, status announcements, cart, and checkout." },
+    { "name": "noNeutralRuntime", "description": "D10 adds no listener, observer, timer, request, formatter, storage, cart service, layout read, or component-specific neutral JavaScript; native Web and target adapters project their own data and state." }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Frequency-field validation presentation independent from option selection.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".subscription-option", "source": "variants" }] } },
-    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Radio selection and expanded-details state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".subscription-option", "classNames": [".is-selected"] }, { "kind": "attribute", "selector": ".subscription-option", "attribute": "aria-checked", "values": { "true": "true", "false": "false" } }] } },
-    { "name": "label", "type": "string", "required": true, "description": "Visible purchase-option label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__label" }] } },
-    { "name": "price", "type": "string", "required": false, "description": "Target-formatted recurring price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__price" }] } },
-    { "name": "savings", "type": "string", "required": false, "description": "Optional readable savings statement.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__savings" }] } },
-    { "name": "frequencyLabel", "type": "string", "required": true, "description": "Visible label associated with the frequency selector.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__frequency-label" }] } },
-    { "name": "frequency", "type": "string", "required": false, "description": "Selected target selling-plan value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option__frequency-select", "attribute": "value", "valueFrom": "property", "elements": ["select"] }] } },
-    { "name": "frequencyMessage", "type": "string", "required": false, "description": "Associated frequency guidance or validation message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__frequency-message" }] } },
-    { "name": "frequencyIndicator", "type": "slot", "required": false, "description": "Fixed passive frequency control indicator.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".subscription-option__frequency-indicator", "classNames": [".subscription-option__frequency-indicator"] }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the frequency selector unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option__frequency-select", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["select"] }] } },
-    { "name": "note", "type": "string", "required": false, "description": "Optional supplemental subscription note.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__note" }] } }
+    { "name": "legend", "type": "string", "required": true, "unsetBehavior": "Omit the complete group when its visible purchase-decision label is empty.", "description": "Visible localized Legend naming the complete purchase-options group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__legend" }] } },
+    { "name": "description", "type": "string", "required": false, "unsetBehavior": "Omit the description and aria-describedby reference together.", "description": "Optional localized group guidance.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__description" }] } },
+    { "name": "name", "type": "string", "required": true, "unsetBehavior": "Omit the complete group when its native field name is empty.", "description": "Native form name repeated across every Radio choice.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option__choice .radio__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "options", "type": "slot", "required": true, "unsetBehavior": "Omit the complete group when fewer than two valid target option records remain.", "description": "Ordered target option records. Each has unique id, kind, label and checkoutPrice; recurring records also require perDeliveryPrice and cadence, with optional verified savings, target-authored terms, disabled state, and one static or uncontrolled initial checked/defaultChecked projection. Controlled adapters derive checkedness from one group selectedValue.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".subscription-option__choices", "classNames": [".subscription-option__item", ".subscription-option__header", ".subscription-option__choice", ".subscription-option__summary", ".subscription-option__price-label", ".subscription-option__checkout-price", ".subscription-option__savings", ".subscription-option__recurring", ".subscription-option__delivery-price", ".subscription-option__cadence", ".subscription-option__details", ".subscription-option__terms", ".radio", ".price", ".badge"] }] } },
+    { "name": "oneTimePriceLabel", "type": "string", "required": true, "unsetBehavior": "Omit the component when a localized one-time amount label cannot be supplied.", "description": "Visible localized label placed before the one-time purchase amount.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__price-label" }] } },
+    { "name": "checkoutChargeLabel", "type": "string", "required": true, "unsetBehavior": "Omit the component when recurring checkout charges cannot be explicitly labelled.", "description": "Visible localized label placed before every recurring checkout charge.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__price-label" }] } },
+    { "name": "perDeliveryLabel", "type": "string", "required": true, "unsetBehavior": "Omit the component when recurring per-delivery amounts cannot be explicitly labelled.", "description": "Visible localized label placed before every recurring per-delivery amount.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__price-label" }] } },
+    { "name": "cadenceLabel", "type": "string", "required": true, "unsetBehavior": "Omit the component when recurring cadence cannot be explicitly labelled.", "description": "Localized label placed before every recurring cadence value.", "targetMappings": { "web": [{ "kind": "content", "selector": ".subscription-option__meta-label" }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": true, "description": "Requires one selected purchase option through the same-name native Radio group.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option__choice .radio__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables the complete purchase-options group through its native Fieldset.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".subscription-option", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-border-default", "--color-feedback-success-default", "--color-surface-primary", "--color-text-secondary", "--color-input-default-unfocused-bg", "--color-input-default-unfocused-inner-border", "--color-input-default-focused-outer-border", "--color-input-error-unfocused-inner-border", "--color-input-error-focused-outer-border", "--color-input-success-unfocused-inner-border", "--color-input-success-focused-outer-border", "--color-input-warning-unfocused-inner-border", "--color-input-warning-focused-outer-border"],
-      "radius": ["--radius-md", "--radius-full", "--radius-sm"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"],
-      "typography": ["--typo-body-size", "--typo-body-sm-size", "--typo-caption-size"]
+      "color": ["--color-border-subtle", "--color-border-default", "--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-md"],
+      "typography": ["--tg-font-weight-semibold", "--typo-body-sm-size", "--typo-body-sm-line-height"],
+      "spacing": ["--space-layout-element-gap", "--space-input-icon-size", "--space-input-icon-gap"]
     }
   },
   "accessibility": [
-    "Use radio semantics or native target radio controls when subscription options are mutually exclusive.",
-    "Keep aria-checked or native selected state synchronized with visual selection.",
-    "Expose savings and delivery frequency as readable text."
+    "Use the canonical native Fieldset and first visible Legend with at least two same-name native Radios; do not add redundant radiogroup or radio roles.",
+    "Give every option a unique stable value and visible localized label. Associate its always-visible checkout, per-delivery, cadence, and savings text through aria-describedby without replacing the concise Radio name.",
+    "Keep one native checkedness owner and preserve Tab, logical arrow keys, Space, mutual exclusion, required validity, FormData, input/change, reset, and disabled propagation.",
+    "Select one-time initially whenever it exists. Never silently project an unknown or stale target id to a different plan; allow required validation while the coordinator repairs it.",
+    "Render every recurring checkout charge, per-delivery amount, and cadence as explicit readable text. Do not depend on equal prices, visual proximity, abbreviation, color, or Badge alone.",
+    "Render savings only from a verified localized target calculation. Keep Badge passive and avoid live-region semantics on static prices or terms.",
+    "Keep selected terms inline and readable; unchecked terms are display-none rather than hidden only by opacity or color.",
+    "Preserve logical wrapping, canonical Radio focus, effective 200 percent text, user text spacing, RTL, dark mode, reduced motion, forced colors, and narrow containers."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify selling plans, recurring prices, and selected allocation state." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "native-fieldset-radio-css", "notes": "Canonical Fieldset, Radio, Price and optional Badge composition is implemented with zero D10 neutral runtime; target records and live group state remain consumer-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Shopify can map variant sellingPlanAllocations to recurring records and one-time to an empty selling_plan payload, but target-native Liquid/block composition, one coordinator, localization, editor behavior and live-store proof remain required." },
+    "react": { "status": "implemented", "kind": "composed-controlled-component", "notes": "The shared Exhibit and Studio artwork projects one selectedValue and repeated target records into canonical native controls. A distributable adapter may additionally expose defaultValue for uncontrolled use." },
+    "figma": { "status": "planned", "kind": "component-composition" },
+    "swiftui": { "status": "planned", "kind": "native-choice-composition" },
+    "compose": { "status": "planned", "kind": "native-choice-composition" }
   }
 }

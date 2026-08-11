@@ -1,11 +1,231 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "edition-badge", "name": "Edition / Numbering", "registryId": "R10", "category": "ceramics", "status": "pilot", "summary": "Limited edition badge showing piece number and total.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/edition-badge", "css": { "file": "components/css/ceramics.css", "selector": ".edition-badge" }, "docs": "site/src/content/components/edition-badge.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".edition-badge", "className": ".edition-badge", "required": true, "description": "Passive edition statement." }, { "name": "number", "selector": ".edition-badge__number", "className": ".edition-badge__number", "required": false, "description": "Target-formatted piece number." }, { "name": "separator", "selector": ".edition-badge__separator", "className": ".edition-badge__separator", "required": false, "description": "Visual separator between number and total." }, { "name": "total", "selector": ".edition-badge__total", "className": ".edition-badge__total", "required": false, "description": "Target-formatted edition total." }, { "name": "label", "selector": ".edition-badge__label", "className": ".edition-badge__label", "required": false, "description": "Optional edition label." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default edition statement." }, { "name": "limited", "className": ".edition-badge--limited", "default": false, "description": "Existing limited-edition emphasis." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Default inline-flex edition presentation." }], "states": [{ "name": "default", "selectors": [".edition-badge"], "description": "Passive edition statement." }],
-  "behavior": [{ "name": "passiveMetadata", "selectors": [".edition-badge"], "description": "Edition Badge is passive. Targets supply truthful numbering and localization; the component does not verify provenance or inventory." }],
-  "properties": [{ "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Selects default or limited-edition emphasis.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".edition-badge", "source": "variants" }] } }, { "name": "number", "type": "string", "required": false, "description": "Target-formatted piece number.", "targetMappings": { "web": [{ "kind": "content", "selector": ".edition-badge__number" }] } }, { "name": "total", "type": "string", "required": false, "description": "Target-formatted edition total.", "targetMappings": { "web": [{ "kind": "content", "selector": ".edition-badge__total" }] } }, { "name": "label", "type": "string", "required": false, "description": "Optional edition label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".edition-badge__label" }] } }],
-  "tokens": { "public": { "color": ["--color-border-default", "--color-feedback-warning-default", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size"], "radius": ["--radius-md"] } },
-  "accessibility": ["Expose the edition statement as coherent readable text.", "Do not rely on limited-edition color alone.", "Keep visual separators out of the accessible name when they add no meaning."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "edition-badge",
+  "name": "Edition / Numbering",
+  "registryId": "R10",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Passive target-formatted edition statement with optional designation, impression or piece identifier, and edition total.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/edition-badge",
+    "css": {
+      "file": "components/css/ceramics.css",
+      "selector": ".edition-badge"
+    },
+    "docs": "site/src/content/components/edition-badge.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".edition-badge",
+      "className": ".edition-badge",
+      "required": true,
+      "description": "Passive native edition statement, omitted when every content value is blank."
+    },
+    {
+      "name": "label",
+      "selector": ".edition-badge__label",
+      "className": ".edition-badge__label",
+      "required": false,
+      "description": "Target-authored edition or proof designation."
+    },
+    {
+      "name": "count",
+      "selector": ".edition-badge__count",
+      "className": ".edition-badge__count",
+      "required": false,
+      "description": "Private structural group for the optional number and total relationship."
+    },
+    {
+      "name": "number",
+      "selector": ".edition-badge__number",
+      "className": ".edition-badge__number",
+      "required": false,
+      "description": "Opaque target-formatted impression or piece identifier."
+    },
+    {
+      "name": "separator",
+      "selector": ".edition-badge__separator",
+      "className": ".edition-badge__separator",
+      "required": false,
+      "description": "Meaningful slash rendered only between a present number and total."
+    },
+    {
+      "name": "total",
+      "selector": ".edition-badge__total",
+      "className": ".edition-badge__total",
+      "required": false,
+      "description": "Opaque target-formatted edition-size value; not inventory."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Neutral edition statement."
+    },
+    {
+      "name": "limited",
+      "className": ".edition-badge--limited",
+      "default": false,
+      "description": "Statement-surface emphasis without warning, verification, scarcity, or inventory semantics."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default intrinsic edition presentation."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".edition-badge"
+      ],
+      "description": "Passive edition statement with no interaction state."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "passiveMetadata",
+      "selectors": [
+        ".edition-badge"
+      ],
+      "description": "Targets supply truthful values and localization; the component does not verify provenance, authenticity, scarcity, availability, produced quantity, or inventory."
+    },
+    {
+      "name": "contentOmission",
+      "selectors": [
+        ".edition-badge",
+        ".edition-badge__count",
+        ".edition-badge__separator"
+      ],
+      "description": "Blank content parts omit; the root omits when every content value is blank, and the separator exists only when number and total are both present."
+    }
+  ],
+  "properties": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Selects neutral or statement-surface emphasis without creating a feedback state.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".edition-badge",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "number",
+      "type": "string",
+      "required": false,
+      "description": "Opaque target-formatted impression or piece identifier; the component does not parse or validate its domain meaning.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".edition-badge__number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "total",
+      "type": "string",
+      "required": false,
+      "description": "Opaque target-formatted edition-size value; the component does not equate it with inventory or produced quantity.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".edition-badge__total"
+          }
+        ]
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Complete target-authored edition or proof designation.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".edition-badge__label"
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-default",
+        "--color-surface-statement",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--font-family-body",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-default-weight",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "radius": [
+        "--radius-md"
+      ]
+    }
+  },
+  "accessibility": [
+    "Use the visible native statement as the accessible content; paragraph naming with aria-label or aria-labelledby is prohibited.",
+    "Expose the slash when it communicates the relationship between a present number and total.",
+    "Do not rely on limited-edition color alone or represent it as warning, verification, scarcity, authenticity, or inventory state.",
+    "Isolate opaque target strings for mixed-direction content and preserve complete localized wording."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/ceramics.css with native target markup documented in the contract and MDX."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js"
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
 }

@@ -1,0 +1,121 @@
+{% liquid
+  assign featured_collection = section.settings.collection
+  assign product_limit = section.settings.product_count
+  assign presentation = section.settings.variant
+  assign section_title = section.settings.title | strip
+
+  if section_title == blank and featured_collection != blank
+    assign section_title = featured_collection.title
+  endif
+
+  assign has_products = false
+  if featured_collection != blank and featured_collection.products.size > 0
+    assign has_products = true
+  endif
+
+  assign heading_id = 'FeaturedCollection-' | append: section.id | append: '-Title'
+%}
+
+{% if section_title != blank and has_products %}
+  <section
+    class="featured-collection{% unless presentation == 'grid' %} featured-collection--{{ presentation }}{% endunless %}{% if presentation == 'grid' %} collection-grid{% elsif presentation == 'carousel' %} carousel{% endif %}"
+    aria-labelledby="{{ heading_id }}"
+  >
+    <header class="featured-collection__header">
+      <h2 class="featured-collection__title" id="{{ heading_id }}">{{ section_title | escape }}</h2>
+
+      {% if section.settings.show_view_all %}
+        <a class="link featured-collection__link" href="{{ featured_collection.url }}">
+          {{ 'collections.view_all' | t }}
+        </a>
+      {% endif %}
+    </header>
+
+    <ul
+      class="featured-collection__grid{% if presentation == 'grid' %} collection-grid__items{% elsif presentation == 'carousel' %} carousel__track{% endif %}"
+      role="list"
+      aria-labelledby="{{ heading_id }}"
+      {% if presentation == 'carousel' %}tabindex="0"{% endif %}
+    >
+      {% for product in featured_collection.products limit: product_limit %}
+        <li class="featured-collection__item{% if presentation == 'grid' %} collection-grid__item{% elsif presentation == 'carousel' %} carousel__slide{% endif %}">
+          {% render 'product-card', product: product, media_ratio: section.settings.media_ratio %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.featured_collection.name",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.featured_collection.settings.collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.featured_collection.settings.title"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "t:sections.featured_collection.settings.media_ratio",
+      "options": [
+        {
+          "value": "square",
+          "label": "t:sections.featured_collection.options.square"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.featured_collection.options.portrait"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "select",
+      "id": "variant",
+      "label": "t:sections.featured_collection.settings.variant",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:sections.featured_collection.options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "t:sections.featured_collection.options.carousel"
+        },
+        {
+          "value": "spotlight",
+          "label": "t:sections.featured_collection.options.spotlight"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "product_count",
+      "label": "t:sections.featured_collection.settings.product_count",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "t:sections.featured_collection.settings.show_view_all",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.featured_collection.name"
+    }
+  ]
+}
+{% endschema %}

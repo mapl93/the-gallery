@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "divider",
   "name": "Divider",
   "registryId": "A14",
@@ -22,7 +22,7 @@
       "selector": ".divider",
       "className": ".divider",
       "required": true,
-      "description": "Horizontal separation rule."
+      "description": "Horizontal or vertical separation rule."
     }
   ],
   "variants": [
@@ -64,8 +64,8 @@
     {
       "name": "separatorSemantics",
       "selectors": [".divider"],
-      "attributes": ["<hr>", "role=\"separator\"", "aria-hidden=\"true\""],
-      "description": "Use semantic separator markup for meaningful separation and hide purely decorative dividers from assistive technology."
+      "attributes": ["<hr>", "role=\"separator\"", "aria-hidden=\"true\"", "aria-orientation=\"vertical\""],
+      "description": "Use semantic separator markup for meaningful separation, declare aria-orientation when an exposed separator is vertical, hide purely decorative dividers from assistive technology, and preserve a visible system-color rule in forced-colors mode."
     }
   ],
   "properties": [
@@ -87,7 +87,10 @@
       "values": ["horizontal", "vertical"],
       "description": "Axis along which the divider separates adjacent content.",
       "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".divider", "attribute": "data-orientation", "values": { "horizontal": null, "vertical": "vertical" } }]
+        "web": [
+          { "kind": "attribute", "selector": ".divider", "attribute": "data-orientation", "values": { "horizontal": null, "vertical": "vertical" } },
+          { "kind": "attribute", "selector": ".divider", "attribute": "aria-orientation", "values": { "horizontal": null, "vertical": "vertical" }, "elements": ["hr"] }
+        ]
       }
     },
     {
@@ -117,6 +120,8 @@
   "accessibility": [
     "Use hr or role=\"separator\" when the divider conveys structure.",
     "Mark decorative dividers as aria-hidden when they add no semantic value.",
+    "Set aria-orientation=\"vertical\" when a structural divider uses the vertical axis; horizontal is the implicit separator default.",
+    "Keep the rule visible in forced-colors mode without relying on its authored background color.",
     "Do not use divider spacing as the only cue for grouped content."
   ],
   "adapters": {

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "combobox",
   "name": "Combobox / Autocomplete",
   "registryId": "H3",
   "category": "forms",
   "status": "pilot",
-  "summary": "Searchable input and listbox pattern with filtered options, highlighted option state, selected option state, and combobox ARIA behavior.",
+  "summary": "Editable native text input with manual list autocomplete, authored suggestion filtering, distinct highlight and selection state, light dismissal, native form ownership, and synchronized combobox/listbox semantics.",
   "dependencies": ["input"],
   "source": {
     "registry": "registry.json#/components/combobox",
@@ -29,7 +29,7 @@
       "selector": ".combobox__input",
       "className": ".combobox__input",
       "required": true,
-      "description": "Search input that controls the filtered options."
+      "description": "Native editable text and form-value owner that controls manual list autocomplete while retaining DOM focus."
     },
     {
       "name": "listbox",
@@ -43,7 +43,7 @@
       "selector": ".combobox__option",
       "className": ".combobox__option",
       "required": true,
-      "description": "Selectable option inside the listbox."
+      "description": "Non-interactive listbox option identified by role=option; selection is activated through the focused input or pointer delegation."
     },
     {
       "name": "check",
@@ -57,7 +57,7 @@
       "selector": ".combobox__empty",
       "className": ".combobox__empty",
       "required": false,
-      "description": "Optional empty-result message."
+      "description": "Optional non-option status message shown when filtering produces no matches."
     }
   ],
   "variants": [
@@ -119,6 +119,31 @@
       "name": "optionSelected",
       "selectors": [".combobox__option[aria-selected=\"true\"]"],
       "description": "Selected option state."
+    },
+    {
+      "name": "optionDisabled",
+      "selectors": [".combobox__option[aria-disabled=\"true\"]"],
+      "description": "Unavailable suggestion skipped by pointer and keyboard navigation."
+    },
+    {
+      "name": "empty",
+      "selectors": [".combobox__empty"],
+      "description": "No-results status shown without adding a selectable option."
+    },
+    {
+      "name": "error",
+      "selectors": [".combobox--error"],
+      "description": "Error validation family independent from open, highlight, selection, and typed value."
+    },
+    {
+      "name": "success",
+      "selectors": [".combobox--success"],
+      "description": "Success validation family independent from open, highlight, selection, and typed value."
+    },
+    {
+      "name": "warning",
+      "selectors": [".combobox--warning"],
+      "description": "Warning validation family independent from open, highlight, selection, and typed value."
     }
   ],
   "behavior": [
@@ -130,7 +155,7 @@
     {
       "name": "listboxSemantics",
       "attributes": ["role=\"listbox\"", "role=\"option\"", "aria-selected"],
-      "description": "The popup must expose listbox semantics and each option must expose selected state."
+      "description": "The popup exposes listbox semantics; non-interactive options expose selected/disabled state and remain outside the page Tab sequence."
     },
     {
       "name": "filtering",
@@ -139,8 +164,27 @@
     },
     {
       "name": "keyboardNavigation",
-      "events": ["ArrowDown", "ArrowUp", "Enter", "Escape", "Home", "End"],
-      "description": "Keyboard navigation moves the highlighted option, selects with Enter, and closes with Escape."
+      "events": ["ArrowDown", "ArrowUp", "Enter", "Escape", "Tab"],
+      "description": "Arrow keys move the active descendant without cycling, Enter selects, and Escape or Tab closes while ordinary text-editing keys remain native."
+    },
+    {
+      "name": "selectionAndEvents",
+      "events": ["input", "change"],
+      "description": "Selecting an option writes its authored value to the native input, emits input then change, and closes; highlight alone never changes the value."
+    },
+    {
+      "name": "dismissal",
+      "events": ["Escape", "Tab", "pointerdown outside"],
+      "description": "The popup light-dismisses without replacing arbitrary typed text and leaves focus ownership on the input."
+    },
+    {
+      "name": "formOwnership",
+      "events": ["input", "change", "reset"],
+      "description": "The native text input solely owns name, value, required validity, FormData, events, and form reset; no hidden mirrored value is added."
+    },
+    {
+      "name": "controlledUncontrolled",
+      "description": "Authored value/open state initialize uncontrolled Web behavior; framework adapters may control the same semantic owners and must avoid a second value store."
     },
     {
       "name": "selectVsCombobox",
@@ -148,9 +192,12 @@
     }
   ],
   "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible accessible name associated with the native editable input.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__label" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the current search value.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".combobox", "source": "variants" }] } },
     { "name": "value", "type": "string", "required": false, "defaultValue": "", "description": "Current editable search value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".combobox__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "name", "type": "string", "required": false, "description": "Stable native form field name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".combobox__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "placeholder", "type": "string", "required": false, "defaultValue": "Search artworks", "description": "Hint displayed while the editable value is empty.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".combobox__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "autocomplete", "type": "string", "required": false, "defaultValue": "off", "description": "Native text-field autocomplete hint; it does not replace aria-autocomplete for suggestions.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".combobox__input", "attribute": "autocomplete", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls listbox visibility and the input expanded state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".combobox", "classNames": [".combobox--open"] }, { "kind": "attribute", "selector": ".combobox__input", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" }, "elements": ["input"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the native text input unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".combobox__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Marks the native text input as required.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".combobox__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
@@ -171,12 +218,15 @@
         "--color-input-default-disabled-inner-border",
         "--color-input-default-disabled-value",
         "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
         "--color-input-error-focused-inner-border",
         "--color-input-error-focused-outer-border",
         "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
         "--color-input-success-focused-inner-border",
         "--color-input-success-focused-outer-border",
         "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
         "--color-input-warning-focused-inner-border",
         "--color-input-warning-focused-outer-border",
         "--color-surface-primary",
@@ -208,7 +258,8 @@
         "--font-family-body",
         "--typo-input-value-size",
         "--typo-input-value-line-height",
-        "--typo-body-size"
+        "--typo-body-size",
+        "--typo-body-line-height"
       ],
       "opacity": [
         "--opacity-disabled"
@@ -220,14 +271,15 @@
     "Expose role=\"combobox\", aria-expanded, aria-controls, aria-activedescendant, and aria-autocomplete on the input when using a custom combobox.",
     "Expose role=\"listbox\" on the popup and role=\"option\" on each option.",
     "Keep the highlighted option synchronized with aria-activedescendant.",
-    "Support ArrowUp, ArrowDown, Enter, and Escape keyboard behavior.",
+    "Support ArrowUp, ArrowDown, Enter, Escape, and Tab behavior without overriding standard single-line text editing keys.",
+    "Keep highlight distinct from selected or arbitrary typed value and keep every option out of the page Tab sequence.",
     "Preserve visible labels and descriptions from the Input contract."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; filtering, selection, and ARIA synchronization must be provided by the consuming target."
+      "kind": "css-js",
+      "notes": "Canonical CSS and components/js/theme.js implement authored-option filtering, IME-safe input, active-descendant navigation, pointer selection, native events/form reset, light dismissal, and ARIA synchronization without fetching data."
     },
     "shopify": {
       "status": "planned",

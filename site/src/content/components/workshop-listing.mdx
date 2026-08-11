@@ -1,40 +1,84 @@
 ## Overview
 
-Workshop Listing presents target-owned workshop summaries with optional media, schedule, level, description, price, availability text, and a composed Button destination.
+Workshop Listing presents one required target-authored collection of independently complete workshop summaries. It is a discovery surface, not an event schema, capacity service, booking flow, checkout, calendar, filter, or live inventory region.
 
-<Preview html={'<section class="workshop-grid tg-preview-frame tg-preview-frame--lg" aria-label="Studio workshops"><article class="workshop-card" id="workshop-details"><div class="workshop-card__image tg-preview-media" role="img" aria-label="Hands centering clay on a pottery wheel"></div><div class="workshop-card__body"><time class="workshop-card__date" datetime="2026-08-15T14:00">August 15, 2:00 PM</time><h2 class="workshop-card__title">Introduction to wheel throwing</h2><p class="workshop-card__level">Beginner</p><p class="workshop-card__description">A small-group studio session covering centering and the first cylinder.</p><footer class="workshop-card__footer"><div><p class="workshop-card__price">ARS 48,000</p><p class="workshop-card__spots workshop-card__spots--low">2 places remaining</p></div><a class="btn btn--outline" href="#workshop-details">Details</a></footer></div></article></section>'} label="Workshop Listing" />
+<Preview html={'<ul class="workshop-grid tg-preview-frame tg-preview-frame--lg" id="workshop-listing-preview"><li class="workshop-grid__item"><article class="card workshop-card" aria-labelledby="workshop-listing-preview-wheel-title"><div class="card__media workshop-card__image"><img src="/media/editorial/potter-at-wheel.jpg" alt="A potter centering clay on a wheel during a studio session." width="1800" height="2700"></div><div class="card__body workshop-card__body"><time class="workshop-card__date" datetime="2026-08-15T14:00:00-03:00" dir="auto">Saturday, 15 August · 14:00 ART</time><h2 class="workshop-card__title" id="workshop-listing-preview-wheel-title" dir="auto">Wheel forming foundations</h2><p class="workshop-card__level" dir="auto">Introductory · In person</p><p class="workshop-card__description" dir="auto">A small-group studio session covering centering and the first cylinder.</p></div><footer class="card__footer workshop-card__footer"><div class="workshop-card__meta"><span class="price workshop-card__price" data-price-alternate-digits="false" data-price-slashed-zero="true" data-price-tabular-numbers="true" data-price-contextual-alternates="true" data-price-fractions="false"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">ARS&nbsp;48.000</bdi></span></span><span class="badge badge--warning workshop-card__spots" dir="auto">2 places left</span></div><a class="btn btn--outline btn--sm workshop-card__action" href="/components/workshop-listing" aria-label="View workshop: Wheel forming foundations">View workshop</a></footer></article></li></ul>'} label="Workshop Listing" />
 
 ## Presentation
 
-`workshops` is the only property and owns the repeated card records. A card requires body content and a title; all media, schedule, level, description, footer, price, availability, and Button composition are optional.
+The required `workshops` slot supplies one or more target-owned records in reader order. A record needs stable identity and a visible non-empty title. Invalid or duplicate-identity peers omit; no valid records omit the complete list. The host may compose Empty State outside R7 when absence needs an explanation or recovery action.
 
-Low-availability and full selectors are visual hooks paired with explicit text. Targets own schedules, currency formatting, price freshness, availability, destinations, ordering, and all booking behavior.
+R7 uses native `ul > li > article` structure. Every article is named by its visible contextual heading. Heading rank follows the surrounding document and is not a visual variant. The whole card is not one interactive wrapper around its nested destination or future actions.
+
+Each article composes canonical Card. Media, schedule, level/format, description, footer, Price, availability Badge, and Button action are optional only when the remaining summary is truthful and useful.
+
+### Schedule and commerce boundaries
+
+Schedule text is complete target-localized content. Use native `time[datetime]` only when the target has a valid machine-readable occurrence that corresponds to the visible text. R7 does not choose an occurrence, time zone, locale, recurrence, cancellation or stale-data fallback.
+
+Price consumes canonical Price and arrives as one complete target-formatted string. Availability consumes passive canonical Badge and remains explicit visible text. `lowAvailability` and `full` select supporting Warning/Error treatments; capacity thresholds, freshness and announcements stay target-owned.
+
+### Destination and booking boundaries
+
+A details destination composes canonical Button as native `a[href]`, includes the workshop title in its accessible name, and preserves ordinary link behavior. A Full workshop can still expose details, waitlist, cancellation or later sessions, so Full does not automatically disable the details link.
+
+R7 owns no registration, reservation, authentication, payment, cancellation, error, confirmation or inventory-lock behavior. A target may compose a separately certified booking action only after those workflow decisions exist.
 
 ## Guidelines
 
 <DoDont>
-  <Do>Show schedule, level, price, and availability as explicit target-formatted text.</Do>
-  <Dont>Do not imply that a details or registration action reserves capacity or completes booking.</Dont>
+  <Do>Supply complete schedule, price, availability and destination facts, and keep each article understandable from its visible title and text.</Do>
+  <Dont>Do not use a no-op button, disable details solely because a workshop is full, or imply that viewing a card reserves capacity.</Dont>
 </DoDont>
 
-- Keep workshop cards focused on summary information.
-- Use a composed Button only for a target-owned destination or action.
-- Confirm booking, payment, cancellation, and authentication behavior outside this contract.
+- Preserve target order and omit incomplete records rather than displaying placeholder cards.
+- Use canonical Card, Price, Badge and Button; do not recreate their surface, currency, status, focus or disabled behavior.
+- Keep availability thresholds and freshness in the authoritative target service.
+- Include time zone, cancellation/reschedule, prerequisites, venue, access or materials when omitting them would mislead.
+- Keep informative media alternatives contextual; use empty alt only when media is decorative or fully redundant.
+- Compose filtering, pagination, loading, errors and empty results outside R7.
 
 ## Accessibility
 
-- Use semantic `time` markup with a machine-readable value when the target has one.
-- Keep level, price, and availability available as text.
-- Do not rely on warning or error color alone for availability.
-- Preserve the composed Button's focus, disabled, and busy semantics.
-- Give informative workshop media useful alternative text.
+- Preserve native `ul > li > article` collection semantics and a visible contextual heading for every article.
+- Use `time[datetime]` only with corresponding valid machine-readable schedule content.
+- Keep schedule, level, price and availability available as visible text and do not rely on tone, position or media alone.
+- Use canonical Price `bdi` isolation for formatted currency and allow long localized content to wrap.
+- Use native anchors for navigation; keep the visible action label inside the accessible name and add workshop-title context for repeated links.
+- Do not make the entire card clickable around nested controls or add grid/widget roles, roving focus or arrow-key behavior.
+- Keep static availability out of live regions. A target that updates capacity owns announcement timing and deduplication.
+- Preserve canonical Card/Button focus and reduced-motion behavior across RTL, text enlargement and forced colors.
 
 ## Specification
 
-**Dependency:** [Button](/components/button).
+**Dependencies:** canonical [Card](/components/card), [Price](/components/price), [Badge](/components/badge), and [Button](/components/button).
 
-**Anatomy:** `.workshop-grid` with repeated `.workshop-card` records containing optional image, required body and title, optional date, level, description, footer, price, availability text, and composed Button content.
+**Anatomy:** required native `.workshop-grid`; repeated direct `.workshop-grid__item`; native `.card.workshop-card` article; optional `.card__media.workshop-card__image`; required `.card__body.workshop-card__body` and contextual `.workshop-card__title`; optional `.workshop-card__date`, level and description; optional `.card__footer.workshop-card__footer` containing canonical Price, Badge and/or Button-as-anchor composition.
 
 <PropTable>
-  <tr><td>`workshops`</td><td>slot</td><td>required</td><td>Target-owned workshop cards without a prescribed CMS or booking model</td></tr>
+  <tr><td>`workshops`</td><td>slot</td><td>required non-empty</td><td>Target-owned ordered workshop-card records composed from canonical parts without a prescribed CMS, event, capacity or booking model</td></tr>
 </PropTable>
+
+**Targets**
+
+- **Neutral Web:** native list/articles/time/link, canonical Card/Price/Badge/Button, intrinsic CSS and zero R7 JavaScript.
+- **Shopify:** planned until workshop resource/metaobject, schedule/time-zone/locale, money/capacity freshness, destination/booking service, editor validation and first consumer are approved.
+- **Webflow:** CMS supplies ordered complete records, valid schedule metadata, formatted price/status and real destinations.
+- **React / Angular:** thin target projection; canonical descendants retain their semantics and booking state remains external.
+- **Figma:** future component models one/many records, media absent/present, sparse/dense metadata, Available/Limited/Full and narrow/wide modes; current generic references are not R7 approval.
+
+**References**
+
+- [HTML article and section semantics](https://html.spec.whatwg.org/dev/sections.html)
+- [HTML `time`](https://html.spec.whatwg.org/dev/text-level-semantics.html#the-time-element)
+- [WAI-ARIA APG Link](https://www.w3.org/WAI/ARIA/apg/patterns/link/)
+- [WAI WCAG G91 — descriptive link text](https://www.w3.org/WAI/WCAG22/Techniques/general/G91)
+- [WAI informative images](https://www.w3.org/WAI/tutorials/images/informative/)
+- [Open UI Card research](https://open-ui.org/components/card.research/)
+- [Radix Themes Card](https://www.radix-ui.com/themes/docs/components/card)
+- [Radix composition](https://www.radix-ui.com/primitives/docs/guides/composition)
+- [Shopify Polaris Web Components](https://shopify.dev/docs/api/app-home/web-components)
+- [Shopify theme-block dynamic sources](https://shopify.dev/docs/storefronts/themes/architecture/blocks/theme-blocks/dynamic-sources)
+- [Shopify Liquid `time_tag`](https://shopify.dev/docs/api/liquid/filters/time_tag)
+
+R7 remains `pilot`. Automated evidence cannot resolve workshop records, schedule/time-zone policy, capacity/pricing/booking services, Shopify mapping, final visual approval or human stability review.

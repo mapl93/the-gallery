@@ -1,78 +1,414 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "size-chart",
   "name": "Size Chart",
   "registryId": "D7",
   "category": "product",
   "status": "pilot",
-  "summary": "Size chart trigger and modal/drawer surface with unit toggle, measurement table, and fit notes.",
-  "dependencies": [],
+  "summary": "Centered product size-reference Modal composing a required target-authored static Data Table, optional Segmented Control presentation choice, and optional notes.",
+  "dependencies": [
+    "modal",
+    "segmented-control",
+    "data-table"
+  ],
   "source": {
     "registry": "registry.json#/components/size-chart",
-    "css": { "file": "components/css/product.css", "selector": ".size-chart" },
+    "css": {
+      "file": "components/css/product.css",
+      "selector": ".size-chart"
+    },
     "docs": "site/src/content/components/size-chart.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".size-chart", "className": ".size-chart", "required": true, "description": "Size chart component wrapper." },
-    { "name": "trigger", "selector": ".size-chart__trigger", "className": ".size-chart__trigger", "required": true, "description": "Trigger button." },
-    { "name": "triggerIcon", "selector": ".size-chart__trigger svg", "required": false, "description": "Optional trigger icon." },
-    { "name": "drawer", "selector": ".size-chart__drawer", "className": ".size-chart__drawer", "required": true, "description": "Overlay drawer or modal layer." },
-    { "name": "panel", "selector": ".size-chart__panel", "className": ".size-chart__panel", "required": true, "description": "Dialog panel." },
-    { "name": "header", "selector": ".size-chart__header", "className": ".size-chart__header", "required": true, "description": "Dialog header." },
-    { "name": "title", "selector": ".size-chart__title", "className": ".size-chart__title", "required": true, "description": "Dialog title." },
-    { "name": "close", "selector": ".size-chart__close", "className": ".size-chart__close", "required": true, "description": "Close button." },
-    { "name": "unitToggle", "selector": ".size-chart__unit-toggle", "className": ".size-chart__unit-toggle", "required": false, "description": "Unit toggle control." },
-    { "name": "unitButton", "selector": ".size-chart__unit-btn", "className": ".size-chart__unit-btn", "required": false, "description": "Single unit option." },
-    { "name": "table", "selector": ".size-chart__table", "className": ".size-chart__table", "required": true, "description": "Measurement table." },
-    { "name": "notes", "selector": ".size-chart__notes", "className": ".size-chart__notes", "required": false, "description": "Fit guide notes." }
+    {
+      "name": "root",
+      "selector": ".size-chart",
+      "className": ".size-chart",
+      "required": true,
+      "description": "Stable product-profile wrapper with no independent landmark or widget role."
+    },
+    {
+      "name": "trigger",
+      "selector": ".size-chart__trigger",
+      "className": ".size-chart__trigger",
+      "required": true,
+      "description": "Canonical link-style Button that invokes the named modal while the component is closed."
+    },
+    {
+      "name": "overlay",
+      "selector": ".size-chart__overlay",
+      "className": ".size-chart__overlay",
+      "required": true,
+      "description": "D7 hook on the canonical centered Modal overlay while the component is open; a native target may map this owner to dialog modality."
+    },
+    {
+      "name": "dialog",
+      "selector": ".size-chart__dialog",
+      "className": ".size-chart__dialog",
+      "required": true,
+      "description": "D7 hook on the canonical named Modal dialog while open."
+    },
+    {
+      "name": "content",
+      "selector": ".size-chart__content",
+      "className": ".size-chart__content",
+      "required": true,
+      "description": "Canonical Modal body arranging the optional unit choice, required chart and optional notes."
+    },
+    {
+      "name": "unitControls",
+      "selector": ".size-chart__units",
+      "className": ".size-chart__units",
+      "required": false,
+      "description": "Optional canonical Segmented Control for mutually exclusive authored presentations."
+    },
+    {
+      "name": "chart",
+      "selector": ".size-chart__chart",
+      "className": ".size-chart__chart",
+      "required": true,
+      "description": "Required named canonical Data Table overflow owner containing one complete target-authored size matrix."
+    },
+    {
+      "name": "notes",
+      "selector": ".size-chart__notes",
+      "className": ".size-chart__notes",
+      "required": false,
+      "description": "Optional target-authored fit, method, approximation, tolerance or variation prose."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default size chart modal/drawer." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Canonical centered Modal size-reference profile at every Web viewport; Sheet and inline presentation are different target compositions, not D7 variants."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default centered panel size." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Intrinsic composition using canonical Modal and Data Table sizing."
+    }
   ],
   "states": [
-    { "name": "closed", "selectors": [".size-chart__drawer"], "description": "Hidden drawer state." },
-    { "name": "open", "selectors": [".size-chart__drawer[aria-hidden=\"false\"]", ".size-chart__drawer.is-open"], "description": "Open drawer state." },
-    { "name": "openPanel", "selectors": [".size-chart__drawer.is-open .size-chart__panel", ".size-chart__drawer[aria-hidden=\"false\"] .size-chart__panel"], "description": "Panel entrance state." },
-    { "name": "activeUnit", "selectors": [".size-chart__unit-btn[aria-pressed=\"true\"]", ".size-chart__unit-btn.is-active"], "description": "Active unit option state." },
-    { "name": "tableHover", "selectors": [".size-chart__table tr:hover td"], "description": "Table row hover state." }
+    {
+      "name": "closed",
+      "selectors": [
+        ".size-chart__trigger"
+      ],
+      "description": "Only the canonical invoker is available."
+    },
+    {
+      "name": "open",
+      "selectors": [
+        ".size-chart__dialog"
+      ],
+      "description": "The named canonical Modal and required chart are available."
+    },
+    {
+      "name": "withUnitChoice",
+      "selectors": [
+        ".size-chart__units"
+      ],
+      "description": "Optional canonical exclusive choice coordinates a complete authored table replacement."
+    },
+    {
+      "name": "withNotes",
+      "selectors": [
+        ".size-chart__notes"
+      ],
+      "description": "Optional target-authored supporting guidance follows the chart."
+    }
   ],
   "behavior": [
-    { "name": "dialog", "selectors": [".size-chart__drawer[aria-hidden=\"false\"]", ".size-chart__close"], "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-hidden", "aria-labelledby"], "events": ["click", "Escape"], "description": "Open state should trap or manage focus and close on explicit close or Escape when supported." },
-    { "name": "unitToggle", "selectors": [".size-chart__unit-btn[aria-pressed=\"true\"]"], "attributes": ["aria-pressed"], "events": ["click"], "description": "Unit toggles should keep measurement values and pressed state synchronized." },
-    { "name": "measurementTable", "selectors": [".size-chart__table"], "attributes": ["<table>", "<th>", "<td>"], "description": "Measurements should remain tabular data in web targets and equivalent native table/list semantics elsewhere." }
+    {
+      "name": "modalComposition",
+      "selectors": [
+        ".size-chart__trigger",
+        ".size-chart__overlay",
+        ".size-chart__dialog"
+      ],
+      "attributes": [
+        "aria-haspopup=\"dialog\"",
+        "aria-controls",
+        "role=\"dialog\"",
+        "aria-modal=\"true\"",
+        "aria-labelledby"
+      ],
+      "events": [
+        "open",
+        "close",
+        "Escape",
+        "Tab",
+        "Shift+Tab",
+        "backdrop request"
+      ],
+      "description": "Canonical centered Modal owns naming, visible dismiss action, content-appropriate initial focus, Tab containment, Escape, focus restoration and target-owned outside inertness/lifecycle at every Web viewport."
+    },
+    {
+      "name": "structuredInitialFocus",
+      "selectors": [
+        ".size-chart__dialog",
+        ".size-chart__chart"
+      ],
+      "attributes": [
+        "title tabindex=\"-1\"",
+        "omit aria-describedby by default"
+      ],
+      "events": [
+        "open"
+      ],
+      "description": "Because content includes a table and may include multiple paragraphs, targets initially focus the static visible title and let users explore structure instead of flattening it into aria-describedby."
+    },
+    {
+      "name": "unitChoiceComposition",
+      "selectors": [
+        ".size-chart__units"
+      ],
+      "attributes": [
+        "<fieldset>",
+        "<legend>",
+        "input[type=\"radio\"]",
+        "same name",
+        "exactly one checked"
+      ],
+      "events": [
+        "change",
+        "Space",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown"
+      ],
+      "description": "Optional unit choice composes canonical Segmented Control. The target owns one selected value and replaces the complete authored chart; D7 owns no second state or conversion."
+    },
+    {
+      "name": "measurementTable",
+      "selectors": [
+        ".size-chart__chart"
+      ],
+      "attributes": [
+        "<table>",
+        "<caption>",
+        "<thead>",
+        "<tbody>",
+        "<th scope=\"col\">",
+        "<th scope=\"row\">",
+        "<td>",
+        "tabindex=\"0\"",
+        "accessible overflow name"
+      ],
+      "events": [
+        "ArrowLeft",
+        "ArrowRight"
+      ],
+      "description": "The target supplies one complete canonical static Data Table with meaningful caption and header relationships; D7 prescribes no column schema and does not use grid semantics."
+    },
+    {
+      "name": "contentReplacement",
+      "selectors": [
+        ".size-chart__units",
+        ".size-chart__chart"
+      ],
+      "events": [
+        "change"
+      ],
+      "description": "A target may coordinate selected unit with a separately authored complete chart. D7 does not parse, calculate, convert, round, localize, persist, synchronize or announce measurement values."
+    },
+    {
+      "name": "boundedPresentation",
+      "selectors": [
+        ".size-chart__dialog",
+        ".size-chart__chart"
+      ],
+      "description": "D7 preserves one complete static table inside the centered Modal. A very large matrix requires a different target presentation; D7 does not virtualize, transpose, split or transform table structure at a breakpoint."
+    },
+    {
+      "name": "requiredComposition",
+      "selectors": [
+        ".size-chart",
+        ".size-chart__chart"
+      ],
+      "description": "Empty trigger label, title, dismiss label or chart omits the complete Size Chart rather than exposing an unusable modal shell."
+    }
   ],
   "properties": [
-    { "name": "triggerLabel", "type": "string", "required": true, "description": "Visible label for the chart trigger.", "targetMappings": { "web": [{ "kind": "content", "selector": ".size-chart__trigger" }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Visible dialog title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".size-chart__title" }] } },
-    { "name": "closeLabel", "type": "string", "required": true, "description": "Accessible name for the close action.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".size-chart__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
-    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls overlay visibility and trigger expanded state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".size-chart__drawer", "classNames": [".is-open"] }, { "kind": "attribute", "selector": ".size-chart__drawer", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }, { "kind": "attribute", "selector": ".size-chart__trigger", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } },
-    { "name": "activeUnit", "type": "boolean", "required": false, "defaultValue": false, "description": "Pressed state for an individual unit button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".size-chart__unit-btn", "attribute": "aria-pressed", "values": { "true": "true", "false": "false" }, "elements": ["button"] }] } }
+    {
+      "name": "triggerLabel",
+      "type": "string",
+      "required": true,
+      "description": "Non-empty visible localized label for the canonical modal invoker.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".size-chart__trigger"
+          }
+        ]
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Non-empty visible localized Modal title and accessible-name source.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".size-chart__dialog .modal__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": true,
+      "description": "Contextual localized accessible name for the canonical visible dismiss action.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".size-chart__dialog .modal__close",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "button"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "chart",
+      "type": "slot",
+      "required": true,
+      "description": "Required non-empty canonical Data Table composition containing one complete localized target-authored size matrix; D7 defines no raw data or conversion schema.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".size-chart__chart",
+            "classNames": [
+              ".size-chart__chart"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "unitControls",
+      "type": "slot",
+      "required": false,
+      "description": "Optional canonical Segmented Control; the target owns selected value and complete-chart replacement.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".size-chart__units",
+            "classNames": [
+              ".size-chart__units"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "notes",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-authored fit, method, approximation, tolerance or variation prose; ordinary content, not a live region by default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".size-chart__notes",
+            "classNames": [
+              ".size-chart__notes"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls whether the target presents the Size Chart Modal. Focus, inertness, dismissal, scroll locking and lifecycle remain target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".size-chart__overlay",
+            "attribute": "aria-hidden",
+            "values": {
+              "true": "false",
+              "false": "true"
+            }
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-text-secondary", "--color-text-primary", "--color-surface-secondary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover"],
-      "radius": ["--radius-lg", "--radius-sm"],
-      "shadow": ["--shadow-xl"],
-      "transition": ["--transition-default", "--transition-fast"],
-      "easing": ["--easing-default", "--easing-out"],
-      "typography": ["--typo-body-sm-size", "--typo-h4-size"]
+      "color": [
+        "--color-text-secondary"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ]
     }
   },
   "accessibility": [
-    "Use dialog semantics for modal targets and preserve focus management.",
-    "Keep the trigger and close actions keyboard accessible.",
-    "Use table semantics for measurement matrices."
+    "Compose canonical Modal with a visible title, named visible close action, content-appropriate title focus, contained Tab sequence, Escape dismissal, outside inertness and focus restoration.",
+    "Omit aria-describedby by default because the dialog contains a table and may contain multiple paragraphs that need structural navigation.",
+    "Compose a canonical Data Table with meaningful caption, scoped column and row headers, and a named keyboard-focusable overflow owner when needed.",
+    "Keep the measurement matrix a static native table rather than an interactive ARIA grid.",
+    "Compose optional unit choice with a visible legend, same-name native radios and exactly one checked value.",
+    "Do not use color, position, abbreviation or placeholder text as the only carrier of size, quantity, unit, approximation or tolerance meaning.",
+    "Keep long, localized, bidirectional and enlarged content reachable without clipping; use bdi for independently formatted values when needed.",
+    "Do not add a live region for the complete table by default; a target with evidence owns concise, non-duplicative update feedback.",
+    "Honor canonical dependency focus, forced-colors and reduced-motion behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map product size metafields or static chart data to the table and unit toggle." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css-composition",
+      "notes": "Composes the canonical centered Modal at every Web viewport plus Segmented Control and Data Table CSS; D7 adds only intrinsic content flow and native-dialog target normalization. Lifecycle remains target-owned."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-js",
+      "notes": "Main Product can render size-chart.liquid from product.metafields.custom.size_chart. A bounded merchant-owned metaobject supplies one required and one optional complete three-column table, localized notes and at most twenty valid rows per presentation; size-chart.js maps canonical behavior to native dialog modality without conversion."
+    },
+    "react": {
+      "status": "implemented",
+      "kind": "component-composition",
+      "notes": "The docs target uses shared SizeChartArtwork with canonical ModalArtwork, SegmentedControlArtwork and DataTableArtwork for both Exhibit and Studio."
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component-composition"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-composition"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-composition"
+    }
   }
 }

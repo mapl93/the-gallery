@@ -1,167 +1,74 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "tooltip",
   "name": "Tooltip",
   "registryId": "B5",
   "category": "layout",
   "status": "pilot",
-  "summary": "Short non-interactive helper text rendered from aria-label with generated bubble and arrow, hover and focus-visible visibility states, and tokenized surface styling.",
+  "summary": "Short non-interactive supplemental content linked to one focusable trigger, with hover, focus, controlled-open, Escape-dismissed, and target-owned positioning behavior.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/tooltip",
-    "css": {
-      "file": "components/css/layout.css",
-      "selector": ".tooltip"
-    },
+    "css": { "file": "components/css/layout.css", "selector": ".tooltip" },
     "docs": "site/src/content/components/tooltip.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".tooltip",
-      "className": ".tooltip",
-      "required": true,
-      "description": "Inline wrapper that owns positioning and receives the accessible tooltip text."
-    },
-    {
-      "name": "bubble",
-      "selector": ".tooltip::before",
-      "required": true,
-      "generated": true,
-      "description": "Generated text bubble rendered from the aria-label attribute."
-    },
-    {
-      "name": "arrow",
-      "selector": ".tooltip::after",
-      "required": false,
-      "generated": true,
-      "description": "Generated arrow that visually connects the bubble to the trigger."
-    }
+    { "name": "root", "selector": ".tooltip", "className": ".tooltip", "required": true, "description": "Inline positioning wrapper around exactly one trigger and one Tooltip content node." },
+    { "name": "trigger", "selector": ".tooltip__trigger", "className": ".tooltip__trigger", "required": true, "description": "Consumer-owned focusable trigger that retains its own accessible name and references the Tooltip content." },
+    { "name": "content", "selector": ".tooltip__content", "className": ".tooltip__content", "required": true, "description": "Explicit short non-interactive content node with role tooltip and a target-owned id." },
+    { "name": "arrow", "selector": ".tooltip__content::after", "required": false, "generated": true, "description": "Decorative arrow that visually relates the content to its trigger." }
   ],
   "variants": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default top-positioned tooltip."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Default top-positioned Tooltip presentation." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default compact tooltip size."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Default compact Tooltip content size." }
   ],
   "states": [
-    {
-      "name": "hidden",
-      "selectors": [".tooltip::before", ".tooltip::after"],
-      "description": "Resting generated content state with zero opacity."
-    },
-    {
-      "name": "hover",
-      "selectors": [".tooltip:hover::before", ".tooltip:hover::after"],
-      "description": "Pointer hover state that reveals the tooltip."
-    },
-    {
-      "name": "focusVisible",
-      "selectors": [".tooltip:focus-visible::before", ".tooltip:focus-visible::after"],
-      "description": "Keyboard focus-visible state that reveals the tooltip."
-    }
+    { "name": "hidden", "selectors": [".tooltip__content"], "description": "Resting content is visually hidden and does not receive pointer events." },
+    { "name": "hover", "selectors": [".tooltip:not(.is-dismissed):hover .tooltip__content"], "description": "Hovering either trigger or content keeps the Tooltip visible." },
+    { "name": "focus", "selectors": [".tooltip:not(.is-dismissed):focus-within .tooltip__content"], "description": "Focus within the trigger path reveals the Tooltip while focus remains on the trigger." },
+    { "name": "open", "selectors": [".tooltip.is-open:not(.is-dismissed) .tooltip__content"], "description": "Target-controlled open state reveals the Tooltip." },
+    { "name": "dismissed", "selectors": [".tooltip.is-dismissed .tooltip__content"], "description": "Escape temporarily suppresses visible content without moving focus." }
   ],
   "behavior": [
-    {
-      "name": "contentSource",
-      "attributes": ["aria-label"],
-      "description": "The generated bubble reads its text from aria-label; adapters that do not use CSS-generated content must preserve an equivalent accessible label or description."
-    },
-    {
-      "name": "visibility",
-      "selectors": [".tooltip:hover::before", ".tooltip:hover::after", ".tooltip:focus-visible::before", ".tooltip:focus-visible::after"],
-      "events": ["hover", "focus"],
-      "description": "Tooltip content appears on hover and keyboard focus without requiring a click."
-    },
-    {
-      "name": "nonInteractive",
-      "description": "Tooltip content must remain short and non-interactive; use Popover when the floating content contains controls or rich structure."
-    }
+    { "name": "descriptionRelationship", "attributes": ["role=\"tooltip\"", "id", "aria-describedby"], "description": "The trigger references the explicit Tooltip content by id so supplemental content does not replace the trigger's accessible name." },
+    { "name": "visibility", "selectors": [".tooltip:not(.is-dismissed):hover .tooltip__content", ".tooltip:not(.is-dismissed):focus-within .tooltip__content", ".tooltip.is-open:not(.is-dismissed) .tooltip__content"], "events": ["pointerenter", "focus", "openChange"], "description": "Tooltip appears on pointer hover, trigger focus, or an explicit target-controlled open state." },
+    { "name": "hoverPersistence", "events": ["pointermove"], "description": "Pointer can move from the trigger onto the Tooltip content without closing it, and content remains until hover/focus ends or it is dismissed." },
+    { "name": "dismissal", "events": ["Escape", "pointerleave", "blur"], "description": "Escape dismisses without moving focus; leaving the complete hover/focus path closes normally and clears temporary dismissal." },
+    { "name": "nonInteractive", "description": "Tooltip content remains short and non-interactive; use Popover or visible content for controls, required instructions, validation, or rich structure." },
+    { "name": "targetPositioning", "description": "Targets own collision detection, portals/top layer, alternative placement, delay coordination, and global mutual exclusion." }
   ],
   "properties": [
-    {
-      "name": "label",
-      "type": "string",
-      "required": true,
-      "description": "Short supplemental text exposed through aria-label and rendered by the web tooltip bubble.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "attribute",
-            "selector": ".tooltip",
-            "attribute": "aria-label",
-            "valueFrom": "property"
-          }
-        ]
-      }
-    }
+    { "name": "content", "type": "string", "required": true, "description": "Short supplemental plain text rendered in the Tooltip content node.", "targetMappings": { "web": [{ "kind": "content", "selector": ".tooltip__content" }] } },
+    { "name": "trigger", "type": "slot", "required": true, "description": "Exactly one focusable consumer-owned trigger with its own visible and accessible name.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".tooltip__trigger", "classNames": [".tooltip__trigger"] }] } },
+    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Optional target-controlled visible state; ordinary web triggers still reveal content on hover and focus.", "targetMappings": { "web": [{ "kind": "class", "selector": ".tooltip", "classNames": [".is-open"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-surface-statement",
-        "--color-text-inverse"
-      ],
-      "radius": [
-        "--radius-sm"
-      ],
-      "z-index": [
-        "--z-dropdown"
-      ],
-      "transition": [
-        "--transition-fast"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
-      "typography": [
-        "--typo-body-size"
-      ]
+      "color": ["--color-surface-statement", "--color-text-primary"],
+      "radius": ["--radius-sm"],
+      "z-index": ["--z-dropdown"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--font-family-body", "--typo-body-sm-size", "--typo-body-sm-line-height"],
+      "spacing": ["--space-layout-element-gap"]
     }
   },
   "accessibility": [
-    "Use Tooltip only for short supplemental text, not required instructions or interactive content.",
-    "Ensure the trigger is keyboard focusable when the tooltip is attached to a non-focusable element.",
-    "Reveal the tooltip on keyboard focus, not only on hover.",
-    "Do not rely on generated visual text as the only accessible name when the trigger needs a different label."
+    "Preserve the trigger's accessible name and reference Tooltip content with aria-describedby.",
+    "Render explicit content with role=\"tooltip\" and a unique target-owned id.",
+    "Reveal on hover and focus, keep content hoverable and persistent, and support Escape dismissal without moving focus.",
+    "Keep content short and non-interactive; required information must remain visible elsewhere.",
+    "Do not depend on Tooltip for touch-only access to essential information."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented with generated pseudo-elements in components/css/layout.css."
-    },
-    "shopify": {
-      "status": "implemented",
-      "kind": "liquid-css-class",
-      "notes": "Shopify Liquid can render the same tooltip wrapper and aria-label contract."
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "style"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "composable"
-    }
+    "web": { "status": "implemented", "kind": "css-target-behavior", "notes": "Canonical CSS owns presentation; the consuming target owns ids, Escape state, delay, and collision behavior." },
+    "shopify": { "status": "implemented", "kind": "host-tooltip-or-liquid-css", "notes": "Use Shopify host Tooltip/interestFor where available; theme targets may emit the neutral DOM relationship and target behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

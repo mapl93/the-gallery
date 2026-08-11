@@ -59,11 +59,14 @@ A component is target-ready only when the required target layers are present.
 - Public tokens/customization hooks are preserved.
 - Accessibility requirements from the contract are represented in the target.
 - The component is included in a target manifest or registry output.
+- The manifest declares a dependency-closed install slice so consumers do not
+  receive unrelated component behavior.
 - The adapter validator can prove that required files and relationships exist.
 
 ## Current Adapter Docs
 
 - `docs/adapters/shopify.md`
+- `docs/decisions/0273-modular-copy-and-own-performance-architecture.md`
 
 ## References
 

@@ -1,40 +1,89 @@
 ## Overview
 
-Announcement Bar presents one concise, target-owned message above the global header. Its content may include a native link.
+Announcement Bar is one controlled compact surface with three mutually exclusive content modes: `static`, `countdown`, and `rotating`. Dismissal is an independent capability available in every mode. The former G11 Announcement Extended identity is deprecated and adds no second implementation.
 
-<Preview html={'<section class="announcement tg-preview-static" aria-label="Store announcement"><a href="#announcement-shipping">Complimentary shipping on orders over $150</a></section>'} label="Announcement Bar" />
+The component owns its intrinsic layout, dependency composition, rotating selection controls, and request events. The target owns campaign content, scheduling, eligibility, placement, persistence, reappearance, analytics, navigation, and focus after controlled removal.
 
 ## Presentation
 
-The root owns the statement surface, centered text treatment, containment, and optional link styling. `message` is required slot content; `label` is optional when the bar is exposed as a labelled region.
+<Preview html={'<section class="announcement announcement--rotating" aria-label="Gallery announcements" aria-roledescription="carousel" data-announcement data-autoplay="false" data-autoplay-interval="6000"><div class="announcement__body"><div class="announcement__rotation carousel"><div class="announcement__track carousel__track" id="announcement-preview-track" tabindex="0" aria-label="Gallery announcements"><div class="announcement__slide carousel__slide" role="group" aria-roledescription="slide" aria-label="Message 1 of 3" aria-current="true">Complimentary shipping on selected works.</div><div class="announcement__slide carousel__slide" role="group" aria-roledescription="slide" aria-label="Message 2 of 3">Private studio visits available this month.</div><div class="announcement__slide carousel__slide" role="group" aria-roledescription="slide" aria-label="Message 3 of 3">New ceramic studies are now in the collection.</div></div><div class="announcement__controls" aria-label="Gallery announcements controls"><button class="icon-btn icon-btn--sm icon-btn--round carousel__nav-btn announcement__previous" type="button" aria-label="Previous announcement" aria-controls="announcement-preview-track">&#8592;</button><span class="announcement__counter" aria-hidden="true" data-counter-template="{current}/{total}">1/3</span><button class="icon-btn icon-btn--sm icon-btn--round carousel__nav-btn announcement__next" type="button" aria-label="Next announcement" aria-controls="announcement-preview-track">&#8594;</button></div><p class="announcement__status carousel__status visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-status-template="Message {current} of {total}">Message 1 of 3</p></div></div></section>'} label="Canonical rotating Announcement Bar" />
 
-Dismissal, rotation, countdowns, scheduling, targeting, persistence, and campaign analytics are not part of the accepted component API.
+### Content modes
 
-## Usage Guidelines
+- `static` renders one stable message and optional canonical Link. It is ordinary page content, not an alert or live region.
+- `countdown` composes canonical Countdown with `countdown--inline`. Its deadline, selected units, current values, retained zero, expiry state, and event remain owned by Countdown.
+- `rotating` composes canonical Carousel with real horizontal scroll-snap slides, previous/next Icon Buttons, and a visible localized current/total counter. It never renders dots or a timing bar.
+
+Every mode wraps intrinsically from its container. Narrow hosts may produce more rows; hiding units, clipping messages, scaling the component, and fixed-height animation are invalid.
+
+Canonical mode selectors are `.announcement--countdown` and `.announcement--rotating`; Static uses the unmodified `.announcement` root.
+
+### Controlled dismissal
+
+`dismissible=true` adds canonical Close Button without creating a fourth content mode. Activation emits `announcementdismissrequest`; the target reconciles `visible`, removes or hides the surface, and decides focus destination, persistence, scope, expiry, and reappearance.
+
+## Guidelines
 
 <DoDont>
-  <Do>Use one brief message with a destination that directly supports the claim.</Do>
-  <Dont>Do not place critical checkout, consent, or legal information only in a promotional announcement.</Dont>
+  <Do>Use one concise static message, a truthful canonical Countdown, or a short ordered set of rotating messages.</Do>
+  <Do>Keep the same message understandable when motion is unavailable and provide localized control names and templates.</Do>
+  <Do>Let the target control Header placement, scheduling, dismissal persistence, URLs, and campaign analytics.</Do>
+  <Dont>Do not combine Countdown and Rotating content or treat dismissal as a content mode.</Dont>
+  <Dont>Do not rotate critical legal, checkout, consent, safety, or time-sensitive information.</Dont>
+  <Dont>Do not recreate Countdown, Carousel, Icon Button, Close Button, or Link behavior inside Announcement Bar.</Dont>
 </DoDont>
 
-- Keep the message readable without requiring animation.
-- Use a native link only when the message navigates to a relevant destination.
-- Keep campaign and scheduling policy in the consuming target.
+Autoplay is optional and defaults off. When enabled it defaults to 6000 ms, exposes pause/play, pauses for hover and hidden documents, and becomes durably paused after focus or manual navigation. Only an explicit Play request resumes it. Reduced motion suppresses automatic rotation and smooth scrolling.
 
 ## Accessibility
 
-- Use `label` only when it adds useful context beyond the visible message.
-- Preserve visible keyboard focus on linked announcements.
-- Do not make essential information depend on automatic rotation or time-limited visibility.
-- Keep the message understandable without color or decorative symbols.
+- Rotating mode requires a useful accessible region name and exposes `aria-roledescription="carousel"`.
+- Each real message is a named `group` with `aria-roledescription="slide"`; exactly one has `aria-current="true"`.
+- Previous, next, optional pause/play, and dismiss controls are native canonical buttons with localized accessible names.
+- Direct touch scrolling and focused track keyboard scrolling remain available; no root-wide Arrow key listener is installed.
+- The visible counter is not redundantly announced. A separate localized position status is `aria-live="off"` while autoplay runs and polite while user-controlled.
+- Focus, hover, document visibility, and reduced-motion preferences stop automatic changes without hiding content.
+- Static page-load content remains neutral. A target replacing content after load must choose live-announcement policy from the actual meaning and urgency.
 
-## References
+## Specification
 
-<PropTable>
-  <tr><td>`label`</td><td>string</td><td>optional</td><td>Accessible name when rendered as a labelled region</td></tr>
-  <tr><td>`message`</td><td>slot</td><td>required</td><td>Target-owned announcement content with an optional native link</td></tr>
-</PropTable>
+### Public properties
 
-Anatomy: required `.announcement` root and an optional native `.announcement a` link. Dependencies: none.
+| Property | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `mode` | `static \| countdown \| rotating` | `static` | Exclusive content model |
+| `label` | string | empty | Region name; composition-required for rotating mode |
+| `message` | slot | conditional | Static message and optional Link |
+| `countdown` | slot | conditional | Canonical inline Countdown |
+| `messages` | slot | conditional | At least two ordered real rotating messages |
+| `visible` | boolean | `true` | Target-controlled presence |
+| `dismissible` | boolean | `false` | Orthogonal canonical Close Button |
+| `dismissLabel` | string | required | Localized dismiss name |
+| `autoplay` | boolean | `false` | Rotating-mode automatic progression |
+| `autoplayInterval` | 3000–12000 ms | `6000` | Validated rotation interval |
+| `previousLabel`, `nextLabel` | string | required | Localized Icon Button names |
+| `pauseLabel`, `playLabel` | string | required | Localized rotation-control names |
+| `counterTemplate` | string | required | Visible template with `{current}` and `{total}` |
+| `statusTemplate` | string | required | Assistive template with `{current}` and `{total}` |
 
-Whether the bar becomes dismissible, scheduled, targeted, or rotating remains an open product boundary.
+### Events
+
+- `announcementdismissrequest` requests target-controlled removal.
+- `announcementchange` reports zero-based `current`, `total`, and whether selection was manual.
+- `announcementplaybackchange` reports `playing`, `paused`, or `off` and projected user-pause state.
+
+### Anatomy and dependencies
+
+The required `.announcement` and `.announcement__body` contain exactly one mode-specific composition. Rotating mode uses `.announcement__rotation`, `.announcement__track`, `.announcement__slide`, `.announcement__controls`, `.announcement__previous`, `.announcement__counter`, `.announcement__next`, optional `.announcement__rotation-control`, and `.announcement__status`. Dismissible composition adds `.announcement__dismiss.close-btn`.
+
+Dependencies are canonical [Link](/components/link), [Close Button](/components/close-button), [Countdown](/components/countdown), [Carousel](/components/carousel), and [Icon Button](/components/icon-button).
+
+### Target translation
+
+- Neutral Web implements all modes through canonical CSS, the Countdown runtime, and the shared Carousel rotation service.
+- Shopify currently implements the static Theme-section profile. Countdown, rotation, controlled dismissal, Header-group placement, and merchant schema remain explicit target maturity work.
+- React and Angular should project the same controlled state and request events over the neutral DOM contract.
+- Figma represents static, countdown, rotating, paused, dismissible, and wrapped visual states without simulating persistence or a clock.
+- SwiftUI and Compose use native controls and scheduling while preserving the same exclusive modes and ownership boundary.
+
+This implementation is prepared for human stability review but remains `pilot`. Review compact density, wrapping, control hierarchy, localized copy, RTL, zoom, forced colors, reduced motion, every exclusive mode, controlled dismissal, and the no-progress-bar treatment before any `stable` promotion.

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "date-picker",
   "name": "Date Picker",
   "registryId": "H4",
   "category": "forms",
   "status": "pilot",
-  "summary": "Calendar date-selection contract with input dependency, floating calendar anatomy, month navigation, today/selected/outside/disabled day states, and grid keyboard behavior.",
+  "summary": "Single-date entry and selection contract with an editable ISO text owner, explicit calendar trigger, non-modal dialog, roving-focus grid, native form lifecycle, bounds, and validation-preserving field states.",
   "dependencies": ["input"],
   "source": {
     "registry": "registry.json#/components/date-picker",
@@ -29,14 +29,21 @@
       "selector": ".datepicker__input",
       "className": ".datepicker__input",
       "required": true,
-      "description": "Native text input that owns the popup relationship and selected date value."
+      "description": "Editable native text input that owns the ISO date value, validation, form submission, and popup relationship."
+    },
+    {
+      "name": "trigger",
+      "selector": ".datepicker__trigger",
+      "className": ".datepicker__trigger",
+      "required": true,
+      "description": "Explicit button that opens or closes the calendar without replacing the input as value owner."
     },
     {
       "name": "calendar",
       "selector": ".datepicker__calendar",
       "className": ".datepicker__calendar",
       "required": true,
-      "description": "Floating calendar surface."
+      "description": "Anchored non-modal dialog containing month navigation and the date grid."
     },
     {
       "name": "header",
@@ -74,6 +81,20 @@
       "description": "Weekday heading row."
     },
     {
+      "name": "weekday",
+      "selector": ".datepicker__weekday",
+      "className": ".datepicker__weekday",
+      "required": true,
+      "description": "Column header with an abbreviated visible label and full accessible weekday name."
+    },
+    {
+      "name": "week",
+      "selector": ".datepicker__week",
+      "className": ".datepicker__week",
+      "required": true,
+      "description": "Semantic grid row containing seven day cells."
+    },
+    {
       "name": "grid",
       "selector": ".datepicker__grid",
       "className": ".datepicker__grid",
@@ -85,7 +106,7 @@
       "selector": ".datepicker__day",
       "className": ".datepicker__day",
       "required": true,
-      "description": "Selectable day cell."
+      "description": "Native button exposed as one date gridcell; only the roving focus target participates in sequential navigation."
     }
   ],
   "variants": [
@@ -139,14 +160,39 @@
       "description": "Unavailable native input state."
     },
     {
+      "name": "inputReadOnly",
+      "selectors": [".datepicker__input:read-only:not(:disabled)"],
+      "description": "Readable and submittable value whose editing and calendar trigger are unavailable."
+    },
+    {
+      "name": "triggerHover",
+      "selectors": [".datepicker__trigger:hover:not(:disabled)"],
+      "description": "Pointer affordance on the explicit calendar trigger."
+    },
+    {
+      "name": "triggerFocus",
+      "selectors": [".datepicker__trigger:focus-visible"],
+      "description": "Visible keyboard focus on the explicit calendar trigger."
+    },
+    {
+      "name": "triggerDisabled",
+      "selectors": [".datepicker__trigger:disabled"],
+      "description": "Trigger state synchronized from disabled or read-only input ownership."
+    },
+    {
       "name": "navHover",
       "selectors": [".datepicker__nav-btn:hover"],
       "description": "Pointer hover state on month navigation controls."
     },
     {
       "name": "dayHover",
-      "selectors": [".datepicker__day:hover"],
+      "selectors": [".datepicker__day:hover:not(:disabled)"],
       "description": "Pointer hover state on a day cell."
+    },
+    {
+      "name": "dayFocus",
+      "selectors": [".datepicker__day:focus-visible"],
+      "description": "Visible focus for the single roving day target."
     },
     {
       "name": "today",
@@ -172,35 +218,64 @@
   "behavior": [
     {
       "name": "inputRelationship",
-      "attributes": ["aria-haspopup=\"grid\"", "aria-expanded", "aria-controls"],
-      "description": "The input or trigger should expose the calendar relationship and keep expanded state synchronized."
+      "attributes": ["role=\"combobox\"", "aria-haspopup=\"dialog\"", "aria-autocomplete=\"none\"", "aria-expanded", "aria-controls"],
+      "description": "The editable input owns the popup relationship and expanded state; the explicit button references the same calendar dialog."
+    },
+    {
+      "name": "dialogRelationship",
+      "attributes": ["role=\"dialog\"", "aria-label", "aria-live=\"polite\""],
+      "description": "The anchored calendar is a named non-modal dialog and announces month changes without asserting modal behavior."
     },
     {
       "name": "calendarGrid",
       "attributes": ["role=\"grid\"", "role=\"row\"", "role=\"gridcell\"", "aria-selected", "aria-current=\"date\"", "aria-disabled"],
-      "description": "The calendar should expose date selection semantics when using a custom grid."
+      "description": "Six explicit week rows expose date buttons as gridcells, with one enabled day at tabindex zero and all other days at minus one."
     },
     {
       "name": "monthNavigation",
-      "events": ["previous month", "next month", "PageUp", "PageDown"],
-      "description": "Users can move between months with visible controls and keyboard shortcuts."
+      "events": ["previous month", "next month", "PageUp", "PageDown", "Shift+PageUp", "Shift+PageDown"],
+      "description": "Visible controls move by month; Page keys preserve the day when possible and Shift plus Page keys move by year."
     },
     {
       "name": "dayKeyboardNavigation",
       "events": ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "Enter", "Space", "Escape"],
-      "description": "Keyboard navigation moves through days, selects with Enter or Space, and closes with Escape."
+      "description": "Arrow navigation respects writing direction, Home and End move within the week, Enter or Space selects, and Escape returns focus to the input."
     },
     {
       "name": "selectionState",
       "selectors": [".datepicker__day--selected", ".datepicker__day--today", ".datepicker__day--outside", ".datepicker__day:disabled"],
       "description": "Visual day states must stay synchronized with selected, current, outside-month, and disabled data."
+    },
+    {
+      "name": "valueAndBounds",
+      "attributes": ["data-date", "data-min", "data-max"],
+      "events": ["input", "change"],
+      "description": "Selection serializes a local calendar date as YYYY-MM-DD, honors inclusive ISO min and max bounds, and emits native input then change events."
+    },
+    {
+      "name": "formLifecycle",
+      "attributes": ["name", "required", "disabled", "readonly", "autocomplete"],
+      "events": ["reset"],
+      "description": "The native text input owns submission and constraint attributes; reset restores its authored value and closes the popup."
+    },
+    {
+      "name": "controlledAndUncontrolled",
+      "events": ["input", "change"],
+      "description": "Uncontrolled targets enhance the authored input value; controlled adapters write value and open state back after observing native events."
     }
   ],
   "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible accessible name associated with the native editable input.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__label" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the selected date value.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".datepicker", "source": "variants" }] } },
-    { "name": "value", "type": "string", "required": false, "defaultValue": "2026-07-12", "description": "Selected date serialized for the native input value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": false, "defaultValue": "2026-07-12", "description": "Editable and selected local calendar date serialized as YYYY-MM-DD.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "name", "type": "string", "required": false, "description": "Stable native form field name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "placeholder", "type": "string", "required": false, "defaultValue": "YYYY-MM-DD", "description": "Format hint displayed while the editable value is empty.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "autocomplete", "type": "string", "required": false, "defaultValue": "off", "description": "Native autofill hint for the text input.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "autocomplete", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "min", "type": "string", "required": false, "description": "Inclusive lower bound serialized as YYYY-MM-DD.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "data-min", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "max", "type": "string", "required": false, "description": "Inclusive upper bound serialized as YYYY-MM-DD.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "data-max", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls calendar visibility and the input expanded state.", "targetMappings": { "web": [{ "kind": "class", "selector": ".datepicker", "classNames": [".datepicker--open"] }, { "kind": "attribute", "selector": ".datepicker__input", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" }, "elements": ["input"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the date input unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "readOnly", "type": "boolean", "required": false, "defaultValue": false, "description": "Prevents editing and calendar selection while preserving focus, selection, and form submission.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "readonly", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Marks the date input as required.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for date guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".datepicker__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
   ],
@@ -210,6 +285,7 @@
         "--color-input-default-unfocused-bg",
         "--color-input-default-unfocused-inner-border",
         "--color-input-default-unfocused-value",
+        "--color-input-default-unfocused-placeholder",
         "--color-input-default-hover-bg",
         "--color-input-default-hover-inner-border",
         "--color-input-default-focused-inner-border",
@@ -218,12 +294,15 @@
         "--color-input-default-disabled-inner-border",
         "--color-input-default-disabled-value",
         "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
         "--color-input-error-focused-inner-border",
         "--color-input-error-focused-outer-border",
         "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
         "--color-input-success-focused-inner-border",
         "--color-input-success-focused-outer-border",
         "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
         "--color-input-warning-focused-inner-border",
         "--color-input-warning-focused-outer-border",
         "--color-surface-primary",
@@ -234,6 +313,7 @@
         "--color-text-secondary",
         "--color-text-disabled",
         "--color-button-primary-bg-default",
+        "--color-button-primary-bg-hover",
         "--color-button-primary-text-default"
       ],
       "radius": [
@@ -258,7 +338,10 @@
         "--font-family-body",
         "--typo-input-value-size",
         "--typo-input-value-line-height",
-        "--typo-body-size"
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
       ],
       "spacing": [
         "--space-input-padding-x",
@@ -270,17 +353,19 @@
     }
   },
   "accessibility": [
-    "Keep the selected date synchronized between the input value and the calendar grid.",
+    "Keep the editable ISO input value synchronized with the selected calendar day without converting it through UTC.",
+    "Keep the explicit calendar trigger keyboard reachable and named for choosing or changing the current date.",
+    "Expose the anchored calendar as a named non-modal dialog with explicit week rows and one roving gridcell tab stop.",
     "Expose the current day with aria-current=\"date\" when it is visible.",
     "Expose selected and disabled days to assistive technology.",
-    "Support arrow key navigation across days and month navigation from the keyboard.",
+    "Support direction-aware arrow navigation, week boundaries, month and year movement, selection, and Escape focus return.",
     "Preserve the Input contract's visible label and description requirements."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; date parsing, calendar state, grid navigation, and input synchronization must be provided by the consuming target."
+      "kind": "css-js",
+      "notes": "Implemented by components/css/forms.css and the progressive enhancer in components/js/theme.js, including local ISO parsing, popup state, bounds, roving grid focus, native events, and form reset."
     },
     "shopify": {
       "status": "planned",

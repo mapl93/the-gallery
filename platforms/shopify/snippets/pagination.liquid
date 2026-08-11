@@ -1,0 +1,41 @@
+{%- comment -%}
+  Canonical Pagination adapter.
+  Usage: {% render 'pagination', paginate: paginate, anchor: '#Comments-123', class_name: 'comments__pagination' %}
+  The caller owns the paginated collection, optional fragment destination and
+  optional domain composition hook.
+{%- endcomment -%}
+
+{%- if paginate != blank and paginate.pages > 1 -%}
+  {%- assign pagination_anchor = anchor | default: '' -%}
+  <nav class="pagination{% if class_name != blank %} {{ class_name }}{% endif %}" aria-label="{{ 'pagination.label' | t }}" data-current-page="{{ paginate.current_page }}">
+    <ul class="pagination__list">
+      {%- if paginate.previous -%}
+        <li class="pagination__item">
+          <a class="link link--subtle pagination__link" href="{{ paginate.previous.url }}{{ pagination_anchor }}" aria-label="{{ 'pagination.previous_page' | t }}">
+            {% render 'icon', name: 'chevron-left', size: 16 %}
+          </a>
+        </li>
+      {%- endif -%}
+
+      {%- for part in paginate.parts -%}
+        {%- if part.is_link -%}
+          <li class="pagination__item">
+            <a class="link link--subtle pagination__link" href="{{ part.url }}{{ pagination_anchor }}" aria-label="{{ 'pagination.page' | t: number: part.title }}">{{ part.title }}</a>
+          </li>
+        {%- elsif part.title == paginate.current_page -%}
+          <li class="pagination__item"><span class="pagination__current" aria-current="page">{{ part.title }}</span></li>
+        {%- else -%}
+          <li class="pagination__item" aria-hidden="true"><span class="pagination__ellipsis" aria-hidden="true">&hellip;</span></li>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if paginate.next -%}
+        <li class="pagination__item">
+          <a class="link link--subtle pagination__link" href="{{ paginate.next.url }}{{ pagination_anchor }}" aria-label="{{ 'pagination.next_page' | t }}">
+            {% render 'icon', name: 'chevron-right', size: 16 %}
+          </a>
+        </li>
+      {%- endif -%}
+    </ul>
+  </nav>
+{%- endif -%}

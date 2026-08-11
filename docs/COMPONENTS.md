@@ -110,7 +110,7 @@ These button tokens must resolve in every viewport mode:
 | B | Layout Primitives | Card, Modal, Drawer, Toast, Tooltip, Accordion, Tabs, Breadcrumb |
 | C | Global | Header, Footer, Announcement Bar, Mobile Menu, Search Overlay, Cart Drawer |
 | D | Product | Product Card, Product Gallery, Product Info, Variant Selector, Add to Cart, Reviews, Related Products, Recently Viewed |
-| E | Collection | Collection Hero, Collection Grid, Collection Filters, Pagination |
+| E | Collection | Collection Hero, Collection Grid, Filter Panel, Pagination |
 | F | Art & Storytelling | Artist Profile, Process Timeline, Certificate of Authenticity, Collection Story, Studio Visit |
 | G | Marketing | Hero Banner, Newsletter, Testimonials, Social Proof, Instagram Feed |
 
@@ -942,22 +942,22 @@ Small passive status indicators for product states. Badge is non-interactive;
 .badge {
   --_badge-bg: var(--color-feedback-info-bg);
   --_badge-text: var(--color-feedback-info-default);
-  --_badge-radius: var(--radius-full);
 
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  max-inline-size: 100%;
   padding: 2px 10px;
-  border-radius: var(--_badge-radius);
+  border-radius: var(--radius-full);
   background: var(--_badge-bg);
   color: var(--_badge-text);
   font-family: var(--font-family-body);
-  font-size: calc(var(--typo-body-size) * 0.75);
+  font-size: var(--typo-caption-size);
   font-weight: 600;
-  line-height: 1.4;
+  line-height: var(--typo-caption-line-height);
+  text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .badge--success { --_badge-bg: var(--color-feedback-success-bg); --_badge-text: var(--color-feedback-success-default); }
@@ -985,6 +985,8 @@ announcement.
   --_tag-bg: var(--color-surface-secondary);
   --_tag-text: var(--color-text-secondary);
   --_tag-border: var(--color-border-subtle);
+  --_tag-focus: var(--color-border-focus);
+  --_tag-remove-size: max(var(--space-input-icon-size), 24px);
   --_tag-padding-start: 12px;
   --_tag-padding-end: 12px;
 
@@ -997,7 +999,9 @@ announcement.
   background: var(--_tag-bg);
   color: var(--_tag-text);
   font-family: var(--font-family-body);
-  font-size: calc(var(--typo-body-size) * 0.875);
+  font-size: var(--typo-body-sm-size);
+  line-height: var(--typo-body-sm-line-height);
+  max-inline-size: 100%;
 }
 
 .tag:has(.tag__remove) {
@@ -1005,7 +1009,7 @@ announcement.
 }
 
 .tag__label {
-  min-width: 0;
+  min-inline-size: 0;
   overflow-wrap: anywhere;
 }
 
@@ -1013,8 +1017,9 @@ announcement.
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--space-input-icon-size);
-  height: var(--space-input-icon-size);
+  inline-size: var(--_tag-remove-size);
+  block-size: var(--_tag-remove-size);
+  flex: 0 0 var(--_tag-remove-size);
   padding: 0;
   border: none;
   background: none;
@@ -1022,9 +1027,11 @@ announcement.
   cursor: pointer;
   opacity: 0.6;
 }
-.tag__remove:hover { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .tag__remove:hover { opacity: 1; }
+}
 .tag__remove:focus-visible {
-  outline: 2px solid var(--color-border-focus);
+  outline: 2px solid var(--_tag-focus);
   outline-offset: 2px;
 }
 ```
@@ -1172,27 +1179,32 @@ value. Field Wrapper owns associated helper or validation messages.
 
 ### A11. Rating Stars
 
-Display-only star rating for reviews.
+Compact display-only rating projection. The target resolves raw rating data into
+full, half, and empty anatomy; neutral Web adds no formatter or runtime.
 
 ```css
 .rating {
   --_rating-filled: var(--color-text-accent);
-  --_rating-empty: var(--color-border-subtle);
-  --_rating-size: 16px;
+  --_rating-empty: var(--color-text-secondary);
+  --_rating-size: var(--typo-body-size);
 
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  max-inline-size: 100%;
 }
 
 .rating__stars {
-  display: flex;
-  gap: 2px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  direction: ltr;
+  gap: 0.125rem;
 }
 
 .rating__star {
-  width: var(--_rating-size);
-  height: var(--_rating-size);
+  inline-size: var(--_rating-size);
+  block-size: var(--_rating-size);
   color: var(--_rating-empty);
 }
 .rating__star--filled { color: var(--_rating-filled); }
@@ -1201,69 +1213,97 @@ Display-only star rating for reviews.
   color: var(--_rating-empty);
 }
 .rating__star--half::before {
-  content: "";
+  content: "★";
   position: absolute;
-  inset: 0;
-  width: 50%;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 50%;
   overflow: hidden;
   color: var(--_rating-filled);
 }
 
 .rating__count {
-  font-size: calc(var(--typo-body-size) * 0.875);
   color: var(--color-text-secondary);
+  font-family: var(--font-family-body);
+  font-size: var(--typo-body-sm-size);
+  line-height: var(--typo-body-sm-line-height);
+  overflow-wrap: anywhere;
 }
 ```
 
 ```html
-<div class="rating" aria-label="Rating: 4.5 out of 5">
-  <div class="rating__stars">
-    {% for i in (1..5) %}
-      {% if i <= rating_floor %}
-        {% render 'icon', name: 'star-filled', class: 'rating__star rating__star--filled' %}
-      {% elsif i == rating_ceil and rating_has_half %}
-        {% render 'icon', name: 'star-half', class: 'rating__star rating__star--half' %}
-      {% else %}
-        {% render 'icon', name: 'star', class: 'rating__star' %}
-      {% endif %}
-    {% endfor %}
-  </div>
-  <span class="rating__count">({{ review_count }})</span>
-</div>
+<span class="rating">
+  <span class="rating__stars" role="img" aria-label="3.5 out of 5 stars">
+    <span class="rating__star rating__star--filled" aria-hidden="true">★</span>
+    <span class="rating__star rating__star--filled" aria-hidden="true">★</span>
+    <span class="rating__star rating__star--filled" aria-hidden="true">★</span>
+    <span class="rating__star rating__star--half" aria-hidden="true">☆</span>
+    <span class="rating__star" aria-hidden="true">☆</span>
+  </span>
+  <span class="rating__count" dir="auto">24 reviews</span>
+</span>
 ```
+
+Keep the optional count outside the star image so it remains independently
+readable. Full, half, and empty states use solid, partial-fill, and outline form
+in addition to color. Use Star Input for value entry.
 
 ---
 
 ### A12. Loading Skeleton
 
-Placeholder shimmer for async content.
+Decorative loading geometry. Skeleton owns only the visual shape; the target
+owns dimensions, the real content region's busy lifecycle, optional localized
+Status text, data/errors, and atomic replacement.
 
 ```css
 .skeleton {
-  --_skel-bg: var(--color-surface-secondary);
-  --_skel-shine: var(--color-surface-primary);
-
   background: linear-gradient(
     90deg,
-    var(--_skel-bg) 25%,
-    var(--_skel-shine) 50%,
-    var(--_skel-bg) 75%
+    var(--color-surface-secondary) 25%,
+    var(--color-surface-primary) 50%,
+    var(--color-surface-secondary) 75%
   );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  background-size: 200%;
+  animation: skeleton-shimmer 1.5s linear 3;
   border-radius: var(--radius-sm);
+  max-width: 100%;
 }
 
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% { background-position: 200%; }
+  100% { background-position: -200%; }
 }
 
-.skeleton--text { height: 1em; width: 80%; margin-bottom: 8px; }
-.skeleton--title { height: 1.5em; width: 60%; margin-bottom: 12px; }
+.skeleton--text { height: 1em; width: 80%; }
+.skeleton--title { height: 1.5em; width: 60%; }
 .skeleton--image { aspect-ratio: 1; width: 100%; border-radius: var(--radius-md); }
 .skeleton--button { height: var(--space-button-min-height); width: 140px; border-radius: var(--radius-md); }
+.skeleton--circle { border-radius: var(--radius-full); }
+
+@media (prefers-reduced-motion: reduce), (forced-colors: active) {
+  .skeleton {
+    animation: none;
+    background: var(--color-surface-secondary);
+  }
+}
+
+@media (forced-colors: active) {
+  .skeleton { background: GrayText; }
+}
 ```
+
+```html
+<section aria-busy="true" aria-labelledby="orders-title">
+  <h2 id="orders-title">Orders</h2>
+  <div class="skeleton skeleton--text" aria-hidden="true"></div>
+</section>
+<p class="visually-hidden" role="status">Loading orders</p>
+```
+
+The target returns `aria-busy` to `false` or removes it after replacement.
+Skeleton has no loading boolean, Status role, accessible name, events, focus,
+keyboard model, dimensions API, or neutral runtime.
 
 ---
 
@@ -1273,30 +1313,33 @@ For zero-result searches, empty carts, etc.
 
 ```css
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  width: 100%;
   text-align: center;
-  padding: var(--space-layout-section-gap);
-  gap: 16px;
+  padding: var(--space-layout-section-gap) min(var(--space-layout-section-gap), 20%);
+  gap: var(--tg-space-stack-md);
 }
 
 .empty-state__icon {
-  width: 64px;
-  height: 64px;
+  inline-size: 64px;
+  aspect-ratio: 1;
   color: var(--color-text-disabled);
 }
 
-.empty-state__title {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-h3-size);
+.empty-state .empty-state__title {
+  max-width: 24ch;
+  overflow-wrap: anywhere;
+  font: var(--tg-typography-h3-weight) var(--typo-h3-size)/var(--typo-h3-line-height) var(--font-family-heading);
   color: var(--color-text-primary);
 }
 
 .empty-state__message {
-  font-size: var(--typo-body-size);
-  color: var(--color-text-secondary);
   max-width: 40ch;
+  overflow-wrap: anywhere;
+  font: var(--tg-typography-body-default-weight) var(--typo-body-size)/var(--typo-body-line-height) var(--font-family-body);
+  color: var(--color-text-secondary);
 }
 ```
 
@@ -1308,6 +1351,15 @@ For zero-result searches, empty carts, etc.
   <a href="/collections/all" class="btn">Explore the Collection</a>
 </div>
 ```
+
+The target chooses a native heading rank that fits the surrounding page,
+section, panel, or dialog. `title` supplies required non-empty content; the
+heading rank is supplied by the owning host under ADR 0236 and is not a public
+component or Studio property. Initial empty
+content is ordinary document content. When a search, filter, or destructive
+update dynamically produces the empty state, the target owns any pre-existing
+Status announcement and focus policy. The optional action is one canonical
+Button or Link slot: use a Link for navigation and a Button for a command.
 
 ---
 
@@ -1340,28 +1392,35 @@ For artist profiles, review authors.
 ```css
 .avatar {
   --_avatar-size: 40px;
-  --_avatar-bg: var(--color-surface-secondary);
-  --_avatar-text: var(--color-text-secondary);
-
-  width: var(--_avatar-size);
-  height: var(--_avatar-size);
+  box-sizing: border-box;
+  inline-size: var(--_avatar-size);
+  block-size: var(--_avatar-size);
   border-radius: var(--radius-full);
   overflow: hidden;
-  flex-shrink: 0;
-  background: var(--_avatar-bg);
-  display: flex;
+  flex: 0 0 var(--_avatar-size);
+  background: var(--color-surface-secondary);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  vertical-align: middle;
   font-family: var(--font-family-body);
-  font-weight: 600;
-  color: var(--_avatar-text);
+  font-weight: var(--tg-font-weight-semibold);
+  line-height: 1;
+  color: var(--color-text-secondary);
 }
 
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar > img { display: block; inline-size: 100%; block-size: 100%; object-fit: cover; }
 .avatar--sm { --_avatar-size: 32px; }
 .avatar--lg { --_avatar-size: 56px; }
 .avatar--xl { --_avatar-size: 80px; }
 ```
+
+Avatar is passive. Targets explicitly author either a native image with
+contextual `alt` or short pre-derived initials. Standalone initials use one named
+image role; initials or images beside the same visible name are hidden/null-alt
+to avoid duplicate identity. Actionable avatars compose canonical Link or Button
+outside the Avatar root. Automatic image fallback and initials typography
+scaling remain open architecture decisions.
 
 ---
 
@@ -1655,134 +1714,47 @@ Used for Cart Drawer and Mobile Menu.
 
 ### B5. Tooltip
 
-CSS-only tooltip using `::before`/`::after`.
+Tooltip supplements, but never replaces, a trigger's accessible name. Render its
+short, non-interactive text as an explicit `role="tooltip"` node and associate it
+with `aria-describedby`. Targets own unique IDs, delayed opening, collision-aware
+positioning, and Escape dismissal. Hovering the content must not dismiss it.
 
-```css
-.tooltip {
-  position: relative;
-}
-
-.tooltip::before,
-.tooltip::after {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--transition-fast) var(--easing-default);
-}
-
-.tooltip::before {
-  content: attr(aria-label);
-  transform: translateX(-50%) translateY(-8px);
-  padding: 4px 10px;
-  background: var(--color-surface-statement);
-  color: var(--color-text-inverse);
-  font-size: calc(var(--typo-body-size) * 0.75);
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-  z-index: var(--z-dropdown);
-}
-
-.tooltip::after {
-  content: "";
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-top-color: var(--color-surface-statement);
-}
-
-.tooltip:hover::before,
-.tooltip:hover::after,
-.tooltip:focus-visible::before,
-.tooltip:focus-visible::after {
-  opacity: 1;
-}
+```html
+<span class="tooltip">
+  <button class="btn btn--outline tooltip__trigger" type="button"
+          aria-describedby="material-tooltip">Material details</button>
+  <span class="tooltip__content" id="material-tooltip" role="tooltip">
+    View material details
+  </span>
+</span>
 ```
 
 ---
 
 ### B6. Accordion
 
-```css
-.accordion {
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.accordion__item + .accordion__item {
-  border-top: 1px solid var(--color-border-subtle);
-}
-
-.accordion__trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 16px var(--space-layout-element-gap);
-  border: none;
-  background: var(--color-surface-primary);
-  color: var(--color-text-primary);
-  font-family: var(--font-family-body);
-  font-size: var(--typo-body-size);
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--transition-fast) var(--easing-default);
-}
-.accordion__trigger:hover { background: var(--color-surface-secondary); }
-.accordion__trigger:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -2px;
-}
-
-.accordion__icon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-secondary);
-  transition: transform var(--transition-base) var(--easing-default);
-}
-.accordion__trigger[aria-expanded="true"] .accordion__icon {
-  transform: rotate(180deg);
-}
-
-.accordion__panel {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows var(--transition-base) var(--easing-default);
-}
-.accordion__trigger[aria-expanded="true"] + .accordion__panel {
-  grid-template-rows: 1fr;
-}
-.accordion__panel-inner {
-  overflow: hidden;
-}
-.accordion__content {
-  padding: 0 var(--space-layout-element-gap) 16px;
-  color: var(--color-text-secondary);
-  font-size: var(--typo-body-size);
-  line-height: var(--typo-body-line-height);
-}
-```
+Each native trigger belongs inside a heading and owns one panel through synchronized
+`aria-expanded`, `aria-controls`, and IDs. Collapsed panels use the native `hidden`
+attribute so their descendants leave rendering and the focus order. The consuming
+target coordinates whether a group allows one or multiple expanded items.
 
 ```html
 <div class="accordion">
   <div class="accordion__item">
-    <button class="accordion__trigger" aria-expanded="false"
-            aria-controls="acc-details" id="acc-details-btn">
-      Product Details
-      {% render 'icon', name: 'chevron-down', class: 'accordion__icon' %}
-    </button>
+    <h3 class="accordion__heading">
+      <button class="accordion__trigger" type="button" aria-expanded="false"
+              aria-controls="acc-details" id="acc-details-btn">
+        <span>Product details</span>
+        <svg class="accordion__icon" aria-hidden="true"><!-- chevron --></svg>
+      </button>
+    </h3>
     <div class="accordion__panel" id="acc-details" role="region"
-         aria-labelledby="acc-details-btn">
+         aria-labelledby="acc-details-btn" hidden>
       <div class="accordion__panel-inner">
-        <div class="accordion__content">
-          {{ product.description }}
-        </div>
+        <div class="accordion__content"><!-- description --></div>
       </div>
     </div>
   </div>
-  <!-- Repeat for: Dimensions, Care Instructions, Shipping -->
 </div>
 ```
 
@@ -1790,61 +1762,24 @@ CSS-only tooltip using `::before`/`::after`.
 
 ### B7. Tabs
 
-```css
-.tabs__list {
-  display: flex;
-  border-bottom: 2px solid var(--color-border-subtle);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.tabs__tab {
-  padding: 12px 20px;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  background: none;
-  color: var(--color-text-secondary);
-  font-family: var(--font-family-body);
-  font-size: var(--typo-body-size);
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color var(--transition-fast) var(--easing-default),
-              border-color var(--transition-fast) var(--easing-default);
-}
-.tabs__tab:hover { color: var(--color-text-primary); }
-.tabs__tab[aria-selected="true"] {
-  color: var(--color-text-accent);
-  border-bottom-color: var(--color-text-accent);
-}
-.tabs__tab:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -2px;
-}
-
-.tabs__panel { padding: var(--space-layout-element-gap) 0; }
-.tabs__panel[hidden] { display: none; }
-```
+Tabs v1 is a horizontal, labelled tablist with one selected enabled tab, roving
+`tabindex`, and one visible associated panel. Targets implement Arrow Left/Right,
+Home, End, and automatic or manual activation; direction-aware navigation follows
+the rendered direction. Disabled tabs are skipped. Panels remain programmatically
+focusable so Tab can move from the active tab into its content.
 
 ```html
-<div class="tabs">
+<div class="tabs" data-activation="automatic">
   <div class="tabs__list" role="tablist" aria-label="Product information">
     <button class="tabs__tab" role="tab" aria-selected="true"
             aria-controls="tab-description" id="tab-btn-description">Description</button>
     <button class="tabs__tab" role="tab" aria-selected="false"
-            aria-controls="tab-care" id="tab-btn-care">Care</button>
-    <button class="tabs__tab" role="tab" aria-selected="false"
-            aria-controls="tab-shipping" id="tab-btn-shipping">Shipping</button>
+            aria-controls="tab-care" id="tab-btn-care" tabindex="-1">Care</button>
   </div>
   <div class="tabs__panel" role="tabpanel" id="tab-description"
-       aria-labelledby="tab-btn-description">
-    {{ product.description }}
-  </div>
+       aria-labelledby="tab-btn-description" tabindex="0"><!-- description --></div>
   <div class="tabs__panel" role="tabpanel" id="tab-care"
-       aria-labelledby="tab-btn-care" hidden>
-    {{ product.metafields.custom.care_instructions | metafield_tag }}
-  </div>
+       aria-labelledby="tab-btn-care" tabindex="0" hidden><!-- care --></div>
 </div>
 ```
 
@@ -1854,23 +1789,37 @@ CSS-only tooltip using `::before`/`::after`.
 
 ```css
 .breadcrumb {
+  --_breadcrumb-gap: calc(var(--space-layout-element-gap) * 0.25);
+  width: 100%;
+  min-width: 0;
+  padding-block: calc(var(--space-layout-element-gap) * 0.5);
+  font-family: var(--font-family-body);
+  font-size: var(--typo-body-sm-size);
+  line-height: var(--typo-body-sm-line-height);
+}
+.breadcrumb__list {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  padding: var(--space-layout-element-gap) 0;
-  font-size: calc(var(--typo-body-size) * 0.875);
+  gap: 0 var(--_breadcrumb-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-
-.breadcrumb__item { color: var(--color-text-secondary); }
+.breadcrumb__item { display: inline-flex; align-items: center; gap: var(--_breadcrumb-gap); min-width: 0; }
 .breadcrumb__link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--space-layout-touch-target);
   color: var(--color-text-secondary);
   text-decoration: none;
+  overflow-wrap: anywhere;
   transition: color var(--transition-fast) var(--easing-default);
 }
 .breadcrumb__link:hover { color: var(--color-text-accent); }
+.breadcrumb__link:focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 2px; }
 .breadcrumb__separator { color: var(--color-text-disabled); }
-.breadcrumb__current { color: var(--color-text-primary); font-weight: 500; }
+.breadcrumb__current { color: var(--color-text-primary); font-weight: 500; overflow-wrap: anywhere; }
 ```
 
 ```html
@@ -1893,13 +1842,105 @@ CSS-only tooltip using `::before`/`::after`.
 
 ---
 
+### B9. Popover
+
+Popover is non-modal and has no default ARIA role. A native Button owns the
+relationship and the panel uses semantics derived from its actual content.
+Capable Web targets should prefer the HTML Popover API for top-layer,
+light-dismiss, and close-request behavior; class-driven targets map the same
+state through `.popover--open` and implement dismissal/focus restoration.
+
+```html
+<button class="btn btn--outline" type="button"
+        popovertarget="artwork-details">Artwork details</button>
+<div class="popover" id="artwork-details" popover="auto">
+  <span class="popover__arrow" aria-hidden="true"></span>
+  <p class="popover__title">Stoneware vessel</p>
+  <div class="popover__content">
+    Hand-thrown and finished with a satin celadon glaze.
+  </div>
+</div>
+```
+
+Do not add `role="dialog"` or `aria-haspopup="dialog"` from appearance alone.
+Non-modal Popover preserves natural Tab order; targets own anchor geometry,
+collision handling, and controlled/uncontrolled `open` state.
+
+---
+
+### B10. Hover Card
+
+Hover Card is a passive, supplemental preview of information fully available
+behind a native link. It remains visible while pointer or focus is within the
+combined trigger/content region. Targets apply `.hover-card--dismissed` after
+Escape and remove it only after pointer and focus leave that region.
+
+```html
+<span class="hover-card">
+  <a class="link" href="/artists/lucia-ferrer">View artist</a>
+  <span class="hover-card__content">
+    <span class="hover-card__title">Lucia Ferrer</span>
+    <span class="hover-card__description">
+      Clay studies shaped by coastal geology and quiet repetition.
+    </span>
+  </span>
+</span>
+```
+
+Do not place controls, required instructions, destructive actions, or unique
+information in Hover Card. Delay, collision, portals, and future Web
+`interestfor` support remain target concerns rather than public v1 properties.
+
+---
+
+### B11. Dropdown Menu
+
+Dropdown Menu v1 is a Button-triggered list of immediate commands. It uses the
+APG Menu Button model: focus enters the menu on open, one menuitem owns roving
+`tabindex`, arrows/Home/End navigate, Escape returns focus, Tab exits without a
+trap, and selection/outside interaction close. Checkable items, radio groups,
+submenus, and navigation menus are not part of this v1 contract.
+
+```html
+<div class="dropdown dropdown--open">
+  <button class="btn btn--outline" id="artwork-actions-trigger" type="button"
+          aria-haspopup="menu" aria-expanded="true"
+          aria-controls="artwork-actions">Actions</button>
+  <div class="dropdown__menu" id="artwork-actions" role="menu"
+       aria-labelledby="artwork-actions-trigger">
+    <div class="dropdown__group" role="group"
+         aria-labelledby="artwork-actions-label">
+      <div class="dropdown__label" id="artwork-actions-label">Artwork</div>
+      <button class="dropdown__item" type="button" role="menuitem"
+              tabindex="0">Edit artwork</button>
+      <button class="dropdown__item" type="button" role="menuitem"
+              tabindex="-1" aria-disabled="true" data-disabled>
+        Export certificate
+      </button>
+    </div>
+    <div class="dropdown__separator" role="separator"></div>
+    <div class="dropdown__group" role="group"
+         aria-label="Destructive actions">
+      <button class="dropdown__item dropdown__item--danger" type="button"
+              role="menuitem" tabindex="-1">Delete artwork</button>
+    </div>
+  </div>
+</div>
+```
+
+Icons are decorative when a text label exists. Shortcut hints use
+`aria-keyshortcuts` only when the shortcut is implemented. Disabled items may
+remain in composite focus according to target convention but never activate.
+
+---
+
 ## C. GLOBAL COMPONENTS
 
 ---
 
 ### C1. Header
 
-Sticky header with logo, navigation, search, cart icon. Collapses to hamburger on mobile.
+Sticky site masthead with brand, target-owned navigation and canonical actions. Its existing 48rem compact/expanded threshold follows the Header container rather than the viewport.
 
 #### CSS Contract
 
@@ -1912,17 +1953,21 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
   --_header-link-hover: var(--color-text-accent);
   --_header-height: var(--space-layout-touch-target);
   --_header-padding: var(--space-layout-element-gap);
+  --_header-min-height: 4rem;
 
   position: sticky;
-  top: 0;
+  inset-block-start: 0;
   z-index: var(--z-sticky);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-layout-container);
-  min-height: 64px;
+  gap: var(--_header-padding);
+  container-name: header;
+  container-type: inline-size;
+  padding-inline: var(--space-layout-container);
+  min-height: max(var(--_header-height), var(--_header-min-height));
   background: var(--_header-bg);
-  border-bottom: 1px solid var(--_header-border);
+  border-block-end: 1px solid var(--_header-border);
 }
 
 .header__logo {
@@ -1958,11 +2003,13 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
   align-items: center;
   gap: 8px;
 }
+.header__action { position: relative; flex: 0 0 auto; }
+.header__hamburger { display: inline-flex; }
 
 .header__cart-count {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  inset-block-start: -4px;
+  inset-inline-end: -4px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
@@ -1977,7 +2024,7 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
 }
 
 /* ── Responsive ── */
-@media (min-width: 768px) {
+@container header (min-width: 48rem) {
   .header__nav {
     display: flex;
     align-items: center;
@@ -1991,7 +2038,7 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
 
 ```html
 <!-- sections/header.liquid -->
-<header class="header" role="banner">
+<header class="header">
   <a class="header__logo" href="/" aria-label="{{ shop.name }}">
     {% if section.settings.logo %}
       {{ section.settings.logo | image_url: width: 200 | image_tag:
@@ -2015,22 +2062,22 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
   </nav>
 
   <div class="header__actions">
-    <button class="btn btn--outline btn--icon-only"
-            aria-label="Search" data-search-toggle>
+    <button class="btn btn--outline btn--icon-only header__action"
+            type="button" aria-label="Search" data-search-toggle>
       {% render 'icon', name: 'search' %}
     </button>
 
-    <a href="/cart" class="btn btn--outline btn--icon-only"
+    <a href="/cart" class="btn btn--outline btn--icon-only header__action"
        aria-label="Cart ({{ cart.item_count }} items)"
-       data-cart-toggle style="position: relative;">
+       data-cart-toggle>
       {% render 'icon', name: 'shopping-bag' %}
       {% if cart.item_count > 0 %}
-        <span class="header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+        <span class="header__cart-count" data-cart-count aria-hidden="true">{{ cart.item_count }}</span>
       {% endif %}
     </a>
 
-    <button class="btn btn--outline btn--icon-only header__hamburger"
-            aria-label="Menu" aria-expanded="false" data-mobile-menu-toggle>
+    <button class="btn btn--outline btn--icon-only header__action header__hamburger"
+            type="button" aria-label="Menu" aria-expanded="false" data-mobile-menu-toggle>
       {% render 'icon', name: 'menu' %}
     </button>
   </div>
@@ -2054,16 +2101,19 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
 ```css
 .announcement {
   --_ann-bg: var(--color-surface-statement);
-  --_ann-text: var(--color-text-inverse);
+  --_ann-text: var(--color-text-primary);
 
   background: var(--_ann-bg);
   color: var(--_ann-text);
   text-align: center;
-  padding: 8px var(--space-layout-container);
-  font-size: calc(var(--typo-body-size) * 0.875);
+  padding-block: 0.5rem;
+  padding-inline: var(--space-layout-container);
+  font-size: var(--typo-body-sm-size);
+  line-height: var(--typo-body-sm-line-height);
   font-weight: 500;
 }
 
+.announcement__link,
 .announcement a {
   color: inherit;
   text-decoration: underline;
@@ -2074,7 +2124,7 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
 ```html
 <!-- sections/announcement-bar.liquid -->
 {% if section.settings.text != blank %}
-<div class="announcement" role="region" aria-label="Announcement">
+<div class="announcement">
   {{ section.settings.text }}
 </div>
 {% endif %}
@@ -2093,318 +2143,157 @@ Sticky header with logo, navigation, search, cart icon. Collapses to hamburger o
 
 ### C3. Footer
 
+Footer is one body-scoped native content-info landmark. It owns container-responsive
+composition and interaction presentation; targets own the actual destinations,
+brand context, legal text, locale, and optional services.
+
 ```css
 .footer {
-  --_footer-bg: var(--color-surface-secondary);
-  --_footer-text: var(--color-text-secondary);
-  --_footer-heading: var(--color-text-primary);
-  --_footer-link: var(--color-text-secondary);
-  --_footer-border: var(--color-border-subtle);
-
-  background: var(--_footer-bg);
-  border-top: 1px solid var(--_footer-border);
+  container-name: footer;
+  container-type: inline-size;
   padding: var(--space-layout-section-gap) var(--space-layout-container);
 }
-
 .footer__grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-layout-grid-gap);
 }
-
-@media (min-width: 768px) {
-  .footer__grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
-}
-
-.footer__heading {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-body-size);
-  font-weight: 600;
-  color: var(--_footer-heading);
-  margin-bottom: 12px;
-}
-
-.footer__links { list-style: none; padding: 0; margin: 0; }
-.footer__links li + li { margin-top: 8px; }
-.footer__links a {
-  color: var(--_footer-link);
-  text-decoration: none;
-  font-size: calc(var(--typo-body-size) * 0.875);
-  transition: color var(--transition-fast) var(--easing-default);
-}
-.footer__links a:hover { color: var(--color-text-accent); }
-
-.footer__bottom {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-top: var(--space-layout-section-gap);
-  padding-top: var(--space-layout-element-gap);
-  border-top: 1px solid var(--_footer-border);
-  font-size: calc(var(--typo-body-size) * 0.75);
-  color: var(--_footer-text);
+@container footer (min-width: 48rem) {
+  .footer__grid {
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  }
 }
 ```
+
+Use one or more `.footer__group` `nav` regions named by visible
+`.footer__heading` elements with `aria-labelledby`. Native lists contain
+`.footer__link` anchors. `.footer__brand` and `.footer__bottom` are ordinary
+content, not extra navigation landmarks. Do not add a redundant
+`role="contentinfo"` to the body-scoped `footer`.
+
+The canonical links keep secondary text at rest and use primary text plus an
+accent underline on hover, preserving contrast. Body-small and caption tokens
+replace calculated type sizes; long localized content wraps rather than
+expanding the container.
 
 ---
 
 ### C4. Mobile Menu
 
-Uses the Drawer component (B3) with `.drawer--left`.
+Mobile Menu is a direct-link navigation list composed as the content slot of
+Drawer (B3) with `.drawer--left`. It does not own another `open` property or
+duplicate dialog lifecycle.
 
 ```html
-<!-- snippets/mobile-menu.liquid -->
-<div class="drawer-overlay" data-mobile-menu-overlay>
-  <div class="drawer drawer--left" data-mobile-menu aria-label="Mobile navigation">
+<div class="drawer-overlay is-open" aria-hidden="false"></div>
+<aside class="drawer drawer--left is-open" role="dialog" aria-modal="true"
+       aria-labelledby="mobile-menu-title">
     <div class="drawer__header">
-      <span class="header__logo">{{ shop.name }}</span>
-      <button class="btn btn--outline btn--icon-only"
-              aria-label="Close menu" data-mobile-menu-close>
-        {% render 'icon', name: 'x' %}
+      <h2 class="drawer__title" id="mobile-menu-title">Menu</h2>
+      <button class="close-btn drawer__close" type="button"
+              aria-label="Close mobile menu">
+        <span class="close-btn__icon" aria-hidden="true">×</span>
       </button>
     </div>
-    <nav class="drawer__body">
+    <nav class="drawer__body" aria-label="Mobile navigation">
       <ul class="mobile-nav">
-        {% for link in linklists['main-menu'].links %}
-          <li class="mobile-nav__item">
-            <a class="mobile-nav__link" href="{{ link.url }}"
-               {% if link.active %}aria-current="page"{% endif %}>
-              {{ link.title }}
-            </a>
-          </li>
-        {% endfor %}
+        <li class="mobile-nav__item">
+          <a class="mobile-nav__link" href="/collections" aria-current="page">Collection</a>
+        </li>
+        <li class="mobile-nav__item">
+          <a class="mobile-nav__link" href="/artists">Artists</a>
+        </li>
       </ul>
     </nav>
-  </div>
-</div>
+</aside>
 ```
 
-```css
-.mobile-nav { list-style: none; padding: 0; margin: 0; }
-.mobile-nav__item + .mobile-nav__item { border-top: 1px solid var(--color-border-subtle); }
-.mobile-nav__link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 0;
-  color: var(--color-text-primary);
-  text-decoration: none;
-  font-size: var(--typo-body-size);
-  font-weight: 500;
-}
-.mobile-nav__link[aria-current="page"] { color: var(--color-text-accent); }
-```
+Use native `nav > ul > li > a` semantics. Ordinary site navigation is not an
+ARIA menu widget: do not add `menu`, `menubar`, `menuitem`, roving focus, or
+arrow-key behavior. Drawer owns title, Close Button, focus containment,
+`Escape`, inertness, and restoration. The v1 Mobile Menu certifies direct links;
+nested disclosures and close-after-navigation policy remain target decisions.
 
 ---
 
 ### C5. Search Overlay
 
-```css
-.search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-overlay);
-  background: rgba(0, 0, 0, var(--opacity-overlay));
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 80px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--transition-base) var(--easing-default),
-              visibility var(--transition-base);
-}
-.search-overlay.is-open { opacity: 1; visibility: visible; }
-
-.search-box {
-  width: min(600px, 90vw);
-  background: var(--color-surface-primary);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-2xl);
-  padding: var(--space-layout-element-gap);
-}
-
-.search-box__input {
-  width: 100%;
-  padding: 16px;
-  border: 2px solid var(--color-border-focus);
-  border-radius: var(--radius-md);
-  font-size: var(--typo-h4-size);
-  font-family: var(--font-family-body);
-  background: var(--color-surface-primary);
-  color: var(--color-text-primary);
-}
-
-.search-results {
-  margin-top: 16px;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.search-result {
-  display: flex;
-  gap: 12px;
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  color: var(--color-text-primary);
-  transition: background var(--transition-fast) var(--easing-default);
-}
-.search-result:hover { background: var(--color-surface-secondary); }
-
-.search-result__image {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-}
-.search-result__title { font-weight: 500; }
-.search-result__price { font-size: calc(var(--typo-body-size) * 0.875); color: var(--color-text-secondary); }
-```
+Search Overlay is a named modal dialog. The visible title, native search form,
+native input label, and canonical Close Button are required; results are an
+optional target-owned slot.
 
 ```html
-<div class="search-overlay" data-search-overlay>
-  <div class="search-box" role="search">
-    <form action="/search" method="get">
-      <input class="search-box__input" type="search" name="q"
-             placeholder="Search for bowls, vases, glazes…"
-             aria-label="Search" autocomplete="off" data-search-input>
-    </form>
-    <div class="search-results" data-search-results aria-live="polite">
-      <!-- Predictive search results injected via JS -->
+<div class="search-overlay is-open" role="dialog" aria-modal="true"
+     aria-labelledby="search-title">
+  <form class="search-box" role="search" action="/search" method="get">
+    <div class="search-box__header">
+      <h2 class="search-box__title" id="search-title">Search The Gallery</h2>
+      <button class="close-btn search-box__close" type="button" aria-label="Close search">
+        <span class="close-btn__icon" aria-hidden="true">×</span>
+      </button>
     </div>
-  </div>
+    <label class="visually-hidden search-box__label" for="search-query">
+      Search artists, works, and collections
+    </label>
+    <input class="search-box__input" id="search-query" type="search" name="q"
+           placeholder="Search artists, works, and collections">
+    <ul class="search-results" aria-label="Search results">
+      <li class="search-results__item">
+        <a class="search-result" href="/products/moon-jar">
+          <span class="search-result__content">
+            <span class="search-result__title">Moon Jar</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </form>
 </div>
 ```
+
+Opening moves focus to the query, contains `Tab` and `Shift+Tab`, and closing
+on `Escape` or the named action restores focus logically. Closed content must
+not remain focusable. Targets own background inertness, page scroll locking,
+provider requests, cancellation, ranking, truthful loading/empty/error status,
+and live-announcement policy. Linked results remain native list/link content;
+Search Overlay does not imply a combobox.
 
 ---
 
 ### C6. Cart Drawer
 
-Uses Drawer (B3) with Shopify Cart API integration.
-
-```css
-.cart-item {
-  display: flex;
-  gap: 16px;
-  padding: 16px 0;
-}
-.cart-item + .cart-item { border-top: 1px solid var(--color-border-subtle); }
-
-.cart-item__image {
-  width: 80px;
-  height: 80px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.cart-item__details { flex: 1; }
-.cart-item__title {
-  font-weight: 500;
-  color: var(--color-text-primary);
-  text-decoration: none;
-}
-.cart-item__variant {
-  font-size: calc(var(--typo-body-size) * 0.875);
-  color: var(--color-text-secondary);
-  margin-top: 2px;
-}
-.cart-item__actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-.cart-item__remove {
-  font-size: calc(var(--typo-body-size) * 0.75);
-  color: var(--color-text-secondary);
-  text-decoration: underline;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.cart-item__remove:hover { color: var(--color-feedback-error-default); }
-
-.cart-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.cart-summary__row {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--typo-body-size);
-  color: var(--color-text-secondary);
-}
-.cart-summary__total {
-  font-size: var(--typo-h4-size);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-```
+Uses Drawer (B3) and canonical Cart Line Item (K2). Cart Drawer owns only its
+compact description-list summary; it must not define a parallel line anatomy.
 
 ```html
-<!-- snippets/cart-drawer.liquid -->
-<div class="drawer-overlay" data-cart-overlay></div>
-<aside class="drawer" data-cart-drawer aria-label="Shopping cart">
+<aside class="drawer" role="dialog" aria-modal="true"
+       aria-labelledby="cart-title" data-cart-drawer>
   <div class="drawer__header">
-    <h2 class="modal__title">Cart ({{ cart.item_count }})</h2>
-    <button class="btn btn--outline btn--icon-only"
-            aria-label="Close cart" data-cart-close>
-      {% render 'icon', name: 'x' %}
-    </button>
+    <h2 class="drawer__title" id="cart-title">Cart</h2>
+    <!-- canonical Close Button -->
   </div>
-
   <div class="drawer__body">
-    {% if cart.item_count == 0 %}
-      {% render 'empty-state', icon: 'shopping-bag',
-         title: 'Your cart is empty',
-         message: 'Discover our handcrafted pieces.',
-         cta_text: 'Shop Now', cta_url: '/collections/all' %}
-    {% else %}
-      {% for item in cart.items %}
-        <div class="cart-item" data-cart-item="{{ item.key }}">
-          <a href="{{ item.url }}">
-            {{ item.image | image_url: width: 160 | image_tag:
-               class: 'cart-item__image', alt: item.title, loading: 'lazy' }}
-          </a>
-          <div class="cart-item__details">
-            <a class="cart-item__title" href="{{ item.url }}">{{ item.product.title }}</a>
-            {% unless item.variant.title == 'Default Title' %}
-              <p class="cart-item__variant">{{ item.variant.title }}</p>
-            {% endunless %}
-            <div class="cart-item__actions">
-              {% render 'quantity-selector', item: item %}
-              <span class="price__current">{{ item.final_line_price | money }}</span>
-            </div>
-            <button class="cart-item__remove" data-remove="{{ item.key }}">
-              Remove
-            </button>
-          </div>
-        </div>
-      {% endfor %}
-    {% endif %}
+    <ul class="cart-lines">
+      <li class="cart-line">
+        <!-- optional media, required identity and Price,
+             optional Quantity Selector and Button actions -->
+      </li>
+    </ul>
   </div>
-
-  {% if cart.item_count > 0 %}
-  <div class="drawer__footer">
-    <div class="cart-summary">
-      <div class="cart-summary__row cart-summary__total">
-        <span>Total</span>
-        <span>{{ cart.total_price | money }}</span>
+  <footer class="drawer__footer">
+    <dl class="cart-drawer__summary">
+      <div class="cart-drawer__summary-row cart-drawer__summary-total">
+        <dt>Total</dt>
+        <dd><bdi>$204.00</bdi></dd>
       </div>
-    </div>
-    <p style="font-size: calc(var(--typo-body-size) * 0.75); color: var(--color-text-secondary); margin: 8px 0;">
-      Shipping calculated at checkout
-    </p>
-    <a href="/checkout" class="btn btn--full">Checkout</a>
-  </div>
-  {% endif %}
+    </dl>
+  </footer>
 </aside>
 ```
+
+Drawer owns modal lifecycle. Cart Line Item owns each record's semantic
+composition. The commerce target owns line keys, data, quantities, mutations,
+formatted totals, empty/error/status content, focus after removal, checkout, and
+persistence.
 
 ---
 
@@ -2584,17 +2473,24 @@ The primary browsing unit. Appears in collection grids, related products, and se
 
 ### D2. Product Gallery
 
-Full-width image gallery with thumbnails, zoom capability. Optimized for showing ceramic detail.
+Finite product media composition with one featured image, optional thumbnail
+Buttons, optional compact pagination and supplementary fine-pointer
+magnification. The collection/current index belongs to the target adapter.
 
 ```css
 .product-gallery {
+  container: product-gallery / inline-size;
+  min-inline-size: 0;
+}
+
+.product-gallery__layout {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-@media (min-width: 768px) {
-  .product-gallery {
+@container product-gallery (min-width: 48rem) {
+  .product-gallery__layout {
     flex-direction: row-reverse;
     gap: 16px;
   }
@@ -2607,21 +2503,20 @@ Full-width image gallery with thumbnails, zoom capability. Optimized for showing
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-surface-secondary);
-  cursor: zoom-in;
 }
 
 .product-gallery__main img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform var(--transition-slow) var(--easing-out);
 }
 
-/* CSS-only zoom on hover (desktop) */
-@media (min-width: 768px) {
-  .product-gallery__main:hover img {
-    transform: scale(2);
-    transform-origin: var(--_zoom-x, center) var(--_zoom-y, center);
+@media (hover: hover) and (pointer: fine) {
+  @container product-gallery (min-width: 48rem) {
+    .product-gallery__main { cursor: zoom-in; }
+    .product-gallery__main:hover img { transform: scale(2); }
   }
 }
 
@@ -2632,295 +2527,316 @@ Full-width image gallery with thumbnails, zoom capability. Optimized for showing
   -webkit-overflow-scrolling: touch;
 }
 
-@media (min-width: 768px) {
+@container product-gallery (min-width: 48rem) {
   .product-gallery__thumbs {
     flex-direction: column;
-    width: 80px;
+    inline-size: 80px;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: 500px;
+    max-block-size: 500px;
   }
 }
 
 .product-gallery__thumb {
-  width: 64px;
-  height: 64px;
+  inline-size: 64px;
+  block-size: 64px;
   flex-shrink: 0;
+  padding: 0;
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 2px solid transparent;
+  background: transparent;
   cursor: pointer;
   opacity: 0.6;
-  transition: opacity var(--transition-fast) var(--easing-default),
-              border-color var(--transition-fast) var(--easing-default);
 }
-.product-gallery__thumb:hover { opacity: 0.8; }
-.product-gallery__thumb[aria-selected="true"] {
+.product-gallery__thumb[aria-current="true"] {
   border-color: var(--color-border-focus);
   opacity: 1;
 }
 .product-gallery__thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ── Mobile swipe indicators ── */
 .product-gallery__dots {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 0;
 }
-@media (min-width: 768px) { .product-gallery__dots { display: none; } }
+@container product-gallery (min-width: 48rem) { .product-gallery__dots { display: none; } }
 
 .product-gallery__dot {
-  width: 8px;
-  height: 8px;
+  display: grid;
+  place-items: center;
+  inline-size: var(--space-layout-touch-target);
+  block-size: var(--space-layout-touch-target);
   border-radius: var(--radius-full);
-  background: var(--color-border-subtle);
+  background: transparent;
   border: none;
-  padding: 0;
-  cursor: pointer;
 }
-.product-gallery__dot[aria-selected="true"] {
+.product-gallery__dot::before {
+  content: "";
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: inherit;
+  background: var(--color-border-subtle);
+}
+.product-gallery__dot[aria-current="true"]::before {
   background: var(--color-text-primary);
 }
 ```
 
 ```html
-<!-- snippets/product-gallery.liquid -->
 <div class="product-gallery" data-product-gallery>
-  <div class="product-gallery__main" data-gallery-main>
-    {{ product.selected_or_first_available_variant.featured_image
-       | default: product.featured_image
-       | image_url: width: 1200
-       | image_tag: class: 'product-gallery__main-image',
-         alt: product.title, loading: 'eager',
-         widths: '400,600,800,1000,1200',
-         sizes: '(min-width: 768px) 50vw, 100vw' }}
-  </div>
-
-  <div class="product-gallery__thumbs" role="listbox" aria-label="Product images">
-    {% for image in product.images %}
-      <button class="product-gallery__thumb" role="option"
-              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-              data-gallery-thumb="{{ forloop.index0 }}">
-        {{ image | image_url: width: 160 | image_tag:
-           alt: image.alt | default: product.title, loading: 'lazy' }}
+  <div class="product-gallery__layout">
+    <div class="product-gallery__main" data-gallery-main>
+      <img src="front.jpg" alt="Celadon vessel, front view">
+    </div>
+    <div class="product-gallery__thumbs" role="group" aria-label="Product media views">
+      <button class="product-gallery__thumb" type="button"
+              aria-label="Show product view: Front view" aria-current="true"
+              data-gallery-index="0" data-gallery-src="front.jpg"
+              data-gallery-alt="Celadon vessel, front view">
+        <img src="front-thumb.jpg" alt="">
       </button>
-    {% endfor %}
-  </div>
-
-  <div class="product-gallery__dots" role="tablist">
-    {% for image in product.images %}
-      <button class="product-gallery__dot"
-              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-              aria-label="Image {{ forloop.index }}"></button>
-    {% endfor %}
+    </div>
+    <div class="product-gallery__dots" role="group" aria-label="Product media pages">
+      <button class="product-gallery__dot" type="button"
+              aria-label="Show product view: Front view" aria-current="true"
+              data-gallery-index="0"></button>
+    </div>
   </div>
 </div>
 ```
+
+The neutral Web enhancement synchronizes the featured image and current state
+only for authored `data-product-gallery` markup. Framework adapters may own
+controlled state and omit that marker. See the canonical contract and Shopify
+snippet for responsive source and localization details. Video, model, AR and
+Lightbox behavior remain target-native composition decisions.
 
 ---
 
 ### D3. Product Info
 
-Main product details block: title, price, description, variant selector, add to cart.
+Passive product details composition: identity, canonical Price, semantic rich
+description, and name-value metadata. Breadcrumb, Rating, Product Form, inventory,
+apps, structured data, variant synchronization, and update announcements belong
+to the owning product-page or quick-view composition.
 
 ```css
 .product-info {
-  display: flex;
-  flex-direction: column;
+  --_product-info-identity-gap: calc(var(--space-layout-element-gap) * 0.25);
+  --_product-info-content-gap: calc(var(--space-layout-element-gap) * 0.5);
+  display: grid;
   gap: var(--space-layout-element-gap);
+  min-inline-size: 0;
 }
 
-.product-info__vendor {
-  font-size: calc(var(--typo-body-size) * 0.875);
+.product-info .product-info__identity {
+  display: grid;
+  gap: var(--_product-info-identity-gap);
+}
+
+.product-info .product-info__vendor {
+  margin: 0;
+  font-size: var(--typo-body-sm-size);
+  line-height: var(--typo-body-sm-line-height);
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  overflow-wrap: anywhere;
 }
 
-.product-info__title {
+.product-info .product-info__title {
   font-family: var(--font-family-heading);
   font-size: var(--typo-h2-size);
+  font-weight: 600;
   line-height: var(--typo-h2-line-height);
   color: var(--color-text-primary);
   margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-wrap: anywhere;
 }
 
-.product-info__subtitle {
+.product-info .product-info__subtitle {
+  margin: 0;
   font-family: var(--font-family-accent);
   font-size: var(--typo-h4-size);
+  line-height: var(--typo-h4-line-height);
   color: var(--color-text-secondary);
   font-style: italic;
+  overflow-wrap: anywhere;
 }
 
-.product-info__description {
+.product-info .product-info__price { overflow-wrap: anywhere; }
+
+.product-info .product-info__description {
   font-size: var(--typo-article-size);
   line-height: var(--typo-article-line-height);
   color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
 }
 
-.product-info__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: calc(var(--typo-body-size) * 0.875);
+.product-info .product-info__description > :where(h2, h3, h4, p, ul, ol) {
+  margin-block: 0;
+}
+
+.product-info .product-info__description > :where(h2, h3, h4) {
+  font-family: var(--font-family-heading);
+  font-size: var(--typo-h4-size);
+  font-weight: 600;
+  line-height: var(--typo-h4-line-height);
+  color: var(--color-text-primary);
+}
+
+.product-info .product-info__description > * + * {
+  margin-block-start: var(--_product-info-content-gap);
+}
+
+.product-info .product-info__description :where(ul, ol) {
+  padding-inline-start: 1.25em;
+  list-style: revert;
+}
+
+.product-info .product-info__description :where(a) {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+
+.product-info .product-info__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--_product-info-content-gap) var(--space-layout-element-gap);
+  min-inline-size: 0;
+  margin: 0;
+  font-size: var(--typo-body-sm-size);
+  line-height: var(--typo-body-sm-line-height);
   color: var(--color-text-secondary);
 }
 
-.product-info__meta dt { font-weight: 600; color: var(--color-text-primary); }
-.product-info__meta dd { margin: 0; }
+.product-info .product-info__meta > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--_product-info-identity-gap);
+}
+
+.product-info .product-info__meta dt,
+.product-info .product-info__meta dd {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.product-info .product-info__meta dt {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.product-info .product-info__meta dd { margin: 0; }
 ```
 
 ```html
 <!-- snippets/product-info.liquid -->
-<div class="product-info">
-  {% render 'breadcrumb', product: product, collection: collection %}
+<section class="product-info">
+  <header class="product-info__identity">
+    {% if product.vendor != blank %}
+      <p class="product-info__vendor" dir="auto">{{ product.vendor | escape }}</p>
+    {% endif %}
+    <h1 class="product-info__title" dir="auto">{{ product.title | escape }}</h1>
+    {% if product.metafields.custom.subtitle.value != blank %}
+      <p class="product-info__subtitle" dir="auto">
+        {{ product.metafields.custom.subtitle.value | escape }}
+      </p>
+    {% endif %}
+  </header>
 
-  {% if product.vendor %}
-    <span class="product-info__vendor">{{ product.vendor }}</span>
-  {% endif %}
-
-  <h1 class="product-info__title">{{ product.title }}</h1>
-
-  {% if product.metafields.custom.subtitle %}
-    <p class="product-info__subtitle">{{ product.metafields.custom.subtitle }}</p>
-  {% endif %}
-
-  {% render 'price', product: product %}
-
-  {% if product.metafields.reviews.rating %}
-    {% render 'rating', rating: product.metafields.reviews.rating,
-       count: product.metafields.reviews.rating_count %}
-  {% endif %}
-
-  <div class="product-info__description">
-    {{ product.description }}
+  <div class="product-info__price">
+    {% render 'price', product: product %}
   </div>
 
-  <dl class="product-info__meta">
-    {% if product.metafields.custom.dimensions %}
-      <div><dt>Dimensions</dt><dd>{{ product.metafields.custom.dimensions }}</dd></div>
-    {% endif %}
-    {% if product.metafields.custom.material %}
-      <div><dt>Material</dt><dd>{{ product.metafields.custom.material }}</dd></div>
-    {% endif %}
-    {% if product.metafields.custom.weight %}
-      <div><dt>Weight</dt><dd>{{ product.metafields.custom.weight }}</dd></div>
-    {% endif %}
-    {% if product.metafields.custom.glaze_type %}
-      <div><dt>Glaze</dt><dd>{{ product.metafields.custom.glaze_type }}</dd></div>
-    {% endif %}
-  </dl>
+  {% if product.description != blank %}
+    <div class="product-info__description">
+      {{ product.description }}
+    </div>
+  {% endif %}
 
-  {% render 'product-form', product: product %}
-</div>
+  {% if product.metafields.custom.dimensions.value != blank %}
+  <dl class="product-info__meta">
+    <div>
+      <dt>{{ 'products.meta.dimensions' | t }}</dt>
+      <dd dir="auto">{{ product.metafields.custom.dimensions.value | escape }}</dd>
+    </div>
+  </dl>
+  {% endif %}
+</section>
 ```
+
+The production Shopify snippet conditionally maps all supported metadata fields.
+The shortened example demonstrates the required semantic group. Product-wide
+versus selected-variant Price and one live-update announcement policy remain
+target-owned decisions.
 
 ---
 
 ### D4. Variant Selector
 
-Handles color swatches (for glazes), size selection, and other options.
+Composes product options as native fieldset/legend radio groups. Swatches and
+pills share the same native value, keyboard, event, validity, FormData, and reset
+owner. Commercial unavailability is independent from native `disabled`; the
+owning product target resolves complete combinations and coordinated updates.
 
 ```css
 .variant-selector {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  --_variant-gap: calc(var(--space-layout-element-gap) * 0.5);
+  --_variant-option-gap: calc(var(--space-layout-element-gap) * 0.25);
+  display: grid;
+  gap: var(--_variant-gap);
+  min-inline-size: 0;
 }
 
-.variant-selector__group { display: flex; flex-direction: column; gap: 8px; }
-
-.variant-selector__label {
+.variant-selector__group {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.variant-selector__legend {
+  margin-block-end: var(--_variant-option-gap);
+  padding: 0;
+  font-family: var(--font-family-body);
   font-size: var(--typo-body-size);
+  line-height: var(--typo-body-line-height);
   font-weight: 600;
-  color: var(--color-text-primary);
 }
-.variant-selector__label span { font-weight: 400; color: var(--color-text-secondary); }
+.variant-selector__selection { font-weight: 400; color: var(--color-text-secondary); }
 
-/* ── Swatch (for glazes/colors) ── */
-.variant-swatches {
+.variant-swatches,
+.variant-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--_variant-option-gap);
 }
 
 .variant-swatch {
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-border-subtle);
-  cursor: pointer;
+  display: grid;
+  place-items: center;
+  inline-size: var(--space-layout-touch-target);
+  block-size: var(--space-layout-touch-target);
+}
+.variant-swatch__input,
+.variant-pill__input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
   overflow: hidden;
-  transition: border-color var(--transition-fast) var(--easing-default);
+  clip: rect(0 0 0 0);
 }
-.variant-swatch:hover { border-color: var(--color-border-default); }
-.variant-swatch input { position: absolute; opacity: 0; pointer-events: none; }
-.variant-swatch input:checked + .variant-swatch__color {
-  box-shadow: inset 0 0 0 2px var(--color-surface-primary);
-}
-.variant-swatch input:checked ~ .variant-swatch__ring {
-  position: absolute;
-  inset: -2px;
-  border: 2px solid var(--color-border-focus);
-  border-radius: var(--radius-full);
-}
-.variant-swatch input:focus-visible ~ .variant-swatch__ring {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-.variant-swatch__color { width: 100%; height: 100%; border-radius: var(--radius-full); }
-
-/* Swatch with image (glaze texture) */
-.variant-swatch--image .variant-swatch__color {
-  background-size: cover;
-  background-position: center;
-}
-
-/* Swatch unavailable */
-.variant-swatch--unavailable {
-  opacity: var(--opacity-disabled);
-  cursor: not-allowed;
-}
-.variant-swatch--unavailable::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, transparent 45%, var(--color-text-disabled) 45%,
-              var(--color-text-disabled) 55%, transparent 55%);
-}
-
-/* ── Pill selector (for sizes, styles) ── */
-.variant-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-
 .variant-pill {
-  padding: 8px 16px;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: var(--space-layout-touch-target);
+  min-block-size: var(--space-layout-touch-target);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
-  background: var(--color-surface-primary);
-  color: var(--color-text-primary);
-  font-size: calc(var(--typo-body-size) * 0.875);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--transition-fast) var(--easing-default),
-              border-color var(--transition-fast) var(--easing-default);
-}
-.variant-pill:hover { border-color: var(--color-border-strong); }
-.variant-pill input { position: absolute; opacity: 0; pointer-events: none; }
-.variant-pill:has(input:checked) {
-  background: var(--color-surface-statement);
-  color: var(--color-text-inverse);
-  border-color: var(--color-surface-statement);
-}
-.variant-pill:has(input:focus-visible) {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-.variant-pill--unavailable {
-  opacity: var(--opacity-disabled);
-  text-decoration: line-through;
-  cursor: not-allowed;
 }
 ```
 
@@ -2928,40 +2844,37 @@ Handles color swatches (for glazes), size selection, and other options.
 <!-- snippets/variant-selector.liquid -->
 {% for option in product.options_with_values %}
   <fieldset class="variant-selector__group">
-    <legend class="variant-selector__label">
-      {{ option.name }}: <span data-selected-value="{{ option.name }}">{{ option.selected_value }}</span>
+    <legend class="variant-selector__legend">
+      <span class="variant-selector__label">{{ option.name | escape }}</span>:
+      <span class="variant-selector__selection" aria-hidden="true" data-selected-value>
+        {{ option.selected_value | escape }}
+      </span>
     </legend>
 
-    {% if option.name == 'Glaze' or option.name == 'Color' %}
-      <div class="variant-swatches" role="radiogroup">
-        {% for value in option.values %}
-          <label class="variant-swatch {% unless product.options_by_name[option.name].values contains value %}variant-swatch--unavailable{% endunless %}"
-                 aria-label="{{ value }}" title="{{ value }}">
-            <input type="radio" name="{{ option.name }}"
-                   value="{{ value }}"
-                   {% if value == option.selected_value %}checked{% endif %}>
-            <span class="variant-swatch__color"
-                  style="background-color: {{ value | handleize | append: '-color' | default: '#ccc' }};">
-            </span>
-            <span class="variant-swatch__ring"></span>
-          </label>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="variant-pills" role="radiogroup">
-        {% for value in option.values %}
-          <label class="variant-pill">
-            <input type="radio" name="{{ option.name }}"
-                   value="{{ value }}"
-                   {% if value == option.selected_value %}checked{% endif %}>
-            {{ value }}
-          </label>
-        {% endfor %}
-      </div>
-    {% endif %}
+    <div class="variant-pills">
+      {% for option_value in option.values %}
+        <label class="variant-pill{% unless option_value.available %} variant-pill--unavailable{% endunless %}">
+          <input class="variant-pill__input" type="radio"
+                 name="options[{{ option.name | escape }}]"
+                 value="{{ option_value.name | escape }}"
+                 data-option-value-id="{{ option_value.id }}"
+                 {% if option_value.selected %}checked{% endif %} required>
+          <span class="variant-pill__label">{{ option_value.name | escape }}</span>
+          {% unless option_value.available %}
+            <span class="variant-selector__option-status">, {{ 'products.options.unavailable' | t }}</span>
+          {% endunless %}
+        </label>
+      {% endfor %}
+    </div>
   </fieldset>
 {% endfor %}
 ```
+
+The production Shopify snippet chooses swatch presentation from native swatch
+data and carries contextual option-value metadata. It intentionally does not
+disable every unavailable value. One target controller must still reconcile all
+groups and synchronize Product Form, URL, Price, media, inventory, selling plans,
+and a single localized update status. See ADR 0116.
 
 ---
 
@@ -2969,60 +2882,61 @@ Handles color swatches (for glazes), size selection, and other options.
 
 ```css
 .product-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  --_product-form-gap: var(--space-layout-element-gap);
+  display: grid;
+  gap: var(--_product-form-gap);
+  min-inline-size: 0;
+}
+
+.product-form > .variant-selector,
+.product-form > .qty,
+.product-form__actions {
+  min-inline-size: 0;
+}
+
+.product-form > .qty {
+  justify-self: start;
+}
+
+.product-form__message {
+  margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .product-form__actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: calc(var(--_product-form-gap) * 0.75);
 }
 
 .product-form__submit {
-  flex: 1;
-  /* Extends .btn .btn--lg */
-}
-
-.product-form__wishlist {
-  /* .btn .btn--outline .btn--icon-only .btn--lg */
+  flex: 1 1 16rem;
+  min-inline-size: min(100%, 12rem);
 }
 ```
 
 ```html
-<!-- snippets/product-form.liquid -->
-{% form 'product', product, data-product-form: '' %}
-  <div class="product-form">
-    {% render 'variant-selector', product: product %}
-
-    <div style="display: flex; gap: 12px; align-items: flex-end;">
-      {% render 'quantity-selector' %}
-      <div class="price" style="margin-left: auto;">
-        <span class="price__current" data-product-price>
-          {{ product.selected_or_first_available_variant.price | money }}
-        </span>
-      </div>
-    </div>
-
-    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"
-           data-variant-id>
-
-    <div class="product-form__actions">
-      <button class="btn btn--lg product-form__submit"
-              type="submit"
-              {% unless product.selected_or_first_available_variant.available %}
-                disabled aria-disabled="true"
-              {% endunless %}>
-        {% if product.selected_or_first_available_variant.available %}
-          Add to Cart — {{ product.selected_or_first_available_variant.price | money }}
-        {% else %}
-          Sold Out
-        {% endif %}
-      </button>
-    </div>
+<form class="product-form" action="/cart/add" method="post">
+  <!-- Canonical Variant Selector and Quantity Selector compositions -->
+  <input type="hidden" name="merchandise" value="resolved-id">
+  <div class="product-form__actions">
+    <button class="btn btn--lg product-form__submit"
+            type="submit" name="intent" value="add">
+      Add to cart
+    </button>
   </div>
-{% endform %}
+</form>
 ```
+
+Product Form is the native purchase-submission boundary, not a product-state
+store. Named canonical children own their current values, validity and reset.
+One target coordinator must resolve option groups to a purchasable merchandise
+identifier and synchronize availability, quantity rules, Price, media, inventory,
+URL, selling plans, pending state and target feedback before submission.
+
+The target may allow native navigation or intercept the same `FormData`. Ajax,
+Cart Drawer updates, errors, retry, focus, announcements and analytics remain
+target-owned. Product Form does not repeat the Price owned by Product Info.
 
 ---
 
@@ -3188,115 +3102,112 @@ Handles color swatches (for glazes), size selection, and other options.
 
 ```css
 .collection-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-layout-grid-gap);
-  padding: var(--space-layout-section-gap) var(--space-layout-container);
+  --_collection-grid-columns: var(--grid-columns, 4);
+  container: collection-grid / inline-size;
 }
 
-@media (min-width: 768px)  { .collection-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1024px) { .collection-grid { grid-template-columns: repeat(var(--grid-columns, 4), 1fr); } }
+.collection-grid__items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-layout-grid-gap);
+  margin: 0;
+  padding: var(--space-layout-section-gap) var(--space-layout-container);
+  list-style: none;
+}
+
+.collection-grid__item { min-inline-size: 0; }
+
+@container collection-grid (min-width: 20rem) {
+  .collection-grid__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@container collection-grid (min-width: 48rem) {
+  .collection-grid__items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@container collection-grid (min-width: 64rem) {
+  .collection-grid__items {
+    grid-template-columns: repeat(var(--_collection-grid-columns), minmax(0, 1fr));
+  }
+}
 ```
+
+Use a neutral root with a native `ul.collection-grid__items` and one
+`li.collection-grid__item` per canonical Product Card. This is a passive
+document list, not an ARIA grid widget; filtering, sorting, pagination, empty
+recovery and result announcements belong to the parent or target adapter.
 
 ---
 
-### E3. Collection Filters
+### E3. Filter Panel
 
-```css
-.filters {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: var(--space-layout-element-gap) 0;
-}
-
-.filters__bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.filters__active {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* ── Sort dropdown ── */
-.filters__sort { /* extends .select */ }
-
-/* ── Filter sidebar (desktop) / drawer (mobile) ── */
-.filters__sidebar {
-  display: none;
-}
-@media (min-width: 768px) {
-  .filters__layout {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: var(--space-layout-grid-gap);
-  }
-  .filters__sidebar { display: block; }
-}
-
-.filter-group {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-.filter-group__title {
-  font-weight: 600;
-  font-size: var(--typo-body-size);
-  color: var(--color-text-primary);
-  margin-bottom: 12px;
-}
-
-.filter-group__options { display: flex; flex-direction: column; gap: 8px; }
-
-/* Swatch filter for glazes */
-.filter-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
-.filter-swatch {
-  /* Extends .variant-swatch but 32x32 */
-  width: 32px;
-  height: 32px;
-}
-```
+Filter Panel is one named native GET form and one canonical control tree. The
+same tree is an adjacent non-modal panel when its own container is coherent and
+a canonical modal Drawer when constrained. Never render separate desktop and
+mobile forms, and never use viewport width as the sole switch.
 
 ```html
-<div class="filters__bar">
-  <div class="filters__active">
-    {% for filter in collection.filters %}
-      {% for value in filter.active_values %}
-        <span class="tag">
-          {{ value.label }}
-          <a class="tag__remove" href="{{ value.url_to_remove }}"
-             aria-label="Remove {{ value.label }}">
-            {% render 'icon', name: 'x', size: 14 %}
-          </a>
-        </span>
-      {% endfor %}
-    {% endfor %}
+<div class="filter-panel filter-panel--immediate"
+     data-filter-panel data-commit-mode="immediate">
+  <div class="filter-panel__toolbar">
+    <button class="btn filter-panel__trigger" type="button"
+            aria-haspopup="dialog" aria-controls="filters-surface"
+            aria-expanded="false" data-filter-panel-trigger>
+      Filters
+    </button>
   </div>
 
-  <button class="btn btn--outline btn--sm filters__toggle"
-          aria-label="Filters" data-filter-toggle>
-    {% render 'icon', name: 'sliders' %} Filter
-  </button>
+  <ul class="filter-panel__active" aria-label="Active filters">
+    <li class="filter-panel__active-item">
+      <span class="tag">
+        <span class="tag__label">Stoneware</span>
+        <button class="tag__remove" type="button"
+                aria-label="Remove Stoneware"></button>
+      </span>
+    </li>
+  </ul>
 
-  <div class="select filters__sort">
-    <label class="select__label visually-hidden" for="sort-by">Sort by</label>
-    <select class="select__field" id="sort-by" data-sort-select>
-      {% for option in collection.sort_options %}
-        <option value="{{ option.value }}"
-          {% if option.value == collection.sort_by %}selected{% endif %}>
-          {{ option.name }}
-        </option>
-      {% endfor %}
-    </select>
+  <div class="filter-panel__layout">
+    <div class="drawer-overlay filter-panel__overlay"
+         data-filter-panel-overlay aria-hidden="true"></div>
+    <div class="drawer drawer--left filter-panel__surface"
+         id="filters-surface" data-filter-panel-surface
+         aria-labelledby="filters-title">
+      <header class="drawer__header filter-panel__header">
+        <h2 class="drawer__title filter-panel__title"
+            id="filters-title">Filter works</h2>
+        <button class="close-btn drawer__close filter-panel__close"
+                type="button" aria-label="Close filters"
+                data-filter-panel-close></button>
+      </header>
+      <form class="filter-panel__form" action="/collection" method="get"
+            aria-label="Filter works">
+        <div class="drawer__body filter-panel__body">
+          <fieldset class="filter-group">
+            <legend class="filter-group__title">Material</legend>
+            <div class="filter-group__options">
+              <label class="checkbox">
+                <input class="checkbox__input" type="checkbox"
+                       name="filter.material" value="stoneware">
+                <span class="checkbox__label">Stoneware</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </form>
+    </div>
+    <div class="filter-panel__results"><!-- target results --></div>
   </div>
 </div>
 ```
+
+Expose `immediate | manual` commitment, with Immediate default. Manual mode adds
+canonical Apply and Cancel actions around one target-owned draft projection.
+The target owns filter data, query serialization, URL/history, requests,
+pending/error/empty status, result replacement, focus and pagination reset.
+Groups remain visible in v1; sort and result count belong to the parent
+collection composition. See ADR 0250 and the component contract for the full
+surface and event lifecycle.
 
 ---
 
@@ -3304,11 +3215,22 @@ Handles color swatches (for glazes), size selection, and other options.
 
 ```css
 .pagination {
+  padding: var(--space-layout-section-gap) 0;
+}
+
+.pagination__list {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 4px;
-  padding: var(--space-layout-section-gap) 0;
+}
+
+.pagination__list,
+.pagination__item {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .pagination__link,
@@ -3322,7 +3244,6 @@ Handles color swatches (for glazes), size selection, and other options.
   border-radius: var(--radius-md);
   font-size: var(--typo-body-size);
   text-decoration: none;
-  transition: background var(--transition-fast) var(--easing-default);
 }
 
 .pagination__link {
@@ -3330,12 +3251,11 @@ Handles color swatches (for glazes), size selection, and other options.
 }
 .pagination__link:hover {
   background: var(--color-surface-secondary);
-  color: var(--color-text-primary);
 }
 
 .pagination__current {
-  background: var(--color-surface-statement);
-  color: var(--color-text-inverse);
+  background: var(--color-button-primary-bg-default);
+  color: var(--color-button-primary-text-default);
   font-weight: 600;
 }
 
@@ -3343,32 +3263,40 @@ Handles color swatches (for glazes), size selection, and other options.
   color: var(--color-text-disabled);
   padding: 0 8px;
 }
+
+.pagination:dir(rtl) svg { scale: -1 1; }
 ```
 
 ```html
 {% if paginate.pages > 1 %}
-<nav class="pagination" aria-label="Pagination">
-  {% if paginate.previous %}
-    <a class="pagination__link" href="{{ paginate.previous.url }}" aria-label="Previous page">
-      {% render 'icon', name: 'chevron-left', size: 16 %}
-    </a>
-  {% endif %}
-
-  {% for part in paginate.parts %}
-    {% if part.is_link %}
-      <a class="pagination__link" href="{{ part.url }}">{{ part.title }}</a>
-    {% elsif part.title == paginate.current_page %}
-      <span class="pagination__current" aria-current="page">{{ part.title }}</span>
-    {% else %}
-      <span class="pagination__ellipsis">…</span>
+<nav class="pagination" aria-label="Pagination" data-current-page="{{ paginate.current_page }}">
+  <ul class="pagination__list">
+    {% if paginate.previous %}
+      <li class="pagination__item">
+        <a class="link link--subtle pagination__link" href="{{ paginate.previous.url }}" aria-label="Previous page">
+          {% render 'icon', name: 'chevron-left', size: 16 %}
+        </a>
+      </li>
     {% endif %}
-  {% endfor %}
 
-  {% if paginate.next %}
-    <a class="pagination__link" href="{{ paginate.next.url }}" aria-label="Next page">
-      {% render 'icon', name: 'chevron-right', size: 16 %}
-    </a>
-  {% endif %}
+    {% for part in paginate.parts %}
+      {% if part.is_link %}
+        <li class="pagination__item"><a class="link link--subtle pagination__link" href="{{ part.url }}">{{ part.title }}</a></li>
+      {% elsif part.title == paginate.current_page %}
+        <li class="pagination__item"><span class="pagination__current" aria-current="page">{{ part.title }}</span></li>
+      {% else %}
+        <li class="pagination__item" aria-hidden="true"><span class="pagination__ellipsis" aria-hidden="true">…</span></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if paginate.next %}
+      <li class="pagination__item">
+        <a class="link link--subtle pagination__link" href="{{ paginate.next.url }}" aria-label="Next page">
+          {% render 'icon', name: 'chevron-right', size: 16 %}
+        </a>
+      </li>
+    {% endif %}
+  </ul>
 </nav>
 {% endif %}
 ```
@@ -3387,121 +3315,154 @@ Showcases the maker behind the pieces. Storytelling is critical for artisan e-co
 
 ```css
 .artist-profile {
-  --_artist-bg: var(--color-surface-archival);
-
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-layout-grid-gap);
   padding: var(--space-layout-section-gap) var(--space-layout-container);
-  background: var(--_artist-bg);
+  background: var(--color-surface-archival);
+  color: var(--color-text-secondary);
+  container-type: inline-size;
 }
 
-@media (min-width: 768px) {
-  .artist-profile { grid-template-columns: 1fr 1fr; align-items: center; }
+.artist-profile__layout {
+  display: grid;
+  gap: var(--space-layout-grid-gap);
+}
+
+@container (min-width: 36rem) {
+  .artist-profile__layout--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
 }
 
 .artist-profile__portrait {
-  aspect-ratio: 3/4;
+  aspect-ratio: 3 / 4;
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .artist-profile__portrait img { width: 100%; height: 100%; object-fit: cover; }
 
 .artist-profile__content {
-  display: flex;
-  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  display: grid;
   gap: var(--space-layout-element-gap);
 }
 
 .artist-profile__label {
-  font-size: calc(var(--typo-body-size) * 0.75);
+  font-size: var(--typo-caption-size);
+  line-height: var(--typo-caption-line-height);
+  font-weight: var(--tg-typography-body-caption-weight);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--color-text-secondary);
 }
 
-.artist-profile__name {
+.artist-profile .artist-profile__name {
+  margin: 0;
+  padding: 0;
+  border: 0;
   font-family: var(--font-family-heading);
   font-size: var(--typo-h2-size);
+  line-height: var(--typo-h2-line-height);
+  font-weight: var(--tg-typography-h2-weight);
   color: var(--color-text-primary);
-  margin: 0;
 }
 
 .artist-profile__location {
   font-size: var(--typo-body-size);
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  line-height: var(--typo-body-line-height);
 }
 
 .artist-profile__bio {
+  display: grid;
+  gap: 1em;
   font-size: var(--typo-article-size);
   line-height: var(--typo-article-line-height);
-  color: var(--color-text-secondary);
 }
 
 .artist-profile__philosophy {
   font-family: var(--font-family-accent);
   font-size: var(--typo-h4-size);
+  line-height: var(--typo-h4-line-height);
   font-style: italic;
-  color: var(--color-text-accent);
-  border-left: 3px solid var(--color-border-decorative);
-  padding-left: 20px;
+  color: color-mix(in srgb, var(--color-text-accent) 70%, var(--color-text-primary));
+  border-inline-start: 3px solid var(--color-border-decorative);
+  padding-inline-start: var(--space-layout-element-gap);
+}
+
+.artist-profile__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-layout-element-gap);
 }
 ```
 
 ```html
-<!-- sections/artist-profile.liquid -->
-<section class="artist-profile">
-  <div class="artist-profile__portrait">
-    {% if section.settings.portrait %}
-      {{ section.settings.portrait | image_url: width: 800 | image_tag:
-         alt: section.settings.name, loading: 'lazy',
-         widths: '400,600,800', sizes: '(min-width: 768px) 50vw, 100vw' }}
+{% liquid
+  assign artist_name = section.settings.name
+  if artist_name == blank
+    assign artist_name = 'artist_profile.default_name' | t
+  endif
+  assign portrait_alt = section.settings.portrait.alt | default: artist_name
+  if section.settings.portrait_decorative
+    assign portrait_alt = ''
+  endif
+  assign action_label = section.settings.cta_text
+  if action_label == blank
+    assign action_label = 'artist_profile.default_action' | t
+  endif
+  assign heading_id = 'ArtistProfile-' | append: section.id | append: '-Name'
+%}
+
+<section class="artist-profile" aria-labelledby="{{ heading_id }}">
+  <div class="artist-profile__layout{% if section.settings.portrait != blank %} artist-profile__layout--split{% endif %}">
+    {% if section.settings.portrait != blank %}
+      <div class="artist-profile__portrait">
+        {{ section.settings.portrait | image_url: width: 1200 | image_tag:
+          alt: portrait_alt,
+          loading: 'lazy',
+          widths: '360, 540, 720, 960, 1200',
+          sizes: '(min-width: 768px) 50vw, 100vw'
+        }}
+      </div>
     {% endif %}
-  </div>
 
-  <div class="artist-profile__content">
-    <span class="artist-profile__label">The Maker</span>
-    <h2 class="artist-profile__name">{{ section.settings.name }}</h2>
-
-    {% if section.settings.location %}
-      <p class="artist-profile__location">
-        {% render 'icon', name: 'map-pin', size: 16 %}
-        {{ section.settings.location }}
-      </p>
-    {% endif %}
-
-    <div class="artist-profile__bio">{{ section.settings.bio }}</div>
-
-    {% if section.settings.philosophy %}
-      <blockquote class="artist-profile__philosophy">
-        {{ section.settings.philosophy }}
-      </blockquote>
-    {% endif %}
-
-    {% if section.settings.cta_url %}
-      <a href="{{ section.settings.cta_url }}" class="btn btn--outline">
-        {{ section.settings.cta_text | default: 'View their work' }}
-      </a>
-    {% endif %}
+    <div class="artist-profile__content">
+      {% if section.settings.label != blank %}
+        <p class="artist-profile__label">{{ section.settings.label | escape }}</p>
+      {% endif %}
+      <h2 class="artist-profile__name" id="{{ heading_id }}">{{ artist_name | escape }}</h2>
+      {% if section.settings.location != blank %}
+        <p class="artist-profile__location">{{ section.settings.location | escape }}</p>
+      {% endif %}
+      {% if section.settings.bio != blank %}
+        <div class="artist-profile__bio">{{ section.settings.bio }}</div>
+      {% endif %}
+      {% if section.settings.philosophy != blank %}
+        <blockquote class="artist-profile__philosophy">{{ section.settings.philosophy | escape }}</blockquote>
+      {% endif %}
+      {% if section.settings.cta_url != blank %}
+        <div class="artist-profile__actions">
+          <a class="btn btn--outline" href="{{ section.settings.cta_url }}">{{ action_label | escape }}</a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "Artist Profile",
+  "name": "t:sections.artist_profile.name",
   "settings": [
-    { "type": "image_picker", "id": "portrait", "label": "Portrait" },
-    { "type": "text", "id": "name", "label": "Name" },
-    { "type": "text", "id": "location", "label": "Location" },
-    { "type": "richtext", "id": "bio", "label": "Biography" },
-    { "type": "textarea", "id": "philosophy", "label": "Philosophy quote" },
-    { "type": "url", "id": "cta_url", "label": "CTA link" },
-    { "type": "text", "id": "cta_text", "label": "CTA text" }
+    { "type": "image_picker", "id": "portrait", "label": "t:sections.artist_profile.settings.portrait" },
+    { "type": "checkbox", "id": "portrait_decorative", "label": "t:sections.artist_profile.settings.portrait_decorative", "default": false },
+    { "type": "text", "id": "label", "label": "t:sections.artist_profile.settings.label" },
+    { "type": "text", "id": "name", "label": "t:sections.artist_profile.settings.name" },
+    { "type": "text", "id": "location", "label": "t:sections.artist_profile.settings.location" },
+    { "type": "richtext", "id": "bio", "label": "t:sections.artist_profile.settings.biography" },
+    { "type": "textarea", "id": "philosophy", "label": "t:sections.artist_profile.settings.philosophy" },
+    { "type": "url", "id": "cta_url", "label": "t:sections.artist_profile.settings.action_url" },
+    { "type": "text", "id": "cta_text", "label": "t:sections.artist_profile.settings.action_label" }
   ],
-  "presets": [{ "name": "Artist Profile" }]
+  "presets": [{ "name": "t:sections.artist_profile.name" }]
 }
 {% endschema %}
 ```
@@ -3510,412 +3471,136 @@ Showcases the maker behind the pieces. Storytelling is critical for artisan e-co
 
 ### F2. Process Timeline
 
-Visual narrative from raw clay to finished piece. Horizontal scroll on mobile, vertical on desktop.
+Passive ordered narrative from raw material to finished work. The canonical CSS
+is `components/css/storytelling.css`; the semantic contract is
+`components/contracts/process-timeline.contract.json`, and ADR 0124 owns the
+intrinsic one-row lane decision.
 
-```css
-.process-timeline {
-  padding: var(--space-layout-section-gap) var(--space-layout-container);
-}
+The root is a native section named by its visible contextual heading. The track
+is a native ordered list with direct list items. Equal implicit tracks share
+available inline space above a private readable minimum; when supplied steps do
+not fit, only the track scrolls horizontally with native snap. Do not reintroduce
+viewport breakpoints, wrapped grid rows, custom scrollbars, synthetic scroll-key
+handlers, progress/current-step state, or target-neutral process records.
 
-.process-timeline__title {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-h2-size);
-  color: var(--color-text-primary);
-  text-align: center;
-  margin-bottom: var(--space-layout-section-gap);
-}
-
-.process-timeline__track {
-  display: flex;
-  gap: 24px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;
-}
-.process-timeline__track::-webkit-scrollbar { height: 4px; }
-.process-timeline__track::-webkit-scrollbar-thumb {
-  background: var(--color-border-subtle);
-  border-radius: var(--radius-full);
-}
-
-@media (min-width: 768px) {
-  .process-timeline__track {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    overflow: visible;
-  }
-}
-
-.process-step {
-  flex: 0 0 260px;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 12px;
-  position: relative;
-}
-
-@media (min-width: 768px) {
-  .process-step { flex: 1; }
-  /* Connecting line */
-  .process-step:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 70px;
-    right: -12px;
-    width: 24px;
-    height: 2px;
-    background: var(--color-border-decorative);
-  }
-}
-
-.process-step__number {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-statement);
-  color: var(--color-text-inverse);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: calc(var(--typo-body-size) * 0.875);
-}
-
-.process-step__image {
-  width: 100%;
-  aspect-ratio: 4/3;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.process-step__image img { width: 100%; height: 100%; object-fit: cover; }
-
-.process-step__title {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-body-size);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.process-step__description {
-  font-size: calc(var(--typo-body-size) * 0.875);
-  color: var(--color-text-secondary);
-  line-height: 1.5;
-}
-```
+Step titles are required; image and description regions are optional and omitted
+when absent. The visible marker mirrors native list order and uses
+`aria-hidden="true"` to prevent duplicate announcement. Images retain
+target-authored informative or decorative alternatives. The logical connector
+is decorative and never carries sequence alone.
 
 ```html
-<!-- sections/process-timeline.liquid -->
-<section class="process-timeline">
-  <h2 class="process-timeline__title">{{ section.settings.title | default: 'From Earth to Art' }}</h2>
-  <div class="process-timeline__track">
-    {% for block in section.blocks %}
-      <div class="process-step" {{ block.shopify_attributes }}>
-        <span class="process-step__number">{{ forloop.index }}</span>
-        {% if block.settings.image %}
-          <div class="process-step__image">
-            {{ block.settings.image | image_url: width: 520 | image_tag:
-               alt: block.settings.title, loading: 'lazy', widths: '260,520' }}
-          </div>
-        {% endif %}
-        <h3 class="process-step__title">{{ block.settings.title }}</h3>
-        <p class="process-step__description">{{ block.settings.description }}</p>
+<section class="process-timeline" aria-labelledby="process-title">
+  <h2 class="process-timeline__title" id="process-title">From earth to kiln</h2>
+  <ol class="process-timeline__track" role="list" tabindex="0" aria-labelledby="process-title">
+    <li class="process-step">
+      <span class="process-step__number" aria-hidden="true">1</span>
+      <div class="process-step__image">
+        <img src="gather.jpg" alt="Local clay and mineral samples on a worktable">
       </div>
-    {% endfor %}
-  </div>
+      <h3 class="process-step__title">Gather</h3>
+      <p class="process-step__description">Local minerals are selected for body and glaze.</p>
+    </li>
+    <li class="process-step">
+      <span class="process-step__number" aria-hidden="true">2</span>
+      <h3 class="process-step__title">Form</h3>
+    </li>
+  </ol>
 </section>
-
-{% schema %}
-{
-  "name": "Process Timeline",
-  "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "From Earth to Art" }
-  ],
-  "blocks": [
-    {
-      "type": "step",
-      "name": "Step",
-      "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "title", "label": "Title" },
-        { "type": "textarea", "id": "description", "label": "Description" }
-      ]
-    }
-  ],
-  "presets": [{
-    "name": "Process Timeline",
-    "blocks": [
-      { "type": "step", "settings": { "title": "Clay Preparation" } },
-      { "type": "step", "settings": { "title": "Wheel Throwing" } },
-      { "type": "step", "settings": { "title": "Bisque Firing" } },
-      { "type": "step", "settings": { "title": "Glazing" } },
-      { "type": "step", "settings": { "title": "Final Kiln Firing" } }
-    ]
-  }]
-}
-{% endschema %}
 ```
+
+Shopify implements the same anatomy in
+`platforms/shopify/sections/process-timeline.liquid`:
+
+- one merchant-reorderable section block per direct `li`;
+- `block.shopify_attributes` on that item;
+- target-unique section/track/heading association;
+- optional image and description omission;
+- media-library alt fallback plus an explicit decorative-image setting;
+- localized schema labels and title/step fallbacks;
+- no section JavaScript or target-owned scroll state.
 
 ---
 
 ### F3. Certificate of Authenticity
 
-Digital COA card for artisan pieces.
+Passive, self-contained presentation for a target-owned certificate record.
+Certificate does not create or validate records, signatures, verification
+destinations, proof, issuer trust, or authenticity guarantees.
 
-```css
-.coa {
-  --_coa-bg: var(--color-surface-archival);
-  --_coa-border: var(--color-border-decorative);
-  --_coa-text: var(--color-text-primary);
-
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 32px;
-  background: var(--_coa-bg);
-  border: 2px solid var(--_coa-border);
-  border-radius: var(--radius-lg);
-  text-align: center;
-}
-
-.coa__header {
-  font-family: var(--font-family-accent);
-  font-size: calc(var(--typo-body-size) * 0.75);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-text-secondary);
-  margin-bottom: 8px;
-}
-
-.coa__title {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-h3-size);
-  color: var(--_coa-text);
-  margin: 0 0 4px;
-}
-
-.coa__artist {
-  font-family: var(--font-family-accent);
-  font-size: var(--typo-h4-size);
-  color: var(--color-text-accent);
-  font-style: italic;
-}
-
-.coa__divider {
-  width: 60px;
-  height: 2px;
-  background: var(--_coa-border);
-  margin: 20px auto;
-}
-
-.coa__details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  text-align: left;
-  font-size: calc(var(--typo-body-size) * 0.875);
-}
-
-.coa__detail-label {
-  font-size: calc(var(--typo-body-size) * 0.75);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-secondary);
-  margin-bottom: 2px;
-}
-
-.coa__detail-value {
-  color: var(--_coa-text);
-  font-weight: 500;
-}
-
-.coa__signature {
-  font-family: var(--font-family-accent);
-  font-size: var(--typo-h4-size);
-  color: var(--_coa-text);
-  margin-top: 24px;
-}
-
-.coa__qr {
-  margin-top: 16px;
-}
-.coa__qr img { width: 80px; height: 80px; }
-.coa__verify {
-  font-size: calc(var(--typo-body-size) * 0.75);
-  color: var(--color-text-disabled);
-  margin-top: 4px;
-}
-```
+The required title names a native `article`. Optional metadata uses a native
+`dl` with direct grouped `dt`/`dd` pairs. A signature is rendered only from a
+real target-owned signature value. Verification is rendered only as a native
+descriptive link when the target supplies a real destination; optional QR or
+other media is redundant to the visible link text.
 
 ```html
-<!-- snippets/certificate-of-authenticity.liquid -->
-<div class="coa">
-  <p class="coa__header">Certificate of Authenticity</p>
-
-  <h3 class="coa__title">{{ product.title }}</h3>
-  <p class="coa__artist">by {{ product.vendor }}</p>
-
-  <div class="coa__divider"></div>
-
-  <div class="coa__details">
-    {% if product.metafields.custom.medium %}
-      <div>
-        <p class="coa__detail-label">Medium</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.medium }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.dimensions %}
-      <div>
-        <p class="coa__detail-label">Dimensions</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.dimensions }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.year %}
-      <div>
-        <p class="coa__detail-label">Year</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.year }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.edition %}
-      <div>
-        <p class="coa__detail-label">Edition</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.edition }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.glaze_type %}
-      <div>
-        <p class="coa__detail-label">Glaze</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.glaze_type }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.firing_temperature %}
-      <div>
-        <p class="coa__detail-label">Firing</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.firing_temperature }}</p>
-      </div>
-    {% endif %}
-  </div>
-
-  {% if product.vendor %}
-    <p class="coa__signature">{{ product.vendor }}</p>
-  {% endif %}
-
-  <div class="coa__qr">
-    <img src="{{ product.url | append: '.json' | md5 | prepend: 'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=' | append: shop.url | append: product.url }}"
-         alt="Verification QR code" width="80" height="80">
-    <p class="coa__verify">Scan to verify authenticity</p>
-  </div>
-</div>
+<article class="coa" aria-labelledby="certificate-title">
+  <p class="coa__header">Certificate of authenticity</p>
+  <h2 class="coa__title" id="certificate-title">Moon Jar No. 07</h2>
+  <p class="coa__artist">Marina Paz</p>
+  <div class="coa__divider" aria-hidden="true"></div>
+  <dl class="coa__details">
+    <div class="coa__detail">
+      <dt class="coa__detail-label">Medium</dt>
+      <dd class="coa__detail-value">Stoneware and ash glaze</dd>
+    </div>
+    <div class="coa__detail">
+      <dt class="coa__detail-label">Record</dt>
+      <dd class="coa__detail-value">TG-MP-2026-007</dd>
+    </div>
+  </dl>
+  <p class="coa__signature" aria-label="Signature: Marina Paz">Marina Paz</p>
+  <a class="coa__verification" href="/certificates/TG-MP-2026-007">
+    <span class="coa__qr" aria-hidden="true"><!-- target media --></span>
+    <span class="coa__verify">View certificate record TG-MP-2026-007</span>
+  </a>
+</article>
 ```
+
+`.coa` is an inline-size container. Its detail grid changes intrinsically
+between two and one columns without depending on the page viewport. Complete
+typography, spacing, description-list resets, link focus, forced-color support,
+and content containment live in `components/css/storytelling.css`.
+
+Shopify implements the same boundary in
+`platforms/shopify/snippets/certificate-of-authenticity.liquid`:
+
+- current product/metafield facts map to localized native detail groups;
+- the product vendor remains attribution and is never relabelled as signature;
+- signature and verification inputs are explicit optional target parameters;
+- no third-party QR request or generated authenticity claim is emitted;
+- missing detail, signature, verification, or media regions are omitted.
 
 ---
 
 ### F4. Collection Story
 
-Narrative context for each collection — why these pieces exist together.
+Collection Story presents one focused narrative as a native section associated
+with its visible contextual heading. The required inner
+`.collection-story__layout` owns responsive composition; add
+`.collection-story__layout--with-media` only when the optional media region is
+present. The root is a named inline-size container, so the media/text split is
+based on the component's actual host width instead of the page viewport.
 
-```css
-.collection-story {
-  --_story-bg: var(--color-surface-primary);
+`reversed` remains a boolean visual-layout property through
+`.collection-story--reversed`. It changes only the intrinsic two-column visual
+placement and never changes media-before-content source order. Without media,
+the narrative stays one centered capped column and no empty grid track is
+reserved.
 
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-layout-grid-gap);
-  padding: var(--space-layout-section-gap) var(--space-layout-container);
-}
+Use the contextual heading for `aria-labelledby`, target-authored informative
+or empty image alt, `blockquote` only for a genuine quotation, and an ordinary
+action group composed from canonical Button or native target controls. Optional
+media, label, quotation, and actions are omitted completely when absent.
+Collection Story has no local state or JavaScript runtime.
 
-@media (min-width: 768px) {
-  .collection-story { grid-template-columns: 1fr 1fr; align-items: center; }
-  .collection-story--reversed .collection-story__media { order: 2; }
-}
-
-.collection-story__media {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  aspect-ratio: 4/3;
-}
-.collection-story__media img { width: 100%; height: 100%; object-fit: cover; }
-
-.collection-story__content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.collection-story__label {
-  font-size: calc(var(--typo-body-size) * 0.75);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-text-accent);
-}
-
-.collection-story__title {
-  font-family: var(--font-family-heading);
-  font-size: var(--typo-h2-size);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.collection-story__text {
-  font-size: var(--typo-article-size);
-  line-height: var(--typo-article-line-height);
-  color: var(--color-text-secondary);
-}
-
-.collection-story__inspiration {
-  font-family: var(--font-family-accent);
-  font-size: var(--typo-h4-size);
-  font-style: italic;
-  color: var(--color-text-accent);
-  padding-left: 20px;
-  border-left: 3px solid var(--color-border-decorative);
-}
-```
-
-```html
-<!-- sections/collection-story.liquid -->
-<section class="collection-story {% if section.settings.reverse %}collection-story--reversed{% endif %}">
-  <div class="collection-story__media">
-    {% if section.settings.image %}
-      {{ section.settings.image | image_url: width: 960 | image_tag:
-         alt: section.settings.title, loading: 'lazy',
-         widths: '480,720,960', sizes: '(min-width: 768px) 50vw, 100vw' }}
-    {% endif %}
-  </div>
-  <div class="collection-story__content">
-    <span class="collection-story__label">{{ section.settings.label | default: 'The Story' }}</span>
-    <h2 class="collection-story__title">{{ section.settings.title }}</h2>
-    <div class="collection-story__text">{{ section.settings.text }}</div>
-    {% if section.settings.quote %}
-      <blockquote class="collection-story__inspiration">{{ section.settings.quote }}</blockquote>
-    {% endif %}
-    {% if section.settings.cta_url %}
-      <a href="{{ section.settings.cta_url }}" class="btn btn--outline">
-        {{ section.settings.cta_text | default: 'Explore Collection' }}
-      </a>
-    {% endif %}
-  </div>
-</section>
-
-{% schema %}
-{
-  "name": "Collection Story",
-  "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "label", "label": "Label", "default": "The Story" },
-    { "type": "text", "id": "title", "label": "Heading" },
-    { "type": "richtext", "id": "text", "label": "Body text" },
-    { "type": "textarea", "id": "quote", "label": "Inspiration quote" },
-    { "type": "url", "id": "cta_url", "label": "CTA link" },
-    { "type": "text", "id": "cta_text", "label": "CTA text" },
-    { "type": "checkbox", "id": "reverse", "label": "Reverse layout", "default": false }
-  ],
-  "presets": [{ "name": "Collection Story" }]
-}
-{% endschema %}
-```
+Shopify implements the same boundary in
+`platforms/shopify/sections/collection-story.liquid`: localized editor settings,
+merchant image alt/decorative intent and focal-point preservation, conditional
+anatomy, a target-unique heading id, canonical Button action and source-safe
+visual reversal. The action slot remains target-owned; ADR 0080 requires explicit
+human/product review before adding a formal public Button dependency.
 
 ---
 

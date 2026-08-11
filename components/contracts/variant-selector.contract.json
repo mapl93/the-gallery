@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "variant-selector",
   "name": "Variant Selector",
   "registryId": "D4",
   "category": "product",
   "status": "pilot",
-  "summary": "Product variant selector with grouped labels, swatches, pills, checked state, focus state, and unavailable state.",
+  "summary": "Product-option composition whose fieldset-and-legend groups use named native radios, keep sold-out values inspectable, disable nonexistent combinations, and delegate coordinated product projection to one commerce target.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/variant-selector",
@@ -14,67 +14,99 @@
     "docs": "site/src/content/components/variant-selector.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".variant-selector", "className": ".variant-selector", "required": true, "description": "Variant selector container." },
-    { "name": "group", "selector": ".variant-selector__group", "className": ".variant-selector__group", "required": false, "description": "Single option group." },
-    { "name": "label", "selector": ".variant-selector__label", "className": ".variant-selector__label", "required": true, "description": "Option group label." },
-    { "name": "swatches", "selector": ".variant-swatches", "className": ".variant-swatches", "required": false, "description": "Swatch option group." },
-    { "name": "swatch", "selector": ".variant-swatch", "className": ".variant-swatch", "required": false, "description": "Single swatch option." },
-    { "name": "swatchInput", "selector": ".variant-swatch input", "required": false, "description": "Native input for swatch selection." },
-    { "name": "swatchColor", "selector": ".variant-swatch__color", "className": ".variant-swatch__color", "required": false, "description": "Swatch color or image surface." },
-    { "name": "swatchRing", "selector": ".variant-swatch__ring", "className": ".variant-swatch__ring", "required": false, "description": "Selected or focus ring layer." },
-    { "name": "pills", "selector": ".variant-pills", "className": ".variant-pills", "required": false, "description": "Pill option group." },
-    { "name": "pill", "selector": ".variant-pill", "className": ".variant-pill", "required": false, "description": "Single pill option." },
-    { "name": "pillInput", "selector": ".variant-pill input", "required": false, "description": "Native input for pill selection." }
+    { "name": "root", "selector": ".variant-selector", "className": ".variant-selector", "required": true, "description": "Collection containing one or more product-option groups." },
+    { "name": "group", "selector": ".variant-selector__group", "className": ".variant-selector__group", "required": true, "description": "Native fieldset for one product option and its same-name radio values." },
+    { "name": "legend", "selector": ".variant-selector__legend", "className": ".variant-selector__legend", "required": true, "description": "First legend that supplies the stable visible and accessible group label." },
+    { "name": "groupLabel", "selector": ".variant-selector__label", "className": ".variant-selector__label", "required": true, "description": "Stable localized product-option name inside the legend." },
+    { "name": "selectedValue", "selector": ".variant-selector__selection", "className": ".variant-selector__selection", "required": false, "description": "Derived visible selected value; it is not an independent value owner and may be hidden from the accessible legend name." },
+    { "name": "swatches", "selector": ".variant-swatches", "className": ".variant-swatches", "required": false, "description": "Wrapping visual-swatch presentation for one native radio group." },
+    { "name": "swatch", "selector": ".variant-swatch", "className": ".variant-swatch", "required": false, "description": "Wrapping label and 44px target for one visual option." },
+    { "name": "swatchInput", "selector": ".variant-swatch__input", "className": ".variant-swatch__input", "required": false, "description": "Named native radio that owns the swatch option value and state." },
+    { "name": "swatchColor", "selector": ".variant-swatch__color", "className": ".variant-swatch__color", "required": false, "description": "Target-provided color or image surface; never the option's only name." },
+    { "name": "swatchLabel", "selector": ".variant-swatch__label", "className": ".variant-swatch__label", "required": false, "description": "Localized accessible name for the visual option." },
+    { "name": "pills", "selector": ".variant-pills", "className": ".variant-pills", "required": false, "description": "Wrapping text-pill presentation for one native radio group." },
+    { "name": "pill", "selector": ".variant-pill", "className": ".variant-pill", "required": false, "description": "Wrapping label and minimum 44px target for one textual option." },
+    { "name": "pillInput", "selector": ".variant-pill__input", "className": ".variant-pill__input", "required": false, "description": "Named native radio that owns the pill option value and state." },
+    { "name": "pillLabel", "selector": ".variant-pill__label", "className": ".variant-pill__label", "required": false, "description": "Visible localized text naming the pill option." },
+    { "name": "optionStatus", "selector": ".variant-selector__option-status", "className": ".variant-selector__option-status", "required": false, "description": "Localized accessible commercial status such as unavailable; targets omit it when not applicable." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default selector supporting swatches and pills." }
+    { "name": "default", "className": null, "default": true, "description": "Product option groups always begin with a selected value; unavailable combinations are commerce state rather than generic validation variants." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default product variant control size." }
+    { "name": "default", "className": null, "default": true, "description": "One product-option density with minimum 44px targets." }
   ],
   "states": [
-    { "name": "default", "selectors": [".variant-selector"], "description": "Default variant selector state." },
-    { "name": "checkedSwatch", "selectors": [".variant-swatch input:checked + .variant-swatch__color", ".variant-swatch input:checked ~ .variant-swatch__ring"], "description": "Selected swatch state." },
-    { "name": "focusSwatch", "selectors": [".variant-swatch input:focus-visible ~ .variant-swatch__ring"], "description": "Keyboard focus ring for swatches." },
-    { "name": "imageSwatch", "selectors": [".variant-swatch--image"], "description": "Image-backed swatch state." },
-    { "name": "unavailableSwatch", "selectors": [".variant-swatch--unavailable", ".variant-swatch--unavailable::after"], "description": "Unavailable swatch state." },
-    { "name": "checkedPill", "selectors": [".variant-pill:has(input:checked)"], "description": "Selected pill state." },
-    { "name": "focusPill", "selectors": [".variant-pill:has(input:focus-visible)"], "description": "Keyboard focus ring for pills." },
-    { "name": "unavailablePill", "selectors": [".variant-pill--unavailable"], "description": "Unavailable pill state." }
+    { "name": "default", "selectors": [".variant-selector"], "description": "One or more available native option groups." },
+    { "name": "hover", "selectors": [".variant-swatch:has(.variant-swatch__input:not(:disabled)):hover", ".variant-pill:has(.variant-pill__input:not(:disabled)):hover"], "description": "Hover-capable pointer feedback on interactive options." },
+    { "name": "checkedSwatch", "selectors": [".variant-swatch__input:checked + .variant-swatch__color"], "description": "Selected swatch boundary derived from native checkedness." },
+    { "name": "focusSwatch", "selectors": [".variant-swatch__input:focus-visible + .variant-swatch__color"], "description": "Keyboard focus indicator distinct from selected swatch state." },
+    { "name": "checkedPill", "selectors": [".variant-pill:has(.variant-pill__input:checked)"], "description": "Selected pill surface derived from native checkedness." },
+    { "name": "focusPill", "selectors": [".variant-pill:has(.variant-pill__input:focus-visible)"], "description": "Keyboard focus indicator distinct from selected pill state." },
+    { "name": "unavailable", "selectors": [".variant-swatch--unavailable", ".variant-pill--unavailable", ".variant-selector__option-status"], "description": "Commercially unavailable value with localized text and a non-color cue; it is not automatically native-disabled." },
+    { "name": "disabledOption", "selectors": [".variant-swatch:has(.variant-swatch__input:disabled)", ".variant-pill:has(.variant-pill__input:disabled)"], "description": "Native-disabled nonexistent combination or genuinely unusable option." },
+    { "name": "disabledGroup", "selectors": [".variant-selector__group:disabled"], "description": "Native fieldset-disabled option group." }
   ],
   "behavior": [
-    { "name": "selection", "selectors": [".variant-swatch input", ".variant-pill input"], "attributes": ["name", "value", "checked", "disabled"], "events": ["change"], "description": "Variant choice should use native input state or equivalent target-native selection state." },
-    { "name": "availability", "selectors": [".variant-swatch--unavailable", ".variant-pill--unavailable"], "attributes": ["disabled", "aria-disabled"], "description": "Unavailable variants should be announced and prevented from selection." },
-    { "name": "variantData", "selectors": [".variant-selector__label"], "description": "Adapters own mapping selected options to product variant ids, availability, price, media, and selling plan state." }
+    { "name": "nativeGroup", "selectors": [".variant-selector__group", ".variant-swatch__input", ".variant-pill__input"], "attributes": ["<fieldset>", "<legend>", "type=\"radio\"", "name", "value", "checked", "required", "disabled"], "events": ["Tab", "Space", "arrow keys", "input", "change", "form submit", "form reset", "constraint validation"], "description": "Each group uses one fieldset/legend and same-name native radios. HTML owns mutual exclusion, one group value, keyboard operation, events, validity, FormData, and reset without a redundant radiogroup role or neutral JavaScript." },
+    { "name": "selectionOwnership", "selectors": [".variant-swatch__input", ".variant-pill__input"], "attributes": ["checked establishes initial checkedness in static HTML", "one controlled or uncontrolled value per group in framework adapters"], "events": ["input", "change", "form reset"], "description": "Static Web delegates live state to native radios. Controlled targets bind one value per option group rather than unrelated option booleans." },
+    { "name": "derivedSelection", "selectors": [".variant-selector__selection"], "description": "Visible selected-value text is derived from the checked radio and is never a second editable value owner. Targets keep it synchronized when the native selection changes." },
+    { "name": "availability", "selectors": [".variant-swatch--unavailable", ".variant-pill--unavailable", ".variant-selector__option-status", ".variant-swatch__input", ".variant-pill__input"], "attributes": ["inspectable sold-out state", "disabled nonexistent or unusable state"], "description": "Under D4-A, sold-out values remain selectable with localized status and a non-color cue; nonexistent combinations and genuinely unusable values use native disabled. Selection never makes unavailable merchandise purchasable." },
+    { "name": "swatchData", "selectors": [".variant-swatch__color", ".variant-swatch__label"], "description": "Color or image surfaces are authored target data. Every swatch retains a localized option name independent from its visual surface." },
+    { "name": "variantCoordination", "selectors": [".variant-selector"], "events": ["native input/change selection request", "target-owned tg:product-variant-change result"], "description": "Native input/change requests selection. The parent product page, quick view, or commerce adapter resolves the complete combination and coordinates variant id, availability, URL, Price, media, inventory, selling plan, submit state, and at most one localized status. Neutral Variant Selector does not duplicate this service." },
+    { "name": "intrinsicLayout", "selectors": [".variant-selector", ".variant-selector__group", ".variant-swatches", ".variant-pills"], "description": "Groups and options wrap from available inline size without viewport-specific DOM, source-order, or keyboard-order changes." }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": true, "description": "Visible option-group label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-selector__label" }] } },
-    { "name": "selectedValue", "type": "string", "required": false, "description": "Visible selected option value.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-selector__label span" }] } },
-    { "name": "optionLabel", "type": "string", "required": true, "description": "Accessible name for an individual native option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "name", "type": "string", "required": true, "description": "Native radio-group name for an individual option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "value", "type": "string", "required": true, "description": "Native submitted value for an individual option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Selected state for an individual native option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Unavailable state for an individual native option.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } }
+    { "name": "label", "type": "string", "required": true, "description": "Stable visible label for one repeated product-option group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-selector__label" }] } },
+    { "name": "optionLabel", "type": "string", "required": true, "description": "Localized name for one repeated option value, visible on pills and accessible for swatches.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-swatch__label" }, { "kind": "content", "selector": ".variant-pill__label" }] } },
+    { "name": "name", "type": "string", "required": true, "description": "Native radio name shared by every value in one option group.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": true, "description": "Stable target value for one repeated option radio.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Establishes initial checkedness in static HTML; controlled adapters bind one live group value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Requires one checked value in each rendered native option group.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "groupDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables every option in a repeated group through its native fieldset.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-selector__group", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Native-disabled state for a nonexistent combination or genuinely unusable repeated option, independent from inspectable sold-out state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".variant-swatch__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".variant-pill__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "unavailable", "type": "boolean", "required": false, "defaultValue": false, "description": "Marks one repeated option sold out while keeping it selectable for inspection under accepted D4-A policy.", "targetMappings": { "web": [{ "kind": "class", "selector": ".variant-swatch", "classNames": [".variant-swatch--unavailable"] }, { "kind": "class", "selector": ".variant-pill", "classNames": [".variant-pill--unavailable"] }] } },
+    { "name": "unavailableText", "type": "string", "required": false, "description": "Localized accessible status appended to an unavailable option; required by the target whenever unavailable is true.", "targetMappings": { "web": [{ "kind": "content", "selector": ".variant-selector__option-status" }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-default", "--color-border-strong", "--color-border-focus", "--color-surface-primary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover", "--color-button-primary-border-default", "--color-button-primary-border-hover", "--color-text-primary", "--color-text-disabled"],
+      "color": [
+        "--color-border-subtle",
+        "--color-border-default",
+        "--color-border-strong",
+        "--color-border-focus",
+        "--color-surface-primary",
+        "--color-button-primary-bg-default",
+        "--color-button-primary-bg-hover",
+        "--color-button-primary-text-default",
+        "--color-button-primary-text-hover",
+        "--color-button-primary-border-default",
+        "--color-button-primary-border-hover",
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-text-disabled"
+      ],
       "radius": ["--radius-full", "--radius-md"],
       "opacity": ["--opacity-disabled"],
       "transition": ["--transition-fast"],
       "easing": ["--easing-default"],
-      "typography": ["--typo-body-size"]
+      "typography": ["--font-family-body", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"]
     }
   },
   "accessibility": [
-    "Use native radio inputs, a radiogroup pattern, or target-native single-selection controls.",
-    "Keep visible selected, focus, unavailable, and disabled states synchronized with semantic state.",
-    "Expose option names and currently selected values in text, not color alone."
+    "Render every option group as a native fieldset with a first legend and same-name native radio inputs. Do not add redundant radiogroup/radio roles or recreate arrow-key focus behavior.",
+    "Keep one stable localized accessible group label. If the visual legend includes a derived selected value, hide only that redundant fragment from the accessible name.",
+    "Give every radio a non-empty localized option label independent from color, image, selected state, tooltip, or commercial status.",
+    "Keep native checked, required, group disabled, option disabled, input/change, FormData, reset, and constraint-validation behavior. A target that controls state binds one value per group.",
+    "Keep sold-out commercial unavailability distinct from native disabled interaction. Sold-out values remain selectable with localized associated text and a non-color cue; nonexistent combinations and genuinely unusable values are disabled.",
+    "Provide at least a 44 by 44 CSS pixel target. Preserve distinct visible selected and focus states in light, dark, forced colors, reduced motion, RTL, zoom, and narrow containers.",
+    "Do not create a live region per group. The parent commerce coordinator owns any one localized announcement after meaningful Price, media, availability, or purchase-state changes."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify product options and variants to swatches or pills." },
-    "react": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css", "notes": "Native fieldset/legend/radio composition and swatch/pill presentation are implemented in canonical Product CSS; product-data and cross-group variant resolution remain consumer-owned." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js", "notes": "Liquid distinguishes exact sold-out variants from nonexistent combinations, preserves native swatches and granular option ids, and one target coordinator performs high-variant Section Rendering, Combined Listing product_url navigation, bounded dependent updates, focus restoration, URL synchronization and one status." },
+    "react": { "status": "implemented", "kind": "component", "notes": "The shared Exhibit/Studio renderer proves group-level controlled values, native change semantics, selectable sold-out values and disabled invalid combinations. Consumers may expose one controlled value or uncontrolled default value per group." },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }

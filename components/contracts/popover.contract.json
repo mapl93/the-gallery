@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "popover",
   "name": "Popover",
   "registryId": "B9",
   "category": "layout",
   "status": "pilot",
-  "summary": "Floating content panel with arrow, title/content anatomy, open state, trigger relationship, escape dismissal, and focus behavior requirements.",
+  "summary": "Non-modal trigger-owned floating surface with content-derived semantics, optional arrow and title, portable and native Web open states, dismissal, and natural focus behavior.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/popover",
@@ -70,20 +70,25 @@
     },
     {
       "name": "open",
-      "selectors": [".popover--open"],
-      "description": "Visible state controlled by the popover--open modifier."
+      "selectors": [".popover--open", ".popover:popover-open"],
+      "description": "Visible state controlled by the portable modifier or the native Web Popover API."
     }
   ],
   "behavior": [
     {
       "name": "visibility",
-      "selectors": [".popover--open"],
-      "description": "The popover is hidden by default and becomes visible when popover--open is applied."
+      "selectors": [".popover--open", ".popover:popover-open"],
+      "description": "The panel is hidden by default and becomes visible through the portable modifier or native Web popover state."
     },
     {
       "name": "triggerRelationship",
-      "attributes": ["aria-expanded", "aria-controls", "aria-haspopup"],
-      "description": "The trigger should expose its expanded state and reference the popover panel."
+      "attributes": ["aria-expanded", "aria-controls", "popovertarget"],
+      "description": "A native Button exposes expanded state and references the panel. Capable Web targets may use popovertarget; aria-haspopup is added only when the content-derived role requires it."
+    },
+    {
+      "name": "contentSemantics",
+      "attributes": ["role", "aria-labelledby", "aria-label"],
+      "description": "Popover has no default ARIA role. Targets select native or ARIA semantics from the content and provide a name only when that role requires one."
     },
     {
       "name": "dismissal",
@@ -93,7 +98,12 @@
     {
       "name": "focusManagement",
       "events": ["open", "close", "Tab"],
-      "description": "Non-modal popovers should preserve natural tab order and restore focus to the trigger when closed by keyboard."
+      "description": "Non-modal popovers preserve natural tab order without a trap. Passive content may leave focus on the trigger; targets that move focus inside restore it on keyboard dismissal."
+    },
+    {
+      "name": "stateOwnership",
+      "events": ["openChange"],
+      "description": "Targets may implement controlled open or uncontrolled default-open state while preserving the same trigger, dismissal, and focus meaning."
     }
   ],
   "properties": [
@@ -138,22 +148,31 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
       ]
     }
   },
   "accessibility": [
-    "Use popover for supplemental content; use modal dialog patterns when interaction behind the panel must be blocked.",
-    "Connect the trigger and panel with aria-controls and keep aria-expanded synchronized.",
+    "Use Popover for concise non-modal supplemental content; use Modal or Drawer when background interaction must be blocked.",
+    "Use a native Button and connect it to the panel with aria-controls/aria-expanded or native popovertarget behavior.",
+    "Do not force role=dialog or aria-haspopup=dialog; choose semantics from the actual content.",
     "Close on Escape and outside interaction.",
     "Do not trap focus in a non-modal popover.",
-    "Use a dialog pattern if the popover contains a complex form or long interaction."
+    "Restore trigger focus after keyboard dismissal when focus moved into the panel.",
+    "Use a dialog pattern if the panel contains a complex form or long interaction."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; positioning and interaction behavior must be provided by the consuming target."
+      "notes": "Portable class state and native :popover-open styling are implemented in components/css/layout.css; the consuming target owns content semantics, positioning, collision, dismissal, and focus behavior."
     },
     "shopify": {
       "status": "planned",

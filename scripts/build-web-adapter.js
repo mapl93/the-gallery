@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildRuntimeSources, runtimeModulesForComponents } from './lib/runtime-modules.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = path.join(repoRoot, 'registry.json');
@@ -8,13 +9,19 @@ const contractsDir = path.join(repoRoot, 'components', 'contracts');
 const cssDir = path.join(repoRoot, 'components', 'css');
 const cssIndexPath = path.join(cssDir, 'index.css');
 const jsSourcePath = path.join(repoRoot, 'components', 'js', 'theme.js');
+const firingScheduleSourcePath = path.join(repoRoot, 'components', 'js', 'firing-schedule.js');
 const webDir = path.join(repoRoot, 'platforms', 'web');
 
 const outputPaths = {
   entry: path.join(webDir, 'index.css'),
   tokens: path.join(webDir, 'tokens.css'),
   components: path.join(webDir, 'components.css'),
+  cssModuleDirectory: path.join(webDir, 'components'),
   javascript: path.join(webDir, 'theme.js'),
+  runtimeDirectory: path.join(webDir, 'runtime'),
+  runtimeLoader: path.join(webDir, 'runtime-loader.js'),
+  runtimeCore: path.join(webDir, 'runtime', 'core.js'),
+  firingSchedule: path.join(webDir, 'firing-schedule.js'),
   manifest: path.join(webDir, 'adapter.manifest.json'),
   summary: path.join(webDir, 'adapter.summary.json')
 };
@@ -120,6 +127,15 @@ function buildComponentsCss(cssFiles) {
   write(outputPaths.components, `${sections.join('\n').trimEnd()}\n`);
 }
 
+function copyCssModules(cssFiles) {
+  fs.rmSync(outputPaths.cssModuleDirectory, { recursive: true, force: true });
+  for (const fileName of cssFiles) {
+    const sourcePath = path.join(cssDir, fileName);
+    assert(fs.existsSync(sourcePath), `${relative(sourcePath)} does not exist`);
+    write(path.join(outputPaths.cssModuleDirectory, fileName), read(sourcePath));
+  }
+}
+
 function buildIndexCss() {
   const content = [
     '/* ============================================================',
@@ -136,12 +152,60 @@ function buildIndexCss() {
   write(outputPaths.entry, content);
 }
 
-function copyThemeJs() {
+function copyJavascript() {
   assert(fs.existsSync(jsSourcePath), `${relative(jsSourcePath)} does not exist`);
+  assert(fs.existsSync(firingScheduleSourcePath), `${relative(firingScheduleSourcePath)} does not exist`);
   write(outputPaths.javascript, read(jsSourcePath));
+  write(outputPaths.firingSchedule, read(firingScheduleSourcePath));
 }
 
-function buildManifest(registry, contracts, cssFiles) {
+function buildModularRuntime() {
+  const runtime = buildRuntimeSources(repoRoot);
+  fs.rmSync(outputPaths.runtimeDirectory, { recursive: true, force: true });
+  write(outputPaths.runtimeCore, runtime.core);
+  for (const [fileName, source] of runtime.modules) {
+    write(path.join(outputPaths.runtimeDirectory, fileName), source);
+  }
+  write(outputPaths.runtimeLoader, runtime.loader);
+  return runtime;
+}
+
+function resolveComponentDependencies(registry, slug, resolved = new Set(), order = []) {
+  if (resolved.has(slug)) return order;
+  const component = registry.components[slug];
+  assert(component, `${slug} is missing from registry.json`);
+  for (const dependency of component.dependencies ?? []) {
+    resolveComponentDependencies(registry, dependency, resolved, order);
+  }
+  resolved.add(slug);
+  order.push(slug);
+  return order;
+}
+
+function installDescriptor(registry, runtimeConfig, slug) {
+  const dependencyClosure = resolveComponentDependencies(registry, slug);
+  const cssSources = [
+    ...Object.values(registry.base).map((entry) => entry.file),
+    ...dependencyClosure.map((componentSlug) => registry.components[componentSlug].file),
+  ];
+  const css = [...new Set(cssSources)].map((source) => (
+    `platforms/web/components/${path.basename(source)}`
+  ));
+  const runtimeIds = runtimeModulesForComponents(runtimeConfig, dependencyClosure);
+  const runtime = runtimeIds.length === 0
+    ? []
+    : [relative(outputPaths.runtimeCore), ...runtimeIds.map((id) => `platforms/web/runtime/${id}.js`)];
+
+  return {
+    dependencyClosure,
+    tokens: relative(outputPaths.tokens),
+    css,
+    runtime,
+    runtimeLoader: runtimeIds.length > 0 ? relative(outputPaths.runtimeLoader) : null,
+  };
+}
+
+function buildManifest(registry, contracts, cssFiles, runtime) {
   const componentsByFile = groupComponentsByCssFile(registry);
   const components = [];
   const uniquePublicTokens = new Set();
@@ -178,6 +242,7 @@ function buildManifest(registry, contracts, cssFiles) {
         docs: contract.source.docs
       },
       dependencies: registryComponent.dependencies ?? [],
+      install: installDescriptor(registry, runtime.config, slug),
       variants: contract.variants.map((variant) => ({
         name: variant.name,
         className: variant.className,
@@ -214,7 +279,13 @@ function buildManifest(registry, contracts, cssFiles) {
     entry: relative(outputPaths.entry),
     tokens: relative(outputPaths.tokens),
     components: relative(outputPaths.components),
+    cssModuleDirectory: relative(outputPaths.cssModuleDirectory),
     javascript: relative(outputPaths.javascript),
+    runtimeDirectory: relative(outputPaths.runtimeDirectory),
+    runtimeLoader: relative(outputPaths.runtimeLoader),
+    runtimeCore: relative(outputPaths.runtimeCore),
+    runtimeModules: [...runtime.modules.keys()].map((fileName) => `platforms/web/runtime/${fileName}`),
+    firingSchedule: relative(outputPaths.firingSchedule),
     manifest: relative(outputPaths.manifest),
     summary: relative(outputPaths.summary)
   };
@@ -233,17 +304,31 @@ function buildManifest(registry, contracts, cssFiles) {
       reason: 'Provides the current hand-authored web component implementation.'
     },
     {
+      type: 'module',
+      path: relative(outputPaths.runtimeLoader),
+      required: false,
+      reason: 'Detects component markup and loads only the progressive-enhancement modules in use.'
+    },
+    {
       type: 'script',
       path: relative(outputPaths.javascript),
       required: false,
-      reason: 'Adds progressive enhancement for current shared web interactions.'
+      compatibility: true,
+      reason: 'Complete compatibility aggregate for existing consumers and diagnostics; do not load together with runtime-loader.js.'
+    },
+    {
+      type: 'module',
+      path: relative(outputPaths.firingSchedule),
+      required: false,
+      reason: 'Pure normalized-program model imported only by Firing Schedule renderers.'
     }
   ];
 
   const policy = {
-    componentImplementation: 'Hand-authored CSS from components/css is the current neutral web adapter implementation.',
+    componentImplementation: 'Hand-authored CSS from components/css is copied as independently installable family modules; components.css remains the complete compatibility bundle.',
     contractRole: 'Component contracts validate and describe the adapter; they do not generate component CSS yet.',
-    distribution: 'Consumer projects copy and own these files locally.'
+    runtimeDelivery: 'runtime-loader.js detects present markup and imports only matching progressive-enhancement modules; theme.js remains a compatibility and diagnostic aggregate.',
+    distribution: 'Consumer projects copy and own dependency-closed CSS and runtime slices locally.'
   };
 
   const stats = {
@@ -251,6 +336,7 @@ function buildManifest(registry, contracts, cssFiles) {
     implementedComponents,
     componentsWithBehavior: behaviorComponents,
     cssFiles: cssFiles.length,
+    runtimeModules: runtime.modules.size,
     uniquePublicTokens: uniquePublicTokens.size
   };
 
@@ -265,7 +351,7 @@ function buildManifest(registry, contracts, cssFiles) {
 
   const manifest = {
     $schema: 'https://the-gallery.dev/schema/web-adapter-manifest.json',
-    manifestVersion: '0.1.0',
+    manifestVersion: '0.2.0',
     target: {
       id: 'web',
       name: 'Neutral Web',
@@ -279,7 +365,9 @@ function buildManifest(registry, contracts, cssFiles) {
       contracts: 'components/contracts',
       tokens: 'tokens/source',
       css: 'components/css',
-      javascript: 'components/js/theme.js'
+      javascript: 'components/js/theme.js',
+      runtimeModules: 'components/js/runtime-modules.json',
+      componentJavascript: ['components/js/firing-schedule.js']
     },
     outputs,
     loadOrder,
@@ -291,7 +379,8 @@ function buildManifest(registry, contracts, cssFiles) {
         return {
           source,
           role: sourceRole(fileName, registry),
-          output: relative(outputPaths.components),
+          output: `platforms/web/components/${fileName}`,
+          aggregateOutput: relative(outputPaths.components),
           components: componentsByFile.get(source) ?? []
         };
       })
@@ -302,7 +391,7 @@ function buildManifest(registry, contracts, cssFiles) {
 
   const summary = {
     $schema: 'https://the-gallery.dev/schema/web-adapter-summary.json',
-    summaryVersion: '0.1.0',
+    summaryVersion: '0.2.0',
     target: manifest.target,
     outputs,
     loadOrder,
@@ -331,9 +420,11 @@ function main() {
   const cssFiles = readCssOrder();
 
   buildComponentsCss(cssFiles);
+  copyCssModules(cssFiles);
   buildIndexCss();
-  copyThemeJs();
-  buildManifest(registry, contracts, cssFiles);
+  copyJavascript();
+  const runtime = buildModularRuntime();
+  buildManifest(registry, contracts, cssFiles, runtime);
 
   console.log(`Built neutral web adapter: ${relative(outputPaths.entry)}, ${relative(outputPaths.components)}, ${relative(outputPaths.javascript)}, ${relative(outputPaths.manifest)}, ${relative(outputPaths.summary)}.`);
 }

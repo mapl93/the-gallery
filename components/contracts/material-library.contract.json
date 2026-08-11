@@ -6,37 +6,105 @@
   "registryId": "R1",
   "category": "ceramics",
   "status": "pilot",
-  "summary": "Material card grid with swatches, descriptions, and property tags.",
+  "summary": "Passive target-owned material reference collection with optional context, complete named records, contextual media, and canonical Tag composition.",
   "dependencies": ["tag"],
-  "source": { "registry": "registry.json#/components/material-library", "css": { "file": "components/css/ceramics.css", "selector": ".material-library" }, "docs": "site/src/content/components/material-library.mdx" },
+  "source": {
+    "registry": "registry.json#/components/material-library",
+    "css": { "file": "components/css/ceramics.css", "selector": ".material-library" },
+    "docs": "site/src/content/components/material-library.mdx"
+  },
   "anatomy": [
-    { "name": "root", "selector": ".material-library", "className": ".material-library", "required": true, "description": "Material library section." },
-    { "name": "header", "selector": ".material-library__header", "className": ".material-library__header", "required": false, "description": "Optional introductory header." },
-    { "name": "title", "selector": ".material-library__title", "className": ".material-library__title", "required": false, "description": "Section heading." },
-    { "name": "subtitle", "selector": ".material-library__subtitle", "className": ".material-library__subtitle", "required": false, "description": "Optional introductory text." },
-    { "name": "grid", "selector": ".material-library__grid", "className": ".material-library__grid", "required": true, "description": "Repeated material-card region." },
-    { "name": "card", "selector": ".material-card", "className": ".material-card", "required": true, "description": "Single material record." },
-    { "name": "swatch", "selector": ".material-card__swatch", "className": ".material-card__swatch", "required": false, "description": "Optional material image or visual sample." },
-    { "name": "body", "selector": ".material-card__body", "className": ".material-card__body", "required": true, "description": "Material text content." },
-    { "name": "name", "selector": ".material-card__name", "className": ".material-card__name", "required": true, "description": "Material name." },
-    { "name": "type", "selector": ".material-card__type", "className": ".material-card__type", "required": false, "description": "Optional target-supplied material classification." },
-    { "name": "description", "selector": ".material-card__description", "className": ".material-card__description", "required": false, "description": "Optional material description." },
-    { "name": "properties", "selector": ".material-card__properties", "className": ".material-card__properties", "required": false, "description": "Optional property-tag composition." },
-    { "name": "propertyTag", "selector": ".material-card__tag", "className": ".material-card__tag", "required": false, "description": "Legacy material property tag styling; adapters may compose canonical Tag." }
+    { "name": "root", "selector": ".material-library", "className": ".material-library", "required": true, "description": "Named native section when a visible title is supplied; otherwise a semantically neutral container. Omitted when the required materials composition is absent or empty." },
+    { "name": "header", "selector": ".material-library__header", "className": ".material-library__header", "required": false, "description": "Optional introductory wrapper, emitted only when title or subtitle is present." },
+    { "name": "title", "selector": ".material-library__title", "className": ".material-library__title", "required": false, "description": "Visible contextual heading and section label when supplied." },
+    { "name": "subtitle", "selector": ".material-library__subtitle", "className": ".material-library__subtitle", "required": false, "description": "Optional visible plain-language introduction." },
+    { "name": "collection", "selector": ".material-library__grid", "className": ".material-library__grid", "required": true, "description": "Native unordered list of complete target-owned material records." },
+    { "name": "item", "selector": ".material-library__item", "className": ".material-library__item", "required": true, "description": "Native list item containing exactly one direct Material Card." },
+    { "name": "card", "selector": ".material-card", "className": ".material-card", "required": true, "description": "Passive native article named by its required visible material name." },
+    { "name": "media", "selector": ".material-card__swatch", "className": ".material-card__swatch", "required": false, "description": "Optional target media slot with context-appropriate image alternatives." },
+    { "name": "body", "selector": ".material-card__body", "className": ".material-card__body", "required": true, "description": "Material text-content wrapper." },
+    { "name": "name", "selector": ".material-card__name", "className": ".material-card__name", "required": true, "description": "Non-empty visible contextual heading used to name the Material Card article." },
+    { "name": "type", "selector": ".material-card__type", "className": ".material-card__type", "required": false, "description": "Optional target-authored material classification; no vocabulary is implied." },
+    { "name": "description", "selector": ".material-card__description", "className": ".material-card__description", "required": false, "description": "Optional complete plain-language material description." },
+    { "name": "properties", "selector": ".material-card__properties", "className": ".material-card__properties", "required": false, "description": "Optional native list of passive material-property labels." },
+    { "name": "propertyItem", "selector": ".material-card__property", "className": ".material-card__property", "required": false, "description": "Native list item containing one canonical passive Tag." },
+    { "name": "propertyTag", "selector": ".material-card__tag", "className": ".material-card__tag", "required": false, "description": "Local composition hook applied to canonical .tag with required visible .tag__label and no remove action in the passive R1 baseline." }
   ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default material library presentation." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Responsive material-card grid." }],
-  "states": [{ "name": "default", "selectors": [".material-library"], "description": "Default passive presentation." }],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Default passive material reference presentation." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic collection layout governed by the actual host width." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".material-library"], "description": "Passive document presentation with no root interaction state." }
+  ],
   "behavior": [
-    { "name": "repeatedMaterials", "selectors": [".material-library__grid", ".material-card"], "description": "The target owns material records, ordering, and data mapping; the neutral contract owns only repeated anatomy." },
-    { "name": "mediaAlternatives", "selectors": [".material-card__swatch"], "attributes": ["alt", "aria-hidden"], "description": "Material media needs useful alternative text when informative and decorative treatment otherwise." }
+    {
+      "name": "semanticRoot",
+      "selectors": [".material-library", ".material-library__title"],
+      "attributes": ["aria-labelledby only when the visible title is present"],
+      "description": "A visible title produces a named native section; without a title the same composition uses a generic div and emits no dangling labelling relationship."
+    },
+    {
+      "name": "nonEmptyMaterials",
+      "selectors": [".material-library__grid", ".material-library__item", ".material-card", ".material-card__name"],
+      "description": "The required materials slot must provide at least one complete item with a stable key and non-empty visible name; otherwise the complete R1 root is omitted."
+    },
+    {
+      "name": "passiveRecords",
+      "selectors": [".material-card"],
+      "description": "Material Cards are passive named articles with no root role, tabindex, hover state, selection, destination or event. Any future target action composes its own truthful canonical control."
+    },
+    {
+      "name": "mediaAlternatives",
+      "selectors": [".material-card__swatch", ".material-card__swatch img"],
+      "attributes": ["alt"],
+      "description": "The target supplies a useful alternative when media conveys material information and alt=\"\" when it is decorative or redundant; textual identity remains required."
+    },
+    {
+      "name": "canonicalPropertyTags",
+      "selectors": [".material-card__properties", ".material-card__property", ".material-card__tag", ".tag__label"],
+      "description": "Optional properties use a native list of canonical passive Tag instances; R1 does not duplicate Tag styling or expose its remove action."
+    },
+    {
+      "name": "targetOwnedRecords",
+      "selectors": [".material-library__grid", ".material-card"],
+      "description": "Targets own records, source order, taxonomy, localization, truth, media, mapping and lifecycle; the neutral contract defines only durable composition."
+    },
+    {
+      "name": "zeroRuntime",
+      "selectors": [".material-library"],
+      "description": "The neutral component owns no listener, observer, timer, request, selection store, filter, sort, navigation, pagination or target service."
+    }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": false, "description": "Optional section heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".material-library__title" }] } },
-    { "name": "subtitle", "type": "string", "required": false, "description": "Optional section introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".material-library__subtitle" }] } },
-    { "name": "materials", "type": "slot", "required": true, "description": "Target-owned ordered material cards; no CMS record shape is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".material-library__grid", "classNames": [".material-library__grid"] }] } }
+    { "name": "title", "type": "string", "required": false, "description": "Optional visible contextual heading; its presence selects named-section semantics.", "targetMappings": { "web": [{ "kind": "content", "selector": ".material-library__title" }] } },
+    { "name": "subtitle", "type": "string", "required": false, "description": "Optional visible supporting introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".material-library__subtitle" }] } },
+    { "name": "materials", "type": "slot", "required": true, "description": "Required non-empty target-owned native Material Card collection; no CMS or record shape is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".material-library__grid", "classNames": [".material-library__grid"] }] } }
   ],
-  "tokens": { "public": { "color": ["--color-border-default", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-h2-size"], "radius": ["--radius-full", "--radius-lg"], "spacing": ["--space-layout-container", "--space-layout-grid-gap", "--space-layout-section-gap"], "transition": ["--transition-fast"], "easing": ["--easing-default"] } },
-  "accessibility": ["Use a heading level appropriate to the containing page.", "Keep material names and technical properties available as text.", "Provide useful alternative text for informative swatches or mark decorative samples accordingly."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-font-weight-semibold", "--tg-typography-body-default-weight", "--tg-typography-body-small-weight", "--tg-typography-h2-weight", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-caption-line-height", "--typo-caption-size", "--typo-h2-line-height", "--typo-h2-size"],
+      "radius": ["--radius-lg"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
+    }
+  },
+  "accessibility": [
+    "Use a contextual visible heading when R1 should be a document section; title-absent compositions remain generic and emit no broken label reference.",
+    "Render a native unordered list with one direct list item and one named native article per complete material record.",
+    "Keep the material name and every essential technical/property fact available as text; never rely on color, texture or imagery alone.",
+    "Give informative media a context-specific alt value and decorative or text-redundant media alt=\"\"; do not claim that editorial imagery is a raw sample.",
+    "Use canonical passive Tags for compact property labels and term/value semantics when technical facts require named values.",
+    "Do not add grid/listbox roles, roving focus, whole-card activation or hover affordance to the passive neutral collection."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Native conditional section/div, list/item/article composition, canonical Tag leaves, intrinsic CSS and zero R1 JavaScript." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Requires approved record source, editor schema, ordering/limits, material-product relationship and first template consumer before target-native implementation." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
 }

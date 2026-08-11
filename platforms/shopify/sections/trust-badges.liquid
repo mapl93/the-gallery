@@ -1,0 +1,80 @@
+{%- liquid
+  assign accessible_label = section.settings.accessible_label | strip
+  assign valid_statement_count = 0
+
+  for block in section.blocks
+    assign statement = block.settings.statement | strip
+    if statement != blank
+      assign valid_statement_count = valid_statement_count | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if valid_statement_count > 0 -%}
+  <ul
+    class="trust-badges{% if section.settings.variant == 'compact' %} trust-badges--compact{% endif %}"
+    role="list"
+    {% if accessible_label != blank %}aria-label="{{ accessible_label | escape }}"{% endif %}
+  >
+    {%- for block in section.blocks -%}
+      {%- assign statement = block.settings.statement | strip -%}
+      {%- if statement != blank -%}
+        <li class="trust-badge" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            {{- block.settings.image | image_url: width: 80 | image_tag:
+              alt: '',
+              class: 'trust-badge__icon',
+              loading: 'lazy',
+              widths: '20, 40, 80',
+              sizes: '20px'
+            -}}
+          {%- endif -%}
+          <span class="trust-badge__text">{{ statement | escape }}</span>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.trust_badges.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "accessible_label",
+      "label": "t:sections.trust_badges.settings.accessible_label"
+    },
+    {
+      "type": "select",
+      "id": "variant",
+      "label": "t:sections.trust_badges.settings.variant.label",
+      "default": "default",
+      "options": [
+        { "value": "default", "label": "t:sections.trust_badges.settings.variant.options.default" },
+        { "value": "compact", "label": "t:sections.trust_badges.settings.variant.options.compact" }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "t:sections.trust_badges.blocks.item.name",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "t:sections.trust_badges.blocks.item.settings.image" },
+        { "type": "text", "id": "statement", "label": "t:sections.trust_badges.blocks.item.settings.statement" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.trust_badges.name",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

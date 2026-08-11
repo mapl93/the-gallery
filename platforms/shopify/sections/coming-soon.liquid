@@ -1,110 +1,127 @@
 {%- comment -%}
-  Section: Coming Soon
-  Split-screen editorial layout.
-  Left: title, subtitle, body, social links.
-  Right: newsletter signup form.
-  Logo pinned top-right.
+  Public Coming Soon page.
+  Password protection belongs to the independent password template.
 {%- endcomment -%}
 
-<div class="coming-soon">
-  {%- if section.settings.background_image != blank -%}
-    <img
-      class="coming-soon__bg"
-      src="{{ section.settings.background_image | image_url: width: 1920 }}"
-      alt=""
-      width="1920"
-      height="1080"
-      loading="eager"
-      fetchpriority="high"
-    >
-  {%- endif -%}
+{%- liquid
+  assign coming_soon_heading = section.settings.heading | strip
+  assign coming_soon_form_heading = section.settings.form_heading | strip
+  if coming_soon_form_heading == blank
+    assign coming_soon_form_heading = 'coming_soon.newsletter_label' | t
+  endif
+  assign heading_id = 'coming-soon-heading-' | append: section.id
+  assign form_heading_id = 'coming-soon-form-heading-' | append: section.id
+  assign form_description_id = 'coming-soon-form-description-' | append: section.id
+  assign email_id = 'coming-soon-email-' | append: section.id
+  assign email_error_id = 'coming-soon-email-error-' | append: section.id
+-%}
 
-  {%- comment -%} Logo — top left {%- endcomment -%}
-  <div class="coming-soon__logo-bar">
-    {%- render 'logo', variant: section.settings.logo_variant, width: 280, class: 'coming-soon__logo', loading: 'eager' -%}
-  </div>
-
-  {%- comment -%} Main content wrapper (max-width centered) {%- endcomment -%}
-  <div class="coming-soon__inner">
-
-  {%- comment -%} Left column: editorial content {%- endcomment -%}
-  <div class="coming-soon__left">
-    {%- if section.settings.heading != blank -%}
-      <h1 class="coming-soon__heading">{{ section.settings.heading }}</h1>
+{%- if coming_soon_heading != blank -%}
+  <section class="coming-soon" aria-labelledby="{{ heading_id }}">
+    {%- if section.settings.background_image != blank -%}
+      <img
+        class="coming-soon__bg"
+        src="{{ section.settings.background_image | image_url: width: 1920 }}"
+        alt=""
+        width="1920"
+        height="1080"
+        loading="eager"
+        fetchpriority="high"
+      >
     {%- endif -%}
 
-    {%- if section.settings.subtitle != blank -%}
-      <p class="coming-soon__subtitle">{{ section.settings.subtitle }}</p>
-    {%- endif -%}
-
-    {%- if section.settings.body != blank -%}
-      <div class="coming-soon__body">{{ section.settings.body }}</div>
-    {%- endif -%}
-
-    {%- comment -%} Social / contact links {%- endcomment -%}
-    {%- if section.settings.instagram_url != blank or section.settings.email != blank -%}
-      <div class="coming-soon__social">
-        {%- if section.settings.instagram_url != blank -%}
-          <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram" class="coming-soon__social-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-          </a>
-        {%- endif -%}
-        {%- if section.settings.email != blank -%}
-          <a href="mailto:{{ section.settings.email }}" aria-label="Email" class="coming-soon__social-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-          </a>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
-  </div>
-
-  {%- comment -%} Right column: newsletter form {%- endcomment -%}
-  {%- if section.settings.show_newsletter -%}
-    <div class="coming-soon__right">
-      {%- if section.settings.form_heading != blank -%}
-        <p class="coming-soon__form-header">{{ section.settings.form_heading }}</p>
-      {%- endif -%}
-      {%- if section.settings.form_subtext != blank -%}
-        <p class="coming-soon__form-subtext">{{ section.settings.form_subtext }}</p>
-      {%- endif -%}
-
-      <div class="coming-soon__newsletter">
-        {% form 'customer', id: 'coming-soon-newsletter' %}
-          <input type="hidden" name="contact[tags]" value="coming-soon,newsletter">
-
-          {%- if form.posted_successfully? -%}
-            <p class="coming-soon__success">{{ 'coming_soon.newsletter_success' | t }}</p>
-          {%- else -%}
-            <div class="coming-soon__form">
-              <input
-                type="email"
-                name="contact[email]"
-                placeholder="{{ 'coming_soon.newsletter_placeholder' | t }}"
-                required
-                autocomplete="email"
-                aria-label="{{ 'coming_soon.newsletter_placeholder' | t }}"
-                class="coming-soon__input"
-              >
-              <button type="submit" class="coming-soon__submit">
-                {{ 'coming_soon.newsletter_submit' | t }}
-              </button>
-            </div>
-            {%- if form.errors -%}
-              <p class="coming-soon__error">{{ form.errors.messages['email'] }}</p>
-            {%- endif -%}
-          {%- endif -%}
-        {% endform %}
-      </div>
+    <div class="coming-soon__logo-bar">
+      {%- render 'logo', variant: section.settings.logo_variant, width: 280, class: 'coming-soon__logo', loading: 'eager' -%}
     </div>
-  {%- endif -%}
 
-  </div>{%- comment -%} end .coming-soon__inner {%- endcomment -%}
+    <div class="coming-soon__inner">
+      <div class="coming-soon__left">
+        <h1 class="coming-soon__heading" id="{{ heading_id }}">
+          {{- coming_soon_heading -}}
+        </h1>
 
-  {%- comment -%} Footer {%- endcomment -%}
-  <p class="coming-soon__footer">
-    &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
-  </p>
-</div>
+        {%- if section.settings.subtitle != blank -%}
+          <p class="coming-soon__subtitle">{{ section.settings.subtitle }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <div class="coming-soon__body">{{ section.settings.body }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.instagram_url != blank or section.settings.email != blank -%}
+          <nav class="coming-soon__social" aria-label="{{ 'coming_soon.social_label' | t }}">
+            {%- if section.settings.instagram_url != blank -%}
+              <a class="link" href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener">
+                Instagram
+              </a>
+            {%- endif -%}
+            {%- if section.settings.email != blank -%}
+              <a class="link" href="mailto:{{ section.settings.email }}">
+                {{- section.settings.email -}}
+              </a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.show_newsletter -%}
+        <div class="coming-soon__right">
+          <h2 class="coming-soon__form-header" id="{{ form_heading_id }}">
+            {{- coming_soon_form_heading -}}
+          </h2>
+          {%- if section.settings.form_subtext != blank -%}
+            <p class="coming-soon__form-subtext" id="{{ form_description_id }}">
+              {{- section.settings.form_subtext -}}
+            </p>
+          {%- endif -%}
+
+          {% form 'customer', id: 'coming-soon-newsletter', class: 'coming-soon__form', aria-labelledby: form_heading_id %}
+            <input type="hidden" name="contact[tags]" value="coming-soon,newsletter">
+
+            {%- if form.posted_successfully? -%}
+              <p class="input__message" role="status">
+                {{- 'coming_soon.newsletter_success' | t -}}
+              </p>
+            {%- else -%}
+              <div class="input{% if form.errors %} input--error{% endif %}">
+                <label class="input__label" for="{{ email_id }}">
+                  {{- 'coming_soon.newsletter_label' | t -}}
+                </label>
+                <div class="input__control">
+                  <input
+                    class="input__field"
+                    id="{{ email_id }}"
+                    type="email"
+                    name="contact[email]"
+                    placeholder="{{ 'coming_soon.newsletter_placeholder' | t }}"
+                    required
+                    autocomplete="email"
+                    {%- if section.settings.form_subtext != blank or form.errors %}
+                      aria-describedby="{% if section.settings.form_subtext != blank %}{{ form_description_id }}{% endif %}{% if form.errors %}{% if section.settings.form_subtext != blank %} {% endif %}{{ email_error_id }}{% endif %}"
+                    {%- endif %}
+                    {%- if form.errors %} aria-invalid="true"{% endif %}
+                  >
+                </div>
+                {%- if form.errors -%}
+                  <p class="input__message" id="{{ email_error_id }}" role="alert">
+                    {{- form.errors.messages['email'] -}}
+                  </p>
+                {%- endif -%}
+              </div>
+              <button type="submit" class="btn">
+                {{- 'coming_soon.newsletter_submit' | t -}}
+              </button>
+            {%- endif -%}
+          {% endform %}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <footer class="coming-soon__footer">
+      &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+    </footer>
+  </section>
+{%- endif -%}
 
 {% schema %}
 {
@@ -133,7 +150,7 @@
       "type": "image_picker",
       "id": "background_image",
       "label": "Background image",
-      "info": "Full-screen background. A dark overlay is applied automatically."
+      "info": "Decorative full-screen background. A contrast overlay is applied automatically."
     },
     {
       "type": "header",
@@ -170,7 +187,7 @@
       "type": "text",
       "id": "email",
       "label": "Contact email",
-      "info": "Shown as a mail icon link."
+      "info": "Shown as a visible email link."
     },
     {
       "type": "header",

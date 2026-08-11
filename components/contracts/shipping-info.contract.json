@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "shipping-info",
   "name": "Shipping Info",
   "registryId": "S14",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive passive information collection for shipping, returns, guarantees, and related service statements.",
+  "summary": "Passive native list of text-complete service or policy facts with optional decorative visuals and intrinsic responsive layout.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/shipping-info",
@@ -22,28 +22,28 @@
       "selector": ".shipping-info",
       "className": ".shipping-info",
       "required": true,
-      "description": "Responsive information-item composition root."
+      "description": "Native unordered list grouping one or more source-ordered service facts."
     },
     {
       "name": "item",
       "selector": ".shipping-info__item",
       "className": ".shipping-info__item",
-      "required": false,
-      "description": "Repeated target-owned information statement."
+      "required": true,
+      "description": "Repeated native list item containing one valid target-owned service fact."
     },
     {
       "name": "icon",
       "selector": ".shipping-info__icon",
       "className": ".shipping-info__icon",
       "required": false,
-      "description": "Optional decorative or informative item visual."
+      "description": "Optional decorative item visual; adjacent visible text owns the complete meaning."
     },
     {
       "name": "label",
       "selector": ".shipping-info__label",
       "className": ".shipping-info__label",
-      "required": false,
-      "description": "Visible item heading."
+      "required": true,
+      "description": "Required non-empty visible item label."
     },
     {
       "name": "text",
@@ -82,9 +82,25 @@
     {
       "name": "itemComposition",
       "selectors": [
+        ".shipping-info",
+        ".shipping-info__item"
+      ],
+      "description": "The target supplies one or more source-ordered native list items with a required visible label, optional supporting text, and an optional decorative visual."
+    },
+    {
+      "name": "responsiveComposition",
+      "selectors": [
+        ".shipping-info",
+        ".shipping-info__item"
+      ],
+      "description": "Intrinsic tracks respond to component inline space without changing, duplicating, or visually reordering items."
+    },
+    {
+      "name": "omission",
+      "selectors": [
         ".shipping-info"
       ],
-      "description": "The target supplies ordered service statements and decides whether each icon is decorative or needs an accessible text alternative."
+      "description": "Missing required items or the absence of every valid labelled item omits the complete root rather than rendering an empty shell."
     }
   ],
   "properties": [
@@ -92,9 +108,21 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned information items with optional icons, labels, and supporting text.",
+      "description": "One or more source-ordered target-owned native list items, each with a required visible label and optional supporting text and decorative visual.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".shipping-info", "classNames": [".shipping-info"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".shipping-info",
+            "classNames": [
+              ".shipping-info",
+              ".shipping-info__item",
+              ".shipping-info__icon",
+              ".shipping-info__label",
+              ".shipping-info__text"
+            ]
+          }
+        ]
       }
     }
   ],
@@ -106,17 +134,26 @@
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-small-weight",
+        "--typo-body-line-height",
+        "--typo-body-size",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size"
       ]
     }
   },
   "accessibility": [
-    "Use list semantics when the information statements form a meaningful group.",
-    "Every item has visible text; decorative icons are hidden and informative icons have an accessible equivalent.",
-    "Responsive layout changes preserve item source and reading order."
+    "Render the meaningful group as a native ul/li list and retain list semantics when list markers are visually suppressed.",
+    "Require a non-empty visible label for every rendered item and omit invalid label-less target records.",
+    "Keep every optional visual decorative because adjacent visible text owns the complete service or policy meaning.",
+    "Responsive layout changes preserve DOM source and reading order and never make passive items focusable.",
+    "Add no section landmark, custom ARIA widget role, Arrow-key model, live region, timer, observer, request, authored motion, or neutral runtime."
   ],
   "adapters": {
     "web": {
@@ -125,8 +162,9 @@
       "notes": "Implemented in components/css/sections.css."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps reorderable labelled fact blocks, optional supporting text, optional decorative images, strict omission, editor attributes, and zero component runtime."
     },
     "react": {
       "status": "planned",

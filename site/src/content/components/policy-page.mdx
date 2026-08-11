@@ -1,44 +1,46 @@
 ## Overview
 
-Policy Page presents a page title, optional visible update date, optional table of contents, and one required semantic legal-content slot. The target supplies the document structure and content; the component does not define a CMS schema, revision model, localization pipeline, policy inventory, or source API.
+Policy Page presents one complete passive legal document with a required visible title and semantic body. Optional update metadata keeps its visible localized text independent from an exact machine value, and an optional named table of contents composes canonical Links to target-owned section identifiers. The target supplies and publishes the legal content; the component does not define a CMS, revision model, localization pipeline, policy inventory, source API, or consent workflow.
 
 <Preview
-  html={'<main class="policy-page tg-preview-frame--lg" aria-labelledby="policy-preview-title"><header class="policy-page__header"><h1 class="policy-page__title" id="policy-preview-title">Privacy policy</h1><time class="policy-page__date" datetime="2026-07-12">Last updated July 12, 2026</time></header><nav class="policy-page__toc" aria-labelledby="policy-preview-toc-title"><p class="policy-page__toc-title" id="policy-preview-toc-title">On this page</p><ol class="policy-page__toc-list"><li><a class="policy-page__toc-link" href="#policy-preview-information">Information provided by visitors</a></li><li><a class="policy-page__toc-link" href="#policy-preview-contact">Contact</a></li></ol></nav><article class="policy-page__body"><section id="policy-preview-information" aria-labelledby="policy-preview-information-title"><h2 id="policy-preview-information-title">Information provided by visitors</h2><p>This preview preserves headings, paragraphs, lists, and links supplied by the target document.</p><ul><li>Contact details submitted through target-owned forms</li><li>Messages sent to the gallery</li></ul></section><section id="policy-preview-contact" aria-labelledby="policy-preview-contact-title"><h2 id="policy-preview-contact-title">Contact</h2><p><a href="#">Use the target-provided contact destination</a> for questions about this document.</p></section></article></main>'}
+  html={'<article class="policy-page tg-preview-frame--lg" aria-labelledby="policy-preview-title"><header class="policy-page__header"><h2 class="policy-page__title" id="policy-preview-title">Privacy policy</h2><time class="policy-page__date" datetime="2026-07-12">Last updated July 12, 2026</time></header><nav class="policy-page__toc" aria-labelledby="policy-preview-toc-title"><h3 class="policy-page__toc-title" id="policy-preview-toc-title">On this page</h3><ol class="policy-page__toc-list"><li><a class="link policy-page__toc-link" href="#policy-preview-information">Information provided by visitors</a></li><li><a class="link policy-page__toc-link" href="#policy-preview-contact">Contact</a></li></ol></nav><div class="policy-page__body"><section class="policy-page__section" id="policy-preview-information" aria-labelledby="policy-preview-information-title"><h3 class="policy-page__section-title" id="policy-preview-information-title">Information provided by visitors</h3><p>This preview preserves headings, paragraphs, lists, and links supplied by the target document.</p><ul><li>Contact details submitted through target-owned forms</li><li>Messages sent to the gallery</li></ul></section><section class="policy-page__section" id="policy-preview-contact" aria-labelledby="policy-preview-contact-title"><h3 class="policy-page__section-title" id="policy-preview-contact-title">Contact</h3><p><a class="link" href="/components/contact-section">Use the target-provided contact destination</a> for questions about this document.</p></section></div></article>'}
   label="Policy Page"
 />
 
 ## Presentation
 
-The root, header, page-level title, and semantic body are required. A target-formatted visible update date and a table of contents with its own title, ordered list, and in-page links are optional.
+The contextual article, header, visible title, and semantic body are required. Missing title or body omits the complete component. A target-formatted visible update label, its independent exact machine-readable value, and a table of contents are optional.
 
-The body is one semantic document slot. It preserves target-supplied headings, paragraphs, lists, links, tables, media, dates, quotations, code, and stable section identifiers. The artwork is a documentation fixture and does not establish a policy type, required clause, or content source.
+The table of contents renders only when it has a non-empty visible title and ordered items. Its anchors compose canonical Link and must resolve to unique target sections in the same order. The body preserves target-supplied headings, paragraphs, lists, links, tables, media, dates, quotations, code, and stable identifiers. The artwork is a fixture and does not establish a policy type, required clause, revision, effective date, or content source.
 
 ## Usage Guidelines
 
 <DoDont>
   <Do>Preserve the legal document's semantic structure and source order.</Do>
-  <Dont>Do not turn preview content into a shared CMS schema, revision system, or policy inventory.</Dont>
+  <Dont>Do not manufacture revision dates, index relationships, legal clauses, or a shared policy inventory.</Dont>
 </DoDont>
 
 - Keep table-of-contents links in the same order as their target sections.
+- Omit an incomplete table of contents instead of leaving an unnamed navigation landmark.
 - Use stable, unique in-page identifiers when a table of contents is supplied.
-- Let the target format visible dates and provide exact machine-readable values when available.
-- Preserve horizontal keyboard access when wide tables or code blocks overflow.
+- Supply visible update text and exact machine-readable values independently; never parse the localized label.
+- Use the explicit named overflow wrapper only when genuinely two-dimensional tables or code cannot reflow.
 
 ## Accessibility
 
-- Use one page-level title followed by a logical, non-skipping heading hierarchy.
-- Render the optional update date as visible text and use `<time datetime>` when the target supplies an exact value.
+- Keep one document-level `main`; P3 is a labelled article inside it, with a contextual title and non-skipping body hierarchy.
+- Render exact update metadata as `<time datetime>` only when visible text and a valid machine value are both supplied.
 - Place the optional table of contents in a labelled navigation landmark.
-- Keep every table-of-contents link paired with a unique section identifier in the same document.
+- Keep every descriptive table-of-contents Link paired with a unique section identifier in the same document.
 - Preserve semantic lists, tables, links, quotations, media alternatives, and other structures from the target source.
 - Keep long text, media, tables, and code contained at narrow widths without removing keyboard access to overflow.
+- Add no custom policy role, menu keyboard model, active-section announcement, focus relocation, authored motion, or neutral runtime.
 
 ## References
 
-**Contract:** `policy-page` v0.2.0, `pilot`.
+**Contract:** `policy-page` v0.3.0, `pilot`.
 
-**Dependencies:** None declared.
+**Dependencies:** `link` for optional table-of-contents navigation.
 
 **Anatomy**
 
@@ -53,13 +55,17 @@ The body is one semantic document slot. It preserves target-supplied headings, p
 | Table-of-contents list | `.policy-page__toc-list` | Optional |
 | Table-of-contents link | `.policy-page__toc-link` | Optional |
 | Semantic body | `.policy-page__body` | Required |
+| Policy section | `.policy-page__section` | Optional |
+| Section title | `.policy-page__section-title` | Optional |
+| Wide-content overflow | `.policy-page__overflow` | Optional |
 
 **API Reference**
 
 <PropTable>
   <tr><td>`title`</td><td>string</td><td>required</td><td>Page-level policy title</td></tr>
   <tr><td>`updatedDate`</td><td>string</td><td>optional</td><td>Target-formatted visible update date</td></tr>
-  <tr><td>`tocTitle`</td><td>string</td><td>optional</td><td>Table-of-contents heading</td></tr>
-  <tr><td>`tocItems`</td><td>slot</td><td>optional</td><td>Target-owned in-page links in policy-section order</td></tr>
+  <tr><td>`updatedDateTime`</td><td>string</td><td>optional</td><td>Independent exact machine-readable datetime</td></tr>
+  <tr><td>`tocTitle`</td><td>string</td><td>optional</td><td>Visible heading conditionally required with table-of-contents items</td></tr>
+  <tr><td>`tocItems`</td><td>slot</td><td>optional</td><td>Target-owned ordered canonical Links synchronized with body sections</td></tr>
   <tr><td>`body`</td><td>slot</td><td>required</td><td>Target-owned semantic policy document content</td></tr>
 </PropTable>

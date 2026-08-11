@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "file-upload",
   "name": "File Upload / Dropzone",
   "registryId": "H6",
   "category": "forms",
   "status": "pilot",
-  "summary": "Native file input dropzone with hover and dragover states, icon/text/hint anatomy, preview thumbnails, accepted-file guidance, and upload interaction behavior.",
+  "summary": "Native file input whose full-surface dropzone preserves browser selection, FileList, form, reset, and constraint-validation ownership while bounded enhancement reflects drag presence and announces selected file names.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/file-upload",
@@ -53,6 +53,13 @@
       "description": "Accepted format, size, or helper text."
     },
     {
+      "name": "status",
+      "selector": ".file-upload__status",
+      "className": ".file-upload__status",
+      "required": true,
+      "description": "Visible polite status initialized with the empty-state label and updated with native selected file names."
+    },
+    {
       "name": "preview",
       "selector": ".file-upload__preview",
       "className": ".file-upload__preview",
@@ -94,37 +101,71 @@
     },
     {
       "name": "hover",
-      "selectors": [".file-upload:hover"],
+      "selectors": [".file-upload:not(:has(.file-upload__input:disabled)):hover"],
       "description": "Pointer hover state."
     },
     {
       "name": "dragover",
       "selectors": [".file-upload--dragover"],
       "description": "Active drag-over state."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".file-upload:has(.file-upload__input:focus-visible)"],
+      "description": "Keyboard focus indicator around the complete activation surface."
+    },
+    {
+      "name": "selected",
+      "selectors": [".file-upload--selected", ".file-upload--selected .file-upload__status"],
+      "description": "Native FileList contains one or more selected files and visible status names them."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".file-upload:has(.file-upload__input:disabled)", ".file-upload__input:disabled"],
+      "description": "Unavailable native file control and dropzone surface."
+    },
+    {
+      "name": "requiredInvalid",
+      "selectors": [".file-upload:has(.file-upload__input:user-invalid)"],
+      "description": "Required native file control after constraint validation reports an empty FileList."
     }
   ],
   "behavior": [
     {
       "name": "nativeFileInput",
-      "attributes": ["type=\"file\"", "accept", "multiple", "disabled", "capture"],
-      "description": "The control should preserve native file input behavior and accepted file constraints."
+      "attributes": ["type=\"file\"", "name", "accept", "multiple", "required", "disabled", "capture"],
+      "events": ["click", "keyboard activation", "input", "change", "cancel", "form submit", "form reset", "constraint validation"],
+      "description": "The sole native file input covers the dropzone and owns selection UI, FileList, submission, reset, accepted-file hints, capture hints, and validity."
     },
     {
       "name": "dropzone",
       "selectors": [".file-upload--dragover"],
       "events": ["dragenter", "dragover", "dragleave", "drop"],
-      "description": "Targets that support drag and drop should synchronize drag-over state and process dropped files through the same validation path."
+      "description": "The shared enhancer only reflects drag presence. It does not prevent native drop, assign DataTransfer files, synthesize events, validate files, or create a second FileList owner."
+    },
+    {
+      "name": "selectedStatus",
+      "selectors": [".file-upload__status", ".file-upload--selected"],
+      "attributes": ["role=\"status\"", "data-empty-label"],
+      "events": ["input", "change", "form reset"],
+      "description": "The shared enhancer derives visible status and selected class from the native FileList, listing authored file names without a locale-specific count template."
     },
     {
       "name": "preview",
       "selectors": [".file-upload__preview", ".file-upload__thumb"],
-      "description": "Selected file previews should reflect the current file list and include useful names or alt text where media is shown."
+      "description": "Optional previews are target-owned derived content, remain synchronized with the native FileList, and include useful names or alt text; the base enhancer creates no object URLs."
     }
   ],
   "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible primary upload instruction and accessible name source.", "targetMappings": { "web": [{ "kind": "content", "selector": ".file-upload__text" }] } },
+    { "name": "hint", "type": "string", "required": false, "description": "Visible accepted-format, size-policy, or upload guidance associated with the native input.", "targetMappings": { "web": [{ "kind": "content", "selector": ".file-upload__hint" }] } },
+    { "name": "emptyStatus", "type": "string", "required": true, "description": "Localized visible status used when the native FileList is empty and restored after form reset.", "targetMappings": { "web": [{ "kind": "content", "selector": ".file-upload__status" }, { "kind": "attribute", "selector": ".file-upload__status", "attribute": "data-empty-label", "valueFrom": "property" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the selected files.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".file-upload", "source": "variants" }] } },
+    { "name": "name", "type": "string", "required": false, "description": "Native form field name used to identify submitted files.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "accept", "type": "string", "required": false, "description": "Native accepted file type expression.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "accept", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "multiple", "type": "boolean", "required": false, "defaultValue": false, "description": "Allows more than one native file selection.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "multiple", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Requires a non-empty native FileList for constraint validation; visible content must also communicate the requirement.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "capture", "type": "enum", "required": false, "defaultValue": "none", "values": ["none", "user", "environment"], "description": "Optional native capture hint for user-facing or environment-facing media sources on supporting devices.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "capture", "values": { "none": null, "user": "user", "environment": "environment" }, "elements": ["input"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the native file input unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for accepted-file guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".file-upload__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
   ],
@@ -137,6 +178,7 @@
         "--color-surface-secondary",
         "--color-text-disabled",
         "--color-text-primary",
+        "--color-text-secondary",
         "--color-border-subtle",
         "--color-input-default-focused-outer-border",
         "--color-input-error-unfocused-inner-border",
@@ -163,22 +205,30 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
-      ]
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ],
+      "opacity": ["--opacity-disabled"]
     }
   },
   "accessibility": [
-    "Use a native file input and visible upload instructions.",
+    "Use one native file input as the only FileList, form-value, reset, and constraint-validation owner.",
+    "Give the full visible dropzone one accessible name from its primary visible instruction.",
     "Expose accepted file types and size limits in visible helper text.",
     "Ensure drag-and-drop is an enhancement, not the only upload path.",
-    "Announce validation errors and selected file names to assistive technology.",
-    "Provide useful alt text or file names for image previews."
+    "Announce selected file names through a polite visible status and associate validation feedback without relying on color.",
+    "Do not claim that accept enforces policy; consuming targets validate type and size after selection.",
+    "Provide useful alt text or file names for target-owned image previews.",
+    "Do not create object URLs in the base enhancer; targets that preview local media own URL creation and revocation."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; file validation, preview generation, and drag events must be provided by the consuming target."
+      "kind": "css-js",
+      "notes": "Implemented by one full-surface native input, canonical CSS, and a bounded shared enhancer that reflects drag presence and FileList names. File validation, upload transport, and previews remain target-owned."
     },
     "shopify": {
       "status": "planned",

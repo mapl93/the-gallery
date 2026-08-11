@@ -36,8 +36,10 @@ not obscure the current field.
 
 - Select now has a target-owned progressive-enhancement behavior layer in
   `components/js/theme.js` in addition to its canonical CSS.
-- Web and Shopify consumers must load the generated `theme.js` to receive the
-  custom presentation; without it they retain a functional native select.
+- Web and Shopify consumers load the generated selective runtime to receive the
+  custom presentation. The complete `theme.js` remains a compatibility path
+  under ADR 0273 and must not be loaded together with the selective loader;
+  without either path consumers retain a functional native select.
 - Studio renders the same trigger/listbox anatomy directly in React while the
   Exhibit preview invokes the shared web enhancer inside its shadow root.
 - The custom panel can be themed through existing public Gallery tokens without

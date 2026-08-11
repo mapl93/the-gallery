@@ -1,12 +1,14 @@
 ## Overview
 
-Gallery Grid arranges ordered target-owned media in a standard grid or masonry presentation. Item activation and destination semantics remain target-specific.
+Gallery Grid arranges a finite ordered list of target-owned media beneath an optional contextual heading. It remains passive until a target supplies legitimate native interaction.
 
 ## Presentation
 
-<Preview html={'<section class="gallery-grid tg-preview-frame" aria-labelledby="gallery-grid-title"><header class="gallery-grid__header"><h2 class="gallery-grid__title" id="gallery-grid-title">Studio gallery</h2></header><div class="gallery-grid__items"><figure class="gallery-grid__item"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Wheel-thrown vessel drying on a studio shelf" /></figure><figure class="gallery-grid__item"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Glaze samples arranged by mineral tone" /></figure><figure class="gallery-grid__item"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Finished bowls grouped after firing" /></figure></div></section>'} label="Gallery Grid" />
+<Preview html={'<section class="gallery-grid tg-preview-frame" aria-labelledby="gallery-grid-title"><div class="gallery-grid__header"><h2 class="gallery-grid__title" id="gallery-grid-title">Studio gallery</h2></div><ul class="gallery-grid__items"><li class="gallery-grid__item"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Wheel-thrown vessel drying on a studio shelf" /></li><li class="gallery-grid__item"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Glaze samples arranged by mineral tone" /></li><li class="gallery-grid__item"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Finished bowls grouped after firing" /></li></ul></section>'} label="Gallery Grid" />
 
-`grid` is the default responsive presentation. `masonry` maps to `.gallery-grid--masonry`. Hover and focus-within image treatment are visual feedback only and do not make a passive item interactive.
+`grid` is the default regular row-major presentation and uses a private uniform crop. `masonry` maps to `.gallery-grid--masonry`, follows source flow through CSS columns, and preserves natural media proportions. Both respond to component space rather than the page viewport.
+
+A titled composition is a native section named by its visible heading. Without a title, use a generic root. The required `items` slot uses a native list and invalid empty composition is omitted.
 
 ## Usage Guidelines
 
@@ -15,7 +17,9 @@ Gallery Grid arranges ordered target-owned media in a standard grid or masonry p
   <Dont>Do not assume gallery items open a lightbox, navigate, or trigger commerce behavior.</Dont>
 </DoDont>
 
-Let each target decide whether an item is passive media, a native link, or another accepted composition.
+Let each target decide whether an item remains passive media or contains a native link/button after activation is established. Passive items are not focusable and do not zoom on hover.
+
+Masonry Gallery remains a separate storytelling contract with caption anatomy. Whether Gallery Grid should retain its image-only masonry presentation is an explicit human architecture review question; do not alias the components silently.
 
 ## Accessibility
 
@@ -23,6 +27,7 @@ Let each target decide whether an item is passive media, a native link, or anoth
 - Use native links or buttons only when an item has established navigation or command behavior.
 - Keep captions and essential information available without hover.
 - Preserve visible focus for any target-supplied interactive descendants.
+- Keep DOM/source order authoritative and do not use APG grid roles, dense packing, or visual reordering.
 
 ## References
 
@@ -33,5 +38,5 @@ Let each target decide whether an item is passive media, a native link, or anoth
 <PropTable>
   <tr><td>`variant`</td><td>enum</td><td>`grid`</td><td>`grid` or `masonry`</td></tr>
   <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible gallery heading</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered target-owned media items</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>One or more ordered target-owned native list-item compositions</td></tr>
 </PropTable>

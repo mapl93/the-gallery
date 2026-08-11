@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.4.0",
+  "contractVersion": "0.6.0",
   "slug": "select",
   "name": "Select",
   "registryId": "A3",
@@ -231,7 +231,19 @@
         ".select__trigger",
         ".select__listbox"
       ],
-      "description": "The native select remains visible and functional without JavaScript. Enhancement hides it only after the custom trigger and listbox are ready."
+      "description": "The native select remains visible and functional without JavaScript. Enhancement hides it only after the custom trigger and listbox are ready; multiple, size-greater-than-one, and optgroup content remain native because the custom popup is a flat single-choice contract."
+    },
+    {
+      "name": "nativeComplexChoiceFallback",
+      "selectors": [
+        ".select__field"
+      ],
+      "attributes": [
+        "multiple",
+        "size greater than one",
+        "optgroup child content"
+      ],
+      "description": "Multiple-selection, listbox-sized, and grouped native selects are deliberately not enhanced, preserving native semantics instead of flattening unsupported choice structures."
     },
     {
       "name": "labelAssociation",
@@ -278,12 +290,31 @@
         ".select__listbox"
       ],
       "attributes": [
+        "role=\"combobox\"",
         "aria-haspopup=\"listbox\"",
         "aria-expanded",
         "aria-controls",
         "aria-activedescendant"
       ],
       "description": "The trigger exposes expanded state, references the listbox, and identifies the keyboard-highlighted option while focus remains on the trigger."
+    },
+    {
+      "name": "nativeFormOwnership",
+      "selectors": [
+        ".select__native",
+        ".select__trigger"
+      ],
+      "attributes": [
+        "name on .select__native",
+        "required on .select__native",
+        "aria-required=\"true\" on .select__trigger when required"
+      ],
+      "events": [
+        "input",
+        "change",
+        "reset"
+      ],
+      "description": "The native select remains the sole value, validity, reset, and form-submission owner; the enhanced trigger reflects required semantics and emits no competing value state."
     },
     {
       "name": "listboxSemantics",
@@ -368,6 +399,17 @@
         "aria-disabled"
       ],
       "description": "The native disabled state synchronizes to the trigger, and disabled options are exposed and skipped without becoming selectable."
+    },
+    {
+      "name": "motionPreference",
+      "selectors": [
+        ".select__field",
+        ".select__indicator"
+      ],
+      "attributes": [
+        "prefers-reduced-motion: reduce"
+      ],
+      "description": "Reduced-motion mode removes field transitions and the decorative indicator rotation without hiding state or content."
     }
   ],
   "properties": [
@@ -427,6 +469,48 @@
             "kind": "attribute",
             "selector": ".select__field",
             "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "select"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name used for successful form submission.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".select__native",
+            "attribute": "name",
+            "valueFrom": "property",
+            "elements": [
+              "select"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Participates in native constraint validation and is reflected to the enhanced combobox trigger.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".select__native",
+            "attribute": "required",
             "values": {
               "true": "",
               "false": null
@@ -520,11 +604,13 @@
     "Use aria-invalid=\"true\" on both native and enhanced controls for the error variant; do not apply aria-invalid for success or warning.",
     "Do not rely on validation color or the indicator alone; include associated feedback text.",
     "Expose aria-haspopup, aria-expanded, aria-controls, and aria-activedescendant on the trigger.",
+    "Expose the enhanced trigger as a select-only combobox and reflect native required state with aria-required.",
     "Expose role=listbox, role=option, aria-selected, and aria-disabled on the custom popup and options.",
     "Keep an initial placeholder out of the option panel with a hidden empty-value native option; do not represent it as a disabled listbox choice.",
     "Keep DOM focus on the trigger while arrow keys update the highlighted option.",
     "Support ArrowUp, ArrowDown, Home, End, Enter, Space, Escape, Tab, and typeahead behavior.",
     "Close on outside interaction and synchronize custom selection back to the native field.",
+    "Keep the native select as the only owner of name, selected value, constraint validation, reset, and form submission; controlled target adapters update that native owner and consume native input and change events.",
     "Use Combobox instead when the list requires search, filtering, asynchronous results, or free-form input."
   ],
   "adapters": {

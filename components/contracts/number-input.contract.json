@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.4.0",
   "slug": "number-input",
   "name": "Number Input",
   "registryId": "H14",
   "category": "forms",
   "status": "pilot",
-  "summary": "Numeric stepper contract with decrement/increment buttons, native number field, disabled button states, hidden browser spin buttons, and min/max/step behavior.",
+  "summary": "Generic native numeric field with one value owner, explicit step actions, form constraints, read-only and disabled semantics, and shared progressive stepping behavior.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/number-input",
@@ -29,14 +29,14 @@
       "selector": ".number-input__btn",
       "className": ".number-input__btn",
       "required": true,
-      "description": "Increment or decrement control."
+      "description": "Named decrement or increment action."
     },
     {
       "name": "field",
       "selector": ".number-input__field",
       "className": ".number-input__field",
       "required": true,
-      "description": "Native number input field."
+      "description": "Sole native numeric value, validity, form, keyboard, and reset owner."
     },
     {
       "name": "innerSpinButton",
@@ -79,8 +79,13 @@
       "description": "Default numeric stepper state."
     },
     {
+      "name": "hover",
+      "selectors": [".number-input:hover:not(:has(.number-input__field:disabled))"],
+      "description": "Pointer hover state that preserves the active validation family."
+    },
+    {
       "name": "buttonHover",
-      "selectors": [".number-input__btn:hover"],
+      "selectors": [".number-input__btn:hover:not(:disabled)"],
       "description": "Pointer hover state on increment or decrement buttons."
     },
     {
@@ -94,6 +99,31 @@
       "description": "Shared field focus hierarchy when any stepper control has focus."
     },
     {
+      "name": "disabled",
+      "selectors": [".number-input:has(.number-input__field:disabled)"],
+      "description": "Unavailable whole-control state driven by the native field."
+    },
+    {
+      "name": "readOnly",
+      "selectors": [".number-input__field:read-only:not(:disabled)"],
+      "description": "Focusable and submittable value with both step actions unavailable."
+    },
+    {
+      "name": "errorFocusWithin",
+      "selectors": [".number-input--error:focus-within"],
+      "description": "Focused error validation family."
+    },
+    {
+      "name": "successFocusWithin",
+      "selectors": [".number-input--success:focus-within"],
+      "description": "Focused success validation family."
+    },
+    {
+      "name": "warningFocusWithin",
+      "selectors": [".number-input--warning:focus-within"],
+      "description": "Focused warning validation family."
+    },
+    {
       "name": "spinButtonsHidden",
       "selectors": [".number-input__field::-webkit-inner-spin-button", ".number-input__field::-webkit-outer-spin-button"],
       "description": "Native WebKit spin buttons hidden by the CSS adapter."
@@ -102,51 +132,83 @@
   "behavior": [
     {
       "name": "nativeNumber",
-      "attributes": ["type=\"number\"", "min", "max", "step", "value", "disabled"],
-      "description": "The field should preserve native number input semantics and constraints."
+      "selectors": [".number-input__field"],
+      "attributes": ["type=\"number\"", "name", "min", "max", "step", "value", "required", "readonly", "disabled", "aria-label", "aria-describedby", "aria-invalid"],
+      "events": ["input", "change", "form submission", "form reset", "constraint validation"],
+      "description": "The native field preserves numeric editing, Arrow Up/Down, constraints, validity, form ownership, empty intermediate input, and reset."
     },
     {
       "name": "incrementDecrement",
-      "selectors": [".number-input__btn"],
-      "events": ["increment", "decrement", "ArrowUp", "ArrowDown"],
-      "description": "Buttons should update the value by step while respecting min and max constraints."
+      "selectors": [".number-input__btn--decrement", ".number-input__btn--increment", ".number-input__field"],
+      "events": ["click on step buttons", "input", "change", "ArrowUp and ArrowDown on the native field"],
+      "description": "Shared progressive enhancement calls native stepDown or stepUp, emits input and change only when the value changes, and preserves direct editing."
     },
     {
       "name": "buttonAvailability",
       "selectors": [".number-input__btn:disabled"],
-      "description": "Increment and decrement buttons should disable when the current value reaches max or min."
+      "attributes": ["disabled"],
+      "description": "Enhancement derives boundary availability and disables both actions when the field is disabled or read-only."
+    },
+    {
+      "name": "validationComposition",
+      "selectors": [".number-input--error", ".number-input--success", ".number-input--warning", ".number-input__field"],
+      "attributes": ["aria-invalid=\"true\" only for error", "aria-describedby references associated feedback"],
+      "description": "Number Input owns control validation treatment while a composing Field Wrapper owns the visible label and feedback."
+    },
+    {
+      "name": "valueOwnership",
+      "selectors": [".number-input__field"],
+      "attributes": ["value establishes the initial value in static HTML", "live value or defaultValue in framework adapters"],
+      "events": ["input", "change", "form reset"],
+      "description": "The native field is the sole numeric owner; buttons and adapters never clamp each keystroke or maintain a hidden mirror."
+    },
+    {
+      "name": "quantityReconciliation",
+      "selectors": [".number-input"],
+      "description": "Number Input shares the internal native stepping model with Quantity Selector without merging, aliasing, or deprecating either public component."
     }
   ],
   "properties": [
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the numeric value.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".number-input", "source": "variants" }] } },
-    { "name": "value", "type": "number", "required": false, "defaultValue": 1, "description": "Current native numeric value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "min", "type": "number", "required": false, "defaultValue": 0, "description": "Minimum allowed value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "min", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "max", "type": "number", "required": false, "defaultValue": 10, "description": "Maximum allowed value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "max", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "step", "type": "number", "required": false, "defaultValue": 1, "minimum": 0.01, "description": "Increment used by native and explicit controls.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "step", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "number", "required": false, "description": "Optional initial numeric value; omission allows an empty field and framework adapters may bind live value or defaultValue.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "min", "type": "number", "required": false, "unsetBehavior": "Omit min when the target has no lower boundary.", "description": "Optional minimum used by native validity and derived step-action availability.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "min", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "max", "type": "number", "required": false, "unsetBehavior": "Omit max when the target has no upper boundary.", "description": "Optional maximum used by native validity and derived step-action availability.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "max", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "step", "type": "number", "required": false, "defaultValue": 1, "minimum": 0, "description": "Positive increment used by native and explicit controls; absent, invalid, or non-positive values fall back to one.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "step", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes field and step controls unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".number-input__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
-    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for numeric guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+    { "name": "name", "type": "string", "required": false, "description": "Native form field name used when the number participates in submission.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Requires a non-empty valid numeric value through native constraint validation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "readOnly", "type": "boolean", "required": false, "defaultValue": false, "description": "Keeps the numeric value focusable and submittable while preventing typing and step actions.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "readonly", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".number-input__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "accessibleLabel", "type": "string", "required": true, "description": "Accessible name for the native numeric field; a visible composing label remains preferred.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "decrementLabel", "type": "string", "required": true, "description": "Accessible name for the decrement action.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__btn--decrement", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "incrementLabel", "type": "string", "required": true, "description": "Accessible name for the increment action.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__btn--increment", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "unsetBehavior": "Omit aria-describedby when no external guidance or validation feedback is composed.", "description": "Id reference for numeric guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".number-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
   ],
   "tokens": {
     "public": {
       "color": [
+        "--color-input-default-unfocused-bg",
         "--color-input-default-unfocused-inner-border",
         "--color-input-default-focused-inner-border",
         "--color-input-default-focused-outer-border",
+        "--color-input-default-disabled-bg",
+        "--color-input-default-disabled-inner-border",
+        "--color-input-default-disabled-value",
         "--color-surface-secondary",
         "--color-text-primary",
-        "--color-border-subtle",
-        "--color-text-disabled",
-        "--color-surface-primary",
+        "--color-text-secondary",
         "--color-input-default-hover-inner-border",
         "--color-input-error-unfocused-inner-border",
         "--color-input-error-focused-inner-border",
         "--color-input-error-focused-outer-border",
+        "--color-input-error-unfocused-icon",
         "--color-input-success-unfocused-inner-border",
         "--color-input-success-focused-inner-border",
         "--color-input-success-focused-outer-border",
+        "--color-input-success-unfocused-icon",
         "--color-input-warning-unfocused-inner-border",
         "--color-input-warning-focused-inner-border",
-        "--color-input-warning-focused-outer-border"
+        "--color-input-warning-focused-outer-border",
+        "--color-input-warning-unfocused-icon"
       ],
       "radius": [
         "--radius-md"
@@ -160,6 +222,12 @@
       "typography": [
         "--typo-body-size",
         "--font-family-body"
+      ],
+      "spacing": [
+        "--space-button-min-height"
+      ],
+      "opacity": [
+        "--opacity-disabled"
       ]
     }
   },
@@ -168,13 +236,15 @@
     "Provide a visible label or equivalent accessible name.",
     "Keep increment and decrement controls clearly named.",
     "Respect min, max, step, disabled, and readonly constraints.",
-    "Do not rely on hidden browser spin buttons as the only way to change the value."
+    "Do not rely on hidden browser spin buttons as the only way to change the value.",
+    "Preserve empty and partial direct editing instead of coercing every input event to zero or a boundary.",
+    "Use native input and change events for controlled adapters and preserve form reset behavior."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; increment/decrement behavior and constraint synchronization must be provided by the consuming target."
+      "kind": "css-js",
+      "notes": "Canonical CSS and shared progressive enhancement preserve native stepping, events, form/reset ownership, validation boundaries, and disabled/read-only synchronization without merging Quantity Selector."
     },
     "shopify": {
       "status": "planned",

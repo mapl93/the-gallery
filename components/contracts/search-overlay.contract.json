@@ -1,74 +1,91 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "search-overlay",
   "name": "Search Overlay",
   "registryId": "C5",
   "category": "global",
   "status": "pilot",
-  "summary": "Full-screen search overlay with search box, result list, and open state.",
-  "dependencies": [],
+  "summary": "Named modal search dialog with canonical dismissal, a labelled native search field, and optional target-owned result content.",
+  "dependencies": ["close-button"],
   "source": {
     "registry": "registry.json#/components/search-overlay",
     "css": { "file": "components/css/global.css", "selector": ".search-overlay" },
     "docs": "site/src/content/components/search-overlay.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".search-overlay", "className": ".search-overlay", "required": true, "description": "Fixed overlay backdrop." },
-    { "name": "box", "selector": ".search-box", "className": ".search-box", "required": true, "description": "Search panel container." },
-    { "name": "input", "selector": ".search-box__input", "className": ".search-box__input", "required": true, "description": "Search input." },
-    { "name": "results", "selector": ".search-results", "className": ".search-results", "required": false, "description": "Result list container." },
-    { "name": "result", "selector": ".search-result", "className": ".search-result", "required": false, "description": "Single result link." },
-    { "name": "resultImage", "selector": ".search-result__image", "className": ".search-result__image", "required": false, "description": "Result thumbnail." },
+    { "name": "root", "selector": ".search-overlay", "className": ".search-overlay", "required": true, "description": "Modal dialog and backdrop layer controlled by the target lifecycle." },
+    { "name": "box", "selector": ".search-box", "className": ".search-box", "required": true, "description": "Native search form panel with bounded viewport geometry and scroll partition." },
+    { "name": "header", "selector": ".search-box__header", "className": ".search-box__header", "required": true, "description": "Top row for the required visible title and canonical dismiss action." },
+    { "name": "title", "selector": ".search-box__title", "className": ".search-box__title", "required": true, "description": "Visible localized dialog title used by aria-labelledby." },
+    { "name": "close", "selector": ".search-box__close", "className": ".search-box__close", "required": true, "description": "Required named dismiss action composed with canonical Close Button." },
+    { "name": "label", "selector": ".search-box__label", "className": ".search-box__label", "required": true, "description": "Native label for the search input; targets may present it visually or with the shared visually-hidden utility." },
+    { "name": "input", "selector": ".search-box__input", "className": ".search-box__input", "required": true, "description": "Native type=search query control." },
+    { "name": "results", "selector": ".search-results", "className": ".search-results", "required": false, "description": "Optional target-owned list, status, loading, empty, or error region." },
+    { "name": "resultItem", "selector": ".search-results__item", "className": ".search-results__item", "required": false, "description": "Native list item for a navigable result." },
+    { "name": "result", "selector": ".search-result", "className": ".search-result", "required": false, "description": "Native destination link for a result." },
+    { "name": "resultImage", "selector": ".search-result__image", "className": ".search-result__image", "required": false, "description": "Optional result thumbnail." },
+    { "name": "resultContent", "selector": ".search-result__content", "className": ".search-result__content", "required": false, "description": "Contained result text wrapper." },
     { "name": "resultTitle", "selector": ".search-result__title", "className": ".search-result__title", "required": false, "description": "Result title." },
-    { "name": "resultPrice", "selector": ".search-result__price", "className": ".search-result__price", "required": false, "description": "Result price text." }
+    { "name": "resultPrice", "selector": ".search-result__price", "className": ".search-result__price", "required": false, "description": "Optional target-formatted result price." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default full-screen search overlay." }
+    { "name": "default", "className": null, "default": true, "description": "Default modal search dialog." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default centered search panel size." }
+    { "name": "default", "className": null, "default": true, "description": "Default bounded search panel size." }
   ],
   "states": [
-    { "name": "closed", "selectors": [".search-overlay"], "description": "Default hidden overlay state." },
-    { "name": "open", "selectors": [".search-overlay.is-open"], "description": "Visible overlay state." },
-    { "name": "resultHover", "selectors": [".search-result:hover"], "description": "Search-result hover state." }
+    { "name": "closed", "selectors": [".search-overlay"], "description": "Hidden overlay state unavailable to focus and assistive technology." },
+    { "name": "open", "selectors": [".search-overlay.is-open"], "description": "Visible modal dialog state." },
+    { "name": "inputFocusVisible", "selectors": [".search-box__input:focus-visible"], "description": "Visible keyboard focus on the primary query field." },
+    { "name": "resultHover", "selectors": [".search-result:hover"], "description": "Fine-pointer result hover surface." },
+    { "name": "resultFocusVisible", "selectors": [".search-result:focus-visible"], "description": "Visible keyboard focus on a result destination." }
   ],
   "behavior": [
-    { "name": "openState", "selectors": [".search-overlay.is-open"], "attributes": ["aria-hidden"], "description": "Overlay visibility should be synchronized with accessible hidden state." },
-    { "name": "queryInput", "selectors": [".search-box__input"], "attributes": ["type=\"search\"", "aria-label"], "events": ["input"], "description": "Search input should drive target search results." },
-    { "name": "dismissal", "selectors": [".search-overlay"], "events": ["Escape", "click"], "description": "Overlay should close on Escape and intentional outside/close actions." },
-    { "name": "resultNavigation", "selectors": [".search-result"], "attributes": ["href"], "events": ["click"], "description": "Search results should navigate to the target result destination." }
+    { "name": "visibility", "selectors": [".search-overlay.is-open"], "attributes": ["aria-hidden"], "description": "The target synchronizes visual open state with accessible availability and removes or disables closed focusables." },
+    { "name": "dialogSemantics", "selectors": [".search-overlay", ".search-box__title"], "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby"], "description": "When open, Search Overlay is a named modal dialog with a required visible title." },
+    { "name": "searchForm", "selectors": [".search-box", ".search-box__label", ".search-box__input"], "attributes": ["role=\"search\"", "for", "id", "type=\"search\""], "events": ["input", "search", "submit"], "description": "A native labelled search control drives the target-owned search request and submission policy." },
+    { "name": "focusManagement", "events": ["open", "close", "Tab", "Shift+Tab"], "description": "Opening moves focus to the query field, modal focus remains contained, and closing restores focus logically." },
+    { "name": "dismissal", "selectors": [".search-box__close"], "events": ["Escape", "close action"], "description": "The target closes on Escape and provides a visible named canonical dismiss action; backdrop dismissal remains target policy." },
+    { "name": "queryOwnership", "selectors": [".search-box__input"], "description": "A target may own query as controlled state or initialize native uncontrolled state, but must maintain one authoritative value and preserve form submission semantics." },
+    { "name": "resultNavigation", "selectors": [".search-results", ".search-result"], "attributes": ["href"], "events": ["click", "Enter"], "description": "Ordinary linked results use native list and link semantics; combobox or listbox interaction is not implied." },
+    { "name": "resultStatusOwnership", "selectors": [".search-results"], "description": "The target owns truthful loading, empty, error, count, and live-announcement policy; the base component does not create an unconditional live region." }
   ],
   "properties": [
-    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls visual visibility and accessible hidden state. Consumer targets still own triggering, focus management, dismissal, and focus restoration.", "targetMappings": { "web": [{ "kind": "class", "selector": ".search-overlay", "classNames": [".is-open"] }, { "kind": "attribute", "selector": ".search-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] } },
-    { "name": "inputLabel", "type": "string", "required": true, "description": "Accessible name for the native search input.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "query", "type": "string", "required": false, "description": "Current value of the native search input.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "placeholder", "type": "string", "required": false, "description": "Optional hint displayed while the search query is empty; it does not replace the accessible input label.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "results", "type": "slot", "required": false, "description": "Target-owned search result, loading, empty, or error content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".search-results", "classNames": [".search-results"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Visible localized dialog title used for the modal accessible name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".search-box__title" }] } },
+    { "name": "dismissLabel", "type": "string", "required": true, "description": "Contextual accessible name for the canonical dismiss action.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls visible and accessible presentation while the target owns trigger, inertness, focus, dismissal, scroll locking, and lifecycle.", "targetMappings": { "web": [{ "kind": "class", "selector": ".search-overlay", "classNames": [".is-open"] }, { "kind": "attribute", "selector": ".search-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] } },
+    { "name": "inputLabel", "type": "string", "required": true, "description": "Localized native label for the search query; placeholder text is not a substitute.", "targetMappings": { "web": [{ "kind": "content", "selector": ".search-box__label" }] } },
+    { "name": "query", "type": "string", "required": false, "description": "Current query when the target uses controlled state, or initial value when it intentionally uses native uncontrolled state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "placeholder", "type": "string", "required": false, "description": "Optional supplemental hint displayed while query is empty.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".search-box__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "results", "type": "slot", "required": false, "description": "Target-owned result list, status, loading, empty, or error content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".search-results", "classNames": [".search-results", ".search-results__item", ".search-result"] }] } }
   ],
   "tokens": {
     "public": {
       "color": ["--color-surface-primary", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-border-focus"],
-      "spacing": ["--space-layout-element-gap"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"],
       "radius": ["--radius-lg", "--radius-md", "--radius-sm"],
       "shadow": ["--shadow-2xl"],
       "opacity": ["--opacity-overlay"],
       "z-index": ["--z-overlay"],
-      "typography": ["--typo-h4-size", "--typo-body-size", "--font-family-body"],
+      "typography": ["--font-family-body", "--typo-h4-size", "--typo-h4-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"],
       "transition": ["--transition-base", "--transition-fast"],
       "easing": ["--easing-default"]
     }
   },
   "accessibility": [
-    "Focus the search input when the overlay opens.",
-    "Close on Escape and return focus to the trigger.",
-    "Expose result count or no-results state when results update dynamically.",
-    "Use real links for navigable results."
+    "Expose a visible title and named modal dialog only while the target actually blocks background interaction.",
+    "Move focus to the native search field, contain Tab and Shift+Tab, close on Escape, and restore focus logically.",
+    "Compose the required named dismiss action with canonical Close Button.",
+    "Use a native label and type=search control; placeholder does not replace the label.",
+    "Use ordinary list and link semantics for results unless an accepted combobox contract is deliberately composed.",
+    "Announce dynamic status only from truthful target-owned content and avoid unconditional live-region noise.",
+    "Preserve bounded viewport geometry, keyboard focus visibility, reduced motion, and forced-colors boundaries."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map predictive search data, query state, result links, and close behavior." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical modal/search anatomy, bounded panel layout, native result list presentation, and interaction states are implemented; the shared docs target demonstrates the lifecycle." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Liquid can expose the semantic form and result container, but predictive-search service, truthful status, focus containment, Escape, inertness, and restoration still require target runtime." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

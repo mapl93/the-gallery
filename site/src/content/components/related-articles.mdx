@@ -1,37 +1,90 @@
 ## Overview
 
-Related Articles presents an optional heading and a target-owned collection of Article Card compositions. Recommendation selection remains target-owned.
+Related Articles is one passive, fail-closed, named thematic section containing one to three explicitly curated canonical Article Card summaries. It requires a non-empty visible title and at least one complete Article Card; missing either omits the complete section. The target removes the current article and duplicates while preserving curator order.
 
 ## Presentation
 
-<Preview html={'<section class="related-articles tg-preview-frame--lg" aria-labelledby="related-articles-title"><h2 id="related-articles-title" class="related-articles__title">Related articles</h2><div class="related-articles__grid"><article class="article-card"><a class="article-card__media" href="#"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Rows of labeled glaze test tiles" /></a><div class="article-card__body"><h3 class="article-card__title"><a href="#">A practical guide to glaze tests</a></h3></div></article><article class="article-card"><a class="article-card__media" href="#"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Ceramic pieces cooling inside a kiln" /></a><div class="article-card__body"><h3 class="article-card__title"><a href="#">What the kiln changes</a></h3></div></article></div></section>'} label="Related Articles" />
+<Preview
+  html={`
+    <section class="related-articles tg-preview-frame--lg" aria-labelledby="related-articles-title">
+      <h2 id="related-articles-title" class="related-articles__title" dir="auto">Continue reading</h2>
+      <ul class="related-articles__grid">
+        <li class="related-articles__item">
+          <article class="card article-card" data-surface="default" data-excerpt-lines="none">
+            <div class="article-card__category-slot article-card__category-slot--overlay"><span class="badge article-card__category" dir="auto">Materials</span></div>
+            <a class="article-card__primary-link" href="#related-ash-glazes">
+              <div class="article-card__layout"><div class="card__media article-card__media"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Ceramic bowls and vessels arranged on a wooden workbench" /></div><div class="card__body article-card__body"><h3 class="article-card__title" dir="auto">A field guide to ash glazes</h3></div></div>
+            </a>
+          </article>
+        </li>
+        <li class="related-articles__item">
+          <article class="card article-card" data-surface="default" data-excerpt-lines="none">
+            <div class="article-card__category-slot article-card__category-slot--overlay"><span class="badge article-card__category" dir="auto">Studio notes</span></div>
+            <a class="article-card__primary-link" href="#related-permanent-tools">
+              <div class="article-card__layout"><div class="card__media article-card__media"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Ceramic artist decorating a vessel at a studio table" /></div><div class="card__body article-card__body"><h3 class="article-card__title" dir="auto">The tools that earn a permanent place</h3></div></div>
+            </a>
+          </article>
+        </li>
+        <li class="related-articles__item">
+          <article class="card article-card" data-surface="default" data-excerpt-lines="none">
+            <div class="article-card__category-slot article-card__category-slot--overlay"><span class="badge article-card__category" dir="auto">Process</span></div>
+            <a class="article-card__primary-link" href="#related-small-batch">
+              <div class="article-card__layout"><div class="card__media article-card__media"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Glazed ceramic cups arranged in a small group" /></div><div class="card__body article-card__body"><h3 class="article-card__title" dir="auto">Firing a small batch with intention</h3></div></div>
+            </a>
+          </article>
+        </li>
+      </ul>
+    </section>
+  `}
+  label="Related Articles"
+/>
 
-The component has one responsive presentation. `.related-articles__grid` moves from one to two and then three columns as space becomes available; every child remains a canonical Article Card composition.
+The root is a native `.related-articles` section named by its visible contextual heading through `aria-labelledby`. `.related-articles__grid` is a native `ul`; each direct `.related-articles__item` is an `li` containing exactly one complete canonical Article Card.
+
+The visual grid uses intrinsic `auto-fit` sizing, so columns follow the component's available inline space rather than the viewport. A narrow host may show one column while another L10 instance in the same viewport shows two or three. Column count and the private minimum card measure are not public semantic properties.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Let the target select relevant articles and pass complete Article Card compositions.</Do>
-  <Dont>Do not add next or previous article behavior to this component while `.article-nav` ownership is undecided.</Dont>
+  <Do>Supply a truthful localized heading and one to three explicitly curated complete canonical Article Cards in curator order.</Do>
+  <Dont>Do not infer a tag fallback, automatic ranking or personalization in v1, and never include the current article or duplicates.</Dont>
 </DoDont>
 
-The adjacent `.article-nav` CSS family is not part of the Related Articles semantic property surface. Whether it belongs here or becomes a separate registered component remains unresolved.
+<DoDont>
+  <Do>Omit the complete section when no valid recommendations are available.</Do>
+  <Dont>Do not interpret legacy `.article-nav` as L10 or register Previous/Next Article Navigation in v1.</Dont>
+</DoDont>
+
+The target owns the explicit curated records, current-article and duplicate exclusion, freshness, loading/error/no-result lifecycle, destinations, tracking, analytics and SEO. On article pages, the host places L10 after primary content and before Comments; Author Card and Share Actions may sit around that boundary without changing L10. The neutral component owns only named collection semantics and intrinsic layout.
+
+Fixture article titles, categories, images, alternatives, destinations, order, item count, H2/H3 ranks and “Continue reading” copy are evidence content, not defaults or public API.
 
 ## Accessibility
 
-- Use a section heading level that fits the surrounding article page hierarchy.
-- Keep the section label associated through its visible heading.
-- Preserve every Article Card heading, destination, image alternative text, and focus behavior.
-- Use `alt=""` when a linked card image only duplicates its adjacent linked title.
-- Do not imply next or previous navigation semantics through visual placement alone.
+- Require a non-empty visible heading and at least one complete Article Card; omit invalid composition instead of emitting an unlabelled or empty region.
+- Use `section[aria-labelledby]`, a target-unique heading id, `ul` and direct `li` children without redundant roles or custom collection keyboard behavior.
+- Preserve each canonical Article Card's native article summary, contextual heading, single required primary Link containing its contextual media and complete title, media alternative, Badge and optional metadata.
+- Keep native Link Tab, Enter, context-menu and modifier-key behavior. The root, list and list items are passive and unfocusable.
+- Preserve complete localized text, logical RTL flow, narrow-container reflow, effective 200% type, user text spacing, dark/forced-color behavior and canonical focus visibility.
 
 ## References
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible section heading</td></tr>
-  <tr><td>`articles`</td><td>slot</td><td>required</td><td>Target-owned Article Card collection</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible localized heading; blank omits the complete root</td></tr>
+  <tr><td>`articles`</td><td>slot</td><td>required</td><td>One to three explicitly curated canonical Article Cards after current/duplicate exclusion</td></tr>
 </PropTable>
 
-Anatomy: `.related-articles`, `.related-articles__title`, and `.related-articles__grid`.
+Anatomy: `.related-articles`, `.related-articles__title`, `.related-articles__grid`, and `.related-articles__item`.
 
-Dependency: [Article Card](/components/article-card). The contract remains `pilot`; ownership of `.article-nav` is explicitly unresolved.
+Dependency: [Article Card](/components/article-card). Owner decision 52 accepts the explicit curated maximum-three source, deterministic exclusions, article-page boundary and absence of Previous/Next navigation in v1. Shopify maps an ordered native `article_list` into the same canonical composition. The contract remains `pilot`; real template placement, final visuals, L10-specific design evidence and explicit human review remain pending.
+
+- [HTML `section`](https://html.spec.whatwg.org/multipage/sections.html#the-section-element)
+- [HTML `ul`](https://html.spec.whatwg.org/multipage/grouping-content.html#the-ul-element)
+- [APG Landmark Regions](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/)
+- [Open UI Card research](https://open-ui.org/components/card.research/)
+- [Radix Themes Grid](https://www.radix-ui.com/themes/docs/components/grid)
+- [Polaris Resource List](https://polaris-react.shopify.com/components/lists/resource-list)
+- [Shopify Liquid `blog`](https://shopify.dev/docs/api/liquid/objects/blog)
+- [Shopify `article_list` setting](https://shopify.dev/docs/storefronts/themes/architecture/settings/input-settings#article_list)
+- [CSS Containment Level 3](https://www.w3.org/TR/css-contain-3/)
+- [WCAG Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)

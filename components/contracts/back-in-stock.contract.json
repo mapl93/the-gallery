@@ -1,91 +1,86 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "back-in-stock",
   "name": "Back in Stock Alert",
   "registryId": "D8",
   "category": "product",
   "status": "pilot",
-  "summary": "Email capture component for unavailable products, with submitted state and success feedback.",
-  "dependencies": [],
+  "summary": "Selected-variant and current-market availability-request profile that composes canonical Input and Button, presents idle/submitting/confirmed/retryable-error states, and leaves provider truth and delivery to the target integration.",
+  "dependencies": ["input", "button"],
   "source": {
     "registry": "registry.json#/components/back-in-stock",
     "css": { "file": "components/css/product.css", "selector": ".back-in-stock" },
     "docs": "site/src/content/components/back-in-stock.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".back-in-stock", "className": ".back-in-stock", "required": true, "description": "Back-in-stock notification container." },
-    { "name": "heading", "selector": ".back-in-stock__heading", "className": ".back-in-stock__heading", "required": true, "description": "Signup heading." },
-    { "name": "text", "selector": ".back-in-stock__text", "className": ".back-in-stock__text", "required": false, "description": "Signup helper copy." },
-    { "name": "form", "selector": ".back-in-stock__form", "className": ".back-in-stock__form", "required": true, "description": "Email signup form." },
-    { "name": "field", "selector": ".back-in-stock__field", "className": ".back-in-stock__field", "required": true, "description": "Email field composition." },
-    { "name": "label", "selector": ".back-in-stock__label", "className": ".back-in-stock__label", "required": true, "description": "Visible email label." },
-    { "name": "control", "selector": ".back-in-stock__control", "className": ".back-in-stock__control", "required": true, "description": "Input and fixed validation-indicator wrapper." },
-    { "name": "input", "selector": ".back-in-stock__input", "className": ".back-in-stock__input", "required": true, "description": "Email input." },
-    { "name": "indicator", "selector": ".back-in-stock__indicator", "className": ".back-in-stock__indicator", "required": false, "description": "Fixed validation or field indicator." },
-    { "name": "message", "selector": ".back-in-stock__message", "className": ".back-in-stock__message", "required": false, "description": "Associated guidance or validation message." },
-    { "name": "submit", "selector": ".back-in-stock__submit", "className": ".back-in-stock__submit", "required": true, "description": "Signup submit action." },
-    { "name": "success", "selector": ".back-in-stock__success", "className": ".back-in-stock__success", "required": false, "description": "Submitted success message." }
+    { "name": "root", "selector": ".back-in-stock", "className": ".back-in-stock", "required": true, "description": "Generic product-context root omitted when the required heading or complete form composition is missing." },
+    { "name": "heading", "selector": ".back-in-stock__heading", "className": ".back-in-stock__heading", "required": true, "description": "Non-empty visible contextual heading and native form name source." },
+    { "name": "text", "selector": ".back-in-stock__text", "className": ".back-in-stock__text", "required": false, "description": "Optional notification promise or expectation-setting copy." },
+    { "name": "form", "selector": ".back-in-stock__form", "className": ".back-in-stock__form", "required": true, "description": "Named native form composed from canonical Input and Button; the target supplies the exact selected-variant/current-market identity and provider data." },
+    { "name": "input", "selector": ".back-in-stock__input", "className": ".back-in-stock__input", "required": true, "description": "D8 sizing hook composed on the canonical Input native email field." },
+    { "name": "submit", "selector": ".back-in-stock__submit", "className": ".back-in-stock__submit", "required": true, "description": "D8 layout hook composed on the canonical primary submit Button." },
+    { "name": "status", "selector": ".back-in-stock__status", "className": ".back-in-stock__status", "required": false, "description": "Optional truthful form-level response content presented with component-owned confirmed or retryable-error semantics." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default back-in-stock signup." },
-    { "name": "error", "className": ".back-in-stock--error", "default": false, "description": "Invalid email feedback family." },
-    { "name": "success", "className": ".back-in-stock--success", "default": false, "description": "Valid email feedback family." },
-    { "name": "warning", "className": ".back-in-stock--warning", "default": false, "description": "Cautionary email feedback family." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic notification-form profile; field validation variants belong to canonical Input." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default stacked signup size." }
+    { "name": "default", "className": null, "default": true, "description": "One container-responsive size that stacks from its own inline capacity." }
   ],
   "states": [
-    { "name": "default", "selectors": [".back-in-stock"], "description": "Default signup form state." },
-    { "name": "inputHover", "selectors": [".back-in-stock__input:hover"], "description": "Input hover state that preserves the active validation family." },
-    { "name": "inputFocus", "selectors": [".back-in-stock__input:focus-visible"], "description": "Four-pixel zero-offset input focus state." },
-    { "name": "inputDisabled", "selectors": [".back-in-stock__input:disabled"], "description": "Unavailable email input state." },
-    { "name": "error", "selectors": [".back-in-stock--error"], "description": "Error validation family." },
-    { "name": "success", "selectors": [".back-in-stock--success"], "description": "Success validation family." },
-    { "name": "warning", "selectors": [".back-in-stock--warning"], "description": "Warning validation family." },
-    { "name": "submitHover", "selectors": [".back-in-stock__submit:hover"], "description": "Submit hover state." },
-    { "name": "submitted", "selectors": [".back-in-stock.is-submitted .back-in-stock__form", ".back-in-stock.is-submitted .back-in-stock__success"], "description": "Submitted state hides the form and shows success feedback." }
+    { "name": "idle", "selectors": [".back-in-stock"], "description": "Resting form with no provider result claim." },
+    { "name": "fieldError", "selectors": [".back-in-stock__form > .input--error"], "description": "Canonical Input error validation composition; aria-invalid and error text remain Input/target obligations." },
+    { "name": "fieldSuccess", "selectors": [".back-in-stock__form > .input--success"], "description": "Canonical Input successful field-validation composition, distinct from provider acceptance." },
+    { "name": "fieldWarning", "selectors": [".back-in-stock__form > .input--warning"], "description": "Canonical Input warning validation composition." },
+    { "name": "submitting", "selectors": [".back-in-stock__form[aria-busy=\"true\"]", ".back-in-stock__submit[aria-busy=\"true\"]"], "description": "A target registration request is in flight; the email is read-only and canonical Button busy/disabled semantics prevent repeat activation." },
+    { "name": "confirmed", "selectors": [".back-in-stock[data-state=\"confirmed\"]", ".back-in-stock[data-state=\"confirmed\"] .back-in-stock__status"], "description": "Provider acceptance is confirmed; the form remains visible, email remains readable and focusable, resubmission is disabled, and adjacent truthful feedback uses status semantics." },
+    { "name": "retryableError", "selectors": [".back-in-stock[data-state=\"retryable-error\"]", ".back-in-stock[data-state=\"retryable-error\"] .back-in-stock__status"], "description": "Provider registration failed without losing context; the field remains editable, submit remains available, and adjacent truthful error feedback is announced." }
   ],
   "behavior": [
-    { "name": "emailSignup", "selectors": [".back-in-stock__form", ".back-in-stock__input", ".back-in-stock__submit"], "attributes": ["type=\"email\"", "required"], "events": ["submit"], "description": "Targets should validate an email address and submit it to the platform notification flow." },
-    { "name": "successFeedback", "selectors": [".back-in-stock__success"], "attributes": ["aria-live=\"polite\""], "description": "Submitted feedback should be announced without moving focus unexpectedly." }
+    { "name": "requiredComposition", "selectors": [".back-in-stock", ".back-in-stock__heading", ".back-in-stock__form"], "description": "Targets omit the complete root when the heading or valid native form composition is absent; required child labels and action names also fail closed in adapters." },
+    { "name": "nativeNotificationForm", "selectors": [".back-in-stock__form"], "attributes": ["<form>", "aria-labelledby", "action", "method"], "events": ["constraint validation", "invalid", "submit", "formdata", "reset"], "description": "Web preserves native validation, successful-entry construction, activated submitter and reset; the target supplies action/method and may navigate or intercept the same complete form data." },
+    { "name": "inputComposition", "selectors": [".back-in-stock__form > .input", ".back-in-stock__input"], "attributes": ["type=\"email\"", "name", "autocomplete=\"email\"", "required"], "events": ["input", "change", "form reset", "constraint validation"], "description": "Canonical Input remains the sole email value, label, name, validation, associated-message, icon, disabled, focus, hover and controlled/uncontrolled owner." },
+    { "name": "buttonComposition", "selectors": [".back-in-stock__submit"], "attributes": ["type=\"submit\"", "disabled", "aria-busy"], "events": ["activated submitter", "submit"], "description": "The explicit submitter composes canonical primary Button and preserves Button-owned activation, focus, disabled, busy, loading and reduced-motion behavior." },
+    { "name": "notificationTarget", "selectors": [".back-in-stock__form"], "attributes": ["target-owned exact selected variant and current market form/model data"], "events": ["variant or market context change"], "description": "The form is eligible only with one exact selected variant and current market. D8 names those semantic identities without prescribing provider field names, schemas or transport." },
+    { "name": "availabilityBoundary", "selectors": [".back-in-stock"], "description": "The connected target inventory authority decides when the selected variant becomes purchasable under the current market policy; preorder, backorder, incoming and reserved states are not silently equivalent." },
+    { "name": "requestStateBoundary", "selectors": [".back-in-stock", ".back-in-stock__form", ".back-in-stock__submit", ".back-in-stock__status"], "attributes": ["data-state=\"idle|submitting|confirmed|retryable-error\"", "readonly", "disabled", "aria-busy", "role=\"status|alert\""], "events": ["request", "confirmed acceptance", "retryable failure", "retry"], "description": "D8 owns coherent request-state presentation while the target integration supplies truthful transitions. Confirmed and retryable-error require non-empty localized feedback or resolve to idle; native submit alone never confirms success." },
+    { "name": "consentBoundary", "selectors": [".back-in-stock__form"], "description": "Availability-service consent is explicit and separate from marketing consent. Provider verification, idempotency, abuse controls, retention, deletion, delivery, retry and unsubscribe remain target responsibilities." },
+    { "name": "intrinsicLayout", "selectors": [".back-in-stock", ".back-in-stock__form"], "description": "The composition responds to its own inline size without viewport breakpoints, reordered DOM or changed keyboard order." },
+    { "name": "zeroNeutralRuntime", "selectors": [".back-in-stock"], "description": "Neutral D8 owns no listener, observer, timer, request, storage, formatter, layout read, custom element, asset, animation or provider runtime." }
   ],
   "properties": [
-    { "name": "heading", "type": "string", "required": true, "description": "Visible signup heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__heading" }] } },
-    { "name": "description", "type": "string", "required": false, "description": "Optional signup helper copy.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__text" }] } },
-    { "name": "label", "type": "string", "required": true, "description": "Visible label associated with the email input.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__label" }] } },
-    { "name": "value", "type": "string", "required": false, "defaultValue": "", "description": "Current email value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "placeholder", "type": "string", "required": false, "description": "Optional email hint that does not replace the visible label.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "message", "type": "string", "required": false, "description": "Associated guidance or validation message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__message" }] } },
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation independent from submitted state.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".back-in-stock", "source": "variants" }] } },
-    { "name": "indicator", "type": "slot", "required": false, "description": "Fixed passive validation indicator.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".back-in-stock__indicator", "classNames": [".back-in-stock__indicator"] }] } },
-    { "name": "required", "type": "boolean", "required": false, "defaultValue": true, "description": "Marks the native email input as required.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the email input and submit action unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".back-in-stock__submit", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
-    { "name": "submitLabel", "type": "string", "required": true, "description": "Visible submit action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__submit" }] } },
-    { "name": "submitted", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows submitted success feedback and hides the form.", "targetMappings": { "web": [{ "kind": "class", "selector": ".back-in-stock", "classNames": [".is-submitted"] }] } },
-    { "name": "successMessage", "type": "string", "required": true, "description": "Polite submitted-state confirmation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__success" }] } }
+    { "name": "heading", "type": "string", "required": true, "unsetBehavior": "Omit the complete Back in Stock Alert when the localized heading is empty.", "description": "Non-empty visible contextual heading and native form name source.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__heading" }] } },
+    { "name": "description", "type": "string", "required": false, "unsetBehavior": "Omit the description without leaving an empty node or rhythm.", "description": "Optional notification promise or expectation-setting copy.", "targetMappings": { "web": [{ "kind": "content", "selector": ".back-in-stock__text" }] } },
+    { "name": "form", "type": "slot", "required": true, "unsetBehavior": "Omit the complete Back in Stock Alert when no valid native form composed from canonical Input and Button with exact selected-variant/current-market context is supplied.", "description": "Complete native target form containing canonical email Input, primary submit Button and exact selected-variant/current-market provider data.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".back-in-stock__form", "classNames": [".back-in-stock__form", ".input", ".back-in-stock__input", ".btn", ".back-in-stock__submit"] }] } },
+    { "name": "requestState", "type": "enum", "required": false, "defaultValue": "idle", "values": ["idle", "submitting", "confirmed", "retryableError"], "description": "Projects target-confirmed provider lifecycle into one coherent component-owned request presentation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".back-in-stock", "attribute": "data-state", "values": { "idle": "idle", "submitting": "submitting", "confirmed": "confirmed", "retryableError": "retryable-error" } }, { "kind": "attribute", "selector": ".back-in-stock__form", "attribute": "aria-busy", "values": { "idle": null, "submitting": "true", "confirmed": null, "retryableError": null }, "elements": ["form"] }, { "kind": "attribute", "selector": ".back-in-stock__input", "attribute": "readonly", "values": { "idle": null, "submitting": "", "confirmed": "", "retryableError": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".back-in-stock__submit", "attribute": "aria-busy", "values": { "idle": null, "submitting": "true", "confirmed": null, "retryableError": null }, "elements": ["button"] }, { "kind": "attribute", "selector": ".back-in-stock__submit", "attribute": "disabled", "values": { "idle": null, "submitting": "", "confirmed": "", "retryableError": null }, "elements": ["button"] }] } },
+    { "name": "feedback", "type": "slot", "required": false, "unsetBehavior": "Render no form-level result; confirmed and retryableError resolve to idle rather than presenting an unexplained locked or error state.", "description": "Truthful localized provider response. D8 owns adjacent confirmed/retryable-error presentation and semantics; the target owns content and transition truth.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".back-in-stock__status", "classNames": [".back-in-stock__status"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover", "--color-button-primary-border-default", "--color-button-primary-border-hover", "--color-feedback-success-default", "--color-input-default-unfocused-bg", "--color-input-default-unfocused-inner-border", "--color-input-default-focused-outer-border", "--color-input-error-unfocused-inner-border", "--color-input-error-focused-outer-border", "--color-input-success-unfocused-inner-border", "--color-input-success-focused-outer-border", "--color-input-warning-unfocused-inner-border", "--color-input-warning-focused-outer-border"],
-      "radius": ["--radius-md", "--radius-sm"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"],
-      "typography": ["--typo-body-size", "--typo-body-sm-size"]
+      "color": ["--color-border-subtle", "--color-feedback-error-bg", "--color-feedback-error-default", "--color-feedback-success-bg", "--color-feedback-success-default", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-md"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-font-weight-semibold", "--tg-typography-body-small-weight", "--typo-body-sm-size", "--typo-body-sm-line-height", "--typo-h4-size", "--typo-h4-line-height", "--typo-input-label-line-height"],
+      "spacing": ["--space-layout-element-gap"]
     }
   },
   "accessibility": [
-    "Label the email input with visible text or an equivalent accessible name.",
-    "Announce success and validation feedback through a live region when the form updates inline.",
-    "Do not remove the form before submission has a clear success or error result."
+    "Use one real native form named by the non-empty visible heading and preserve native constraint validation, submit, FormData and reset behavior.",
+    "Compose the email control from canonical Input with a visible associated label, stable target field name, type=email, autocomplete=email, required communication and associated guidance or validation text.",
+    "Preserve Input's Default, Error, Success and Warning families; use aria-invalid only for Error and never treat successful field validation as provider acceptance.",
+    "Compose the explicit submitter from canonical Button; submitting uses Button busy plus native disabled semantics and preserves the visible label while preventing repeat activation.",
+    "Supply the exact selected variant and current market, invalidate stale context on either change and do not submit an ambiguous notification request.",
+    "Do not announce or display confirmed registration until the target provider accepts it; keep field validation separate from form-level response feedback.",
+    "Keep the form in place after confirmation, preserve focus/context, make the email read-only, disable resubmission and expose truthful adjacent status. Retryable error restores editing/submission and uses error announcement semantics.",
+    "Keep notification-purpose copy and any required consent/privacy information explicit; do not imply unrelated marketing consent.",
+    "Preserve Input-then-Button source, reading and keyboard order when the container stacks, localizes or changes direction."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should connect to the chosen back-in-stock provider or notification endpoint." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css", "notes": "Intrinsic CSS composes canonical Input and Button and presents coherent request states with zero neutral runtime; the target drives transitions from the exact variant, market and provider result." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-class", "notes": "Main Product hosts provider app blocks, publishes current variant and market context, replaces the app block with every variant render and emits both identities. The installed app owns registration, consent, inventory observation and delivery; the theme ships no notification database or fake endpoint." },
+    "react": { "status": "implemented", "kind": "component", "notes": "The shared Exhibit/Studio renderer composes canonical Input/Button and proves idle, submitting, confirmed and retryable-error presentation while the framework integration owns provider transitions." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Visible idle, canonical field validation, submitting, confirmed and retryable-error compositions only; no provider or inventory engine." },
     "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

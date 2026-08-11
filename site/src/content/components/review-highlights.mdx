@@ -1,44 +1,93 @@
 ## Overview
 
-Responsive collection of target-supplied review themes and optional counts. Items are passive by default; navigation or selection semantics belong to the consuming target.
+Native collection of target-supplied review themes and optional counts. The
+neutral component is passive; navigation or in-place selection remains an
+explicit target decision.
 
-<Preview html={'<section class="review-highlights tg-preview-frame--md" aria-label="Common review themes"><span class="review-highlights__tag">Quality <span class="review-highlights__count">42</span></span><span class="review-highlights__tag">Craftsmanship <span class="review-highlights__count">38</span></span><span class="review-highlights__tag">Packaging <span class="review-highlights__count">21</span></span></section>'} label="Review Highlights" />
+<Preview html={'<ul class="review-highlights tg-preview-frame--md" role="list" aria-label="Common review themes"><li><span class="review-highlights__tag">Quality <span class="review-highlights__count" aria-hidden="true">42</span><span class="visually-hidden">42 reviews</span></span></li><li><span class="review-highlights__tag">Craftsmanship <span class="review-highlights__count" aria-hidden="true">38</span><span class="visually-hidden">38 reviews</span></span></li><li><span class="review-highlights__tag">Packaging <span class="review-highlights__count" aria-hidden="true">21</span><span class="visually-hidden">21 reviews</span></span></li></ul>'} label="Review Highlights" />
 
 ## Presentation
 
-The required root wraps repeated theme items. Each `.review-highlights__tag` may include a target-formatted `.review-highlights__count`. The root can receive an accessible label when surrounding content does not already identify the collection.
+The required `.review-highlights` root is a native unordered list. Each native
+list item contains one `.review-highlights__tag` and may include a
+target-formatted `.review-highlights__count`. The root can receive an accessible
+name when surrounding content does not already identify the collection.
 
-The neutral presentation supports passive text, native links, or native buttons. Pressed, active-class, hover, focus-visible, and disabled hooks only apply when the target has chosen matching native semantics.
+The shared Exhibit/Studio artwork uses passive text because no filtering or
+navigation model has been accepted. The visual class can be projected onto
+truthful native surfaces:
+
+| Target intent | Native surface | State |
+| --- | --- | --- |
+| Passive classification | `span` | none |
+| Navigation | `a[href]` | optional truthful `aria-current` |
+| In-place selection | `button[type=button]` | projected `aria-pressed`; optional native `disabled` |
+
+The component provides no transition. Passive and target-projected state
+changes are immediate, so reduced-motion mode needs no special behavior.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use passive theme text until the target has explicitly chosen navigation or in-place selection behavior.</Do>
-  <Dont>Do not treat `.is-active` as a filtering contract or assume single-select, multi-select, or URL behavior.</Dont>
+  <Do>Use the passive list until a target has explicitly chosen navigation or in-place selection behavior.</Do>
+  <Dont>Do not infer filtering from pill styling or recreate selected appearance with a semanticless active class.</Dont>
 </DoDont>
 
-Theme extraction, counts, filtering, result updates, URL state, focus retention, and announcements remain target-owned and unresolved. The preview values are documentation fixtures, not component defaults.
+Theme extraction, counts, provider state, selection cardinality, URLs, result
+updates, loading, focus, empty results and announcements remain target-owned.
+Fixture values are evidence content, not component defaults.
+
+For a filtering target, decide one of these contracts first:
+
+- multi-select toggle buttons with a controlled or initial value array;
+- single-select radio semantics with an explicit required-selection policy;
+- navigation links with real destinations and history behavior;
+- a separate Review Theme Filter component.
 
 ## Accessibility
 
 <Callout type="info">
-  Native element choice carries the interaction meaning; the visual tag class does not create semantics.
+  Native element choice carries the interaction meaning; the pill surface never creates semantics by itself.
 </Callout>
 
-- Use plain text for passive themes, native links for navigation, and native buttons for in-place selection.
-- Put `aria-pressed` on a toggle button only when the target has selected that behavior.
-- Use an appropriate current-page attribute for target-owned navigation when applicable.
-- Do not apply pointer behavior or interactive semantics to passive items.
-- Keep each count programmatically associated with its theme label.
-- Do not rely on color alone for a target-owned active state.
+- Preserve the native `ul` / `li` relationship. `role="list"` keeps that
+  relationship exposed when visual list markers are removed.
+- Use plain text for passive themes, native links for navigation and native
+  buttons for in-place selection.
+- Put `aria-pressed` on a toggle button only after the target chooses that
+  behavior, and keep its visible label stable.
+- Use `aria-current` only for a truthful current navigation destination.
+- Keep every count inside its theme item and provide a localized accessible unit
+  or context; a bare number is ambiguous.
+- Do not make the collection a live region. A target-owned results controller
+  announces a complete localized message when necessary.
+
+## State Ownership
+
+The passive neutral component has no controlled/uncontrolled state and adds no
+runtime. A target that projects buttons owns authored initial state, projected
+state, activation requests, reconciliation, reset and persistence. A target
+that projects links owns URLs, history, current destination, loading and focus.
+
+## Target Translation
+
+- **Web:** native list/list-item anatomy with passive `span`, native `a`, or
+  native `button` surfaces.
+- **Shopify:** a review-provider theme app block supplies taxonomy, localized
+  counts and any URLs/actions while consuming generated Reviews CSS.
+- **React / Angular:** passive list now; controlled/initial selection only after
+  an interactive target contract is accepted.
+- **Figma / native:** reproduce reviewed passive and target-mode visual states
+  without inventing provider behavior.
 
 ## References
 
-**Anatomy:** required `.review-highlights` root and repeated `.review-highlights__tag`; optional `.review-highlights__count`.
+**Anatomy:** required `.review-highlights` native list, repeated native list item
+and `.review-highlights__tag`; optional `.review-highlights__count`.
 
 **Dependencies:** None.
 
 <PropTable>
-  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional accessible collection name</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned theme items and counts</td></tr>
+  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional localized accessible list name</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned native list items, theme surfaces and optional counts</td></tr>
 </PropTable>

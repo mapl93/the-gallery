@@ -1,45 +1,78 @@
 ## Overview
 
-Product details: title, vendor, description, metadata.
+Product Info is a passive composition for product identity, canonical pricing,
+semantic rich description, and name-value metadata.
 
-<Preview html={"<div class=\"product-info tg-preview-frame--md\"><span class=\"product-info__vendor\">The Gallery Studio</span><h1 class=\"product-info__title\">Handcrafted Ceramic Vase</h1><p class=\"product-info__subtitle\">Limited Edition – No. 42 of 100</p><p class=\"product-info__description\">Each piece is hand-thrown on the potter's wheel, making every vase truly unique.</p><dl class=\"product-info__meta\"><dt>Material</dt><dd>Stoneware</dd><dt>Height</dt><dd>28 cm</dd></dl></div>"} label="Product Info" />
+<Preview html={"<section class=\"product-info tg-preview-frame--md\" data-product-info data-product-info-projection=\"variant\"><header class=\"product-info__identity\"><p class=\"product-info__vendor\" dir=\"auto\">Lucia Ferrer</p><h2 class=\"product-info__title\" dir=\"auto\">Celadon Study No. 4</h2><p class=\"product-info__subtitle\" dir=\"auto\">One of one</p></header><div class=\"product-info__price\"><span class=\"price\" data-price-alternate-digits=\"false\" data-price-slashed-zero=\"true\" data-price-tabular-numbers=\"true\" data-price-contextual-alternates=\"true\" data-price-fractions=\"false\"><span class=\"price__current\"><span class=\"price__label\">Price: </span><bdi class=\"price__value\">$120.00</bdi></span></span></div><div class=\"product-info__description\"><p>Hand-thrown stoneware finished with a satin celadon glaze.</p><p>Each work is unique. Review the <a href=\"#care\">care guidance</a> before use.</p><ul><li>Food safe</li><li>Finished by hand</li></ul></div><dl class=\"product-info__meta\"><div><dt>Material</dt><dd dir=\"auto\">Stoneware</dd></div><div><dt>Dimensions</dt><dd dir=\"auto\">28 × 16 cm</dd></div><div><dt>Firing</dt><dd dir=\"auto\">1,240 °C</dd></div><div data-product-info-variant-field=\"sku\"><dt>SKU</dt><dd dir=\"auto\">CS-04-CEL</dd></div><div data-product-info-variant-field=\"inventory\"><dt>Inventory</dt><dd dir=\"auto\">3</dd></div><div data-product-info-variant-field=\"availability\"><dt>Availability</dt><dd dir=\"auto\">Available</dd></div></dl></section>"} label="Selected variant projection" />
 
 ## Presentation
 
-Product Info is a stacked editorial composition. Price remains delegated to Price, and metadata remains a semantic description list.
+The identity wrapper keeps vendor, title, and subtitle as one editorial cluster.
+Price is a required canonical dependency. Description and metadata are optional
+semantic slots; the renderer omits their wrappers when no content exists.
+
+The component has one intrinsic size and no state or neutral runtime. Metadata
+columns adapt to the component's available inline size without changing source or
+reading order. Heading rank remains contextual: use `h1` on a full product page
+when it is the page heading and the appropriate lower rank in a quick view or
+other composition.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Optimize product images for web — use WebP format and responsive srcset.</Do>
-  <Dont>Don't overload product components with too many badges or CTAs — keep it clean.</Dont>
+  <Do>Supply one non-empty native title heading, one canonical Price, semantic rich description content, and complete localized metadata pairs.</Do>
+  <Dont>Do not place Breadcrumb, Rating, Product Form, coordinator state, or update-announcement behavior inside Product Info merely because they appear nearby.</Dont>
 </DoDont>
+
+Under accepted direction D3-A, Product Info displays whichever truthful
+projection the owning product surface supplies. Before resolution that may be a
+target-formatted product Price range with product-level metadata only. After
+resolution, Price, SKU, inventory and availability represent the exact selected
+variant. The same page or Quick View coordinator atomically updates media, URL,
+structured data and at most one localized status; Product Info never announces
+independently.
 
 ## Accessibility
 
 <Callout type="tip">
-  Product components are designed to work together. The product page combines gallery, info, form, and related products.
+  Product Info is ordinary document content, not an ARIA widget. Native structure
+  and visible text provide its semantics.
 </Callout>
 
-- Ensure proper color contrast ratios (4.5:1 for text, 3:1 for large text) when customizing tokens.
-- Use one appropriate heading level for the product title in the page context.
-- Render metadata as a description list when pairing labels and values.
+- Choose the title's native heading level from the surrounding document outline.
+- Do not add a redundant `aria-label`, widget role, or tab stop to the root.
+- Preserve paragraphs, headings, lists, links, emphasis, language, and direction
+  in supplied rich description content.
+- Use `dl` with one or more complete `dt`/`dd` groups for metadata; never render
+  an empty description list.
+- Use a known direction or `dir="auto"` for unknown plaintext identity and scalar
+  metadata values. Price isolates its formatted values with `bdi`.
+- Links inside rich content retain their native visible focus and keyboard
+  behavior. Product Info itself adds no interaction or motion.
+- Do not rely on color alone for price, availability, inventory, or status.
 
 ## References
 
 ### Dependencies
 
-This component uses:
+This component requires:
 
 - [Price](/components/price)
+
+Adjacent components such as Breadcrumb, Rating, Variant Selector, and Product
+Form belong to the owning product-page or quick-view composition.
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`.product-info`</td><td>class</td><td>—</td><td>Base product info styles</td></tr>
-  <tr><td>`.product-info__vendor`</td><td>class</td><td>—</td><td>Vendor or brand line</td></tr>
-  <tr><td>`.product-info__title`</td><td>class</td><td>—</td><td>Product title</td></tr>
-  <tr><td>`.product-info__subtitle`</td><td>class</td><td>—</td><td>Editorial subtitle or edition note</td></tr>
-  <tr><td>`.product-info__description`</td><td>class</td><td>—</td><td>Product description text</td></tr>
-  <tr><td>`.product-info__meta`</td><td>class</td><td>—</td><td>Product metadata description list</td></tr>
+  <tr><td>`.product-info`</td><td>class</td><td>—</td><td>Passive root; target chooses its semantic element</td></tr>
+  <tr><td>`.product-info__identity`</td><td>required part</td><td>—</td><td>Vendor, title, and subtitle cluster</td></tr>
+  <tr><td>`.product-info__vendor`</td><td>optional content</td><td>—</td><td>Vendor or brand line</td></tr>
+  <tr><td>`.product-info__title`</td><td>required content</td><td>—</td><td>Non-empty contextual native heading</td></tr>
+  <tr><td>`.product-info__subtitle`</td><td>optional content</td><td>—</td><td>Editorial subtitle or edition note</td></tr>
+  <tr><td>`.product-info__price`</td><td>required slot</td><td>—</td><td>Wrapper containing one canonical target-formatted Price dependency</td></tr>
+  <tr><td>`.product-info__description`</td><td>optional slot</td><td>—</td><td>Target-owned semantic rich description</td></tr>
+  <tr><td>`.product-info__meta`</td><td>optional slot</td><td>—</td><td>Native metadata description list</td></tr>
+  <tr><td>`.product-info__meta > div`</td><td>group</td><td>—</td><td>One complete `dt`/`dd` name-value association</td></tr>
+  <tr><td>`data-product-info-projection`</td><td>target diagnostic</td><td>`product`</td><td>Records product-level or exact selected-variant target content; it is not a configurable neutral property</td></tr>
 </PropTable>

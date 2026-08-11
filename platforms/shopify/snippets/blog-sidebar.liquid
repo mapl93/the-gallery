@@ -1,0 +1,135 @@
+{% doc %}
+Renders the initial Shopify Blog Sidebar profile from one explicit blog.
+
+The host owns placement, heading rank, module order, limits, localization and
+whether this complementary region is truthful in the surrounding document.
+Search and Newsletter are separate compositions and are never enabled here.
+
+@param {blog} blog - Required Shopify blog source.
+@param {string} label - Required localized accessible name for the aside.
+@param {string} heading_tag - Required contextual h1-h6 element for module headings.
+@param {string} recent_title - Required localized heading when Recent Articles renders.
+@param {string} topics_title - Required localized heading when Topics renders.
+@param {article} [current_article] - Optional article excluded from Recent Articles.
+@param {boolean} [show_recent_articles] - Whether the available Recent Articles module renders; defaults true.
+@param {boolean} [show_topics] - Whether the available Topics module renders; defaults true.
+@param {number} [recent_limit] - Target-owned visible article limit from 1 through 12; defaults 3.
+@param {number} [topics_limit] - Target-owned visible topic limit from 1 through 24; defaults 8.
+@param {string} [module_order] - recent-first or topics-first; defaults recent-first.
+@param {string} [class] - Optional target-owned additional root class.
+
+@example
+{% render 'blog-sidebar', blog: blog, label: 'More from the journal', heading_tag: 'h2', recent_title: 'Recent articles', topics_title: 'Topics', current_article: article %}
+{% enddoc %}
+
+{%- liquid
+  assign sidebar_heading_tag = heading_tag | downcase
+  assign sidebar_allowed_heading_tags = 'h1,h2,h3,h4,h5,h6' | split: ','
+  unless sidebar_allowed_heading_tags contains sidebar_heading_tag
+    assign sidebar_heading_tag = ''
+  endunless
+
+  assign sidebar_show_recent = true
+  assign sidebar_show_topics = true
+  if show_recent_articles == false
+    assign sidebar_show_recent = false
+  endif
+  if show_topics == false
+    assign sidebar_show_topics = false
+  endif
+
+  assign sidebar_recent_limit = recent_limit | default: 3 | plus: 0
+  if sidebar_recent_limit < 1
+    assign sidebar_recent_limit = 1
+  elsif sidebar_recent_limit > 12
+    assign sidebar_recent_limit = 12
+  endif
+
+  assign sidebar_topics_limit = topics_limit | default: 8 | plus: 0
+  if sidebar_topics_limit < 1
+    assign sidebar_topics_limit = 1
+  elsif sidebar_topics_limit > 24
+    assign sidebar_topics_limit = 24
+  endif
+
+  assign sidebar_has_recent = false
+  if sidebar_show_recent and recent_title != blank and blog.articles_count > 0
+    assign sidebar_has_recent = true
+    if current_article != blank and blog.articles_count == 1 and blog.articles.first.id == current_article.id
+      assign sidebar_has_recent = false
+    endif
+  endif
+
+  assign sidebar_has_topics = false
+  if sidebar_show_topics and topics_title != blank and blog.all_tags.size > 0
+    assign sidebar_has_topics = true
+  endif
+
+  assign sidebar_modules = 'recent,topics' | split: ','
+  if module_order == 'topics-first'
+    assign sidebar_modules = 'topics,recent' | split: ','
+  endif
+
+  assign sidebar_class = 'blog-sidebar'
+  if class != blank
+    assign sidebar_class = sidebar_class | append: ' ' | append: class
+  endif
+
+  assign sidebar_can_render = false
+  if blog != blank and label != blank and sidebar_heading_tag != blank
+    if sidebar_has_recent or sidebar_has_topics
+      assign sidebar_can_render = true
+    endif
+  endif
+-%}
+
+{%- if sidebar_can_render -%}
+  <aside class="{{ sidebar_class | escape }}" aria-label="{{ label | escape }}">
+    {%- for sidebar_module in sidebar_modules -%}
+      {%- case sidebar_module -%}
+        {%- when 'recent' -%}
+          {%- if sidebar_has_recent -%}
+            <section class="blog-sidebar__section">
+              <{{ sidebar_heading_tag }} class="blog-sidebar__title" dir="auto">{{ recent_title | escape }}</{{ sidebar_heading_tag }}>
+              <ul class="blog-sidebar__list">
+                {%- assign sidebar_rendered_recent = 0 -%}
+                {%- for sidebar_article in blog.articles -%}
+                  {%- if sidebar_rendered_recent >= sidebar_recent_limit -%}
+                    {%- break -%}
+                  {%- endif -%}
+                  {%- if current_article == blank or sidebar_article.id != current_article.id -%}
+                    <li class="blog-sidebar__list-item">
+                      <a class="link link--subtle blog-sidebar__link" href="{{ sidebar_article.url | escape }}" dir="auto">
+                        {{ sidebar_article.title | escape }}
+                      </a>
+                    </li>
+                    {%- assign sidebar_rendered_recent = sidebar_rendered_recent | plus: 1 -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </section>
+          {%- endif -%}
+        {%- when 'topics' -%}
+          {%- if sidebar_has_topics -%}
+            <section class="blog-sidebar__section">
+              <{{ sidebar_heading_tag }} class="blog-sidebar__title" dir="auto">{{ topics_title | escape }}</{{ sidebar_heading_tag }}>
+              <ul class="blog-sidebar__topics tag-cloud">
+                {%- for sidebar_topic in blog.all_tags limit: sidebar_topics_limit -%}
+                  {%- assign sidebar_topic_handle = sidebar_topic | handle -%}
+                  <li class="blog-sidebar__topic tag-cloud__entry">
+                    <a
+                      class="link link--subtle blog-sidebar__topic-link tag-cloud__item"
+                      href="{{ blog.url | append: '/tagged/' | append: sidebar_topic_handle | escape }}"
+                      dir="auto"
+                    >
+                      {{ sidebar_topic | escape }}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </section>
+          {%- endif -%}
+      {%- endcase -%}
+    {%- endfor -%}
+  </aside>
+{%- endif -%}

@@ -2,11 +2,11 @@
 
 Header is the global site masthead. It combines required brand content and destination with optional primary navigation, target-owned actions, cart count, and a Button-composed mobile-menu trigger.
 
-<Preview html={'<header class="header tg-preview-static"><a class="header__logo" href="#header-home">The Gallery</a><nav class="header__nav" aria-label="Primary navigation"><a class="header__nav-link" href="#header-shop" aria-current="page">Shop</a><a class="header__nav-link" href="#header-artists">Artists</a><a class="header__nav-link" href="#header-about">About</a></nav><div class="header__actions"><a class="btn btn--outline btn--sm" href="#header-search">Search</a><a class="btn btn--sm" href="#header-cart">Cart<span class="header__cart-count" aria-label="2 items in cart">2</span></a></div></header>'} label="Header" />
+<Preview html={'<header class="header tg-preview-static"><a class="header__logo" href="#header-home">The Gallery</a><nav class="header__nav" aria-label="Primary"><a class="header__nav-link" href="#header-shop" aria-current="page">Shop</a><a class="header__nav-link" href="#header-artists">Artists</a><a class="header__nav-link" href="#header-about">About</a></nav><div class="header__actions"><a class="btn btn--outline btn--sm header__action" href="#header-search">Search</a><a class="btn btn--sm header__action" href="#header-cart" aria-label="Cart, 2 items">Cart<span class="header__cart-count" aria-hidden="true">2</span></a></div></header>'} label="Header" />
 
 ## Presentation
 
-The root owns the sticky horizontal composition and responsive containment. The optional primary navigation is hidden at the canonical mobile breakpoint; a consuming target may supply `mobileMenuTrigger` through `.header__hamburger` when it also provides the corresponding Mobile Menu or Drawer runtime.
+The root owns the sticky horizontal composition and establishes an inline-size container. The optional primary navigation is hidden until the existing 48rem composition threshold fits inside Header itself, not merely inside the viewport. A consuming target may supply `mobileMenuTrigger` through `.header__hamburger` when it also provides the corresponding Mobile Menu or Drawer runtime.
 
 Brand content, destinations, navigation records, actions, and cart state are target data. Header does not decide which global actions exist or connect them to Search Overlay, Cart Drawer, Mobile Menu, Drawer, or Mega Menu.
 
@@ -18,6 +18,7 @@ Brand content, destinations, navigation records, actions, and cart state are tar
 </DoDont>
 
 - Keep the visible action set focused at each breakpoint.
+- Compose actions from canonical Button or native Link implementations and add `.header__action` only as the Header positioning hook.
 - Supply `cartCount` only when a target can keep it synchronized with cart state.
 - Use the Button dependency for an optional mobile-menu trigger without making its fixture content a Header default.
 
@@ -28,6 +29,8 @@ Brand content, destinations, navigation records, actions, and cart state are tar
 - Ensure the brand link has an accessible name; use `logoLabel` only when visible brand content is insufficient.
 - A target-connected mobile-menu trigger must synchronize `aria-expanded` and `aria-controls` with the controlled surface.
 - Announce meaningful cart-count changes according to the target's live-region policy rather than relying on the badge alone.
+- A top-level `<header>` already exposes the banner landmark; do not add a redundant `role="banner"`. Nested Header previews are not page banners.
+- Sticky targets must preserve focused and fragment-linked content below the occupied header; scroll offset policy belongs to the page shell.
 
 ## References
 
@@ -42,6 +45,6 @@ Brand content, destinations, navigation records, actions, and cart state are tar
   <tr><td>`mobileMenuTrigger`</td><td>slot</td><td>optional</td><td>Button dependency connected by the target runtime</td></tr>
 </PropTable>
 
-Anatomy: `.header`, `.header__logo`, optional `.header__nav` and `.header__nav-link`, optional `.header__actions`, optional `.header__cart-count`, and optional `.header__hamburger`.
+Anatomy: `.header`, `.header__logo`, optional `.header__nav` and `.header__nav-link`, optional `.header__actions` and `.header__action`, optional `.header__cart-count`, and optional `.header__hamburger`.
 
-Dependency: [Button](/components/button). Trigger coordination and navigation data remain open target boundaries.
+Dependency: [Button](/components/button). Trigger coordination, action priority, navigation disclosure behavior, scroll offset, and navigation data remain open target boundaries.

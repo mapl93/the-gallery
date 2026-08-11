@@ -1,53 +1,100 @@
-<section class="testimonials">
-  <h2 class="testimonials__title">{{ section.settings.title | default: 'What Collectors Say' }}</h2>
-  <div class="testimonials__grid">
-    {% for block in section.blocks %}
-      <div class="testimonial" {{ block.shopify_attributes }}>
-        <p class="testimonial__quote">{{ block.settings.quote }}</p>
-        <div class="testimonial__author">
-          {% if block.settings.avatar %}
-            <div class="avatar">
-              {{ block.settings.avatar | image_url: width: 96 | image_tag:
-                 alt: block.settings.name, loading: 'lazy' }}
-            </div>
-          {% endif %}
-          <div>
-            <p class="testimonial__name">{{ block.settings.name }}</p>
-            {% if block.settings.detail %}
-              <p class="testimonial__detail">{{ block.settings.detail }}</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-</section>
+{%- liquid
+  assign testimonials_title = section.settings.title | strip
+  assign title_id = 'TestimonialsTitle-' | append: section.id
+  assign valid_testimonial_count = 0
+
+  for block in section.blocks
+    assign testimonial_quote = block.settings.quote | strip
+    assign testimonial_name = block.settings.name | strip
+    if testimonial_quote != blank and testimonial_name != blank
+      assign valid_testimonial_count = valid_testimonial_count | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if valid_testimonial_count > 0 -%}
+  {%- if testimonials_title != blank -%}
+    <section class="testimonials" aria-labelledby="{{ title_id }}">
+      <h2 class="testimonials__title" id="{{ title_id }}">{{ testimonials_title | escape }}</h2>
+  {%- else -%}
+    <div class="testimonials">
+  {%- endif -%}
+
+    <ul class="testimonials__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign testimonial_quote = block.settings.quote | strip
+          assign testimonial_name = block.settings.name | strip
+          assign testimonial_detail = block.settings.detail | strip
+        -%}
+        {%- if testimonial_quote != blank and testimonial_name != blank -%}
+          <li class="testimonials__item" {{ block.shopify_attributes }}>
+            <figure class="testimonial">
+              <span class="testimonial__mark" aria-hidden="true">“</span>
+              <blockquote class="testimonial__quote">
+                <p>{{ testimonial_quote | escape }}</p>
+              </blockquote>
+              <figcaption class="testimonial__author">
+                {%- if block.settings.avatar -%}
+                  <span class="avatar">
+                    {{- block.settings.avatar | image_url: width: 96 | image_tag:
+                      alt: '',
+                      loading: 'lazy'
+                    -}}
+                  </span>
+                {%- endif -%}
+                <span class="testimonial__identity">
+                  <span class="testimonial__name">{{ testimonial_name | escape }}</span>
+                  {%- if testimonial_detail != blank -%}
+                    <span class="testimonial__detail">{{ testimonial_detail | escape }}</span>
+                  {%- endif -%}
+                </span>
+              </figcaption>
+            </figure>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+
+  {%- if testimonials_title != blank -%}
+    </section>
+  {%- else -%}
+    </div>
+  {%- endif -%}
+{%- endif -%}
 
 {% schema %}
 {
-  "name": "Testimonials",
+  "name": "t:sections.testimonials.name",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "What Collectors Say" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.testimonials.settings.title",
+      "default": "Collector notes"
+    }
   ],
   "blocks": [
     {
       "type": "testimonial",
-      "name": "Testimonial",
+      "name": "t:sections.testimonials.blocks.testimonial.name",
       "settings": [
-        { "type": "textarea", "id": "quote", "label": "Quote" },
-        { "type": "text", "id": "name", "label": "Author name" },
-        { "type": "text", "id": "detail", "label": "Detail (e.g. location)" },
-        { "type": "image_picker", "id": "avatar", "label": "Avatar" }
+        { "type": "textarea", "id": "quote", "label": "t:sections.testimonials.blocks.testimonial.settings.quote" },
+        { "type": "text", "id": "name", "label": "t:sections.testimonials.blocks.testimonial.settings.name" },
+        { "type": "text", "id": "detail", "label": "t:sections.testimonials.blocks.testimonial.settings.detail" },
+        { "type": "image_picker", "id": "avatar", "label": "t:sections.testimonials.blocks.testimonial.settings.avatar" }
       ]
     }
   ],
-  "presets": [{
-    "name": "Testimonials",
-    "blocks": [
-      { "type": "testimonial", "settings": { "quote": "The craftsmanship is extraordinary.", "name": "Sarah M." } },
-      { "type": "testimonial", "settings": { "quote": "Each piece feels like it has a soul.", "name": "James K." } },
-      { "type": "testimonial", "settings": { "quote": "A true gallery experience.", "name": "Ana L." } }
-    ]
-  }]
+  "presets": [
+    {
+      "name": "t:sections.testimonials.name",
+      "blocks": [
+        { "type": "testimonial", "settings": { "quote": "The craftsmanship is extraordinary.", "name": "Sarah M." } },
+        { "type": "testimonial", "settings": { "quote": "Each piece feels considered and distinctly made.", "name": "James K." } },
+        { "type": "testimonial", "settings": { "quote": "A quiet gallery experience at home.", "name": "Ana L." } }
+      ]
+    }
+  ]
 }
 {% endschema %}

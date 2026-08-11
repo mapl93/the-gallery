@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "faq-section",
   "name": "FAQ Section",
   "registryId": "S9",
   "category": "sections",
   "status": "pilot",
-  "summary": "Centered FAQ section shell that composes Accordion-owned question and answer items.",
+  "summary": "Container-responsive contextual wrapper that composes one required canonical Accordion without duplicating disclosure state or behavior.",
   "dependencies": [
     "accordion"
   ],
@@ -24,28 +24,42 @@
       "selector": ".faq-section",
       "className": ".faq-section",
       "required": true,
-      "description": "FAQ section root and Accordion composition surface."
+      "description": "FAQ context root rendered as a title-labelled native section when titled and as a generic grouping when untitled."
     },
     {
       "name": "header",
       "selector": ".faq-section__header",
       "className": ".faq-section__header",
       "required": false,
-      "description": "Optional centered heading region."
+      "description": "Optional introduction present only when a title or subtitle is supplied."
     },
     {
       "name": "title",
       "selector": ".faq-section__title",
       "className": ".faq-section__title",
       "required": false,
-      "description": "Optional FAQ section heading."
+      "description": "Optional non-empty visible contextual heading whose target-unique id names the native section."
     },
     {
       "name": "subtitle",
       "selector": ".faq-section__subtitle",
       "className": ".faq-section__subtitle",
       "required": false,
-      "description": "Optional supporting context."
+      "description": "Optional supporting context that never substitutes for a visible section title."
+    },
+    {
+      "name": "accordionList",
+      "selector": ".faq-section__list",
+      "className": ".faq-section__list",
+      "required": true,
+      "description": "Required contextual hook on the complete canonical Accordion composition."
+    },
+    {
+      "name": "item",
+      "selector": ".faq-section__item",
+      "className": ".faq-section__item",
+      "required": true,
+      "description": "Repeatable ordered FAQ item that also preserves complete canonical Accordion item anatomy."
     }
   ],
   "variants": [
@@ -53,7 +67,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "One centered optional introduction followed by one ordered canonical Accordion."
     }
   ],
   "sizes": [
@@ -61,7 +75,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "One intrinsic size whose maximum measures and container-relative padding curve remain private composition."
     }
   ],
   "states": [
@@ -70,16 +84,91 @@
       "selectors": [
         ".faq-section"
       ],
-      "description": "Resting FAQ section presentation; item expansion states belong to Accordion."
+      "description": "Complete FAQ context with one or more ordered items; item states remain canonical Accordion states."
     }
   ],
   "behavior": [
     {
+      "name": "requiredComposition",
+      "selectors": [
+        ".faq-section",
+        ".faq-section__list",
+        ".faq-section__item"
+      ],
+      "description": "Targets omit the complete wrapper when the ordered item composition is absent, empty, or contains no valid items."
+    },
+    {
+      "name": "conditionalSectionSemantics",
+      "selectors": [
+        ".faq-section",
+        ".faq-section__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty visible title creates and names a native thematic section; an untitled wrapper is a generic div and subtitle text alone does not create a section landmark."
+    },
+    {
       "name": "accordionComposition",
+      "selectors": [
+        ".faq-section__list",
+        ".faq-section__item",
+        ".accordion",
+        ".accordion__item",
+        ".accordion__heading",
+        ".accordion__trigger",
+        ".accordion__panel",
+        ".accordion__content"
+      ],
+      "description": "FAQ Section consumes canonical Accordion anatomy, trigger/panel relationships, hidden state, disabled state, focus, keyboard activation, indicator and content flow without recreating them."
+    },
+    {
+      "name": "targetOwnedGroupPolicy",
+      "selectors": [
+        ".faq-section__list"
+      ],
+      "events": [
+        "expandedChange"
+      ],
+      "description": "Single, multiple, exact-exclusive, collapsible, required-open, initial and controlled/uncontrolled policies belong to the Accordion consumer or target rather than FAQ Section."
+    },
+    {
+      "name": "optionalPanelRegions",
+      "selectors": [
+        ".faq-section__list"
+      ],
+      "attributes": [
+        "role=\"region\"",
+        "aria-labelledby"
+      ],
+      "description": "Panels do not receive region semantics by default; targets opt in only for structurally significant panels without creating landmark proliferation."
+    },
+    {
+      "name": "essentialInformation",
+      "selectors": [
+        ".faq-section__list"
+      ],
+      "description": "Information every user must read to complete a critical task remains visible outside collapsed FAQ answers and nested accordions are unsupported."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".faq-section",
+        ".faq-section__header",
+        ".faq-section__title",
+        ".faq-section__subtitle",
+        ".faq-section__list",
+        ".faq-section__item"
+      ],
+      "description": "Short, long, empty, localized, RTL and unbroken content remains contained through logical, component-width-aware composition without viewport- or Studio-owned layout rules."
+    },
+    {
+      "name": "passiveWrapperRuntime",
       "selectors": [
         ".faq-section"
       ],
-      "description": "Question items compose Accordion and preserve Accordion-owned trigger semantics, expanded state, keyboard behavior, panel relationships, and focus treatment."
+      "description": "FAQ Section itself owns no state, event, listener, observer, request, timer, layout read, asset, custom element, animation or neutral runtime."
     }
   ],
   "properties": [
@@ -87,77 +176,128 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible FAQ section heading.",
+      "unsetBehavior": "Render no title; use a generic root instead of an unnamed native section.",
+      "description": "Optional non-empty visible contextual heading; targets choose the contextual heading rank and unique id.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".faq-section__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".faq-section__title"
+          }
+        ]
       }
     },
     {
       "name": "subtitle",
       "type": "string",
       "required": false,
-      "description": "Optional supporting FAQ context.",
+      "unsetBehavior": "Omit the subtitle without leaving an empty node or rhythm.",
+      "description": "Optional supporting FAQ context that never replaces the visible title as a section name.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".faq-section__subtitle" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".faq-section__subtitle"
+          }
+        ]
       }
     },
     {
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered Accordion composition rendered after the optional header.",
+      "unsetBehavior": "Omit the complete FAQ Section when no valid canonical Accordion items are supplied.",
+      "description": "Required non-empty ordered canonical Accordion composition rendered after the optional introduction.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".faq-section", "classNames": [".faq-section"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".faq-section__list",
+            "classNames": [
+              ".faq-section__list",
+              ".faq-section__item",
+              ".accordion",
+              ".accordion__item",
+              ".accordion__heading",
+              ".accordion__trigger",
+              ".accordion__panel",
+              ".accordion__content"
+            ]
+          }
+        ]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
+        "--color-border-focus",
+        "--color-border-subtle",
+        "--color-surface-primary",
+        "--color-surface-secondary",
         "--color-text-primary",
         "--color-text-secondary"
       ],
+      "radius": [
+        "--radius-md"
+      ],
+      "transition": [
+        "--transition-fast"
+      ],
+      "easing": [
+        "--easing-default"
+      ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-body-default-weight",
+        "--tg-typography-h2-weight",
+        "--typo-body-line-height",
         "--typo-body-size",
+        "--typo-h2-line-height",
         "--typo-h2-size"
       ],
       "spacing": [
         "--space-layout-container",
-        "--space-layout-section-gap"
+        "--space-layout-element-gap",
+        "--space-layout-section-gap",
+        "--space-layout-touch-target"
       ]
     }
   },
   "accessibility": [
-    "Use a contextual heading level and associate the section with its visible title when present.",
-    "Compose Accordion without duplicating its button, aria-expanded, aria-controls, panel relationship, keyboard, and focus obligations.",
-    "Question and answer source order remains meaningful when scripting is absent."
+    "Omit the component without valid items; use a title-labelled native section only when a non-empty visible contextual title exists and otherwise use a generic root.",
+    "Compose canonical Accordion headings, native triggers, expanded/disabled state, stable relationships, hidden panels, keyboard activation, focus and content semantics without duplication.",
+    "Do not give every answer a region landmark by default; opt in only when a panel is structurally significant and landmark count remains useful.",
+    "Keep information required for a critical task visible outside collapsed answers and do not nest accordions.",
+    "Preserve ordered question/answer source order, localized and RTL content, visible focus, text/border/focus contrast, forced-color semantics and reduced-motion behavior."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "component-composition",
+      "notes": "Conditional section semantics and container-responsive S9 CSS compose canonical Accordion; the consumer owns group state and panel-region policy."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Localized merchant section maps valid ordered blocks to native details/summary with canonical Accordion classes, theme-editor attributes and no target script."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-composition"
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-composition"
     },
     "swiftui": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-composition"
     },
     "compose": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-composition"
     }
   }
 }

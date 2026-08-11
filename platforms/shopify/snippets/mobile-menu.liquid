@@ -1,28 +1,36 @@
 {%- comment -%}
   Snippet: mobile-menu
-  Usage: {% render 'mobile-menu' %}
+  Usage: {% render 'mobile-menu', menu: linklists['main-menu'] %}
 {%- endcomment -%}
 
-<div class="drawer-overlay" data-mobile-menu-overlay>
-  <div class="drawer drawer--left" data-mobile-menu aria-label="Mobile navigation">
-    <div class="drawer__header">
-      <span class="header__logo">{{ shop.name }}</span>
-      <button class="btn btn--outline btn--icon-only"
-              aria-label="Close menu" data-mobile-menu-close>
-        {% render 'icon', name: 'x' %}
-      </button>
-    </div>
-    <nav class="drawer__body">
-      <ul class="mobile-nav">
-        {% for link in linklists['main-menu'].links %}
-          <li class="mobile-nav__item">
-            <a class="mobile-nav__link" href="{{ link.url }}"
-               {% if link.active %}aria-current="page"{% endif %}>
-              {{ link.title }}
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    </nav>
+{%- assign mobile_menu = menu | default: linklists['main-menu'] -%}
+<div class="drawer-overlay" data-mobile-menu-overlay aria-hidden="true"></div>
+<aside class="drawer drawer--left"
+       id="mobile-menu"
+       role="dialog"
+       aria-modal="true"
+       aria-hidden="true"
+       aria-labelledby="mobile-menu-title"
+       data-mobile-menu>
+  <div class="drawer__header">
+    <h2 class="drawer__title" id="mobile-menu-title">{{ 'accessibility.menu' | t }}</h2>
+    <button class="close-btn drawer__close"
+            type="button"
+            aria-label="{{ 'accessibility.close' | t }} {{ 'accessibility.menu' | t | downcase }}"
+            data-mobile-menu-close>
+      {% render 'icon', name: 'x' %}
+    </button>
   </div>
-</div>
+  <nav class="drawer__body" aria-label="{{ 'accessibility.navigation' | t }}">
+    <ul class="mobile-nav">
+      {% for link in mobile_menu.links %}
+        <li class="mobile-nav__item">
+          <a class="mobile-nav__link" href="{{ link.url }}"
+             {% if link.active %}aria-current="page"{% endif %}>
+            {{ link.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</aside>

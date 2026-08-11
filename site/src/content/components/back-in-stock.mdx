@@ -1,49 +1,52 @@
 ## Overview
 
-Email signup form for an out-of-stock product notification. It keeps the email field, validation feedback, submit action, and submitted confirmation within one semantic component.
+Back in Stock is an unavailable-product notification profile. It provides a concise product context and one native form composed from canonical Input and Button; the consuming target owns the requested product or variant, provider, consent, request, and confirmed result.
 
-<Preview html={"<div class=\"back-in-stock\"><h4 class=\"back-in-stock__heading\">Notify me when available</h4><p class=\"back-in-stock__text\">Enter your email and we'll let you know when this item is back.</p><form class=\"back-in-stock__form\"><div class=\"back-in-stock__field\"><label class=\"back-in-stock__label\" for=\"back-in-stock-email\">Email address</label><div class=\"back-in-stock__control\"><input class=\"back-in-stock__input\" id=\"back-in-stock-email\" type=\"email\" placeholder=\"name@example.com\" aria-describedby=\"back-in-stock-message\" required /><svg class=\"back-in-stock__indicator\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect width=\"18\" height=\"14\" x=\"3\" y=\"5\" rx=\"2\"/><path d=\"m3 7 9 6 9-6\"/></svg></div><p class=\"back-in-stock__message\" id=\"back-in-stock-message\">We only use this address for availability updates.</p></div><button class=\"back-in-stock__submit\" type=\"submit\">Notify me</button></form><p class=\"back-in-stock__success\" role=\"status\">You're on the list.</p></div>"} label="Back in Stock Alert" />
+<Preview html={'<div class="back-in-stock tg-preview-frame--md" data-state="idle"><h2 class="back-in-stock__heading" id="back-in-stock-preview-title">Join the waitlist</h2><p class="back-in-stock__text">We will email you if this selected piece becomes purchasable in your current market.</p><form class="back-in-stock__form" action="/target-notification-endpoint" method="post" aria-labelledby="back-in-stock-preview-title"><div class="input"><label class="input__label" for="back-in-stock-preview-email">Email address</label><div class="input__control"><input class="input__field back-in-stock__input" id="back-in-stock-preview-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" aria-describedby="back-in-stock-preview-email-message" required /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div><span class="input__message" id="back-in-stock-preview-email-message">Availability notification only; marketing consent is separate.</span></div><input type="hidden" name="variant" value="target-selected-variant" /><input type="hidden" name="market" value="target-current-market" /><button class="btn back-in-stock__submit" type="submit">Notify me</button></form></div>'} label="Back in Stock Alert" />
 
 ## Presentation
 
-The field follows the shared value-entry language. `default`, `error`, `success`, and `warning` alter the label, border, indicator, focus ring, and message as a single validation family. The submitted state replaces the form with a concise live confirmation.
+D8 owns the framed context, heading, supporting copy, intrinsic form layout, and the `idle`, `submitting`, `confirmed`, and `retryableError` request presentations. The email field is the complete canonical Input, including its visible label, associated message, passive icon, native value, and Default/Error/Success/Warning validation families. The submitter is the canonical primary Button, including disabled, focus, busy, and reduced-motion behavior.
+
+At wider component widths the field and action share one row. The component stacks them from its own inline capacity, not from the browser viewport. Validation messages may change independently without turning a valid email into a confirmed provider registration. A target drives request state only after binding the form to the exact selected variant and current market.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use one clear promise about what notification the customer will receive.</Do>
-  <Dont>Do not hide delivery expectations or reuse the address for unrelated marketing without consent.</Dont>
+  <Do>State exactly which availability notification the customer is requesting and wait for the provider response before confirming it.</Do>
+  <Dont>Do not equate a native submit event with success or reuse the address for unrelated marketing without the required consent.</Dont>
 </DoDont>
 
-- Keep the message short enough to remain attached visually to the field.
-- Use the warning state for recoverable attention, error for invalid input, and success only after validation.
-- Keep the submit label specific to the notification action.
+- Render the profile only when the target has an unambiguous selected variant, current market and valid notification service.
+- Use `type="email"`, a stable target field name, `autocomplete="email"`, a visible label, and native `required` when the email is mandatory.
+- Supply the exact selected variant and current market through target-owned form/model data; the class contract does not standardize provider field names.
+- Set `requestState=submitting` only while registration is in flight, `confirmed` only after provider acceptance, and `retryableError` when the customer may correct or retry.
+- Keep field validation separate from provider feedback. A syntactically valid email is not proof that a request was stored.
+- Keep the form present. Submitting and confirmed make its email read-only and prevent resubmission; retryable error keeps it editable and available.
+- Treat availability-only consent separately from marketing consent. The integration owns notice, verification, duplicate, abuse, retention, expiry, delivery and unsubscribe policy.
 
 ## Accessibility
 
-- Connect the visible label and helper message to the email input.
-- Announce submitted and validation feedback through an appropriate live region.
-- Preserve the field while correcting an error; only replace it after successful submission.
-- Do not use the indicator icon as the only carrier of validation meaning.
+- Name the native form from the visible heading and keep the heading rank contextual to its host page.
+- Preserve canonical Input label/message relationships and use `aria-invalid="true"` only for an error.
+- Preserve Input-then-Button source, reading, and keyboard order when the container stacks or changes direction.
+- Use canonical Button busy semantics during a real request; keep its visible label and block repeat activation. Confirmed also blocks resubmission without removing the focused context.
+- Insert or update truthful form-level feedback only when a target result exists. Use status semantics for non-blocking confirmed results and appropriate alert, summary, or focus treatment for blocking errors.
+- Do not pre-render a hidden success message, announce successful registration before provider confirmation, or treat the notification request as marketing consent.
 
 ## References
 
+The base contract intentionally stops before provider and commerce policy. It has one visual variant and one intrinsic size; Input owns field variants and Button owns action states.
+
 <PropTable>
-  <tr><td>`heading`</td><td>string</td><td>required</td><td>Notification heading</td></tr>
-  <tr><td>`description`</td><td>string</td><td>required</td><td>Expectation-setting copy</td></tr>
-  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible email label</td></tr>
-  <tr><td>`value`</td><td>string</td><td>empty</td><td>Current email value</td></tr>
-  <tr><td>`placeholder`</td><td>string</td><td>optional</td><td>Example email value</td></tr>
-  <tr><td>`message`</td><td>string</td><td>optional</td><td>Helper or validation message</td></tr>
-  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
-  <tr><td>`indicator`</td><td>slot</td><td>optional</td><td>Decorative field indicator</td></tr>
-  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required state</td></tr>
-  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the email and submit controls</td></tr>
-  <tr><td>`submitLabel`</td><td>string</td><td>required</td><td>Submit action label</td></tr>
-  <tr><td>`submitted`</td><td>boolean</td><td>`false`</td><td>Shows the submitted confirmation</td></tr>
-  <tr><td>`successMessage`</td><td>string</td><td>required when submitted</td><td>Submitted confirmation copy</td></tr>
-  <tr><td>`.back-in-stock--error`</td><td>class</td><td>optional</td><td>Error validation family</td></tr>
-  <tr><td>`.back-in-stock--success`</td><td>class</td><td>optional</td><td>Success validation family</td></tr>
-  <tr><td>`.back-in-stock--warning`</td><td>class</td><td>optional</td><td>Warning validation family</td></tr>
-  <tr><td>`.back-in-stock.is-submitted`</td><td>state</td><td>optional</td><td>Submitted state</td></tr>
+  <tr><td>`heading`</td><td>string</td><td>required</td><td>Visible contextual heading and form name source</td></tr>
+  <tr><td>`description`</td><td>string</td><td>optional</td><td>Notification promise or expectation-setting copy</td></tr>
+  <tr><td>`form`</td><td>slot</td><td>required</td><td>Native target form composed from canonical Input and Button</td></tr>
+  <tr><td>`requestState`</td><td>enum</td><td>`idle`</td><td>`idle | submitting | confirmed | retryableError` presentation driven by the target result</td></tr>
+  <tr><td>`feedback`</td><td>slot</td><td>optional</td><td>Truthful target-owned form-level response</td></tr>
+  <tr><td>`.back-in-stock__input`</td><td>class</td><td>required</td><td>D8 sizing hook on canonical `.input__field`</td></tr>
+  <tr><td>`.back-in-stock__submit`</td><td>class</td><td>required</td><td>D8 layout hook on canonical `.btn` submitter</td></tr>
+  <tr><td>`.back-in-stock__status`</td><td>class</td><td>optional</td><td>Target-owned feedback placement</td></tr>
 </PropTable>
+
+Configure the email label, value/default value, name, placeholder, autocomplete, required state, validation family, associated message, and passive icons through Input. Configure the action label through Button or the target form composition. Provider endpoint, selected-variant/current-market encoding, consent, inventory observation, persistence, delivery, and result truth are adapter responsibilities.

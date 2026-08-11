@@ -1,37 +1,78 @@
 ## Overview
 
-Countdown presents repeated time values and units in Default, Inline, or Cards treatments. Runtime calculation and expiration behavior are not defined by the source component.
+Countdown calculates real remaining time toward one absolute future deadline. It owns clock projection, drift-safe scheduling, localization, the `running | expired` transition, retained zero values, and one optional expiry announcement. It does not decide whether the deadline represents a launch, offer, reservation, or any other domain event.
 
 ## Presentation
 
-<Preview html={'<div class="countdown countdown--cards" role="timer" aria-label="2 days, 14 hours, and 38 minutes remaining"><div class="countdown__segment" aria-hidden="true"><span class="countdown__number">02</span><span class="countdown__label">Days</span></div><span class="countdown__separator" aria-hidden="true">:</span><div class="countdown__segment" aria-hidden="true"><span class="countdown__number">14</span><span class="countdown__label">Hours</span></div><span class="countdown__separator" aria-hidden="true">:</span><div class="countdown__segment" aria-hidden="true"><span class="countdown__number">38</span><span class="countdown__label">Minutes</span></div></div>'} label="Countdown Timer" />
+<Preview html={'<time class="countdown countdown--cards" datetime="2030-12-31T23:59:59Z" data-countdown data-countdown-units="days-hours-minutes-seconds" data-countdown-expired-announcement="Countdown complete"><span class="countdown__fallback">Ends December 31, 2030</span><span class="countdown__display" aria-hidden="true" hidden><span class="countdown__item" data-countdown-unit="days"><span class="countdown__separator" aria-hidden="true" hidden>:</span><span class="countdown__segment"><span class="countdown__number">00</span><span class="countdown__label">Days</span></span></span><span class="countdown__item" data-countdown-unit="hours"><span class="countdown__separator" aria-hidden="true" hidden>:</span><span class="countdown__segment"><span class="countdown__number">00</span><span class="countdown__label">Hours</span></span></span><span class="countdown__item" data-countdown-unit="minutes"><span class="countdown__separator" aria-hidden="true" hidden>:</span><span class="countdown__segment"><span class="countdown__number">00</span><span class="countdown__label">Minutes</span></span></span><span class="countdown__item" data-countdown-unit="seconds"><span class="countdown__separator" aria-hidden="true" hidden>:</span><span class="countdown__segment"><span class="countdown__number">00</span><span class="countdown__label">Seconds</span></span></span></span><span class="countdown__announcement" aria-live="polite" aria-atomic="true"></span></time>'} label="Deadline-driven Countdown" />
 
-Default uses `.countdown`; Inline adds `.countdown--inline` for compact value-and-unit rows; Cards adds `.countdown--cards` for padded segment surfaces. Optional separators remain visual content between repeated segments.
+Default leaves segments open, Inline (`.countdown--inline`) compacts each value/unit pair for banners, and Cards gives every unit its own surface. All treatments wrap intrinsically; they do not hide units or shrink text based on the viewport.
 
-## Usage Guidelines
+## Guidelines
 
 <DoDont>
-  <Do>Use Countdown only after the consuming target defines a trustworthy deadline and what happens when it expires.</Do>
-  <Dont>Do not infer target time, time zone, tick cadence, clock correction, synchronization, or expiration behavior from the preview.</Dont>
+  <Do>Use a truthful absolute ISO deadline containing `Z` or an explicit numeric UTC offset.</Do>
+  <Do>Choose a stable non-empty unit set. The default is days, hours, minutes, and seconds.</Do>
+  <Do>Listen for `countdownexpire` or read `data-countdown-state` when the target needs to react.</Do>
+  <Dont>Use a floating local date, reset the deadline per visitor, or create artificial scarcity.</Dont>
+  <Dont>Announce every tick or make the timer itself focusable.</Dont>
+  <Dont>Put redirect, price, purchase, replacement, persistence, or analytics policy inside Countdown.</Dont>
 </DoDont>
 
-The displayed values are documentation fixtures, not a running timer or component defaults.
+## Behavior
+
+`theme.js` validates `datetime`, reads the current clock, and recomputes the projection at the next boundary required by the smallest selected unit. Every connected instance shares one timeout. The timeout is removed while the document is hidden, then values are recomputed from the deadline on visibility, page-show, or window-focus recovery.
+
+When the deadline is reached, every selected value remains visible at zero and the root exposes `data-countdown-state="expired"`. A single bubbling `countdownexpire` event reports the normalized deadline and expired state. Consumers can retain the component, hide it, replace it with contextual content, or execute a domain action without turning those reactions into Countdown properties.
+
+An invalid, missing, date-only, or floating deadline never receives `role="timer"`. It shows the ordinary localized fallback text instead.
 
 ## Accessibility
 
-- Associate every value with a visible or programmatic unit label.
-- Expose one concise complete time-remaining phrase when the visual segments would be verbose or ambiguous.
-- Do not announce every tick through a live region.
-- Communicate the accepted expiration behavior before treating the countdown as functional.
+- The runtime adds `role="timer"` only to a genuine updating counter.
+- Visual segments are hidden from assistive technology; one complete locale-formatted remaining-time phrase names the timer.
+- Timer retains its implicit `aria-live="off"`, so seconds are not announced repeatedly.
+- Optional `expiredAnnouncement` content is written to a polite status node only once at the running-to-expired transition.
+- Without JavaScript, the native `<time datetime>` and visible fallback preserve useful deadline information.
 
-## References
+## Anatomy
 
-| Anatomy | Selector | Requirement |
+| Part | Selector | Requirement |
 | --- | --- | --- |
-| Root | `.countdown` | Required segment collection |
-| Segment | `.countdown__segment` | Required repeated time-unit group |
-| Number | `.countdown__number` | Required displayed value |
-| Label | `.countdown__label` | Required visible unit label |
-| Separator | `.countdown__separator` | Optional visual separator |
+| Root | `.countdown` | Required native `<time>` with `datetime` and `data-countdown` |
+| Fallback | `.countdown__fallback` | Required localized static deadline text |
+| Display | `.countdown__display` | Required visual segment collection, hidden before valid enhancement |
+| Item | `.countdown__item` | One stable wrapper per canonical unit |
+| Segment | `.countdown__segment` | Visual value/unit pair |
+| Number | `.countdown__number` | Runtime-owned locale-formatted value |
+| Label | `.countdown__label` | Runtime-owned locale-formatted unit |
+| Separator | `.countdown__separator` | Optional decorative separator |
+| Announcement | `.countdown__announcement` | Optional one-shot polite expiry status |
 
-Dependencies: None.
+## Public API
+
+| Property | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `variant` | `default \| inline \| cards` | `default` | Visual treatment |
+| `deadline` | absolute ISO date-time | required | Authoritative end point with timezone information |
+| `units` | validated ordered preset | all four | Stable subset of days, hours, minutes, and seconds |
+| `fallbackText` | localized string | required | Useful no-script/invalid-deadline statement |
+| `expiredAnnouncement` | localized string | empty | Optional neutral phrase announced once at expiry |
+
+Derived output is deliberately not a configurable input:
+
+- `data-countdown-state="running|expired|invalid"`;
+- one `countdownexpire` event per running-to-expired transition; and
+- current localized values and accessible phrase.
+
+## Target Translation
+
+- Neutral Web uses canonical CSS and the shared progressive enhancer.
+- Shopify can reuse the copied runtime only after a target-native surface supplies a truthful global deadline and placement; no merchant surface is assumed here.
+- React and Angular adapters map deadline and unit props to the same neutral DOM/event contract rather than creating a second calculation model.
+- Figma exposes static Running, Expired, Invalid and presentation examples without claiming a functioning clock.
+- SwiftUI and Compose use native lifecycle scheduling while preserving the same deadline, units, derived state, zero, and expiry-event boundary.
+
+## Human Review
+
+The implementation is prepared for human stability review but remains `pilot`. Review Default, Inline, and Cards geometry; unit typography and separators; wrapping at narrow containers; long day counts; localized labels/digits; RTL; forced colors; and the retained-zero expired presentation before any `stable` promotion.

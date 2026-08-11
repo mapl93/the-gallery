@@ -1,42 +1,62 @@
 ## Overview
 
-Maker's Mark is a passive identity surface for a visible maker name with optional stamp media, studio text, and target-formatted year.
+Maker's Mark is a maker-attribution group with one required visible identity, one optional canonical profile Link, and optional target-owned stamp, studio context, and formatted year wording. It does not define a person, studio, vendor, product, provenance, certificate, or authenticity record.
 
-<Preview html={'<aside class="makers-mark tg-preview-frame tg-preview-frame--sm" aria-label="Maker information"><div class="makers-mark__stamp tg-preview-media tg-preview-media--avatar" role="img" aria-label="Stamped MG maker mark"></div><div class="makers-mark__info"><p class="makers-mark__artist">Maria Garcia</p><p class="makers-mark__studio">Buenos Aires studio</p><p class="makers-mark__year">Made in 2026</p></div></aside>'} label="Maker's Mark" />
+<Preview html={'<div class="makers-mark tg-preview-frame tg-preview-frame--sm"><div class="makers-mark__stamp"><span class="tg-preview-media tg-preview-media--avatar" aria-hidden="true">MG</span></div><div class="makers-mark__info"><p class="makers-mark__artist" dir="auto"><a class="link makers-mark__artist-link" href="/makers/maria-garcia">Maria Garcia</a></p><p class="makers-mark__studio" dir="auto">Buenos Aires studio</p><p class="makers-mark__year" dir="auto">Made in 2026</p></div></div>'} label="Maker's Mark" />
 
 ## Presentation
 
-`artist` is required. `stamp`, `studio`, and `year` are optional target-owned content. The surface is always passive and does not define artist or studio record models.
+`artist` is required and a blank value omits the complete component. `href`, `stamp`, `studio`, and `year` omit independently. A non-empty real `href` wraps only the complete visible identity in one native canonical Link; without it, the same identity remains ordinary text. The interactive Exhibit/Studio fixture and this fallback use the same content and structure; MG is hidden from assistive technology because the adjacent visible name already communicates the identity.
 
-The fixture identifies a maker but makes no authenticity or verification claim.
+The neutral root is a generic non-landmark container. A target may choose `aside`, `article`, `section`, `address`, or another element only when its document context independently supports that meaning. The root, stamp, studio and year remain passive; the optional identity Link provides only target-owned profile navigation and makes no authenticity, verification, authorship, manufacture, or provenance claim.
 
 ## Guidelines
 
 <DoDont>
-  <Do>Keep the maker's name visible as text and use the stamp as supporting identity content.</Do>
-  <Dont>Do not present the mark as proof of authenticity unless a target owns and substantiates that claim.</Dont>
+  <Do>Keep a complete maker name visible and treat the stamp as contextual supporting content.</Do>
+  <Dont>Do not force a landmark, Avatar, Badge, empty/scripted Link, verification state, or authenticity claim from the visual treatment.</Dont>
 </DoDont>
 
-- Use target-formatted studio and year text when provided.
-- Keep the identity concise enough for the compact surface.
-- Omit decorative stamp media when it adds no useful context.
+- Use complete localized studio and year wording supplied by the target; R9 does not parse or infer their meaning.
+- Use native `img` or appropriate graphic markup when a stamp adds information and provide an equivalent alternative.
+- Use `alt=""` or `aria-hidden="true"` when a mark only repeats the adjacent visible identity.
+- Omit empty stamp wrappers and optional text rather than leaving placeholders.
+- Use the optional canonical Link on the complete visible identity only when the target owns a real maker-profile destination; never make the stamp or whole surface clickable.
+- Keep certificate, QR, signature verification, provenance, vendor records, rights, and product relationships outside R9.
 
 ## Accessibility
 
-- Keep the maker identity available as text.
-- Give an informative stamp useful alternative text.
-- Hide a decorative stamp from assistive technology.
-- Do not encode identity or provenance only in the image.
+- Keep the full maker identity available as visible text and fail closed when it is empty.
+- Default to a generic container with no landmark role, accessible name, live region, or widget semantics; only the optional canonical identity Link enters tab order.
+- Do not use `cite` for a person or organization name. Do not use `address` unless the content is actual contact information for the nearest article or page.
+- Do not assign an image role to a generic empty block or announce initials plus the adjacent full name as two identities.
+- Preserve automatic direction, complete text wrapping, 200% text, user spacing, forced-color boundaries, and source order.
+- Never present a visual stamp, border, year, badge, icon, or code as evidence of authenticity without a separately substantiated target record.
 
 ## Specification
 
-**Dependencies:** None.
+**Dependencies:** canonical Link. Maker stamp media is not automatically Avatar or Badge composition.
 
-**Anatomy:** required `.makers-mark` and `.makers-mark__info`, optional stamp, required artist name, and optional studio and year text.
+**Anatomy:** required generic `.makers-mark`, optional `.makers-mark__stamp`, required `.makers-mark__info` and non-empty `.makers-mark__artist`, optional `.makers-mark__artist-link`, plus optional `.makers-mark__studio` and `.makers-mark__year`.
 
 <PropTable>
-  <tr><td>`stamp`</td><td>slot</td><td>optional</td><td>Target-owned maker-mark media</td></tr>
-  <tr><td>`artist`</td><td>string</td><td>required</td><td>Visible artist or maker name</td></tr>
-  <tr><td>`studio`</td><td>string</td><td>optional</td><td>Studio text</td></tr>
-  <tr><td>`year`</td><td>string</td><td>optional</td><td>Target-formatted year</td></tr>
+  <tr><td>`stamp`</td><td>slot</td><td>optional</td><td>Target-owned passive mark media or graphic with contextual accessibility</td></tr>
+  <tr><td>`artist`</td><td>string</td><td>required non-empty</td><td>Visible maker, artist, collective, or target display name</td></tr>
+  <tr><td>`href`</td><td>string</td><td>optional</td><td>Real target-owned maker-profile destination for the canonical identity Link</td></tr>
+  <tr><td>`studio`</td><td>string</td><td>optional</td><td>Complete target-owned studio context</td></tr>
+  <tr><td>`year`</td><td>string</td><td>optional</td><td>Complete target-formatted year wording with target-owned meaning</td></tr>
 </PropTable>
+
+## Research References
+
+- [WHATWG `aside`](https://html.spec.whatwg.org/dev/sections.html#the-aside-element)
+- [WAI complementary landmark example](https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/examples/complementary.html)
+- [WAI landmark-region practices](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/)
+- [WHATWG `cite`](https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-cite-element)
+- [WHATWG `address`](https://html.spec.whatwg.org/#the-address-element)
+- [WAI Images Tutorial](https://www.w3.org/WAI/tutorials/images/)
+- [Radix Avatar](https://www.radix-ui.com/primitives/docs/components/avatar)
+- [Polaris Avatar](https://polaris-react.shopify.com/components/images-and-icons/avatar)
+- [Shopify product vendor](https://shopify.dev/docs/api/liquid/objects/product#product-vendor)
+- [Shopify metaobjects](https://shopify.dev/docs/apps/build/metaobjects)
+- [Open UI component matrix](https://open-ui.org/research/component-matrix/)

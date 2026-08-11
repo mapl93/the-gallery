@@ -187,15 +187,6 @@ const previewHostCss = `${previewBundleCss}
   max-width: 380px;
 }
 
-.tg-preview-contained-cookie {
-  padding: 16px 24px !important;
-}
-
-.tg-preview-contained-cookie .cookie-banner__inner {
-  flex-direction: column;
-  text-align: center;
-}
-
 .tg-preview-menu-layer {
   position: absolute !important;
   top: 24px !important;
@@ -231,7 +222,7 @@ const previewHostCss = `${previewBundleCss}
 }
 
 .tg-preview-anchor-stage--field .combobox__listbox {
-  top: 50px;
+  top: 46px;
 }
 
 .tg-preview-anchor-stage--menu .dropdown__menu {
@@ -239,7 +230,7 @@ const previewHostCss = `${previewBundleCss}
 }
 
 .tg-preview-anchor-stage--calendar .datepicker__calendar {
-  top: 50px;
+  top: 54px;
 }
 
 .tg-preview-anchor-popover {
@@ -340,7 +331,10 @@ const previewHostCss = `${previewBundleCss}
 
 .tg-preview-swatch--clay { background: #c4a882; }
 .tg-preview-swatch--sage { background: #5a7d6f; }
-.tg-preview-swatch--ink { background: #2c3e50; }
+.tg-preview-swatch--celadon { background: #7f9b8f; }
+.tg-preview-swatch--ash { background: #8b8177; }
+.tg-preview-swatch--porcelain { background: #d8e0e5; }
+.tg-preview-swatch--ink { background: #242424; }
 
 .tg-preview-range-fill--middle {
   left: 20%;
@@ -468,6 +462,11 @@ const previewHostCss = `${previewBundleCss}
   height: 48px;
 }
 
+.tg-preview-skeleton-default {
+  width: min(100%, 20rem);
+  height: 4rem;
+}
+
 .tg-preview-line {
   width: 320px;
   max-width: 100%;
@@ -513,6 +512,10 @@ export default function ComponentPreview({
       }
 
       el.classList.toggle(currentInteraction.toggle, next);
+      if (el.hasAttribute('data-preview-visibility')) {
+        el.setAttribute('aria-hidden', String(!next));
+        el.toggleAttribute('inert', !next);
+      }
     });
 
     const triggerSelector = currentInteraction.triggerSelector ?? '[data-preview-trigger]';
@@ -538,7 +541,14 @@ export default function ComponentPreview({
     window.TheGallery?.enhanceTextareas(rootEl);
     window.TheGallery?.enhanceCheckboxes(rootEl);
     window.TheGallery?.enhanceQuantities(rootEl);
+    window.TheGallery?.enhanceSliders(rootEl);
+    window.TheGallery?.enhanceComboboxes(rootEl);
+    window.TheGallery?.enhanceDatepickers(rootEl);
     window.TheGallery?.enhanceToggleGroups(rootEl);
+    window.TheGallery?.enhanceCountdowns(rootEl);
+    window.TheGallery?.enhanceMarquees(rootEl);
+    window.TheGallery?.enhanceFileUploads(rootEl);
+    window.TheGallery?.enhanceFilterPanels(rootEl);
 
     const currentInteraction = getDomInteraction(rootEl) ?? interaction;
     resolvedInteractionRef.current = currentInteraction;
@@ -547,16 +557,37 @@ export default function ComponentPreview({
       ?? '[data-preview-close], .drawer__close, .modal__close, .toast__close, .popup__close, .lightbox__close, .size-chart__close, .social-proof__close, [aria-label="Close"], [aria-label="Dismiss"]';
     const triggerSelector = currentInteraction?.triggerSelector ?? '[data-preview-trigger]';
 
+    const focusTrigger = () => {
+      requestAnimationFrame(() => {
+        const target = rootEl.querySelector<HTMLElement>(triggerSelector);
+        target?.focus();
+      });
+    };
+
+    const focusDialog = () => {
+      requestAnimationFrame(() => {
+        const target = rootEl.querySelector<HTMLElement>('[data-preview-initial-focus]')
+          ?? rootEl.querySelector<HTMLElement>('[data-preview-dialog]');
+        target?.focus();
+      });
+    };
+
     const handleTriggerClick = (event: Event) => {
       if (!resolvedInteractionRef.current) return;
       event.preventDefault();
-      setActive((current) => !current);
+      setActive((current) => {
+        const next = !current;
+        if (next) focusDialog();
+        else focusTrigger();
+        return next;
+      });
     };
 
     const handleCloseClick = (event: Event) => {
       if (!resolvedInteractionRef.current) return;
       event.preventDefault();
       setActive(false);
+      focusTrigger();
     };
 
     const handlePreviewClick = (event: MouseEvent) => {
@@ -572,8 +603,46 @@ export default function ComponentPreview({
     };
 
     const handlePreviewKeyDown = (event: KeyboardEvent) => {
-      if (!resolvedInteractionRef.current || event.key !== 'Escape') return;
-      setActive(false);
+      if (!resolvedInteractionRef.current) return;
+      const dialog = rootEl.querySelector<HTMLElement>('[data-preview-dialog]:not([aria-hidden="true"])');
+      if (!dialog) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setActive(false);
+        focusTrigger();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+      const focusable = Array.from(dialog.querySelectorAll<HTMLElement>([
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])',
+      ].join(','))).filter((element) => (
+        !element.hidden && element.getAttribute('aria-hidden') !== 'true'
+      ));
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const rootNode = rootEl.getRootNode();
+      const activeElement = rootNode instanceof ShadowRoot
+        ? rootNode.activeElement
+        : document.activeElement;
+      if (event.shiftKey && (activeElement === first || !dialog.contains(activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     const triggerEls = currentInteraction ? Array.from(rootEl.querySelectorAll(triggerSelector)) : [];
@@ -587,6 +656,7 @@ export default function ComponentPreview({
     previewRootRef.current = rootEl;
 
     return () => {
+      window.TheGallery?.destroyFilterPanels(rootEl);
       triggerEls.forEach((el) => el.removeEventListener('click', handleTriggerClick));
       closeEls.forEach((el) => el.removeEventListener('click', handleCloseClick));
       rootEl.removeEventListener('click', handlePreviewClick);

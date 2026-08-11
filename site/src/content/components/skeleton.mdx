@@ -1,32 +1,33 @@
 ## Overview
 
-Decorative loading placeholder that mirrors the geometry of content that has not arrived yet.
+Decorative loading geometry that reserves the shape of expected content without owning its data or lifecycle.
 
-<Preview html={"<div class=\"tg-preview-frame tg-preview-frame--sm\" role=\"status\" aria-busy=\"true\" aria-label=\"Loading content\"><div class=\"tg-preview-stack\" aria-hidden=\"true\"><div class=\"skeleton skeleton--circle tg-preview-skeleton-circle\"></div><div class=\"skeleton skeleton--image\"></div><div class=\"skeleton skeleton--title\"></div><div class=\"skeleton skeleton--text\"></div><div class=\"skeleton skeleton--button\"></div></div></div>"} label="Loading Skeleton" />
+<Preview html={"<div class=\"tg-preview-frame tg-preview-frame--sm\"><div role=\"region\" aria-busy=\"true\" aria-label=\"Loading preview content\"><div class=\"skeleton tg-preview-skeleton-default\" aria-hidden=\"true\"></div></div><span class=\"visually-hidden\" role=\"status\">Loading content</span></div>"} label="Loading Skeleton" />
 
 ## Presentation
 
-Default is an unopinionated block whose dimensions come from its composition. Text, Title, Image, Button, and Circle provide the canonical shape classes already implemented by neutral web.
+Default is an unopinionated block whose dimensions come from its composition. Text, Title, Image, Button, and Circle are low-fidelity geometry presets; they do not change semantics or loading ownership.
 
-<Preview html={"<div class=\"tg-preview-grid tg-preview-frame tg-preview-frame--md\" aria-hidden=\"true\"><span>Text</span><div class=\"skeleton skeleton--text\"></div><span>Title</span><div class=\"skeleton skeleton--title\"></div><span>Image</span><div class=\"skeleton skeleton--image tg-preview-w-25\"></div><span>Button</span><div class=\"skeleton skeleton--button\"></div><span>Circle</span><div class=\"skeleton skeleton--circle tg-preview-skeleton-circle\"></div></div>"} label="Skeleton Variants" />
+<Preview html={"<div class=\"tg-preview-grid tg-preview-frame tg-preview-frame--md\"><span>Text</span><div class=\"skeleton skeleton--text\" aria-hidden=\"true\"></div><span>Title</span><div class=\"skeleton skeleton--title\" aria-hidden=\"true\"></div><span>Image</span><div class=\"skeleton skeleton--image tg-preview-w-25\" aria-hidden=\"true\"></div><span>Button</span><div class=\"skeleton skeleton--button\" aria-hidden=\"true\"></div><span>Circle</span><div class=\"skeleton skeleton--circle tg-preview-skeleton-circle\" aria-hidden=\"true\"></div></div>"} label="Skeleton Variants" />
 
 ## Usage Guidelines
 
 <DoDont>
   <Do>Match each skeleton shape to the geometry of the content that will replace it.</Do>
-  <Dont>Do not use Skeleton for a resolved empty state or leave it visible after loading finishes.</Dont>
+  <Dont>Do not use Skeleton for unknown progress, a resolved empty/error state, or content whose final geometry cannot be predicted.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="info">
-  Skeleton shapes are usually decorative. Put loading announcement semantics on the containing region when needed.
+  Skeleton shapes are always decorative. Put busy lifecycle on the real content region and use one actual localized Status message only when loading needs an announcement.
 </Callout>
 
-- Use `aria-busy` or `role="status"` on the loading region when users need loading feedback.
-- Keep the individual skeleton shapes hidden from assistive technology.
-- Replace skeletons with real content as soon as target data is available.
-- Neutral web removes the shimmer animation when reduced motion is requested.
+- Set `aria-busy="true"` on the consumer's content region while it is incomplete, then set it to `false` or remove it after replacement.
+- Keep every Skeleton shape `aria-hidden="true"`; do not give it Status, Progressbar, label, focus, or interaction semantics.
+- If explicit feedback is useful, provide one actual localized `role="status"` message outside the decorative shapes.
+- Replace Skeletons promptly and keep placeholder/final geometry aligned to avoid layout shift.
+- Neutral Web stops shimmer after 4.5 seconds and renders static solid geometry for reduced motion and forced colors.
 
 ## References
 
@@ -34,4 +35,14 @@ Default is an unopinionated block whose dimensions come from its composition. Te
   <tr><td>`variant`</td><td>`default | text | title | image | button | circle`</td><td>`default`</td><td>Canonical placeholder geometry</td></tr>
 </PropTable>
 
-The visual root is `.skeleton`. Variant values map to `.skeleton--text`, `.skeleton--title`, `.skeleton--image`, `.skeleton--button`, and `.skeleton--circle`; Default adds no modifier class.
+The visual root is `.skeleton`. Variant values map to `.skeleton--text`, `.skeleton--title`, `.skeleton--image`, `.skeleton--button`, and `.skeleton--circle`; Default adds no modifier class. Text/Title spacing, Default dimensions, Circle diameter, repeated layout, busy lifecycle, Status text, data, errors, and replacement remain target-owned.
+
+## Target Lifecycle
+
+Skeleton has no controlled/uncontrolled state. A consumer conditionally renders decorative shapes, marks the real content region busy, replaces the shapes atomically, and clears busy state. A localized Status message is target composition, not a Skeleton property.
+
+Use Spinner when future geometry cannot be represented, Progress when measurable completion matters, and Empty State only after absence is resolved.
+
+## Motion And Targets
+
+The base shimmer is finite and uses no JavaScript. React and Angular keep request/state ownership outside the component; Shopify composes the generated class contract inside target Liquid; SwiftUI and Compose map the same decorative geometry through native motion and accessibility preferences. Figma receives the six visual shapes but no data/loading behavior.

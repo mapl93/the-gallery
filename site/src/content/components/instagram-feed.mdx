@@ -1,39 +1,40 @@
 ## Overview
 
-Instagram Feed arranges target-owned social media items beneath optional account context. Authorization, fetching, caching, consent, freshness, failures, metrics, and item activation remain target-owned.
+Instagram Feed presents a finite collection of target-supplied studio or social media beneath optional account context. Authorization, fetching, caching, consent, freshness, moderation, failures, metrics, and provider integration remain target-owned.
 
 ## Presentation
 
-<Preview html={'<section class="instagram-feed tg-preview-frame" aria-labelledby="instagram-feed-heading"><header class="instagram-feed__header"><h2 class="instagram-feed__heading" id="instagram-feed-heading">From the studio</h2><a class="instagram-feed__handle" href="#">@thegallery</a></header><div class="instagram-feed__grid" role="list"><figure class="instagram-feed__item" role="listitem"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Freshly thrown cups lined on a studio board" /><figcaption class="instagram-feed__overlay"><span class="instagram-feed__stat">Studio process</span></figcaption></figure><figure class="instagram-feed__item" role="listitem"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Mineral glaze tests after firing" /><figcaption class="instagram-feed__overlay"><span class="instagram-feed__stat">Glaze notes</span></figcaption></figure><figure class="instagram-feed__item" role="listitem"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Finished vessels wrapped for delivery" /><figcaption class="instagram-feed__overlay"><span class="instagram-feed__stat">New work</span></figcaption></figure><figure class="instagram-feed__item" role="listitem"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Ceramic bowls displayed on a gallery shelf" /><figcaption class="instagram-feed__overlay"><span class="instagram-feed__stat">At the gallery</span></figcaption></figure></div></section>'} label="Instagram Feed" />
+<Preview html={'<section class="instagram-feed tg-preview-frame" aria-labelledby="instagram-feed-heading"><header class="instagram-feed__header"><h2 class="instagram-feed__heading" id="instagram-feed-heading">From the studio</h2><a class="instagram-feed__handle" href="/components/instagram-feed">@thegallery</a></header><ul class="instagram-feed__grid"><li class="instagram-feed__item"><a class="instagram-feed__link" href="/components/process-timeline"><figure class="instagram-feed__figure"><img class="instagram-feed__media tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Freshly thrown cups lined on a studio board" /><figcaption class="instagram-feed__caption">Wheel-thrown forms</figcaption></figure></a></li><li class="instagram-feed__item"><figure class="instagram-feed__figure"><img class="instagram-feed__media tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Mineral glaze tests arranged after firing" /><figcaption class="instagram-feed__caption">Glaze tests</figcaption></figure></li><li class="instagram-feed__item"><a class="instagram-feed__link" href="/components/shipping-info"><figure class="instagram-feed__figure"><img class="instagram-feed__media tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Finished vessels wrapped for protected delivery" /><figcaption class="instagram-feed__caption">Packing one-of-one works</figcaption></figure></a></li><li class="instagram-feed__item"><figure class="instagram-feed__figure"><img class="instagram-feed__media tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Ceramic bowls displayed on a gallery shelf" /><figcaption class="instagram-feed__caption">Installation view</figcaption></figure></li></ul><div class="instagram-feed__cta"><a class="btn btn--outline" href="/components/gallery-grid">Browse the visual archive</a></div></section>'} label="Instagram Feed" />
 
-The feed is a presentation shell for supplied records. Overlay metadata may be present, but social metrics are not guaranteed semantic properties. Items may be passive or receive target-selected native semantics.
+The component is a passive presentation shell for already-rendered records. Its native unordered list preserves source order; each record uses a figure and optional visible caption. A target may wrap a figure in a native link only when a real destination exists. Passive items never receive a tab stop.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Provide a resilient local or cached fallback and make every supplied destination explicit.</Do>
-  <Dont>Do not imply that provider access, consent, fetching, or item navigation is built into the component.</Dont>
+  <Do>Supply a finite local or cached record collection, useful image alternatives, visible captions, and explicit real destinations.</Do>
+  <Dont>Do not add `role="feed"`, artificial social metrics, fake anchors, generic focusable items, or content disclosed only on hover.</Dont>
 </DoDont>
 
 Keep account context accurate and avoid making essential content available only through an external feed.
 
 ## Accessibility
 
-- Give informative media useful alternative text and keep essential captions available without hover.
-- Use a native link for the account handle only when a real profile destination exists.
-- Give target-supplied item links or controls accessible names and visible focus.
-- Communicate loading, empty, stale, and error conditions through the target data layer.
+- Use a native `section` only when a visible heading can name it through `aria-labelledby`; otherwise use a generic `div`.
+- Give informative media useful alternative text, explicitly decorative media `alt=""`, and keep captions visible without hover, focus, touch, color, or motion.
+- Render the account handle only when both its label and real destination exist; never synthesize `#` or preview-only fallbacks.
+- Keep passive items out of the tab order. Native handle, item, and action links retain accessible names, history, activation, full pointer targets, and visible focus.
+- Omit the complete component when no valid items exist. Communicate loading, empty, stale, consent, and error conditions through the target data layer.
 
 ## References
 
 **Dependencies:** None.
 
-**Anatomy:** `.instagram-feed`, `.instagram-feed__header`, `.instagram-feed__heading`, `.instagram-feed__handle`, `.instagram-feed__grid`, `.instagram-feed__item`, `.instagram-feed__overlay`, `.instagram-feed__stat`, and `.instagram-feed__cta`.
+**Anatomy:** `.instagram-feed`, `.instagram-feed__header`, `.instagram-feed__heading`, `.instagram-feed__handle`, `.instagram-feed__grid`, `.instagram-feed__item`, `.instagram-feed__link`, `.instagram-feed__figure`, `.instagram-feed__media`, `.instagram-feed__caption`, and `.instagram-feed__cta`.
 
 <PropTable>
-  <tr><td>`heading`</td><td>string</td><td>optional</td><td>Visible section heading</td></tr>
-  <tr><td>`handle`</td><td>string</td><td>optional</td><td>Visible account handle</td></tr>
-  <tr><td>`handleDestination`</td><td>string</td><td>optional</td><td>Target-owned profile destination</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered target-owned social media items and metadata</td></tr>
-  <tr><td>`action`</td><td>slot</td><td>optional</td><td>Target-owned account or gallery action</td></tr>
+  <tr><td>`heading`</td><td>string</td><td>optional</td><td>Non-empty visible contextual heading; its target-unique id names the section</td></tr>
+  <tr><td>`handle`</td><td>string</td><td>optional</td><td>Non-empty visible account label paired with `handleDestination`</td></tr>
+  <tr><td>`handleDestination`</td><td>string</td><td>optional</td><td>Real target-owned native profile destination paired with `handle`</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered native item/figure/media compositions with optional caption and destination</td></tr>
+  <tr><td>`action`</td><td>slot</td><td>optional</td><td>Target-owned native account or gallery action</td></tr>
 </PropTable>

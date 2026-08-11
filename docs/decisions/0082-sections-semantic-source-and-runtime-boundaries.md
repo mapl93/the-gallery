@@ -57,8 +57,10 @@ No automated result promotes these components to `stable`.
   does not recreate their semantic properties or states.
 - Comparison Table exposes a target-owned native table composition rather than
   flattening rows and columns into parent properties.
-- Before / After exposes two media slots, visible labels, and an optional
-  target-owned control slot without defining a slider value model.
+- Before / After originally exposed two media slots, visible labels, and an
+  optional target-owned control slot without defining a slider value model.
+  ADR 0233 supersedes that boundary with required matched media, a required
+  localized label, and canonical Slider composition.
 
 Repeated children retain dependency ownership. Parent sections control layout and
 placement only; Product Card, Button, Accordion, Input, Textarea, and any future
@@ -102,8 +104,9 @@ Canonical Section CSS now uses existing public tokens only and adds:
   coverage.
 - Visible focus for section-owned links, optional controls, rich-text links, and
   target-owned interactive descendants.
-- Existing touch-target sizing for the featured link, Lookbook hotspots, and the
-  optional Before / After control surface.
+- Existing touch-target sizing for the featured link and Lookbook hotspots.
+  ADR 0233 later gives Before / After one canonical native Slider thumb rather
+  than an opaque optional control surface.
 - Focus-within and non-hover caption or metadata disclosure for Gallery Grid,
   Lookbook, Instagram Feed, and Collage Section.
 - Reduced-motion fallbacks for parallax hints, image scaling, captions, hotspots,
@@ -111,10 +114,10 @@ Canonical Section CSS now uses existing public tokens only and adds:
   marquee motion.
 - Static wrapping fallbacks for animated Logo Bar and Marquee tracks.
 
-Pointer cursors are removed from passive Gallery Grid items, Lookbook hotspots,
-and the Before / After divider where the source did not establish native
-activation or dragging semantics. Targets may add appropriate interaction only
-after selecting native elements and behavior.
+Pointer cursors are removed from passive Gallery Grid items and Lookbook
+hotspots. This ADR originally kept the Before / After divider passive; ADR 0233
+supersedes that provisional boundary by composing the canonical native Slider
+while keeping the divider decorative.
 
 ## Open Product Boundaries
 
@@ -132,22 +135,23 @@ components from `stable`.
 
 ### Before / After interaction
 
-- Is the comparison passive, pointer-draggable, keyboard-adjustable, or capable
-  of more than one target-specific mode?
-- If it becomes a slider, which element owns native or ARIA range semantics,
-  minimum and maximum values, current value, pointer capture, touch gestures,
-  keyboard increments, and announcements?
-- How is the clip position synchronized between CSS, runtime state, and target
-  editor previews?
+ADR 0233 resolves this boundary. S17 is one horizontal interactive comparison;
+one canonical native `input[type="range"]` owns value, focus, pointer, touch,
+keyboard, form and reset behavior on a fixed `0..100`, step `1` scale. The
+canonical Slider enhancement synchronizes one private progress variable used by
+the logical clip and decorative divider. No second drag engine exists.
 
 ### Marquee content and motion
 
-- Which layer duplicates content for seamless Logo Bar or Marquee motion, and how
-  are visual duplicates hidden from assistive technology?
-- Are speed, direction, pause behavior, repetition count, and runtime controls
-  public properties or target-owned settings?
-- Is continuously moving content allowed for essential information, and what
-  non-motion fallback is required beyond reduced-motion CSS?
+ADRs 0231 and 0232 resolve this boundary with one progressively enhanced
+canonical Marquee, one authored semantic list, one inert visual copy, a
+canonical Pause/Resume Button, logical direction, semantic
+distance-normalized pace, and static reduced-motion/no-enhancement fallback.
+Logo Bar defaults to a static native mark list and composes that lifecycle only
+when its consumer explicitly selects `marquee`; it has no second motion owner.
+Critical information must remain available outside continuously moving content.
+Exact Marquee velocities and Logo Bar artwork remain human-review questions,
+not architecture gaps.
 
 ### Social feeds and data fetching
 

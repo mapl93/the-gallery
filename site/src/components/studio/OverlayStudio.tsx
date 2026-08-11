@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -7,6 +15,7 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { getStudioLucideIcon } from './lucideCatalogue';
+import ModalArtwork from './ModalArtwork';
 
 interface OverlayStudioProps {
   contract: ComponentContract;
@@ -47,7 +56,24 @@ export default function OverlayStudio({ contract, definition }: OverlayStudioPro
     const result = Object.fromEntries((contract.properties ?? []).map((property) => (
       [property.name, defaultValue(contract, property)]
     ))) as StudioPropertyValues;
-    result.open = true;
+    Object.assign(result, contract.slug === 'modal'
+      ? {
+          title: 'Confirm order',
+          content: true,
+          dismissAction: true,
+          dismissLabel: 'Close modal',
+          descriptionId: 'studio-modal-description',
+          actions: true,
+          open: true,
+        }
+      : {
+          title: 'Collection notes',
+          content: true,
+          dismissAction: true,
+          dismissLabel: 'Close drawer',
+          footer: true,
+          open: true,
+        });
     return result;
   }, [contract]);
   const studioTokens = useMemo(() => [...new Set(definition.groups.flatMap((group) => (
@@ -56,6 +82,11 @@ export default function OverlayStudio({ contract, definition }: OverlayStudioPro
   const [values, setValues] = useState<StudioPropertyValues>(initialValues);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const initialFocusRef = useRef<HTMLButtonElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     const read = () => {
@@ -75,7 +106,76 @@ export default function OverlayStudio({ contract, definition }: OverlayStudioPro
   const CloseIcon = getStudioLucideIcon('x');
 
   function setOpen(next: boolean) {
+    if (next && !open) {
+      const activeElement = document.activeElement;
+      returnFocusRef.current = activeElement instanceof HTMLElement && activeElement !== document.body
+        ? activeElement
+        : null;
+    }
     setValues((current) => ({ ...current, open: next }));
+  }
+
+  useEffect(() => {
+    if (contract.slug === 'modal') return undefined;
+    if (open) {
+      wasOpenRef.current = true;
+      const frame = requestAnimationFrame(() => {
+        (initialFocusRef.current ?? panelRef.current)?.focus();
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    if (!wasOpenRef.current) return undefined;
+    wasOpenRef.current = false;
+    const returnTarget = returnFocusRef.current?.isConnected
+      ? returnFocusRef.current
+      : triggerRef.current;
+    returnFocusRef.current = null;
+    const frame = requestAnimationFrame(() => returnTarget?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, open]);
+
+  function handleDialogKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setOpen(false);
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const focusable = Array.from(panel.querySelectorAll<HTMLElement>([
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(','))).filter((element) => (
+      !element.hidden && element.getAttribute('aria-hidden') !== 'true'
+    ));
+
+    if (focusable.length === 0) {
+      event.preventDefault();
+      panel.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const activeElement = document.activeElement;
+    if (event.shiftKey && (activeElement === first || !panel.contains(activeElement))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function handleBackdropClick(event: MouseEvent<HTMLElement>) {
+    if (event.target === event.currentTarget) setOpen(false);
   }
 
   function reset() {
@@ -84,51 +184,95 @@ export default function OverlayStudio({ contract, definition }: OverlayStudioPro
   }
 
   function renderModal() {
-    if (!open) return <button className="btn" type="button" onClick={() => setOpen(true)}>Open modal</button>;
+    const title = String(values.title || '').trim();
+    if (!title) return null;
+    const descriptionId = String(values.descriptionId || '').trim() || undefined;
+    const hasActions = values.actions === true;
     return (
-      <div className="modal-overlay docs-studio__preview-modal-overlay" aria-hidden="false">
-        <div className="modal docs-studio__preview-modal" role="dialog" aria-modal="true" aria-labelledby="studio-modal-title">
-          <div className="modal__header">
-            <h2 className="modal__title" id="studio-modal-title">Confirm order</h2>
-            <button className="close-btn" type="button" aria-label="Close modal" onClick={() => setOpen(false)}>
-              {CloseIcon && <CloseIcon className="close-btn__icon" aria-hidden="true" />}
-            </button>
-          </div>
-          <div className="modal__body">
-            <p>Are you sure you want to place this order for <strong>$240.00</strong>?</p>
-          </div>
-          <div className="modal__footer">
+      <ModalArtwork
+        id="studio-modal"
+        title={title}
+        open={open}
+        dismissLabel={String(values.dismissLabel || 'Close modal')}
+        triggerLabel="Open modal"
+        descriptionId={descriptionId}
+        overlayClassName="docs-studio__preview-modal-overlay"
+        className="docs-studio__preview-modal"
+        closeIcon={CloseIcon && <CloseIcon className="close-btn__icon" aria-hidden="true" />}
+        actions={hasActions ? (
+          <>
             <button className="btn btn--outline" type="button" onClick={() => setOpen(false)}>Cancel</button>
             <button className="btn" type="button" onClick={() => setOpen(false)}>Confirm</button>
-          </div>
-        </div>
-      </div>
+          </>
+        ) : undefined}
+        initialFocus={hasActions ? 'first-action' : 'close'}
+        onOpenChange={setOpen}
+      >
+        {values.content !== false && (
+          <p id={descriptionId}>Are you sure you want to place this order for <strong>$240.00</strong>?</p>
+        )}
+      </ModalArtwork>
     );
   }
 
   function renderDrawer() {
-    if (!open) return <button className="btn" type="button" onClick={() => setOpen(true)}>Open drawer</button>;
+    if (!open) {
+      return (
+        <button
+          ref={triggerRef}
+          className="btn"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="studio-drawer"
+          aria-expanded="false"
+          onClick={() => setOpen(true)}
+        >
+          Open drawer
+        </button>
+      );
+    }
     const placementClass = variantClass(contract, values.placement);
+    const title = String(values.title || 'Collection notes');
     return (
-      <div className="drawer-overlay is-open docs-studio__preview-drawer-overlay">
+      <div
+        className="drawer-overlay is-open docs-studio__preview-drawer-overlay"
+        aria-hidden="false"
+        onClick={handleBackdropClick}
+      >
         <aside
+          ref={(node) => { panelRef.current = node; }}
           className={['drawer', placementClass, 'is-open', 'docs-studio__preview-drawer'].filter(Boolean).join(' ')}
+          id="studio-drawer"
           role="dialog"
           aria-modal="true"
           aria-labelledby="studio-drawer-title"
+          tabIndex={-1}
+          onKeyDown={handleDialogKeyDown}
         >
           <div className="drawer__header">
-            <h2 id="studio-drawer-title">Collection notes</h2>
-            <button className="drawer__close" type="button" aria-label="Close drawer" onClick={() => setOpen(false)}>
-              {CloseIcon && <CloseIcon aria-hidden="true" />}
-            </button>
+            <h2 className="drawer__title" id="studio-drawer-title">{title}</h2>
+            {values.dismissAction !== false && (
+              <button
+                ref={initialFocusRef}
+                className="close-btn drawer__close"
+                type="button"
+                aria-label={String(values.dismissLabel || 'Close drawer')}
+                onClick={() => setOpen(false)}
+              >
+                {CloseIcon && <CloseIcon className="close-btn__icon" aria-hidden="true" />}
+              </button>
+            )}
           </div>
-          <div className="drawer__body">
-            <p>This vessel was formed in three stages and fired at high temperature.</p>
-          </div>
-          <div className="drawer__footer">
-            <button className="btn btn--full" type="button" onClick={() => setOpen(false)}>Done</button>
-          </div>
+          {values.content !== false && (
+            <div className="drawer__body">
+              <p>This vessel was formed in three stages and fired at high temperature.</p>
+            </div>
+          )}
+          {values.footer === true && (
+            <div className="drawer__footer">
+              <button className="btn btn--full" type="button" onClick={() => setOpen(false)}>Done</button>
+            </div>
+          )}
         </aside>
       </div>
     );
@@ -143,18 +287,19 @@ export default function OverlayStudio({ contract, definition }: OverlayStudioPro
         shadow: '--shadow-2xl',
         'overlay-opacity': '--opacity-overlay',
         'title-size': '--typo-h3-size',
+        'title-line-height': '--typo-h3-line-height',
         'title-family': '--font-family-body',
         'body-padding': '--space-layout-element-gap',
       }
     : {
         surface: '--color-surface-primary',
-        'hover-surface': '--color-surface-secondary',
         divider: '--color-border-subtle',
-        'secondary-text': '--color-text-secondary',
-        focus: '--color-border-focus',
-        radius: '--radius-sm',
+        title: '--color-text-primary',
         shadow: '--shadow-2xl',
         'overlay-opacity': '--opacity-overlay',
+        'title-size': '--typo-h4-size',
+        'title-line-height': '--typo-h4-line-height',
+        'title-family': '--font-family-body',
         padding: '--space-layout-element-gap',
       };
 

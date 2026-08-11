@@ -1,0 +1,97 @@
+{% liquid
+  assign section_title = section.settings.title | strip
+  assign heading_id = 'StatsSection-' | append: section.id | append: '-Title'
+  assign valid_metric_count = 0
+
+  for block in section.blocks
+    assign metric_value = block.settings.value | strip
+    assign metric_label = block.settings.label | strip
+    if metric_value != blank and metric_label != blank
+      assign valid_metric_count = valid_metric_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if valid_metric_count > 0 %}
+  {% if section_title != blank %}
+    <section class="stats-section" aria-labelledby="{{ heading_id }}">
+  {% else %}
+    <div class="stats-section">
+  {% endif %}
+    <div class="stats-section__inner">
+      {% if section_title != blank %}
+        <h2 class="stats-section__title" id="{{ heading_id }}">{{ section_title | escape }}</h2>
+      {% endif %}
+
+      <ul class="stats-section__grid stat-group">
+        {% for block in section.blocks %}
+          {% liquid
+            assign metric_value = block.settings.value | strip
+            assign metric_label = block.settings.label | strip
+          %}
+
+          {% if metric_value != blank and metric_label != blank %}
+            <li
+              class="stats-section__item stat"
+              data-stat-alternate-digits="false"
+              data-stat-slashed-zero="true"
+              data-stat-tabular-numbers="true"
+              data-stat-contextual-alternates="true"
+              data-stat-fractions="false"
+              {{ block.shopify_attributes }}
+            >
+              <span class="stat__value">{{ metric_value | escape }}</span>
+              <span class="stat__label">{{ metric_label | escape }}</span>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% if section_title != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.stats_section.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.stats_section.settings.title"
+    }
+  ],
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "metric",
+      "name": "t:sections.stats_section.blocks.metric.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "t:sections.stats_section.blocks.metric.settings.value"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:sections.stats_section.blocks.metric.settings.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.stats_section.name",
+      "blocks": [
+        { "type": "metric" },
+        { "type": "metric" },
+        { "type": "metric" }
+      ]
+    }
+  ]
+}
+{% endschema %}

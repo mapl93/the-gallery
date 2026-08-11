@@ -1,397 +1,250 @@
-/* ============================================================
-   COMING SOON / PASSWORD
-   Split-screen editorial layout.
-   Left: content (title, subtitle, body, social).
-   Right: newsletter form.
-   Logo pinned top-left. Max-width centered.
-   ============================================================ */
+/* X1. Coming Soon: public editorial launch or maintenance page. */
 
-/* ── Root container ── */
 .coming-soon {
+  --_coming-soon-content-max: 75rem;
+  --_coming-soon-copy-max: 32rem;
+  --_coming-soon-form-max: 24rem;
+  --_coming-soon-logo-max: 2.5rem;
+  --_coming-soon-scrim-strong: 0.78;
+  --_coming-soon-text: var(--color-text-primary);
+  --_coming-soon-text-muted: var(--color-text-secondary);
+
+  container: coming-soon / inline-size;
+  isolation: isolate;
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
-  background-color: var(--color-surface-primary);
-  overflow: hidden;
+  min-block-size: 100vh;
+  min-block-size: 100dvh;
+  overflow-x: clip;
+  color: var(--_coming-soon-text);
+  background: var(--color-surface-primary);
 }
 
-/* ── Background image (covers full viewport) ── */
 .coming-soon__bg {
   position: absolute;
+  z-index: -2;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  inline-size: 100%;
+  block-size: 100%;
   object-fit: cover;
-  z-index: 0;
 }
 
-/* Dark gradient overlay when background image is present */
+.coming-soon:has(.coming-soon__bg) {
+  --_coming-soon-text: var(--color-text-inverse);
+  --_coming-soon-text-muted: color-mix(in srgb, var(--color-text-inverse) 86%, transparent);
+}
+
 .coming-soon:has(.coming-soon__bg)::after {
   content: "";
   position: absolute;
+  z-index: -1;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.78) 100%
-  );
-  z-index: 1;
   pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / var(--opacity-overlay)),
+    rgb(0 0 0 / var(--_coming-soon-scrim-strong))
+  );
 }
 
-/* ── Color contracts: with image ── */
-.coming-soon:has(.coming-soon__bg) .coming-soon__inner,
-.coming-soon:has(.coming-soon__bg) .coming-soon__logo-bar,
-.coming-soon:has(.coming-soon__bg) .coming-soon__footer,
-.coming-soon:has(.coming-soon__bg) .coming-soon__modal-panel {
-  --_cs-text: #FAFAFA;
-  --_cs-text-muted: rgba(250, 250, 250, 0.88);
-  --_cs-border: rgba(250, 250, 250, 0.56);
-  --_cs-input-bg: rgba(0, 0, 0, 0.18);
-  --_cs-btn-bg: #FFFFFF;
-  --_cs-btn-text: #171717;
-  --_cs-btn-hover: #F5F5F5;
-  --_cs-divider: rgba(250, 250, 250, 0.15);
-  color: var(--_cs-text);
-}
-
-/* ── Color contracts: no image (light surface) ── */
-.coming-soon__inner,
-.coming-soon__logo-bar,
-.coming-soon__footer,
-.coming-soon__modal-panel {
-  --_cs-text: var(--color-text-primary);
-  --_cs-text-muted: var(--color-text-secondary);
-  --_cs-border: var(--color-border-default);
-  --_cs-input-bg: var(--color-surface-secondary);
-  --_cs-btn-bg: var(--color-button-primary-bg-default);
-  --_cs-btn-text: var(--color-button-primary-text-default);
-  --_cs-btn-hover: var(--color-button-primary-bg-hover);
-  --_cs-divider: var(--color-border-default);
-}
-
-/* ── Logo bar (top-left, for coming-soon) ── */
 .coming-soon__logo-bar {
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  padding: 24px 32px;
-}
-
-/* ── Logo inline (inside left column, for password) ── */
-.coming-soon__logo-inline {
-  /* sits in the flex column flow, no absolute positioning */
+  z-index: 2;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  padding: var(--space-layout-element-gap) var(--space-layout-container);
+  color: var(--_coming-soon-text);
 }
 
 .coming-soon__logo {
-  max-height: 2.5rem;
-  width: auto;
+  display: block;
+  inline-size: auto;
+  max-block-size: var(--_coming-soon-logo-max);
 }
 
 .coming-soon__store-name {
+  color: inherit;
+  font-family: var(--font-family-body);
   font-size: var(--typo-h4-size);
+  line-height: var(--typo-h4-line-height);
   font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--_cs-text);
+  overflow-wrap: anywhere;
 }
 
-/* ── Inner wrapper: max-width + centered + grid ── */
 .coming-soon__inner {
-  position: relative;
-  z-index: 2;
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  min-height: 100vh;
-  min-height: 100dvh;
-  max-width: 1200px;
-  margin: 0 auto;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  min-block-size: inherit;
+  max-inline-size: var(--_coming-soon-content-max);
+  margin-inline: auto;
 }
 
-/* ── Left column: editorial content ── */
-.coming-soon__left {
+.coming-soon__left,
+.coming-soon__right {
   display: flex;
+  min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: 100px 48px 48px;
-  gap: 20px;
-  color: var(--_cs-text);
+  padding: calc(var(--space-layout-section-gap) * 2) var(--space-layout-container)
+    calc(var(--space-layout-section-gap) + var(--space-layout-element-gap));
+  color: var(--_coming-soon-text);
+}
+
+.coming-soon__left {
+  gap: var(--space-layout-element-gap);
+}
+
+.coming-soon__right {
+  align-items: flex-start;
+}
+
+.coming-soon__heading,
+.coming-soon__subtitle,
+.coming-soon__body,
+.coming-soon__form-header,
+.coming-soon__form-subtext,
+.coming-soon__footer {
+  overflow-wrap: anywhere;
 }
 
 .coming-soon__heading {
+  margin: 0;
+  font-family: var(--font-family-heading);
   font-size: var(--typo-display-size);
   line-height: var(--typo-display-line-height);
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin: 0;
 }
 
 .coming-soon__subtitle {
+  margin: 0;
+  color: var(--_coming-soon-text-muted);
+  font-family: var(--font-family-heading);
   font-size: var(--typo-h3-size);
   line-height: var(--typo-h3-line-height);
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: var(--_cs-text-muted);
-  margin: 0;
 }
 
 .coming-soon__body {
+  max-inline-size: var(--_coming-soon-copy-max);
+  margin: 0;
+  color: var(--_coming-soon-text-muted);
+  font-family: var(--font-family-body);
   font-size: var(--typo-body-size);
   line-height: var(--typo-body-line-height);
-  color: var(--_cs-text-muted);
-  max-width: 32rem;
-  margin: 0;
 }
 
 .coming-soon__body strong {
-  color: var(--_cs-text);
+  color: var(--_coming-soon-text);
   font-weight: 600;
 }
 
-/* ── Social links ── */
 .coming-soon__social {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
   align-items: center;
-  margin-top: 8px;
+  gap: var(--space-layout-element-gap);
 }
 
-.coming-soon__social-link {
-  color: var(--_cs-text-muted);
-  transition: color var(--transition-base) var(--easing-out);
+.coming-soon__social .link {
+  color: var(--_coming-soon-text);
 }
-
-.coming-soon__social-link:hover {
-  color: var(--_cs-text);
-}
-
-/* ── Right column: newsletter / form ── */
-.coming-soon__right {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 100px 48px 48px;
-  color: var(--_cs-text);
-  position: relative;
-}
-
-/* (divider removed) */
 
 .coming-soon__form-header {
+  margin: 0 0 calc(var(--space-layout-element-gap) / 2);
+  color: var(--_coming-soon-text);
+  font-family: var(--font-family-heading);
   font-size: var(--typo-h4-size);
+  line-height: var(--typo-h4-line-height);
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin: 0 0 8px;
-  color: var(--_cs-text);
 }
 
 .coming-soon__form-subtext {
+  max-inline-size: var(--_coming-soon-form-max);
+  margin: 0 0 var(--space-layout-element-gap);
+  color: var(--_coming-soon-text-muted);
+  font-family: var(--font-family-body);
   font-size: var(--typo-body-sm-size);
   line-height: var(--typo-body-sm-line-height);
-  color: var(--_cs-text-muted);
-  margin: 0 0 24px;
-  max-width: 24rem;
-}
-
-.coming-soon__newsletter {
-  width: 100%;
-  max-width: 24rem;
 }
 
 .coming-soon__form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  gap: calc(var(--space-layout-element-gap) / 2);
+  inline-size: min(100%, var(--_coming-soon-form-max));
 }
 
-.coming-soon__input {
-  width: 100%;
-  padding: 14px 16px;
-  background: var(--_cs-input-bg);
-  border: 1px solid var(--_cs-border);
-  border-radius: var(--radius-sm, 4px);
-  color: var(--_cs-text);
-  font-size: var(--typo-body-size);
-  line-height: 1.5;
-  min-height: var(--space-layout-touch-target);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition: border-color var(--transition-fast) var(--easing-default);
+.coming-soon__form .input {
+  min-inline-size: 0;
+  margin: 0;
 }
 
-.coming-soon__input::placeholder {
-  color: var(--_cs-text-muted);
+.coming-soon__form .input__label,
+.coming-soon__form .input__message {
+  color: var(--_coming-soon-text);
 }
 
-.coming-soon__input:focus {
-  outline: none;
-  border-color: var(--_cs-text);
+.coming-soon__form .btn {
+  inline-size: 100%;
 }
 
-.coming-soon__submit {
-  padding: 14px 24px;
-  background: var(--_cs-btn-bg);
-  color: var(--_cs-btn-text);
-  font-size: var(--typo-body-size);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  border: none;
-  border-radius: var(--radius-sm, 4px);
-  cursor: pointer;
-  white-space: nowrap;
-  min-height: var(--space-layout-touch-target);
-  text-align: center;
-  transition: background-color var(--transition-base) var(--easing-out);
-}
-
-.coming-soon__submit:hover {
-  background: var(--_cs-btn-hover);
-}
-
-.coming-soon__success {
-  font-size: var(--typo-h4-size);
-  color: var(--_cs-text);
-  font-weight: 500;
-}
-
-.coming-soon__error {
-  margin-top: 4px;
-  font-size: var(--typo-body-sm-size);
-  color: var(--color-feedback-error-default);
-}
-
-/* ── Password link (replaces inline form) ── */
-.coming-soon__password-link {
-  display: inline-block;
-  margin-top: 24px;
-  padding: 0;
-  background: none;
-  border: none;
-  font-size: var(--typo-body-sm-size);
-  color: var(--_cs-text-muted);
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color var(--transition-base) var(--easing-out);
-}
-
-.coming-soon__password-link:hover {
-  color: var(--_cs-text);
-}
-
-/* ── Password modal overlay ── */
-.coming-soon__modal {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--transition-base) var(--easing-out),
-              visibility var(--transition-base) var(--easing-out);
-}
-
-.coming-soon__modal.is-open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.coming-soon__modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  cursor: pointer;
-}
-
-.coming-soon__modal-panel {
-  position: relative;
-  background: var(--color-surface-primary);
-  border-radius: var(--radius-md, 8px);
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
-  margin: 24px;
-  transform: translateY(16px);
-  transition: transform var(--transition-base) var(--easing-out);
-}
-
-.coming-soon__modal.is-open .coming-soon__modal-panel {
-  transform: translateY(0);
-}
-
-.coming-soon__modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  padding: 4px;
-  background: none;
-  border: none;
-  color: var(--_cs-text-muted);
-  cursor: pointer;
-  transition: color var(--transition-fast) var(--easing-default);
-}
-
-.coming-soon__modal-close:hover {
-  color: var(--_cs-text);
-}
-
-.coming-soon__modal-title {
-  font-size: var(--typo-h4-size);
-  font-weight: 600;
-  margin: 0 0 24px;
-  color: var(--_cs-text);
-}
-
-/* ── Footer (bottom-left) ── */
 .coming-soon__footer {
   position: absolute;
-  bottom: 24px;
-  left: 32px;
-  z-index: 10;
+  z-index: 2;
+  inset-block-end: var(--space-layout-element-gap);
+  inset-inline-start: var(--space-layout-container);
+  margin: 0;
+  color: var(--_coming-soon-text-muted);
+  font-family: var(--font-family-body);
   font-size: var(--typo-caption-size);
-  color: var(--_cs-text-muted);
+  line-height: var(--typo-caption-line-height);
   letter-spacing: 0.02em;
 }
 
-/* ============================================================
-   RESPONSIVE: stacks vertically on mobile
-   ============================================================ */
-@media (max-width: 767px) {
+@container coming-soon (max-width: 48rem) {
   .coming-soon__inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto;
-    min-height: auto;
+    min-block-size: auto;
   }
 
   .coming-soon__logo-bar {
-    padding: 20px 24px;
+    padding-inline: var(--space-layout-element-gap);
+  }
+
+  .coming-soon__left,
+  .coming-soon__right {
+    padding-inline: var(--space-layout-element-gap);
   }
 
   .coming-soon__left {
-    padding: 80px 24px 32px;
+    padding-block: calc(var(--space-layout-section-gap) * 2) var(--space-layout-element-gap);
   }
 
   .coming-soon__right {
-    padding: 0 24px 32px;
+    padding-block: 0 var(--space-layout-section-gap);
   }
-
-
 
   .coming-soon__footer {
     position: relative;
-    bottom: auto;
-    left: auto;
-    padding: 16px 24px 24px;
-    z-index: 2;
+    inset: auto;
+    padding: 0 var(--space-layout-element-gap) var(--space-layout-element-gap);
+  }
+}
+
+@media (forced-colors: active) {
+  .coming-soon:has(.coming-soon__bg) {
+    --_coming-soon-text: CanvasText;
+    --_coming-soon-text-muted: CanvasText;
   }
 
-  .coming-soon__modal-panel {
-    padding: 32px 24px;
-    margin: 16px;
+  .coming-soon > .coming-soon__bg {
+    display: none;
+  }
+
+  .coming-soon:has(.coming-soon__bg)::after {
+    background: Canvas;
+    forced-color-adjust: none;
   }
 }

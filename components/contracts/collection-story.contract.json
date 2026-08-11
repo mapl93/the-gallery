@@ -1,66 +1,399 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "collection-story",
   "name": "Collection Story",
   "registryId": "F4",
   "category": "storytelling",
   "status": "pilot",
-  "summary": "Editorial block with image, title, text, and inspiration quote.",
+  "summary": "Named editorial section with optional media, required narrative, optional quotation, and target-owned actions.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/collection-story",
-    "css": { "file": "components/css/storytelling.css", "selector": ".collection-story" },
+    "css": {
+      "file": "components/css/storytelling.css",
+      "selector": ".collection-story"
+    },
     "docs": "site/src/content/components/collection-story.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".collection-story", "className": ".collection-story", "required": true, "description": "Collection story section." },
-    { "name": "media", "selector": ".collection-story__media", "className": ".collection-story__media", "required": false, "description": "Optional collection media region." },
-    { "name": "mediaImage", "selector": ".collection-story__media img", "className": null, "required": false, "description": "Collection image supplied by the target." },
-    { "name": "content", "selector": ".collection-story__content", "className": ".collection-story__content", "required": true, "description": "Ordered collection narrative content." },
-    { "name": "label", "selector": ".collection-story__label", "className": ".collection-story__label", "required": false, "description": "Optional editorial label." },
-    { "name": "title", "selector": ".collection-story__title", "className": ".collection-story__title", "required": true, "description": "Collection story heading." },
-    { "name": "text", "selector": ".collection-story__text", "className": ".collection-story__text", "required": true, "description": "Collection narrative rich content." },
-    { "name": "inspiration", "selector": ".collection-story__inspiration", "className": ".collection-story__inspiration", "required": false, "description": "Optional inspiration quotation." },
-    { "name": "actions", "selector": ".collection-story__actions", "className": ".collection-story__actions", "required": false, "description": "Optional target-owned action composition." }
+    {
+      "name": "root",
+      "selector": ".collection-story",
+      "className": ".collection-story",
+      "required": true,
+      "description": "Native thematic section named by its visible collection-story heading and establishing the inline-size container."
+    },
+    {
+      "name": "layout",
+      "selector": ".collection-story__layout",
+      "className": ".collection-story__layout",
+      "required": true,
+      "description": "Internal container-responsive layout that preserves media-before-content source order."
+    },
+    {
+      "name": "media",
+      "selector": ".collection-story__media",
+      "className": ".collection-story__media",
+      "required": false,
+      "description": "Optional passive collection media region, omitted completely when no media is supplied."
+    },
+    {
+      "name": "mediaImage",
+      "selector": ".collection-story__media img",
+      "className": null,
+      "required": false,
+      "description": "Native collection image supplied by the target with context-appropriate alternative text."
+    },
+    {
+      "name": "content",
+      "selector": ".collection-story__content",
+      "className": ".collection-story__content",
+      "required": true,
+      "description": "Ordered collection narrative content."
+    },
+    {
+      "name": "label",
+      "selector": ".collection-story__label",
+      "className": ".collection-story__label",
+      "required": false,
+      "description": "Optional editorial label before the visible title."
+    },
+    {
+      "name": "title",
+      "selector": ".collection-story__title",
+      "className": ".collection-story__title",
+      "required": true,
+      "description": "Visible contextual collection-story heading."
+    },
+    {
+      "name": "text",
+      "selector": ".collection-story__text",
+      "className": ".collection-story__text",
+      "required": true,
+      "description": "Target-owned collection narrative rich-content region."
+    },
+    {
+      "name": "inspiration",
+      "selector": ".collection-story__inspiration",
+      "className": ".collection-story__inspiration",
+      "required": false,
+      "description": "Optional native block quotation when the inspiration is genuinely quoted content."
+    },
+    {
+      "name": "actions",
+      "selector": ".collection-story__actions",
+      "className": ".collection-story__actions",
+      "required": false,
+      "description": "Optional ordinary action group composed from canonical Button or other target-owned native controls; it is not automatically a navigation landmark."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default collection story presentation." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default passive collection-story presentation."
+    }
   ],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Single-column layout that becomes two columns at wider viewports." }],
-  "states": [{ "name": "default", "selectors": [".collection-story"], "description": "Default collection story state." }],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One intrinsic composition that splits media and narrative only when media is present and the component container is wide enough."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".collection-story"
+      ],
+      "description": "Required title and narrative content with any accepted optional parts."
+    },
+    {
+      "name": "withMedia",
+      "selectors": [
+        ".collection-story__layout--with-media"
+      ],
+      "description": "Explicit media-present composition that enables the intrinsic two-column split. Adapters omit the modifier when optional media is absent."
+    }
+  ],
   "behavior": [
-    { "name": "narrativeOrder", "selectors": [".collection-story", ".collection-story__content"], "description": "Adapters should preserve meaningful media and narrative source order even when reversed visual placement is used." }
+    {
+      "name": "sectionLabelling",
+      "selectors": [
+        ".collection-story",
+        ".collection-story__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "The native section references a target-unique id on its visible contextual heading; heading rank remains owned by the surrounding document."
+    },
+    {
+      "name": "narrativeOrder",
+      "selectors": [
+        ".collection-story__layout",
+        ".collection-story__content"
+      ],
+      "description": "Adapters preserve media before label, title, body, quotation, and actions in source order even when reversed changes only wide visual placement."
+    },
+    {
+      "name": "containerComposition",
+      "selectors": [
+        ".collection-story",
+        ".collection-story__layout",
+        ".collection-story__layout--with-media"
+      ],
+      "description": "The root establishes an inline-size container; the internal layout stacks in narrow containers, splits only with media in wide containers, and remains one centered narrative column when media is absent."
+    },
+    {
+      "name": "mediaAlternative",
+      "selectors": [
+        ".collection-story__media img"
+      ],
+      "attributes": [
+        "alt"
+      ],
+      "description": "The target supplies useful alternative text for informative media or an empty alternative for decorative or redundant media and omits the entire media region when absent."
+    },
+    {
+      "name": "optionalContent",
+      "selectors": [
+        ".collection-story__media",
+        ".collection-story__label",
+        ".collection-story__inspiration",
+        ".collection-story__actions"
+      ],
+      "description": "Optional parts are omitted without empty shells, placeholder actions, reserved columns, or changes to the required title/body order."
+    },
+    {
+      "name": "quotationSemantics",
+      "selectors": [
+        ".collection-story__inspiration"
+      ],
+      "description": "Inspiration uses a native blockquote only when it is quoted from another source. Any attribution or citation remains separate target-authored content."
+    },
+    {
+      "name": "actionComposition",
+      "selectors": [
+        ".collection-story__actions"
+      ],
+      "events": [
+        "native activation from composed controls"
+      ],
+      "description": "The group adds no landmark or composite-widget semantics. Canonical Button or target-native links/buttons own destinations, activation, focus, disabled, busy, hover and pressed behavior."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".collection-story__content",
+        ".collection-story__text",
+        ".collection-story__inspiration",
+        ".collection-story__actions"
+      ],
+      "description": "Rich, localized and unbroken content wraps inside the actual container; actions wrap as a group without page-level overflow."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".collection-story"
+      ],
+      "description": "Collection Story owns no controlled or uncontrolled state, listener, observer, live region, focus movement or animation. Content safety, media loading, routing and analytics remain target responsibilities."
+    }
   ],
   "properties": [
-    { "name": "reversed", "type": "boolean", "required": false, "defaultValue": false, "description": "Places media after narrative content at wider viewports without changing source order.", "targetMappings": { "web": [{ "kind": "class", "selector": ".collection-story", "classNames": [".collection-story--reversed"], "removeWhen": [false] }] } },
-    { "name": "media", "type": "slot", "required": false, "description": "Target-owned collection media with appropriate alternative text.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-story__media", "classNames": [".collection-story__media"] }] } },
-    { "name": "label", "type": "string", "required": false, "description": "Optional editorial label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-story__label" }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Collection story heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-story__title" }] } },
-    { "name": "body", "type": "slot", "required": true, "description": "Target-owned collection narrative rich content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-story__text", "classNames": [".collection-story__text"] }] } },
-    { "name": "inspiration", "type": "string", "required": false, "description": "Optional inspiration quotation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".collection-story__inspiration" }] } },
-    { "name": "actions", "type": "slot", "required": false, "description": "Optional target-owned calls to action.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-story__actions", "classNames": [".collection-story__actions"] }] } }
+    {
+      "name": "reversed",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Places media after narrative content in the intrinsic wide composition without changing source order; it is a layout property, not a state or variant.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".collection-story",
+            "classNames": [
+              ".collection-story--reversed"
+            ],
+            "removeWhen": [
+              false
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "media",
+      "type": "slot",
+      "required": false,
+      "description": "Target-owned passive collection media with informative or decorative native alternative text as context requires.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".collection-story__media",
+            "classNames": [
+              ".collection-story__media"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Optional editorial label shown before the collection-story title.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".collection-story__label"
+          }
+        ]
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Visible collection-story heading; its contextual native heading level remains target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".collection-story__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "body",
+      "type": "slot",
+      "required": true,
+      "description": "Target-owned collection narrative rich content.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".collection-story__text",
+            "classNames": [
+              ".collection-story__text"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "inspiration",
+      "type": "string",
+      "required": false,
+      "description": "Optional genuine inspiration quotation; attribution remains separate target-owned content.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".collection-story__inspiration"
+          }
+        ]
+      }
+    },
+    {
+      "name": "actions",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned calls to action; canonical Button or target-native controls retain their own semantics and destinations without making the section interactive.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".collection-story__actions",
+            "classNames": [
+              ".collection-story__actions"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-decorative", "--color-surface-primary", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
-      "typography": ["--font-family-accent", "--font-family-heading", "--typo-article-line-height", "--typo-article-size", "--typo-body-size", "--typo-h2-size", "--typo-h4-size"],
-      "radius": ["--radius-lg"],
-      "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
+      "color": [
+        "--color-border-decorative",
+        "--color-surface-primary",
+        "--color-text-accent",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-caption-size",
+        "--typo-caption-line-height",
+        "--tg-typography-body-caption-weight",
+        "--font-family-heading",
+        "--typo-h2-size",
+        "--typo-h2-line-height",
+        "--tg-typography-h2-weight",
+        "--typo-article-size",
+        "--typo-article-line-height",
+        "--tg-typography-article-body-weight",
+        "--font-family-accent",
+        "--typo-h4-size",
+        "--typo-h4-line-height",
+        "--tg-font-weight-medium"
+      ],
+      "radius": [
+        "--radius-lg"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
+        "--space-layout-section-gap"
+      ]
     }
   },
   "accessibility": [
-    "Use a heading level appropriate to the surrounding page for the title.",
-    "Give meaningful media useful alternative text and mark decorative media accordingly.",
-    "Preserve logical reading order when the reversed property changes only visual placement.",
-    "Keep composed actions keyboard accessible with visible focus indicators."
+    "Associate the native section with its visible contextual heading through a target-unique aria-labelledby/id pair.",
+    "Use a heading level appropriate to the surrounding page for the title; the visual class does not mandate h2.",
+    "Give informative media concise useful alternative text, use an empty alternative for decorative or redundant media, and omit the media region when absent.",
+    "Preserve media-before-narrative source order when reversed changes only wide visual placement.",
+    "Use blockquote only for content genuinely quoted from another source and keep attribution outside the quotation.",
+    "Keep composed actions native and keyboard accessible with canonical visible focus without making the section a navigation landmark.",
+    "Keep meaning complete when media, optional parts, CSS or JavaScript are unavailable.",
+    "Allow localized, unbroken, RTL and zoomed content to reflow without page-level horizontal overflow."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/storytelling.css with named inline-size containment and no component runtime."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Dedicated merchant-configurable Liquid section maps optional image metadata, label, required narrative fields, quotation, native Button action and visual reversal without neutral runtime."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

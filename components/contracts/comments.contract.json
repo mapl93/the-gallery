@@ -1,75 +1,161 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "comments",
   "name": "Comment Section",
   "registryId": "L11",
   "category": "blog",
   "status": "pilot",
-  "summary": "Threaded comment list with reply form and sort.",
-  "dependencies": ["avatar", "button", "textarea"],
+  "summary": "Fail-closed named finite discussion with at most two visible thread levels, canonical empty/order/pagination/control composition, controlled target-configured reaction arrays, and target-owned identity, moderation and mutation lifecycle.",
+  "dependencies": ["avatar", "button", "empty-state", "pagination", "select", "textarea", "toggle"],
   "source": {
     "registry": "registry.json#/components/comments",
     "css": { "file": "components/css/blog.css", "selector": ".comments" },
     "docs": "site/src/content/components/comments.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".comments", "className": ".comments", "required": true, "description": "Comment-section container." },
-    { "name": "title", "selector": ".comments__title", "className": ".comments__title", "required": true, "description": "Comment-section title." },
-    { "name": "count", "selector": ".comments__count", "className": ".comments__count", "required": false, "description": "Optional target-formatted comment count." },
-    { "name": "comment", "selector": ".comment", "className": ".comment", "required": false, "description": "Target-owned comment record." },
-    { "name": "avatar", "selector": ".comment__avatar", "className": ".comment__avatar", "required": false, "description": "Optional Avatar composition for the comment author." },
-    { "name": "body", "selector": ".comment__body", "className": ".comment__body", "required": false, "description": "Comment content wrapper." },
-    { "name": "header", "selector": ".comment__header", "className": ".comment__header", "required": false, "description": "Comment author and date wrapper." },
-    { "name": "author", "selector": ".comment__author", "className": ".comment__author", "required": false, "description": "Target-supplied comment author label." },
-    { "name": "date", "selector": ".comment__date", "className": ".comment__date", "required": false, "description": "Target-formatted comment date." },
-    { "name": "text", "selector": ".comment__text", "className": ".comment__text", "required": false, "description": "Comment text content." },
-    { "name": "actions", "selector": ".comment__actions", "className": ".comment__actions", "required": false, "description": "Target-owned comment actions." },
-    { "name": "action", "selector": ".comment__action-btn", "className": ".comment__action-btn", "required": false, "description": "Native button for a target-owned comment action." },
-    { "name": "replies", "selector": ".comment__replies", "className": ".comment__replies", "required": false, "description": "Nested target-owned reply composition." },
-    { "name": "composer", "selector": ".comment-form", "className": ".comment-form", "required": false, "description": "Optional target-owned comment form composition." },
-    { "name": "composerTitle", "selector": ".comment-form__title", "className": ".comment-form__title", "required": false, "description": "Optional comment-form title." }
+    { "name": "root", "selector": ".comments", "className": ".comments", "required": true, "description": "Named thematic discussion section, omitted when its required visible title or discussion composition is absent." },
+    { "name": "title", "selector": ".comments__title", "className": ".comments__title", "required": true, "description": "Visible localized contextual heading that names the section." },
+    { "name": "count", "selector": ".comments__count", "className": ".comments__count", "required": false, "description": "Optional target-formatted authoritative count text; never a neutral computed value or live region." },
+    { "name": "toolbar", "selector": ".comments__toolbar", "className": ".comments__toolbar", "required": false, "description": "Optional container for one canonical Select when the target can verify and project an alternative order." },
+    { "name": "order", "selector": ".comments__order", "className": ".comments__order", "required": false, "description": "Composition hook on the target-controlled canonical Select; it never sorts neutral DOM records." },
+    { "name": "thread", "selector": ".comments__thread", "className": ".comments__thread", "required": false, "description": "Native ordered list used when the required discussion slot contains comment records." },
+    { "name": "item", "selector": ".comments__item", "className": ".comments__item", "required": false, "description": "Native list item containing exactly one comment article plus, only on a top-level item, one optional reply list." },
+    { "name": "comment", "selector": ".comment", "className": ".comment", "required": false, "description": "Native article for one target-owned comment record." },
+    { "name": "avatar", "selector": ".comment__avatar", "className": ".comment__avatar", "required": false, "description": "Optional canonical passive Avatar composition for the author." },
+    { "name": "body", "selector": ".comment__body", "className": ".comment__body", "required": false, "description": "Intrinsic comment metadata, content and action wrapper." },
+    { "name": "header", "selector": ".comment__header", "className": ".comment__header", "required": false, "description": "Native comment header containing visible author and optional date." },
+    { "name": "author", "selector": ".comment__author", "className": ".comment__author", "required": false, "description": "Required visible target-supplied author label for every rendered record." },
+    { "name": "date", "selector": ".comment__date", "className": ".comment__date", "required": false, "description": "Optional native time element with visible localized text and a machine-readable datetime." },
+    { "name": "status", "selector": ".comment__status", "className": ".comment__status", "required": false, "description": "Optional target lifecycle text such as a visible moderation-pending state; it is never inferred by neutral source." },
+    { "name": "content", "selector": ".comment__content", "className": ".comment__content", "required": false, "description": "Target-sanitized comment-content boundary." },
+    { "name": "replyTo", "selector": ".comment__reply-to", "className": ".comment__reply-to", "required": false, "description": "Visible localized parent-context label required when a provider reply deeper than level two is flattened into the second visible level." },
+    { "name": "text", "selector": ".comment__text", "className": ".comment__text", "required": false, "description": "One plain paragraph in the evidence composition; targets may provide other sanitized authored content." },
+    { "name": "actions", "selector": ".comment__actions", "className": ".comment__actions", "required": false, "description": "Native comment footer containing target-owned canonical controls." },
+    { "name": "action", "selector": ".comment__action", "className": ".comment__action", "required": false, "description": "Composition hook on a canonical Button or Link action." },
+    { "name": "reactions", "selector": ".comment__reactions", "className": ".comment__reactions", "required": false, "description": "Named group rendered only when a comment record supplies at least one target-configured reaction." },
+    { "name": "reaction", "selector": ".comment__reaction", "className": ".comment__reaction", "required": false, "description": "Standalone canonical Toggle button projection of one controlled reaction item; the wrapper intentionally is not the exclusive Toggle Group." },
+    { "name": "reactionIcon", "selector": ".comment__reaction-icon", "className": ".comment__reaction-icon", "required": false, "description": "Optional decorative target-owned icon that never replaces the complete localized accessible label." },
+    { "name": "reactionCount", "selector": ".comment__reaction-count", "className": ".comment__reaction-count", "required": false, "description": "Optional visible target-authoritative count hidden from the button name because the supplied reaction label is complete." },
+    { "name": "replies", "selector": ".comment__replies", "className": ".comment__replies", "required": false, "description": "One second-level native ordered list; it never contains another reply list." },
+    { "name": "emptyState", "selector": ".comments__empty", "className": ".comments__empty", "required": false, "description": "Canonical Empty State composition for a resolved valid discussion with zero records." },
+    { "name": "pagination", "selector": ".comments__pagination", "className": ".comments__pagination", "required": false, "description": "Optional canonical finite numbered Pagination after a non-empty thread." },
+    { "name": "composer", "selector": ".comment-form", "className": ".comment-form", "required": false, "description": "Optional target-owned native top-level comment form; reply controls require an authenticated target composer." },
+    { "name": "composerTitle", "selector": ".comment-form__title", "className": ".comment-form__title", "required": false, "description": "Visible heading that names the optional composer form." },
+    { "name": "composerStatus", "selector": ".comment-form__status", "className": ".comment-form__status", "required": false, "description": "Target-owned accessible error or result feedback for the native composer." },
+    { "name": "composerModeration", "selector": ".comment-form__moderation", "className": ".comment-form__moderation", "required": false, "description": "Optional truthful target moderation notice displayed before submission." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default threaded comment presentation." }
+    { "name": "default", "className": null, "default": true, "description": "One finite target-owned discussion; records and canonical optional compositions determine its visible content." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Fluid comment width with responsive wrapping and reply indentation." }
+    { "name": "default", "className": null, "default": true, "description": "Fluid single-column discussion with container-relative logical reply indentation." }
   ],
   "states": [
-    { "name": "default", "selectors": [".comments"], "description": "Default comment-section state." },
-    { "name": "actionHover", "selectors": [".comment__action-btn:hover"], "description": "Comment action hover state." },
-    { "name": "actionFocus", "selectors": [".comment__action-btn:focus-visible"], "description": "Visible keyboard focus for comment actions." }
+    { "name": "default", "selectors": [".comments"], "description": "Valid named discussion with one required target-owned thread or resolved empty-state composition." },
+    { "name": "resolvedEmpty", "selectors": [".comments__empty"], "description": "The target has resolved a valid zero-record discussion and composes canonical Empty State; loading, error, locked and unavailable are different target states." },
+    { "name": "withThread", "selectors": [".comments__thread", ".comments__item", ".comment"], "description": "One or more authoritative records are present in oldest-first order by default." },
+    { "name": "withReplies", "selectors": [".comment__replies", ".comment__reply-to"], "description": "Second-level replies are present; provider depths beyond two are flattened with explicit parent context." },
+    { "name": "withReactions", "selectors": [".comment__reactions", ".comment__reaction"], "description": "At least one record supplies a non-empty controlled reaction array." },
+    { "name": "withPagination", "selectors": [".comments__pagination"], "description": "A long authoritative discussion composes canonical finite Pagination." },
+    { "name": "withComposer", "selectors": [".comment-form"], "description": "An optional target-owned top-level composer is present." }
   ],
   "behavior": [
-    { "name": "targetCommentData", "selectors": [".comment", ".comment__replies"], "description": "The target supplies comment records, author identity, dates, nesting, authentication, moderation state, and synchronization." },
-    { "name": "targetCommentActions", "selectors": [".comment__actions", ".comment-form"], "description": "Sorting, reply and top-level composers, submission, optimistic updates, and feedback remain target-owned pending a source decision." }
+    {
+      "name": "failClosedComposition",
+      "selectors": [".comments", ".comments__title"],
+      "attributes": ["section", "aria-labelledby", "target-unique heading id"],
+      "description": "A non-empty visible title and non-null target discussion slot are required. Missing either omits the complete root instead of emitting an unlabelled or context-free shell."
+    },
+    {
+      "name": "validEmptyComposition",
+      "selectors": [".comments__empty"],
+      "attributes": ["canonical Empty State", "no live role by default"],
+      "description": "A resolved valid discussion with zero records composes canonical Empty State with truthful target copy. A participation action is optional only when an authenticated composer actually exists; loading, provider error, moderation lock and unavailable are never represented as empty."
+    },
+    {
+      "name": "finiteDocumentStructure",
+      "selectors": [".comments__thread", ".comments__item", ".comment", ".comment__replies"],
+      "attributes": ["ol", "li", "article", "role=feed absent", "tabindex absent"],
+      "description": "Neutral Web uses ordinary finite document/list semantics with no Feed role, roving focus, custom collection keyboard model, automatic loading, position metadata or busy lifecycle."
+    },
+    {
+      "name": "maximumTwoVisibleLevels",
+      "selectors": [".comment__replies", ".comment__reply-to"],
+      "description": "Only top-level comments and one reply list are rendered. Provider descendants deeper than level two are flattened into that reply list in authoritative order and receive a localized visible reply-to label naming their immediate parent context."
+    },
+    {
+      "name": "authoritativeOrdering",
+      "selectors": [".comments__toolbar", ".comments__order", ".comments__thread"],
+      "events": ["target order request"],
+      "description": "The default supplied record set is oldest first. A target may compose canonical Select for another verified order, but it must return one complete authoritative ordered record set; neutral CSS and runtime never sort records."
+    },
+    {
+      "name": "finitePagination",
+      "selectors": [".comments__pagination"],
+      "attributes": ["canonical Pagination"],
+      "events": ["target page navigation"],
+      "description": "Long discussions use canonical finite numbered Pagination. The target owns page count, URLs, current page, replacement, history, scroll, focus and announcements; infinite Feed and unbounded insertion are outside v1."
+    },
+    {
+      "name": "commentIdentity",
+      "selectors": [".comment", ".comment__author", ".comment__date", ".comment__content"],
+      "attributes": ["aria-labelledby", "id", "time", "datetime", "dir=auto on target text"],
+      "description": "Each rendered article is distinguishable from visible author plus optional date and contains non-empty target-sanitized content. The target owns stable IDs, identity privacy, timestamps, localization, language, direction and trust policy."
+    },
+    {
+      "name": "controlledReactionArrays",
+      "selectors": [".comment__reactions", ".comment__reaction"],
+      "attributes": ["button", "aria-pressed", "disabled", "complete localized accessible name"],
+      "events": ["reaction request"],
+      "description": "Each record supplies one ordered array of zero, one or multiple reactions. Every item provides stable id, complete localized label, optional icon, optional authoritative count, selected state and availability. Empty omits the surface. Activation emits a request and the target returns the complete authoritative array, independently preserving selections or atomically enforcing mutual exclusion without a public single/multiple mode."
+    },
+    {
+      "name": "targetReplyLifecycle",
+      "selectors": [".comment__action", ".comment__replies"],
+      "attributes": ["canonical Button", "contextual accessible name"],
+      "events": ["reply request"],
+      "description": "Reply controls appear only when a target-authenticated composer and moderation lifecycle exist. Targets with a flat native model may omit reply controls and nesting without fabricating unsupported relationships."
+    },
+    {
+      "name": "targetComposer",
+      "selectors": [".comment-form", ".comment-form__title"],
+      "attributes": ["form", "aria-labelledby", "named canonical controls", "explicit submit Button"],
+      "events": ["submit", "reset", "invalid", "target-owned mutation result"],
+      "description": "The optional slot composes a native named form from canonical controls. Draft ownership, validation, authentication, permissions, sanitization, moderation, persistence, pending/error/result announcement, authoritative count, insertion and focus restoration remain target-owned."
+    }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Visible comment-section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".comments__title" }] } },
-    { "name": "count", "type": "string", "required": false, "description": "Optional target-formatted comment count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".comments__count" }] } },
-    { "name": "thread", "type": "slot", "required": true, "description": "Target-owned comment records, nesting, actions, and any empty-state content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comments", "classNames": [".comments"] }] } },
-    { "name": "composer", "type": "slot", "required": false, "description": "Target-owned top-level comment form composed from Textarea and Button controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comment-form", "classNames": [".comment-form"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Non-empty visible localized discussion heading; blank omits the complete root.", "targetMappings": { "web": [{ "kind": "content", "selector": ".comments__title" }] } },
+    { "name": "count", "type": "string", "required": false, "description": "Optional target-formatted authoritative static count text; not automatically derived or announced.", "targetMappings": { "web": [{ "kind": "content", "selector": ".comments__count" }] } },
+    { "name": "orderControl", "type": "slot", "required": false, "description": "Optional canonical Select that emits an order request; the target supplies the replacement ordered thread.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comments__toolbar", "classNames": [".select", ".comments__order"] }] } },
+    { "name": "thread", "type": "slot", "required": true, "description": "Non-null target discussion composition containing either the authoritative native ordered thread or canonical resolved Empty State; absence omits the complete root.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comments", "classNames": [".comments__thread", ".comments__item", ".comment", ".comment__replies", ".comments__empty"] }] } },
+    { "name": "pagination", "type": "slot", "required": false, "description": "Optional canonical finite numbered Pagination for a long non-empty discussion.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comments", "classNames": [".pagination", ".comments__pagination"] }] } },
+    { "name": "composer", "type": "slot", "required": false, "description": "Optional target-owned top-level native form composed from canonical Textarea and Button controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".comment-form", "classNames": [".comment-form"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
-      "easing": ["--easing-default"],
-      "typography": ["--font-family-heading", "--typo-body-line-height", "--typo-body-size", "--typo-h4-size"],
-      "spacing": ["--space-layout-element-gap", "--space-layout-section-gap", "--space-layout-touch-target"],
-      "transition": ["--transition-fast"]
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-font-weight-semibold", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-h4-line-height", "--typo-h4-size"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-section-gap", "--tg-space-inline-md", "--tg-space-inline-sm", "--tg-space-inline-xs", "--tg-space-stack-md", "--tg-space-stack-xs"]
     }
   },
   "accessibility": [
-    "Represent comment records and nested replies with a semantic structure that communicates their relationships without relying on indentation alone.",
-    "Expose author and date text clearly, and use a time element with a machine-readable datetime value when the target provides one.",
-    "Use native buttons for comment actions with visible focus and descriptive accessible names.",
-    "Composed Textarea and Button controls retain their own labels, validation, disabled, busy, and submission semantics.",
-    "Authentication, moderation, submission feedback, and live updates require target-specific accessible status handling."
+    "Require a non-empty visible title and non-null discussion slot, then name the native section from that heading through aria-labelledby.",
+    "Represent records with ol and direct li items, one native article per comment and at most one nested ol reply list; do not rely on indentation alone.",
+    "Flatten provider depths beyond two into the second list in authoritative order and expose visible localized reply-to context naming the immediate parent.",
+    "Give each comment article a distinguishing name from visible author plus optional visible date; preserve native time datetime and complete localized target text.",
+    "Hide a redundant Avatar when adjacent visible author text identifies the same person.",
+    "Render reactions as native standalone Toggle buttons with complete localized names, boolean aria-pressed and native disabled state; optional icon and count never replace the label, and an empty array renders no group.",
+    "Do not wrap target-controlled reaction buttons in the exclusive canonical Toggle Group because neutral reaction policy intentionally permits independent or target-enforced mutually exclusive arrays.",
+    "Compose optional order and pagination from canonical Select and Pagination, preserving their native keyboard, focus, current-page and URL contracts while the target owns result replacement and announcements.",
+    "Use canonical Empty State only for resolved zero records; loading, error, moderation lock and unavailable require distinct target-owned page compositions.",
+    "Show reply actions only with an authenticated target composer and lifecycle. The optional top-level composer uses a named native form, visible canonical labels, explicit submit and accessible pending/error/success feedback.",
+    "Do not add role=feed unless a target separately implements and verifies automatic loading, focus navigation, position, set-size and busy-state semantics."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Structural CSS is implemented; sorting, composer, authentication, moderation, and update behavior remain target-owned." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "web": { "status": "implemented", "kind": "html-css-composition", "notes": "Finite two-level document structure, controlled standalone reaction toggles, canonical Select/Empty State/Pagination/Button/Textarea composition and intrinsic container-relative CSS are implemented with zero L11 runtime; targets own all records and mutation lifecycles." },
+    "shopify": { "status": "implemented", "kind": "liquid-section-css-form", "notes": "Article-only Theme Editor section maps published article.comments, canonical finite Pagination, canonical Empty State and the native new_comment form with exact author/email/body names, localization and moderation/result feedback. Shopify remains flat and deliberately omits replies and reactions." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

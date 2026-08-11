@@ -1,0 +1,60 @@
+{% doc %}
+  Renders the target-native Free Shipping Bar anatomy from an already selected
+  qualifying amount, threshold, and localized copy. The caller owns eligibility,
+  currency formatting, cart refresh, placement, and announcement behavior.
+
+  @param {number} value - Current qualifying amount in the target-selected unit.
+  @param {number} max - Positive free-shipping threshold in the same unit.
+  @param {string} message - Complete localized remaining or achieved message.
+  @param {string} accessible_label - Localized name for the progressbar.
+  @param {string} [value_text] - Optional localized interpretation of the raw value.
+
+  @example
+  {% render 'free-shipping-bar', value: qualifying_amount, max: shipping_threshold, message: shipping_message, accessible_label: shipping_progress_label, value_text: shipping_value_text %}
+{% enddoc %}
+
+{%- liquid
+  assign shipping_message = message | strip
+  assign shipping_accessible_label = accessible_label | strip
+  assign shipping_value = value | plus: 0
+  assign shipping_max = max | plus: 0
+
+  if shipping_value < 0
+    assign shipping_value = 0
+  endif
+
+  if shipping_value > shipping_max
+    assign shipping_value = shipping_max
+  endif
+
+  assign shipping_percent = 0
+  if shipping_max > 0
+    assign shipping_percent = shipping_value | times: 100.0 | divided_by: shipping_max | at_least: 0 | at_most: 100
+  endif
+
+  assign shipping_achieved = false
+  if shipping_max > 0 and shipping_value >= shipping_max
+    assign shipping_achieved = true
+  endif
+-%}
+
+{%- if shipping_message != blank and shipping_accessible_label != blank and shipping_max > 0 -%}
+  <div class="shipping-bar{% if shipping_achieved %} shipping-bar--achieved{% endif %}">
+    <p class="shipping-bar__message">{{ shipping_message | escape }}</p>
+    <div
+      class="progress shipping-bar__progress"
+      role="progressbar"
+      aria-label="{{ shipping_accessible_label | escape }}"
+      aria-valuemin="0"
+      aria-valuemax="{{ shipping_max }}"
+      aria-valuenow="{{ shipping_value }}"
+      {%- if value_text != blank %}
+        aria-valuetext="{{ value_text | strip | escape }}"
+      {%- endif %}
+    >
+      <div class="progress__track">
+        <div class="progress__bar" style="width: {{ shipping_percent }}%;"></div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}

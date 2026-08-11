@@ -1,46 +1,92 @@
 ## Overview
 
-Full-width collection introduction with a title, optional description, product count, and optional image-backed presentation.
+Collection Hero is a passive collection introduction with one contextual title,
+an optional concise description, an optional target-formatted count, and
+optional image media. Supplying the image derives the image-backed contrast
+composition; there is no separate variant control that can contradict it.
 
-<Preview html={"<section class=\"collection-hero collection-hero--with-image tg-preview-stage\"><div class=\"collection-hero__image tg-preview-media tg-preview-media--wide\" role=\"img\" aria-label=\"Stoneware vessels arranged in gallery light\"></div><div class=\"collection-hero__content\"><h1 class=\"collection-hero__title\">Quiet Forms</h1><p class=\"collection-hero__description\">A study in balance, texture, and useful objects.</p><p class=\"collection-hero__count\">24 works</p></div></section>"} label="Collection Hero" />
+<Preview html={'<section class="collection-hero collection-hero--with-image"><img class="collection-hero__image" src="/media/editorial/ceramic-tableware.jpg" alt="Stoneware vessels arranged in soft gallery light"><div class="collection-hero__content"><h2 class="collection-hero__title">Quiet Forms</h2><p class="collection-hero__description">A study in balance, texture, and useful objects.</p><p class="collection-hero__count">24 works</p></div></section>'} label="Collection Hero" />
 
 ## Presentation
 
-`default` uses the archival surface and primary text. `with-image` places the media behind a generated contrast overlay and switches collection copy to inverse text.
+Without image media, the component uses the archival surface and primary text.
+With image media, the target adds `.collection-hero--with-image`; canonical CSS
+places the image behind a semantic contrast layer and pairs it with inverse text
+in both light and dark themes. The content stack and information hierarchy do
+not change between compositions.
 
-### Default
-
-<Preview html={"<section class=\"collection-hero\"><div class=\"collection-hero__content\"><h1 class=\"collection-hero__title\">Studio Favorites</h1><p class=\"collection-hero__description\">A curated edit of handcrafted pieces.</p><p class=\"collection-hero__count\">24 works</p></div></section>"} label="Default" />
-
-### With Image
-
-<Preview html={"<section class=\"collection-hero collection-hero--with-image tg-preview-stage\"><div class=\"collection-hero__image tg-preview-media tg-preview-media--wide\" role=\"img\" aria-label=\"Handcrafted vessels\"></div><div class=\"collection-hero__content\"><h1 class=\"collection-hero__title\">Artisan Ceramics</h1><p class=\"collection-hero__description\">Handcrafted pieces from independent studios.</p><p class=\"collection-hero__count\">42 works</p></div></section>"} label="With Image" />
+Root padding responds to available inline size through token-bounded intrinsic
+values.
+Image-backed mode keeps a private minimum depth, while text-only mode grows from
+its content. Title, description, and count wrap safely inside a private readable
+maximum; these geometry details are not consumer properties.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use the collection title as the primary identity signal for the page.</Do>
-  <Dont>Do not use image-backed presentation when the media cannot support readable text.</Dont>
+  <Do>Use one visible native title heading at the correct rank for the surrounding page.</Do>
+  <Dont>Expose heading rank as a visual style switch or add a widget role.</Dont>
+  <Do>Let image presence derive the image-backed class and contrast layer.</Do>
+  <Dont>Offer independent image and variant controls that can produce contradictory markup.</Dont>
+  <Do>Supply useful contextual alt text when the media conveys information, or an empty alt when it is decorative.</Do>
+  <Dont>Copy the collection title into alt text merely to avoid an empty value.</Dont>
 </DoDont>
 
-- Keep the description curatorial and concise.
-- Format the count through the target commerce layer.
-- Treat decorative media as empty-alt content; provide useful alternative text when it carries meaning.
+Keep the description concise and plain text. Long-form or richly structured
+collection narrative belongs in a separate content region. Count formatting,
+pluralization, filtering meaning, and commerce data belong to the target. Omit
+optional nodes instead of rendering empty spacing.
 
 ## Accessibility
 
-- Use the page-appropriate heading level for the collection title.
-- Ensure image-backed text maintains sufficient contrast in every theme.
-- Do not make the product count the only way collection size is communicated after filtering.
+- Render exactly one visible native heading for the collection title. A
+  collection template commonly uses `h1`; this nested docs preview uses `h2`
+  because the component page already owns its `h1`.
+- Use a real image. Preserve meaningful alt text for informative media and
+  `alt=""` for decorative atmosphere.
+- Verify image-backed contrast against every supplied image frame in light and
+  dark themes. Forced-colors presentation must not depend on image pixels.
+- Keep the optional count as ordinary readable text, not an implicit live
+  region. Filters or result summaries own synchronized announcements.
+- Collection Hero has no focus, keyboard, controlled/uncontrolled, event, or
+  reduced-motion contract because it owns no interaction or animation.
+
+## Technical Specification
+
+- root: `.collection-hero`
+- image-backed root: `.collection-hero.collection-hero--with-image`, derived
+  only when image media exists
+- media: real `.collection-hero__image`
+- content stack: `.collection-hero__content`
+- required contextual heading: `.collection-hero__title`
+- optional plain copy: `.collection-hero__description`
+- optional formatted count: `.collection-hero__count`
+- contrast layer: generated `.collection-hero--with-image::before`
+
+The component adds no JavaScript, events, observers, timers, requests, or
+layout loops. Target adapters choose heading rank, image resource/loading policy,
+localized count text, and collection data source.
+
+## Content And Responsive Coverage
+
+Validate text-only and image-backed compositions with short, long, localized,
+empty optional, and unbroken extreme content. Test informative and decorative
+images, absent media, very light and dark frames, 200% zoom, all accepted themes,
+forced colors, and mobile, tablet, desktop, and XL containers.
 
 ## References
 
+### API Reference
+
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default` or `with-image`</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible collection title</td></tr>
-  <tr><td>`description`</td><td>string</td><td>optional</td><td>Collection description</td></tr>
-  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted product count</td></tr>
-  <tr><td>`image`</td><td>slot</td><td>optional</td><td>Collection media</td></tr>
-  <tr><td>`imageAlt`</td><td>string</td><td>optional</td><td>Meaningful media alternative text</td></tr>
-  <tr><td>`.collection-hero--with-image`</td><td>class</td><td>optional</td><td>Image-backed presentation</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible collection identity in one context-ranked native heading</td></tr>
+  <tr><td>`description`</td><td>string</td><td>optional</td><td>Concise plain-text collection summary</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Already localized and target-formatted product count</td></tr>
+  <tr><td>`image`</td><td>slot</td><td>optional</td><td>Real collection media whose presence derives image-backed presentation</td></tr>
+  <tr><td>`imageAlt`</td><td>string</td><td>conditional</td><td>Contextual alternative text; empty string is valid for decorative media</td></tr>
 </PropTable>
+
+Overlay opacity, content width, minimum height, crop, alignment, section
+padding, heading rank, description markup, filter synchronization, and image
+loading policy are private composition or target concerns, not neutral public
+properties.

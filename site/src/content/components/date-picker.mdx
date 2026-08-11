@@ -1,42 +1,68 @@
 ## Overview
 
-Date field with a custom calendar grid and month navigation.
+Date Picker combines an editable local-date field with an explicit calendar trigger. The native text input remains the value, validation, and form-submission owner; the calendar adds spatial selection without converting the date through a timezone.
 
 ## Presentation
 
-Date Picker supports `default`, `error`, `success`, and `warning` validation families on its input while calendar selection remains an independent state.
+The canonical fixture uses the stable `YYYY-MM-DD` edit format, a non-modal calendar dialog, and one selected day. The enhancer builds the complete six-week grid from this authored anatomy, so Exhibit and Studio exercise the same states and class contract.
 
-<Preview html={"<div class=\"field tg-preview-frame--sm\"><label class=\"field__label\" for=\"date-demo\">Exhibition date</label><div class=\"datepicker datepicker--open tg-preview-anchor-stage tg-preview-anchor-stage--calendar\"><input id=\"date-demo\" class=\"datepicker__input\" data-preview-trigger type=\"text\" value=\"2026-07-12\" readonly aria-haspopup=\"grid\" aria-expanded=\"true\" aria-controls=\"date-demo-calendar\" /><div id=\"date-demo-calendar\" class=\"datepicker__calendar\"><div class=\"datepicker__header\"><span class=\"datepicker__month-year\">July 2026</span><div class=\"datepicker__nav\"><button class=\"datepicker__nav-btn\" type=\"button\" aria-label=\"Previous month\">‹</button><button class=\"datepicker__nav-btn\" type=\"button\" aria-label=\"Next month\">›</button></div></div><div class=\"datepicker__weekdays\" aria-hidden=\"true\"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div><div class=\"datepicker__grid\" role=\"grid\" aria-label=\"July 2026\"><button class=\"datepicker__day datepicker__day--outside\" type=\"button\" role=\"gridcell\">28</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\">6</button><button class=\"datepicker__day datepicker__day--today datepicker__day--selected\" type=\"button\" role=\"gridcell\" aria-current=\"date\" aria-selected=\"true\" data-preview-close>12</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\">18</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\">24</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\">30</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\">31</button></div></div></div></div>"} label="Date Picker" layout="anchored" interaction={{"selector":".datepicker","toggle":"datepicker--open","triggerLabel":"Open Date Picker","triggerSelector":"[data-preview-trigger]","closeSelector":"[data-preview-close]","startVisible":true}} />
+<Preview html={"<div class=\"field tg-preview-frame--sm\"><label class=\"field__label\" for=\"date-demo\">Exhibition date</label><div class=\"datepicker datepicker--open tg-preview-anchor-stage tg-preview-anchor-stage--calendar\" data-today=\"2026-07-12\"><input id=\"date-demo\" class=\"datepicker__input\" type=\"text\" inputmode=\"numeric\" name=\"exhibitionDate\" value=\"2026-07-12\" placeholder=\"YYYY-MM-DD\" autocomplete=\"off\" role=\"combobox\" aria-haspopup=\"dialog\" aria-autocomplete=\"none\" aria-expanded=\"true\" aria-controls=\"date-demo-calendar\" aria-describedby=\"date-demo-hint\" /><button class=\"datepicker__trigger\" type=\"button\" aria-label=\"Change date, July 12, 2026\" aria-controls=\"date-demo-calendar\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 2v4M16 2v4M3 10h18\"/><rect x=\"3\" y=\"4\" width=\"18\" height=\"17\" rx=\"2\"/></svg></button><div id=\"date-demo-calendar\" class=\"datepicker__calendar\" role=\"dialog\" aria-label=\"Choose date\"><div class=\"datepicker__header\"><span id=\"date-demo-month\" class=\"datepicker__month-year\" aria-live=\"polite\">July 2026</span><div class=\"datepicker__nav\"><button class=\"datepicker__nav-btn\" data-datepicker-previous type=\"button\" aria-label=\"Previous month\">&#8249;</button><button class=\"datepicker__nav-btn\" data-datepicker-next type=\"button\" aria-label=\"Next month\">&#8250;</button></div></div><div class=\"datepicker__grid\" role=\"grid\" aria-labelledby=\"date-demo-month\"><div class=\"datepicker__weekdays\" role=\"row\"><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Sunday\">Sun</abbr></span><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Monday\">Mon</abbr></span><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Tuesday\">Tue</abbr></span><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Wednesday\">Wed</abbr></span><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Thursday\">Thu</abbr></span><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Friday\">Fri</abbr></span><span class=\"datepicker__weekday\" role=\"columnheader\"><abbr title=\"Saturday\">Sat</abbr></span></div><div class=\"datepicker__week\" role=\"row\"><button class=\"datepicker__day datepicker__day--outside\" type=\"button\" role=\"gridcell\" data-date=\"2026-06-28\" tabindex=\"-1\">28</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\" data-date=\"2026-07-06\" tabindex=\"-1\">6</button><button class=\"datepicker__day datepicker__day--today datepicker__day--selected\" type=\"button\" role=\"gridcell\" data-date=\"2026-07-12\" tabindex=\"0\" aria-current=\"date\" aria-selected=\"true\">12</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\" data-date=\"2026-07-18\" tabindex=\"-1\">18</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\" data-date=\"2026-07-24\" tabindex=\"-1\">24</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\" data-date=\"2026-07-30\" tabindex=\"-1\">30</button><button class=\"datepicker__day\" type=\"button\" role=\"gridcell\" data-date=\"2026-07-31\" tabindex=\"-1\">31</button></div></div></div></div><span id=\"date-demo-hint\" class=\"field__description\">Use YYYY-MM-DD or choose a date.</span></div>"} label="Date Picker" layout="anchored" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use a custom calendar when visual date context materially improves selection.</Do>
-  <Dont>Don't replace a target's accessible native date input without a clear benefit.</Dont>
+  <Do>Use Date Picker when calendar context helps users choose one day and preserve a visible format hint for direct entry.</Do>
+  <Dont>Don't use this single-date contract for ranges, date-and-time values, or locale-specific edit formats without a separate accepted decision.</Dont>
 </DoDont>
+
+## Behavior
+
+- Direct editing and calendar selection share one native text value serialized as `YYYY-MM-DD`.
+- The input opens the calendar with `ArrowDown`; the explicit trigger is independently keyboard reachable.
+- Day focus is roving: arrow keys move by day or week, `Home`/`End` move within the week, `PageUp`/`PageDown` move by month, and adding `Shift` moves by year.
+- `Enter` or `Space` selects the focused date, emits native `input` followed by `change`, closes the dialog, and returns focus to the input.
+- `Escape`, outside pointer activation, or focus leaving the component closes the non-modal dialog.
+- `min` and `max` are inclusive ISO bounds. Unavailable days and month controls are disabled and skipped.
+- Native form reset restores the authored input value and closes the calendar.
 
 ## Accessibility
 
-- Synchronize the input value with the selected calendar day.
-- Expose current, selected, outside-month, and disabled states.
-- Support arrow-key day navigation, PageUp/PageDown month navigation, selection, and Escape.
-- Preserve the visible label and associated feedback.
+- Keep a visible `<label>` associated with the editable input; a placeholder is never its accessible name.
+- Expose the input as `role="combobox"` with `aria-haspopup="dialog"`, `aria-autocomplete="none"`, `aria-expanded`, and `aria-controls`.
+- Name the calendar dialog and associate its grid with the live month heading.
+- Render explicit week rows and full weekday/date names while keeping only one enabled day at `tabindex="0"`.
+- Expose today with `aria-current="date"`, selection with `aria-selected`, and unavailability through the native `disabled` state.
+- Keep the trigger enabled only while the input is editable; disabled and read-only values remain native form states.
+
+## Composition and targets
+
+The base source owns CSS and progressive behavior without a framework dependency. Web consumes the native input, explicit button, and generated grid directly. Shopify should render the same form owner and enhancement hooks in Liquid, while React and future targets map controlled `value`/`open` state onto the same event and focus contract. Range selection, localized edit formats, first-weekday policy, multiple months, and time selection remain separate decisions.
 
 ## References
 
 <PropTable>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible accessible field name</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>Validation presentation</td></tr>
-  <tr><td>`value`</td><td>string</td><td>`2026-07-12`</td><td>Serialized selected date</td></tr>
+  <tr><td>`value`</td><td>string</td><td>`2026-07-12`</td><td>Editable and selected ISO date</td></tr>
+  <tr><td>`name`</td><td>string</td><td>optional</td><td>Native form field name</td></tr>
+  <tr><td>`placeholder`</td><td>string</td><td>`YYYY-MM-DD`</td><td>Visible edit-format hint</td></tr>
+  <tr><td>`autocomplete`</td><td>string</td><td>`off`</td><td>Native autofill hint</td></tr>
+  <tr><td>`min`</td><td>string</td><td>optional</td><td>Inclusive ISO lower bound</td></tr>
+  <tr><td>`max`</td><td>string</td><td>optional</td><td>Inclusive ISO upper bound</td></tr>
   <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Calendar visibility and expanded state</td></tr>
-  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Input availability</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Input and trigger availability</td></tr>
+  <tr><td>`readOnly`</td><td>boolean</td><td>`false`</td><td>Native read-only text value</td></tr>
   <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required state</td></tr>
   <tr><td>`describedBy`</td><td>string</td><td>optional</td><td>Guidance or validation message id</td></tr>
-  <tr><td>`.datepicker`</td><td>class</td><td>—</td><td>Input and calendar root</td></tr>
+  <tr><td>`.datepicker`</td><td>class</td><td>—</td><td>Input, trigger, and calendar root</td></tr>
   <tr><td>`.datepicker--open`</td><td>modifier</td><td>—</td><td>Visible calendar state</td></tr>
   <tr><td>`.datepicker--error`</td><td>modifier</td><td>—</td><td>Error validation family</td></tr>
   <tr><td>`.datepicker--success`</td><td>modifier</td><td>—</td><td>Success validation family</td></tr>
   <tr><td>`.datepicker--warning`</td><td>modifier</td><td>—</td><td>Warning validation family</td></tr>
-  <tr><td>`.datepicker__input`</td><td>class</td><td>—</td><td>Native input trigger</td></tr>
-  <tr><td>`.datepicker__calendar`</td><td>class</td><td>—</td><td>Calendar surface</td></tr>
-  <tr><td>`.datepicker__day`</td><td>class</td><td>—</td><td>Selectable day cell</td></tr>
+  <tr><td>`.datepicker__input`</td><td>class</td><td>—</td><td>Native editable value owner</td></tr>
+  <tr><td>`.datepicker__trigger`</td><td>class</td><td>—</td><td>Explicit calendar trigger</td></tr>
+  <tr><td>`.datepicker__calendar`</td><td>class</td><td>—</td><td>Non-modal dialog surface</td></tr>
+  <tr><td>`.datepicker__weekday`</td><td>class</td><td>—</td><td>Weekday column heading</td></tr>
+  <tr><td>`.datepicker__week`</td><td>class</td><td>—</td><td>Calendar grid row</td></tr>
+  <tr><td>`.datepicker__day`</td><td>class</td><td>—</td><td>Roving-focus day gridcell button</td></tr>
 </PropTable>

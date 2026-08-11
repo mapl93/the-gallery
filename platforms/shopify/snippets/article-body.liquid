@@ -1,0 +1,37 @@
+{% doc %}
+Renders one passive Article Body from supplied trusted rich content or a Shopify article resource.
+
+The owning article section/template controls the surrounding article, heading,
+content policy, localization, SEO, media rewriting, commerce islands, and editor
+experience. This snippet does not parse or rewrite merchant HTML.
+
+@param {article} [article] - Optional Shopify Article whose content is used when content is blank.
+@param {string} [content] - Optional target-supplied trusted semantic rich content.
+@param {boolean} [drop_cap] - Adds the optional prose drop-cap class.
+@param {string} [class] - Optional target-owned additional class.
+
+@example
+{% render 'article-body', article: article, drop_cap: true %}
+{% enddoc %}
+
+{%- liquid
+  assign article_body_content = content
+  if article_body_content == blank and article != blank
+    assign article_body_content = article.content
+  endif
+
+  assign article_body_text = article_body_content | strip_html | strip
+  assign article_body_class = 'article-body prose'
+  if drop_cap == true
+    assign article_body_class = article_body_class | append: ' article-body--drop-cap'
+  endif
+  if class != blank
+    assign article_body_class = article_body_class | append: ' ' | append: class
+  endif
+-%}
+
+{%- if article_body_text != blank -%}
+  <div class="{{ article_body_class | escape }}">
+    {{ article_body_content }}
+  </div>
+{%- endif -%}

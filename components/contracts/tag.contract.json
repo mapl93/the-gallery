@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "tag",
   "name": "Tag",
   "registryId": "A8",
@@ -59,14 +59,14 @@
     {
       "name": "removeRequest",
       "selectors": [".tag__remove"],
-      "attributes": ["type=\"button\"", "aria-label"],
+      "attributes": ["type=\"button\"", "non-empty aria-label"],
       "events": ["click", "Space", "Enter"],
-      "description": "The native button emits a removal request; the consuming target updates application state and removes the Tag."
+      "description": "The native button emits a removal request only when a contextual accessible name is available; the consuming target updates application state and removes the Tag."
     },
     {
       "name": "removalAnnouncement",
       "selectors": [".tag__remove"],
-      "description": "When removal changes an editable list or active filters, the consuming target announces the result in its contextual live region."
+      "description": "When removal changes an editable list or active filters, the consuming target chooses a surviving focus destination and announces the result in its contextual live region when useful."
     },
     {
       "name": "nativeDisabled",
@@ -94,7 +94,7 @@
       "name": "removeLabel",
       "type": "string",
       "required": false,
-      "description": "Accessible name for the optional remove action, including the value being removed.",
+      "description": "Conditionally required non-empty accessible name when removeAction is present, including the value being removed; omit the action when no valid name is available.",
       "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tag__remove", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
     },
     {
@@ -116,14 +116,16 @@
       ],
       "spacing": ["--space-input-icon-size"],
       "radius": ["--radius-full"],
-      "typography": ["--typo-body-size", "--font-family-body"],
+      "typography": ["--typo-body-sm-size", "--typo-body-sm-line-height", "--font-family-body"],
       "opacity": ["--opacity-disabled"]
     }
   },
   "accessibility": [
     "Use a native type=\"button\" remove action and include the represented value in its aria-label.",
+    "Render the optional remove action only when its contextual accessible name is non-empty.",
     "Do not make the entire Tag interactive when only removal is available.",
-    "Keep the visible value readable and let the consuming target announce removal from an editable list or filter set.",
+    "Keep the visible value readable and let the consuming target own DOM removal, the next focus destination, and any contextual announcement.",
+    "Keep the remove action at least 24 by 24 CSS pixels and preserve visible focus and native disabled behavior.",
     "Use Badge for passive status and Link when activating the label should navigate."
   ],
   "adapters": {

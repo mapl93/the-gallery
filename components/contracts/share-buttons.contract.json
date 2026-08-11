@@ -1,50 +1,97 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "share-buttons",
-  "name": "Share Buttons",
+  "name": "Share Actions",
   "registryId": "L9",
   "category": "blog",
   "status": "pilot",
-  "summary": "Social sharing buttons. Inline and sticky sidebar variants.",
-  "dependencies": [],
+  "summary": "Fail-closed named group of target-selected canonical share actions with intrinsic inline or stacked layout, curated semantic action ids, arbitrary custom actions, and target-owned capabilities and results.",
+  "dependencies": ["button"],
   "source": {
     "registry": "registry.json#/components/share-buttons",
     "css": { "file": "components/css/blog.css", "selector": ".share-buttons" },
     "docs": "site/src/content/components/share-buttons.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".share-buttons", "className": ".share-buttons", "required": true, "description": "Share-action composition container." }
+    { "name": "root", "selector": ".share-buttons", "className": ".share-buttons", "required": true, "description": "Generic named role=group containing one finite ordered set of independent share actions; it is not a toolbar, menu or fixed rail." },
+    { "name": "action", "selector": ".share-buttons__action", "className": ".share-buttons__action", "required": true, "description": "Contextual hook composed on a canonical Button root rendered as a native button for an operation or anchor for a destination." }
   ],
   "variants": [
-    { "name": "inline", "className": ".share-buttons--inline", "default": true, "description": "Inline wrapping share-action composition." },
-    { "name": "sticky", "className": ".share-buttons--sticky", "default": false, "description": "Column presentation intended for placement by a containing sticky layout." }
+    { "name": "inline", "className": ".share-buttons--inline", "default": true, "description": "Intrinsic wrapping row of canonical actions." },
+    { "name": "stacked", "className": ".share-buttons--stacked", "default": false, "description": "Intrinsic vertical action group without fixed or sticky viewport placement." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Action sizing remains owned by each composed control." }
+    { "name": "default", "className": null, "default": true, "description": "Root owns no action size; each canonical Button composition retains its reviewed size." }
   ],
   "states": [
-    { "name": "default", "selectors": [".share-buttons"], "description": "Default share-action composition state." }
+    { "name": "default", "selectors": [".share-buttons"], "description": "Valid named group with at least one target-capable action." },
+    { "name": "hover", "selectors": [".share-buttons__action.btn"], "description": "Canonical Button hover presentation; L9 adds no parallel state." },
+    { "name": "active", "selectors": [".share-buttons__action.btn"], "description": "Canonical Button active presentation; L9 adds no persistent shared state." },
+    { "name": "focusVisible", "selectors": [".share-buttons__action.btn"], "description": "Canonical Button focus indicator with ordinary sequential Tab order." },
+    { "name": "disabled", "selectors": [".share-buttons__action.btn"], "description": "Truthful action-local canonical unavailable state; capability-unavailable share actions are omitted rather than rendered as dead controls." },
+    { "name": "busy", "selectors": [".share-buttons__action.btn"], "description": "Optional truthful target-owned pending action projected through canonical Button." }
   ],
   "behavior": [
-    { "name": "targetShareActions", "selectors": [".share-buttons"], "description": "The target supplies provider actions, destinations, labels, icons, Web Share behavior, copy feedback, and fallbacks; the canonical share family remains unresolved." }
+    {
+      "name": "nativeActionSemantics",
+      "selectors": [".share-buttons__action.btn"],
+      "attributes": ["button type=button for operations", "a href for destinations", "complete visible label"],
+      "events": ["click", "Enter", "Space", "native navigation"],
+      "description": "Native Share and Copy are target-enhanced Buttons. Email, verified provider flows and custom destinations are anchors with real target-supplied href values. Canonical Button owns visual and focus behavior."
+    },
+    {
+      "name": "hybridActionCatalogue",
+      "selectors": [".share-buttons"],
+      "attributes": ["native", "copy", "email", "whatsapp", "facebook", "x", "pinterest", "linkedin", "telegram", "reddit", "instagram", "threads", "tiktok", "custom"],
+      "description": "Consumers select and order zero or more curated semantic ids plus arbitrary custom canonical actions. The component never renders the whole catalogue by default and ids do not freeze provider URLs or support claims."
+    },
+    {
+      "name": "capabilityOmission",
+      "selectors": [".share-buttons"],
+      "description": "The current target omits any selected action it cannot truthfully perform. It does not render a disabled dead provider action or silently substitute Native Share or Copy."
+    },
+    {
+      "name": "targetOwnedResult",
+      "selectors": [".share-buttons__action"],
+      "events": ["target action request", "native promise result", "provider navigation"],
+      "description": "Targets own payload, canonical URL, encoding, capability checks, permissions, popup/new-context security, promise success/cancel/error, fallback, status announcement, analytics and cleanup. L9 adds no neutral runtime or fabricated success."
+    },
+    {
+      "name": "failClosed",
+      "selectors": [".share-buttons"],
+      "description": "A blank localized group label or zero valid target-capable actions omits the complete group. Duplicate action ids and blank labels are invalid."
+    },
+    {
+      "name": "hostPlacement",
+      "selectors": [".share-buttons"],
+      "description": "Fixed/sticky placement, safe areas, collision avoidance, z-index, mobile relocation and print behavior belong to the page host or a separately reviewed Share Rail."
+    }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Inline or column share-action presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".share-buttons", "source": "variants" }] } },
-    { "name": "actions", "type": "slot", "required": true, "description": "Target-owned share links or buttons with provider-specific behavior and feedback.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".share-buttons", "classNames": [".share-buttons"] }] } }
+    { "name": "variant", "type": "enum", "required": false, "defaultValue": "inline", "valuesFrom": "variants", "description": "Semantic inline wrapping or stacked intrinsic layout; it never promises viewport placement.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".share-buttons", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Non-empty localized accessible name for the complete related-action group.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".share-buttons", "attribute": "aria-label", "valueFrom": "property", "elements": ["div"] }] } },
+    { "name": "actions", "type": "slot", "required": true, "description": "Ordered non-empty composition of target-capable canonical Button or anchor Button actions. It may resolve curated semantic ids or arbitrary custom actions; no action is implicit.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".share-buttons", "classNames": [".share-buttons", ".share-buttons__action", ".btn"] }] } }
   ],
-  "tokens": { "public": {} },
+  "tokens": {
+    "public": {
+      "spacing": ["--tg-space-stack-sm"]
+    }
+  },
   "accessibility": [
-    "Use links for provider destinations and buttons for actions such as native sharing or copying a link.",
-    "Give icon-only actions provider-specific accessible names and preserve each composed control's focus behavior.",
-    "Announce copy success or failure through the target action's feedback pattern without changing the component contract here."
+    "Give the generic role=group one required localized accessible name and every action a complete visible localized label.",
+    "Use native button type=button for operations and native anchors with real href values for destinations; do not add toolbar, menu, selection, aria-current, aria-pressed or roving-focus semantics.",
+    "Preserve ordinary Tab order, native Enter/Space activation and canonical Button focus, disabled and busy behavior.",
+    "Omit capability-unavailable actions. Do not expose a focusable dead provider action or silently relabel a different fallback as that provider.",
+    "Targets expose truthful asynchronous success or failure through an accepted status pattern only after the real result; cancellation is not automatically an error and L9 owns no live region.",
+    "Keep complete labels, at least canonical Button target size, intrinsic reflow, RTL order, forced-color boundaries and reduced-motion behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "The .share-buttons composition CSS is implemented; provider behavior and reconciliation with .share remain unresolved." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "named-native-action-composition", "notes": "Named fail-closed group, inline/stacked CSS and canonical Button composition are implemented with zero neutral runtime. A consuming target supplies capabilities, href values, handlers and real feedback." },
+    "shopify": { "status": "planned", "kind": "liquid-css-target-enhancement", "notes": "A future storefront/app consumer selects valid actions, canonical resource data, localized labels, verified provider mappings and progressive native/copy feedback; copied CSS alone is not readiness." },
+    "react": { "status": "planned", "kind": "composition", "notes": "Thin named group around target-supplied canonical action elements; hooks/services own capability and asynchronous results." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Compose canonical Button instances in inline/stacked layouts and relevant action states without encoding provider runtime or sticky placement." },
+    "swiftui": { "status": "planned", "kind": "native-action-group", "notes": "Map semantic ids to target-capable ShareLink/share-sheet, clipboard or custom native actions; omit unsupported ids." },
+    "compose": { "status": "planned", "kind": "native-action-group", "notes": "Map semantic ids to Android share intents, clipboard or custom native actions while keeping capability/result policy target-owned." }
   }
 }

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "instagram-feed",
   "name": "Instagram Feed",
   "registryId": "S16",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive social-media gallery shell with target-owned records, destinations, metadata, and feed integration.",
+  "summary": "Passive finite media collection with optional account context, native list and figure semantics, explicit destinations, and target-owned records.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/instagram-feed",
@@ -22,56 +22,70 @@
       "selector": ".instagram-feed",
       "className": ".instagram-feed",
       "required": true,
-      "description": "Social gallery section root."
+      "description": "Native thematic section when a visible heading can name it; otherwise a generic div. Omitted when no valid items exist."
     },
     {
       "name": "header",
       "selector": ".instagram-feed__header",
       "className": ".instagram-feed__header",
       "required": false,
-      "description": "Optional centered heading and account region."
+      "description": "Optional heading and valid paired account-link region."
     },
     {
       "name": "heading",
       "selector": ".instagram-feed__heading",
       "className": ".instagram-feed__heading",
       "required": false,
-      "description": "Optional visible section heading."
+      "description": "Optional visible contextual heading whose target-unique id names the section root."
     },
     {
       "name": "handle",
       "selector": ".instagram-feed__handle",
       "className": ".instagram-feed__handle",
       "required": false,
-      "description": "Optional native account-profile link."
+      "description": "Optional native account-profile link rendered only when both label and destination are non-empty."
     },
     {
       "name": "grid",
       "selector": ".instagram-feed__grid",
       "className": ".instagram-feed__grid",
       "required": true,
-      "description": "Responsive target-owned social-item composition."
+      "description": "Native unordered finite collection of valid target-owned media records in source order."
     },
     {
       "name": "item",
       "selector": ".instagram-feed__item",
       "className": ".instagram-feed__item",
       "required": false,
-      "description": "Repeated target-owned social-media item."
+      "description": "Repeated native list item; passive unless it contains a real native destination."
     },
     {
-      "name": "overlay",
-      "selector": ".instagram-feed__overlay",
-      "className": ".instagram-feed__overlay",
+      "name": "itemLink",
+      "selector": ".instagram-feed__link",
+      "className": ".instagram-feed__link",
       "required": false,
-      "description": "Optional metadata overlay disclosed without requiring hover."
+      "description": "Optional native anchor wrapping one figure when the target supplies a real item destination."
     },
     {
-      "name": "stat",
-      "selector": ".instagram-feed__stat",
-      "className": ".instagram-feed__stat",
+      "name": "figure",
+      "selector": ".instagram-feed__figure",
+      "className": ".instagram-feed__figure",
       "required": false,
-      "description": "Optional target-formatted social metric."
+      "description": "Native figure grouping one valid media record and its optional authored caption."
+    },
+    {
+      "name": "media",
+      "selector": ".instagram-feed__media",
+      "className": ".instagram-feed__media",
+      "required": false,
+      "description": "Target-owned informative or decorative media with explicit alternative-text semantics."
+    },
+    {
+      "name": "caption",
+      "selector": ".instagram-feed__caption",
+      "className": ".instagram-feed__caption",
+      "required": false,
+      "description": "Optional always-visible authored figcaption; provider metrics are not canonical fields."
     },
     {
       "name": "cta",
@@ -103,14 +117,7 @@
       "selectors": [
         ".instagram-feed"
       ],
-      "description": "Resting social-gallery presentation."
-    },
-    {
-      "name": "handleHover",
-      "selectors": [
-        ".instagram-feed__handle:hover"
-      ],
-      "description": "Pointer emphasis for the optional account link."
+      "description": "Passive resting finite-media presentation."
     },
     {
       "name": "handleFocusVisible",
@@ -120,40 +127,80 @@
       "description": "Visible keyboard focus on the optional account link."
     },
     {
-      "name": "itemHover",
+      "name": "itemLinkFocusVisible",
       "selectors": [
-        ".instagram-feed__item:hover img",
-        ".instagram-feed__item:hover::after",
-        ".instagram-feed__item:hover .instagram-feed__overlay"
+        ".instagram-feed__link:focus-visible"
       ],
-      "description": "Pointer image emphasis and metadata disclosure for one supplied item."
-    },
-    {
-      "name": "itemFocusWithin",
-      "selectors": [
-        ".instagram-feed__item:focus-visible",
-        ".instagram-feed__item:focus-within img",
-        ".instagram-feed__item:focus-within::after",
-        ".instagram-feed__item:focus-within .instagram-feed__overlay"
-      ],
-      "description": "Equivalent disclosure when target-owned interactive content receives keyboard focus."
+      "description": "Visible keyboard focus on an item-wide native destination."
     }
   ],
   "behavior": [
     {
-      "name": "feedOwnership",
+      "name": "conditionalRoot",
       "selectors": [
-        ".instagram-feed"
+        ".instagram-feed",
+        ".instagram-feed__heading"
       ],
-      "description": "Targets own provider authorization, fetching, caching, consent, freshness, failure and empty states, record ordering, and metric formatting. Canonical CSS accepts already-rendered content only."
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty visible heading creates and names a native thematic section through a target-unique id; without a heading targets use a generic div rather than an unnamed landmark."
+    },
+    {
+      "name": "requiredItems",
+      "selectors": [
+        ".instagram-feed",
+        ".instagram-feed__grid",
+        ".instagram-feed__item"
+      ],
+      "description": "Missing or empty required valid media records omit the complete component instead of rendering an empty shell."
+    },
+    {
+      "name": "pairedHandle",
+      "selectors": [
+        ".instagram-feed__handle"
+      ],
+      "attributes": [
+        "href"
+      ],
+      "description": "The optional account handle renders only when both a non-empty visible label and a real target-owned destination exist; targets never synthesize # or preview-only URLs."
+    },
+    {
+      "name": "finiteNativeCollection",
+      "selectors": [
+        ".instagram-feed__grid",
+        ".instagram-feed__item",
+        ".instagram-feed__figure",
+        ".instagram-feed__caption"
+      ],
+      "description": "Targets preserve native ul, li, figure, and optional figcaption semantics for a finite already-rendered collection; S16 does not implement the APG dynamic feed pattern, article focus movement, busy state, or infinite loading."
     },
     {
       "name": "itemNavigationBoundary",
       "selectors": [
-        ".instagram-feed__item",
+        ".instagram-feed__link",
         ".instagram-feed__cta"
       ],
-      "description": "This contract does not make every item navigational. Targets use native links or buttons only when real destinations or actions exist and preserve visible focus and accessible names."
+      "description": "Passive records remain unfocusable. Targets use native links or buttons only for real destinations or actions, avoid nested interaction inside an item-wide link, and preserve accessible names, history, activation, and visible focus."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".instagram-feed",
+        ".instagram-feed__heading",
+        ".instagram-feed__handle",
+        ".instagram-feed__grid",
+        ".instagram-feed__caption"
+      ],
+      "description": "Short, long, localized, RTL, unbroken, zoomed, captioned, uncaptioned, passive, and linked records remain in authored order and within the available component container without viewport-specific markup."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".instagram-feed"
+      ],
+      "description": "S16 owns no controlled or uncontrolled state, event, listener, observer, request, provider SDK, timer, layout read, authored motion, custom element, hydration, asset, or neutral runtime. Provider authorization, fetching, caching, consent, freshness, failures, moderation, analytics, ordering, and metric truth remain target-owned."
     }
   ],
   "properties": [
@@ -161,7 +208,8 @@
       "name": "heading",
       "type": "string",
       "required": false,
-      "description": "Optional visible section heading.",
+      "unsetBehavior": "Omit the heading and render a generic root without aria-labelledby.",
+      "description": "Optional non-empty visible contextual heading; targets choose its native heading rank and unique id.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".instagram-feed__heading" }]
       }
@@ -170,7 +218,8 @@
       "name": "handle",
       "type": "string",
       "required": false,
-      "description": "Optional visible account handle.",
+      "unsetBehavior": "Omit the complete handle link when the label or paired destination is empty.",
+      "description": "Optional non-empty visible account label paired with handleDestination.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".instagram-feed__handle" }]
       }
@@ -179,7 +228,8 @@
       "name": "handleDestination",
       "type": "string",
       "required": false,
-      "description": "Target-owned profile destination for the optional handle link.",
+      "unsetBehavior": "Omit the complete handle link when the destination or paired label is empty; never invent a fallback.",
+      "description": "Optional target-owned native profile destination paired with handle.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".instagram-feed__handle", "attribute": "href", "valueFrom": "property", "elements": ["a"] }]
       }
@@ -188,7 +238,8 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned social-media items and any supplied overlay metadata.",
+      "unsetBehavior": "Omit the complete component when no valid media item is supplied.",
+      "description": "Required ordered target-owned native item, figure, media, optional caption, and optional destination compositions.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".instagram-feed__grid", "classNames": [".instagram-feed__grid"] }]
       }
@@ -197,7 +248,8 @@
       "name": "action",
       "type": "slot",
       "required": false,
-      "description": "Optional target-owned account or gallery action.",
+      "unsetBehavior": "Omit the action region without reserving layout space.",
+      "description": "Optional target-owned native account or gallery action; targets may compose the canonical Button or Link contract.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".instagram-feed__cta", "classNames": [".instagram-feed__cta"] }]
       }
@@ -208,30 +260,37 @@
       "color": [
         "--color-border-focus",
         "--color-text-accent",
-        "--color-text-primary"
-      ],
-      "easing": [
-        "--easing-default"
+        "--color-text-primary",
+        "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-body-small-weight",
+        "--tg-typography-h3-weight",
+        "--typo-body-sm-line-height",
         "--typo-body-sm-size",
+        "--typo-caption-line-height",
+        "--typo-caption-size",
+        "--typo-h3-line-height",
         "--typo-h3-size"
       ],
-      "other": [
-        "--section-spacing-y"
-      ],
-      "transition": [
-        "--transition-default",
-        "--transition-fast"
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
+        "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Provide useful alternatives for informative social imagery and avoid repeating provider captions verbatim when adjacent text already names the item.",
-    "Metadata overlays remain available on focus within and non-hover input rather than relying on pointer hover alone.",
-    "Only real destinations or actions receive native link or button semantics, visible focus, and descriptive accessible names.",
-    "Target-owned loading, empty, failure, consent, and stale-data states require accessible text rather than a permanently blank grid."
+    "Render a native section only when a non-empty visible contextual heading can name it; otherwise use a generic div and omit the complete root when no valid media records exist.",
+    "Preserve native ul, li, figure, optional figcaption, image, and anchor semantics; do not apply the APG dynamic feed pattern to this finite already-rendered collection.",
+    "Provide useful alternatives for informative imagery, empty alternatives for explicitly decorative media, and visible authored captions without depending on hover, focus, touch, color, provider metrics, or motion.",
+    "Keep passive records out of the tab order. Only real handle, item, or action destinations receive native semantics, accessible names, activation, history, full pointer targets, and visible keyboard focus.",
+    "Keep content contained through narrow widths, localization, RTL, zoom, 200 percent text, forced colors, dark themes, mixed captions, and unbroken strings without alternate DOM or component JavaScript.",
+    "Targets communicate provider loading, empty, failure, consent, stale, moderation, and data-truth states as accessible content outside the neutral component."
   ],
   "adapters": {
     "web": {
@@ -240,8 +299,9 @@
       "notes": "Implemented in components/css/sections.css."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Maps localized optional heading and paired account/action links plus validated merchant image blocks to canonical classes with strict empty omission and zero component JavaScript."
     },
     "react": {
       "status": "planned",

@@ -20,6 +20,7 @@ Checkbox has one default size and four validation variants. Selection is a nativ
 | `required` | `true` | native `required` |
 
 The generated Check and Minus indicators use accepted Lucide geometry without adding an icon-library dependency to the web adapter.
+The `20px` visual control is centered on the first `24px` label line, while the wrapping label supplies the full activation area. Semantic borders and labels use private contrast-strengthening mixes of the public validation tokens; semantic indicators use a dark internal stroke so their state remains legible in light and dark themes.
 
 ### Checked
 
@@ -35,7 +36,7 @@ The generated Check and Minus indicators use accepted Lucide geometry without ad
 
 ### Error
 
-<Preview html={'<div class="field tg-preview-frame tg-preview-frame--sm"><label class="checkbox checkbox--error"><input class="checkbox__input" type="checkbox" required aria-invalid="true" aria-describedby="checkbox-error-message" /><span class="checkbox__label">Accept the return policy</span></label><p class="field__error" id="checkbox-error-message" role="alert">Accept the policy before continuing.</p></div>'} label="Checkbox error" />
+<Preview html={'<div class="field tg-preview-frame tg-preview-frame--sm"><label class="checkbox checkbox--error"><input class="checkbox__input" type="checkbox" required aria-invalid="true" aria-describedby="checkbox-error-message" /><span class="checkbox__label">Accept the return policy</span></label><p class="field__error" id="checkbox-error-message">Accept the policy before continuing.</p></div>'} label="Checkbox error" />
 
 ### Success
 
@@ -59,6 +60,8 @@ The generated Check and Minus indicators use accepted Lucide geometry without ad
 
 Use Field Wrapper for helper or validation feedback. Checkbox owns the visual variant and native state; Field Wrapper owns message layout and content.
 
+In static HTML, `checked` establishes initial checkedness and the browser owns subsequent user changes and form reset. `data-indeterminate="true"` only initializes the independent native mixed property. Framework adapters may bind live `checked` and `indeterminate` properties with native `input`/`change` events; they must keep the native checkbox as the only selection and form-value owner.
+
 ## Accessibility
 
 <Callout type="info">
@@ -69,8 +72,10 @@ Use Field Wrapper for helper or validation feedback. Checkbox owns the visual va
 - Keep `name`, `value`, `checked`, `required`, and `disabled` on the native input.
 - Space toggles the focused checkbox; clicking any part of the wrapping label toggles it.
 - Use native `indeterminate` for mixed state. `data-indeterminate="true"` is the progressive initialization hook.
+- `checked` and `indeterminate` are independent: mixed wins visually, but submission still depends on checked.
 - Use `aria-invalid="true"` only for Error and connect external feedback with `aria-describedby`.
 - Success and Warning do not expose invalid or alert semantics.
+- Use `role="alert"` only when external error feedback is inserted dynamically; static feedback only needs `aria-describedby`.
 - Checked and indeterminate retain different visible indicators so selection does not rely on color.
 - Forced-colors mode restores native checkbox appearance.
 

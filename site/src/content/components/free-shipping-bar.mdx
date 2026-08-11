@@ -1,36 +1,38 @@
 ## Overview
 
-Free Shipping Bar communicates cart progress toward a target-owned shipping threshold. Visible text and native progressbar semantics carry the meaning; fill width is supporting presentation.
+Free Shipping Bar combines one complete target-owned shipping message with the determinate Bar profile of canonical Progress. The target owns the qualifying amount, threshold, localized copy, eligibility, cart updates, and announcements.
 
 <Preview
-  html={'<div class="shipping-bar tg-preview-frame--md"><p class="shipping-bar__text"><strong>$30 away</strong> from free shipping</p><div class="shipping-bar__track" role="progressbar" aria-label="Free shipping progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"><div class="shipping-bar__fill tg-preview-w-70"></div></div></div>'}
+  html={'<div class="shipping-bar tg-preview-frame--md"><p class="shipping-bar__message">You are $35 away from free shipping.</p><div class="progress shipping-bar__progress" role="progressbar" aria-label="Progress toward free shipping" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="$65 of $100 toward free shipping"><div class="progress__track"><div class="progress__bar tg-preview-w-65"></div></div></div></div>'}
   label="Free Shipping Bar"
 />
 
 ## Presentation
 
-`value` represents the current cart amount and `max` represents the free-shipping threshold. Their contract defaults are `0` and `100`, and both remain required target inputs.
+`message` supplies one required complete below-threshold or achieved statement. `accessibleLabel` independently names the canonical progressbar, and optional `valueText` gives assistive technology a localized interpretation when raw money-like values would otherwise be announced only as a percentage.
 
-`achieved` defaults to `false`. When the threshold is reached, `.shipping-bar--achieved` changes the message treatment, but `text` must explicitly communicate the achieved state rather than relying on color or a full track.
+`value` and `max` are required controlled target inputs with contract defaults of `0` and `100`. The implementation fixes the minimum at zero, requires a finite positive `max`, clamps the visual and accessible current value together, and derives `.shipping-bar--achieved` when the current value reaches the threshold. There is no independent achieved property.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Recalculate progress from the same cart state used for totals and shipping eligibility.</Do>
-  <Dont>Do not infer free-shipping eligibility from presentation width alone.</Dont>
+  <Do>Supply the message, value, max, and value text from the same authoritative eligibility calculation.</Do>
+  <Dont>Do not infer free-shipping eligibility from fill width or choose a subtotal policy inside the component.</Dont>
 </DoDont>
 
-- Format the remaining amount through the commerce target.
-- Clamp visual progress to the valid range while preserving the true target state in text.
-- Replace the remaining-amount message with a clear achieved message at the threshold.
+- Replace the remaining-amount message with an explicit achieved message when the authoritative threshold is reached.
+- Format currency and describe exceptional eligibility rules in the commerce target.
+- Keep the component passive; place it where the cart target can update it without giving K5 store or request ownership.
+- Omit invalid composition rather than rendering a blank message/name or a non-positive threshold.
+- Use the canonical Progress component for track, bar, range, reduced-motion, and forced-colors behavior.
 
 ## Accessibility
 
-- Give the track `role="progressbar"` and synchronize `aria-valuenow` and `aria-valuemax` with `value` and `max`.
-- Provide a concise accessible name for the progressbar.
-- Expose the amount remaining or achieved state as visible text.
-- Announce meaningful eligibility changes when cart totals update.
-- Do not rely on fill width or success color alone.
+- Give the canonical progressbar a concise localized accessible name through `accessibleLabel`.
+- Synchronize `aria-valuenow`, `aria-valuemax`, optional `aria-valuetext`, and fill width from the same clamped range.
+- Use visible text to distinguish remaining and achieved states; width, color, and emphasis are supporting cues only.
+- Do not make the root focusable, a landmark, or a live region.
+- Announce one meaningful authoritative eligibility transition from the surrounding cart status policy rather than every amount update.
 
 ## References
 
@@ -41,8 +43,9 @@ Free Shipping Bar communicates cart progress toward a target-owned shipping thre
 ### API Reference
 
 <PropTable>
-  <tr><td>`text`</td><td>string</td><td>required</td><td>Threshold or achieved-state message</td></tr>
-  <tr><td>`value`</td><td>number</td><td>`0`</td><td>Current cart amount represented by the progressbar</td></tr>
-  <tr><td>`max`</td><td>number</td><td>`100`</td><td>Free-shipping threshold represented by the progressbar</td></tr>
-  <tr><td>`achieved`</td><td>boolean</td><td>`false`</td><td>Communicates that the threshold has been reached</td></tr>
+  <tr><td>`message`</td><td>string</td><td>required</td><td>Complete localized below-threshold or achieved message</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Localized accessible name for the canonical progressbar</td></tr>
+  <tr><td>`value`</td><td>number</td><td>`0`</td><td>Finite target-owned qualifying amount, clamped to the range</td></tr>
+  <tr><td>`max`</td><td>number</td><td>`100`</td><td>Finite positive target-owned threshold in the same unit</td></tr>
+  <tr><td>`valueText`</td><td>string</td><td>optional</td><td>Localized human-readable interpretation of the raw value</td></tr>
 </PropTable>

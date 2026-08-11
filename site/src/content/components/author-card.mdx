@@ -1,41 +1,68 @@
 ## Overview
 
-Author Card presents author identity, an optional Avatar, optional role and biography text, and target-owned profile or social links. It supports full and compact presentations.
+Author Card is a passive, fail-closed identity composition for exactly one target-supplied article author. It requires one visible name and may add a canonical Avatar, role or affiliation, plain biography, and canonical author Links without fetching data, inferring destinations, exposing provider fields, or becoming the surrounding article landmark.
 
 ## Presentation
 
-<Preview html={'<aside class="author-card tg-preview-frame--md" aria-label="About Marina Costa"><div class="author-card__avatar"><span class="avatar avatar--lg" aria-hidden="true">MC</span></div><div class="author-card__info"><p class="author-card__name">Marina Costa</p><p class="author-card__role">Ceramic artist and writer</p><p class="author-card__bio">Marina documents material experiments and the daily practice of a working studio.</p><div class="author-card__links"><a href="#">Author profile</a><a href="#">Article archive</a></div></div></aside>'} label="Author Card" />
+<Preview html={'<div class="author-card tg-preview-frame--md"><span class="avatar avatar--lg author-card__avatar" aria-hidden="true">MP</span><div class="author-card__info"><p class="author-card__name" dir="auto">Marina Paz</p><p class="author-card__role" dir="auto">Ceramic artist and writer</p><p class="author-card__bio" dir="auto">Marina writes about material practice, studio rituals, and the lives objects gather through use.</p><div class="author-card__links"><a class="link link--nav author-card__link" href="mailto:studio@example.com" rel="author">Email</a><a class="link link--nav author-card__link" href="#author-profile" rel="author">Profile</a></div></div></div>'} label="Author Card" />
 
-`full` is the default and has no modifier class. `compact` maps to `.author-card--compact`, removes the frame treatment, and visually hides the biography and links. The Avatar slot controls its own size.
+The shared renderer uses a neutral `.author-card` `div` and neutral `.author-card__name` paragraph because the consuming article owns placement and document structure. A host may wrap L6 in an article `footer`, use a tangential `aside`, choose a contextual heading, or use `address` only for contact-only content whose nearest article/body relationship is truthful.
+
+`full` is the default classless framed presentation and renders every supplied optional part. `compact` adds `.author-card--compact` and renders only Avatar, name, and role; biography and Links are omitted from the DOM rather than merely hidden. A blank `name` removes the complete root. Missing optional content creates no empty wrapper or derived fallback.
+
+The optional Avatar slot carries both canonical `.avatar` and contextual `.author-card__avatar` classes. The target explicitly supplies an image or already-derived initials, semantic Avatar size, and contextual alternative. The optional Links slot uses native `.link.link--nav.author-card__link` anchors; labels, destinations, target/rel security, `rel="author"`, provider choice, and privacy policy remain target-owned.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use full presentation when biography and links provide useful article context.</Do>
-  <Dont>Do not treat author identity, destinations, or social-provider choices as component defaults.</Dont>
+  <Do>Use full presentation when a short biography and author destinations add useful context near one article.</Do>
+  <Dont>Do not make the whole card clickable, infer a profile from the name, or publish email, homepage, or social destinations without target policy.</Dont>
 </DoDont>
 
-Use compact presentation for a short byline composition. The target supplies author data and chooses whether profile or social destinations are available.
+<DoDont>
+  <Do>Use compact as a concise identity row and place it in a host-owned byline/header/footer composition.</Do>
+  <Dont>Do not supply critical biography or destinations only to compact, because those nodes are intentionally not rendered.</Dont>
+</DoDont>
+
+One L6 root represents one person. A target with multiple authors repeats Author Card inside an appropriate semantic list or group; singular L6 does not expose a CMS-specific author collection. Role is visible content, not an ARIA role. Biography is complete plain text in the neutral boundary; rich authoring, sanitization, localization, structured data, analytics, SEO, image delivery, fallback, and social-provider behavior stay with the target.
+
+Full layout responds intrinsically to its available inline size and the Link group wraps. Mobile, Tablet, Desktop, and XL are evidence contexts rather than component sizes or viewport breakpoints. Avatar keeps its own canonical fixed size while Author Card owns only the relationship between supplied parts.
 
 ## Accessibility
 
-- Use a heading or text element for the author name that fits the surrounding article hierarchy.
-- Avoid repeating an adjacent visible author name in Avatar alternative text unless the image adds useful information.
-- Give icon-only profile or social links specific accessible names.
-- Use links for destinations and buttons only for actions.
-- Preserve visible keyboard focus for all composed links and controls.
+- Require a non-empty visible author name and omit the root without it; do not create an anonymous region or image-only identity.
+- Keep the neutral root out of the landmark and heading outline. The host chooses a truthful `footer`, tangential `aside`, contact-only `address`, contextual heading rank, or linked-name policy.
+- Hide adjacent Avatar initials or use an empty image alternative when the visible name already supplies the same identity. Supply contextual alt only when the portrait communicates additional useful information.
+- Use native canonical Links with real `href` values for profile, homepage, social, archive, or `mailto:` destinations. Use Button only for an action.
+- Add `rel="author"` only when the destination truthfully describes or contacts the nearest article author. Preserve complete localized link purpose, target/rel security, keyboard focus, forced colors, and reduced motion.
+- Preserve `dir="auto"` on standalone target strings, complete text at narrow widths and zoom, 200-percent text, user text spacing, and logical RTL flow. L6 owns no live region, keyboard model, focus management, status, loading, announcement, or neutral runtime.
 
 ## References
 
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`full`</td><td>`full` or `compact`</td></tr>
-  <tr><td>`avatar`</td><td>slot</td><td>optional</td><td>Avatar composition</td></tr>
-  <tr><td>`name`</td><td>string</td><td>required</td><td>Visible author name</td></tr>
-  <tr><td>`role`</td><td>string</td><td>optional</td><td>Author role or affiliation</td></tr>
-  <tr><td>`bio`</td><td>string</td><td>optional</td><td>Biography shown in full presentation</td></tr>
-  <tr><td>`links`</td><td>slot</td><td>optional</td><td>Target-owned profile or social links</td></tr>
+  <tr><td>`variant`</td><td>`full | compact`</td><td>`full`</td><td>Full framed content or compact Avatar/name/role-only presentation</td></tr>
+  <tr><td>`avatar`</td><td>slot</td><td>optional</td><td>Canonical Avatar composition with target-owned content, alternative, size, loading, and fallback</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Non-empty complete visible author name; omission removes the complete root</td></tr>
+  <tr><td>`role`</td><td>string</td><td>optional</td><td>Complete visible localized role or affiliation</td></tr>
+  <tr><td>`bio`</td><td>string</td><td>optional</td><td>Complete plain biography rendered only in full</td></tr>
+  <tr><td>`links`</td><td>slot</td><td>optional</td><td>Target-owned canonical author Links rendered only in full</td></tr>
 </PropTable>
 
-Anatomy: `.author-card`, `.author-card__avatar`, `.author-card__info`, `.author-card__name`, `.author-card__role`, `.author-card__bio`, and `.author-card__links`.
+Anatomy: `.author-card`, optional `.author-card__avatar.avatar`, required `.author-card__info` and `.author-card__name`, optional `.author-card__role`, full-only `.author-card__bio`, and full-only `.author-card__links` containing `.author-card__link.link.link--nav` anchors.
 
-Dependency: [Avatar](/components/avatar). The contract remains `pilot`, and target author data is not promoted to a root-level content model.
+Dependencies: canonical [Avatar](/components/avatar) and [Link](/components/link). Runtime Exhibit and Studio resolve the same registered `AuthorCardArtwork`, fixture values, DOM, variant omission, Avatar and Link composition; the markup above is the matching static fallback. Owner decision 50 accepts this singular, neutral, host-owned boundary: multiple authors repeat canonical cards, public email stays off by default, and homepage/social destinations require explicit target supply and approval. The contract remains `pilot`; real target integration, final Full/Compact visuals, Avatar fallback follow-up, L6-specific design evidence, and explicit human stability review remain pending.
+
+- [HTML `address`](https://html.spec.whatwg.org/dev/sections.html#the-address-element)
+- [HTML `aside`, `header`, and `footer`](https://html.spec.whatwg.org/dev/sections.html#the-aside-element)
+- [HTML link type `author`](https://html.spec.whatwg.org/dev/links.html#link-type-author)
+- [WAI Images Tutorial](https://www.w3.org/WAI/tutorials/images/)
+- [APG Link pattern](https://www.w3.org/WAI/ARIA/apg/patterns/link/)
+- [WCAG Headings and Labels](https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html)
+- [WCAG Link Purpose](https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html)
+- [WCAG Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)
+- [Open UI Card research](https://open-ui.org/components/card.research/)
+- [Radix Avatar](https://www.radix-ui.com/primitives/docs/components/avatar)
+- [Polaris Avatar](https://shopify.dev/docs/api/app-home/web-components/media-and-visuals/avatar)
+- [Shopify Liquid Article](https://shopify.dev/docs/api/liquid/objects/article)
+- [Shopify Liquid User](https://shopify.dev/docs/api/liquid/objects/user)
+- [Shopify Storefront ArticleAuthor](https://shopify.dev/docs/api/storefront/latest/objects/articleauthor)

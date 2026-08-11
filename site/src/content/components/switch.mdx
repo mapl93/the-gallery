@@ -1,49 +1,75 @@
 ## Overview
 
-On/off toggle switch. sm and lg sizes.
+Immediate binary on/off setting backed by one native checkbox with switch semantics, stable visible labeling, form participation, validation, and three visual sizes.
+
+<Preview html={"<label class=\"switch\"><input type=\"checkbox\" class=\"switch__input\" role=\"switch\" name=\"notifications\" value=\"enabled\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Enable notifications</span></label>"} label="Switch / Toggle" />
 
 ## Presentation
 
-Switch supports `default`, `error`, `success`, and `warning` validation families independently of size and checked state.
+Switch supports `default`, `error`, `success`, and `warning` validation families independently of size and checked state. The off state retains a surface track with a visible boundary; the on state fills the track. Semantic boundaries and active surfaces are contrast-reinforced while focus uses the matching lighter `4px` outer ring.
 
-<Preview html={"<label class=\"switch\"><input type=\"checkbox\" class=\"switch__input\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Enable notifications</span></label>"} label="Switch / Toggle" />
+<Preview html={"<div class=\"tg-preview-stack\"><label class=\"switch switch--sm\"><input type=\"checkbox\" class=\"switch__input\" role=\"switch\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Small</span></label><label class=\"switch\"><input type=\"checkbox\" class=\"switch__input\" role=\"switch\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Default</span></label><label class=\"switch switch--lg\"><input type=\"checkbox\" class=\"switch__input\" role=\"switch\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Large</span></label></div>"} label="Switch sizes" />
 
-<Preview html={"<label class=\"switch switch--sm\"><input type=\"checkbox\" class=\"switch__input\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Small</span></label> <label class=\"switch\"><input type=\"checkbox\" class=\"switch__input\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Default</span></label> <label class=\"switch switch--lg\"><input type=\"checkbox\" class=\"switch__input\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">Large</span></label>"} label="Sizes" />
+| Property | Value | Web mapping |
+| --- | --- | --- |
+| `size` | `sm` | `.switch--sm` |
+| `size` | `default` | `.switch` |
+| `size` | `lg` | `.switch--lg` |
+| `variant` | `error` | `.switch--error` |
+| `variant` | `success` | `.switch--success` |
+| `variant` | `warning` | `.switch--warning` |
+| `checked` | `true` | native `checked` |
 
-| Class | Size |
-|-------|------|
-| `.switch--sm` | Sm |
-| *(default)* | Default |
-| `.switch--lg` | Lg |
+The track uses logical positioning, so checked thumb travel mirrors in right-to-left layouts. Long or localized labels wrap inside their container and remain aligned to the first line of the switch.
+
+<Preview html={"<div class=\"tg-preview-frame tg-preview-frame--sm\" dir=\"rtl\"><label class=\"switch\"><input type=\"checkbox\" class=\"switch__input\" role=\"switch\" checked /><span class=\"switch__track\"><span class=\"switch__thumb\"></span></span><span class=\"switch__label\">إتاحة الإشعارات التفصيلية لجميع تحديثات الطلب والشحن</span></label></div>"} label="RTL long-label switch" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Always pair form inputs with visible labels for accessibility.</Do>
-  <Dont>Don't rely on placeholder text as the only label — it disappears on input.</Dont>
+  <Do>Use Switch for a binary setting whose effect is applied immediately.</Do>
+  <Dont>Do not use Switch for choosing one item from a group, submitting a deferred form answer, or representing mixed state.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Keep the visible label stable while checkedness communicates on or off.</Do>
+  <Dont>Do not change the accessible name from “Enable…” to “Disable…” when the setting toggles.</Dont>
+</DoDont>
+
+Persistence, optimistic pending treatment, retry, and rollback belong to the consuming target. The base component owns only the immediate native state and its presentation. Use Checkbox when the choice may be indeterminate or is committed later with a form.
+
+### State ownership
+
+In static HTML, `checked` establishes default checkedness and the browser owns the live state. Framework adapters may expose `checked` for controlled use or `defaultChecked` for uncontrolled use, but must bind the same native input and must not synchronize a second hidden checkbox.
+
+The checked switch submits its `name=value` pair; the off switch contributes no value. Native form reset restores default checkedness. The default submitted value is `on` unless the consumer supplies `value`.
 
 ## Accessibility
 
-<Callout type="tip">
-  Switch is backed by a native checkbox input. Targets may expose `role="switch"`, but checked state must stay synchronized with the native input.
+<Callout type="info">
+  Switch requires `role="switch"` on its native checkbox. Native `checked` remains the sole visual, form, and accessibility state; a separately managed `aria-checked` is unnecessary.
 </Callout>
 
-- Provide a visible label or equivalent accessible name.
-- Support Space to toggle the switch.
-- Keep checked, disabled, and required state synchronized with the input.
+- Provide a stable visible label associated through the wrapping `<label>`.
+- Support Space, click, native `input`, and native `change` through the checkbox.
+- Keep `checked`, `disabled`, `required`, `name`, and submitted `value` on the native input.
+- A required switch is invalid while off; native invalidity does not imply Error styling until the consumer selects the Error variant.
+- Use `aria-invalid="true"` only for Error and connect static feedback with `aria-describedby`. Static preview feedback is not an alert.
+- Do not expose indeterminate or mixed state.
+- Reduced-motion mode removes thumb and track transitions; forced-colors mode uses system colors without hiding checkedness, focus, or disabled state.
 
-## References
+## API Reference
 
 <PropTable>
-  <tr><td>`.switch`</td><td>class</td><td>—</td><td>Root label wrapper</td></tr>
-  <tr><td>`.switch__input`</td><td>element</td><td>`checked`, `disabled`</td><td>Native checkbox input</td></tr>
-  <tr><td>`.switch__track`</td><td>element</td><td>—</td><td>Visual switch track</td></tr>
-  <tr><td>`.switch__thumb`</td><td>element</td><td>—</td><td>Movable switch thumb</td></tr>
-  <tr><td>`.switch__label`</td><td>element</td><td>—</td><td>Visible label text</td></tr>
-  <tr><td>`.switch--error`</td><td>modifier</td><td>—</td><td>Error validation family</td></tr>
-  <tr><td>`.switch--success`</td><td>modifier</td><td>—</td><td>Success validation family</td></tr>
-  <tr><td>`.switch--warning`</td><td>modifier</td><td>—</td><td>Warning validation family</td></tr>
-  <tr><td>`.switch--sm`</td><td>modifier</td><td>—</td><td>Sm size</td></tr>
-  <tr><td>`.switch--lg`</td><td>modifier</td><td>—</td><td>Lg size</td></tr>
+  <tr><td>`label`</td><td>`string`</td><td>required</td><td>Stable visible accessible label</td></tr>
+  <tr><td>`size`</td><td>`sm | default | lg`</td><td>`default`</td><td>Canonical visual size</td></tr>
+  <tr><td>`variant`</td><td>`default | error | success | warning`</td><td>`default`</td><td>Validation presentation independent from checkedness</td></tr>
+  <tr><td>`checked`</td><td>`boolean`</td><td>`false`</td><td>Default checkedness on static Web; live value in controlled adapters</td></tr>
+  <tr><td>`disabled`</td><td>`boolean`</td><td>`false`</td><td>Makes the native switch unavailable</td></tr>
+  <tr><td>`required`</td><td>`boolean`</td><td>`false`</td><td>Requires the switch to be on for native validity</td></tr>
+  <tr><td>`name`</td><td>`string`</td><td>unset</td><td>Native form field name</td></tr>
+  <tr><td>`value`</td><td>`string`</td><td>`on`</td><td>Submitted value while on</td></tr>
+  <tr><td>`describedBy`</td><td>`string`</td><td>unset</td><td>Id reference for external helper or validation feedback</td></tr>
 </PropTable>
+
+The canonical root remains a wrapping `<label class="switch">`. Size and validation modifiers belong on that root; form, role, and ARIA attributes remain on `.switch__input`.

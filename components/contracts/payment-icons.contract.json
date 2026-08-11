@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "payment-icons",
   "name": "Payment Icons",
   "registryId": "G6",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Passive wrapping payment-method icon row with standard and established small icon presentation.",
+  "summary": "Passive native list of target-supplied recognized payment-method marks with informative names, semantic sizing, and intrinsic wrapping.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/payment-icons",
@@ -22,19 +22,21 @@
       "selector": ".payment-icons",
       "className": ".payment-icons",
       "required": true,
-      "description": "Wrapping payment-method icon collection."
+      "description": "Native unordered list containing one or more valid payment-method items and an optional localized accessible name."
     },
     {
-      "name": "imageIcon",
-      "selector": ".payment-icons img",
-      "required": false,
-      "description": "Raster or externally supplied payment-method mark."
+      "name": "item",
+      "selector": ".payment-icons__item",
+      "className": ".payment-icons__item",
+      "required": true,
+      "description": "Repeated native list item for one recognized target-supplied payment method."
     },
     {
-      "name": "svgIcon",
-      "selector": ".payment-icons svg",
-      "required": false,
-      "description": "Inline vector payment-method mark."
+      "name": "mark",
+      "selector": ".payment-icons__mark",
+      "className": ".payment-icons__mark",
+      "required": true,
+      "description": "Approved raster, vector, or target-native payment-method mark with a brief accessible method name."
     }
   ],
   "variants": [
@@ -42,7 +44,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Single passive visual treatment."
+      "description": "One passive treatment that preserves target brand artwork."
     }
   ],
   "sizes": [
@@ -50,7 +52,13 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Standard 24px icon height; the existing small modifier is exposed as a size capability rather than an interaction state."
+      "description": "Standard 1.5rem mark block size."
+    },
+    {
+      "name": "sm",
+      "className": ".payment-icons--sm",
+      "default": false,
+      "description": "Compact 1.125rem mark block size for dense supporting contexts."
     }
   ],
   "states": [
@@ -59,24 +67,57 @@
       "selectors": [
         ".payment-icons"
       ],
-      "description": "Passive resting icon collection."
-    },
-    {
-      "name": "iconHover",
-      "selectors": [
-        ".payment-icons img:hover",
-        ".payment-icons svg:hover"
-      ],
-      "description": "Existing pointer-only visual emphasis; it does not imply activation."
+      "description": "Populated passive collection with no focus, hover, live-region, motion, controlled state, or neutral runtime."
     }
   ],
   "behavior": [
     {
-      "name": "passiveMarks",
+      "name": "nativeCollection",
+      "selectors": [
+        ".payment-icons",
+        ".payment-icons__item"
+      ],
+      "attributes": [
+        "role=\"list\" when marker removal would otherwise weaken list exposure"
+      ],
+      "description": "The collection uses native ul/li semantics, preserves target source order, and adds no widget role or keyboard model."
+    },
+    {
+      "name": "informativeMarks",
+      "selectors": [
+        ".payment-icons__mark"
+      ],
+      "attributes": [
+        "non-empty alt for informative img marks",
+        "role=\"img\" and an accessible name for informative inline SVG marks",
+        "target-native accessibilityLabel or equivalent for native marks"
+      ],
+      "description": "Every valid mark communicates its recognized payment-method name without relying on color, hover, or surrounding brand inference."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".payment-icons",
+        ".payment-icons__item",
+        ".payment-icons__mark"
+      ],
+      "description": "Targets omit unnamed or invalid marks and their items, and omit the complete root when no valid method remains."
+    },
+    {
+      "name": "intrinsicWrapping",
+      "selectors": [
+        ".payment-icons",
+        ".payment-icons__item",
+        ".payment-icons__mark"
+      ],
+      "description": "Items wrap from the component content box without viewport queries, visual reordering, clipping, or Studio-only layout repair."
+    },
+    {
+      "name": "targetDataOwnership",
       "selectors": [
         ".payment-icons"
       ],
-      "description": "Payment marks communicate accepted methods and do not become controls unless wrapped by a separately contracted link or button."
+      "description": "Targets own current availability, provider/region/currency eligibility, order, official assets, licenses, brand rules, localization, and publication."
     }
   ],
   "properties": [
@@ -84,32 +125,52 @@
       "name": "icons",
       "type": "slot",
       "required": true,
-      "description": "Payment-method marks supplied by the target or payment provider.",
+      "description": "One or more target-owned native list-item compositions containing a recognized informative payment-method mark and its accessible name.",
       "targetMappings": {
         "web": [
           {
             "kind": "slot",
             "selector": ".payment-icons",
             "classNames": [
-              ".payment-icons"
+              ".payment-icons",
+              ".payment-icons__item",
+              ".payment-icons__mark"
             ]
           }
         ]
       }
     },
     {
-      "name": "small",
-      "type": "boolean",
+      "name": "size",
+      "type": "enum",
       "required": false,
-      "defaultValue": false,
-      "description": "Applies the established 18px icon-size modifier; this is a size capability, not a component state.",
+      "valuesFrom": "sizes",
+      "description": "Default or Small mark presentation density.",
       "targetMappings": {
         "web": [
           {
-            "kind": "class",
+            "kind": "optionClass",
             "selector": ".payment-icons",
-            "classNames": [
-              ".payment-icons--sm"
+            "source": "sizes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "accessibleLabel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit aria-label when surrounding visible context already identifies the accepted payment methods.",
+      "description": "Optional localized accessible list name used only when surrounding visible context does not already identify the methods.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".payment-icons",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "ul"
             ]
           }
         ]
@@ -118,29 +179,30 @@
   ],
   "tokens": {
     "public": {
-      "easing": [
-        "--easing-default"
-      ],
-      "transition": [
-        "--transition-fast"
+      "spacing": [
+        "--space-layout-element-gap"
       ]
     }
   },
   "accessibility": [
-    "Provide accessible names for payment methods when the marks are not accompanied by readable text.",
-    "Hide purely decorative duplicate marks from assistive technology.",
-    "Do not make passive payment marks keyboard-focusable solely because they have a hover treatment.",
-    "Do not imply that a payment method is available unless target checkout data supports the claim."
+    "Render the collection as a native ul/li list, preserving target source order and adding role=list only as a marker-removal exposure safeguard.",
+    "Require every mark to expose a brief recognized payment-method name through alt, named image semantics, or the target-native equivalent.",
+    "Omit unnamed or invalid marks/items and omit the complete root when no valid payment method remains.",
+    "Use an optional localized accessibleLabel only when surrounding visible context does not already identify the collection.",
+    "Do not add focus stops, controls, widget roles, hover-only disclosure, live regions, keyboard behavior, motion, controlled state, or neutral runtime to passive marks.",
+    "Do not grayscale, recolor, reduce the opacity of, or otherwise override approved target brand artwork.",
+    "Leave current availability, eligibility, order, official assets, licensing, brand rules, localization, and publication with the target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/marketing.css. The registry-aligned size list remains default-only; small is explicitly classified as a size capability property."
+      "kind": "html-css-composition",
+      "notes": "Implemented as a conditionally rendered native list with named informative marks, semantic size, intrinsic wrapping, preserved brand treatment, and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "liquid-css",
+      "notes": "Dedicated snippet consumes supplied types or shop.enabled_payment_types and maps official payment_type_svg_tag output to the canonical native-list class contract with a localized list label and zero component JavaScript."
     },
     "react": {
       "status": "planned",

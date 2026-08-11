@@ -1,69 +1,86 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.4.0",
   "slug": "wishlist",
   "name": "Wishlist",
   "registryId": "U8",
   "category": "account",
   "status": "pilot",
-  "summary": "Wishlist page with header, count, product grid, and wishlist toggle button.",
-  "dependencies": ["product-card"],
+  "summary": "Heading-labelled, target-controlled exact-variant saved-item collection composed from a native list, canonical Product Cards, optional canonical Empty State, and target-owned hybrid persistence and confirmed mutation lifecycle.",
+  "dependencies": ["product-card", "empty-state"],
   "source": {
     "registry": "registry.json#/components/wishlist",
     "css": { "file": "components/css/account.css", "selector": ".wishlist" },
     "docs": "site/src/content/components/wishlist.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".wishlist", "className": ".wishlist", "required": true, "description": "Wishlist page container." },
-    { "name": "header", "selector": ".wishlist__header", "className": ".wishlist__header", "required": true, "description": "Wishlist header." },
-    { "name": "title", "selector": ".wishlist__title", "className": ".wishlist__title", "required": true, "description": "Wishlist title." },
-    { "name": "count", "selector": ".wishlist__count", "className": ".wishlist__count", "required": false, "description": "Wishlist item count." },
-    { "name": "grid", "selector": ".wishlist__grid", "className": ".wishlist__grid", "required": true, "description": "Wishlist product grid." },
-    { "name": "button", "selector": ".wishlist-btn", "className": ".wishlist-btn", "required": false, "description": "Wishlist toggle button." }
+    { "name": "root", "selector": ".wishlist", "className": ".wishlist", "required": true, "description": "Native thematic section labelled by its required visible title; it has no widget, application, live-region, or persistence semantics." },
+    { "name": "header", "selector": ".wishlist__header", "className": ".wishlist__header", "required": true, "description": "Responsive title and optional count composition." },
+    { "name": "title", "selector": ".wishlist__title", "className": ".wishlist__title", "required": true, "description": "Required non-empty contextual heading that labels the root through a unique ID." },
+    { "name": "count", "selector": ".wishlist__count", "className": ".wishlist__count", "required": false, "description": "Optional complete target-formatted count text; it is passive and not an internal live region." },
+    { "name": "grid", "selector": ".wishlist__grid", "className": ".wishlist__grid", "required": false, "description": "Native unordered list rendered when saved Product Card items are present." },
+    { "name": "item", "selector": ".wishlist__item", "className": ".wishlist__item", "required": false, "description": "Native list item containing exactly one complete canonical Product Card composition." },
+    { "name": "emptyState", "selector": null, "required": false, "description": "Optional canonical Empty State composition rendered instead of the product list when the target has resolved an empty collection; the Wishlist host supplies contextual native heading rank under ADR 0236." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default wishlist page." }
+    { "name": "default", "className": null, "default": true, "description": "Single neutral saved-product collection; persistence and account models do not become visual variants." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default responsive product grid." }
+    { "name": "default", "className": null, "default": true, "description": "One fluid intrinsic grid whose columns respond to the Wishlist container." }
   ],
   "states": [
-    { "name": "default", "selectors": [".wishlist"], "description": "Default wishlist state." },
-    { "name": "buttonHover", "selectors": [".wishlist-btn:hover"], "description": "Wishlist toggle hover state." },
-    { "name": "buttonFocus", "selectors": [".wishlist-btn:focus-visible"], "description": "Visible keyboard focus on wishlist toggles." },
-    { "name": "buttonPressed", "selectors": [".wishlist-btn[aria-pressed=\"true\"]"], "description": "Wishlist toggle selected state." }
+    { "name": "populated", "selectors": [".wishlist__grid", ".wishlist__item"], "description": "Target supplies one or more canonical Product Cards from one authoritative exact-variant saved-item projection." },
+    { "name": "resolvedEmpty", "selectors": [".wishlist"], "description": "Target has resolved that no saved products exist and supplies an intentional Empty State composition instead of an empty list." },
+    { "name": "retainedUnavailable", "selectors": [".wishlist__item", ".product-card"], "description": "An exact saved variant that is sold out or no longer available remains present with truthful visible status, parent-product navigation, and explicit removal." }
   ],
   "behavior": [
-    { "name": "productGridComposition", "selectors": [".wishlist__grid"], "description": "Wishlist grid should compose Product Card for saved products." },
-    { "name": "wishlistToggle", "selectors": [".wishlist-btn"], "attributes": ["aria-pressed"], "events": ["click"], "description": "Toggle should add or remove a product from wishlist state." },
-    { "name": "wishlistCount", "selectors": [".wishlist__count"], "description": "Wishlist count should update when saved products change." }
+    { "name": "labelledSection", "selectors": [".wishlist", ".wishlist__title"], "attributes": ["aria-labelledby", "id"], "description": "The native section references the unique ID of its required visible contextual heading and adds no parent widget role." },
+    { "name": "nativeCollection", "selectors": [".wishlist__grid", ".wishlist__item"], "description": "Populated content uses ul and li semantics without grid roles, row counts, selection models, roving tabindex, or custom arrow-key behavior." },
+    { "name": "canonicalProductCardComposition", "selectors": [".wishlist__item", ".product-card", ".card"], "description": "Every populated item consumes one complete canonical Product Card, including its own product link, media, Price/footer composition, focus layering, and optional target-composed Button command." },
+    { "name": "controlledCollection", "selectors": [".wishlist__grid", ".wishlist__count"], "description": "Exact-variant records and count are controlled inputs from one authoritative target projection. Wishlist owns no saved IDs, query, persistence, local storage, optimistic state, formatter, or internal controlled/uncontrolled value." },
+    { "name": "exactVariantIdentity", "selectors": [".wishlist__item", ".product-card"], "description": "Every saved record represents one exact target variant or merchandise selection. Stable variant identity is the target merge and deduplication key; parent product identity remains available for navigation. Multiple variants of one product may coexist and each card visibly names its saved option selection." },
+    { "name": "contextualRemovalCommand", "selectors": [".wishlist__item"], "events": ["click"], "description": "A target may compose a canonical Button command inside each Product Card to remove that exact variant. The command includes product and saved-option context and no aria-pressed. The target updates count/list/empty state only after confirmed success, places focus deliberately, and offers undo when feasible." },
+    { "name": "reusableToggleBoundary", "selectors": [".wishlist"], "description": "A persistent Save toggle is not U8 anatomy. If accepted later, it needs a separate canonical owner with stable label, pressed state, controlled/uncontrolled API, persistence reconciliation, and Product Card integration." },
+    { "name": "resolvedContentRequirement", "selectors": [".wishlist__grid", ".wishlist"], "description": "After loading or error resolution, the target supplies either one or more products or an intentional emptyState composition. Products is optional at the property level so Studio and targets can represent resolved empty without an empty list." },
+    { "name": "emptyLifecycle", "selectors": [".wishlist"], "description": "Loading, resolved empty, error, offline, unauthorized, and stale-product states are selected by the target. Empty State may be composed only after absence is resolved; U8 does not infer lifecycle or add a live role." },
+    { "name": "statusAndFocusOwnership", "selectors": [".wishlist__count", ".wishlist"], "description": "Count is passive. A target mutation owner provides complete pending, success, failure, undo, resulting-count, and empty-transition status plus a logical focus destination after confirmed removal." },
+    { "name": "hybridPersistence", "selectors": [".wishlist"], "description": "The accepted profile combines anonymous local-device records with authenticated account records. Neutral U8 stores nothing; each target provides storage, account service, identity, synchronization, consent, retention, authorization, failure recovery, telemetry, and analytics." },
+    { "name": "confirmedSignInMerge", "selectors": [".wishlist"], "description": "After sign-in, the target requests an idempotent union keyed by exact variant identity. Neither source destructively replaces the other. Local anonymous records are cleared only after the authenticated service confirms and returns the authoritative merged result; failure preserves them intact for retry." },
+    { "name": "unavailableRecordRetention", "selectors": [".wishlist__item", ".product-card"], "description": "Sold-out or unavailable exact variants are never silently deleted or converted to product-level favorites. The target retains them with truthful localized status, parent-product navigation, alternative selection path when available, and explicit Remove." },
+    { "name": "containerResponse", "selectors": [".wishlist", ".wishlist__header", ".wishlist__grid", ".wishlist__item"], "description": "Logical sizing, intrinsic tracks, wrapping header, minmax containment, and emergency text wrapping preserve DOM, reading, and focus order across container widths, localization, direction, and zoom." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Wishlist page title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".wishlist__title" }] } },
-    { "name": "count", "type": "string", "required": false, "description": "Target-formatted saved-item count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".wishlist__count" }] } },
-    { "name": "products", "type": "slot", "required": true, "description": "Saved Product Card compositions, including per-product toggle state.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".wishlist__grid", "classNames": [".wishlist__grid"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Required non-empty visible contextual heading content that labels the collection root; heading rank is target-owned.", "targetMappings": { "web": [{ "kind": "content", "selector": ".wishlist__title" }] } },
+    { "name": "count", "type": "string", "required": false, "description": "Optional complete localized and target-formatted count text from the same source as products; Wishlist does not pluralize or announce it.", "targetMappings": { "web": [{ "kind": "content", "selector": ".wishlist__count" }] } },
+    { "name": "products", "type": "slot", "required": false, "description": "Optional target-controlled exact-variant saved-item collection. When populated, it contains li wrappers with complete canonical Product Cards that visibly name each saved option, retain unavailable records truthfully, and may include contextual target Remove commands; after resolution, omit it only when emptyState is supplied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".wishlist__grid", "classNames": [".wishlist__grid", ".wishlist__item", ".card", ".product-card"] }] } },
+    { "name": "emptyState", "type": "slot", "required": false, "description": "Optional canonical Empty State composition used only when products is resolved empty; lifecycle, copy, action, announcement, and contextual heading rank remain target-owned.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".wishlist", "classNames": [".empty-state"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-primary", "--color-text-secondary", "--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-feedback-error-default"],
-      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--space-layout-grid-gap", "--space-layout-touch-target"],
-      "radius": ["--radius-full"],
-      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"]
+      "color": ["--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--space-layout-grid-gap", "--tg-space-stack-lg", "--tg-space-stack-xs", "--tg-space-inline-lg"],
+      "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--typo-h2-size", "--typo-h2-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Wishlist toggles need aria-pressed and product-specific accessible names.",
-    "Wishlist count changes should be understandable after add/remove actions.",
-    "Protect customer-specific saved items behind the appropriate account or local-storage model."
+    "Supply a required non-empty contextual heading with a unique ID and reference it from the native section using aria-labelledby; do not add application, grid, listbox, selection, or live-region roles.",
+    "Render populated products as a native ul with li children, each containing exactly one complete canonical Product Card article. Preserve Product Card image alternatives, one title link, Price semantics, focus layering, and Button composition.",
+    "Use a native canonical Button for a contextual removal command. Include the product name in its accessible name and omit aria-pressed because the saved-page command removes an item rather than exposing a persistent two-state control.",
+    "Include the exact saved option selection in visible Product Card content and in contextual removal naming. Do not rely on image, swatch, or color alone to distinguish variants of the same product.",
+    "If a reusable Save toggle is accepted later, keep its accessible label stable while aria-pressed communicates state and expose an explicit controlled/uncontrolled contract at its canonical owner.",
+    "Keep count passive and synchronized with products from the same target source. Target-owned Status or Alert output communicates pending, completion, failure, undo, resulting count, and resolved-empty transitions without moving focus merely to announce them.",
+    "After a successful removal, the target moves focus only when needed to a logical surviving action, adjacent item, collection heading, or empty-state action; it must not leave focus on a removed node or infer one universal destination.",
+    "Do not show Empty State while data is pending or errors are unresolved. Preserve contextual heading hierarchy and canonical action semantics when an Empty State is composed.",
+    "Retain sold-out or unavailable exact variants with truthful text and explicit navigation/removal choices; never silently delete or coerce them to product-level favorites.",
+    "For the accepted hybrid profile, preserve anonymous records until an idempotent exact-variant union is confirmed by the authenticated service. Communicate synchronization failures without discarding local truth.",
+    "Protect customer-specific saved data according to the selected local-device/account storage, consent, merge, retention, authorization, and protected-data model."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to customer metafields, app-backed wishlist state, or local wishlist storage." },
-    "react": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css-composition", "notes": "Native labelled section/list and canonical exact-variant Product Card composition are implemented in components/css/account.css; the target implements accepted anonymous-local plus authenticated-account persistence, confirmed union, lifecycle, actions, status, and focus." },
+    "shopify": { "status": "planned", "kind": "hybrid-customer-account-extension-and-storefront-service", "notes": "The selected profile combines a local-device storefront wishlist with an authenticated account service and idempotent exact-variant union after sign-in. Shopify documents Wishlist as a customer-account.page.render full-page extension; any customer metafield writes require appropriate scopes and approved protected-customer-data access. Copied theme CSS is not readiness." },
+    "react": { "status": "planned", "kind": "controlled-composition" },
     "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "swiftui": { "status": "planned", "kind": "native-list-grid" },
+    "compose": { "status": "planned", "kind": "native-list-grid" }
   }
 }

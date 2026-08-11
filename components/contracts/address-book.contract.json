@@ -1,65 +1,76 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "address-book",
   "name": "Address Book",
   "registryId": "U6",
   "category": "account",
   "status": "pilot",
-  "summary": "Address card grid with default address state, editable cards, and add-new card.",
-  "dependencies": ["button"],
+  "summary": "Passive native collection of saved address records with canonical default markers and target-owned actions.",
+  "dependencies": ["badge", "button"],
   "source": {
     "registry": "registry.json#/components/address-book",
     "css": { "file": "components/css/account.css", "selector": ".address-grid" },
     "docs": "site/src/content/components/address-book.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".address-grid", "className": ".address-grid", "required": true, "description": "Address card grid." },
-    { "name": "card", "selector": ".address-card", "className": ".address-card", "required": true, "description": "Address card." },
-    { "name": "defaultTag", "selector": ".address-card__default-tag", "className": ".address-card__default-tag", "required": false, "description": "Default address marker." },
-    { "name": "name", "selector": ".address-card__name", "className": ".address-card__name", "required": true, "description": "Recipient name." },
-    { "name": "text", "selector": ".address-card__text", "className": ".address-card__text", "required": true, "description": "Formatted address text." },
-    { "name": "actions", "selector": ".address-card__actions", "className": ".address-card__actions", "required": false, "description": "Address actions group." }
+    { "name": "root", "selector": ".address-grid", "className": ".address-grid", "required": true, "description": "Native unordered saved-address list and named inline-size container." },
+    { "name": "record", "selector": ".address-card", "className": ".address-card", "required": true, "description": "Native list item with a neutral non-interactive record surface." },
+    { "name": "body", "selector": ".address-card__body", "className": ".address-card__body", "required": true, "description": "Recipient, postal lines, and optional default marker." },
+    { "name": "defaultTag", "selector": ".address-card__default-tag", "className": ".address-card__default-tag", "required": false, "description": "Canonical passive Badge with the target-authoritative default label." },
+    { "name": "name", "selector": ".address-card__name", "className": ".address-card__name", "required": true, "description": "Recipient paragraph with automatic text direction." },
+    { "name": "text", "selector": ".address-card__text", "className": ".address-card__text", "required": true, "description": "Target-formatted postal lines rendered as direction-aware spans." },
+    { "name": "actions", "selector": ".address-card__actions", "className": ".address-card__actions", "required": false, "description": "Target-owned canonical Buttons or Links for one record." },
+    { "name": "newAction", "selector": ".address-card__new-action", "className": ".address-card__new-action", "required": false, "description": "Optional canonical add-address Button or Link in a final list item." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default address card grid." }
+    { "name": "default", "className": null, "default": true, "description": "Neutral saved-address collection profile." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default responsive address grid." }
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic container-responsive collection profile." }
   ],
   "states": [
-    { "name": "default", "selectors": [".address-grid"], "description": "Default address grid." },
-    { "name": "defaultCard", "selectors": [".address-card--default"], "description": "Default address card state." },
-    { "name": "newCard", "selectors": [".address-card--new"], "description": "Add-new address card state." },
-    { "name": "newCardHover", "selectors": [".address-card--new:hover"], "description": "Add-new card hover state." },
-    { "name": "newCardFocus", "selectors": [".address-card--new:focus-visible"], "description": "Visible keyboard focus on the add-address action." }
+    { "name": "default", "selectors": [".address-grid"], "description": "One or more complete saved-address records." },
+    { "name": "defaultAddressPresent", "selectors": [".address-card__default-tag"], "description": "Zero or one record carries target-authoritative default truth and a visible canonical Badge." },
+    { "name": "actionsPresent", "selectors": [".address-card__actions"], "description": "One or more target-owned record actions are composed." },
+    { "name": "newAddressPresent", "selectors": [".address-card--new", ".address-card__new-action"], "description": "A non-empty optional label adds one final canonical action item." }
   ],
   "behavior": [
-    { "name": "addressActions", "selectors": [".address-card__actions"], "events": ["click"], "description": "Address actions should edit, delete, or set default address through target account APIs." },
-    { "name": "newAddress", "selectors": [".address-card--new"], "attributes": ["native button or link semantics"], "events": ["click", "Enter", "Space"], "description": "Add-new card should use a native action and open or navigate to Address Form." },
-    { "name": "defaultAddress", "selectors": [".address-card--default", ".address-card__default-tag"], "description": "Default address should be represented as text and state." }
+    { "name": "nativeCollection", "selectors": [".address-grid", ".address-card"], "attributes": ["ul and li semantics"], "description": "Render saved records as a native unordered list without grid, listbox, option, selection, or roving-tabindex semantics." },
+    { "name": "completeCollection", "selectors": [".address-grid"], "attributes": ["non-empty complete records", "unique record identifiers", "at most one default record"], "description": "Omit the complete renderer when the required collection is absent, empty, duplicate, or incomplete." },
+    { "name": "postalContent", "selectors": [".address-card__name", ".address-card__text"], "attributes": ["paragraph semantics", "dir=auto on recipient and each postal line"], "description": "Use paragraphs rather than the HTML address element for arbitrary postal data and preserve target-formatted lines." },
+    { "name": "defaultAddress", "selectors": [".address-card__default-tag"], "description": "Expose target-authoritative default truth with visible passive Badge text, not border or color alone." },
+    { "name": "addressActions", "selectors": [".address-card__actions"], "attributes": ["canonical native button or link semantics", "accessible name includes visible label and record context"], "events": ["click", "Enter", "Space"], "description": "Add and Edit use canonical actions; navigation uses Link and commands/mutations use Button. Delete requires target confirmation or guaranteed undo. Set Default renders only when supported. Targets own capability, pending/error and mutation lifecycle." },
+    { "name": "protectedDeletion", "selectors": [".address-card", ".address-card__actions"], "events": ["request delete", "confirm", "cancel", "undo", "failure", "success"], "description": "A record remains present and ordered until authoritative deletion success. The target provides confirmation or guaranteed undo, status feedback, recovery and a deliberate focus destination." },
+    { "name": "authoritativeReconciliation", "selectors": [".address-grid", ".address-card__default-tag"], "description": "Records retain authoritative presence/order and the existing default marker through pending, cancellation, failure or undo availability. Successful target data may remove/reorder records or confirm at most one new default." },
+    { "name": "newAddress", "selectors": [".address-card__new-action"], "attributes": ["native button or link semantics", "visible accessible label"], "events": ["click", "Enter", "Space"], "description": "A non-empty optional label adds a canonical action that targets may route to or disclose as Address Form." },
+    { "name": "passiveOwnership", "selectors": [".address-grid"], "description": "Authentication, authorization, formatting, loading, empty, error, pending, confirmation/undo, concurrency, authoritative reconciliation, routing, deliberate focus restoration, announcements, and telemetry remain target composition." },
+    { "name": "responsiveContainer", "selectors": [".address-grid"], "attributes": ["container: address-book / inline-size"], "description": "Track count responds intrinsically to the component container while minimum track and add-action dimensions remain private." }
   ],
   "properties": [
-    { "name": "addresses", "type": "slot", "required": true, "description": "Target-owned collection of address cards and actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-grid", "classNames": [".address-grid"] }] } },
-    { "name": "newAddressLabel", "type": "string", "required": false, "description": "Visible accessible label for the add-address action.", "targetMappings": { "web": [{ "kind": "content", "selector": ".address-card--new span" }] } }
+    { "name": "addresses", "type": "slot", "required": true, "description": "Complete target-owned native collection of saved-address records and permitted per-record actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-grid", "classNames": [".address-grid"] }] } },
+    { "name": "newAddressLabel", "type": "string", "required": false, "description": "Non-empty visible accessible label for the optional add-address action.", "targetMappings": { "web": [{ "kind": "content", "selector": ".address-card__new-action" }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-button-primary-bg-default", "--color-text-primary", "--color-text-secondary", "--color-surface-secondary", "--color-text-disabled"],
+      "color": ["--color-border-subtle", "--color-surface-primary", "--color-text-primary", "--color-text-secondary"],
       "radius": ["--radius-md"],
-      "typography": ["--typo-body-size"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"]
+      "spacing": ["--space-layout-element-gap", "--tg-space-stack-xs", "--tg-space-stack-md", "--tg-space-inline-lg"],
+      "typography": ["--font-family-body", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--tg-font-weight-semibold"]
     }
   },
   "accessibility": [
-    "Protect address data behind authentication.",
-    "Default address state must be readable text, not only border color.",
-    "Edit, delete, and add actions need clear accessible names."
+    "Protect and minimize address data through target authentication, authorization, and redaction before composition.",
+    "Use native unordered-list semantics for records and ordinary paragraphs for arbitrary postal addresses.",
+    "Default address state must be visible readable Badge text, not only color, and no more than one record may be default.",
+    "Repeated record actions need accessible names that contain their visible label and distinguish the affected address.",
+    "Canonical Button or Link owns focus, keyboard activation, disabled or busy state, forced colors, and reduced motion.",
+    "Delete requires target confirmation or an equivalent guaranteed undo path; keep the record present until authoritative success and restore focus deliberately after success, cancellation, undo, or failure.",
+    "Mutation feedback, concurrency, user-error recovery, default-address confirmation, and focus restoration remain target-owned outside the passive collection."
   ],
   "adapters": {
     "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer addresses and default address state." },
+    "shopify": { "status": "planned", "kind": "canonical-or-native-address-handoff", "notes": "Shopify v1 uses hosted Profile/Addresses as an intentional native handoff with no U6 parity claim. Target-controlled supplementary/full-page extensions or headless storefronts may project authoritative records and protected mutations with target-native components and Customer Account data, including B2B policy. Classic Liquid is separately versioned compatibility; copied CSS is not readiness." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

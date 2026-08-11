@@ -1,0 +1,101 @@
+## Overview
+
+Filter Panel is the full multi-group filter surface for an associated result
+region. One native GET form and one canonical control tree appear as an adjacent
+panel when the owning container is wide enough and inside canonical Drawer when
+constrained. It is not navigation and does not own the result query or data.
+
+<Preview html={'<div class="filter-panel filter-panel--immediate tg-preview-frame--lg" data-filter-panel data-commit-mode="immediate"><div class="filter-panel__toolbar"><button class="btn filter-panel__trigger" type="button" aria-haspopup="dialog" aria-controls="filter-panel-preview" aria-expanded="false" data-filter-panel-trigger>Filters</button></div><ul class="filter-panel__active" aria-label="Active filters"><li class="filter-panel__active-item"><span class="tag"><span class="tag__label">Stoneware</span><button class="tag__remove" type="button" aria-label="Remove Stoneware"></button></span></li></ul><div class="filter-panel__layout"><div class="drawer-overlay filter-panel__overlay" data-filter-panel-overlay aria-hidden="true"></div><div class="drawer drawer--left filter-panel__surface" id="filter-panel-preview" data-filter-panel-surface aria-labelledby="filter-panel-preview-title"><header class="drawer__header filter-panel__header"><h3 class="drawer__title filter-panel__title" id="filter-panel-preview-title">Filter works</h3><button class="close-btn drawer__close filter-panel__close" type="button" aria-label="Close filters" data-filter-panel-close></button></header><form class="filter-panel__form" action="/collections/quiet-forms" method="get" aria-label="Filter works"><div class="drawer__body filter-panel__body"><fieldset class="filter-group"><legend class="filter-group__title">Material</legend><div class="filter-group__options"><label class="checkbox"><input class="checkbox__input" type="checkbox" name="filter.material" value="stoneware" checked /><span class="checkbox__label">Stoneware</span></label><label class="checkbox"><input class="checkbox__input" type="checkbox" name="filter.material" value="porcelain" /><span class="checkbox__label">Porcelain</span></label></div></fieldset></div></form></div><div class="filter-panel__results">24 matching works</div></div></div>'} label="Filter Panel" />
+
+## Presentation
+
+The panel has one density and two container-driven surfaces, not two component
+trees. In a coherent wide host, the canonical Drawer root becomes a non-modal
+in-flow panel beside the result slot. In a constrained host, a canonical Button
+opens the same form inside modal Drawer with a visible title and Close Button.
+Without enhancement, the native GET form remains inline and usable.
+
+Groups remain visible in v1 and use native `fieldset`/`legend`. Filter Panel
+does not add disclosure state. Result count, sort, view mode and other collection
+toolbar content belong to the owning toolbar rather than this component.
+
+### Manual commitment
+
+<Preview html={'<div class="filter-panel filter-panel--manual tg-preview-frame--md" data-commit-mode="manual"><div class="filter-panel__layout"><div class="drawer-overlay filter-panel__overlay" aria-hidden="true"></div><div class="drawer drawer--left filter-panel__surface" aria-labelledby="filter-panel-manual-title"><header class="drawer__header filter-panel__header"><h3 class="drawer__title filter-panel__title" id="filter-panel-manual-title">Filter works</h3><button class="close-btn drawer__close filter-panel__close" type="button" aria-label="Close filters"></button></header><form class="filter-panel__form" action="/collections/quiet-forms" method="get" aria-label="Filter works"><div class="drawer__body filter-panel__body"><fieldset class="filter-group"><legend class="filter-group__title">Availability</legend><div class="filter-group__options"><label class="checkbox"><input class="checkbox__input" type="checkbox" name="filter.availability" value="available" /><span class="checkbox__label">Available now</span></label></div></fieldset></div><footer class="drawer__footer filter-panel__footer"><button class="btn btn--outline filter-panel__cancel" type="button">Cancel</button><button class="btn filter-panel__apply" type="submit">Apply filters</button></footer></form></div><div class="filter-panel__results">Associated results</div></div></div>'} label="Manual Apply and Cancel" />
+
+`immediate` is the default: every canonical choice change is a committed query
+change request. `manual` keeps one target-owned draft; Apply requests commitment
+and Cancel restores the last committed values without changing the URL.
+
+## Usage Guidelines
+
+<DoDont>
+  <Do>Use Filter Panel for multiple labelled facet groups adjacent to one result surface.</Do>
+  <Dont>Do not duplicate desktop and mobile forms or use Filter Panel as category navigation.</Dont>
+</DoDont>
+
+- Supply a real GET `formAction`, stable target-defined input names/values and
+  truthful available/disabled states.
+- Keep committed active values in one named native list of canonical Tags.
+- Use canonical Checkbox for independent values and Radio for mutually exclusive
+  values. Swatches must retain visible text and a non-color selected state.
+- Keep groups always visible. A future collapsible group must compose a reviewed
+  Disclosure or Accordion rather than turning the legend into an inert Button.
+- Keep results outside the form so Product Card and other consumer forms remain
+  valid.
+- The target owns query-parameter names/serialization, URL/history, Back/Forward,
+  cancellation, pending/error/empty status, result replacement, analytics,
+  focus and pagination reset.
+- Cap or search very large target facets through a separately reviewed data and
+  control policy; do not silently virtualize or truncate authored choices.
+
+## Accessibility
+
+- Give the panel a non-empty visible title and use it to name the native GET form
+  and constrained Drawer.
+- In constrained mode preserve canonical Drawer focus containment, Escape and
+  close behavior, backdrop policy, background exclusion, scroll lock and trigger
+  restoration. In wide mode remove modal semantics and constrained-only actions.
+- Keep exactly one form/control tree and one checked-state owner across surfaces.
+- Group every related set with a first native Legend and preserve canonical
+  Checkbox/Radio keyboard, disabled, checked, reset and FormData behavior.
+- A Tag removal requests one committed-value removal; the target chooses
+  surviving focus and any localized result announcement.
+- Manual Cancel restores committed values without URL mutation. Apply and
+  Immediate commitment update at most one target-owned result status.
+- Preserve long/localized labels, RTL, unbroken text, text spacing, 200% zoom,
+  forced-color focus and reduced motion through canonical dependencies.
+
+## References
+
+### Dependencies
+
+- [Drawer](/components/drawer)
+- [Button](/components/button)
+- [Checkbox](/components/checkbox)
+- [Radio](/components/radio)
+- [Tag](/components/tag)
+
+### API Reference
+
+<PropTable>
+  <tr><td>`commitMode`</td><td>enum</td><td>`immediate`</td><td>`immediate` or `manual` query commitment</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible panel/form/Drawer name</td></tr>
+  <tr><td>`formAction`</td><td>string</td><td>required</td><td>Real target-owned GET destination</td></tr>
+  <tr><td>`triggerLabel`</td><td>string</td><td>required</td><td>Constrained Drawer open action</td></tr>
+  <tr><td>`dismissLabel`</td><td>string</td><td>required</td><td>Constrained Drawer Close Button name</td></tr>
+  <tr><td>`applyLabel` / `cancelLabel`</td><td>string</td><td>Manual mode</td><td>Complete localized commitment actions</td></tr>
+  <tr><td>`activeFiltersLabel`</td><td>string</td><td>with active list</td><td>Native committed-value list name</td></tr>
+  <tr><td>`activeFilters`</td><td>slot</td><td>optional</td><td>Ordered canonical Tag items</td></tr>
+  <tr><td>`filterGroups`</td><td>slot</td><td>optional</td><td>Always-visible native choice fieldsets</td></tr>
+  <tr><td>`results`</td><td>slot</td><td>required</td><td>Associated target result composition outside the form</td></tr>
+</PropTable>
+
+- [HTML forms](https://html.spec.whatwg.org/multipage/forms.html)
+- [WAI form grouping](https://www.w3.org/WAI/tutorials/forms/grouping/)
+- [WAI accessible names](https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/)
+- [Open UI component research](https://open-ui.org/components/)
+- [Radix Checkbox](https://www.radix-ui.com/primitives/docs/components/checkbox)
+- [Radix Accordion](https://www.radix-ui.com/primitives/docs/components/accordion)
+- [Shopify storefront filtering](https://shopify.dev/docs/storefronts/themes/navigation-search/filtering/storefront-filtering)
+- [Shopify Liquid filter object](https://shopify.dev/docs/api/liquid/objects/filter)

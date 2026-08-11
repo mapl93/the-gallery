@@ -1,65 +1,287 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "product-slider",
   "name": "Product Slider",
   "registryId": "D6",
   "category": "product",
   "status": "pilot",
-  "summary": "Horizontal product carousel for related products, recommendations, and recently viewed lists.",
-  "dependencies": ["icon-button", "product-card"],
+  "summary": "Finite, user-controlled horizontal product list that composes Carousel scrolling, canonical Icon Button controls, and canonical Product Card items without autoplay or looping.",
+  "dependencies": ["carousel", "icon-button", "product-card"],
   "source": {
     "registry": "registry.json#/components/product-slider",
-    "css": { "file": "components/css/product.css", "selector": ".product-slider" },
+    "css": {
+      "file": "components/css/product.css",
+      "selector": ".product-slider"
+    },
     "docs": "site/src/content/components/product-slider.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".product-slider", "className": ".product-slider", "required": true, "description": "Slider section container." },
-    { "name": "header", "selector": ".product-slider__header", "className": ".product-slider__header", "required": false, "description": "Header row for title and navigation." },
-    { "name": "title", "selector": ".product-slider__title", "className": ".product-slider__title", "required": false, "description": "Slider title." },
-    { "name": "nav", "selector": ".product-slider__nav", "className": ".product-slider__nav", "required": false, "description": "Previous and next navigation controls." },
-    { "name": "track", "selector": ".product-slider__track", "className": ".product-slider__track", "required": true, "description": "Horizontally scrolling product-card track." },
-    { "name": "trackItem", "selector": ".product-slider__track > *", "required": true, "description": "Scroll-snapped product-card child." },
-    { "name": "productCard", "selector": ".product-card", "className": ".product-card", "required": true, "description": "Product Card dependency rendered in the track." }
+    {
+      "name": "root",
+      "selector": ".product-slider",
+      "className": ".product-slider",
+      "required": true,
+      "description": "Contextual section named by its visible heading and layered on the canonical Carousel root."
+    },
+    {
+      "name": "header",
+      "selector": ".product-slider__header",
+      "className": ".product-slider__header",
+      "required": true,
+      "description": "Intrinsic header row containing the title and optional navigation."
+    },
+    {
+      "name": "title",
+      "selector": ".product-slider__title",
+      "className": ".product-slider__title",
+      "required": true,
+      "description": "Visible contextual heading that names the section and product list."
+    },
+    {
+      "name": "nav",
+      "selector": ".product-slider__nav",
+      "className": ".product-slider__nav",
+      "required": false,
+      "description": "Named group for optional finite previous and next controls."
+    },
+    {
+      "name": "navButton",
+      "selector": ".product-slider__nav-button",
+      "className": ".product-slider__nav-button",
+      "required": false,
+      "description": "Canonical Carousel Icon Button for previous or next product navigation."
+    },
+    {
+      "name": "track",
+      "selector": ".product-slider__track",
+      "className": ".product-slider__track",
+      "required": true,
+      "description": "Keyboard-focusable native horizontal list layered on the canonical Carousel track."
+    },
+    {
+      "name": "item",
+      "selector": ".product-slider__item",
+      "className": ".product-slider__item",
+      "required": true,
+      "description": "Native list item and canonical Carousel snap item."
+    },
+    {
+      "name": "productCard",
+      "selector": ".product-card",
+      "className": ".product-card",
+      "required": true,
+      "description": "Exactly one canonical Product Card rendered in each list item."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default horizontal product slider." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Finite horizontal product-list composition."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive track item width controlled by breakpoints." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Intrinsic two, three, or four-card density derived from the Product Slider container."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".product-slider"], "description": "Default product slider state." },
-    { "name": "snapTrack", "selectors": [".product-slider__track > *"], "description": "Scroll snap item state." },
-    { "name": "hiddenScrollbar", "selectors": [".product-slider__track::-webkit-scrollbar"], "description": "Hidden visual scrollbar state on supported browsers." }
+    {
+      "name": "default",
+      "selectors": [".product-slider"],
+      "description": "Default first-bound product-list state."
+    },
+    {
+      "name": "first",
+      "selectors": [".product-slider__nav-button--previous"],
+      "description": "First item is nearest logical start and previous navigation is disabled."
+    },
+    {
+      "name": "middle",
+      "selectors": [".product-slider__nav-button"],
+      "description": "An interior item is nearest logical start and both adjacent directions are available."
+    },
+    {
+      "name": "last",
+      "selectors": [".product-slider__nav-button--next"],
+      "description": "Last reachable item is nearest logical start and next navigation is disabled."
+    },
+    {
+      "name": "noOverflow",
+      "selectors": [".product-slider__nav"],
+      "description": "The supplied list fits in the track and both optional controls are disabled or omitted."
+    },
+    {
+      "name": "trackFocus",
+      "selectors": [".product-slider__track"],
+      "description": "Visible keyboard focus on the native product-list viewport."
+    }
   ],
   "behavior": [
-    { "name": "horizontalScroll", "selectors": [".product-slider__track"], "events": ["scroll", "click"], "description": "Track should support horizontal scrolling and optional previous/next controls." },
-    { "name": "productCardComposition", "selectors": [".product-card"], "description": "Each item should preserve Product Card navigation, pricing, badge, and quick-add behavior." }
+    {
+      "name": "carouselComposition",
+      "selectors": [".product-slider", ".product-slider__track", ".product-slider__item", ".product-slider__nav-button"],
+      "description": "Product Slider consumes canonical Carousel root, native track, snap item, finite control, focus, RTL, forced-colors, and reduced-motion behavior."
+    },
+    {
+      "name": "horizontalScroll",
+      "selectors": [".product-slider__track", ".product-slider__item"],
+      "events": ["scroll", "touch scroll", "wheel", "keyboard scroll"],
+      "description": "The native list scrolls horizontally and complete Product Card items snap to logical start."
+    },
+    {
+      "name": "navigation",
+      "selectors": [".product-slider__nav-button"],
+      "events": ["previous product", "next product"],
+      "attributes": ["aria-controls", "aria-label", "disabled"],
+      "description": "Optional canonical Icon Buttons target exact adjacent items and expose finite disabled bounds; when activation disables the focused boundary control, focus moves to the named track instead of the document."
+    },
+    {
+      "name": "directScrolling",
+      "selectors": [".product-slider__track"],
+      "events": ["scroll", "touch scroll", "keyboard scroll"],
+      "description": "Direct native scrolling synchronizes the nearest logical-start item and both navigation bounds."
+    },
+    {
+      "name": "productCardComposition",
+      "selectors": [".product-card"],
+      "description": "Every item delegates product media, navigation, Price, Badge, and quick-add semantics to canonical Product Card."
+    },
+    {
+      "name": "containerDensity",
+      "selectors": [".product-slider__track"],
+      "description": "Card density responds to the Product Slider container rather than the viewport."
+    },
+    {
+      "name": "finiteCollection",
+      "description": "v1 does not autoplay or loop; empty collections are omitted by the owning target."
+    }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": false, "description": "Optional slider section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-slider__title" }] } },
-    { "name": "navigation", "type": "slot", "required": false, "description": "Optional previous and next navigation controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-slider__nav", "classNames": [".product-slider__nav"] }] } },
-    { "name": "items", "type": "slot", "required": true, "description": "Consumer-owned Product Card collection rendered in the track.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-slider__track", "classNames": [".product-slider__track"] }] } }
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Visible product-collection heading and source of the section and track accessible name.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".product-slider__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": false,
+      "description": "Localized accessible action name required when the optional previous control is rendered.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".product-slider__nav-button--previous",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": ["button"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false,
+      "description": "Localized accessible action name required when the optional next control is rendered.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".product-slider__nav-button--next",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": ["button"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "navigation",
+      "type": "slot",
+      "required": false,
+      "description": "Optional canonical previous and next Icon Button composition; targets disable or omit it when the collection does not overflow.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".product-slider__nav",
+            "classNames": [".product-slider__nav"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "items",
+      "type": "slot",
+      "required": true,
+      "description": "Non-empty consumer-owned collection of canonical Product Cards.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".product-slider__track",
+            "classNames": [".product-slider__track"]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
       "color": ["--color-text-primary"],
       "spacing": ["--space-layout-element-gap"],
-      "typography": ["--typo-h3-size", "--font-family-heading"]
+      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-h3-line-height"]
     }
   },
   "accessibility": [
-    "Expose previous and next controls with clear accessible names when navigation buttons are present.",
-    "Allow keyboard users to reach every product card in the track.",
-    "Do not rely only on drag gestures to reveal additional products."
+    "Use a visible contextual heading to name the section and the focusable native product list.",
+    "Preserve native list semantics and normal Product Card link/button Tab order; do not add a second composite arrow-key model.",
+    "Expose localized previous and next Icon Button names, aria-controls, and native disabled bounds; retain control focus while another item is reachable and move focus to the named track when the activated control becomes disabled.",
+    "Synchronize finite bounds after buttons, touch, wheel, scrollbar, or keyboard scrolling and target exact items instead of physical offsets.",
+    "Preserve canonical Carousel focus, reduced-motion, forced-colors, and RTL behavior and do not autoplay or loop in v1."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map product recommendation, related product, or recently viewed arrays to Product Card children." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css-composition",
+      "notes": "Product Slider CSS layers container-driven product density on canonical Carousel, Icon Button, and Product Card classes; the target owns the finite item index and exact-item synchronization."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "liquid-css-js",
+      "notes": "The related-products section loads Product Recommendations through Section Rendering, composes canonical Product Card snippets, localizes controls, omits empty results, and owns bounded target scrolling."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

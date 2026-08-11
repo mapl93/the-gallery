@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "spinner",
   "name": "Spinner",
   "registryId": "A23",
@@ -31,7 +31,8 @@
     { "name": "loading", "selectors": [".spinner", "@keyframes spinner-rotate"], "description": "Indeterminate loading state." }
   ],
   "behavior": [
-    { "name": "loadingSemantics", "selectors": [".spinner", ".spinner-overlay"], "attributes": ["aria-hidden=\"true\"", "role=\"status\"", "aria-live=\"polite\"", "aria-busy=\"true\""], "description": "Spinner visuals are often decorative; loading announcement should live on the containing region when needed." }
+    { "name": "decorativeGraphic", "selectors": [".spinner"], "attributes": ["aria-hidden=\"true\""], "description": "The rotating or static ring is decorative and never duplicates an accessible loading announcement." },
+    { "name": "statusComposition", "selectors": [".spinner-overlay", ".spinner-overlay__text"], "attributes": ["role=\"status\""], "description": "Optional visible status text is exposed once through a polite Status composition; a separate consumer region owns aria-busy and the loading lifecycle." }
   ],
   "properties": [
     { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Visual spinner diameter.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".spinner", "source": "sizes" }] } },
@@ -41,14 +42,14 @@
     "public": {
       "color": ["--color-text-primary", "--color-text-secondary"],
       "radius": ["--radius-full"],
-      "typography": ["--typo-body-size"]
+      "typography": ["--typo-body-size", "--typo-body-line-height"]
     }
   },
   "accessibility": [
-    "Use role=\"status\" or aria-busy on the loading region when loading must be announced.",
+    "Use one role=\"status\" composition or aria-busy on the loading region when loading must be announced.",
     "Hide decorative spinner graphics from assistive technology when text announces loading.",
     "The spinner graphic is decorative and should use aria-hidden=\"true\"; the containing region owns aria-busy or status text.",
-    "Respect reduced-motion preferences; the neutral web target stops rotation."
+    "Respect reduced-motion preferences; the neutral web target stops rotation while preserving track/head differentiation."
   ],
   "adapters": {
     "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition and keyframes in components/css/primitives.css." },

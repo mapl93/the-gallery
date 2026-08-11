@@ -1,79 +1,112 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "cookie-consent",
-  "name": "Cookie Consent",
+  "name": "Consent Manager",
   "registryId": "G9",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Dismissible cookie notice presentation with Button-composed actions and optional preference-surface anatomy; the consent model remains target-owned.",
-  "dependencies": [
-    "button"
-  ],
+  "summary": "Controlled consent-decision composition with an in-flow first layer, explicit accept/reject/customize requests, canonical Modal preferences, and target-owned policy, state, persistence, processing, provider, and audit behavior.",
+  "dependencies": ["button", "link", "modal", "checkbox"],
   "source": {
     "registry": "registry.json#/components/cookie-consent",
     "css": {
       "file": "components/css/marketing.css",
-      "selector": ".cookie-banner"
+      "selector": ".consent-manager"
     },
     "docs": "site/src/content/components/cookie-consent.mdx"
   },
   "anatomy": [
     {
       "name": "root",
-      "selector": ".cookie-banner",
-      "className": ".cookie-banner",
+      "selector": ".consent-manager",
+      "className": ".consent-manager",
       "required": true,
-      "description": "Viewport-edge cookie notice surface."
+      "description": "Controlled, named, non-modal first-layer section rendered in normal document flow."
     },
     {
-      "name": "inner",
-      "selector": ".cookie-banner__inner",
-      "className": ".cookie-banner__inner",
+      "name": "content",
+      "selector": ".consent-manager__content",
+      "className": ".consent-manager__content",
       "required": true,
-      "description": "Responsive notice content wrapper."
+      "description": "Localized title, explanation, and real policy Link region."
     },
     {
-      "name": "text",
-      "selector": ".cookie-banner__text",
-      "className": ".cookie-banner__text",
+      "name": "title",
+      "selector": ".consent-manager__title",
+      "className": ".consent-manager__title",
       "required": true,
-      "description": "Cookie notice and optional policy link."
+      "description": "Visible localized heading that names the first layer."
+    },
+    {
+      "name": "description",
+      "selector": ".consent-manager__description",
+      "className": ".consent-manager__description",
+      "required": true,
+      "description": "Target-approved explanation of the requested decision."
+    },
+    {
+      "name": "policyLink",
+      "selector": ".consent-manager__policy",
+      "className": ".consent-manager__policy",
+      "required": true,
+      "description": "Canonical Link with a real target-owned policy destination."
     },
     {
       "name": "actions",
-      "selector": ".cookie-banner__actions",
-      "className": ".cookie-banner__actions",
+      "selector": ".consent-manager__actions",
+      "className": ".consent-manager__actions",
       "required": true,
-      "description": "Button-composed consent actions."
+      "description": "Equal-access canonical Button group for accept, reject, and customize requests."
     },
     {
-      "name": "preferences",
-      "selector": ".cookie-preferences",
-      "className": ".cookie-preferences",
-      "required": false,
-      "description": "Optional preference-surface content shell without a prescribed consent model."
+      "name": "acceptAction",
+      "selector": ".consent-manager__action--accept",
+      "className": ".consent-manager__action--accept",
+      "required": true,
+      "description": "Explicit accept request; the target decides and persists the result."
     },
     {
-      "name": "preferenceCategory",
-      "selector": ".cookie-preferences__category",
-      "className": ".cookie-preferences__category",
-      "required": false,
-      "description": "Repeated preference category row."
+      "name": "rejectAction",
+      "selector": ".consent-manager__action--reject",
+      "className": ".consent-manager__action--reject",
+      "required": true,
+      "description": "Explicit reject request with the same interaction access as accept."
     },
     {
-      "name": "preferenceName",
-      "selector": ".cookie-preferences__name",
-      "className": ".cookie-preferences__name",
-      "required": false,
-      "description": "Preference category name."
+      "name": "customizeAction",
+      "selector": ".consent-manager__action--customize",
+      "className": ".consent-manager__action--customize",
+      "required": true,
+      "description": "Canonical Modal trigger for target-supplied detailed preferences."
     },
     {
-      "name": "preferenceDescription",
-      "selector": ".cookie-preferences__desc",
-      "className": ".cookie-preferences__desc",
+      "name": "feedback",
+      "selector": ".consent-manager__feedback",
+      "className": ".consent-manager__feedback",
       "required": false,
-      "description": "Preference category description."
+      "description": "Optional target-owned pending, result, error, or retry composition with context-appropriate semantics."
+    },
+    {
+      "name": "preferencesModal",
+      "selector": ".consent-manager__preferences.modal",
+      "className": ".consent-manager__preferences",
+      "required": true,
+      "description": "Canonical Modal composition for detailed preferences; G9 adds no overlay or focus system."
+    },
+    {
+      "name": "preferencesList",
+      "selector": ".consent-manager__preferences-list",
+      "className": ".consent-manager__preferences-list",
+      "required": true,
+      "description": "Target-supplied category/value slot composed from canonical choice controls."
+    },
+    {
+      "name": "saveAction",
+      "selector": ".consent-manager__save",
+      "className": ".consent-manager__save",
+      "required": true,
+      "description": "Explicit target-handled save request inside the canonical Modal footer."
     }
   ],
   "variants": [
@@ -81,7 +114,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Single responsive cookie-notice presentation."
+      "description": "One in-flow consent-decision surface; viewport placement is target-owned and is not a variant."
     }
   ],
   "sizes": [
@@ -89,194 +122,215 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Full-width, viewport-contained banner."
+      "description": "Intrinsic container-responsive presentation with no viewport-width API."
     }
   ],
   "states": [
     {
-      "name": "hidden",
-      "selectors": [
-        ".cookie-banner"
-      ],
-      "description": "Banner is translated below the viewport by default."
+      "name": "closed",
+      "selectors": [".consent-manager[hidden]"],
+      "description": "Authoritative target state omits or natively hides both the first layer and preferences from interaction."
     },
     {
-      "name": "visible",
-      "selectors": [
-        ".cookie-banner[data-visible]"
-      ],
-      "description": "Visible banner state."
+      "name": "open",
+      "selectors": [".consent-manager"],
+      "description": "Valid named first layer is present in normal document flow."
     },
     {
-      "name": "policyLinkFocusVisible",
-      "selectors": [
-        ".cookie-banner__text a:focus-visible"
-      ],
-      "description": "Visible keyboard focus on an optional policy link."
+      "name": "busy",
+      "selectors": [".consent-manager[aria-busy=\"true\"]"],
+      "description": "Target mutation is pending; request actions are unavailable and target feedback may explain progress."
+    },
+    {
+      "name": "preferencesOpen",
+      "selectors": [".consent-manager__preferences.modal"],
+      "description": "Canonical Modal is open with target-owned current category values."
     }
   ],
   "behavior": [
     {
-      "name": "visibility",
-      "selectors": [
-        ".cookie-banner[data-visible]"
-      ],
-      "attributes": [
-        "data-visible"
-      ],
-      "description": "The banner is hidden by canonical CSS until data-visible is present."
+      "name": "controlledVisibility",
+      "selectors": [".consent-manager", ".consent-manager__preferences.modal"],
+      "attributes": ["hidden", "aria-busy", "aria-hidden"],
+      "description": "Open, preferences-open, and busy state are controlled target projections. Closed content is omitted or natively hidden, never translated offscreen."
     },
     {
-      "name": "buttonComposition",
-      "selectors": [
-        ".cookie-banner__actions"
-      ],
-      "events": [
-        "click"
-      ],
-      "description": "Consent actions compose Button and emit native action requests; the target owns policy meaning, persistence, blocking, and subsequent state."
+      "name": "explicitDecisionRequests",
+      "selectors": [".consent-manager__action--accept", ".consent-manager__action--reject", ".consent-manager__action--customize"],
+      "elements": ["button"],
+      "attributes": ["type=\"button\"", "disabled"],
+      "events": ["accept request", "reject request", "customize request"],
+      "description": "Three explicit native Button activations request target action. No dismissal, inactivity, scrolling, or page continuation is interpreted as consent."
     },
     {
-      "name": "preferenceBoundary",
-      "selectors": [
-        ".cookie-preferences",
-        ".cookie-preferences__category"
-      ],
-      "description": "Canonical CSS provides preference layout anatomy only and does not define categories, defaults, required cookies, control types, storage, or consent withdrawal behavior."
+      "name": "preferenceComposition",
+      "selectors": [".consent-manager__preferences.modal", ".consent-manager__preferences-list", ".consent-manager__save"],
+      "events": ["open", "Tab", "Shift+Tab", "Escape", "close", "save request", "restore focus"],
+      "description": "Detailed preferences consume canonical Modal and canonical choice controls. Modal owns its complete focus/dismissal lifecycle; the target owns supplied categories, values, validation, save, and results."
+    },
+    {
+      "name": "providerBoundary",
+      "selectors": [".consent-manager"],
+      "events": ["target reconciliation", "target reopen or withdrawal"],
+      "description": "The neutral component performs no jurisdiction lookup, cookie/storage access, resource blocking, provider call, persistence, analytics, or compliance claim."
     }
   ],
   "properties": [
     {
-      "name": "message",
+      "name": "title",
       "type": "string",
       "required": true,
-      "description": "Visible cookie notice text.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".cookie-banner__text"
-          }
-        ]
-      }
+      "description": "Visible localized first-layer title and accessible name.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__title" }] }
     },
     {
-      "name": "actions",
-      "type": "slot",
+      "name": "description",
+      "type": "string",
       "required": true,
-      "description": "Target-defined consent actions composed from Button.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".cookie-banner__actions",
-            "classNames": [
-              ".cookie-banner__actions"
-            ]
-          }
-        ]
-      }
+      "description": "Target-approved localized decision explanation.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__description" }] }
+    },
+    {
+      "name": "policyLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized visible label for the canonical policy Link.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__policy" }] }
+    },
+    {
+      "name": "policyHref",
+      "type": "string",
+      "required": true,
+      "description": "Real target-owned policy destination; placeholder-only links are invalid.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager__policy", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] }
+    },
+    {
+      "name": "acceptLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized label for the explicit accept request.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__action--accept" }] }
+    },
+    {
+      "name": "rejectLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized label for the explicit reject request.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__action--reject" }] }
+    },
+    {
+      "name": "customizeLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized label for the preferences Modal trigger.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__action--customize" }] }
+    },
+    {
+      "name": "preferencesTitle",
+      "type": "string",
+      "required": true,
+      "description": "Visible localized title and accessible name for the canonical preferences Modal.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__preferences .modal__title" }] }
+    },
+    {
+      "name": "preferencesDescription",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the introductory paragraph; category labels and descriptions remain target-owned.",
+      "description": "Optional localized introduction above the target category controls.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__preferences-description" }] }
     },
     {
       "name": "preferences",
       "type": "slot",
-      "required": false,
-      "description": "Optional target-defined preference content; this slot does not define the cookie preference model.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".cookie-preferences",
-            "classNames": [
-              ".cookie-preferences"
-            ]
-          }
-        ]
-      }
+      "required": true,
+      "description": "Target-supplied current categories and values composed from canonical choice controls.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".consent-manager__preferences-list", "classNames": [".consent-manager__preferences-list"] }] }
     },
     {
-      "name": "visible",
+      "name": "closePreferencesLabel",
+      "type": "string",
+      "required": true,
+      "description": "Contextual accessible label for the canonical Close Button.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager__preferences .modal__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "saveLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized label for the explicit save-preferences request.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__save" }] }
+    },
+    {
+      "name": "feedback",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned pending, result, error, or retry composition; its semantics and copy depend on the actual result.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".consent-manager__feedback", "classNames": [".consent-manager__feedback"] }] }
+    },
+    {
+      "name": "open",
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Controls banner presentation only; consent state and persistence remain target-owned.",
+      "description": "Controls whether the valid first layer and any preferences surface are present; the target derives this from authoritative policy/provider state.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager", "attribute": "hidden", "values": { "true": null, "false": "" } }] }
+    },
+    {
+      "name": "preferencesOpen",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Controls the canonical preferences Modal; customize and close actions emit requests for the target to reconcile.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager__preferences.modal", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] }
+    },
+    {
+      "name": "busy",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Projects a target-owned pending mutation and disables further decision/save requests without inventing a result model.",
       "targetMappings": {
         "web": [
-          {
-            "kind": "attribute",
-            "selector": ".cookie-banner",
-            "attribute": "data-visible",
-            "values": {
-              "true": "",
-              "false": null
-            }
-          }
+          { "kind": "attribute", "selector": ".consent-manager", "attribute": "aria-busy", "values": { "true": "true", "false": null } },
+          { "kind": "attribute", "selector": ".consent-manager__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] },
+          { "kind": "attribute", "selector": ".consent-manager__save", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }
         ]
       }
     }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-border-focus",
-        "--color-border-subtle",
-        "--color-surface-primary",
-        "--color-text-accent",
-        "--color-text-primary",
-        "--color-text-secondary"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
-      "shadow": [
-        "--shadow-lg"
-      ],
-      "spacing": [
-        "--space-layout-container"
-      ],
-      "transition": [
-        "--transition-default"
-      ],
-      "typography": [
-        "--typo-body-size"
-      ],
-      "z-index": [
-        "--z-overlay"
-      ]
+      "color": ["--color-surface-primary", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "radius": ["--radius-lg"],
+      "spacing": ["--space-layout-element-gap", "--space-input-icon-size", "--space-input-icon-gap"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-typography-h3-weight", "--typo-h3-size", "--typo-h3-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-caption-size", "--typo-caption-line-height"]
     }
   },
   "accessibility": [
-    "Use clear Button labels that describe each target-defined consent action.",
-    "Keep the policy link keyboard reachable with visible focus.",
-    "Do not treat closing the banner as consent unless an accepted target policy explicitly defines that meaning.",
-    "When preferences open in a modal surface, that containing surface owns naming, focus containment, Escape dismissal, and focus restoration.",
-    "Respect reduced-motion preferences for banner transitions."
+    "Render a visible localized heading and a real policy Link before requesting a decision.",
+    "Keep Accept, Reject, and Customize as explicit keyboard-reachable canonical Buttons with equal interaction access.",
+    "Never infer consent from closing, inactivity, scrolling, or continued use.",
+    "Omit or natively hide the entire controlled composition when closed; do not leave an offscreen focusable copy.",
+    "Compose canonical Modal for preferences, including naming, initial focus, Tab containment, Escape, visible close, and logical focus restoration.",
+    "Compose target categories from labeled canonical choice controls and preserve authoritative current values.",
+    "Give target feedback the semantics appropriate to the real pending, success, or error result; do not announce a result before provider reconciliation.",
+    "Keep the first layer in normal flow unless a target separately owns and tests fixed/sticky obstruction, safe-area, and stacking policy."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Banner and preference layout CSS are implemented; the legal preference model and persistence are unresolved."
+      "kind": "html-css-composition",
+      "notes": "In-flow controlled first layer composes canonical Button, Link, Modal, and Checkbox surfaces; provider, persistence, and policy behavior remain target-owned."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "customer-privacy-liquid-js",
+      "notes": "A future target adapter must project Shopify Customer Privacy state and mutations into this contract; copied CSS is not provider readiness."
     },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "native-component"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "native-component"
-    }
+    "react": { "status": "planned", "kind": "controlled-component" },
+    "figma": { "status": "planned", "kind": "component-set" },
+    "swiftui": { "status": "planned", "kind": "native-composition" },
+    "compose": { "status": "planned", "kind": "native-composition" }
   }
 }

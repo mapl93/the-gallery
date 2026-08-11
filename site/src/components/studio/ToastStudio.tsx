@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -50,6 +50,7 @@ export default function ToastStudio({ contract, definition }: ToastStudioProps) 
       message: 'Your changes have been saved.',
       variant: 'success',
       icon: true,
+      action: true,
       dismissAction: true,
       dismissLabel: 'Dismiss notification',
       announcement: 'polite',
@@ -65,6 +66,8 @@ export default function ToastStudio({ contract, definition }: ToastStudioProps) 
   const [slotIconValues, setSlotIconValues] = useState<StudioSlotIconValues>(initialIcons);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
+  const [triggerVisible, setTriggerVisible] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const read = () => {
@@ -87,13 +90,20 @@ export default function ToastStudio({ contract, definition }: ToastStudioProps) 
   const CloseIcon = getStudioLucideIcon('x');
 
   function setVisible(next: boolean) {
+    if (!next) setTriggerVisible(true);
     setValues((current) => ({ ...current, visible: next }));
+  }
+
+  function dismiss() {
+    setVisible(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
   function reset() {
     setValues({ ...initialValues });
     setSlotIconValues({ ...initialIcons });
     setTokenOverrides({});
+    setTriggerVisible(false);
   }
 
   return (
@@ -109,15 +119,15 @@ export default function ToastStudio({ contract, definition }: ToastStudioProps) 
           tokenValues={tokenValues}
           activeTokens={{
             surface: '--color-surface-primary',
-            'hover-surface': '--color-surface-secondary',
             'default-border': '--color-border-default',
-            focus: '--color-border-focus',
             'title-color': '--color-text-primary',
             'message-color': '--color-text-secondary',
             feedback: `--color-feedback-${variant}-default`,
             radius: '--radius-md',
             shadow: '--shadow-lg',
-            'type-size': '--typo-body-size',
+            'type-size': '--typo-body-sm-size',
+            'type-line-height': '--typo-body-sm-line-height',
+            spacing: '--space-layout-element-gap',
           }}
           onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))}
           onSlotIconChange={(slot, iconName) => setSlotIconValues((current) => ({ ...current, [slot]: iconName }))}
@@ -131,28 +141,36 @@ export default function ToastStudio({ contract, definition }: ToastStudioProps) 
           aria-label={`${contract.name} preview`}
           style={tokenOverrides as CSSProperties}
         >
-          <div className="docs-studio__stage-inner">
-            {!visible ? (
-              <button className="btn" type="button" onClick={() => setVisible(true)}>Show toast</button>
-            ) : (
+          <div className="docs-studio__stage-inner docs-studio__toast-fixture">
+            {triggerVisible && (
+              <button ref={triggerRef} className="btn btn--outline" type="button" onClick={() => setVisible(true)}>Show toast</button>
+            )}
+            {visible && (
               <div
                 className={['toast', variantClass(contract, values.variant), 'is-visible', 'docs-studio__preview-toast'].filter(Boolean).join(' ')}
-                role={announcement === 'assertive' ? 'alert' : announcement === 'polite' ? 'status' : undefined}
-                aria-live={announcement === 'none' ? undefined : announcement as 'polite' | 'assertive'}
+                aria-hidden="false"
               >
                 {values.icon === true && Icon && <Icon className="toast__icon" aria-hidden="true" />}
-                <div className="toast__content">
+                <div
+                  className="toast__content"
+                  role={announcement === 'assertive' ? 'alert' : announcement === 'polite' ? 'status' : undefined}
+                  aria-live={announcement === 'none' ? undefined : announcement as 'polite' | 'assertive'}
+                  aria-atomic={announcement === 'none' ? undefined : 'true'}
+                >
                   {String(values.title || '') && <p className="toast__title">{String(values.title)}</p>}
                   <p className="toast__message">{String(values.message || '')}</p>
                 </div>
+                {values.action === true && (
+                  <button className="btn btn--link btn--sm toast__action" type="button" onClick={dismiss}>Undo</button>
+                )}
                 {values.dismissAction === true && (
                   <button
-                    className="toast__close"
+                    className="close-btn toast__close"
                     type="button"
                     aria-label={String(values.dismissLabel || 'Dismiss notification')}
-                    onClick={() => setVisible(false)}
+                    onClick={dismiss}
                   >
-                    {CloseIcon && <CloseIcon aria-hidden="true" />}
+                    {CloseIcon && <CloseIcon className="close-btn__icon" aria-hidden="true" />}
                   </button>
                 )}
               </div>

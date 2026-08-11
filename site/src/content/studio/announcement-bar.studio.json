@@ -1,6 +1,6 @@
 {
   "$schema": "./studio.schema.json",
-  "studioVersion": "0.1.0",
+  "studioVersion": "0.3.0",
   "slug": "announcement-bar",
   "designReference": {
     "fileKey": "k3axoTaF87g17fBRgJ0PMY",
@@ -12,8 +12,34 @@
       "id": "content",
       "label": "Content",
       "controls": [
+        { "id": "mode", "label": "Mode", "kind": "segmented", "properties": ["mode"], "optionLabels": { "static": "Static", "countdown": "Countdown", "rotating": "Rotating" } },
         { "id": "label", "label": "Region label", "kind": "text", "properties": ["label"] },
-        { "id": "message", "label": "Message", "kind": "slot-composition", "properties": ["message"] }
+        { "id": "message", "label": "Message", "kind": "slot-composition", "properties": ["message"], "visibleWhen": { "property": "mode", "equals": "static" } },
+        { "id": "countdown", "label": "Countdown", "kind": "slot-composition", "properties": ["countdown"], "visibleWhen": { "property": "mode", "equals": "countdown" } },
+        { "id": "messages", "label": "Messages", "kind": "slot-composition", "properties": ["messages"], "visibleWhen": { "property": "mode", "equals": "rotating" } }
+      ]
+    },
+    {
+      "id": "lifecycle",
+      "label": "Lifecycle",
+      "controls": [
+        { "id": "visible", "label": "Visible", "kind": "toggle", "properties": ["visible"] },
+        { "id": "dismissible", "label": "Dismissible", "kind": "toggle", "properties": ["dismissible"] },
+        { "id": "dismiss-label", "label": "Dismiss label", "kind": "text", "properties": ["dismissLabel"], "visibleWhen": { "property": "dismissible", "equals": true } }
+      ]
+    },
+    {
+      "id": "rotation",
+      "label": "Rotation",
+      "controls": [
+        { "id": "autoplay", "label": "Autoplay", "kind": "toggle", "properties": ["autoplay"], "visibleWhen": { "property": "mode", "equals": "rotating" } },
+        { "id": "autoplay-interval", "label": "Autoplay interval", "kind": "number", "properties": ["autoplayInterval"], "visibleWhen": { "property": "autoplay", "equals": true } },
+        { "id": "previous-label", "label": "Previous label", "kind": "text", "properties": ["previousLabel"], "visibleWhen": { "property": "mode", "equals": "rotating" } },
+        { "id": "next-label", "label": "Next label", "kind": "text", "properties": ["nextLabel"], "visibleWhen": { "property": "mode", "equals": "rotating" } },
+        { "id": "pause-label", "label": "Pause label", "kind": "text", "properties": ["pauseLabel"], "visibleWhen": { "property": "autoplay", "equals": true } },
+        { "id": "play-label", "label": "Play label", "kind": "text", "properties": ["playLabel"], "visibleWhen": { "property": "autoplay", "equals": true } },
+        { "id": "counter-template", "label": "Counter template", "kind": "text", "properties": ["counterTemplate"], "visibleWhen": { "property": "mode", "equals": "rotating" } },
+        { "id": "status-template", "label": "Status template", "kind": "text", "properties": ["statusTemplate"], "visibleWhen": { "property": "mode", "equals": "rotating" } }
       ]
     },
     {
@@ -22,7 +48,8 @@
       "controls": [
         { "id": "colors", "label": "Colors", "kind": "token-pair", "tokens": { "category": "color", "names": ["--color-surface-statement", "--color-text-primary"] } },
         { "id": "container-space", "label": "Container space", "kind": "token", "tokens": { "category": "spacing", "names": ["--space-layout-container"] } },
-        { "id": "type", "label": "Type", "kind": "token", "tokens": { "category": "typography", "names": ["--typo-body-size"] } }
+        { "id": "element-gap", "label": "Element gap", "kind": "token", "tokens": { "category": "spacing", "names": ["--space-layout-element-gap"] } },
+        { "id": "type", "label": "Type", "kind": "token-pair", "tokens": { "category": "typography", "names": ["--typo-body-sm-size", "--typo-body-sm-line-height"] } }
       ]
     }
   ]

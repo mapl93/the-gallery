@@ -1,47 +1,42 @@
 ## Overview
 
-Read-only summary of target-supplied aggregate rating and review-count values, with optional target-supplied distribution rows.
+Passive aggregate rating and review count with an optional target-supplied
+distribution. Review Summary composes canonical Rating; it owns no aggregation,
+normalization, provider, filtering or live-update service.
 
-<Preview html={'<section class="review-summary tg-preview-frame--md" data-rating="4.5" data-review-count="127" aria-label="4.5 out of 5 stars from 127 reviews"><div class="review-summary__average"><span class="review-summary__score">4.5</span><div class="star-rating" data-rating="4.5" aria-label="4.5 out of 5 stars"><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-filled" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg><svg class="star-rating__star is-half" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 2.5Z" /></svg></div><span class="review-summary__count">127 reviews</span></div><div class="review-summary__bars" aria-label="Rating distribution"><div class="review-summary__bar-row"><span class="review-summary__bar-label">5 stars</span><div class="review-summary__bar-track" aria-hidden="true"><div class="review-summary__bar-fill tg-preview-w-70"></div></div><span class="review-summary__bar-count">89</span></div><div class="review-summary__bar-row"><span class="review-summary__bar-label">4 stars</span><div class="review-summary__bar-track" aria-hidden="true"><div class="review-summary__bar-fill tg-preview-w-25"></div></div><span class="review-summary__bar-count">25</span></div></div></section>'} label="Review Summary" />
+<Preview html={'<figure class="review-summary tg-preview-frame--md" data-rating="4.5" data-review-count="127"><figcaption class="review-summary__average"><span class="review-summary__score" aria-hidden="true">4.5</span><span class="rating" data-rating="4.5"><span class="rating__stars" role="img" aria-label="4.5 out of 5 stars"><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--half" aria-hidden="true">☆</span></span></span><span class="review-summary__count">127 reviews</span></figcaption><ul class="review-summary__bars" aria-label="Rating distribution"><li class="review-summary__bar-row"><span class="review-summary__bar-label">5 stars</span><span class="review-summary__bar-track" aria-hidden="true"><span class="review-summary__bar-fill tg-preview-w-70"></span></span><span class="review-summary__bar-count">89</span></li><li class="review-summary__bar-row"><span class="review-summary__bar-label">4 stars</span><span class="review-summary__bar-track" aria-hidden="true"><span class="review-summary__bar-fill tg-preview-w-25"></span></span><span class="review-summary__bar-count">25</span></li></ul></figure>'} label="Review Summary" />
 
 ## Presentation
 
-The required average group contains visible score and review-count text. A composed Star Rating is optional. Distribution is also optional and consists of repeated rows with a visible bucket label, passive track and target-sized fill, and visible count.
+The exact aggregate and canonical star projection are explicit inputs.
+`ratingValue`/`scoreLabel` may preserve a provider value such as `4.6`, while
+`ratingDisplayValue` must be the target-selected half-step passed to Rating.
+Neutral code never silently rounds one into the other. `ratingLabel` must agree
+with that star projection.
 
-`ratingValue`, `scoreLabel`, `ratingLabel`, `reviewCount`, and `reviewCountLabel` are supplied independently by the target. The component does not calculate averages, normalize scales, select buckets, infer fill widths, or synchronize counts.
+The optional distribution is a labelled native list. Every visual bar has
+visible bucket and count text; targets supply widths and records.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Supply readable score and count labels alongside any decorative stars or bars.</Do>
-  <Dont>Do not present example distribution values as calculated component output.</Dont>
+  <Do>Supply exact aggregate, half-step star projection, localized labels, count, and optional distribution as one coherent snapshot.</Do>
+  <Dont>Do not calculate aggregates, infer bucket widths, or announce provider updates inside Review Summary.</Dont>
 </DoDont>
-
-Aggregation, rounding, missing values, filtering, moderation, localization, and provider synchronization remain open target decisions. Keep the visible labels consistent with the target data source.
 
 ## Accessibility
 
-<Callout type="info">
-  Stars and bar widths supplement the supplied text; they are not the only representation of the data.
-</Callout>
-
-- Provide an accessible rating label containing the value and scale.
-- Keep the numeric score and total review count visible as text.
-- Give every distribution row a visible bucket label and count.
-- Hide passive tracks and fills from assistive technology when their values are already expressed in text.
-- Do not make passive aggregate data a live region unless the consuming target has a separate update requirement.
+- The visible score is hidden from the accessibility tree because canonical
+  Rating owns the equivalent target-projected value and scale once.
+- Keep the review count as readable visible text.
+- Name the optional native distribution list and retain text equivalents for
+  every bar.
+- The entire component is passive, unfocusable and non-live.
 
 ## References
 
-**Anatomy:** required `.review-summary`, `.review-summary__average`, `.review-summary__score`, and `.review-summary__count`; optional composed `.star-rating`, `.review-summary__bars`, and repeated row, label, track, fill, and count elements.
+**Dependency:** [Rating](/components/rating).
 
-**Dependencies:** None. Star Rating is an optional composition in the reviewed anatomy, but the current registry dependency array remains empty.
-
-<PropTable>
-  <tr><td>`ratingValue`</td><td>number</td><td>required</td><td>Target-supplied aggregate value from `0` to `5`</td></tr>
-  <tr><td>`scoreLabel`</td><td>string</td><td>required</td><td>Visible target-formatted score</td></tr>
-  <tr><td>`ratingLabel`</td><td>string</td><td>required</td><td>Accessible value and scale</td></tr>
-  <tr><td>`reviewCount`</td><td>number</td><td>required</td><td>Target-supplied non-negative count</td></tr>
-  <tr><td>`reviewCountLabel`</td><td>string</td><td>required</td><td>Visible target-formatted count</td></tr>
-  <tr><td>`distribution`</td><td>slot</td><td>none</td><td>Target-owned distribution rows</td></tr>
-</PropTable>
+Required anatomy is `figure.review-summary`, its
+`figcaption.review-summary__average`, visible score, canonical `.rating`, and
+review count. The distribution list and rows are optional target composition.

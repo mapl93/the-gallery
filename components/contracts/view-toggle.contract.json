@@ -1,65 +1,80 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "view-toggle",
   "name": "Grid / List View Toggle",
   "registryId": "E5",
   "category": "collection",
   "status": "pilot",
-  "summary": "Collection view toggle for switching between grid and list presentations.",
-  "dependencies": [],
+  "summary": "Fixed Grid/List collection-mode profile over canonical native Segmented Control with visible icon-plus-text choices, one value, logical arrow navigation, and target-owned result coordination.",
+  "dependencies": ["segmented-control"],
   "source": {
     "registry": "registry.json#/components/view-toggle",
     "css": { "file": "components/css/collection.css", "selector": ".view-toggle" },
     "docs": "site/src/content/components/view-toggle.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".view-toggle", "className": ".view-toggle", "required": true, "description": "View toggle group." },
-    { "name": "button", "selector": ".view-toggle__btn", "className": ".view-toggle__btn", "required": true, "description": "Single view mode button." },
-    { "name": "icon", "selector": ".view-toggle__btn svg", "required": false, "description": "View mode icon." }
+    { "name": "root", "selector": ".view-toggle", "className": ".view-toggle", "required": true, "description": "Canonical native Segmented Control fieldset specialized for the fixed Grid/List view choice." },
+    { "name": "legend", "selector": ".view-toggle__legend", "className": ".view-toggle__legend", "required": true, "description": "Visible native Legend naming the collection-view choice." },
+    { "name": "options", "selector": ".view-toggle__options", "className": ".view-toggle__options", "required": true, "description": "Joined canonical Segmented Control surface containing exactly two options." },
+    { "name": "item", "selector": ".view-toggle__item", "className": ".view-toggle__item", "required": true, "description": "One fixed Grid or List segment label wrapper." },
+    { "name": "input", "selector": ".view-toggle__input", "className": ".view-toggle__input", "required": true, "description": "Canonical same-name native Radio with fixed grid or list value." },
+    { "name": "label", "selector": ".view-toggle__label", "className": ".view-toggle__label", "required": true, "description": "Visible segment label and pointer target." },
+    { "name": "icon", "selector": ".view-toggle__icon", "className": ".view-toggle__icon", "required": true, "description": "Fixed passive Grid or List representation hidden from duplicate accessible naming." },
+    { "name": "text", "selector": ".view-toggle__text", "className": ".view-toggle__text", "required": true, "description": "Visible localized Grid or List text that names the option without depending on its icon." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default two-option view toggle." }
+    { "name": "default", "className": null, "default": true, "description": "One joined icon-plus-text Grid/List control using canonical Segmented Control states." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default square icon-button size." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic size with canonical 44px minimum targets and wrap-safe visible labels." }
   ],
   "states": [
-    { "name": "default", "selectors": [".view-toggle"], "description": "Default toggle state." },
-    { "name": "hover", "selectors": [".view-toggle__btn:hover"], "description": "Button hover state." },
-    { "name": "focus", "selectors": [".view-toggle__btn:focus-visible"], "description": "Visible view-button focus state." },
-    { "name": "active", "selectors": [".view-toggle__btn[aria-pressed=\"true\"]", ".view-toggle__btn.is-active"], "description": "Pressed view mode state." },
-    { "name": "disabled", "selectors": [".view-toggle__btn:disabled"], "description": "Unavailable view-mode state." }
+    { "name": "default", "selectors": [".view-toggle"], "description": "Available group with exactly one checked Grid or List value." },
+    { "name": "hover", "selectors": [".segmented__label:hover"], "description": "Canonical Segmented Control hover presentation." },
+    { "name": "selected", "selectors": [".segmented__input:checked + .segmented__label"], "description": "Unambiguous active surface synchronized with the native checked Radio." },
+    { "name": "focusVisible", "selectors": [".segmented:has(.segmented__input:focus-visible) .segmented__options", ".segmented__input:focus-visible + .segmented__label"], "description": "Canonical outer group and inner focused-option indicators." },
+    { "name": "disabled", "selectors": [".segmented:disabled"], "description": "Native Fieldset disables both fixed choices." }
   ],
   "behavior": [
-    { "name": "pressedState", "selectors": [".view-toggle__btn[aria-pressed=\"true\"]", ".view-toggle__btn.is-active"], "attributes": ["aria-pressed", "aria-label"], "events": ["click", "Space", "Enter"], "description": "Pressed state should stay synchronized with the active collection view mode." },
-    { "name": "viewMode", "selectors": [".view-toggle__btn"], "description": "Adapters own applying the selected grid/list view to the collection results." }
+    { "name": "canonicalSegmentedComposition", "selectors": [".view-toggle", ".segmented", ".segmented__input"], "description": "E5 is a profile of canonical Segmented Control and does not duplicate its selection, focus, validation, disabled, forced-color, or reduced-motion implementation." },
+    { "name": "fixedNativeChoice", "selectors": [".view-toggle", ".view-toggle__legend", ".view-toggle__input"], "attributes": ["<fieldset>", "<legend>", "type=radio", "name", "value=grid", "value=list", "checked", "disabled"], "events": ["Tab", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space", "input", "change", "form submit", "form reset"], "description": "Exactly two same-name native Radios in stable Grid/List source order own one value, one Tab entry point, logical directional selection, events, FormData, and reset." },
+    { "name": "visibleIconAndText", "selectors": [".view-toggle__icon", ".view-toggle__text"], "attributes": ["aria-hidden=true on decorative icon", "visible localized text"], "description": "Every segment combines one fixed passive icon with complete visible localized text. Text alone communicates the value." },
+    { "name": "defaultAndAvailability", "selectors": [".view-toggle__input[value=\"grid\"]"], "attributes": ["checked or controlled activeView=grid"], "description": "Grid is the neutral initial value unless a target explicitly supplies a valid merchant, URL, or account preference. Omit E5 whenever only one real result layout exists." },
+    { "name": "selectionOwnership", "selectors": [".view-toggle__input"], "attributes": ["checked or defaultChecked", "one controlled activeView"], "events": ["valueChange", "input", "change", "reset"], "description": "One group value is the only current-view owner. Static/uncontrolled targets author one initial checked Radio; framework adapters project one activeView and one callback." },
+    { "name": "resultOwnership", "events": ["view value change", "result layout update", "optional URL or preference update", "optional localized status update"], "description": "The target result coordinator applies Grid/List while preserving filters, sort, pagination, product identity, and focus/scroll according to target policy. Neutral E5 stores nothing and emits no live announcement." },
+    { "name": "contentResilience", "selectors": [".view-toggle", ".view-toggle__options", ".view-toggle__label", ".view-toggle__text"], "description": "The two horizontal segments share available inline space; visible localized labels wrap without hiding icons or changing fixed source order at narrow widths, RTL, zoom, or user text spacing." },
+    { "name": "noNeutralRuntime", "description": "E5 adds no listener, observer, timer, request, storage, formatter, layout read, animation coordinator, result mutation, or component-specific JavaScript; native Radios own interaction." }
   ],
   "properties": [
-    { "name": "groupLabel", "type": "string", "required": true, "description": "Accessible name for the related view controls.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle", "attribute": "aria-label", "valueFrom": "property" }] } },
-    { "name": "activeView", "type": "enum", "required": false, "defaultValue": "grid", "values": ["grid", "list"], "description": "Target-owned view mode synchronized across both pressed buttons.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle", "attribute": "data-view", "values": { "grid": "grid", "list": "list" } }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables both native view buttons.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle__btn", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+    { "name": "groupLabel", "type": "string", "required": true, "unsetBehavior": "Omit the complete control when its visible group label is empty.", "description": "Visible localized Legend naming the Grid/List choice.", "targetMappings": { "web": [{ "kind": "content", "selector": ".view-toggle__legend" }] } },
+    { "name": "name", "type": "string", "required": true, "unsetBehavior": "Omit the complete control when its native field name is empty.", "description": "Native form name shared by the fixed Grid and List Radios.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "gridLabel", "type": "string", "required": true, "unsetBehavior": "Omit the complete control when the visible Grid label is empty.", "description": "Visible localized text for the fixed Grid option.", "targetMappings": { "web": [{ "kind": "content", "selector": ".view-toggle__input[value=\"grid\"] + .view-toggle__label .view-toggle__text" }] } },
+    { "name": "listLabel", "type": "string", "required": true, "unsetBehavior": "Omit the complete control when the visible List label is empty.", "description": "Visible localized text for the fixed List option.", "targetMappings": { "web": [{ "kind": "content", "selector": ".view-toggle__input[value=\"list\"] + .view-toggle__label .view-toggle__text" }] } },
+    { "name": "activeView", "type": "enum", "required": false, "defaultValue": "grid", "values": ["grid", "list"], "description": "One current target-owned result presentation projected to the native checked Radio.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle__input[value=\"grid\"]", "attribute": "checked", "values": { "grid": "", "list": null }, "elements": ["input"] }, { "kind": "attribute", "selector": ".view-toggle__input[value=\"list\"]", "attribute": "checked", "values": { "grid": null, "list": "" }, "elements": ["input"] }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables both choices through the native Fieldset.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".view-toggle", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-secondary", "--color-text-primary", "--color-button-primary-bg-default", "--color-button-primary-bg-hover", "--color-button-primary-text-default", "--color-button-primary-text-hover"],
-      "radius": ["--radius-sm"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"],
-      "opacity": ["--opacity-disabled"]
+      "radius": ["--radius-full"],
+      "spacing": ["--space-input-icon-size", "--space-input-icon-gap"]
     }
   },
   "accessibility": [
-    "Provide accessible names for icon-only view buttons.",
-    "Keep aria-pressed synchronized with the active view.",
-    "Do not change focus unexpectedly when switching views."
+    "Use the canonical native Segmented Control Fieldset, a visible Legend, and exactly two same-name native Radios with fixed grid and list values; do not add redundant radiogroup, radio, aria-pressed, or button semantics.",
+    "Keep exactly one checked value. Grid is the neutral default unless a target supplies another valid initial preference; omit E5 when only one real layout exists.",
+    "Let native Radio behavior provide one Tab entry point, logical arrow selection, Space, input/change, FormData, disabled propagation, and reset.",
+    "Keep Grid and List as complete visible localized text. Hide their redundant decorative icons and never rely on icon, color, position, or selected surface alone.",
+    "Keep keyboard focus visually distinct from selected state through canonical Segmented Control; do not move focus to results automatically.",
+    "Preserve 44px minimum targets, visible text at effective 200 percent, user text spacing, RTL, dark mode, reduced motion, forced colors, and narrow-container wrapping.",
+    "Neutral E5 does not announce view changes. A target may update one pre-existing localized result status only when the result change is meaningful and not already announced."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should persist selected view mode where appropriate." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "native-segmented-radio-profile", "notes": "Canonical Segmented Control fieldset/radios plus fixed E5 icon/text composition; target results and preference lifecycle remain consumer-owned and E5 adds zero runtime." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Requires an owning collection section, visible localized labels, result-mode mapping, merchant/default policy, optional URL/persistence coordination, editor behavior, and live-store proof." },
+    "react": { "status": "implemented", "kind": "controlled-segmented-profile", "notes": "The shared docs renderer projects one activeView to canonical Segmented Control and emits one value change; a distributable adapter may also expose defaultValue." },
+    "figma": { "status": "planned", "kind": "segmented-control-profile" },
+    "swiftui": { "status": "planned", "kind": "native-segmented-picker" },
+    "compose": { "status": "planned", "kind": "native-single-choice-composition" }
   }
 }

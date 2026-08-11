@@ -7,10 +7,7 @@ import {
   type FormEvent,
 } from 'react';
 import {
-  Check,
-  Minus,
   PackageOpen,
-  Plus,
   ShoppingBag,
   X,
 } from 'lucide-react';
@@ -21,6 +18,22 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import CartEmptyArtwork from './CartEmptyArtwork';
+import CartLineItemArtwork from './CartLineItemArtwork';
+import CartNoteArtwork from './CartNoteArtwork';
+import CartPageArtwork from './CartPageArtwork';
+import CartSummaryArtwork, { type CartSummaryRow } from './CartSummaryArtwork';
+import CartUpsellArtwork from './CartUpsellArtwork';
+import DiscountFieldArtwork from './DiscountFieldArtwork';
+import FreeShippingBarArtwork from './FreeShippingBarArtwork';
+import GiftWrapArtwork from './GiftWrapArtwork';
+import ModalArtwork from './ModalArtwork';
+import PriceArtwork from './PriceArtwork';
+import ProductFormArtwork from './ProductFormArtwork';
+import ProductGalleryArtwork from './ProductGalleryArtwork';
+import { buildProductGalleryFixture } from './productGalleryFixture';
+import StickyAtcArtwork from './StickyAtcArtwork';
+import TextareaArtwork from './TextareaArtwork';
 import { editorialMedia } from './editorialMedia';
 
 interface CartStudioProps {
@@ -32,27 +45,30 @@ const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
   'cart-page': {
-    title: 'Your cart', count: '2 items', continueLabel: 'Continue shopping',
-    continueHref: '#collection', lineItems: true, summary: true,
+    title: 'Your cart', count: '1 item', continueLabel: 'Continue shopping',
+    continueHref: '#collection', lineItems: true, summary: true, summaryPlacement: 'sticky',
   },
   'cart-line-item': {
-    image: true, imageAlt: 'Celadon glazed stoneware vessel', title: 'Celadon Study No. 4',
-    href: '#product', variant: 'Celadon / Medium', quantitySelector: true,
-    removeLabel: 'Remove', saveLabel: 'Save for later', price: '$120.00', comparePrice: '$150.00',
+    media: true, title: 'Celadon Study No. 4', href: '#product', details: true,
+    price: true, quantitySelector: true, removeAction: true, saveAction: true,
   },
   'cart-summary': {
     title: 'Order summary', rows: true, note: 'Taxes and shipping calculated at checkout.',
-    checkoutLabel: 'Checkout', checkoutDisabled: false, express: true,
+    checkoutLabel: 'Checkout', checkoutDisabled: false, checkoutBusy: false, express: true,
   },
   'discount-field': {
     toggleLabel: 'Add discount code', expanded: true, input: true, applyLabel: 'Apply',
-    applied: false, appliedCode: 'STUDIO10', removeLabel: 'Remove STUDIO10 discount',
+    applyDisabled: false, applyBusy: false, appliedCodes: false,
   },
   'free-shipping-bar': {
-    text: 'You are $35 away from free shipping.', value: 65, max: 100, achieved: false,
+    message: 'You are $35 away from free shipping.',
+    accessibleLabel: 'Progress toward free shipping',
+    value: 65,
+    max: 100,
+    valueText: '$65 of $100 toward free shipping',
   },
   'cart-upsell': {
-    title: 'Complete the set', items: true, addLabel: 'Add', addDisabled: false,
+    title: 'Complete the set', items: true,
   },
   'cart-empty': {
     icon: true, title: 'Your cart is empty',
@@ -60,17 +76,26 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     actionLabel: 'Browse collection', href: '#collection',
   },
   'quick-view': {
-    gallery: true, title: 'Celadon Study No. 4', vendor: 'Lucia Ferrer',
+    open: true, dismissLabel: 'Close quick view', gallery: true,
+    title: 'Celadon Study No. 4', vendor: 'Lucia Ferrer', price: true,
     description: 'Hand-thrown stoneware finished with a satin celadon glaze.',
     productForm: true, fullLinkLabel: 'View full details', href: '#product',
   },
   'sticky-atc': {
     visible: true, image: true, imageAlt: 'Celadon glazed stoneware vessel',
-    title: 'Celadon Study No. 4', price: '$120.00', actionLabel: 'Add to cart',
-    actionDisabled: false,
+    title: 'Celadon Study No. 4', price: true, actionLabel: 'Add to cart',
+    productFormId: 'sticky-product-form-preview', actionDisabled: false, pending: false,
   },
   'cart-note': { toggleLabel: 'Add an order note', expanded: true, field: true },
-  'gift-wrap': { selected: false, label: 'Add gift wrapping', price: '$8.00', disabled: false },
+  'gift-wrap': {
+    selected: false,
+    label: 'Add gift wrapping',
+    price: true,
+    name: 'gift_wrap',
+    value: 'selected',
+    describedBy: '',
+    disabled: false,
+  },
 };
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
@@ -122,10 +147,15 @@ export default function CartStudio({ contract, definition }: CartStudioProps) {
   const [quantity, setQuantity] = useState(1);
   const [lineRemoved, setLineRemoved] = useState(false);
   const [lineSaved, setLineSaved] = useState(false);
+  const [summaryFeedback, setSummaryFeedback] = useState('');
   const [discountCode, setDiscountCode] = useState('');
+  const [discountCodes, setDiscountCodes] = useState(['STUDIO10', 'WELCOME5']);
+  const [discountError, setDiscountError] = useState('');
+  const [discountFeedback, setDiscountFeedback] = useState('');
   const [upsellAdded, setUpsellAdded] = useState(false);
   const [quickViewAdded, setQuickViewAdded] = useState(false);
-  const [stickyAdded, setStickyAdded] = useState(false);
+  const [quickViewGalleryId, setQuickViewGalleryId] = useState('front');
+  const [stickyFeedback, setStickyFeedback] = useState('');
   const [note, setNote] = useState('Please include a handwritten card.');
 
   useEffect(() => {
@@ -151,208 +181,453 @@ export default function CartStudio({ contract, definition }: CartStudioProps) {
     setQuantity(1);
     setLineRemoved(false);
     setLineSaved(false);
+    setSummaryFeedback('');
     setDiscountCode('');
+    setDiscountCodes(['STUDIO10', 'WELCOME5']);
+    setDiscountError('');
+    setDiscountFeedback('');
     setUpsellAdded(false);
     setQuickViewAdded(false);
-    setStickyAdded(false);
+    setQuickViewGalleryId('front');
+    setStickyFeedback('');
     setNote('Please include a handwritten card.');
   }
 
   function currentState() {
-    if (contract.slug === 'discount-field') return values.applied === true ? 'applied' : 'default';
-    if (contract.slug === 'free-shipping-bar') {
-      const value = Number(values.value) || 0;
-      const max = Math.max(1, Number(values.max) || 1);
-      return values.achieved === true || value >= max ? 'achieved' : 'default';
+    if (contract.slug === 'discount-field') {
+      if (discountError) return 'inputError';
+      if (values.applyBusy === true) return 'applyBusy';
+      if (values.applyDisabled === true) return 'applyDisabled';
+      if (values.appliedCodes === true) return 'appliedCodes';
+      return values.expanded === true ? 'open' : 'default';
     }
-    if (contract.slug === 'sticky-atc') return values.visible === true ? 'visible' : 'hidden';
+    if (contract.slug === 'free-shipping-bar') {
+      const value = Number(values.value);
+      const max = Number(values.max);
+      return Number.isFinite(value) && Number.isFinite(max) && max > 0 && value >= max
+        ? 'achieved'
+        : 'default';
+    }
+    if (contract.slug === 'quick-view') return values.open === true ? 'open' : 'closed';
+    if (contract.slug === 'sticky-atc') {
+      if (values.pending === true) return 'pending';
+      if (values.actionDisabled === true) return 'unavailable';
+      return values.visible === true ? 'visible' : 'hidden';
+    }
     return 'default';
   }
 
   function changeState(next: string) {
-    if (contract.slug === 'discount-field') setValue('applied', next === 'applied');
-    else if (contract.slug === 'free-shipping-bar') setValue('achieved', next === 'achieved');
-    else if (contract.slug === 'sticky-atc') setValue('visible', next === 'visible');
+    if (contract.slug === 'discount-field') {
+      setValues((current) => ({
+        ...current,
+        expanded: next !== 'default',
+        applyDisabled: next === 'applyDisabled',
+        applyBusy: next === 'applyBusy',
+        appliedCodes: next === 'appliedCodes',
+      }));
+      setDiscountError(next === 'inputError' ? 'This code could not be applied. Check it and try again.' : '');
+      if (next === 'inputError') setDiscountCode('INVALID');
+    }
+    else if (contract.slug === 'free-shipping-bar') {
+      setValues((current) => {
+        const authoredMax = Number(current.max);
+        const max = Number.isFinite(authoredMax) && authoredMax > 0 ? authoredMax : 100;
+        const achieved = next === 'achieved';
+        return {
+          ...current,
+          value: achieved ? max : max * 0.65,
+          message: achieved
+            ? 'You qualify for free shipping.'
+            : 'Continue adding items to qualify for free shipping.',
+          valueText: achieved
+            ? 'Free shipping threshold reached'
+            : '65% of the free-shipping threshold',
+        };
+      });
+    }
+    else if (contract.slug === 'quick-view') setValue('open', next === 'open');
+    else if (contract.slug === 'sticky-atc') {
+      setValues((current) => ({
+        ...current,
+        visible: next !== 'hidden',
+        actionDisabled: next === 'unavailable',
+        pending: next === 'pending',
+      }));
+      setStickyFeedback('');
+    }
   }
 
-  function renderQuantity() {
-    return (
-      <div className="qty cart-line__quantity" role="group" aria-label="Quantity">
-        <button className="qty__btn qty__btn--decrement" type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity((current) => Math.max(1, current - 1))}>
-          <Minus className="qty__icon" aria-hidden="true" />
-        </button>
-        <input className="qty__input" type="number" min={1} value={quantity} aria-label="Quantity" onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))} />
-        <button className="qty__btn qty__btn--increment" type="button" aria-label="Increase quantity" onClick={() => setQuantity((current) => current + 1)}>
-          <Plus className="qty__icon" aria-hidden="true" />
-        </button>
-      </div>
-    );
-  }
-
-  function renderLineItem(useContractValues = true) {
+  function renderLineItem(
+    useContractValues = true,
+    onFixtureQuantityChange?: (value: number | null) => void,
+  ) {
     const item = useContractValues ? values : {
-      image: true,
-      imageAlt: 'Celadon glazed stoneware vessel',
+      media: true,
       title: 'Celadon Study No. 4',
       href: '#product',
-      variant: 'Celadon / Medium',
+      details: true,
+      price: true,
       quantitySelector: true,
-      removeLabel: 'Remove',
-      saveLabel: 'Save for later',
-      price: '$120.00',
-      comparePrice: '$150.00',
+      removeAction: true,
+      saveAction: true,
     };
 
     if (lineRemoved) {
       return (
-        <p className="docs-studio__cart-feedback" role="status">
-          Item removed from cart.
-          <button className="link" type="button" onClick={() => setLineRemoved(false)}>Undo</button>
-        </p>
+        <div className="docs-studio__cart-feedback">
+          <p role="status">Celadon Study No. 4 was removed in the local preview.</p>
+          <button className="btn btn--link" type="button" onClick={() => setLineRemoved(false)}>Restore preview item</button>
+        </div>
       );
     }
 
     return (
-      <article className="cart-line docs-studio__cart-line">
-        {item.image === true && <CartMedia className="cart-line__image" alt={String(item.imageAlt || '')} />}
-        <div className="cart-line__info">
-          <a className="cart-line__title" href={String(item.href || '#product')} onClick={(event) => event.preventDefault()}>{String(item.title)}</a>
-          {String(item.variant || '') && <div className="cart-line__variant">{String(item.variant)}</div>}
-          {item.quantitySelector === true && renderQuantity()}
-          <div className="cart-line__actions">
-            {String(item.removeLabel || '') && <button className="cart-line__remove" type="button" onClick={() => setLineRemoved(true)}>{String(item.removeLabel)}</button>}
-            {String(item.saveLabel || '') && <button className="cart-line__save" type="button" disabled={lineSaved} onClick={() => setLineSaved(true)}>{lineSaved ? 'Saved' : String(item.saveLabel)}</button>}
-          </div>
-        </div>
-        <div className="cart-line__prices">
-          {String(item.comparePrice || '') && <div className="cart-line__price-compare">{String(item.comparePrice)}</div>}
-          <div className="cart-line__price">{String(item.price)}</div>
-        </div>
-      </article>
+      <>
+        <ul className="cart-lines docs-studio__cart-lines">
+          <CartLineItemArtwork
+            className="docs-studio__cart-line"
+            lineKey="celadon-study-4"
+            title={String(item.title)}
+            href={String(item.href || '')}
+            onNavigate={(event) => event.preventDefault()}
+            details={item.details === true ? 'Celadon / Medium' : undefined}
+            imageSrc={item.media === true ? editorialMedia.texturedVase : ''}
+            imageAlt=""
+            imageClassName="docs-studio__cart-media"
+            currentPrice={item.price === true ? '$120.00' : ''}
+            currentPriceLabel="Sale price"
+            compareAtPrice={item.price === true ? '$150.00' : ''}
+            compareAtPriceLabel="Regular price"
+            quantity={item.quantitySelector === true ? quantity : undefined}
+            quantityMin={1}
+            quantityMax={8}
+            quantityName="updates[celadon-study-4]"
+            onQuantityChange={item.quantitySelector === true
+              ? (next) => {
+                setQuantity(next ?? 1);
+                onFixtureQuantityChange?.(next);
+              }
+              : undefined}
+            removeLabel={item.removeAction === true ? 'Remove' : ''}
+            removeAccessibleLabel={`Remove ${String(item.title)} from cart`}
+            onRemove={() => setLineRemoved(true)}
+            saveLabel={item.saveAction === true ? (lineSaved ? 'Saved for later' : 'Save for later') : ''}
+            saveAccessibleLabel={lineSaved ? `${String(item.title)} is saved for later` : `Save ${String(item.title)} for later`}
+            saveDisabled={lineSaved}
+            onSave={() => setLineSaved(true)}
+          />
+        </ul>
+        {lineSaved && <p className="docs-studio__cart-feedback" role="status">Celadon Study No. 4 was saved in the local preview.</p>}
+      </>
     );
   }
 
-  function renderSummary(useContractValues = true) {
+  function renderSummary(useContractValues = true, cartQuantity = 1) {
     const summary = useContractValues ? values : {
       title: 'Order summary', rows: true, note: 'Taxes and shipping calculated at checkout.',
-      checkoutLabel: 'Checkout', checkoutDisabled: false, express: true,
+      checkoutLabel: 'Checkout', checkoutDisabled: false, checkoutBusy: false, express: true,
     };
+    const formatMoney = (amount: number) => `$${amount.toFixed(2)}`;
+    const rows: CartSummaryRow[] = summary.rows === true ? [
+      { key: 'subtotal', label: 'Subtotal', value: formatMoney(150 * cartQuantity) },
+      { key: 'discount', label: 'Studio member discount', value: `−${formatMoney(30 * cartQuantity)}` },
+      { key: 'total', label: 'Estimated total', value: `${formatMoney(120 * cartQuantity)} USD`, total: true },
+    ] : [];
     return (
-      <aside className="cart-summary docs-studio__cart-summary">
-        <h2 className="cart-summary__title">{String(summary.title)}</h2>
-        {summary.rows === true && <>
-          <div className="cart-summary__row"><span>Subtotal</span><span className="cart-summary__value">$120.00</span></div>
-          <div className="cart-summary__row"><span>Shipping</span><span className="cart-summary__value">Calculated later</span></div>
-          <div className="cart-summary__row cart-summary__row--total"><span>Total</span><span className="cart-summary__value">$120.00</span></div>
-        </>}
-        {String(summary.note || '') && <p className="cart-summary__note">{String(summary.note)}</p>}
-        <button className="btn cart-summary__checkout" type="button" disabled={summary.checkoutDisabled === true}>{String(summary.checkoutLabel)}</button>
-        {summary.express === true && <><div className="cart-summary__divider">or</div><div className="cart-summary__express"><button className="btn btn--outline" type="button">Express checkout</button></div></>}
-      </aside>
+      <>
+        <CartSummaryArtwork
+          id={`${id}-cart-summary`}
+          className="docs-studio__cart-summary"
+          title={String(summary.title)}
+          rows={rows}
+          note={String(summary.note || '')}
+          checkoutLabel={String(summary.checkoutLabel)}
+          checkoutDisabled={summary.checkoutDisabled === true}
+          checkoutBusy={summary.checkoutBusy === true}
+          onCheckout={() => setSummaryFeedback('Checkout was requested in the local preview.')}
+          expressContent={summary.express === true ? (
+            <>
+              <div className="cart-summary__divider"><span>or pay with</span></div>
+              <button className="btn btn--outline" type="button" onClick={() => setSummaryFeedback('Express checkout was requested in the local preview.')}>Express checkout</button>
+            </>
+          ) : undefined}
+        />
+        {summaryFeedback && <p className="docs-studio__cart-feedback" role="status">{summaryFeedback}</p>}
+      </>
     );
   }
 
   function renderCartPage() {
     return (
-      <section className="cart-page docs-studio__cart-page">
-        <section className="cart-page__items">
-          <header className="cart-page__header"><h2 className="cart-page__title">{String(values.title)}</h2>{String(values.count || '') && <span className="cart-page__count">{String(values.count)}</span>}</header>
-          {String(values.continueLabel || '') && <a className="cart-page__continue" href={String(values.continueHref || '#collection')} onClick={(event) => event.preventDefault()}>{String(values.continueLabel)}</a>}
-          {values.lineItems === true && renderLineItem(false)}
-        </section>
-        {values.summary === true && <section className="cart-page__summary">{renderSummary(false)}</section>}
-      </section>
+      <CartPageArtwork
+        id={`${id}-cart-page`}
+        className="docs-studio__cart-page"
+        title={String(values.title)}
+        count={String(values.count || '')}
+        continueLabel={String(values.continueLabel || '')}
+        continueHref={String(values.continueHref || '')}
+        summaryPlacement={String(values.summaryPlacement || 'sticky')}
+        onContinue={(event) => event.preventDefault()}
+        lineItems={values.lineItems === true ? renderLineItem(false, (next) => {
+          const nextQuantity = next ?? 1;
+          setValue('count', `${nextQuantity} ${nextQuantity === 1 ? 'item' : 'items'}`);
+        }) : null}
+        summary={values.summary === true ? renderSummary(false, quantity) : null}
+      />
     );
   }
 
   function renderDiscount() {
-    const expanded = values.expanded === true;
-    const applied = values.applied === true;
-    const apply = (event: FormEvent) => {
+    const apply = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (!discountCode.trim()) return;
-      setValues((current) => ({ ...current, applied: true, appliedCode: discountCode.trim().toUpperCase(), expanded: false }));
+      if (values.applyDisabled === true || values.applyBusy === true) return;
+      const candidate = discountCode.trim();
+      if (!candidate) return;
+      if (candidate.toLocaleUpperCase() === 'INVALID') {
+        setDiscountError('This code could not be applied. Check it and try again.');
+        setDiscountFeedback('');
+        return;
+      }
+      setDiscountCodes((current) => (
+        current.some((code) => code.toLocaleLowerCase() === candidate.toLocaleLowerCase())
+          ? current
+          : [...current, candidate]
+      ));
+      setValues((current) => ({ ...current, appliedCodes: true, expanded: true }));
+      setDiscountCode('');
+      setDiscountError('');
+      setDiscountFeedback(`${candidate} was applied in the local preview.`);
     };
+
+    const remove = (key: string) => {
+      const code = discountCodes.find((candidate) => candidate === key);
+      const remaining = discountCodes.filter((candidate) => candidate !== key);
+      setDiscountCodes(remaining);
+      if (remaining.length === 0) setValue('appliedCodes', false);
+      setDiscountFeedback(`${code || 'The code'} was removed in the local preview.`);
+      requestAnimationFrame(() => document.getElementById(`${id}-discount-input`)?.focus());
+    };
+
     return (
-      <section className="discount-field docs-studio__discount-field" data-applied={applied} data-expanded={expanded}>
-        {!applied && <button className="discount-field__toggle" type="button" aria-expanded={expanded} aria-controls={`${id}-discount-form`} onClick={() => setValue('expanded', !expanded)}>{String(values.toggleLabel)}</button>}
-        {!applied && expanded && <form className="discount-field__form" id={`${id}-discount-form`} onSubmit={apply}>
-          {values.input === true && <div className="input discount-field__input"><label className="input__label" htmlFor={`${id}-discount-code`}>Discount code</label><input className="input__field" id={`${id}-discount-code`} value={discountCode} onChange={(event) => setDiscountCode(event.target.value)} /></div>}
-          {String(values.applyLabel || '') && <button className="btn btn--outline discount-field__apply" type="submit">{String(values.applyLabel)}</button>}
-        </form>}
-        {applied && <div className="discount-field__applied"><Check aria-hidden="true" /><span>{String(values.appliedCode || discountCode || 'STUDIO10')}</span><button className="discount-field__remove" type="button" aria-label={String(values.removeLabel || 'Remove discount')} onClick={() => setValues((current) => ({ ...current, applied: false, expanded: true }))}><X aria-hidden="true" /></button></div>}
-      </section>
+      <div className="docs-studio__discount-fixture">
+        <DiscountFieldArtwork
+          id={`${id}-discount`}
+          className="docs-studio__discount-field"
+          toggleLabel={String(values.toggleLabel)}
+          expanded={values.expanded === true}
+          inputPresent={values.input === true}
+          inputLabel="Discount code"
+          inputValue={discountCode}
+          inputMessage={discountError}
+          inputVariant={discountError ? 'error' : 'default'}
+          applyLabel={String(values.applyLabel)}
+          applyDisabled={values.applyDisabled === true}
+          applyBusy={values.applyBusy === true}
+          appliedCodes={values.appliedCodes === true ? discountCodes.map((code) => ({
+            key: code,
+            code,
+            removeLabel: `Remove ${code} discount`,
+          })) : []}
+          onExpandedChange={(expanded) => setValue('expanded', expanded)}
+          onInputChange={(event) => {
+            setDiscountCode(event.target.value);
+            if (discountError) setDiscountError('');
+          }}
+          onApply={apply}
+          onRemove={remove}
+        />
+        {discountFeedback && <p className="docs-studio__cart-feedback" role="status">{discountFeedback}</p>}
+      </div>
     );
   }
 
   function renderShippingBar() {
-    const value = Math.max(0, Number(values.value) || 0);
-    const max = Math.max(1, Number(values.max) || 1);
-    const achieved = values.achieved === true || value >= max;
-    const progress = Math.min(100, (value / max) * 100);
     return (
-      <section className={`shipping-bar docs-studio__shipping-bar${achieved ? ' shipping-bar--achieved' : ''}`}>
-        <div className="shipping-bar__text">{String(values.text)}</div>
-        <div className="shipping-bar__track" role="progressbar" aria-label="Free shipping progress" aria-valuemin={0} aria-valuenow={value} aria-valuemax={max}>
-          <div className="shipping-bar__fill" style={{ '--_shipping-progress': `${progress}%` } as CSSProperties} />
-        </div>
-      </section>
+      <FreeShippingBarArtwork
+        className="docs-studio__shipping-bar"
+        message={String(values.message ?? '')}
+        accessibleLabel={String(values.accessibleLabel ?? '')}
+        value={Number(values.value)}
+        max={Number(values.max)}
+        valueText={String(values.valueText ?? '')}
+      />
     );
   }
 
   function renderUpsell() {
+    const itemTitle = 'Celadon incense holder';
+
     return (
-      <section className="cart-upsell docs-studio__cart-upsell">
-        <h2 className="cart-upsell__title">{String(values.title)}</h2>
-        {values.items === true && <div className="cart-upsell__items"><article className="cart-upsell__item"><CartMedia className="cart-upsell__item-image" alt="Celadon incense holder" /><div className="cart-upsell__item-info"><div className="cart-upsell__item-title">Celadon incense holder</div><div className="cart-upsell__item-price">$34.00</div></div><button className="btn btn--sm cart-upsell__action" type="button" disabled={values.addDisabled === true || upsellAdded} onClick={() => setUpsellAdded(true)}>{upsellAdded ? <><Check className="btn__icon btn__icon--leading" aria-hidden="true" />Added</> : String(values.addLabel)}</button></article></div>}
-        <span className="visually-hidden" role="status" aria-live="polite">{upsellAdded ? 'Recommendation added to cart.' : ''}</span>
-      </section>
+      <>
+        <CartUpsellArtwork
+          id="cart-upsell-preview"
+          className="docs-studio__cart-upsell"
+          title={String(values.title ?? '')}
+          items={values.items === true ? [{
+            key: 'celadon-incense-holder',
+            title: itemTitle,
+            href: '#product',
+            onNavigate: (event) => event.preventDefault(),
+            imageSrc: editorialMedia.texturedVase,
+            imageAlt: '',
+            imageClassName: 'docs-studio__cart-media',
+            currentPrice: '$34.00',
+            currentPriceLabel: 'Price',
+            actionLabel: 'Add',
+            actionAccessibleLabel: `Add ${itemTitle} to cart`,
+            onAction: () => setUpsellAdded(true),
+          }] : []}
+        />
+        <span className="visually-hidden" role="status">
+          {upsellAdded ? `${itemTitle} was added to the preview cart.` : ''}
+        </span>
+      </>
     );
   }
 
   function renderEmpty() {
     return (
-      <section className="cart-empty docs-studio__cart-empty">
-        {values.icon === true && <PackageOpen className="cart-empty__icon" aria-hidden="true" />}
-        <h2 className="cart-empty__title">{String(values.title)}</h2>
-        {String(values.message || '') && <p className="cart-empty__message">{String(values.message)}</p>}
-        {String(values.actionLabel || '') && <a className="btn cart-empty__action" href={String(values.href || '#collection')} onClick={(event) => event.preventDefault()}>{String(values.actionLabel)}</a>}
-      </section>
+      <CartEmptyArtwork
+        className="docs-studio__cart-empty"
+        title={String(values.title || '')}
+        titleElement="h2"
+        message={String(values.message || '')}
+        icon={values.icon === true ? <PackageOpen /> : undefined}
+        actionLabel={String(values.actionLabel || '')}
+        href={String(values.href || '')}
+        onAction={(event) => event.preventDefault()}
+      />
     );
   }
 
   function renderQuickView() {
+    const title = String(values.title || '').trim();
+    const dismissLabel = String(values.dismissLabel || '').trim();
+    const fullLinkLabel = String(values.fullLinkLabel || '').trim();
+    const href = String(values.href || '').trim();
+    const hasGallery = values.gallery === true;
+    const hasPrice = values.price === true;
+    const hasProductForm = values.productForm === true;
+    const hasFullLink = Boolean(fullLinkLabel && href);
+    if (!title || !dismissLabel || !hasGallery || !hasPrice || (!hasProductForm && !hasFullLink)) return null;
+    const feedbackId = `${id}-quick-view-feedback`;
+
     return (
-      <section className="quick-view docs-studio__quick-view" aria-labelledby={`${id}-quick-view-title`}>
-        {values.gallery === true && <div className="quick-view__gallery"><CartMedia alt="Celadon glazed stoneware vessel" /></div>}
-        <div className="quick-view__info">
-          {String(values.vendor || '') && <span className="quick-view__vendor">{String(values.vendor)}</span>}
-          <h2 className="quick-view__title" id={`${id}-quick-view-title`}>{String(values.title)}</h2>
-          <span className="price"><span className="price__current">$120.00</span></span>
-          {String(values.description || '') && <p className="quick-view__description">{String(values.description)}</p>}
-          {values.productForm === true && <div className="quick-view__form product-form"><div className="product-form__actions"><button className="btn product-form__submit" type="button" disabled={quickViewAdded} onClick={() => setQuickViewAdded(true)}><ShoppingBag className="btn__icon btn__icon--leading" aria-hidden="true" />{quickViewAdded ? 'Added' : 'Add to cart'}</button></div></div>}
-          {String(values.fullLinkLabel || '') && <a className="quick-view__full-link" href={String(values.href || '#product')} onClick={(event) => event.preventDefault()}>{String(values.fullLinkLabel)}</a>}
+      <ModalArtwork
+        id={`${id}-quick-view`}
+        title={title}
+        open={values.open === true}
+        dismissLabel={dismissLabel}
+        triggerLabel={`Open quick view for ${title}`}
+        overlayClassName="quick-view-overlay docs-studio__preview-modal-overlay docs-studio__quick-view-overlay"
+        className="quick-view docs-studio__quick-view"
+        closeIcon={<X className="close-btn__icon" aria-hidden="true" />}
+        initialFocus="title"
+        onOpenChange={(open) => setValue('open', open)}
+      >
+        <div className="quick-view__layout">
+          <div className="quick-view__gallery">
+            <ProductGalleryArtwork
+              className="docs-studio__quick-view-gallery"
+              media={buildProductGalleryFixture()}
+              currentId={quickViewGalleryId}
+              imageDetail="none"
+              onCurrentIdChange={setQuickViewGalleryId}
+            />
+          </div>
+          <div className="quick-view__info">
+            {String(values.vendor || '').trim() && <p className="quick-view__vendor" dir="auto">{String(values.vendor)}</p>}
+            <div className="quick-view__price">
+              <PriceArtwork currentPrice="$120.00" currentPriceLabel="Price" />
+            </div>
+            {String(values.description || '').trim() && <p className="quick-view__description" dir="auto">{String(values.description)}</p>}
+            {hasProductForm && (
+              <ProductFormArtwork
+                className="quick-view__form"
+                action="#cart"
+                method="post"
+                submitLabel="Add to cart"
+                submitDisabled={quickViewAdded}
+                feedback={quickViewAdded ? `${title} was added to the preview cart.` : undefined}
+                feedbackId={quickViewAdded ? feedbackId : undefined}
+                feedbackRole={quickViewAdded ? 'status' : undefined}
+                targetData={<input type="hidden" name="merchandise" value="celadon-study-4" />}
+                submitIcon={<ShoppingBag className="btn__icon btn__icon--leading" aria-hidden="true" />}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (!quickViewAdded) setQuickViewAdded(true);
+                }}
+              />
+            )}
+            {hasFullLink && <a className="link quick-view__full-link" href={href} onClick={(event) => event.preventDefault()}>{fullLinkLabel}</a>}
+          </div>
         </div>
-      </section>
+      </ModalArtwork>
     );
   }
 
   function renderStickyAtc() {
-    const visible = values.visible === true;
+    const title = String(values.title || '').trim();
+    const actionLabel = String(values.actionLabel || '').trim();
+    const productFormId = String(values.productFormId || '').trim();
+    if (!title || !actionLabel || !productFormId) return null;
+    const unavailable = values.actionDisabled === true;
+    const pending = values.pending === true;
     return (
-      <aside className={`sticky-atc docs-studio__sticky-atc${visible ? ' sticky-atc--visible' : ''}`} aria-hidden={!visible}>
-        <div className="sticky-atc__inner"><div className="sticky-atc__info">{values.image === true && <CartMedia className="sticky-atc__image" alt={String(values.imageAlt || '')} />}<span className="sticky-atc__title">{String(values.title)}</span>{String(values.price || '') && <span className="sticky-atc__price">{String(values.price)}</span>}</div><button className="btn sticky-atc__action" type="button" tabIndex={visible ? 0 : -1} disabled={values.actionDisabled === true || stickyAdded} onClick={() => setStickyAdded(true)}>{stickyAdded ? <><Check className="btn__icon btn__icon--leading" aria-hidden="true" />Added</> : String(values.actionLabel)}</button></div>
-      </aside>
+      <>
+        <div hidden>
+          <ProductFormArtwork
+            id={productFormId}
+            action="#cart"
+            method="post"
+            submitLabel={actionLabel}
+            submitDisabled={unavailable}
+            pending={pending}
+            targetData={<><input type="hidden" name="merchandise" value="celadon-study-4" /><input type="hidden" name="quantity" value="1" /></>}
+            onSubmit={(event) => {
+              event.preventDefault();
+              setStickyFeedback(`${title} was added to the preview cart.`);
+            }}
+          />
+        </div>
+        {stickyFeedback && <p className="docs-studio__sticky-atc-status" role="status">{stickyFeedback}</p>}
+        <StickyAtcArtwork
+          className="docs-studio__sticky-atc"
+          visible={values.visible === true}
+          title={title}
+          actionLabel={actionLabel}
+          productFormId={productFormId}
+          image={values.image === true ? <img className="sticky-atc__image" src={editorialMedia.texturedVase} alt={String(values.imageAlt || '')} /> : undefined}
+          price={values.price === true ? <PriceArtwork currentPrice="$120.00" currentPriceLabel="Price" /> : undefined}
+          actionDisabled={unavailable}
+          pending={pending}
+        />
+      </>
     );
   }
 
   function renderCartNote() {
     const expanded = values.expanded === true;
     return (
-      <section className="cart-note docs-studio__cart-note" data-expanded={expanded}>
-        <button className="cart-note__toggle" type="button" aria-expanded={expanded} aria-controls={`${id}-cart-note-field`} onClick={() => setValue('expanded', !expanded)}>{String(values.toggleLabel)}</button>
-        {expanded && values.field === true && <div className="input cart-note__field" id={`${id}-cart-note-field`}><label className="input__label" htmlFor={`${id}-cart-note`}>Order note</label><textarea className="input__field textarea__field" id={`${id}-cart-note`} rows={4} data-resize="vertical" data-min-lines="3" data-max-lines="8" value={note} onChange={(event) => setNote(event.target.value)} /></div>}
-      </section>
+      <CartNoteArtwork
+        className="docs-studio__cart-note"
+        toggleLabel={String(values.toggleLabel || '')}
+        expanded={expanded}
+        onExpandedChange={(nextExpanded) => setValue('expanded', nextExpanded)}
+        field={values.field === true ? (
+          <TextareaArtwork
+            id={`${id}-cart-note`}
+            className="cart-note__field"
+            label="Order note"
+            value={note}
+            name="note"
+            placeholder="Special instructions for this order"
+            autoComplete="off"
+            onChange={(event) => setNote(event.target.value)}
+          />
+        ) : undefined}
+      />
     );
   }
 
@@ -360,10 +635,19 @@ export default function CartStudio({ contract, definition }: CartStudioProps) {
     const selected = values.selected === true;
     const disabled = values.disabled === true;
     return (
-      <label className="gift-wrap checkbox docs-studio__gift-wrap">
-        <span className="gift-wrap__control"><input className="checkbox__input" type="checkbox" checked={selected} disabled={disabled} onChange={(event) => setValue('selected', event.target.checked)} /></span>
-        <div className="checkbox__label gift-wrap__info"><div className="gift-wrap__label">{String(values.label)}</div>{String(values.price || '') && <div className="gift-wrap__price">{String(values.price)}</div>}</div>
-      </label>
+      <GiftWrapArtwork
+        className="docs-studio__gift-wrap"
+        label={String(values.label || '')}
+        selected={selected}
+        name={String(values.name || '')}
+        value={String(values.value || 'on')}
+        describedBy={String(values.describedBy || '') || undefined}
+        disabled={disabled}
+        price={values.price === true ? (
+          <PriceArtwork currentPrice="+$8.00" currentPriceLabel="Gift wrapping surcharge" />
+        ) : undefined}
+        onSelectedChange={(nextSelected) => setValue('selected', nextSelected)}
+      />
     );
   }
 
@@ -382,13 +666,14 @@ export default function CartStudio({ contract, definition }: CartStudioProps) {
   }
 
   const stickyStage = contract.slug === 'sticky-atc';
+  const overlayStage = contract.slug === 'quick-view';
 
   return (
     <div className="docs-studio">
       <h1 className="docs-studio__title">{contract.name}</h1>
       <div className="docs-studio__workspace">
         <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue={currentState()} tokenValues={tokenValues} activeTokens={activeTokens} onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))} onSlotIconChange={() => undefined} onStateChange={changeState} onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))} onReset={reset} />
-        <section className={`docs-studio__stage${stickyStage ? ' docs-studio__stage--cart-sticky' : ''}`} aria-label={`${contract.name} preview`} style={tokenOverrides as CSSProperties}><div className={`docs-studio__stage-inner docs-studio__cart-stage-inner docs-studio__cart-stage-inner--${contract.slug}`}>{renderPreview()}</div></section>
+        <section className={`docs-studio__stage${stickyStage ? ' docs-studio__stage--cart-sticky' : ''}${overlayStage ? ' docs-studio__stage--overlay' : ''}`} aria-label={`${contract.name} preview`} style={tokenOverrides as CSSProperties}><div className={`docs-studio__stage-inner docs-studio__cart-stage-inner docs-studio__cart-stage-inner--${contract.slug}`}>{renderPreview()}</div></section>
       </div>
     </div>
   );

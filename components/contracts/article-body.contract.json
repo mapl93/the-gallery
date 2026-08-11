@@ -1,81 +1,84 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "article-body",
   "name": "Article Body / Prose",
   "registryId": "L3",
   "category": "blog",
   "status": "pilot",
-  "summary": "Rich article content: drop cap, blockquotes, pull quotes, callouts, figures, code, product embeds.",
-  "dependencies": [],
+  "summary": "Article-specific consumer of the canonical Foundations Prose contract with required target-owned semantic content, optional drop cap, authored quote/callout/media extensions, named local overflow, canonical commerce islands, and zero neutral runtime.",
+  "dependencies": ["product-card", "price"],
   "source": {
     "registry": "registry.json#/components/article-body",
-    "css": { "file": "components/css/blog.css", "selector": ".prose" },
+    "css": { "file": "components/css/blog.css", "selector": ".article-body" },
     "docs": "site/src/content/components/article-body.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".prose", "className": ".prose", "required": true, "description": "Long-form article content container." },
-    { "name": "sectionHeading", "selector": ".prose h2", "required": false, "description": "Second-level article section heading." },
-    { "name": "subheading", "selector": ".prose h3", "required": false, "description": "Third-level article subsection heading." },
-    { "name": "minorHeading", "selector": ".prose h4", "required": false, "description": "Fourth-level article subsection heading." },
-    { "name": "blockquote", "selector": ".prose blockquote", "required": false, "description": "Quoted passage with optional citation." },
-    { "name": "pullQuote", "selector": ".pull-quote", "className": ".pull-quote", "required": false, "description": "Prominent editorial quotation." },
-    { "name": "pullQuoteAttribution", "selector": ".pull-quote__attribution", "className": ".pull-quote__attribution", "required": false, "description": "Optional pull-quote attribution." },
-    { "name": "callout", "selector": ".callout", "className": ".callout", "required": false, "description": "Informational callout composition." },
-    { "name": "calloutIcon", "selector": ".callout__icon", "className": ".callout__icon", "required": false, "description": "Optional callout indicator icon." },
-    { "name": "figure", "selector": ".prose figure", "required": false, "description": "Article figure with optional caption." },
-    { "name": "fullBleed", "selector": ".prose__full-bleed", "className": ".prose__full-bleed", "required": false, "description": "Viewport-width media composition." },
-    { "name": "imagePair", "selector": ".prose__image-pair", "className": ".prose__image-pair", "required": false, "description": "Responsive pair of article images." },
-    { "name": "imageGrid", "selector": ".prose__image-grid", "className": ".prose__image-grid", "required": false, "description": "Responsive article image grid." },
-    { "name": "codeBlock", "selector": ".prose pre", "required": false, "description": "Horizontally scrollable preformatted code block." },
-    { "name": "productEmbed", "selector": ".prose__product-embed", "className": ".prose__product-embed", "required": false, "description": "Optional linked product composition." },
-    { "name": "productEmbedInfo", "selector": ".prose__product-embed-info", "className": ".prose__product-embed-info", "required": false, "description": "Product embed text wrapper." },
-    { "name": "productEmbedTitle", "selector": ".prose__product-embed-title", "className": ".prose__product-embed-title", "required": false, "description": "Embedded product title." },
-    { "name": "productEmbedPrice", "selector": ".prose__product-embed-price", "className": ".prose__product-embed-price", "required": false, "description": "Target-formatted embedded product price." },
-    { "name": "table", "selector": ".prose table", "required": false, "description": "Overflow-contained tabular article content." }
+    { "name": "root", "selector": ".article-body", "className": ".article-body", "required": true, "description": "Passive non-landmark Article Body boundary; the surrounding target owns article/page semantics." },
+    { "name": "proseConsumer", "selector": ".article-body.prose", "className": ".prose", "required": true, "description": "Explicit consumer of the reusable Foundations Prose contract. Blog CSS does not reimplement the Prose selector." },
+    { "name": "pullQuote", "selector": ".article-body__pull-quote", "className": ".article-body__pull-quote", "required": false, "description": "Prominent authored figure containing blockquote and optional attribution caption." },
+    { "name": "pullQuoteAttribution", "selector": ".article-body__pull-quote-attribution", "className": ".article-body__pull-quote-attribution", "required": false, "description": "Optional figcaption outside quoted content; cite identifies a work title rather than a person." },
+    { "name": "callout", "selector": ".article-body__callout", "className": ".article-body__callout", "required": false, "description": "Static authored grouped guidance with no implicit alert or status semantics." },
+    { "name": "calloutIcon", "selector": ".article-body__callout-icon", "className": ".article-body__callout-icon", "required": false, "description": "Optional decorative or contextually labelled target icon." },
+    { "name": "imagePair", "selector": ".article-body__image-pair", "className": ".article-body__image-pair", "required": false, "description": "Intrinsically stacking two-image authored collection." },
+    { "name": "imageGrid", "selector": ".article-body__image-grid", "className": ".article-body__image-grid", "required": false, "description": "Intrinsically wrapping authored media collection." },
+    { "name": "overflow", "selector": ".article-body__overflow", "className": ".article-body__overflow", "required": false, "description": "L3 marker composed with Foundations prose__overflow for target-named keyboard-scrollable code or genuinely two-dimensional data." },
+    { "name": "commerceIsland", "selector": ".article-body__commerce-island", "className": ".article-body__commerce-island", "required": false, "description": "Explicit prose-excluded wrapper containing canonical Product Card and Price without prose restyling." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default long-form prose presentation." }
+    { "name": "default", "className": null, "default": true, "description": "One passive semantic article-content flow; authored child types are not root variants." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Readable line length and responsive article typography." }
+    { "name": "default", "className": null, "default": true, "description": "One readable intrinsic Prose measure; heading ranks and host layout remain contextual." }
   ],
   "states": [
-    { "name": "default", "selectors": [".prose"], "description": "Default prose state." },
-    { "name": "linkHover", "selectors": [".prose a:hover"], "description": "Inline link hover state." },
-    { "name": "linkFocus", "selectors": [".prose a:focus-visible"], "description": "Visible keyboard focus for article links." },
-    { "name": "productEmbedHover", "selectors": [".prose__product-embed:hover"], "description": "Product embed hover elevation." },
-    { "name": "productEmbedFocus", "selectors": [".prose__product-embed:focus-visible"], "description": "Visible keyboard focus for linked product embeds." }
+    { "name": "default", "selectors": [".article-body.prose"], "description": "Passive resting semantic content composed on canonical Prose." },
+    { "name": "dropCap", "selectors": [".article-body--drop-cap > p:first-of-type::first-letter"], "description": "Optional visual first-letter treatment that preserves content and collapses in very narrow containers." },
+    { "name": "linkFocusVisible", "selectors": [".article-body.prose"], "description": "Canonical Foundations Prose preserves visible native inline-Link focus for Article Body descendants." },
+    { "name": "overflowFocusVisible", "selectors": [".article-body__overflow"], "description": "The Article Body overflow marker composes Foundations prose__overflow, whose focus-visible state remains visible." },
+    { "name": "legacyAliases", "selectors": [".pull-quote", ".callout"], "description": "Deprecated one-cycle compatibility aliases for pre-v1 authored content; new source uses Article Body BEM parts." }
   ],
   "behavior": [
-    { "name": "semanticContent", "selectors": [".prose h2", ".prose h3", ".prose h4", ".prose blockquote", ".prose table"], "description": "Adapters preserve the semantic heading hierarchy, quotations, lists, figures, code, and table markup supplied by the target content source." },
-    { "name": "targetEmbeds", "selectors": [".prose__product-embed", ".prose__product-embed-price"], "attributes": ["href"], "description": "Product destinations, imagery, and formatted prices are supplied by the commerce target." }
+    { "name": "requiredContent", "selectors": [".article-body"], "description": "A non-empty semantic content slot is required. Missing content omits the complete root." },
+    { "name": "canonicalProseOwnership", "selectors": [".article-body", ".prose"], "description": "Foundations is the sole CSS owner of the reusable Prose selector. L3 adds Article Body BEM extensions without a second Prose implementation." },
+    { "name": "semanticHierarchy", "selectors": [".article-body.prose"], "description": "Targets preserve authored paragraphs, contextual heading ranks, lists, emphasis, quotations, figures/captions, pre/code and table relationships in document order; neither Prose nor L3 parses or infers them." },
+    { "name": "quotationAttribution", "selectors": [".article-body__pull-quote", ".article-body__pull-quote-attribution"], "description": "Quoted content remains inside blockquote while attribution remains in figure figcaption; cite identifies a cited work." },
+    { "name": "staticCallout", "selectors": [".article-body__callout", ".article-body__callout-icon"], "description": "Static authored callouts are ordinary grouped content. A target uses canonical Alert only when timing or importance truthfully requires alert/status semantics." },
+    { "name": "mediaMeaning", "selectors": [".article-body__image-pair", ".article-body__image-grid"], "description": "Targets own contextual alternatives, captions, loading, sources, crop, focal point and content order; L3 only contains supplied media." },
+    { "name": "localOverflow", "selectors": [".article-body__overflow"], "attributes": ["role", "aria-label", "tabindex"], "description": "Only code or genuinely two-dimensional data receives a target-named keyboard-scrollable wrapper. The Prose root and page never become horizontal scroll regions." },
+    { "name": "fullBleedHostBoundary", "selectors": [".article-body"], "description": "Genuinely full-bleed media belongs to host layout outside Prose. L3 exposes no full-bleed part, viewport breakout, or page-layout engine." },
+    { "name": "canonicalCommerceIsland", "selectors": [".article-body__commerce-island"], "description": "Commerce inside the article flow uses an explicit Prose exclusion wrapper and canonical Product Card/Price dependencies. L3 does not duplicate product markup, price formatting, or commerce interaction." },
+    { "name": "legacyMigration", "selectors": [".pull-quote", ".pull-quote__attribution", ".callout", ".callout__icon"], "description": "Legacy aliases remain for one pre-v1 migration cycle only. New markup uses Article Body BEM parts, and aliases must be removed before the public v1 contract freezes." },
+    { "name": "contentTrust", "selectors": [".article-body"], "description": "The target owns authoring, trust, sanitization, parsing, localization, heading/link policy, asset delivery, publishing and content completeness; neutral source never injects or rewrites HTML." },
+    { "name": "passiveRuntime", "selectors": [".article-body"], "description": "L3 owns no state, event, observer, request, timer, parser, formatter, sanitizer, highlighter, focus relocation, authored motion, asset, or neutral JavaScript." }
   ],
   "properties": [
-    { "name": "content", "type": "slot", "required": true, "description": "Target-owned semantic long-form article content, including optional rich editorial compositions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".prose", "classNames": [".prose"] }] } },
-    { "name": "dropCap", "type": "boolean", "required": false, "defaultValue": false, "description": "Applies the existing drop-cap treatment to the first paragraph.", "targetMappings": { "web": [{ "kind": "class", "selector": ".prose", "classNames": [".prose--drop-cap"] }] } }
+    { "name": "content", "type": "slot", "required": true, "unsetBehavior": "Omit the complete root when no non-empty semantic content is supplied.", "description": "Target-owned semantic long-form content including native rich-content nodes, Article Body extensions, named local overflow, and optional prose-excluded canonical islands.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-body", "classNames": [".article-body", ".prose"] }] } },
+    { "name": "dropCap", "type": "boolean", "required": false, "defaultValue": false, "unsetBehavior": "Render semantic content without the Article Body drop-cap class.", "description": "Applies the accepted visual first-letter treatment to the first direct paragraph without changing content or semantics.", "targetMappings": { "web": [{ "kind": "class", "selector": ".article-body", "classNames": [".article-body--drop-cap"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-decorative", "--color-border-focus", "--color-border-subtle", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-warning-default", "--color-surface-secondary", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
-      "easing": ["--easing-default"],
-      "typography": ["--font-family-accent", "--font-family-body", "--font-family-heading", "--font-family-mono", "--typo-article-line-height", "--typo-article-size", "--typo-body-size", "--typo-h2-size", "--typo-h3-size", "--typo-h4-size"],
-      "radius": ["--radius-md", "--radius-sm"],
-      "shadow": ["--shadow-md"],
-      "transition": ["--transition-fast"]
+      "color": ["--color-border-decorative", "--color-border-default", "--color-feedback-info-default", "--color-feedback-success-default", "--color-feedback-warning-default", "--color-surface-secondary", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--space-layout-section-gap", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"],
+      "typography": ["--font-family-accent", "--font-family-body", "--font-family-heading", "--tg-font-weight-bold", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-h3-line-height", "--typo-h3-size"],
+      "radius": ["--radius-md"]
     }
   },
   "accessibility": [
-    "Preserve a logical heading hierarchy and native semantics for lists, quotations, figures, code, and tables.",
-    "Provide text alternatives and captions for informative media, and keep wide code or table content horizontally accessible without clipping the page.",
-    "Keep line length readable and preserve visible keyboard focus for inline links and product embeds.",
-    "Do not use the drop cap as a substitute for semantic text content."
+    "Require non-empty semantic content and omit the complete root when absent; the surrounding target owns article/page semantics and contextual heading ranks.",
+    "Keep quote attribution outside blockquote, associate it through figure/figcaption, and use cite only for a work title.",
+    "Provide contextual image alternatives and captions according to media purpose; captions do not replace informative alt text.",
+    "Preserve native list, figure, pre/code and data-table semantics, including captions and header/data relationships.",
+    "Use named keyboard-scrollable wrappers only for code or genuinely two-dimensional data; keep Prose and the page free of horizontal overflow.",
+    "Keep static authored callouts passive and use canonical Alert only for truthful alert/status content.",
+    "Keep canonical commerce components inside prose-excluded wrappers so Prose cannot override their heading, Link, Card, Button, image, or Price contracts.",
+    "Preserve visible Link/overflow focus, logical RTL flow, 320/200px content, effective 200 percent text, user text spacing, forced colors, and reduced motion."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article content and any product embeds without flattening rich text semantics." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "html-css-composition", "notes": "Article Body composes the Foundations Prose class, Article Body BEM extensions, explicit Prose exclusion, canonical Product Card/Price, named local overflow, and zero neutral runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The passive article-body snippet maps trusted supplied content or article.content to article-body prose without parsing or rewriting. Sections/templates own sanitization, breakouts, commerce islands, locale, SEO, editor behavior, and canonical child snippets." },
+    "react": { "status": "planned", "kind": "component", "notes": "Preserve the Prose consumer and canonical child-component boundaries without framework state in neutral source." },
+    "figma": { "status": "planned", "kind": "component-composition", "notes": "Needs L3-specific prose hierarchy, drop-cap, quote/callout, media, overflow, and canonical commerce-island artwork; registered nodes remain generic Button shells." },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }
   }

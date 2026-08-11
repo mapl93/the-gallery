@@ -1,0 +1,109 @@
+{% liquid
+  assign heading_id = 'BrandStory-' | append: section.id | append: '-Title'
+  assign signature_text = section.settings.signature_text | strip
+  assign signature_image = section.settings.signature_image
+  assign signature_image_alt = section.settings.signature_image_alt | strip
+  if signature_image_alt == blank and signature_image != blank
+    assign signature_image_alt = signature_image.alt | strip
+  endif
+  if section.settings.signature_image_decorative
+    assign signature_image_alt = ''
+  endif
+
+  assign has_signature_image_semantics = false
+  if section.settings.signature_image_decorative or signature_image_alt != blank
+    assign has_signature_image_semantics = true
+  endif
+
+  capture signature_markup
+    if signature_image != blank and has_signature_image_semantics
+      echo '<footer class="brand-story__signature">'
+      echo signature_image | image_url: width: 600 | image_tag: alt: signature_image_alt, loading: 'lazy', widths: '180, 300, 450, 600', sizes: '200px'
+      echo '</footer>'
+    elsif signature_text != blank
+      echo '<footer class="brand-story__signature">'
+      echo signature_text | escape
+      echo '</footer>'
+    endif
+  endcapture
+  assign signature_markup = signature_markup | strip
+%}
+
+{% render 'image-text-composition',
+  image: section.settings.image,
+  image_decorative: section.settings.image_decorative,
+  image_alt: section.settings.image_alt,
+  eyebrow: section.settings.eyebrow,
+  title: section.settings.title,
+  body: section.settings.body,
+  heading_id: heading_id,
+  presentation: 'default',
+  image_sizes: '(min-width: 768px) 50vw, 100vw',
+  after_body: signature_markup,
+  root_classes: 'brand-story'
+%}
+
+{% schema %}
+{
+  "name": "t:sections.brand_story.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.brand_story.settings.image"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_decorative",
+      "label": "t:sections.brand_story.settings.image_decorative",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "t:sections.brand_story.settings.image_alt"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:sections.brand_story.settings.eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.brand_story.settings.title"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "t:sections.brand_story.settings.body"
+    },
+    {
+      "type": "text",
+      "id": "signature_text",
+      "label": "t:sections.brand_story.settings.signature_text"
+    },
+    {
+      "type": "image_picker",
+      "id": "signature_image",
+      "label": "t:sections.brand_story.settings.signature_image"
+    },
+    {
+      "type": "checkbox",
+      "id": "signature_image_decorative",
+      "label": "t:sections.brand_story.settings.signature_image_decorative",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "signature_image_alt",
+      "label": "t:sections.brand_story.settings.signature_image_alt"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.brand_story.name"
+    }
+  ]
+}
+{% endschema %}

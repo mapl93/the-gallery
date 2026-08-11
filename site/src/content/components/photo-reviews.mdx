@@ -1,44 +1,113 @@
 ## Overview
 
-Responsive gallery of ordered, target-owned review images. Items are passive by default and do not imply a Lightbox or Modal.
+Passive native collection of target-supplied review images. Photo Reviews owns
+square, container-responsive presentation; it does not own a review provider,
+image pipeline, moderation, upload, navigation, download, Lightbox or Modal.
 
-<Preview html={'<div class="photo-reviews tg-preview-frame--md" role="list" aria-label="Customer review photos"><div class="photo-reviews__item" role="listitem"><img class="photo-reviews__image tg-preview-media tg-preview-media--square" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Customer photo of a glazed bowl on a dining table" /></div><div class="photo-reviews__item" role="listitem"><img class="photo-reviews__image tg-preview-media tg-preview-media--square" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Customer photo showing the bowl rim and glaze detail" /></div><div class="photo-reviews__item" role="listitem"><img class="photo-reviews__image tg-preview-media tg-preview-media--square" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Customer photo of the bowl beside serving utensils" /></div></div>'} label="Photo Reviews" />
+<Preview html={'<ul class="photo-reviews tg-preview-frame--md" role="list" aria-label="Customer review photos"><li class="photo-reviews__item"><img class="photo-reviews__image tg-preview-media tg-preview-media--square" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Glazed bowl on a dining table" loading="lazy" decoding="async" /></li><li class="photo-reviews__item"><img class="photo-reviews__image tg-preview-media tg-preview-media--square" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Close view of the bowl rim and glaze" loading="lazy" decoding="async" /></li><li class="photo-reviews__item"><img class="photo-reviews__image tg-preview-media tg-preview-media--square" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Bowl beside serving utensils" loading="lazy" decoding="async" /></li></ul>'} label="Photo Reviews" />
 
 ## Presentation
 
-The required root contains repeated square `.photo-reviews__item` elements and `.photo-reviews__image` media. A direct child image remains supported as a compatibility fallback. Generated overlay, hover transform, and focus presentation apply only when the target renders an item as a native link or button.
+The required `.photo-reviews` root is a native `ul[role=list]`. Every
+`.photo-reviews__item` is a native `li` containing one strict
+`.photo-reviews__image`. `role=list` defensively preserves the exposed
+collection relationship after CSS removes visual markers.
 
-The optional root label identifies the gallery when surrounding content does not. Item order, image data, alt text, and any native action are target-owned.
+The shared Exhibit/Studio artwork is passive. If a target has a real
+destination or action, it places an optional native
+`.photo-reviews__action` link or button *inside* the list item:
+
+| Target intent | Native surface | Target-owned facts |
+| --- | --- | --- |
+| Passive evidence | no action wrapper | source, alt, responsive delivery |
+| Full-media navigation | `a.photo-reviews__action[href]` | URL, destination name, history/download policy |
+| Enlarged-media request | `button.photo-reviews__action[type=button]` | action name, overlay component, open/index state |
+
+Only that action receives hover zoom, decorative overlay, a two-tone
+focus-visible perimeter, disabled and reduced-motion treatment. Collection
+membership never moves onto the link or button.
+
+### State Ownership
+
+The passive component has no controlled or uncontrolled value. A target that
+composes Lightbox or Modal owns open state, active media, captions, navigation,
+loading, preloading, dismissal, focus restoration, URL/history and analytics.
+Static Web may author real links without component JavaScript.
+
+### Target Translation
+
+- **Web:** native list/items, strict image class and optional native action;
+  target supplies `src`, `srcset`, `sizes`, `alt`, loading and failure policy.
+- **Shopify:** a review-provider theme app block supplies moderated image data,
+  Shopify CDN transforms, localized alternatives and any actions while
+  consuming generated Reviews CSS.
+- **React / Angular:** the passive list remains stateless; a separately accepted
+  overlay composition owns controlled or initial open/index state.
+- **Figma / native:** reproduce the reviewed passive grid and target-action
+  visual states without inventing provider or overlay behavior.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep review photos passive unless the target has selected a concrete native destination or activation pattern.</Do>
-  <Dont>Do not make a div click-only or assume that every photo opens enlarged media.</Dont>
+  <Do>Keep review images passive until the target has a real destination or a complete native overlay composition.</Do>
+  <Dont>Do not make a list item or div click-only, infer Lightbox behavior from the square crop, or duplicate the image selector.</Dont>
 </DoDont>
 
-Direct links, downloads, Lightbox triggers, Modal triggers, captions, image loading, focus management, navigation, and dismissal remain open target decisions. The local preview media is a documentation fixture rather than a remote asset.
+The square crop, grid minimum, gap, radius, overlay strength and zoom are
+private composition. Do not expose them as public API merely because CSS uses
+literal values.
+
+Caption, reviewer attribution, duplicate-photo treatment, provider taxonomy,
+moderation, source order, maximum count, formats, CDN transforms, fallback and
+sensitive-content policy remain target/product decisions.
 
 ## Accessibility
 
 <Callout type="info">
-  Every informative review image needs an alternative that conveys the relevant visible content.
+  Informative and functional images have different naming obligations. The
+  photo alternative describes the essential visual content; an optional action
+  name describes what activating it does or where it goes.
 </Callout>
 
-- Give informative images meaningful `alt` text.
-- Use empty alt text only for genuinely decorative duplicate images.
-- Use native links or buttons when the target makes an item actionable.
-- Preserve an accessible name and visible focus for each target-supplied action.
-- Do not communicate review information only through hover or a generated overlay.
-- Delegate modal or lightbox focus management and dismissal to the separately selected overlay component.
+- Keep the native `ul` / `li` relationship and source order.
+- Give informative review photos concise, contextual `alt` text.
+- Use `alt=""` only when the same photo is genuinely decorative or redundant
+  in its current context.
+- Use a native link for navigation/download and a native button for an action.
+- Give the action an explicit accessible name that describes its purpose or
+  destination rather than relying only on the photo description.
+- Preserve native Enter, Space for buttons, visible focus and native disabled
+  behavior. Links do not use fake disabled state.
+- Do not convey action, loading, failure, moderation or review information only
+  through crop, hover, zoom or the decorative overlay.
+- If enlarged media is selected, compose the complete Lightbox or Modal
+  contract. Photo Reviews does not partially own focus containment, Escape,
+  close, navigation or focus restoration.
 
-## References
+## Content And Performance
 
-**Anatomy:** required `.photo-reviews` root, repeated `.photo-reviews__item`, and `.photo-reviews__image`; optional direct-image compatibility selector and generated action overlay.
+Use responsive sources and modern formats appropriate to the target. Reserve
+the square layout before the media loads, and let the target decide eager/lazy
+thresholds, decoding, fallback and whether a failure removes or replaces an
+item. Photo Reviews emits no live region for image loading or failure.
 
-**Dependencies:** None.
+The docs fixture uses local editorial media with `loading="lazy"` and
+`decoding="async"`. Those files demonstrate the renderer; their source size is
+not a public production default.
+
+The neutral component adds no listener, observer, timer, request, formatter,
+layout read, JavaScript asset, icon, font or media file.
+
+## Specification
+
+**Anatomy:** required native `.photo-reviews` list, repeated native
+`.photo-reviews__item` and `.photo-reviews__image`; optional native
+`.photo-reviews__action`; generated action-only overlay.
+
+**Dependencies:** None. A target may compose the canonical Lightbox or Modal
+after separately accepting that product behavior.
 
 <PropTable>
-  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional accessible gallery name</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered target-owned images, alt text, and optional native actions</td></tr>
+  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional localized accessible collection name</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered native items containing image delivery/alternative data and any optional native action</td></tr>
 </PropTable>

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
-import { ArrowLeft, ArrowRight, FileText, PackageSearch, Search, Settings, X } from 'lucide-react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { FileText, PackageSearch, Search, Settings, X } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -8,6 +8,7 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { editorialImage } from './editorialMedia';
+import LightboxArtwork from './LightboxArtwork';
 
 interface OverlaySearchMediaStudioProps {
   contract: ComponentContract;
@@ -17,9 +18,15 @@ interface OverlaySearchMediaStudioProps {
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const commandFixtures = [
-  { label: 'Find artwork', shortcut: 'G A', icon: PackageSearch },
-  { label: 'Open exhibition notes', shortcut: 'G N', icon: FileText },
-  { label: 'Studio settings', shortcut: 'G S', icon: Settings },
+  { id: 'find-artwork', label: 'Find artwork', icon: PackageSearch },
+  { id: 'exhibition-notes', label: 'Open exhibition notes', icon: FileText },
+  { id: 'studio-settings', label: 'Studio settings', icon: Settings },
+  { id: 'export-catalogue', label: 'Export catalogue', icon: FileText, disabled: true },
+];
+const lightboxFixtures = [
+  { id: 'celadon', src: editorialImage(0), alt: 'Stoneware vessel with satin celadon glaze', caption: 'Celadon Study No. 4', className: 'docs-studio__lightbox-artwork docs-studio__lightbox-artwork--1' },
+  { id: 'ash', src: editorialImage(1), alt: 'Hand-thrown vessel with warm ash glaze', caption: 'Ash Glaze Study No. 2', className: 'docs-studio__lightbox-artwork docs-studio__lightbox-artwork--2' },
+  { id: 'porcelain', src: editorialImage(2), alt: 'Porcelain vessel with a cool translucent finish', caption: 'Porcelain Study No. 7', className: 'docs-studio__lightbox-artwork docs-studio__lightbox-artwork--3' },
 ];
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
@@ -43,8 +50,8 @@ function initialFixtureValues(contract: ComponentContract): StudioPropertyValues
   ))) as StudioPropertyValues;
   values.open = true;
   if (contract.slug === 'lightbox') {
-    values.alt = 'Stoneware vessel with satin celadon glaze';
-    values.caption = 'Celadon Study No. 4';
+    values.alt = lightboxFixtures[0].alt;
+    values.caption = lightboxFixtures[0].caption;
   }
   return values;
 }
@@ -58,8 +65,17 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [highlightedCommand, setHighlightedCommand] = useState(0);
+  const [committedQuery, setCommittedQuery] = useState(String(initialValues.query || ''));
   const [imageIndex, setImageIndex] = useState(0);
-  const commandRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const commandRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const commandTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const commandDialogRef = useRef<HTMLDivElement | null>(null);
+  const commandInputRef = useRef<HTMLInputElement | null>(null);
+  const commandPreviousFocusRef = useRef<HTMLElement | null>(null);
+  const composingRef = useRef(false);
+  const commandTitleId = useId();
+  const commandResultsId = useId();
+  const commandGroupLabelId = useId();
 
   useEffect(() => {
     const read = () => {
@@ -75,9 +91,49 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   }, [studioTokens]);
 
   const open = values.open === true;
-  const query = String(values.query || '').toLocaleLowerCase();
-  const visibleCommands = commandFixtures.filter((command) => command.label.toLocaleLowerCase().includes(query));
+  const query = committedQuery.toLocaleLowerCase();
+  const visibleCommands = useMemo(() => commandFixtures.filter((command) => (
+    command.label.toLocaleLowerCase().includes(query)
+  )), [query]);
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
+
+  useEffect(() => {
+    if (contract.slug !== 'command-palette' || composingRef.current) return;
+    setCommittedQuery(String(values.query || ''));
+  }, [contract.slug, values.query]);
+
+  useEffect(() => {
+    if (contract.slug !== 'command-palette') return;
+    const firstEnabled = visibleCommands.findIndex((command) => !command.disabled);
+    if (!visibleCommands[highlightedCommand] || visibleCommands[highlightedCommand]?.disabled) {
+      setHighlightedCommand(firstEnabled);
+    }
+  }, [contract.slug, highlightedCommand, visibleCommands]);
+
+  useEffect(() => {
+    if (contract.slug !== 'command-palette' || !open) return undefined;
+    const active = document.activeElement as HTMLElement | null;
+    if (active && active !== document.body && !commandDialogRef.current?.contains(active)) {
+      commandPreviousFocusRef.current = active;
+    }
+    const frame = requestAnimationFrame(() => commandInputRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, open]);
+
+  useEffect(() => {
+    if (contract.slug !== 'command-palette') return undefined;
+    const toggleShortcut = (event: globalThis.KeyboardEvent) => {
+      if (event.key.toLocaleLowerCase() !== 'k' || (!event.metaKey && !event.ctrlKey) || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      const editable = target?.matches('input, textarea, select, [contenteditable="true"]');
+      if (editable && target !== commandInputRef.current) return;
+      event.preventDefault();
+      if (open) closeCommandPalette();
+      else openCommandPalette();
+    };
+    document.addEventListener('keydown', toggleShortcut);
+    return () => document.removeEventListener('keydown', toggleShortcut);
+  }, [contract.slug, open]);
 
   function setOpen(next: boolean) {
     setValues((current) => ({ ...current, open: next }));
@@ -87,22 +143,45 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   function reset() {
     setValues({ ...initialValues });
     setHighlightedCommand(0);
+    setCommittedQuery(String(initialValues.query || ''));
     setImageIndex(0);
     setTokenOverrides({});
   }
 
+  function openCommandPalette() {
+    const active = document.activeElement as HTMLElement | null;
+    if (active && active !== document.body && !commandDialogRef.current?.contains(active)) {
+      commandPreviousFocusRef.current = active;
+    }
+    setOpen(true);
+  }
+
+  function closeCommandPalette() {
+    setOpen(false);
+    requestAnimationFrame(() => {
+      const previous = commandPreviousFocusRef.current;
+      if (previous?.isConnected && previous !== document.body) previous.focus();
+      else commandTriggerRef.current?.focus();
+    });
+  }
+
+  function executeCommand(index: number) {
+    if (index < 0 || visibleCommands[index]?.disabled) return;
+    closeCommandPalette();
+  }
+
   function commandKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (!visibleCommands.length) return;
+    const enabled = visibleCommands.map((command, index) => ({ command, index })).filter(({ command }) => !command.disabled);
+    if (!enabled.length) return;
+    const currentEnabledIndex = Math.max(0, enabled.findIndex(({ index }) => index === highlightedCommand));
     let next = highlightedCommand;
-    if (event.key === 'ArrowDown') next = (highlightedCommand + 1) % visibleCommands.length;
-    else if (event.key === 'ArrowUp') next = (highlightedCommand - 1 + visibleCommands.length) % visibleCommands.length;
+    if (event.key === 'ArrowDown') next = enabled[(currentEnabledIndex + 1) % enabled.length].index;
+    else if (event.key === 'ArrowUp') next = enabled[(currentEnabledIndex - 1 + enabled.length) % enabled.length].index;
+    else if (event.key === 'Home') next = enabled[0].index;
+    else if (event.key === 'End') next = enabled[enabled.length - 1].index;
     else if (event.key === 'Enter') {
       event.preventDefault();
-      setOpen(false);
-      return;
-    } else if (event.key === 'Escape') {
-      event.preventDefault();
-      setOpen(false);
+      executeCommand(highlightedCommand);
       return;
     } else return;
     event.preventDefault();
@@ -110,93 +189,155 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
     commandRefs.current[next]?.scrollIntoView({ block: 'nearest' });
   }
 
+  function commandDialogKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeCommandPalette();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusables = Array.from(commandDialogRef.current?.querySelectorAll<HTMLElement>(
+      'button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])',
+    ) ?? []).filter((element) => element.getClientRects().length > 0);
+    if (!focusables.length) return;
+    const current = focusables.indexOf(document.activeElement as HTMLElement);
+    const next = event.shiftKey
+      ? (current <= 0 ? focusables.length - 1 : current - 1)
+      : (current === focusables.length - 1 ? 0 : current + 1);
+    event.preventDefault();
+    focusables[next]?.focus();
+  }
+
   function renderCommandPalette() {
-    if (!open) return <button className="btn" type="button" onClick={() => setOpen(true)}>Open command palette</button>;
+    if (!open) {
+      return (
+        <button className="btn" type="button" ref={commandTriggerRef} onClick={openCommandPalette}>
+          Open command palette
+        </button>
+      );
+    }
     return (
-      <div className="command-palette command-palette--open docs-studio__preview-command-palette" role="dialog" aria-modal="true" aria-labelledby="studio-command-title">
-        <div className="command-palette__panel">
-          <h2 className="docs-studio__sr-only" id="studio-command-title">Command palette</h2>
+      <div
+        className="modal-overlay command-palette command-palette--open docs-studio__preview-command-palette"
+        aria-hidden="false"
+        onPointerDown={(event) => {
+          if (event.target === event.currentTarget) closeCommandPalette();
+        }}
+      >
+        <div
+          className="modal command-palette__panel"
+          ref={commandDialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={commandTitleId}
+          onKeyDown={commandDialogKeyDown}
+        >
+          <h2 className="modal__title visually-hidden" id={commandTitleId}>Command palette</h2>
           <div className="command-palette__input-wrapper">
             <Search className="command-palette__search-icon" aria-hidden="true" />
             <input
               className="command-palette__input"
+              ref={commandInputRef}
               type="text"
               role="combobox"
+              aria-label="Search commands"
+              aria-autocomplete="list"
               aria-expanded="true"
-              aria-controls="studio-command-results"
-              aria-activedescendant={visibleCommands[highlightedCommand] ? `studio-command-${highlightedCommand}` : undefined}
+              aria-controls={commandResultsId}
+              aria-activedescendant={visibleCommands[highlightedCommand] && !visibleCommands[highlightedCommand].disabled ? `studio-command-${visibleCommands[highlightedCommand].id}` : undefined}
               placeholder="Search commands"
               value={String(values.query || '')}
               onChange={(event) => {
                 setValues((current) => ({ ...current, query: event.target.value }));
+                if (!composingRef.current) setCommittedQuery(event.target.value);
+                setHighlightedCommand(0);
+              }}
+              onCompositionStart={() => { composingRef.current = true; }}
+              onCompositionEnd={(event) => {
+                composingRef.current = false;
+                setCommittedQuery(event.currentTarget.value);
                 setHighlightedCommand(0);
               }}
               onKeyDown={commandKeyDown}
             />
+            <button className="close-btn command-palette__close" type="button" aria-label="Close command palette" onClick={closeCommandPalette}>
+              <X className="close-btn__icon" aria-hidden="true" />
+            </button>
           </div>
-          <div className="command-palette__results" id="studio-command-results" role="listbox" aria-label="Commands">
+          <p className="command-palette__status visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+            {visibleCommands.length ? '' : 'No commands found.'}
+          </p>
+          <div className="command-palette__results" id={commandResultsId} role="listbox" aria-label="Commands">
             {visibleCommands.length ? (
-              <>
-                <div className="command-palette__group-label">Gallery</div>
+              <div className="command-palette__group" role="group" aria-labelledby={commandGroupLabelId}>
+                <div className="command-palette__group-label" id={commandGroupLabelId}>Gallery</div>
                 {visibleCommands.map((command, index) => {
                   const Icon = command.icon;
                   return (
-                    <button
+                    <div
                       className="command-palette__item"
-                      id={`studio-command-${index}`}
-                      type="button"
+                      id={`studio-command-${command.id}`}
                       role="option"
-                      aria-selected={highlightedCommand === index}
+                      tabIndex={-1}
+                      aria-selected={highlightedCommand === index && !command.disabled}
+                      aria-disabled={command.disabled || undefined}
                       key={command.label}
                       ref={(element) => { commandRefs.current[index] = element; }}
-                      data-highlighted={highlightedCommand === index || undefined}
-                      onPointerMove={() => setHighlightedCommand(index)}
-                      onClick={() => setOpen(false)}
+                      data-disabled={command.disabled || undefined}
+                      data-highlighted={highlightedCommand === index && !command.disabled || undefined}
+                      onPointerMove={() => { if (!command.disabled) setHighlightedCommand(index); }}
+                      onClick={() => executeCommand(index)}
                     >
                       <Icon className="command-palette__item-icon" aria-hidden="true" />
                       <span className="command-palette__item-text">{command.label}</span>
-                      <span className="command-palette__item-shortcut">{command.shortcut}</span>
-                    </button>
+                    </div>
                   );
                 })}
-              </>
+              </div>
             ) : (
               <div className="command-palette__empty">No commands found.</div>
             )}
           </div>
-          <div className="command-palette__footer"><span>Navigate with arrows</span><span>Enter to select</span></div>
+          <div className="command-palette__footer"><span>↑↓ Navigate · Enter select</span><span>Esc close</span></div>
         </div>
       </div>
     );
   }
 
-  function moveImage(direction: number) {
-    setImageIndex((current) => (current + direction + 3) % 3);
+  function openLightbox() {
+    setOpen(true);
+  }
+
+  function closeLightbox() {
+    setOpen(false);
+  }
+
+  function selectLightboxImage(id: string) {
+    const next = lightboxFixtures.findIndex((fixture) => fixture.id === id);
+    if (next < 0 || next === imageIndex) return;
+    const fixture = lightboxFixtures[next];
+    setImageIndex(next);
+    setValues((current) => ({ ...current, alt: fixture.alt, caption: fixture.caption }));
   }
 
   function renderLightbox() {
-    if (!open) return <button className="btn" type="button" onClick={() => setOpen(true)}>Open lightbox</button>;
+    if (!open) return <button className="btn" type="button" onClick={openLightbox}>Open lightbox</button>;
+    const images = lightboxFixtures.map((fixture, index) => index === imageIndex ? {
+      ...fixture,
+      alt: String(values.alt || ''),
+      caption: String(values.caption || '').trim(),
+    } : fixture);
     return (
-      <div className="lightbox lightbox--open docs-studio__preview-lightbox" role="dialog" aria-modal="true" aria-labelledby="studio-lightbox-caption">
-        <div className="lightbox__content docs-studio__lightbox-content">
-          <img
-            className={`lightbox__image docs-studio__lightbox-artwork docs-studio__lightbox-artwork--${imageIndex + 1}`}
-            src={editorialImage(imageIndex)}
-            alt={String(values.alt || '')}
-          />
-        </div>
-        <button className="lightbox__close close-btn" type="button" aria-label="Close lightbox" onClick={() => setOpen(false)}>
-          <X className="close-btn__icon" aria-hidden="true" />
-        </button>
-        <button className="lightbox__nav lightbox__nav--prev icon-btn" type="button" aria-label="Previous image" onClick={() => moveImage(-1)}>
-          <ArrowLeft className="icon-btn__icon" aria-hidden="true" />
-        </button>
-        <button className="lightbox__nav lightbox__nav--next icon-btn" type="button" aria-label="Next image" onClick={() => moveImage(1)}>
-          <ArrowRight className="icon-btn__icon" aria-hidden="true" />
-        </button>
-        <div className="lightbox__counter" aria-live="polite">{imageIndex + 1} / 3</div>
-        <div className="lightbox__caption" id="studio-lightbox-caption">{String(values.caption || '')}</div>
-      </div>
+      <LightboxArtwork
+        images={images}
+        currentId={lightboxFixtures[imageIndex].id}
+        open
+        loop={values.loop === true}
+        title="Artwork viewer"
+        className="docs-studio__preview-lightbox"
+        onCurrentIdChange={selectLightboxImage}
+        onOpenChange={(next) => { if (!next) closeLightbox(); }}
+      />
     );
   }
 
@@ -205,16 +346,24 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
         surface: '--color-surface-primary',
         hover: '--color-surface-secondary',
         border: '--color-border-subtle',
+        focus: '--color-border-focus',
         text: '--color-text-primary',
         secondary: '--color-text-secondary',
         muted: '--color-text-disabled',
         radius: '--radius-lg',
         shadow: '--shadow-2xl',
         overlay: '--opacity-overlay',
+        'body-size': '--typo-body-size',
+        caption: '--typo-caption-size',
+        spacing: '--space-layout-element-gap',
+        'touch-target': '--space-layout-touch-target',
+        transition: '--transition-fast',
       }
     : {
-        text: '--color-text-inverse',
         radius: '--radius-sm',
+        spacing: '--space-layout-element-gap',
+        'body-size': '--typo-body-size',
+        'body-small': '--typo-body-sm-size',
         transition: '--transition-base',
       };
 

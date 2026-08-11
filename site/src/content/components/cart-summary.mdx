@@ -1,36 +1,55 @@
 ## Overview
 
-Cart Summary presents target-owned totals and the primary checkout handoff. It supports an optional expectation note and optional target-native express checkout actions.
+Cart Summary presents one target-owned cart snapshot and the primary checkout
+handoff. It is a passive named section: the target supplies complete formatted
+rows, checkout state, an optional expectation note, and optional provider-native
+express checkout composition.
 
 <Preview
-  html={'<aside class="cart-summary tg-preview-frame--sm"><h2 class="cart-summary__title">Order Summary</h2><div class="cart-summary__row"><span>Subtotal</span><span class="cart-summary__value">$240.00</span></div><div class="cart-summary__row"><span>Shipping</span><span class="cart-summary__value">Free</span></div><div class="cart-summary__row"><span>Discount</span><span class="cart-summary__value">-$24.00</span></div><div class="cart-summary__row cart-summary__row--total"><span>Total</span><span class="cart-summary__value">$216.00</span></div><button class="btn cart-summary__checkout" type="button">Checkout</button><p class="cart-summary__note">Taxes calculated at checkout.</p></aside>'}
+  html={'<section class="cart-summary tg-preview-frame--sm" aria-labelledby="cart-summary-preview-title"><h2 class="cart-summary__title" id="cart-summary-preview-title">Order summary</h2><dl class="cart-summary__rows"><div class="cart-summary__row"><dt class="cart-summary__label">Subtotal</dt><dd class="cart-summary__value"><bdi>$150.00</bdi></dd></div><div class="cart-summary__row"><dt class="cart-summary__label">Studio member discount</dt><dd class="cart-summary__value"><bdi>−$30.00</bdi></dd></div><div class="cart-summary__row cart-summary__row--total"><dt class="cart-summary__label">Estimated total</dt><dd class="cart-summary__value"><bdi>$120.00 USD</bdi></dd></div></dl><p class="cart-summary__note">Taxes and shipping calculated at checkout.</p><button class="btn btn--full cart-summary__checkout" type="button">Checkout</button></section>'}
   label="Cart Summary"
 />
 
 ## Presentation
 
-`rows` is a required slot for subtotal, shipping, discounts, taxes, and total. The total row may use `.cart-summary__row--total` for emphasis, while each target-formatted amount uses `.cart-summary__value`.
+`rows` is a required semantic slot using one native description list. Every
+target-authored row contains a localized `dt` label and complete `dd` value; at
+least one `.cart-summary__row--total` is required. Use `bdi` around formatted
+values so currency and mixed-direction text remain isolated.
 
-The checkout button is required. `checkoutDisabled` represents a temporarily unavailable cart state; optional express actions compose in their own region without replacing the primary handoff.
+The primary checkout action composes canonical Button. `checkoutDisabled`
+represents target-owned unavailability and needs a visible explanation;
+`checkoutBusy` composes Button's pending/disabled behavior without replacing the
+label. Optional `express` content remains opaque provider-native composition.
+
+Cart Summary is not sticky by itself. Cart Page or another target owns placement,
+offset, scrolling and focus-obscuration behavior.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Derive every displayed amount and checkout state from the same commerce snapshot.</Do>
-  <Dont>Do not estimate taxes, discounts, or shipping in the component presentation.</Dont>
+  <Do>Derive every row and checkout state from one coherent commerce snapshot.</Do>
+  <Dont>Do not calculate, relabel or announce monetary values inside presentation.</Dont>
 </DoDont>
 
-- Keep the total visually distinct from supporting rows.
-- Use `note` for concise checkout expectations, not policy-length content.
-- Explain unavailable checkout state in surrounding content when disabling the action.
+- Render only truthful subtotal, discount, shipping, tax, duty and total facts.
+- Keep legal/estimate qualifications complete and concise in `note`.
+- Do not use canonical Price for arbitrary summary facts such as Free or an
+  estimated total.
+- Keep provider actions inside the `express` slot and do not inspect their
+  internal DOM, lifecycle or analytics.
+- Keep Cart Drawer's compact summary isolated; it does not compose K3.
 
 ## Accessibility
 
-- Use readable labels for every subtotal, discount, tax, shipping, and total value.
-- Keep row labels and values in a logical reading order.
-- Ensure the checkout action remains keyboard reachable after totals update.
-- Do not rely on sticky positioning as the only path to checkout.
-- Give target-native express actions distinct accessible names.
+- Name the section with a visible context-correct heading.
+- Preserve native `dl`, `dt`, and `dd` relationships and label-then-value DOM order.
+- Keep the primary checkout Button before optional express actions in focus order.
+- Preserve checkout label while disabled or busy and provide a visible reason
+  for unavailability.
+- Announce cart or checkout results once through a parent target status with
+  complete context; do not make totals or individual values live regions.
+- Parent-owned sticky placement must not obscure focused content.
 
 ## References
 
@@ -41,10 +60,11 @@ The checkout button is required. `checkoutDisabled` represents a temporarily una
 ### API Reference
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Summary title</td></tr>
-  <tr><td>`rows`</td><td>slot</td><td>required</td><td>Subtotal, shipping, discount, tax, and total rows</td></tr>
-  <tr><td>`note`</td><td>string</td><td>optional</td><td>Checkout expectation note</td></tr>
-  <tr><td>`checkoutLabel`</td><td>string</td><td>required</td><td>Primary checkout action label</td></tr>
-  <tr><td>`checkoutDisabled`</td><td>boolean</td><td>`false`</td><td>Disables checkout while cart state is unavailable</td></tr>
-  <tr><td>`express`</td><td>slot</td><td>optional</td><td>Target-native express checkout actions</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible summary heading</td></tr>
+  <tr><td>`rows`</td><td>slot</td><td>required</td><td>Native name/value groups including at least one total</td></tr>
+  <tr><td>`note`</td><td>string</td><td>optional</td><td>Concise checkout expectation or qualification</td></tr>
+  <tr><td>`checkoutLabel`</td><td>string</td><td>required</td><td>Primary checkout Button label</td></tr>
+  <tr><td>`checkoutDisabled`</td><td>boolean</td><td>`false`</td><td>Target-owned unavailable state</td></tr>
+  <tr><td>`checkoutBusy`</td><td>boolean</td><td>`false`</td><td>Target-owned canonical Button busy state</td></tr>
+  <tr><td>`express`</td><td>slot</td><td>optional</td><td>Opaque target-native express checkout composition</td></tr>
 </PropTable>

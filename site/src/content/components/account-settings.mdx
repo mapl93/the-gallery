@@ -1,50 +1,127 @@
 ## Overview
 
-Account Settings is an authenticated container for target-owned settings sections composed from Input, Button, and Switch controls.
+Account Settings is a passive shell for target-owned account-preference
+sections. It provides titled section structure and composition rhythm without
+becoming the account schema, Form, customer API, or save lifecycle.
 
 <Preview
-  html={'<form class="account-settings tg-preview-frame tg-preview-frame--md"><section class="account-settings__section"><h2 class="account-settings__section-title">Profile</h2><p class="account-settings__section-description">Contact information used for account communication.</p><div class="input"><label class="input__label" for="settings-name">Display name</label><div class="input__control"><input class="input__field" id="settings-name" name="name" type="text" autocomplete="name" value="Maria Garcia" /></div></div></section><section class="account-settings__section"><h2 class="account-settings__section-title">Notifications</h2><p class="account-settings__section-description" id="settings-orders-description">Choose whether to receive order progress updates.</p><label class="switch"><input class="switch__input" type="checkbox" role="switch" aria-describedby="settings-orders-description" checked /><span class="switch__track"><span class="switch__thumb"></span></span><span class="switch__label">Order updates</span></label></section><section class="account-settings__section"><h2 class="account-settings__section-title">Security</h2><p class="account-settings__section-description">Review the credentials connected to this account.</p><button class="btn btn--outline" type="button">Manage password</button></section></form>'}
+  html={`
+    <div class="account-settings tg-preview-frame tg-preview-frame--md">
+      <section class="account-settings__section" aria-labelledby="settings-profile-title">
+        <header class="account-settings__section-header">
+          <h2 class="account-settings__section-title" id="settings-profile-title">Profile</h2>
+          <p class="account-settings__section-description" id="settings-profile-description">Update the details used across your account.</p>
+        </header>
+        <div class="account-settings__section-content">
+          <form class="form" autocomplete="on">
+            <div class="form__row" data-columns="one">
+              <div class="input">
+                <label class="input__label" for="settings-name">Name</label>
+                <div class="input__control"><input class="input__field" id="settings-name" name="displayName" type="text" autocomplete="name" value="Alex Morgan" /></div>
+              </div>
+              <div class="input">
+                <label class="input__label" for="settings-email">Email address</label>
+                <div class="input__control"><input class="input__field" id="settings-email" name="email" type="email" autocomplete="email" value="alex@example.com" /></div>
+              </div>
+            </div>
+            <div class="form__actions"><button class="btn" type="submit" name="intent" value="update-profile">Update profile</button></div>
+          </form>
+        </div>
+      </section>
+      <section class="account-settings__section" aria-labelledby="settings-display-title">
+        <header class="account-settings__section-header">
+          <h2 class="account-settings__section-title" id="settings-display-title">Display</h2>
+          <p class="account-settings__section-description" id="settings-display-description">These demo display preferences take effect immediately and are not consent records.</p>
+        </header>
+        <div class="account-settings__section-content">
+          <div class="account-settings__controls" role="group" aria-labelledby="settings-display-title" aria-describedby="settings-display-description">
+            <label class="switch" for="settings-compact-layout">
+              <input class="switch__input" id="settings-compact-layout" type="checkbox" role="switch" name="compactAccountLayout" value="enabled" checked />
+              <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+              <span class="switch__label">Compact account layout</span>
+            </label>
+            <label class="switch" for="settings-order-thumbnails">
+              <input class="switch__input" id="settings-order-thumbnails" type="checkbox" role="switch" name="orderThumbnails" value="enabled" />
+              <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+              <span class="switch__label">Show order thumbnails</span>
+            </label>
+          </div>
+        </div>
+      </section>
+    </div>
+  `}
   label="Account Settings"
 />
 
 ## Presentation
 
-`sections` is the only Account Settings property. Section titles, descriptions, controls, actions, ordering, validation, and persistence are repeated fixture or target-owned composition inside that slot.
+`sections` is the only Account Settings property. Each section supplies a
+visible contextual heading, optional description, and target-owned composition
+of canonical controls or Forms. Profile fields, display choices, action
+labels, ordering, validation, and persistence do not become U9 properties.
 
-The artwork demonstrates Input, Switch, and Button dependencies without establishing whether a target saves on submit, on change, or by another section-specific strategy. Account Settings supplies grouping and visual structure only.
+The artwork deliberately combines one explicit profile Form with immediate
+display-preference Switches. That is fixture content, not a universal inventory.
+Each target documents the truthful commitment lifecycle per section. A Form may
+wrap only coherent deferred sections; immediate controls remain outside any
+unrelated Save action.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Group related preferences under concise titles and explain consequences where needed.</Do>
-  <Dont>Do not make the wrapper responsible for child-control validation or persistence policy.</Dont>
+  <Do>Choose a clear persistence boundary for each target and compose canonical Form and controls without copying their anatomy.</Do>
+  <Dont>Do not make U9 claim that every setting saves globally, immediately, or through the same account API.</Dont>
 </DoDont>
 
-- Let each target decide which sections and controls are available.
-- Use Input and Switch validation semantics for field-level feedback.
-- Make destructive account actions visually and verbally explicit and confirm them according to target policy.
-- Keep persistence, loading, success, and failure behavior consistent within the chosen target strategy.
+- Use concise titles and explain consequences before the controls they affect.
+- Use Switch only when the binary setting takes effect immediately. Use a
+  deferred canonical control when a choice waits for Form submission.
+- Treat notification and marketing consent as policy-backed records with their
+  own evidence and lifecycle, not as generic immediate booleans.
+- Keep field names, autocomplete purposes, validation, pending state, errors,
+  consent, and customer-data policy with the owning target and dependency.
+- Put target success/failure feedback in the owning Form or adjacent feedback
+  component; U9 does not include an empty live region.
 
 ## Accessibility
 
-- Protect account settings behind the target authentication system.
-- Give every section a descriptive heading and preserve logical heading order.
-- Associate controls with visible labels and supporting descriptions where needed.
-- Keep Switch checked state synchronized with its native checkbox.
-- Announce save failures or confirmations through target-owned feedback and move focus appropriately after errors.
+- Render a passive generic root and one native `section` per thematic group.
+- Give every section a non-empty visible contextual heading with a unique ID
+  and `aria-labelledby`; preserve the heading level required by the page.
+- Label every Input and Switch visibly. Preserve native names, values,
+  autocomplete, checked state, focus, keyboard, and validation behavior.
+- Use a labelled group or Fieldset for related controls and reference relevant
+  visible description text.
+- Keep immediate Switches outside deferred save semantics. Announce real
+  target results with sufficient context only after they occur.
+- Link to or omit platform-hosted account settings instead of copying them into
+  a neutral flow that cannot preserve the platform lifecycle.
 
 ## References
 
+### Standards and mature systems
+
+- [HTML sections](https://html.spec.whatwg.org/multipage/sections.html#the-section-element)
+- [HTML forms](https://html.spec.whatwg.org/multipage/forms.html#the-form-element)
+- [WAI form grouping](https://www.w3.org/WAI/tutorials/forms/grouping/)
+- [APG Switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/)
+- [Open UI Switch explainer](https://open-ui.org/components/switch.explainer/)
+- [Radix Switch](https://www.radix-ui.com/primitives/docs/components/switch)
+- [Polaris customer-account Form](https://shopify.dev/docs/api/customer-account-ui-extensions/latest/web-components/forms/form)
+- [Polaris customer-account Switch](https://shopify.dev/docs/api/customer-account-ui-extensions/latest/web-components/forms/switch)
+
 ### Dependencies
 
+- [Form](/components/form)
 - [Input](/components/input)
 - [Button](/components/button)
 - [Switch](/components/switch)
 
-The sections and controls in the artwork are fixture content inside `sections`; they do not define a fixed settings schema or save strategy.
+The rendered fields and preferences are examples inside `sections`; they do not
+define a fixed account model or save strategy.
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`sections`</td><td>slot</td><td>required</td><td>Target-owned settings sections and composed controls</td></tr>
+  <tr><td>`sections`</td><td>slot</td><td>required</td><td>Non-empty target-owned titled sections containing canonical Forms, controls, actions, and target-selected persistence boundaries</td></tr>
 </PropTable>

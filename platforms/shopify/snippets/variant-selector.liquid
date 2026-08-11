@@ -1,42 +1,86 @@
 {%- comment -%}
   Snippet: variant-selector
-  Usage: {% render 'variant-selector', product: product %}
+  Usage: {% render 'variant-selector', product: product, product_form_id: product_form_id %}
+
+  This snippet renders initial native option state. The product target controller
+  owns contextual re-rendering and coordinated variant, URL, media, price,
+  inventory, selling-plan, submit-state, and status updates.
 {%- endcomment -%}
 
-<div class="variant-selector">
-  {% for option in product.options_with_values %}
-    <fieldset class="variant-selector__group">
-      <legend class="variant-selector__label">
-        {{ option.name }}: <span data-selected-value="{{ option.name }}">{{ option.selected_value }}</span>
+{%- liquid
+  if selector_id == blank
+    assign selector_id = 'variant-selector-' | append: product.id
+  endif
+-%}
+
+<div class="variant-selector" data-variant-selector>
+  {%- for option in product.options_with_values -%}
+    {%- liquid
+      assign has_swatches = false
+      for option_value in option.values
+        if option_value.swatch != blank
+          assign has_swatches = true
+          break
+        endif
+      endfor
+    -%}
+    <fieldset class="variant-selector__group" data-option-position="{{ option.position }}">
+      <legend class="variant-selector__legend">
+        <span class="variant-selector__label">{{ option.name | escape }}</span>:
+        <span class="variant-selector__selection" aria-hidden="true" data-selected-value>{{ option.selected_value | escape }}</span>
       </legend>
 
-      {% if option.name == 'Glaze' or option.name == 'Color' %}
-        <div class="variant-swatches" role="radiogroup">
-          {% for value in option.values %}
-            <label class="variant-swatch"
-                   aria-label="{{ value }}" title="{{ value }}">
-              <input type="radio" name="{{ option.name }}"
-                     value="{{ value }}"
-                     {% if value == option.selected_value %}checked{% endif %}>
-              <span class="variant-swatch__color"
-                    style="background-color: {{ value | handleize | append: '-color' | default: '#ccc' }};">
-              </span>
-              <span class="variant-swatch__ring"></span>
-            </label>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="variant-pills" role="radiogroup">
-          {% for value in option.values %}
-            <label class="variant-pill">
-              <input type="radio" name="{{ option.name }}"
-                     value="{{ value }}"
-                     {% if value == option.selected_value %}checked{% endif %}>
-              {{ value }}
-            </label>
-          {% endfor %}
-        </div>
-      {% endif %}
+      <div class="{% if has_swatches %}variant-swatches{% else %}variant-pills{% endif %}">
+        {%- for option_value in option.values -%}
+          {%- liquid
+            assign option_id = selector_id | append: '-option-' | append: option.position | append: '-' | append: forloop.index0
+            assign option_variant = option_value.variant
+            assign option_unavailable = false
+            assign option_disabled = false
+            if option_variant == blank and option_value.product_url == blank
+              assign option_disabled = true
+            elsif option_variant != blank and option_variant.available == false
+              assign option_unavailable = true
+            endif
+          -%}
+          <label
+            class="{% if has_swatches %}variant-swatch{% if option_unavailable %} variant-swatch--unavailable{% endif %}{% else %}variant-pill{% if option_unavailable %} variant-pill--unavailable{% endif %}{% endif %}"
+            for="{{ option_id }}"
+          >
+            <input
+              class="{% if has_swatches %}variant-swatch__input{% else %}variant-pill__input{% endif %}"
+              id="{{ option_id }}"
+              type="radio"
+              name="options[{{ option.name | escape }}]"
+              value="{{ option_value.name | escape }}"
+              data-option-value-id="{{ option_value.id }}"
+              data-option-position="{{ option.position }}"
+              data-option-exists="{% if option_disabled %}false{% else %}true{% endif %}"
+              data-option-available="{% if option_variant != blank and option_variant.available %}true{% else %}false{% endif %}"
+              {% if option_value.product_url != blank %}data-product-url="{{ option_value.product_url }}"{% endif %}
+              {% if option_variant != blank %}data-variant-id="{{ option_variant.id }}"{% endif %}
+              {% if product_form_id != blank %}form="{{ product_form_id }}"{% endif %}
+              {% if option_value.selected %}checked{% endif %}
+              {% if option_disabled %}disabled{% endif %}
+              required
+            >
+            {%- if has_swatches -%}
+              <span
+                class="variant-swatch__color"
+                {% if option_value.swatch != blank %}style="{% if option_value.swatch.color != blank %}--_variant-swatch-color: {{ option_value.swatch.color.rgb }};{% endif %}{% if option_value.swatch.image != blank %}--_variant-swatch-image: url('{{ option_value.swatch.image | image_url: width: 88 }}');{% endif %}"{% endif %}
+              ></span>
+              <span class="variant-swatch__label">{{ option_value.name | escape }}</span>
+            {%- else -%}
+              <span class="variant-pill__label">{{ option_value.name | escape }}</span>
+            {%- endif -%}
+            {%- if option_unavailable -%}
+              <span class="variant-selector__option-status">, {{ 'products.options.unavailable' | t }}</span>
+            {%- elsif option_disabled -%}
+              <span class="variant-selector__option-status">, {{ 'products.options.invalid_combination' | t }}</span>
+            {%- endif -%}
+          </label>
+        {%- endfor -%}
+      </div>
     </fieldset>
-  {% endfor %}
+  {%- endfor -%}
 </div>

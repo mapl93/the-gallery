@@ -1,55 +1,68 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "address-form",
   "name": "Address Form",
   "registryId": "U7",
   "category": "account",
   "status": "pilot",
-  "summary": "Responsive address form wrapper with two-column row support.",
-  "dependencies": ["input", "select", "button"],
+  "summary": "Canonical Form profile that composes target-owned localized address fields, explicit submission, optional non-reset cancellation, and external mutation lifecycle.",
+  "dependencies": ["form", "input", "select", "button"],
   "source": {
     "registry": "registry.json#/components/address-form",
     "css": { "file": "components/css/account.css", "selector": ".address-form" },
     "docs": "site/src/content/components/address-form.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".address-form", "className": ".address-form", "required": true, "description": "Address form container." },
-    { "name": "fields", "selector": ".address-form__fields", "className": ".address-form__fields", "required": true, "description": "Address field composition region." },
-    { "name": "row", "selector": ".address-form__row", "className": ".address-form__row", "required": false, "description": "Two-column address field row." },
-    { "name": "actions", "selector": ".address-form__actions", "className": ".address-form__actions", "required": false, "description": "Address form actions." }
+    { "name": "root", "selector": ".address-form", "className": ".address-form", "required": true, "description": "Canonical native Form root carrying .form and .address-form plus a dual-named inline-size container; target owns action, method, authentication, and mutation handling." },
+    { "name": "fields", "selector": ".address-form__fields", "className": ".address-form__fields", "required": true, "description": "Canonical .form__section containing the complete target-owned composition of address Input and Select controls." },
+    { "name": "row", "selector": ".address-form__row", "className": ".address-form__row", "required": false, "description": "Optional canonical .form__row with the U7 compact responsive profile; it adds no semantic grouping or field API." },
+    { "name": "actions", "selector": ".address-form__actions", "className": ".address-form__actions", "required": false, "description": "Optional canonical .form__actions row containing explicit submit and non-reset cancellation Button composition." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default address form." }
+    { "name": "default", "className": null, "default": true, "description": "Neutral native address-form composition profile." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default narrow form with responsive rows." }
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic max-measure form with container-responsive rows." }
   ],
   "states": [
-    { "name": "default", "selectors": [".address-form"], "description": "Default address form state." },
-    { "name": "responsiveRow", "selectors": [".address-form__row"], "description": "Responsive field row that stacks on small viewports." }
+    { "name": "default", "selectors": [".address-form", ".address-form__fields"], "description": "Complete target-defined canonical field composition in a native Form." },
+    { "name": "responsiveRow", "selectors": [".address-form__row"], "description": "Optional canonical row changes from two tracks to one according to the form container without reordering DOM or focus." },
+    { "name": "actionsPresent", "selectors": [".address-form__actions"], "description": "Optional canonical Form actions contain explicit submit and optional non-reset cancellation." }
   ],
   "behavior": [
-    { "name": "formComposition", "selectors": [".address-form__fields", ".address-form__actions"], "description": "Address Form should compose Input, Select, and Button primitives." },
-    { "name": "addressSubmit", "selectors": [".address-form"], "events": ["submit"], "description": "Form should create or update an address through the target account API." }
+    { "name": "canonicalForm", "selectors": [".address-form", ".address-form__fields", ".address-form__actions"], "attributes": ["native form element", ".form root", ".form__section fields", ".form__row rows", ".form__actions actions", "optional .form__error-summary"], "description": "Form owns the native submission boundary, section, row, action, and optional error-summary composition while U7 adds only localized address-field and compact container layout specialization." },
+    { "name": "completeFieldComposition", "selectors": [".address-form__fields"], "attributes": ["target-defined complete address controls", "visible labels", "unique ids", "stable submission names", "valid autocomplete purposes"], "description": "The required slot composes the complete canonical Input and Select controls selected by the target address model; the docs fixture is not a universal schema." },
+    { "name": "canonicalComposition", "selectors": [".address-form", ".address-form__fields", ".address-form__actions"], "description": "Form retains native submission and action layout; Input and Select retain label, name, value, autocomplete, requiredness, validation, focus, and controlled or uncontrolled ownership; Button retains activation, disabled, and busy ownership." },
+    { "name": "explicitSubmission", "selectors": [".address-form"], "events": ["submit"], "description": "Create or update is triggered only by explicit native form submission; field change, blur, and option selection do not auto-submit." },
+    { "name": "nativeConstraintValidation", "selectors": [".address-form", ".address-form__fields"], "events": ["invalid", "submit"], "description": "Preserve native required validation. Targets adding custom or server validation identify errors in canonical field messages and compose a useful linked Form error summary when needed." },
+    { "name": "cancelComposition", "selectors": [".address-form__actions"], "attributes": ["type=button on cancellation command or native link navigation"], "events": ["click", "navigate", "close"], "description": "Optional Cancel requests target navigation or closure. It never uses type=reset and never implies that draft field values were restored or discarded." },
+    { "name": "externalLifecycle", "selectors": [".address-form"], "description": "Authentication, localized address schema, create or edit mode, mutation, pending, success, failure, cancellation, routing, focus recovery, feedback, analytics, and telemetry remain target-owned outside U7." },
+    { "name": "responsiveContainer", "selectors": [".address-form", ".address-form__row"], "attributes": ["container-name: form address-form", "container-type: inline-size", "stable DOM and focus order"], "description": "Canonical Form and U7 row/action rules respond to the same component container while maximum measure and thresholds remain private composition." }
   ],
   "properties": [
-    { "name": "fields", "type": "slot", "required": true, "description": "Target-owned address inputs and selects with native autocomplete and validation semantics.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-form__fields", "classNames": [".address-form__fields"] }] } },
-    { "name": "actions", "type": "slot", "required": false, "description": "Submit and optional cancellation actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-form__actions", "classNames": [".address-form__actions"] }] } }
+    { "name": "fields", "type": "slot", "required": true, "description": "Complete target-owned localized canonical address controls with visible labels, stable names, values, autocomplete purpose, requiredness, validation semantics, and optional canonical Form error summary when needed.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-form__fields", "classNames": [".form__section", ".address-form__fields", ".form__row", ".address-form__row", ".form__error-summary"] }] } },
+    { "name": "actions", "type": "slot", "required": false, "description": "Target-selected canonical explicit submit and optional navigation/close cancellation actions; Cancel never implies reset and lifecycle remains external.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".address-form__actions", "classNames": [".form__actions", ".address-form__actions"] }] } }
   ],
   "tokens": {
-    "public": {}
+    "public": {
+      "spacing": ["--tg-space-stack-md", "--tg-space-inline-lg"]
+    }
   },
   "accessibility": [
-    "Associate every address field with a label.",
-    "Composed Input and Select fields preserve their default, error, success, and warning validation semantics.",
-    "Use autocomplete attributes where the target supports them.",
-    "Expose field validation errors near the affected input.",
-    "Protect address editing behind authentication."
+    "Protect address editing and mutation through target authentication, authorization, and privacy controls before rendering U7.",
+    "Use canonical Form with native form, section, row, action, and optional error-summary semantics plus canonical Input, Select, and Button controls without adding parent widget roles or keyboard handling.",
+    "Associate every control with a visible label, unique id, stable successful-control name, and correct autocomplete purpose for the actual value.",
+    "Preserve native required constraint validation and explicit submit; never auto-submit on change, blur, or country selection.",
+    "Custom and server errors must identify the affected field in canonical text feedback, use canonical field association, and move focus to the first invalid control or useful linked Form error summary.",
+    "Keep Submit explicit. Optional Cancel is target navigation or close composition with Button type=button or Link semantics; it must not reset draft values implicitly.",
+    "Responsive rows must preserve DOM, reading, serialization, and focus order when the component container narrows.",
+    "Mutation pending, success, failure, authentication expiry, cancellation, focus recovery, and announcements remain target composition outside U7.",
+    "U7 adds no motion, focus ring, color, icon, or forced-colors behavior; canonical dependencies retain those responsibilities."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer address create/update form fields." },
+    "web": { "status": "implemented", "kind": "canonical-form-css-composition", "notes": "Implemented as canonical Form plus the localized U7 layout specialization in components/css/account.css, with no U7 runtime." },
+    "shopify": { "status": "planned", "kind": "canonical-or-native-address-form-handoff", "notes": "Shopify v1 uses hosted current-account Profile/Addresses as an intentional native handoff with no U7 parity claim. Target-controlled headless storefronts may project canonical U7 against authenticated Customer Account address mutations and field-addressable user errors. Classic Liquid is separately versioned compatibility; copied CSS is not readiness." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

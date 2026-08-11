@@ -1,43 +1,73 @@
 ## Overview
 
-Cookie Consent presents a viewport-edge notice, Button-composed actions, and optional preference-layout anatomy without defining a consent policy or preference model.
+Consent Manager is a controlled composition for presenting a target-authorized privacy decision. Its public slug remains `cookie-consent` only as a pre-v1 migration path; there is no second Cookie Consent implementation.
+
+The neutral component owns a named, non-modal first layer; explicit Accept, Reject, and Customize requests; canonical Button and Link composition; and a canonical Modal boundary for detailed preferences. The target owns jurisdiction, legal copy, categories, current values, provider integration, persistence, processing gates, withdrawal, errors, and audit evidence.
 
 ## Presentation
 
-<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="true" aria-controls="cookie-preview-banner" hidden>Show cookie notice</button><aside class="cookie-banner tg-preview-bottom-layer tg-preview-contained-cookie" id="cookie-preview-banner" data-visible aria-label="Cookie options"><div class="cookie-banner__inner"><p class="cookie-banner__text">This site uses cookies according to its published policy. <a href="#cookie-preview-policy">Read the cookie policy</a>.</p><div class="cookie-banner__actions"><button class="btn" type="button" data-preview-close>Review options</button><button class="btn btn--outline" type="button" data-preview-close>Dismiss notice</button></div></div></aside></div>'} label="Cookie Consent" layout="overlay" interaction={{ selector: '.cookie-banner', toggle: 'attr:data-visible=', triggerLabel: 'Show Banner', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
+<Preview html={'<section class="consent-manager" aria-labelledby="consent-preview-title" aria-describedby="consent-preview-description"><div class="consent-manager__content"><h2 class="consent-manager__title" id="consent-preview-title">Choose how this site uses data</h2><p class="consent-manager__description" id="consent-preview-description">You can accept, reject, or review optional uses before making a choice.</p><a class="link consent-manager__policy" href="/policies/privacy-and-cookies">Read the privacy and cookie policy</a></div><div class="consent-manager__actions"><button class="btn btn--outline consent-manager__action consent-manager__action--accept" type="button">Accept optional uses</button><button class="btn btn--outline consent-manager__action consent-manager__action--reject" type="button">Reject optional uses</button><button class="btn btn--outline consent-manager__action consent-manager__action--customize" type="button" aria-haspopup="dialog">Customize choices</button></div></section>'} label="Consent Manager" />
 
-The primary Exhibit artwork starts visible. Its sibling trigger is hidden while the banner is active, appears after dismissal, and can reopen the fixture. That open/dismiss/reopen behavior and bounded edge placement belong to the docs site; they do not define consent, persistence, or a component default.
+The primary Exhibit and Studio artwork uses the same `ConsentManagerArtwork`, target-simulation fixture, canonical `ModalArtwork`, and canonical `CheckboxArtwork`. The policy destination and example categories are fixture content, not legal defaults or contract-owned category inventory.
 
-`data-visible` controls banner presentation. `.cookie-preferences` and its repeated category anatomy provide layout only.
+## Composition
 
-## Usage Guidelines
+- Render the first layer in normal document flow. A target may place it in a fixed or sticky host only when that target owns safe-area, stacking, page reservation, and focus-not-obscured behavior.
+- Provide a visible localized title, explanation, and real policy destination.
+- Keep Accept, Reject, and Customize as explicit, comparably reachable native Button requests.
+- Use the canonical Modal for detailed preferences. Do not create consent-specific overlay, focus containment, Escape, or restoration behavior.
+- Supply current category records and values through canonical choice controls. Consent Manager does not define universal categories or defaults.
+- Omit or natively hide the complete composition when authoritative target state closes it.
 
-<DoDont>
-  <Do>Define action meaning, storage, blocking, withdrawal, and jurisdiction-specific requirements in the consuming target before deployment.</Do>
-  <Dont>Do not treat dismissal as consent or infer categories, required cookies, defaults, or control types from this fixture.</Dont>
-</DoDont>
+## Anatomy
 
-The preference model remains unresolved. This component does not decide which categories exist or how their choices are represented.
+| Part | Selector | Requirement |
+| --- | --- | --- |
+| Root | `.consent-manager` | Required named, controlled, in-flow section |
+| Content | `.consent-manager__content` | Required title, description, and policy region |
+| Title | `.consent-manager__title` | Required visible accessible name |
+| Description | `.consent-manager__description` | Required target-approved explanation |
+| Policy | `.consent-manager__policy.link` | Required canonical Link with a real destination |
+| Actions | `.consent-manager__actions` | Required equal-access Button group |
+| Accept | `.consent-manager__action--accept` | Required explicit target request |
+| Reject | `.consent-manager__action--reject` | Required explicit target request |
+| Customize | `.consent-manager__action--customize` | Required canonical Modal trigger |
+| Feedback | `.consent-manager__feedback` | Optional target-owned semantic result composition |
+| Preferences | `.consent-manager__preferences.modal` | Required canonical Modal profile |
+| Preference list | `.consent-manager__preferences-list` | Required target-supplied canonical choice controls |
+| Save | `.consent-manager__save` | Required explicit target save request |
+
+## Controlled State
+
+- `open=false` means the first layer and preferences are absent from interaction; transform-only hiding is invalid.
+- `preferencesOpen` projects the canonical Modal state. Customize, Close, Escape, and Save request target reconciliation.
+- `busy` projects an in-flight target mutation with `aria-busy` and unavailable decision/save actions.
+- `feedback` is an optional slot because pending, success, failure, retry, and their announcement semantics depend on a real provider result.
+
+The component has no uncontrolled consent default. Closing, inactivity, scrolling, and continued use never imply consent.
+
+## Public Properties
+
+Content properties are `title`, `description`, `policyLabel`, and `policyHref`. Decision labels are `acceptLabel`, `rejectLabel`, and `customizeLabel`. Preferences use `preferencesTitle`, optional `preferencesDescription`, required `preferences`, `closePreferencesLabel`, and `saveLabel`. Controlled projection uses `open`, `preferencesOpen`, `busy`, and optional `feedback`.
+
+These properties describe stable, cross-target semantics. Category identifiers, legal basis, provider errors, persistence records, cookies, storage keys, geography, processing flags, analytics, and audit data remain outside the component API.
 
 ## Accessibility
 
-- Use clear Button labels that describe each target-defined action.
-- Keep the policy link keyboard reachable with visible focus.
-- Do not equate closing the banner with consent unless an accepted target policy explicitly defines that meaning.
-- If preferences open in a modal surface, that surface owns naming, focus containment, `Escape`, and focus restoration.
-- Respect reduced-motion preferences for banner transitions.
+- The first layer is a named section, not a modal and not an alert.
+- Canonical Buttons preserve keyboard activation, disabled state, focus indication, and readable labels.
+- Canonical Link preserves real navigation and visible focus.
+- Canonical Modal owns initial focus, contained Tab and Shift+Tab, Escape, visible close, inert-background integration, and logical focus restoration.
+- Target-supplied categories use labeled canonical choice controls with current controlled values.
+- Closed content is omitted or natively hidden, so no invisible policy link or action remains tabbable.
+- A fixed target placement must separately prove that it does not obscure focused content.
 
-## References
+## Target Translation
 
-| Anatomy | Selector | Requirement |
-| --- | --- | --- |
-| Root | `.cookie-banner` | Required viewport-edge notice surface |
-| Inner | `.cookie-banner__inner` | Required responsive content wrapper |
-| Text | `.cookie-banner__text` | Required notice and optional policy link |
-| Actions | `.cookie-banner__actions` | Required Button-composed action group |
-| Preferences | `.cookie-preferences` | Optional target-defined layout shell |
-| Preference category | `.cookie-preferences__category` | Optional repeated category row |
-| Preference name | `.cookie-preferences__name` | Optional category name |
-| Preference description | `.cookie-preferences__desc` | Optional category description |
+- **Neutral Web:** semantic HTML and canonical CSS composition; native click callbacks/handlers request target action; no provider, storage, network, or cookie runtime.
+- **Shopify:** a future adapter must project `window.Shopify.customerPrivacy` state and `setTrackingConsent` results into this controlled profile. Copied CSS alone is not target readiness.
+- **React/Angular:** thin controlled props and callbacks over the same content, request, and Modal boundaries.
+- **Figma:** first-layer, busy, closed, and preferences-open visual states only; no compliance or persistence claim.
+- **SwiftUI/Compose:** native privacy-service state and native modal/choice controls while preserving the same target ownership.
 
-Dependency: [Button](/components/button).
+Human review must approve the first-layer hierarchy, equal-action treatment, density, wrapping, Modal presentation, and example fixture. The contract remains `pilot` until that review.

@@ -1,0 +1,104 @@
+{% liquid
+  assign presentation = section.settings.variant
+  assign heading_id = 'ImageText-' | append: section.id | append: '-Title'
+  assign image_sizes = '(min-width: 768px) 50vw, 100vw'
+  if presentation == 'stacked' or presentation == 'overlay'
+    assign image_sizes = '100vw'
+  endif
+%}
+
+{% render 'image-text-composition',
+  image: section.settings.image,
+  image_decorative: section.settings.image_decorative,
+  image_alt: section.settings.image_alt,
+  eyebrow: section.settings.eyebrow,
+  title: section.settings.title,
+  body: section.settings.body,
+  heading_id: heading_id,
+  presentation: presentation,
+  image_sizes: image_sizes,
+  action_label: section.settings.button_label,
+  action_url: section.settings.button_url
+%}
+
+{% schema %}
+{
+  "name": "t:sections.image_text.name",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.image_text.settings.image"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_decorative",
+      "label": "t:sections.image_text.settings.image_decorative",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "t:sections.image_text.settings.image_alt"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:sections.image_text.settings.eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.image_text.settings.title"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "t:sections.image_text.settings.body"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:sections.image_text.settings.button_label"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "t:sections.image_text.settings.button_url"
+    },
+    {
+      "type": "select",
+      "id": "variant",
+      "label": "t:sections.image_text.settings.variant",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:sections.image_text.options.default"
+        },
+        {
+          "value": "reversed",
+          "label": "t:sections.image_text.options.reversed"
+        },
+        {
+          "value": "stacked",
+          "label": "t:sections.image_text.options.stacked"
+        },
+        {
+          "value": "overlay",
+          "label": "t:sections.image_text.options.overlay"
+        },
+        {
+          "value": "offset",
+          "label": "t:sections.image_text.options.offset"
+        }
+      ],
+      "default": "default"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.image_text.name"
+    }
+  ]
+}
+{% endschema %}

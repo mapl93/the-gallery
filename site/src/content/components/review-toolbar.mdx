@@ -1,14 +1,16 @@
 ## Overview
 
-Responsive structural toolbar for target-owned review-list controls, with optional Select and Button or link composition.
+Container-responsive labelled group for target-owned review-list controls, with optional canonical Select and Button or link composition.
 
-<Preview html={'<div class="review-toolbar tg-preview-frame--md" role="toolbar" aria-label="Review controls"><div class="review-toolbar__sort"><div class="select"><label class="select__label" for="review-sort">Order reviews</label><select class="select__field review-toolbar__sort-select" id="review-sort" name="review-sort"><option value="recent" selected>Most recent</option><option value="rated">Highest rated</option></select></div></div><button class="btn btn--outline review-toolbar__write-btn" type="button">Write a review</button></div>'} label="Review Toolbar" />
+<Preview html={'<div class="review-toolbar tg-preview-frame--md" role="group" aria-label="Review controls"><div class="review-toolbar__sort"><div class="select"><label class="select__label" for="review-sort">Order reviews</label><select class="select__field review-toolbar__sort-select" id="review-sort" name="review-sort"><option value="recent" selected>Most recent</option><option value="rated">Highest rated</option></select></div></div><button class="btn btn--outline review-toolbar__write-btn" type="button">Write a review</button></div>'} label="Review Toolbar" />
 
 ## Presentation
 
-The required root provides responsive layout only. The optional sort wrapper contains a target-owned native control or composed Select. The optional write action composes Button or a native link. On narrow viewports, the layout stacks and stretches its child controls.
+The required root provides labelled group semantics and layout only. The optional control wrapper contains a target-owned native control or composed Select. The optional write action composes Button or a native link. When the root container is narrow, the layout stacks and stretches its child controls independently of the page viewport.
 
 Select retains its label, options, enhancement, validation, focus, and disabled semantics. Button retains its action, link, focus, disabled, and busy semantics. The preview options are documentation fixtures rather than component defaults.
+
+When neither optional slot is supplied, omit the complete component instead of rendering an empty named group or decorative rule.
 
 ## Usage Guidelines
 
@@ -22,9 +24,10 @@ Ordering and filtering models, navigation versus in-place updates, write-review 
 ## Accessibility
 
 <Callout type="info">
-  Label the toolbar when surrounding context does not already identify its controls.
+  Use a named group for this two-control composition. Do not assign the ARIA toolbar role without the complete roving-focus and arrow-key widget pattern.
 </Callout>
 
+- Preserve normal sequential Tab order; the group adds no arrow-key focus management.
 - Preserve the composed Select's visible label, native fallback, keyboard behavior, validation, and disabled state.
 - Use Button for an action and an anchor when the write-review affordance navigates.
 - Preserve visible focus and accessible names for every control.
@@ -32,12 +35,12 @@ Ordering and filtering models, navigation versus in-place updates, write-review 
 
 ## References
 
-**Anatomy:** required `.review-toolbar` root; optional `.review-toolbar__sort`, composed `.select`, legacy `.review-toolbar__sort-select` containment hook, and composed `.btn` action.
+**Anatomy:** required `.review-toolbar` group root; optional `.review-toolbar__sort`, composed `.select`, containment-only `.review-toolbar__sort-select` native fallback hook, and composed `.btn` or native-link action.
 
-**Dependencies:** None. Select and Button are optional reviewed compositions; the current registry dependency array remains empty.
+**Dependencies:** canonical Select and Button. Both slots remain optional, but the formal graph records the actual reviewed compositions.
 
 <PropTable>
-  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional accessible toolbar name</td></tr>
+  <tr><td>`label`</td><td>string</td><td>none</td><td>Optional accessible group name</td></tr>
   <tr><td>`control`</td><td>slot</td><td>none</td><td>Target-owned Select or native review-list control</td></tr>
   <tr><td>`writeAction`</td><td>slot</td><td>none</td><td>Target-owned Button or native link</td></tr>
 </PropTable>

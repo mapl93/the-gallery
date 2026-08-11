@@ -1,52 +1,67 @@
 ## Overview
 
-Order Detail presents one authenticated order with a required title and optional metadata, target-owned tracking, and purchased line-item composition.
+Order Detail is a passive section for one authoritative order. A required visible title labels the section; optional metadata, target-owned tracking through canonical Steps, and a read-only canonical Cart Line Item collection complete the composition.
 
 <Preview
-  html={'<article class="order-detail tg-preview-frame tg-preview-frame--lg"><header class="order-detail__header"><h1 class="order-detail__title">Order #1042</h1><div class="order-detail__meta"><time datetime="2026-06-15">Jun 15, 2026</time></div></header><div class="order-tracking" aria-label="Delivery progress"><div class="order-tracking__step order-tracking__step--done"><span class="order-tracking__dot" aria-hidden="true"></span><span class="order-tracking__label">Placed</span></div><div class="order-tracking__step order-tracking__step--active" aria-current="step"><span class="order-tracking__dot" aria-hidden="true"></span><span class="order-tracking__label">In transit</span></div><div class="order-tracking__step"><span class="order-tracking__dot" aria-hidden="true"></span><span class="order-tracking__label">Delivered</span></div></div><section class="order-detail__items" aria-label="Purchased items"><article class="cart-line"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /><div class="cart-line__info"><a class="cart-line__title" href="#">Artisan Ceramic Vase</a><span class="cart-line__variant">Large / White</span></div><div class="cart-line__prices"><span class="cart-line__price">$120.00</span></div></article></section></article>'}
+  html={'<section class="order-detail tg-preview-frame tg-preview-frame--lg" aria-labelledby="order-1048-title"><header class="order-detail__header"><h2 class="order-detail__title" id="order-1048-title">Order #1048</h2><div class="order-detail__meta">Placed <time datetime="2026-07-08">July 8, 2026</time></div></header><ol class="steps order-detail__tracking" aria-label="Order progress"><li class="steps__item steps__item--completed"><span class="steps__indicator" aria-hidden="true">✓</span><span class="steps__content"><span class="steps__title">Confirmed</span><span class="steps__state visually-hidden">Completed</span></span></li><li class="steps__item steps__item--completed"><span class="steps__indicator" aria-hidden="true">✓</span><span class="steps__content"><span class="steps__title">Prepared</span><span class="steps__state visually-hidden">Completed</span></span></li><li class="steps__item steps__item--active" aria-current="step"><span class="steps__indicator" aria-hidden="true">3</span><span class="steps__content"><span class="steps__title">Shipped</span></span></li><li class="steps__item"><span class="steps__indicator" aria-hidden="true">4</span><span class="steps__content"><span class="steps__title">Delivered</span></span></li></ol><section class="order-detail__items" aria-label="Purchased items"><ul class="cart-lines"><li class="cart-line order-detail__line-item" data-line-key="order-1048-celadon-study-4"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" /><div class="cart-line__info"><a class="cart-line__title" href="#product">Celadon Study No. 4</a><div class="cart-line__details"><span>Celadon / Medium</span><span>Quantity 1</span></div></div><div class="cart-line__price"><span class="price" data-price-alternate-digits="false" data-price-slashed-zero="true" data-price-tabular-numbers="true" data-price-contextual-alternates="true" data-price-fractions="false"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$120.00</bdi></span></span></div></li></ul></section></section>'}
   label="Order Detail"
 />
 
 ## Presentation
 
-The header combines required `title` with optional target-owned `meta`. The example date is fixture content inside that slot.
+`title` is the only required U5 property. A non-empty visible heading labels the native section with `aria-labelledby`; the target chooses the heading rank appropriate to the host page. The docs fixture uses `h2` inside Component Detail.
 
-`tracking` contains repeated steps and their current-state semantics. The labels and number of steps in the artwork are illustrative; the contract does not define a fixed tracking sequence. `lineItems` composes Cart Line Item anatomy for purchased products without quantity, remove, or save-for-later controls.
+`meta` is semantic target-owned content. This fixture uses `time[datetime]`, but order numbers, date formatting, financial and fulfillment statuses, and any canonical Badge composition remain target responsibilities rather than U5 fields.
+
+`tracking` is an optional ordered canonical Steps composition only when the provider supplies a trustworthy finite milestone model. The example stages and current projection are fixture data, not a Gallery-wide order-state taxonomy. When authoritative facts are non-linear or uncertain, omit Steps and render ordinary target-authored semantic status content. `lineItems` is an optional non-empty native collection of canonical Cart Line Item records with purchased quantity as text and no cart mutation controls.
+
+The root establishes a named inline-size container. Header placement responds to U5 width; Steps and Cart Line Item keep their own responsive, semantic, token, forced-color, and reduced-motion behavior.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Map metadata, tracking, and line items from the same authenticated order record.</Do>
-  <Dont>Do not expose cart mutation controls on purchased line items.</Dont>
+  <Do>Map title, metadata, progress, and purchased items from the same authorized order, then compose canonical Steps and Cart Line Item.</Do>
+  <Dont>Do not invent a universal stage sequence, duplicate stepper visuals, or expose cart mutation controls for purchased items.</Dont>
 </DoDont>
 
-- Let the target determine which tracking steps exist and which step is current.
-- Format order identifiers, dates, statuses, and prices in the target layer.
-- Include only order metadata that helps the customer understand fulfillment or payment.
-- Keep purchased line items linked to useful product detail when that destination remains available.
+- Omit the complete component when `title` is blank. Omit optional regions rather than rendering empty wrappers.
+- Use Steps only when the provider supplies a trustworthy ordered sequence. Do not infer one from processing, fulfillment, shipment delivery, pickup, return, refund, partial, split, or cancellation state.
+- Mark at most one canonical step current and retain non-color completed meaning.
+- Use a real product destination only when it remains useful and authorized; otherwise render the canonical Cart Line Item title as text.
+- Compose loading, redacted, unavailable, error, not-found, and expired-session UI outside passive U5.
+- Keep addresses, payment details, totals, refunds, returns, actions, carrier data, and ETA content outside U5 until explicit semantic regions are accepted.
 
 ## Accessibility
 
-- Protect order details behind the target authentication system and authorize access to the requested order.
-- Mark the active tracking step with `aria-current="step"` and readable text.
-- Keep tracking dots decorative; do not rely on their color to communicate state.
-- Label the purchased-items region and preserve a logical reading order.
-- Remove cart-only mutation controls from composed purchased line items.
+- Protect or redact order data according to the target authentication and authorization context before rendering it.
+- Label the section from its required visible title and preserve a context-correct heading hierarchy.
+- Use native `time[datetime]` for date/time metadata when applicable.
+- Keep tracking as a labelled native `ol/li` Steps composition with at most one `aria-current="step"`; do not add a custom role, roving focus, or arrow-key model.
+- Keep completed/current meaning readable independently of connector or indicator color.
+- Preserve native `ul/li` semantics for purchased items and normal Link Tab/Enter/modified activation for an available product destination.
+- Do not make the complete order section or line-item row an additional interactive surface.
+- Preserve DOM order title, metadata, tracking, items across container sizes, localization, RTL, zoom, forced colors, and reduced motion.
+
+## Target Notes
+
+- Target-controlled account views may project one authorized authoritative order through canonical U5. Platform-owned non-replaceable screens use documented native handoff without claiming U5 visual or functional parity.
+- Shopify v1 uses the hosted current-account Order status page rather than a theme-owned clone. Customer Account extensions and headless API views are distinct target-controlled profiles; classic Liquid remains separately versioned compatibility.
+- Protected loading, authorization/redaction, provider links, unavailable/not-found/error state, live updates, announcements and focus recovery remain with the owning target surface.
 
 ## References
 
 ### Dependencies
 
-- [Badge](/components/badge)
+- [Steps](/components/steps)
 - [Cart Line Item](/components/cart-line-item)
 
-Tracking steps and purchased rows are fixture data inside their respective slots. Neither collection becomes a fixed top-level schema here.
+The progress and line-item records are target/fixture content inside slots. They do not add stage, current-index, order schema, query, disclosure, formatting, or account-lifecycle APIs to U5.
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Order title or target-formatted number</td></tr>
-  <tr><td>`meta`</td><td>slot</td><td>optional</td><td>Target-owned date, status, or supporting metadata</td></tr>
-  <tr><td>`tracking`</td><td>slot</td><td>optional</td><td>Target-owned tracking steps and current-state semantics</td></tr>
-  <tr><td>`lineItems`</td><td>slot</td><td>optional</td><td>Purchased Cart Line Item compositions without mutation controls</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty localized visible title and accessible section-name source; target owns heading rank</td></tr>
+  <tr><td>`meta`</td><td>slot</td><td>optional</td><td>Target-owned semantic date, status, or supporting metadata</td></tr>
+  <tr><td>`tracking`</td><td>slot</td><td>optional</td><td>Target-owned ordered records projected through canonical Steps</td></tr>
+  <tr><td>`lineItems`</td><td>slot</td><td>optional</td><td>Non-empty read-only canonical Cart Line Item collection</td></tr>
 </PropTable>

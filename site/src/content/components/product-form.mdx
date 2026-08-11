@@ -1,35 +1,51 @@
 ## Overview
 
-Add-to-cart form layout.
+Native product-purchase form that composes canonical option, quantity, and primary-action controls while the target owns merchandise resolution and the purchase lifecycle.
 
-<Preview html={"<form class=\"product-form tg-preview-frame--md\"><div class=\"variant-selector\"><span class=\"variant-selector__label\">Size</span><div class=\"variant-pills\"><label class=\"variant-pill\"><input type=\"radio\" name=\"product-size\" value=\"s\" />S</label><label class=\"variant-pill\"><input type=\"radio\" name=\"product-size\" value=\"m\" checked />M</label><label class=\"variant-pill\"><input type=\"radio\" name=\"product-size\" value=\"l\" />L</label></div></div><div class=\"product-form__actions\"><button class=\"btn product-form__submit\" type=\"submit\">Add to Cart</button><button class=\"btn btn--secondary\" type=\"button\">Wishlist</button></div></form>"} label="Product Form" />
+<Preview html={"<form class=\"product-form tg-preview-frame--md\" action=\"#cart\" method=\"post\"><div class=\"variant-selector\"><fieldset class=\"variant-selector__group\"><legend class=\"variant-selector__legend\"><span class=\"variant-selector__label\">Size</span>: <span class=\"variant-selector__selection\" aria-hidden=\"true\">M</span></legend><div class=\"variant-pills\"><label class=\"variant-pill\"><input class=\"variant-pill__input\" type=\"radio\" name=\"size\" value=\"s\" /><span class=\"variant-pill__label\">S</span></label><label class=\"variant-pill\"><input class=\"variant-pill__input\" type=\"radio\" name=\"size\" value=\"m\" checked /><span class=\"variant-pill__label\">M</span></label><label class=\"variant-pill\"><input class=\"variant-pill__input\" type=\"radio\" name=\"size\" value=\"l\" /><span class=\"variant-pill__label\">L</span></label></div></fieldset></div><div class=\"qty\" role=\"group\" aria-label=\"Quantity selector\" data-qty><button class=\"qty__btn qty__btn--decrement\" type=\"button\" aria-label=\"Decrease quantity\" data-qty-minus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\" /></svg></button><input class=\"qty__input\" type=\"number\" name=\"quantity\" value=\"1\" min=\"1\" max=\"8\" step=\"1\" required aria-label=\"Quantity\" data-qty-input /><button class=\"qty__btn qty__btn--increment\" type=\"button\" aria-label=\"Increase quantity\" data-qty-plus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" /></svg></button></div><input type=\"hidden\" name=\"merchandise\" value=\"celadon-m\" /><div class=\"product-form__actions\"><button class=\"btn btn--lg product-form__submit\" type=\"submit\" name=\"intent\" value=\"add\">Add to cart</button></div></form>"} label="Product Form" />
 
 ## Presentation
 
-Product Form composes Variant Selector, Quantity Selector, and Button without replacing their semantics or validation ownership.
+Product Form owns one intrinsic vertical rhythm and a wrapping action row. Variant Selector, Quantity Selector, and Button keep their own anatomy, states, tokens, keyboard behavior, and value ownership.
+
+The target may omit options for a product with no meaningful variants or omit Quantity when product policy fixes one. Product Form does not repeat Price: Product Info owns the one canonical price surface for this composition.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Optimize product images for web — use WebP format and responsive srcset.</Do>
-  <Dont>Don't overload product components with too many badges or CTAs — keep it clean.</Dont>
+  <Do>Resolve current options to one purchasable identifier and synchronize it before enabling or submitting the form.</Do>
+  <Dont>Do not store a second mirrored object for child values or submit a stale variant identifier.</Dont>
 </DoDont>
+
+<DoDont>
+  <Do>Use the native form, named child controls, activated submitter, FormData, constraint validation, and reset lifecycle.</Do>
+  <Dont>Do not add Ajax, Cart Drawer, inventory, analytics, or result-announcement policy to the target-neutral component.</Dont>
+</DoDont>
+
+### Target ownership
+
+Neutral Web adds no Product Form runtime. Native submission is the required complete baseline. A capable target may intercept that same valid form and FormData to update a cart surface without navigation; it owns pending, errors, retry, focus, announcements, and rollback and must not create a parallel submission path. The shared product coordinator owns option-combination resolution, merchandise id, availability, quantity rules, and Price/media/inventory/URL synchronization.
+
+Unavailable and pending are different states. Unavailable uses the native disabled submitter and a visible explanation when option content does not already provide one. Pending uses canonical Button busy semantics, keeps the label stable, and prevents repeat activation.
+
+Accelerated checkout and a generic supplementary-field slot are excluded from neutral v1. Selling plans, personalization, uploads, gifts, and preorder flows require separately accepted canonical compositions. In Shopify, a merchant may show the canonical Quantity Selector or omit it when quantity is fixed to one.
 
 ## Accessibility
 
-<Callout type="tip">
-  Product components are designed to work together. The product page combines gallery, info, form, and related products.
+<Callout type="info">
+  Product Form provides the native submission boundary and feedback placement. Canonical children own their own names and validity; the target owns commerce result timing.
 </Callout>
 
-- Associate every input with a `<label>` using matching `for`/`id` attributes.
-- Validate variant, quantity, and selling-plan state before submit.
-- Explain unavailable submit states instead of silently disabling checkout.
+- Use a real `<form>` with an explicit `button[type="submit"]`.
+- Give each submitted child control a stable name and preserve the activated submitter in FormData.
+- Keep the resolved merchandise identifier synchronized and disable submission when no purchasable combination exists.
+- Preserve native child validity, reset, keyboard behavior, labels, and accessible names.
+- Keep visible, reading, and tab order aligned when the action row wraps or content localizes.
+- Let the target choose feedback insertion, live-region role, focus movement, recovery, and removal so the page does not announce the same update more than once.
 
 ## References
 
 ### Dependencies
-
-This component uses:
 
 - [Button](/components/button)
 - [Quantity Selector](/components/quantity-selector)
@@ -38,7 +54,12 @@ This component uses:
 ### API Reference
 
 <PropTable>
-  <tr><td>`.product-form`</td><td>class</td><td>—</td><td>Base product form styles</td></tr>
-  <tr><td>`.product-form__actions`</td><td>class</td><td>—</td><td>Action row for add-to-cart and secondary actions</td></tr>
-  <tr><td>`.product-form__submit`</td><td>class</td><td>—</td><td>Primary submit button</td></tr>
+  <tr><td>`variantSelector`</td><td>`slot`</td><td>optional</td><td>Canonical option-group composition</td></tr>
+  <tr><td>`quantitySelector`</td><td>`slot`</td><td>optional</td><td>Canonical named quantity composition</td></tr>
+  <tr><td>`submitLabel`</td><td>`string`</td><td>required</td><td>Localized visible purchase-action label</td></tr>
+  <tr><td>`submitDisabled`</td><td>`boolean`</td><td>`false`</td><td>Unavailable resolved selection</td></tr>
+  <tr><td>`pending`</td><td>`boolean`</td><td>`false`</td><td>Target work projected to Button busy semantics</td></tr>
+  <tr><td>`feedback`</td><td>`slot`</td><td>optional</td><td>Target-owned localized result or supporting content</td></tr>
 </PropTable>
+
+The structural classes are `.product-form`, `.product-form__message`, `.product-form__actions`, and `.product-form__submit`.

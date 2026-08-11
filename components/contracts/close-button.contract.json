@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "close-button",
   "name": "Close Button",
   "registryId": "A18",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Compact close action primitive used by overlays, toasts, drawers, and dismissible surfaces.",
+  "summary": "Compact native close action that requests dismissal while the containing overlay, toast, drawer, or surface owns state, Escape, motion, removal, and focus restoration.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/close-button",
@@ -30,7 +30,9 @@
     { "name": "disabled", "selectors": [".close-btn:disabled"], "description": "Unavailable native button state." }
   ],
   "behavior": [
-    { "name": "dismissAction", "selectors": [".close-btn"], "attributes": ["type=\"button\"", "aria-label"], "events": ["click", "Space", "Enter"], "description": "The native button requests dismissal of its owned surface without submitting forms. Escape handling belongs to that containing surface." }
+    { "name": "dismissAction", "selectors": [".close-btn"], "attributes": ["type=\"button\"", "aria-label"], "events": ["click", "Space", "Enter"], "description": "The native button requests dismissal of its owned surface without submitting forms. Escape, open state, exit motion, removal, and focus restoration belong to that containing surface." },
+    { "name": "motionPreference", "selectors": [".close-btn"], "description": "Decorative color and background transitions are removed when the user requests reduced motion without changing the dismiss request." },
+    { "name": "atomicInlineLayout", "selectors": [".close-btn"], "description": "The fixed-size control participates as an inline flex atom so surrounding layout does not acquire a block-level break." }
   ],
   "properties": [
     {
@@ -68,10 +70,12 @@
   "accessibility": [
     "Provide a clear accessible name such as Close or Dismiss.",
     "Use type=\"button\" inside forms.",
-    "Keep focus management owned by the containing overlay or dismissible surface."
+    "Keep Escape handling, exit motion, removal, and focus management owned by the containing overlay or dismissible surface.",
+    "Honor reduced-motion preferences for decorative color and background transitions.",
+    "Keep the target at least 24 by 24 CSS pixels."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by class composition in components/css/primitives.css." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented as a native named inline-flex button with decorative icon slot, native disabled behavior, focus visibility, and reduced-motion CSS in components/css/primitives.css." },
     "shopify": { "status": "implemented", "kind": "liquid-css-js" },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

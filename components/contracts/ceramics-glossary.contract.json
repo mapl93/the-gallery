@@ -1,12 +1,80 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "ceramics-glossary", "name": "Ceramics Glossary", "registryId": "R12", "category": "ceramics", "status": "pilot", "summary": "Alphabetical glossary of ceramics terms with accordion definitions.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/ceramics-glossary", "css": { "file": "components/css/ceramics.css", "selector": ".ceramics-glossary" }, "docs": "site/src/content/components/ceramics-glossary.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".ceramics-glossary", "className": ".ceramics-glossary", "required": true, "description": "Ceramics glossary presentation." }, { "name": "title", "selector": ".ceramics-glossary__title", "className": ".ceramics-glossary__title", "required": false, "description": "Glossary heading." }, { "name": "intro", "selector": ".ceramics-glossary__intro", "className": ".ceramics-glossary__intro", "required": false, "description": "Optional glossary introduction." }, { "name": "alphaNavigation", "selector": ".ceramics-glossary__alpha-nav", "className": ".ceramics-glossary__alpha-nav", "required": false, "description": "Optional target-owned alphabet navigation or filtering controls." }, { "name": "alphaControl", "selector": ".ceramics-glossary__alpha-btn", "className": ".ceramics-glossary__alpha-btn", "required": false, "description": "Single alphabet control." }, { "name": "group", "selector": ".ceramics-glossary__group", "className": ".ceramics-glossary__group", "required": true, "description": "Target-owned glossary letter group." }, { "name": "letter", "selector": ".ceramics-glossary__letter", "className": ".ceramics-glossary__letter", "required": true, "description": "Group heading." }, { "name": "term", "selector": ".glossary-term", "className": ".glossary-term", "required": true, "description": "Single glossary term and definition." }, { "name": "termTrigger", "selector": ".glossary-term__trigger", "className": ".glossary-term__trigger", "required": true, "description": "Existing disclosure-style term control." }, { "name": "termContent", "selector": ".glossary-term__content", "className": ".glossary-term__content", "required": true, "description": "Term definition content." }, { "name": "termImage", "selector": ".glossary-term__image", "className": ".glossary-term__image", "required": false, "description": "Optional term image." }, { "name": "related", "selector": ".glossary-term__related", "className": ".glossary-term__related", "required": false, "description": "Optional related-term region." }, { "name": "relatedLink", "selector": ".glossary-term__related-link", "className": ".glossary-term__related-link", "required": false, "description": "Optional target-owned related-term link." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Grouped glossary presentation." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained responsive glossary." }],
-  "states": [{ "name": "default", "selectors": [".ceramics-glossary"], "description": "Default glossary presentation." }, { "name": "activeControl", "selectors": [".ceramics-glossary__alpha-btn[aria-pressed=\"true\"]", ".ceramics-glossary__alpha-btn.is-active"], "description": "Existing visual hook for a target-owned current alphabet control." }, { "name": "expandedTerm", "selectors": [".glossary-term[aria-expanded=\"true\"]"], "description": "Existing visual hook for disclosed term content." }, { "name": "disabledControl", "selectors": [".ceramics-glossary__alpha-btn:disabled"], "description": "Unavailable alphabet control." }],
-  "behavior": [{ "name": "glossaryContent", "selectors": [".ceramics-glossary__group", ".glossary-term"], "description": "Targets own terms, definitions, grouping, ordering, and related-term destinations; no glossary CMS schema is defined." }, { "name": "navigationOwnership", "selectors": [".ceramics-glossary__alpha-nav", ".ceramics-glossary__alpha-btn"], "attributes": ["aria-pressed", "disabled"], "description": "The contract preserves visual hooks but does not decide whether alphabet controls navigate, filter, scroll, or how results and URLs synchronize." }, { "name": "disclosureOwnership", "selectors": [".glossary-term__trigger", ".glossary-term__content"], "attributes": ["aria-expanded", "aria-controls"], "description": "Targets own disclosure behavior and must synchronize control state, panel visibility, and relationships." }],
-  "properties": [{ "name": "title", "type": "string", "required": false, "description": "Optional glossary heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-glossary__title" }] } }, { "name": "intro", "type": "string", "required": false, "description": "Optional glossary introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-glossary__intro" }] } }, { "name": "alphabetNavigation", "type": "slot", "required": false, "description": "Optional target-owned controls; no search or filtering behavior is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-glossary__alpha-nav", "classNames": [".ceramics-glossary__alpha-nav"] }] } }, { "name": "terms", "type": "slot", "required": true, "description": "Target-owned grouped terms and definitions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-glossary__group", "classNames": [".ceramics-glossary__group"] }] } }],
-  "tokens": { "public": { "color": ["--color-border-focus", "--color-border-subtle", "--color-surface-secondary", "--color-surface-statement", "--color-text-accent", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-body-sm-size", "--typo-h2-size", "--typo-h3-size"], "radius": ["--radius-sm"], "spacing": ["--layout-gutter", "--space-layout-touch-target"], "transition": ["--transition-fast"], "easing": ["--easing-default"] } },
-  "accessibility": ["Use semantic headings or description-list structures for terms and definitions.", "If terms collapse, each control must expose aria-expanded and reference its panel.", "If alphabet controls filter or navigate, expose their purpose and current state consistently.", "Filtering must not remove the only accessible path to glossary content without announcing the change.", "Provide useful alternative text for informative term images."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "CSS visual hooks are implemented; navigation, filtering, and disclosure behavior remain target-owned." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "ceramics-glossary",
+  "name": "Ceramics Glossary",
+  "registryId": "R12",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Grouped ceramics terms whose definitions compose canonical Accordion disclosures and whose related destinations compose canonical Link, without implying unresolved alphabet navigation, filtering, or search behavior.",
+  "dependencies": ["accordion", "link"],
+  "source": {
+    "registry": "registry.json#/components/ceramics-glossary",
+    "css": { "file": "components/css/ceramics.css", "selector": ".ceramics-glossary" },
+    "docs": "site/src/content/components/ceramics-glossary.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".ceramics-glossary", "className": ".ceramics-glossary", "required": true, "description": "Contained glossary presentation; it is labelled by the optional title when one is supplied." },
+    { "name": "title", "selector": ".ceramics-glossary__title", "className": ".ceramics-glossary__title", "required": false, "description": "Optional contextual glossary heading." },
+    { "name": "intro", "selector": ".ceramics-glossary__intro", "className": ".ceramics-glossary__intro", "required": false, "description": "Optional glossary introduction." },
+    { "name": "group", "selector": ".ceramics-glossary__group", "className": ".ceramics-glossary__group", "required": true, "description": "Repeatable letter group emitted in source order." },
+    { "name": "letter", "selector": ".ceramics-glossary__letter", "className": ".ceramics-glossary__letter", "required": true, "description": "Contextual heading naming one term group." },
+    { "name": "terms", "selector": ".ceramics-glossary__terms", "className": ".ceramics-glossary__terms", "required": true, "description": "Canonical Accordion root containing the terms for one group." },
+    { "name": "term", "selector": ".glossary-term", "className": ".glossary-term", "required": true, "description": "One canonical Accordion item containing a dfn term and definition content." },
+    { "name": "termImage", "selector": ".glossary-term__image", "className": ".glossary-term__image", "required": false, "description": "Optional informative media within a definition." },
+    { "name": "related", "selector": ".glossary-term__related", "className": ".glossary-term__related", "required": false, "description": "Optional related-term sentence." },
+    { "name": "relatedLink", "selector": ".glossary-term__related-link", "className": ".glossary-term__related-link", "required": false, "description": "Canonical Link to a real target-owned related destination." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Grouped disclosure glossary without alphabet controls." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Fluid contained glossary with no viewport-specific size API." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".ceramics-glossary"], "description": "Default glossary with the target-selected initial expansion state." },
+    { "name": "collapsedTerm", "selectors": [".accordion__trigger[aria-expanded=\"false\"]", ".accordion__panel[hidden]"], "description": "Collapsed canonical Accordion term with its definition removed from rendering and focus order." },
+    { "name": "expandedTerm", "selectors": [".accordion__trigger[aria-expanded=\"true\"]", ".accordion__panel:not([hidden])"], "description": "Expanded canonical Accordion term exposing its definition." },
+    { "name": "disabledTerm", "selectors": [".accordion__trigger:disabled"], "description": "Unavailable target-owned term disclosure." }
+  ],
+  "behavior": [
+    { "name": "glossaryContent", "selectors": [".ceramics-glossary__group", ".glossary-term"], "description": "Targets own records, normalized grouping keys, ordering, stable ids, definitions, media, and related destinations; the contract does not define a CMS schema." },
+    { "name": "canonicalAccordionComposition", "selectors": [".ceramics-glossary__terms", ".accordion", ".accordion__item", ".accordion__trigger", ".accordion__panel"], "attributes": ["aria-expanded", "aria-controls", "hidden"], "description": "Every term consumes canonical Accordion anatomy and behavior rather than recreating disclosure markup, state, focus, or motion." },
+    { "name": "termSemantics", "selectors": [".glossary-term"], "attributes": ["<dfn>"], "description": "The visible term uses dfn inside the contextual Accordion heading; the associated panel owns the definition content." },
+    { "name": "groupPolicy", "selectors": [".ceramics-glossary__terms"], "description": "A target may allow single or multiple expanded terms and may choose the initial expansion state; this component does not add a second controlled or uncontrolled API over Accordion." },
+    { "name": "titleOmission", "selectors": [".ceramics-glossary", ".ceramics-glossary__title"], "attributes": ["aria-labelledby"], "description": "When title is omitted, the root also omits the dangling aria-labelledby relationship while grouped headings preserve content structure." },
+    { "name": "relatedLinks", "selectors": [".glossary-term__related-link", ".link"], "attributes": ["href"], "description": "Related terms compose canonical Link with real target-owned destinations; placeholder or prevented links are not part of the contract." },
+    { "name": "contentResilience", "selectors": [".ceramics-glossary", ".ceramics-glossary__letter", ".accordion__trigger", ".accordion__content"], "description": "Long, empty, localized, and bidirectional content wraps in source order without clipping or viewport-specific behavior." },
+    { "name": "alphabetControlsExcluded", "description": "Alphabet navigation, filtering, search, URL state, and result announcements remain outside the v1 API until their product behavior is explicitly decided." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional contextual glossary heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-glossary__title" }] } },
+    { "name": "intro", "type": "string", "required": false, "description": "Optional glossary introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-glossary__intro" }] } },
+    { "name": "terms", "type": "slot", "required": true, "description": "Target-supplied letter groups and canonical Accordion term items with required terms and definitions plus optional media and related Links.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-glossary", "classNames": [".ceramics-glossary__group", ".ceramics-glossary__letter", ".ceramics-glossary__terms", ".glossary-term"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-statement", "--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--layout-gutter", "--space-layout-element-gap", "--space-layout-section-gap"],
+      "typography": ["--font-family-heading", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-size", "--typo-h2-size", "--typo-h3-size"],
+      "radius": ["--radius-sm"]
+    }
+  },
+  "accessibility": [
+    "Use contextual native headings for the glossary title, letter groups, and canonical Accordion triggers.",
+    "Keep each trigger id, aria-expanded, aria-controls, panel id, optional region label, and native hidden state synchronized through Accordion.",
+    "Preserve native Button click, Enter, Space, and normal Tab order; do not add arrow-key behavior to independent disclosure triggers.",
+    "Use labelled regions only while the number of simultaneously visible panels remains small enough to avoid landmark proliferation.",
+    "Use dfn for the term, informative alternative text for meaningful media, and canonical Links with real destinations for related terms.",
+    "Keep long and localized terms readable at 200 percent zoom, in narrow containers, and in right-to-left direction.",
+    "Do not introduce alphabet controls until their navigation, filtering, search, URL, focus, and announcement behavior is defined."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css-composition", "notes": "Ceramics CSS owns grouping and content presentation while canonical Accordion owns disclosure behavior and canonical Link owns related destinations." },
+    "shopify": { "status": "planned", "kind": "liquid-accordion-or-details", "notes": "Liquid maps records and groups to canonical Accordion markup or a semantics-preserving details/summary equivalent; the target owns ids and group policy." },
+    "react": { "status": "planned", "kind": "composition" },
+    "figma": { "status": "planned", "kind": "component-composition" },
+    "swiftui": { "status": "planned", "kind": "native-composition" },
+    "compose": { "status": "planned", "kind": "native-composition" }
+  }
 }

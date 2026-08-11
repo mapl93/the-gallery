@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "rich-text-section",
   "name": "Rich Text Section",
   "registryId": "S15",
   "category": "sections",
   "status": "pilot",
-  "summary": "Contained semantic rich-content section with an optional heading and target-owned document body.",
+  "summary": "Passive bounded narrative section with an optional visible title, required target-owned semantic body, intrinsic containment, and zero neutral runtime.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/rich-text-section",
@@ -22,21 +22,21 @@
       "selector": ".rich-text-section",
       "className": ".rich-text-section",
       "required": true,
-      "description": "Contained rich-text section root."
+      "description": "Native thematic section when a visible title can name it; otherwise a generic div."
     },
     {
       "name": "title",
       "selector": ".rich-text-section__title",
       "className": ".rich-text-section__title",
       "required": false,
-      "description": "Optional visible section heading."
+      "description": "Optional non-empty visible contextual heading whose target-unique id names the section root."
     },
     {
       "name": "body",
       "selector": ".rich-text-section__body",
       "className": ".rich-text-section__body",
       "required": true,
-      "description": "Target-owned semantic rich content."
+      "description": "Required non-empty target-owned semantic narrative body."
     }
   ],
   "variants": [
@@ -44,7 +44,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "One bounded narrative presentation; measure, rhythm, element styling and responsive behavior remain private composition."
     }
   ],
   "sizes": [
@@ -52,7 +52,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "One semantic title/body scale whose native heading rank remains target-owned."
     }
   ],
   "states": [
@@ -61,23 +61,43 @@
       "selectors": [
         ".rich-text-section"
       ],
-      "description": "Resting rich-content presentation."
+      "description": "Passive resting narrative content."
     },
     {
       "name": "linkFocusVisible",
       "selectors": [
         ".rich-text-section__body a:focus-visible"
       ],
-      "description": "Visible keyboard focus on target-supplied rich-content links."
+      "description": "Visible keyboard focus on target-owned native links."
     }
   ],
   "behavior": [
+    {
+      "name": "conditionalRoot",
+      "selectors": [
+        ".rich-text-section",
+        ".rich-text-section__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty visible title creates and names a native thematic section through a target-unique id; without a title targets use a generic div rather than an unnamed section or article."
+    },
+    {
+      "name": "requiredBody",
+      "selectors": [
+        ".rich-text-section",
+        ".rich-text-section__body"
+      ],
+      "description": "Missing or empty required semantic body content omits the complete component instead of rendering an empty shell."
+    },
     {
       "name": "semanticContent",
       "selectors": [
         ".rich-text-section__body"
       ],
-      "description": "Targets preserve meaningful heading order, list, quotation, link, image, and document semantics rather than flattening supplied rich content into decorative containers."
+      "description": "Targets preserve meaningful paragraphs, contextual headings, ordered and unordered lists, emphasis, quotations and citations, figures and captions, images, and links rather than flattening supplied content into decorative containers."
     },
     {
       "name": "linkNavigation",
@@ -87,7 +107,23 @@
       "attributes": [
         "href"
       ],
-      "description": "Links use native anchors with target-owned destinations and descriptive accessible names."
+      "description": "Links remain descriptive native anchors with target-owned destinations, history, external-link policy, and activation."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".rich-text-section",
+        ".rich-text-section__title",
+        ".rich-text-section__body"
+      ],
+      "description": "Short, long, empty, localized, RTL, unbroken, zoomed, and media-rich target content remains in authored order and within the component container without viewport-only markup."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".rich-text-section"
+      ],
+      "description": "Rich Text Section owns no controlled or uncontrolled state, event, listener, observer, request, timer, parser, sanitizer, layout read, custom element, asset, authored motion, or neutral runtime."
     }
   ],
   "properties": [
@@ -95,18 +131,33 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible section heading.",
+      "unsetBehavior": "Omit the title and render a generic root without aria-labelledby.",
+      "description": "Optional non-empty visible contextual heading; targets choose its native heading rank and unique id.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".rich-text-section__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".rich-text-section__title"
+          }
+        ]
       }
     },
     {
       "name": "body",
       "type": "slot",
       "required": true,
-      "description": "Target-owned semantic rich document content.",
+      "unsetBehavior": "Omit the complete component when no non-empty semantic body is supplied.",
+      "description": "Required non-empty target-owned semantic narrative content; targets own source trust, sanitization, parsing, markup and publishing.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".rich-text-section__body", "classNames": [".rich-text-section__body"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".rich-text-section__body",
+            "classNames": [
+              ".rich-text-section__body"
+            ]
+          }
+        ]
       }
     }
   ],
@@ -119,35 +170,40 @@
         "--color-text-primary",
         "--color-text-secondary"
       ],
-      "typography": [
-        "--font-family-heading",
-        "--typo-body-size",
-        "--typo-h2-size"
-      ],
-      "radius": [
-        "--radius-md"
-      ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-section-gap"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--font-family-heading",
+        "--tg-typography-article-body-weight",
+        "--tg-typography-h2-weight",
+        "--typo-article-line-height",
+        "--typo-article-size",
+        "--typo-h2-line-height",
+        "--typo-h2-size"
       ]
     }
   },
   "accessibility": [
-    "Preserve semantic headings, paragraphs, lists, quotations, links, and image alternatives in target-supplied rich content.",
-    "Use a contextual heading hierarchy and do not select heading levels from visual size alone.",
-    "Links are descriptive native anchors with visible keyboard focus, and long content remains contained at narrow widths.",
-    "Do not rely on blockquote styling alone when a citation or source is available."
+    "Render a native section only when a non-empty visible contextual title can name it; otherwise use a generic div and never default to an autonomous article semantic.",
+    "Preserve logical target-owned heading order and native semantics for paragraphs, lists, emphasis, quotations, citations, figures, captions, links, and image alternatives.",
+    "Omit the complete component when the required semantic body is absent and omit the optional title without leaving empty nodes or naming attributes.",
+    "Keep native link purpose, destination, activation, persistent underline and visible keyboard focus; do not make passive content focusable.",
+    "Keep text and media contained through narrow widths, localization, RTL, zoom, 200 percent text, forced colors, and user styles without component JavaScript or authored motion."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "notes": "Implemented in components/css/sections.css with conditional native root semantics supplied by targets."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Maps localized optional heading and required Shopify richtext settings to canonical classes with strict empty omission and zero component runtime."
     },
     "react": {
       "status": "planned",

@@ -1,0 +1,247 @@
+{% liquid
+  assign section_title = section.settings.title | strip
+  assign section_description = section.settings.description | strip
+  assign contact_email = section.settings.contact_email | strip
+  assign contact_phone = section.settings.contact_phone | strip
+  assign contact_note = section.settings.contact_note | strip
+  assign form_label = section.settings.form_label | strip
+  assign title_id = 'ContactSection-' | append: section.id | append: '-Title'
+  assign form_id = 'ContactSection-' | append: section.id | append: '-Form'
+  assign name_id = 'ContactSection-' | append: section.id | append: '-Name'
+  assign email_id = 'ContactSection-' | append: section.id | append: '-Email'
+  assign phone_id = 'ContactSection-' | append: section.id | append: '-Phone'
+  assign message_id = 'ContactSection-' | append: section.id | append: '-Message'
+  assign email_error_id = email_id | append: '-Error'
+  assign message_error_id = message_id | append: '-Error'
+  assign has_details = false
+  assign has_info = false
+
+  if form_label == blank
+    assign form_label = 'sections.contact_section.form_label' | t
+  endif
+
+  if contact_email != blank or contact_phone != blank or contact_note != blank
+    assign has_details = true
+  endif
+
+  if section_title != blank or section_description != blank or has_details
+    assign has_info = true
+  endif
+%}
+
+{% if form_label != blank %}
+  {% if section_title != blank %}
+    <section class="contact-section" aria-labelledby="{{ title_id }}">
+  {% else %}
+    <div class="contact-section">
+  {% endif %}
+    <div class="contact-section__grid">
+      {% if has_info %}
+        <div class="contact-section__info">
+          {% if section_title != blank or section_description != blank %}
+            <header class="contact-section__header">
+              {% if section_title != blank %}
+                <h2 class="contact-section__title" id="{{ title_id }}">{{ section_title | escape }}</h2>
+              {% endif %}
+              {% if section_description != blank %}
+                <p class="contact-section__text">{{ section_description | escape }}</p>
+              {% endif %}
+            </header>
+          {% endif %}
+
+          {% if has_details %}
+            <address class="contact-section__details">
+              <ul>
+                {% if contact_email != blank %}
+                  <li class="contact-section__detail">
+                    <a href="mailto:{{ contact_email | escape }}">{{ contact_email | escape }}</a>
+                  </li>
+                {% endif %}
+                {% if contact_phone != blank %}
+                  <li class="contact-section__detail">
+                    <a href="tel:{{ contact_phone | replace: ' ', '' | escape }}">{{ contact_phone | escape }}</a>
+                  </li>
+                {% endif %}
+                {% if contact_note != blank %}
+                  <li class="contact-section__detail"><span>{{ contact_note | escape }}</span></li>
+                {% endif %}
+              </ul>
+            </address>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% form 'contact', id: form_id, class: 'contact-section__form', aria-label: form_label %}
+        {% if form.posted_successfully? %}
+          <p class="contact-section__status" role="status" tabindex="-1" autofocus>
+            {{- 'sections.contact_section.success' | t -}}
+          </p>
+        {% elsif form.errors %}
+          <div class="contact-section__status" role="alert" tabindex="-1" autofocus>
+            <p>{{ 'sections.contact_section.error_heading' | t }}</p>
+            <ul>
+              {% for error in form.errors %}
+                {% liquid
+                  assign error_target = blank
+                  case error
+                    when 'author'
+                      assign error_target = name_id
+                    when 'email'
+                      assign error_target = email_id
+                    when 'body'
+                      assign error_target = message_id
+                  endcase
+                %}
+                <li>
+                  {% if error_target != blank %}<a href="#{{ error_target }}">{% endif %}
+                    {% if error == 'form' %}
+                      {{ form.errors.messages[error] }}
+                    {% else %}
+                      {{ form.errors.translated_fields[error] }} — {{ form.errors.messages[error] }}
+                    {% endif %}
+                  {% if error_target != blank %}</a>{% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_name %}
+          <div class="input{% if form.errors contains 'author' %} input--error{% endif %}">
+            <label class="input__label" for="{{ name_id }}">{{ 'sections.contact_section.name_label' | t }}</label>
+            <div class="input__control">
+              <input
+                class="input__field"
+                id="{{ name_id }}"
+                name="contact[name]"
+                type="text"
+                autocomplete="name"
+                value="{% if form.name %}{{ form.name | escape }}{% elsif customer %}{{ customer.name | escape }}{% endif %}"
+              >
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="input{% if form.errors contains 'email' %} input--error{% endif %}">
+          <label class="input__label" for="{{ email_id }}">{{ 'sections.contact_section.email_label' | t }}</label>
+          <div class="input__control">
+            <input
+              class="input__field"
+              id="{{ email_id }}"
+              name="contact[email]"
+              type="email"
+              autocomplete="email"
+              autocapitalize="off"
+              spellcheck="false"
+              value="{% if form.email %}{{ form.email | escape }}{% elsif customer %}{{ customer.email | escape }}{% endif %}"
+              required
+              {% if form.errors contains 'email' %}aria-invalid="true" aria-describedby="{{ email_error_id }}"{% endif %}
+            >
+          </div>
+          {% if form.errors contains 'email' %}
+            <p class="input__message" id="{{ email_error_id }}">
+              {{- form.errors.translated_fields.email }} — {{ form.errors.messages.email -}}
+            </p>
+          {% endif %}
+        </div>
+
+        {% if section.settings.show_phone %}
+          <div class="input">
+            <label class="input__label" for="{{ phone_id }}">{{ 'sections.contact_section.phone_label' | t }}</label>
+            <div class="input__control">
+              <input
+                class="input__field"
+                id="{{ phone_id }}"
+                name="contact[phone]"
+                type="tel"
+                autocomplete="tel"
+                value="{% if form.phone %}{{ form.phone | escape }}{% elsif customer %}{{ customer.phone | escape }}{% endif %}"
+              >
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="input textarea{% if form.errors contains 'body' %} input--error{% endif %}">
+          <label class="input__label" for="{{ message_id }}">{{ 'sections.contact_section.message_label' | t }}</label>
+          <div class="input__control">
+            <textarea
+              class="input__field textarea__field"
+              id="{{ message_id }}"
+              name="contact[body]"
+              required
+              data-min-lines="4"
+              {% if form.errors contains 'body' %}aria-invalid="true" aria-describedby="{{ message_error_id }}"{% endif %}
+            >{{ form.body }}</textarea>
+          </div>
+          {% if form.errors contains 'body' %}
+            <p class="input__message" id="{{ message_error_id }}">
+              {{- form.errors.translated_fields.body }} — {{ form.errors.messages.body -}}
+            </p>
+          {% endif %}
+        </div>
+
+        <button class="btn" type="submit">{{ 'sections.contact_section.send' | t }}</button>
+      {% endform %}
+    </div>
+  {% if section_title != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.contact_section.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.contact_section.settings.title"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:sections.contact_section.settings.description"
+    },
+    {
+      "type": "text",
+      "id": "form_label",
+      "label": "t:sections.contact_section.settings.form_label",
+      "info": "t:sections.contact_section.settings.form_label_info"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "t:sections.contact_section.settings.contact_email"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "t:sections.contact_section.settings.contact_phone"
+    },
+    {
+      "type": "text",
+      "id": "contact_note",
+      "label": "t:sections.contact_section.settings.contact_note"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_name",
+      "label": "t:sections.contact_section.settings.show_name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_phone",
+      "label": "t:sections.contact_section.settings.show_phone",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.contact_section.name"
+    }
+  ]
+}
+{% endschema %}

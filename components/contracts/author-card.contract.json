@@ -1,64 +1,118 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "author-card",
   "name": "Author Card",
   "registryId": "L6",
   "category": "blog",
   "status": "pilot",
-  "summary": "Author bio card with avatar and social links. Full and compact variants.",
-  "dependencies": ["avatar"],
+  "summary": "Passive fail-closed identity composition for one target-supplied author, with optional canonical Avatar, role, full-only biography and author Links, intrinsic full/compact layout, and zero neutral runtime.",
+  "dependencies": ["avatar", "link"],
   "source": {
     "registry": "registry.json#/components/author-card",
     "css": { "file": "components/css/blog.css", "selector": ".author-card" },
     "docs": "site/src/content/components/author-card.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".author-card", "className": ".author-card", "required": true, "description": "Author identity and biography container." },
-    { "name": "avatar", "selector": ".author-card__avatar", "className": ".author-card__avatar", "required": false, "description": "Optional Avatar composition." },
-    { "name": "info", "selector": ".author-card__info", "className": ".author-card__info", "required": true, "description": "Author text content wrapper." },
-    { "name": "name", "selector": ".author-card__name", "className": ".author-card__name", "required": true, "description": "Author display name." },
-    { "name": "role", "selector": ".author-card__role", "className": ".author-card__role", "required": false, "description": "Optional author role or affiliation." },
-    { "name": "bio", "selector": ".author-card__bio", "className": ".author-card__bio", "required": false, "description": "Optional author biography, hidden in compact presentation." },
-    { "name": "links", "selector": ".author-card__links", "className": ".author-card__links", "required": false, "description": "Optional target-owned author links, hidden in compact presentation." }
+    { "name": "root", "selector": ".author-card", "className": ".author-card", "required": true, "description": "Neutral non-landmark container for exactly one author identity; omitted when name is empty." },
+    { "name": "avatar", "selector": ".author-card__avatar", "className": ".author-card__avatar", "required": false, "description": "Optional canonical Avatar composition with target-authored image or initials semantics." },
+    { "name": "info", "selector": ".author-card__info", "className": ".author-card__info", "required": true, "description": "Intrinsic author text column." },
+    { "name": "name", "selector": ".author-card__name", "className": ".author-card__name", "required": true, "description": "Required non-empty visible localized author name rendered as neutral text by the shared implementation." },
+    { "name": "role", "selector": ".author-card__role", "className": ".author-card__role", "required": false, "description": "Optional visible role or affiliation." },
+    { "name": "bio", "selector": ".author-card__bio", "className": ".author-card__bio", "required": false, "description": "Optional plain-text biography rendered only in full presentation." },
+    { "name": "links", "selector": ".author-card__links", "className": ".author-card__links", "required": false, "description": "Optional wrapping group rendered only in full presentation." },
+    { "name": "link", "selector": ".author-card__link", "className": ".author-card__link", "required": false, "description": "Target-owned author destination composed from canonical Link." }
   ],
   "variants": [
-    { "name": "full", "className": null, "default": true, "description": "Full author card with optional biography and links." },
-    { "name": "compact", "className": ".author-card--compact", "default": false, "description": "Inline author identity with biography and links visually hidden." }
+    { "name": "full", "className": null, "default": true, "description": "Framed identity composition that renders every supplied optional part." },
+    { "name": "compact", "className": ".author-card--compact", "default": false, "description": "Unframed concise Avatar, name and role row; biography and Links are omitted from its DOM." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive size controlled by content and the Avatar dependency." }
+    { "name": "default", "className": null, "default": true, "description": "One fluid intrinsic size; Avatar selects its own canonical semantic size independently." }
   ],
   "states": [
-    { "name": "default", "selectors": [".author-card"], "description": "Default author card state." },
-    { "name": "linkFocus", "selectors": [".author-card__links a:focus-visible", ".author-card__links button:focus-visible"], "description": "Visible keyboard focus for composed author links." }
+    { "name": "default", "selectors": [".author-card"], "description": "Passive identity content with no selection, disabled, loading, interactive, controlled or uncontrolled state." }
   ],
   "behavior": [
-    { "name": "targetAuthorData", "selectors": [".author-card__name", ".author-card__role", ".author-card__bio", ".author-card__links"], "description": "Author identity, biography, destinations, and provider choices are supplied by the target." }
+    { "name": "requiredIdentity", "selectors": [".author-card", ".author-card__name"], "description": "A non-empty visible name is required; missing or blank name omits the complete root rather than emitting an unidentified card." },
+    { "name": "hostSemantics", "selectors": [".author-card", ".author-card__name"], "description": "Neutral Web uses a div root and neutral name text. The consuming article owns contextual footer, aside, contact-only address, heading rank, author Link, structured data and placement semantics." },
+    { "name": "canonicalComposition", "selectors": [".author-card__avatar", ".author-card__link"], "attributes": ["href", "rel"], "events": ["click"], "description": "Visual identity composes canonical Avatar and destinations compose canonical native Links. Targets own image/initials alternatives, destinations, labels, target/rel security, author relationship and navigation." },
+    { "name": "compactOmission", "selectors": [".author-card--compact", ".author-card__bio", ".author-card__links"], "description": "Compact rendering omits biography and Links from the DOM instead of serializing permanently unavailable hidden content; defensive CSS still hides incompatible copied markup." },
+    { "name": "singleAuthor", "selectors": [".author-card"], "description": "One root represents one author. Targets repeat L6 in an appropriate semantic collection for multiple authors instead of passing a provider-specific collection API." },
+    { "name": "intrinsicResponse", "selectors": [".author-card", ".author-card__info", ".author-card__links"], "description": "Full presentation wraps from available inline size, strings and Links remain complete, and logical geometry avoids viewport coupling and document-level overflow." },
+    { "name": "targetDataPrivacy", "selectors": [".author-card__name", ".author-card__role", ".author-card__bio", ".author-card__links"], "description": "Author source, localization, sanitization, email/homepage/social exposure, privacy, consent, analytics, SEO and provider policy remain target-owned." },
+    { "name": "passiveRuntime", "selectors": [".author-card"], "description": "L6 owns no data fetch, listener, observer, timer, request, storage, live region, focus manager, fallback derivation, animation, asset or neutral JavaScript." }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Full or compact author presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".author-card", "source": "variants" }] } },
-    { "name": "avatar", "type": "slot", "required": false, "description": "Optional Avatar composition for the author.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".author-card__avatar", "classNames": [".author-card__avatar"] }] } },
-    { "name": "name", "type": "string", "required": true, "description": "Visible author display name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__name" }] } },
-    { "name": "role", "type": "string", "required": false, "description": "Optional author role or affiliation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__role" }] } },
-    { "name": "bio", "type": "string", "required": false, "description": "Optional author biography for the full presentation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__bio" }] } },
-    { "name": "links", "type": "slot", "required": false, "description": "Target-owned author profile or social links.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".author-card__links", "classNames": [".author-card__links"] }] } }
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Full or compact presentation and content-density profile; full is classless.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".author-card", "source": "variants" }] }
+    },
+    {
+      "name": "avatar",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit the Avatar without generating an empty wrapper, image, initials or fallback.",
+      "description": "Optional canonical Avatar composition. The target explicitly supplies image or initials content, contextual alternative, semantic size, loading and fallback policy.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".author-card__avatar", "classNames": [".author-card__avatar", ".avatar"] }] }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when the trimmed visible author name is empty.",
+      "description": "Required complete visible localized author name; neutral Web does not infer a heading rank or destination.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__name" }] }
+    },
+    {
+      "name": "role",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the role node and collapse its rhythm.",
+      "description": "Optional complete visible localized role or affiliation; this is content, not an ARIA role.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__role" }] }
+    },
+    {
+      "name": "bio",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the biography node; compact omits it even when a source value exists.",
+      "description": "Optional complete plain-text biography for full presentation. Rich authoring remains target-owned.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".author-card__bio" }] }
+    },
+    {
+      "name": "links",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit the destination group; compact omits it even when a source slot exists.",
+      "description": "Optional target-owned canonical author Links with complete labels, href values, native relationship/security attributes and privacy policy.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".author-card__links", "classNames": [".author-card__links", ".author-card__link", ".link", ".link--nav"] }] }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
-      "typography": ["--font-family-heading", "--typo-body-line-height", "--typo-body-size"],
-      "radius": ["--radius-lg"]
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size"],
+      "radius": ["--radius-lg"],
+      "spacing": ["--space-layout-touch-target", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"]
     }
   },
   "accessibility": [
-    "Use an appropriate heading or text element for the author name according to the surrounding article hierarchy.",
-    "Avatar alternative text should not repeat an adjacent visible author name unless the image adds useful information.",
-    "Give icon-only author links accessible names and preserve visible keyboard focus."
+    "Require a non-empty visible author name and omit the complete root when it is absent; do not create an anonymous landmark or image-only identity.",
+    "Keep the neutral root out of the landmark and heading outline; the consuming article chooses a truthful footer, aside, contact-only address, heading rank or linked name when its context requires one.",
+    "Compose canonical Avatar and avoid repeating the adjacent visible name in image alternatives; targets provide contextual alt or a named image role only when the portrait adds unique identity information.",
+    "Use canonical native anchors with href for author destinations and Button only for actions; preserve clear localized purpose, target/rel security and visible focus.",
+    "Use rel=author only when the destination truthfully describes or contacts the nearest article author; email/homepage publication and social/provider choices require target privacy policy.",
+    "Omit biography and Links from compact DOM, keep complete text and logical RTL flow, and preserve 320 CSS-pixel reflow, 200-percent text, user text spacing, dark and forced-color operation.",
+    "Do not introduce whole-card activation, nested interactive surfaces, person/card roles, menus, status/live announcements, roving focus, loading state or automated fallback behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article author data and target-configured profile links." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Canonical Blog CSS and shared renderer implement fail-closed neutral semantics, canonical Avatar/Link composition, semantic full/compact omission, intrinsic wrapping and zero neutral runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "A passive snippet maps explicit user or article.user data, requires a name, omits unavailable parts and keeps homepage/email off until explicitly enabled with localized labels. First consumer, contextual placement, privacy approval, role/social extensions and multiple authors remain target-owned." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

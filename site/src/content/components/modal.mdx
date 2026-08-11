@@ -1,9 +1,9 @@
 ## Overview
 
-A dialog overlay with header, body, and footer sections. The modal traps focus and provides a backdrop for critical interactions like confirmations, forms, or detail views.
+A named dialog composition for focused decisions and short tasks. Canonical CSS owns its bounded surface and scroll partition; each target owns true modality, focus, inertness, dismissal, and lifecycle.
 
 <Preview
-  html='<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger aria-expanded="true">Open modal</button><div class="modal-overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-preview-title"><div class="modal__header"><h2 class="modal__title" id="modal-preview-title">Confirm order</h2><button class="close-btn" type="button" data-preview-close aria-label="Close modal"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="modal__body"><p>Are you sure you want to place this order for <strong>$240.00</strong>?</p></div><div class="modal__footer"><button class="btn btn--outline" type="button" data-preview-close>Cancel</button><button class="btn" type="button" data-preview-close>Confirm</button></div></div></div></div>'
+  html='<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger aria-expanded="true">Open modal</button><div class="modal-overlay tg-preview-overlay-layer" aria-hidden="false"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-preview-title" aria-describedby="modal-preview-description"><div class="modal__header"><h2 class="modal__title" id="modal-preview-title">Confirm order</h2><button class="close-btn modal__close" type="button" data-preview-close aria-label="Close modal"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="modal__body"><p id="modal-preview-description">Are you sure you want to place this order for <strong>$240.00</strong>?</p></div><div class="modal__footer"><button class="btn btn--outline" type="button" data-preview-close>Cancel</button><button class="btn" type="button" data-preview-close>Confirm</button></div></div></div></div>'
   label="Modal"
   layout="overlay"
   interaction={{ selector: '.modal-overlay', toggle: 'attr:aria-hidden=false', triggerLabel: 'Open Modal', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', dismissSelector: '.modal-overlay', startVisible: true }}
@@ -20,6 +20,7 @@ The component is composed of an overlay, a dialog container, and structural sect
 | Overlay            | `.modal-overlay`  | Darkened backdrop, click to dismiss |
 | Container          | `.modal`          | The dialog box itself          |
 | Header             | `.modal__header`  | Title row                      |
+| Close              | `.modal__close`   | Required canonical Close Button |
 | Body               | `.modal__body`    | Main content area              |
 | Footer             | `.modal__footer`  | Action buttons (confirm/cancel)|
 
@@ -38,12 +39,13 @@ The component is composed of an overlay, a dialog container, and structural sect
 ## Accessibility
 
 <Callout type="warning">
-  Modals **must** trap keyboard focus while open. The user should not be able to tab to elements behind the overlay.
+  Modal CSS alone is not modality. A target must make outside content inert, contain focus, close on Escape, and restore focus before it can assert `aria-modal="true"`.
 </Callout>
 
 - Set `aria-hidden="false"` on the overlay when open, `"true"` when closed.
 - Use `role="dialog"` and `aria-modal="true"` on the `.modal` element.
 - Add `aria-labelledby` pointing to the modal title's `id`.
+- Add `aria-describedby` only for a short, simple description; omit it for rich or lengthy content.
 - Return focus to the trigger element when the modal closes.
 - Close on `Escape` key press.
 
@@ -52,6 +54,7 @@ The component is composed of an overlay, a dialog container, and structural sect
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal__header">
       <h2 class="modal__title" id="modal-title">Title</h2>
+      <button class="close-btn modal__close" type="button" aria-label="Close modal">…</button>
     </div>
     <div class="modal__body">…</div>
     <div class="modal__footer">
@@ -65,11 +68,18 @@ The component is composed of an overlay, a dialog container, and structural sect
 ## References
 
 <PropTable>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible localized title used by `aria-labelledby`</td></tr>
+  <tr><td>`content`</td><td>slot</td><td>required</td><td>Primary content in the independently scrollable body</td></tr>
+  <tr><td>`dismissAction`</td><td>slot</td><td>required</td><td>Native action composed with Close Button</td></tr>
+  <tr><td>`dismissLabel`</td><td>string</td><td>required</td><td>Contextual accessible name for dismissal</td></tr>
+  <tr><td>`descriptionId`</td><td>string</td><td>optional</td><td>Short-description association; omit for rich content</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Footer actions composed with Button</td></tr>
   <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Maps inverse visibility to overlay `aria-hidden`</td></tr>
   <tr><td>`.modal-overlay`</td><td>class</td><td>—</td><td>Full-screen backdrop with overlay opacity</td></tr>
   <tr><td>`.modal`</td><td>class</td><td>—</td><td>Dialog container with shadow and radius</td></tr>
   <tr><td>`.modal__header`</td><td>class</td><td>—</td><td>Header section with title</td></tr>
   <tr><td>`.modal__title`</td><td>class</td><td>—</td><td>Title text styling</td></tr>
+  <tr><td>`.modal__close`</td><td>class</td><td>—</td><td>Modal layout hook on canonical Close Button</td></tr>
   <tr><td>`.modal__body`</td><td>class</td><td>—</td><td>Main content area</td></tr>
   <tr><td>`.modal__footer`</td><td>class</td><td>—</td><td>Footer with action buttons</td></tr>
   <tr><td>`aria-hidden`</td><td>attribute</td><td>`true`</td><td>Controls overlay visibility</td></tr>

@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.4.0",
   "slug": "tags-input",
   "name": "Tags Input",
   "registryId": "H8",
   "category": "forms",
   "status": "pilot",
-  "summary": "Multi-value text input contract with removable tag chips, focus-within state, free-text entry, keyboard removal, and tag dependency.",
-  "dependencies": ["tag"],
+  "summary": "Labelled free-form multi-value field that composes Field Wrapper and canonical Tags, keeps draft text native, and delegates the controlled collection to the consuming target.",
+  "dependencies": ["field-wrapper", "tag"],
   "source": {
     "registry": "registry.json#/components/tags-input",
     "css": {
@@ -22,28 +22,70 @@
       "selector": ".tags-input",
       "className": ".tags-input",
       "required": true,
-      "description": "Input-like wrapper for selected tags and free-text entry."
+      "description": "Field Wrapper composition root for the visible label, multi-value control, guidance, feedback, and status."
+    },
+    {
+      "name": "label",
+      "selector": ".field__label",
+      "className": ".field__label",
+      "required": true,
+      "description": "Canonical visible field label explicitly associated with the draft input."
+    },
+    {
+      "name": "control",
+      "selector": ".tags-input__control",
+      "className": ".tags-input__control",
+      "required": true,
+      "description": "Input-like visual surface that arranges committed values and the native draft field without adding a widget role."
+    },
+    {
+      "name": "values",
+      "selector": ".tags-input__values",
+      "className": ".tags-input__values",
+      "required": false,
+      "description": "Native list of committed values in reading order; omitted or empty when the collection has no values."
+    },
+    {
+      "name": "item",
+      "selector": ".tags-input__item",
+      "className": ".tags-input__item",
+      "required": false,
+      "description": "One list item containing a canonical Tag."
     },
     {
       "name": "tag",
-      "selector": ".tags-input__tag",
-      "className": ".tags-input__tag",
+      "selector": ".tags-input__item > .tag",
+      "className": ".tag",
       "required": false,
-      "description": "Selected value chip."
-    },
-    {
-      "name": "remove",
-      "selector": ".tags-input__remove",
-      "className": ".tags-input__remove",
-      "required": false,
-      "description": "Remove button inside a selected tag."
+      "description": "Canonical Tag dependency representing one committed value and its optional named remove request."
     },
     {
       "name": "field",
       "selector": ".tags-input__field",
       "className": ".tags-input__field",
       "required": true,
-      "description": "Text input used to add tags."
+      "description": "Native single-line text input that exclusively owns draft text editing and focus."
+    },
+    {
+      "name": "description",
+      "selector": ".field__description",
+      "className": ".field__description",
+      "required": false,
+      "description": "Optional persistent Field Wrapper guidance associated with the draft input."
+    },
+    {
+      "name": "feedback",
+      "selector": ".field__feedback",
+      "className": ".field__feedback",
+      "required": false,
+      "description": "Optional current Error, Success, or Warning feedback associated with the draft input."
+    },
+    {
+      "name": "status",
+      "selector": ".tags-input__status",
+      "className": ".tags-input__status",
+      "required": true,
+      "description": "Pre-mounted visually hidden polite status region whose localized collection result text is target-owned."
     }
   ],
   "variants": [
@@ -51,78 +93,256 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default tags input."
+      "description": "Default neutral multi-value field."
     },
-    { "name": "error", "className": ".tags-input--error", "default": false, "description": "Invalid tag collection presentation." },
-    { "name": "success", "className": ".tags-input--success", "default": false, "description": "Validated tag collection presentation." },
-    { "name": "warning", "className": ".tags-input--warning", "default": false, "description": "Tag collection that needs attention." }
+    {
+      "name": "error",
+      "className": ".tags-input--error",
+      "default": false,
+      "description": "Invalid collection with Error label, feedback, surface, hover, and focus treatment."
+    },
+    {
+      "name": "success",
+      "className": ".tags-input--success",
+      "default": false,
+      "description": "Validated collection with Success label, feedback, surface, hover, and focus treatment."
+    },
+    {
+      "name": "warning",
+      "className": ".tags-input--warning",
+      "default": false,
+      "description": "Collection needing attention with Warning label, feedback, surface, hover, and focus treatment."
+    }
   ],
   "sizes": [
     {
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default tag and input size."
+      "description": "One responsive field density using canonical Tag sizing."
     }
   ],
   "states": [
     {
       "name": "default",
       "selectors": [".tags-input"],
-      "description": "Default tags input state."
+      "description": "Editable field with its current controlled values and native draft."
     },
     {
-      "name": "focusWithin",
-      "selectors": [".tags-input:focus-within"],
-      "description": "Focused state when the input or a child control has focus."
+      "name": "empty",
+      "selectors": [".tags-input__values:empty"],
+      "description": "No committed values; the native draft field remains the only content inside the control."
     },
     {
-      "name": "removeHover",
-      "selectors": [".tags-input__remove:hover"],
-      "description": "Pointer hover state on a remove control."
+      "name": "hover",
+      "selectors": [".tags-input__control:hover"],
+      "description": "Fine-pointer hover on an editable control, preserving its active validation family."
+    },
+    {
+      "name": "focusVisible",
+      "selectors": [".tags-input__control:has(.tags-input__field:focus-visible)"],
+      "description": "Visible outer focus treatment while the native draft field has keyboard focus."
+    },
+    {
+      "name": "removeFocusVisible",
+      "selectors": [".tags-input__item"],
+      "description": "Canonical Tag focus state on one named remove action without a second field ring."
+    },
+    {
+      "name": "readOnly",
+      "selectors": [".tags-input:has(.tags-input__field:read-only:not(:disabled))"],
+      "description": "Focusable readable draft and committed values with no add or remove request."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".tags-input:has(.tags-input__field:disabled)"],
+      "description": "Native disabled draft and disabled canonical Tag remove actions."
+    },
+    {
+      "name": "errorFocusVisible",
+      "selectors": [".tags-input--error", ".tags-input__control:has(.tags-input__field:focus-visible)"],
+      "description": "Focused Error collection retaining its Error focus family."
+    },
+    {
+      "name": "successFocusVisible",
+      "selectors": [".tags-input--success", ".tags-input__control:has(.tags-input__field:focus-visible)"],
+      "description": "Focused Success collection retaining its Success focus family."
+    },
+    {
+      "name": "warningFocusVisible",
+      "selectors": [".tags-input--warning", ".tags-input__control:has(.tags-input__field:focus-visible)"],
+      "description": "Focused Warning collection retaining its Warning focus family."
     }
   ],
   "behavior": [
     {
-      "name": "addTag",
-      "events": ["Enter", "Comma", "Blur", "paste"],
-      "description": "Targets define which committed text creates a tag and should validate duplicates or disallowed values."
+      "name": "labelAssociation",
+      "selectors": [".field__label", ".tags-input__field"],
+      "attributes": ["for on .field__label matches id on .tags-input__field"],
+      "description": "The required visible label is the native draft field's accessible name and activates that field."
     },
     {
-      "name": "removeTag",
-      "selectors": [".tags-input__remove"],
-      "events": ["remove action", "Backspace", "Delete"],
-      "description": "Users can remove tags with explicit remove controls and keyboard behavior."
+      "name": "controlledCollection",
+      "selectors": [".tags-input__values", ".tags-input__item", ".tag"],
+      "events": ["values change"],
+      "description": "Committed values are target-controlled records with stable identity. Neutral markup and shared CSS never create a second collection store."
     },
     {
-      "name": "fieldSemantics",
-      "attributes": ["aria-describedby", "aria-invalid", "aria-autocomplete", "aria-controls"],
-      "description": "The text field should expose validation and optional suggestion-list relationships when present."
+      "name": "nativeDraftOwnership",
+      "selectors": [".tags-input__field"],
+      "attributes": ["value IDL property represents the live draft", "readonly", "disabled"],
+      "events": ["input", "change", "form reset", "compositionstart", "compositionend"],
+      "description": "Static HTML may leave draft text natively uncontrolled; framework adapters may control the live value without changing committed collection ownership."
     },
     {
-      "name": "dependency",
-      "description": "The selected value chip style is local to Tags Input today, but the component depends on the Tag primitive for broader chip semantics."
+      "name": "addRequest",
+      "selectors": [".tags-input__field"],
+      "events": ["Enter after compositionend", "addRequest(value)"],
+      "description": "Enter requests one trimmed non-empty draft value. The target accepts or rejects it, updates values, clears draft only on success, and returns focus to the field."
+    },
+    {
+      "name": "removeRequest",
+      "selectors": [".tags-input__item"],
+      "attributes": ["type=\"button\"", "non-empty aria-label"],
+      "events": ["click", "Space", "Enter", "removeRequest(id)"],
+      "description": "A canonical Tag requests removal of one identified value. The target reconciles the collection and returns focus to the draft field."
+    },
+    {
+      "name": "collectionValidation",
+      "selectors": [".tags-input__field", ".field__feedback"],
+      "attributes": ["aria-required", "aria-invalid", "aria-describedby"],
+      "events": ["duplicate", "disallowed value", "capacity", "asynchronous validation"],
+      "description": "The target validates committed values and domain policy. Required is collection-level and must not apply native required to an empty draft when committed values already satisfy the rule."
+    },
+    {
+      "name": "resultAnnouncement",
+      "selectors": [".tags-input__status"],
+      "attributes": ["role=\"status\"", "aria-atomic=\"true\""],
+      "events": ["accepted", "removed", "rejected"],
+      "description": "The pre-mounted target-owned status receives concise localized results without announcing ordinary draft keystrokes or duplicating validation alerts."
+    },
+    {
+      "name": "freeTextBoundary",
+      "selectors": [".tags-input__field"],
+      "events": ["native blur", "native comma", "native semicolon", "native paste", "native Backspace", "native Delete"],
+      "description": "Without a separate accepted adapter policy, blur, punctuation, paste, Backspace, and Delete retain ordinary text-editing behavior and do not implicitly add or remove committed values."
+    },
+    {
+      "name": "noPopupSemantics",
+      "selectors": [".tags-input__field"],
+      "description": "The free-form v1 field has no popup and therefore does not expose combobox, aria-autocomplete, aria-expanded, aria-controls, active-option, or listbox semantics."
+    },
+    {
+      "name": "formSerializationBoundary",
+      "selectors": [".tags-input"],
+      "events": ["formdata", "submit", "reset"],
+      "description": "The target adapter serializes controlled values through repeated native inputs, FormData, URL state, or its platform data API; the draft field must not masquerade as the committed collection."
     }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the current tag collection.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".tags-input", "source": "variants" }] } },
-    { "name": "placeholder", "type": "string", "required": false, "description": "Hint shown in the free-text field.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes free-text entry unavailable; targets should also disable remove actions.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "invalid", "type": "boolean", "required": false, "defaultValue": false, "description": "Exposes native invalid state when Error is active.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "aria-invalid", "values": { "true": "true", "false": null }, "elements": ["input"] }] } },
-    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for tag guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible label explicitly associated with the native draft field.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".field__label" }] }
+    },
+    {
+      "name": "selectedValues",
+      "type": "slot",
+      "required": false,
+      "description": "Controlled committed-value collection rendered as native list items containing canonical Tags.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".tags-input__values", "classNames": [".tags-input__values"] }] }
+    },
+    {
+      "name": "inputValue",
+      "type": "string",
+      "required": false,
+      "description": "Live draft text in the native entry field; it remains distinct from committed values.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] }
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "Supplementary hint shown only while the draft is empty.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] }
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Persistent guidance associated with the native draft field.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".field__description" }] }
+    },
+    {
+      "name": "feedback",
+      "type": "string",
+      "required": false,
+      "description": "Current validation or confirmation text; the selected variant determines its semantic presentation.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".field__feedback" }] }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation for the complete field composition.",
+      "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".tags-input", "source": "variants" }] }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Marks the committed collection as required; the target synchronizes collection validity without applying native required to the draft.",
+      "targetMappings": {
+        "web": [
+          { "kind": "class", "selector": ".field__label", "classNames": [".field__label--required"] },
+          { "kind": "attribute", "selector": ".tags-input__field", "attribute": "aria-required", "values": { "true": "true", "false": null }, "elements": ["input"] }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Disables native draft editing and every rendered Tag removal action.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Keeps the draft and committed values focusable/readable while suppressing add requests and Tag removal actions.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "readonly", "values": { "true": "", "false": null }, "elements": ["input"] }] }
+    },
+    {
+      "name": "invalid",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Exposes target-known Error validity on the native draft field; Success and Warning leave it unset.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tags-input__field", "attribute": "aria-invalid", "values": { "true": "true", "false": null }, "elements": ["input"] }] }
+    }
   ],
   "tokens": {
     "public": {
       "color": [
         "--color-input-default-unfocused-bg",
+        "--color-input-default-unfocused-value",
+        "--color-input-default-unfocused-placeholder",
         "--color-input-default-unfocused-inner-border",
+        "--color-input-default-hover-bg",
+        "--color-input-default-hover-inner-border",
         "--color-input-default-focused-inner-border",
         "--color-input-default-focused-outer-border",
-        "--color-surface-secondary",
+        "--color-input-default-disabled-bg",
+        "--color-input-default-disabled-value",
+        "--color-input-default-disabled-inner-border",
         "--color-text-primary",
-        "--color-text-secondary",
-        "--color-border-subtle",
-        "--color-input-default-hover-inner-border",
         "--color-input-error-unfocused-inner-border",
         "--color-input-error-focused-inner-border",
         "--color-input-error-focused-outer-border",
@@ -133,41 +353,49 @@
         "--color-input-warning-focused-inner-border",
         "--color-input-warning-focused-outer-border"
       ],
-      "radius": [
-        "--radius-md",
-        "--radius-full"
+      "spacing": [
+        "--space-input-padding-x",
+        "--space-input-padding-y",
+        "--space-input-icon-gap",
+        "--space-input-margin-bottom"
       ],
-      "transition": [
-        "--transition-fast"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
+      "radius": ["--radius-md"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-input-value-size",
+        "--typo-input-value-line-height"
       ]
     }
   },
   "accessibility": [
-    "Provide a visible label or equivalent accessible name for the tag entry field.",
-    "Make each remove control keyboard accessible and clearly named with the tag value.",
-    "Announce validation errors and duplicate-tag prevention.",
-    "Keep the input focused after adding or removing tags unless the target has a documented reason not to.",
-    "Expose selected values in reading order before the text entry field."
+    "Provide a visible label explicitly associated with the native draft field; placeholder text is supplementary only.",
+    "Render committed values in reading order as canonical Tags and give every available remove button a non-empty contextual accessible name.",
+    "Do not assign Combobox, Listbox, option, aria-autocomplete, aria-expanded, aria-controls, or active-option semantics when no conforming popup exists.",
+    "Keep Enter inert during IME composition and preserve ordinary native behavior for blur, punctuation, paste, Backspace, Delete, and text editing keys.",
+    "Use aria-invalid only for Error, associate persistent guidance and current feedback through aria-describedby, and communicate collection-level required state without misusing native required on the draft.",
+    "Pre-mount one empty polite atomic status and let the target announce concise localized add, remove, duplicate, capacity, and rejection results without echoing every keystroke.",
+    "After a successful add or remove reconciliation, return focus to the native draft field unless a documented target flow supplies a more logical surviving destination.",
+    "Preserve canonical Tag focus, disabled, forced-color, and 24 by 24 CSS-pixel removal-target behavior.",
+    "Read-only collections expose no removal actions; disabled collections disable the draft and every rendered removal action.",
+    "Keep long, localized, bidirectional, empty, and many-value content inside the available container without truncating accessible names."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; tag creation, duplicate handling, suggestions, and removal behavior must be provided by the consuming target."
+      "kind": "css-controlled-composition",
+      "notes": "Canonical Field Wrapper, Tag, native input, list, feedback, and status markup use components/css/forms.css and primitives.css; the consumer owns values and request handling, with zero neutral collection runtime."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "liquid-css-target-js",
+      "notes": "Requires one concrete Shopify data owner and target-native serialization/update policy; canonical copied CSS and Tag composition are available."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "controlled-component",
+      "notes": "Expose distinct values/inputValue and add/remove callbacks; optional default values remain adapter-local without changing contract semantics."
     },
     "figma": {
       "status": "planned",
@@ -175,11 +403,11 @@
     },
     "swiftui": {
       "status": "planned",
-      "kind": "style"
+      "kind": "controlled-view"
     },
     "compose": {
       "status": "planned",
-      "kind": "composable"
+      "kind": "controlled-composable"
     }
   }
 }

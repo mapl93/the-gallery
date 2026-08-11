@@ -1,17 +1,17 @@
 ## Overview
 
-Artist Index provides a title, optional introduction and filter region, and a required target-owned result composition.
+Artist Index provides a labelled directory section, optional introduction and filter region, and a required ordered target-owned result list.
 
 <Preview
-  html={'<section class="artist-index tg-preview-frame tg-preview-frame--lg"><header class="artist-index__header"><h2 class="artist-index__heading">Our Artists</h2><p class="artist-index__intro">Meet the makers behind each collection.</p></header><div class="artist-index__filters" aria-label="Artist filters"><button class="artist-index__filter-btn" type="button">All</button><button class="artist-index__filter-btn" type="button">Ceramics</button><button class="artist-index__filter-btn" type="button">Textiles</button></div><div class="artist-index__grid tg-preview-grid tg-preview-grid--3" role="list" aria-label="Artist results"><article class="tg-preview-stack" role="listitem"><div class="tg-preview-media tg-preview-media--portrait" role="img" aria-label="Portrait of Maria Garcia"></div><h3>Maria Garcia</h3><p>Ceramics, Buenos Aires</p></article><article class="tg-preview-stack" role="listitem"><div class="tg-preview-media tg-preview-media--portrait" role="img" aria-label="Portrait of Sofia Alvarez"></div><h3>Sofia Alvarez</h3><p>Textiles, Mendoza</p></article><article class="tg-preview-stack" role="listitem"><div class="tg-preview-media tg-preview-media--portrait" role="img" aria-label="Portrait of Tomas Silva"></div><h3>Tomas Silva</h3><p>Ceramics, Cordoba</p></article></div></section>'}
+  html={'<section class="artist-index tg-preview-frame tg-preview-frame--lg" aria-labelledby="artist-index-preview-title"><header class="artist-index__header"><h2 class="artist-index__heading" id="artist-index-preview-title">Our Artists</h2><p class="artist-index__intro">Meet the makers behind each collection.</p></header><ul class="artist-index__grid"><li class="artist-index__item"><article class="artist-card tg-preview-stack"><div class="artist-card__portrait tg-preview-media tg-preview-media--portrait" aria-hidden="true"></div><h3 class="artist-card__name">Maria Garcia</h3><p class="artist-card__medium">Ceramics</p><p class="artist-card__location">Buenos Aires</p></article></li><li class="artist-index__item"><article class="artist-card tg-preview-stack"><div class="artist-card__portrait tg-preview-media tg-preview-media--portrait" aria-hidden="true"></div><h3 class="artist-card__name">Sofia Alvarez</h3><p class="artist-card__medium">Textiles</p><p class="artist-card__location">Mendoza</p></article></li><li class="artist-index__item"><article class="artist-card tg-preview-stack"><div class="artist-card__portrait tg-preview-media tg-preview-media--portrait" aria-hidden="true"></div><h3 class="artist-card__name">Tomas Silva</h3><p class="artist-card__medium">Ceramics</p><p class="artist-card__location">Cordoba</p></article></li></ul></section>'}
   label="Artist Index Grid"
 />
 
 ## Presentation
 
-`title` and `results` are required. `introduction` and the target-owned `filters` slot are optional. The result grid creates responsive columns but does not prescribe a result-card dependency.
+`title` and `results` are required. `introduction` and the target-owned `filters` slot are optional. Results use native list semantics and create one, two, or three columns from the component width, but do not prescribe a result-card dependency.
 
-The preview shows unselected buttons only. ADR 0080 leaves single-select versus multi-select, selected-state semantics, filter-to-result synchronization, empty results, and announcements target-owned. `[aria-pressed="true"]` and `.is-active` remain visual hooks rather than a universal toggle-button decision.
+The shared default fixture omits filters rather than presenting an incomplete interaction. ADR 0080 leaves single-select versus multi-select, selected-state semantics, filter-to-result and URL synchronization, empty/loading/error results, and announcements target-owned. `[aria-pressed="true"]` and `.is-active` remain visual hooks rather than a universal toggle-button decision.
 
 ## Usage Guidelines
 
@@ -22,6 +22,7 @@ The preview shows unselected buttons only. ADR 0080 leaves single-select versus 
 
 - Keep result records in stable source order unless the target clearly communicates sorting.
 - Provide an empty-result treatment and update announcements when the target implements filtering.
+- Do not apply pressed, checked, or selected state only to obtain the visual treatment; it must match real target behavior.
 - Compose result content without assuming Artist Card ownership.
 
 ## Accessibility
@@ -29,13 +30,14 @@ The preview shows unselected buttons only. ADR 0080 leaves single-select versus 
 - Use a page-appropriate heading level for the Artist Index title.
 - Give filter controls visible text, keyboard access, and focus indication when a target activates them.
 - Choose and correctly implement one target-owned selection pattern before applying selected semantics.
+- Keep the passive result layout as a native list; do not add grid/listbox roles or arrow-key behavior.
 - Preserve logical result order and announce target-driven result changes and empty results where appropriate.
 
 ## References
 
 **Dependencies:** None. Artist Card is not a dependency of the current result slot.
 
-**Anatomy:** required `.artist-index` root, `.artist-index__header`, `.artist-index__heading`, and `.artist-index__grid`; optional `.artist-index__intro`, `.artist-index__filters`, and `.artist-index__filter-btn`.
+**Anatomy:** required `.artist-index` root, `.artist-index__header`, `.artist-index__heading`, native `.artist-index__grid` list, and repeated `.artist-index__item`; optional `.artist-index__intro`, `.artist-index__filters`, and `.artist-index__filter-btn`.
 
 **API Reference**
 
@@ -43,5 +45,5 @@ The preview shows unselected buttons only. ADR 0080 leaves single-select versus 
   <tr><td>`title`</td><td>string</td><td>required</td><td>Artist Index heading</td></tr>
   <tr><td>`introduction`</td><td>string</td><td>optional</td><td>Introductory copy below the heading</td></tr>
   <tr><td>`filters`</td><td>slot</td><td>optional</td><td>Target-owned filter controls and selection semantics</td></tr>
-  <tr><td>`results`</td><td>slot</td><td>required</td><td>Target-owned artist result composition</td></tr>
+  <tr><td>`results`</td><td>slot</td><td>required</td><td>Ordered target-owned artist result composition</td></tr>
 </PropTable>

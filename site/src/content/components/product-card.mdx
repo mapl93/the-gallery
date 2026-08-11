@@ -3,7 +3,7 @@
 The product card is the primary way to display items in collection grids and related product sections. It combines an image with hover effects, vendor info, title, and pricing.
 
 <Preview
-  html='<article class="product-card tg-preview-frame--sm"><a class="product-card__media" href="#"><div class="product-card__image tg-preview-media tg-preview-media--portrait" role="img" aria-label="Ceramic Vase"></div></a><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Artisan Ceramic Vase</a></h3><div class="product-card__footer"><span class="price"><span class="price__current">$120.00</span></span></div></div></article>'
+  html='<article class="card product-card tg-preview-frame--sm" data-media-ratio="square"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" role="img" aria-label="Ceramic Vase"></div></div><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Artisan Ceramic Vase</a></h3><div class="product-card__footer"><span class="price"><span class="price__current"><bdi class="price__value">$120.00</bdi></span></span></div></div></article>'
   label="Product Card"
 />
 
@@ -11,8 +11,9 @@ The product card is the primary way to display items in collection grids and rel
 
 | Element                     | Class                    | Purpose                       |
 |-----------------------------|--------------------------|-------------------------------|
-| Card                        | `.product-card`          | Container with hover shadow   |
-| Media                       | `.product-card__media`   | Image wrapper (link)          |
+| Card                        | `.card.product-card`     | Canonical Card surface plus product layout |
+| Media ratio                 | `data-media-ratio="square\|portrait"` | Bounded shared media proportion; square by default |
+| Media                       | `.product-card__media`   | Passive image wrapper         |
 | Image                       | `.product-card__image`   | Product photo with hover zoom |
 | Primary Image               | `.product-card__image--primary` | Primary image when hover media exists |
 | Hover Image                 | `.product-card__image--hover` | Optional alternate image revealed on hover |
@@ -27,12 +28,16 @@ The product card is the primary way to display items in collection grids and rel
 ### Usage in Grids
 
 Product cards are designed to work inside CSS Grid layouts. The card is fully fluid — it fills its grid cell width.
+Every card in one grid, slider, recommendation surface, or saved-product list
+should receive the same `mediaRatio` value so rows remain aligned. `square`
+maps to 1:1 and `portrait` maps to the established 3:4 portrait proportion;
+arbitrary numeric ratios are intentionally not part of the public API.
 
 ```html
 <div class="collection-grid">
-  <article class="product-card">…</article>
-  <article class="product-card">…</article>
-  <article class="product-card">…</article>
+  <article class="card product-card">…</article>
+  <article class="card product-card">…</article>
+  <article class="card product-card">…</article>
 </div>
 ```
 
@@ -43,8 +48,8 @@ Product cards are designed to work inside CSS Grid layouts. The card is fully fl
 ### With Badge and Compare Price
 
 <Preview
-  html='<article class="product-card tg-preview-frame--sm"><a class="product-card__media" href="#"><div class="product-card__image tg-preview-media tg-preview-media--portrait" role="img" aria-label="Limited Print"></div><span class="product-card__badges"><span class="badge badge--warning">Sale</span></span></a><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Limited Edition Print</a></h3><div class="product-card__footer"><span class="price"><span class="price__compare">$180.00</span> <span class="price__current">$144.00</span></span></div></div></article>'
-  label="With Badge + Sale Price"
+  html='<article class="card product-card tg-preview-frame--sm" data-media-ratio="portrait"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" role="img" aria-label="Limited Print"></div><span class="product-card__badges"><span class="badge badge--warning">Sale</span></span></div><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Limited Edition Print</a></h3><div class="product-card__footer"><span class="price price--on-sale"><s class="price__compare"><span class="price__label">Regular price: </span><bdi class="price__value">$180.00</bdi></s><span class="price__current"><span class="price__label">Sale price: </span><bdi class="price__value">$144.00</bdi></span></span></div></div></article>'
+  label="Portrait + Badge + Sale Price"
 />
 
 ## Usage Guidelines
@@ -61,15 +66,18 @@ Product cards are designed to work inside CSS Grid layouts. The card is fully fl
 
 ## Accessibility
 
-- The card image must have a descriptive `alt` attribute.
-- The product title link is the primary interactive element — it should be descriptive enough for screen readers.
-- Avoid wrapping the entire card in a single `<a>` — it makes the accessible name too long. Keep links on the image and title separately.
+- Use one descriptive product-title link as the navigation target and keep media passive; do not add a redundant image link.
+- Give the primary image descriptive alternative text when it adds information. Alternate hover imagery for the same product uses empty alternative text.
+- Keep quick add and any other interactive descendants above the stretched title-link hit area and preserve their native focus behavior.
+- Keep quick add visible when hover is unavailable and include the product name in its accessible name when cards repeat.
+- Preserve the card-sized title focus indicator and reduced-motion behavior from canonical CSS.
 
 ## References
 
 ### Dependencies
 
 This component uses:
+- [Card](/components/card) — for the canonical surface, border, radius, shadow, clipping, and lift
 - [Badge](/components/badge) — for sale/new/limited tags
 - [Button](/components/button) — for optional quick-add actions
 - [Price](/components/price) — for current and compare-at pricing
@@ -77,11 +85,12 @@ This component uses:
 ### API Reference
 
 <PropTable>
-  <tr><td>`.product-card`</td><td>class</td><td>—</td><td>Card container with hover shadow transition</td></tr>
+  <tr><td>`.card.product-card`</td><td>classes</td><td>required</td><td>Canonical Card surface composed with Product Card layout and behavior</td></tr>
   <tr><td>`.product-card__media`</td><td>class</td><td>—</td><td>Image wrapper, handles overflow and hover zoom</td></tr>
   <tr><td>`.product-card__image`</td><td>class</td><td>—</td><td>Product image with object-fit cover</td></tr>
   <tr><td>`.product-card__image--primary`</td><td>modifier</td><td>—</td><td>Primary image layer when a hover image is present</td></tr>
   <tr><td>`.product-card__image--hover`</td><td>modifier</td><td>—</td><td>Hover image layer</td></tr>
+  <tr><td>`mediaRatio`</td><td>`square \| portrait`</td><td>`square`</td><td>Semantic media proportion shared by cards in the same composed surface</td></tr>
   <tr><td>`.product-card__badges`</td><td>class</td><td>—</td><td>Badge stack for sale, new, or availability labels</td></tr>
   <tr><td>`.product-card__quick-add`</td><td>class</td><td>—</td><td>Optional quick-add action area</td></tr>
   <tr><td>`.product-card__body`</td><td>class</td><td>—</td><td>Text content container</td></tr>

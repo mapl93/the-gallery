@@ -1,12 +1,12 @@
 ## Overview
 
-Native data table with responsive horizontal overflow and optional striped, hover, or sortable presentation.
+Native data table with an optional caption, keyboard-accessible horizontal overflow, and independently composable striped, hover, or sortable presentation.
 
-<Preview html={'<div class="table-wrapper"><table class="table"><thead><tr><th scope="col">Object</th><th scope="col">Material</th><th scope="col">Available</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>Stoneware</td><td>12</td></tr><tr><td>Raku Bowl</td><td>Earthenware</td><td>7</td></tr><tr><td>Porcelain Cup</td><td>Porcelain</td><td>24</td></tr></tbody></table></div>'} label="Table" />
+<Preview html={'<div class="table-wrapper" tabindex="0" aria-label="Available gallery objects table scroll area"><table class="table"><caption class="visually-hidden">Available gallery objects</caption><thead><tr><th scope="col">Object</th><th scope="col">Material</th><th scope="col">Available</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>Stoneware</td><td>12</td></tr><tr><td>Raku Bowl</td><td>Earthenware</td><td>7</td></tr><tr><td>Porcelain Cup</td><td>Porcelain</td><td>24</td></tr></tbody></table></div>'} label="Table" />
 
 ## Presentation
 
-The base table can independently compose striped rows, row hover, and sortable-header anatomy. These controls are intentionally not exclusive: a sortable table may also be striped and preserve hover feedback. The responsive wrapper is optional anatomy and does not change table semantics.
+The base table can independently compose striped rows, row hover, and sortable-header anatomy. These controls are intentionally not exclusive: a sortable table may also be striped and preserve hover feedback. The optional native caption names the dataset. The responsive wrapper does not change table semantics; it preserves readable column widths and owns keyboard scrolling and focus when present.
 
 <Preview html={'<div class="table-wrapper"><table class="table table--striped"><thead><tr><th scope="col">Object</th><th scope="col">Material</th></tr></thead><tbody><tr><td>Celadon Vase</td><td>Stoneware</td></tr><tr><td>Raku Bowl</td><td>Earthenware</td></tr><tr><td>Porcelain Cup</td><td>Porcelain</td></tr></tbody></table></div>'} label="Striped table" />
 
@@ -23,7 +23,7 @@ Rows, columns, values, and the sample inventory in Exhibit and Studio are fixtur
   <Dont>Don't use table markup only to align unrelated page content.</Dont>
 </DoDont>
 
-Keep column labels concise and preserve the same data meaning down each column. Use the overflow wrapper when the table may be wider than its container instead of compressing cell content until it becomes unreadable.
+Keep column labels concise and preserve the same data meaning down each column. Use the overflow wrapper when the table may be wider than its container instead of compressing cell content until it becomes unreadable. The wrapper uses inline overflow rather than changing the table into cards; target-specific adaptive tables remain a separate composition.
 
 ## Accessibility
 
@@ -33,8 +33,10 @@ Keep column labels concise and preserve the same data meaning down each column. 
 
 - Use `<thead>`, `<tbody>`, `<th>`, and `<td>` according to the data structure.
 - Add `scope="col"` or `scope="row"` for simple headers and explicit header associations for complex tables.
-- Place `aria-sort` on the currently sortable header cell and synchronize it with the visible row order.
+- Provide a native caption or equivalent contextual label. A caption may be visually hidden when the same visible heading already identifies the dataset.
+- Keep one `aria-sort` value on the owning sortable header and synchronize `none`, `ascending`, or `descending` with visible row order.
 - Keep sort triggers as native buttons; do not rely on pointer hover or icon direction alone.
+- Give an overflow wrapper a contextual accessible name, `tabindex="0"`, and a visible focus indicator so keyboard users can reach and scroll it.
 
 ## References
 
@@ -42,6 +44,7 @@ Keep column labels concise and preserve the same data meaning down each column. 
   <tr><td>`striped`</td><td>boolean</td><td>`false`</td><td>Adds alternating row surfaces</td></tr>
   <tr><td>`rowHover`</td><td>boolean</td><td>`false`</td><td>Adds pointer hover feedback to rows</td></tr>
   <tr><td>`sortable`</td><td>boolean</td><td>`false`</td><td>Composes sortable-header anatomy; target owns ordering</td></tr>
+  <tr><td>`caption`</td><td>string</td><td>optional</td><td>Native dataset name or concise summary</td></tr>
   <tr><td>`.table-wrapper`</td><td>optional anatomy</td><td>none</td><td>Horizontal overflow container</td></tr>
   <tr><td>`.table`</td><td>required anatomy</td><td>native `table`</td><td>Base table styles and semantics</td></tr>
   <tr><td>`.table__sort-btn`</td><td>optional anatomy</td><td>none</td><td>Native sortable-header trigger</td></tr>

@@ -1,51 +1,66 @@
 ## Overview
 
-Address Form is an authenticated form wrapper that composes target-owned Input and Select fields with optional actions. Its field region supports responsive two-column rows without redefining the child controls.
+Address Form is a localized address profile of canonical Form. It composes target-owned canonical Input and Select fields with optional canonical actions, preserves native serialization, constraint validation, and explicit submit, and keeps its compact rows responsive to the component container.
 
 <Preview
-  html={'<form class="address-form tg-preview-frame tg-preview-frame--md"><div class="address-form__fields"><div class="address-form__row"><div class="input"><label class="input__label" for="address-given-name">First name</label><div class="input__control"><input class="input__field" id="address-given-name" name="given-name" type="text" autocomplete="given-name" /></div></div><div class="input"><label class="input__label" for="address-family-name">Last name</label><div class="input__control"><input class="input__field" id="address-family-name" name="family-name" type="text" autocomplete="family-name" /></div></div></div><div class="input"><label class="input__label" for="address-line-one">Address</label><div class="input__control"><input class="input__field" id="address-line-one" name="address-line1" type="text" autocomplete="address-line1" /></div></div><div class="address-form__row"><div class="input"><label class="input__label" for="address-city">City</label><div class="input__control"><input class="input__field" id="address-city" name="address-level2" type="text" autocomplete="address-level2" /></div></div><div class="select"><label class="select__label" for="address-country">Country</label><select class="select__field" id="address-country" name="country" autocomplete="country"><option value="" hidden selected>Choose a country</option><option value="AR">Argentina</option><option value="MX">Mexico</option><option value="ES">Spain</option></select></div></div></div><div class="address-form__actions"><button class="btn btn--outline" type="button">Cancel</button><button class="btn" type="submit">Save address</button></div></form>'}
+  html={'<form class="form address-form tg-preview-frame tg-preview-frame--md"><div class="form__section address-form__fields"><div class="form__row form__row--2col address-form__row"><div class="input"><label class="input__label" for="address-given-name">First name</label><div class="input__control"><input class="input__field" id="address-given-name" name="givenName" type="text" value="Alex" autocomplete="given-name" required /></div></div><div class="input"><label class="input__label" for="address-family-name">Last name</label><div class="input__control"><input class="input__field" id="address-family-name" name="familyName" type="text" value="Morgan" autocomplete="family-name" required /></div></div></div><div class="input"><label class="input__label" for="address-line-one">Address</label><div class="input__control"><input class="input__field" id="address-line-one" name="addressLine1" type="text" value="18 Gallery Lane" autocomplete="address-line1" required /></div></div><div class="form__row form__row--2col address-form__row"><div class="input"><label class="input__label" for="address-city">City</label><div class="input__control"><input class="input__field" id="address-city" name="city" type="text" value="Buenos Aires" autocomplete="address-level2" required /></div></div><div class="select"><label class="select__label" for="address-country">Country</label><div class="select__control"><select class="select__field" id="address-country" name="country" autocomplete="country-name" required><option value="">Choose a country</option><option value="Argentina" selected>Argentina</option><option value="Mexico">Mexico</option><option value="Spain">Spain</option></select></div></div></div></div><div class="form__actions address-form__actions"><button class="btn btn--outline" type="button">Cancel</button><button class="btn" type="submit">Save address</button></div></form>'}
   label="Address Form"
 />
 
 ## Presentation
 
-`fields` is the required slot for Input and Select dependencies. Field labels, names, values, validation, autocomplete, locale-specific ordering, and requiredness remain owned by those controls and by the target address model.
+`fields` is the required canonical Form section for a complete target-defined set of canonical Input and Select controls. Every successful control needs a visible label, unique ID, stable non-empty submission name, and the correct autocomplete purpose. Field inventory, values, requiredness, validation, and locale-specific order remain owned by those controls and the target address model. When multiple custom or server errors need an overview, the target may compose canonical Form error-summary markup before the affected fields and link it to their canonical messages.
 
-`actions` is optional and can compose submit and cancellation behavior. The repeated fields in the artwork are a fixture. `.address-form__row` only supplies responsive layout and does not create a separate field API.
+`actions` is optional and uses the canonical Form action row. Submit remains explicit. Cancel is a target-owned navigation or close action with `type="button"` or native Link semantics; it never means reset. The repeated fields and intercepted action feedback in the artwork are docs fixtures, not a universal address schema or lifecycle. `.address-form__row` specializes canonical Form row layout for the compact U7 measure and does not create semantic grouping or a separate field API.
+
+Address Form has no controlled/uncontrolled value state. Composed fields keep their own value strategy; the target owns create/edit mode, authentication, localized schema, validation response, protected mutation, cancellation, routing, focus recovery, and feedback. U7 formally depends on canonical Form under owner decision U7-A and ADR 0264.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use native autocomplete values and arrange fields according to the address locale.</Do>
-  <Dont>Do not duplicate Input or Select validation properties on Address Form.</Dont>
+  <Do>Use stable submission names and correct native autocomplete purposes, then arrange fields for the destination locale.</Do>
+  <Dont>Do not flatten field state, validation, address schema, or mutation lifecycle into Address Form properties.</Dont>
 </DoDont>
 
 - Ask only for fields required by the target and destination locale.
-- Let Input and Select preserve their own default, error, success, and warning semantics.
+- Let Input and Select preserve their own names, values, autocomplete, requiredness, and default/error/success/warning semantics.
+- Submit only through explicit native form submission; do not submit on field change, blur, or country selection.
 - Keep action labels explicit about whether the address is created or updated.
-- Submit address mutations through the target account API and reconcile only after its response.
+- Map mutation user errors back to the affected canonical fields, add a useful linked Form error summary when needed, and reconcile target state only after its response.
+- Treat Cancel as navigation or close composition; do not use `type="reset"` or claim that draft values were discarded.
 
 ## Accessibility
 
-- Protect address editing behind the target authentication system.
+- Protect address editing behind the target authentication and authorization system.
+- Preserve the native form boundary, successful-control names, required constraint validation, and explicit submit.
 - Associate every field with a visible label and appropriate autocomplete value.
-- Connect field-level help and validation messages with `aria-describedby`.
-- Move focus to the first invalid field after a failed submission.
-- Preserve native form submission and clear keyboard order through responsive rows.
+- Connect field-level help and validation messages with `aria-describedby`; identify errors in text.
+- Move focus to the first invalid field or a useful error summary after failed custom/server validation.
+- Preserve DOM, reading, serialization, and keyboard order when responsive rows collapse.
+- Keep pending/success/failure and cancellation feedback outside U7, with deliberate target-owned focus after navigation, closure, or failed submission.
 
 ## References
 
 ### Dependencies
 
+- [Form](/components/form)
 - [Input](/components/input)
 - [Select](/components/select)
 - [Button](/components/button)
 
-The example fields are fixture composition inside `fields`; their names and count are not Address Form properties.
+The example fields are fixture composition inside `fields`; their names, values, count, requiredness, and order are not Address Form properties. Runtime Exhibit and Studio resolve the same registered `AddressFormArtwork`, canonical child controls, fixture state, DOM, and behavior; this markup remains a matching static fallback.
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`fields`</td><td>slot</td><td>required</td><td>Target-owned address inputs and selects</td></tr>
-  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Submit and optional cancellation actions</td></tr>
+  <tr><td>`fields`</td><td>slot</td><td>required</td><td>Complete localized canonical address controls with labels, names, values, autocomplete, validation, and optional linked Form error summary</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Explicit submit plus optional navigation/close cancellation; Cancel never resets implicitly</td></tr>
 </PropTable>
+
+### Standards and targets
+
+- [HTML forms and autofill](https://html.spec.whatwg.org/multipage/forms.html)
+- [WCAG Identify Input Purpose](https://www.w3.org/WAI/WCAG22/Understanding/identify-input-purpose.html)
+- [WAI form notifications](https://www.w3.org/WAI/tutorials/forms/notifications/)
+- [Open UI customizable Select](https://open-ui.org/components/customizableselect/)
+- [Shopify Customer API address creation](https://shopify.dev/docs/api/customer/latest/mutations/customerAddressCreate)

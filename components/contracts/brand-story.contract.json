@@ -1,13 +1,15 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "brand-story",
   "name": "Brand Story",
   "registryId": "S8",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive brand narrative section with target-owned media, rich story content, and optional signature.",
-  "dependencies": [],
+  "summary": "Passive brand-narrative profile composed from canonical Image with Text with an optional editorial signature.",
+  "dependencies": [
+    "image-text"
+  ],
   "source": {
     "registry": "registry.json#/components/brand-story",
     "css": {
@@ -18,60 +20,60 @@
   },
   "anatomy": [
     {
-      "name": "root",
+      "name": "rootProfile",
       "selector": ".brand-story",
       "className": ".brand-story",
       "required": true,
-      "description": "Brand story section root."
-    },
-    {
-      "name": "grid",
-      "selector": ".brand-story__grid",
-      "className": ".brand-story__grid",
-      "required": true,
-      "description": "Responsive media and narrative layout."
+      "description": "Brand Story context hook layered on the required canonical Image with Text section and named by its visible contextual heading."
     },
     {
       "name": "media",
-      "selector": ".brand-story__media",
-      "className": ".brand-story__media",
+      "selector": ".image-text__media",
+      "className": ".image-text__media",
       "required": true,
-      "description": "Target-owned brand media."
+      "description": "Required canonical Image with Text media region containing target-owned native media."
     },
     {
       "name": "content",
-      "selector": ".brand-story__content",
-      "className": ".brand-story__content",
+      "selector": ".image-text__content",
+      "className": ".image-text__content",
       "required": true,
-      "description": "Narrative content region."
+      "description": "Required canonical Image with Text narrative grouping."
     },
     {
       "name": "eyebrow",
-      "selector": ".brand-story__eyebrow",
-      "className": ".brand-story__eyebrow",
+      "selector": ".image-text__eyebrow",
+      "className": ".image-text__eyebrow",
       "required": false,
-      "description": "Optional short contextual label."
+      "description": "Optional canonical contextual label that never replaces the required title."
     },
     {
       "name": "title",
-      "selector": ".brand-story__title",
-      "className": ".brand-story__title",
+      "selector": ".image-text__title",
+      "className": ".image-text__title",
       "required": true,
-      "description": "Brand story heading."
+      "description": "Required non-empty visible contextual heading whose id names the section."
     },
     {
-      "name": "text",
-      "selector": ".brand-story__text",
-      "className": ".brand-story__text",
+      "name": "body",
+      "selector": ".image-text__body",
+      "className": ".image-text__body",
       "required": true,
-      "description": "Target-owned narrative rich content."
+      "description": "Required non-empty target-owned narrative rich content using canonical Image with Text anatomy."
     },
     {
       "name": "signature",
       "selector": ".brand-story__signature",
       "className": ".brand-story__signature",
       "required": false,
-      "description": "Optional target-owned signature or maker mark."
+      "description": "Optional target-owned section-footer attribution or editorial mark without authenticity semantics."
+    },
+    {
+      "name": "signatureImage",
+      "selector": ".brand-story__signature :where(img, svg)",
+      "className": null,
+      "required": false,
+      "description": "Optional signature image whose informative or decorative alternative remains target-owned."
     }
   ],
   "variants": [
@@ -79,7 +81,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "Fixed contextual profile of the canonical default Image with Text presentation."
     }
   ],
   "sizes": [
@@ -87,7 +89,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "One intrinsic size whose crop, split, measure, padding curve, threshold and signature cap remain private composition."
     }
   ],
   "states": [
@@ -96,23 +98,90 @@
       "selectors": [
         ".brand-story"
       ],
-      "description": "Resting brand story presentation."
+      "description": "Complete passive brand narrative with required media, visible title and rich body plus accepted optional content."
     }
   ],
   "behavior": [
     {
+      "name": "imageTextComposition",
+      "selectors": [
+        ".brand-story",
+        ".image-text",
+        ".image-text__media",
+        ".image-text__content",
+        ".image-text__eyebrow",
+        ".image-text__title",
+        ".image-text__body"
+      ],
+      "description": "Brand Story consumes canonical Image with Text anatomy, source order, intrinsic response, media containment, typography, color and spacing without recreating them."
+    },
+    {
+      "name": "namedSection",
+      "selectors": [
+        ".brand-story",
+        ".image-text__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "The required visible contextual heading names the native thematic section through a target-unique id."
+    },
+    {
+      "name": "requiredComposition",
+      "selectors": [
+        ".brand-story",
+        ".image-text__media",
+        ".image-text__title",
+        ".image-text__body"
+      ],
+      "description": "Targets omit the complete profile when media, trimmed visible title or non-empty narrative body is unavailable."
+    },
+    {
       "name": "mediaSemantics",
       "selectors": [
-        ".brand-story__media"
+        ".image-text__media"
       ],
-      "description": "Targets determine informative or decorative media semantics and supply appropriate alternative text."
+      "attributes": [
+        "alt",
+        "width",
+        "height"
+      ],
+      "description": "Targets own media source, intrinsic dimensions, responsive candidates, loading, focal point and informative or decorative alternative purpose."
     },
     {
       "name": "narrativeOrder",
       "selectors": [
-        ".brand-story__grid"
+        ".image-text__media",
+        ".image-text__content"
       ],
-      "description": "Adapters preserve a meaningful source order for media and narrative content when the layout stacks."
+      "description": "Media remains before narrative in DOM and reading order while the canonical component adapts to available inline size."
+    },
+    {
+      "name": "signatureSemantics",
+      "selectors": [
+        ".brand-story__signature",
+        ".brand-story__signature :where(img, svg)"
+      ],
+      "description": "A supplied signature is ordinary visible footer content or target-owned media. It does not assert verified authorship, authenticity or cryptographic proof, and visible text receives no redundant replacement label."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".brand-story",
+        ".image-text__content",
+        ".image-text__title",
+        ".image-text__body",
+        ".brand-story__signature"
+      ],
+      "description": "Short, long, empty, localized, RTL and unbroken content remains contained without viewport- or Studio-owned S8 layout rules."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".brand-story"
+      ],
+      "description": "Brand Story owns no controlled or uncontrolled state, listener, observer, request, timer, layout read, focus model, live region, animation, custom element, asset or neutral runtime."
     }
   ],
   "properties": [
@@ -120,98 +189,152 @@
       "name": "media",
       "type": "slot",
       "required": true,
-      "description": "Target-owned brand media.",
+      "unsetBehavior": "Omit the entire profile when target-owned native media is unavailable.",
+      "description": "Required target-owned native media consumed through canonical Image with Text anatomy.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".brand-story__media", "classNames": [".brand-story__media"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".image-text__media",
+            "classNames": [
+              ".image-text__media"
+            ]
+          }
+        ]
       }
     },
     {
       "name": "eyebrow",
       "type": "string",
       "required": false,
-      "description": "Optional short context above the heading.",
+      "unsetBehavior": "Omit the eyebrow without leaving empty rhythm.",
+      "description": "Optional short context above the required heading.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".brand-story__eyebrow" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".image-text__eyebrow"
+          }
+        ]
       }
     },
     {
       "name": "title",
       "type": "string",
       "required": true,
-      "description": "Visible brand story heading.",
+      "unsetBehavior": "Omit the entire profile when the trimmed visible heading is empty.",
+      "description": "Required non-empty visible contextual heading; targets choose the native heading rank.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".brand-story__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".image-text__title"
+          }
+        ]
       }
     },
     {
       "name": "body",
       "type": "slot",
       "required": true,
-      "description": "Target-owned narrative rich content.",
+      "unsetBehavior": "Omit the entire profile when narrative rich content is empty.",
+      "description": "Required non-empty target-owned narrative rich content; targets own sanitization and native markup.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".brand-story__text", "classNames": [".brand-story__text"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".image-text__body",
+            "classNames": [
+              ".image-text__body"
+            ]
+          }
+        ]
       }
     },
     {
       "name": "signature",
       "type": "slot",
       "required": false,
-      "description": "Optional signature or maker-mark content.",
+      "unsetBehavior": "Omit the footer completely when no attribution or editorial mark is supplied.",
+      "description": "Optional target-owned text or media footer without authenticity or verification semantics.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".brand-story__signature", "classNames": [".brand-story__signature"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".brand-story__signature",
+            "classNames": [
+              ".brand-story__signature"
+            ]
+          }
+        ]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
         "--color-text-primary",
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-default-weight",
+        "--tg-typography-body-large-weight",
+        "--tg-typography-h2-weight",
         "--typo-body-size",
-        "--typo-h2-size"
-      ],
-      "radius": [
-        "--radius-lg"
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height",
+        "--typo-h2-size",
+        "--typo-h2-line-height",
+        "--typo-h4-size",
+        "--typo-h4-line-height"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Use a contextual heading level and semantic paragraphs or rich-content elements for the narrative.",
-    "Give informative media useful alternative text and hide decorative imagery or signatures when adjacent text already conveys the same identity.",
-    "Preserve meaningful source order when the two-column layout stacks."
+    "Require native media, a non-empty visible contextual heading and non-empty narrative body; omit invalid compositions.",
+    "Associate the native thematic section with the visible title through one target-unique aria-labelledby and id pair.",
+    "Give informative media useful alternatives and intrinsic dimensions; use an empty alternative for decorative or redundant imagery.",
+    "Preserve media-before-narrative DOM order and semantic rich-content structure at every width and in RTL.",
+    "Render a supplied signature as ordinary visible footer text or purpose-labelled target media without redundant aria-label or authenticity claims.",
+    "Add no focus stop, widget role, key handling, selection, live region, authored motion or neutral runtime."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "component-profile",
+      "notes": "Implemented as a named passive profile of canonical Image with Text with strict required composition and an optional editorial footer."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Localized merchant section reuses the shared Image with Text Liquid composition and adds optional target-owned text or image signature content."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-profile"
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-profile"
     },
     "swiftui": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-component-profile"
     },
     "compose": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-component-profile"
     }
   }
 }

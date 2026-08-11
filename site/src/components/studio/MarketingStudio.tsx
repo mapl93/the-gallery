@@ -1,5 +1,4 @@
 import {
-  Fragment,
   useEffect,
   useId,
   useMemo,
@@ -25,6 +24,10 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { editorialMedia } from './editorialMedia';
+import CountdownArtwork from './CountdownArtwork';
+import CheckboxArtwork from './CheckboxArtwork';
+import ConsentManagerArtwork from './ConsentManagerArtwork';
+import HeroArtwork from './HeroArtwork';
 
 interface MarketingStudioProps {
   contract: ComponentContract;
@@ -35,12 +38,35 @@ const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
   hero: {
+    layout: 'full',
+    height: 'default',
+    mediaBehavior: 'slideshow',
     label: 'New collection',
     title: 'Objects shaped for daily rituals',
     description: 'A quiet study in hand-thrown stoneware, tactile glazes, and useful forms.',
     media: true,
     overlay: true,
     actions: true,
+    slides: true,
+    autoplay: true,
+    loop: true,
+    navigation: 'both',
+    autoplayInterval: 6000,
+    previousLabel: 'Previous slide',
+    nextLabel: 'Next slide',
+    pauseLabel: 'Pause slideshow',
+    playLabel: 'Play slideshow',
+    statusTemplate: 'Slide {current} of {total}',
+  },
+  'hero-section': {
+    layout: 'full', height: 'default', mediaBehavior: 'slideshow',
+    label: 'New collection', title: 'Objects shaped for daily rituals',
+    description: 'A quiet study in hand-thrown stoneware, tactile glazes, and useful forms.',
+    media: true, overlay: true, actions: true, slides: true, autoplay: true,
+    loop: true, navigation: 'both', autoplayInterval: 6000,
+    previousLabel: 'Previous slide', nextLabel: 'Next slide',
+    pauseLabel: 'Pause slideshow', playLabel: 'Play slideshow',
+    statusTemplate: 'Slide {current} of {total}',
   },
   newsletter: {
     title: 'Notes from the studio',
@@ -49,37 +75,50 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     note: 'One concise update each month. Unsubscribe at any time.',
   },
   testimonials: { title: 'Collector notes', items: true },
-  popup: {
-    variant: 'split',
-    media: true,
-    title: 'Private studio viewing',
-    text: 'Reserve a place for the next presentation of one-of-a-kind works.',
-    dismissAction: true,
-    dismissLabel: 'Close popup',
+  'trust-badges': {
+    variant: 'compact',
+    items: true,
+    accessibleLabel: 'Example purchase assurances',
   },
-  'trust-badges': { variant: 'compact', items: true },
-  'payment-icons': { icons: true, small: false },
-  countdown: { variant: 'cards', segments: true },
-  urgency: { variant: 'low-stock', message: 'Sample inventory: 3 pieces remain' },
+  'payment-icons': {
+    icons: true,
+    size: 'default',
+    accessibleLabel: 'Example accepted payment methods',
+  },
+  countdown: {
+    variant: 'cards',
+    deadline: new Date(Date.now() + 225525000).toISOString(),
+    units: 'days-hours-minutes-seconds',
+    fallbackText: 'Ends at the configured deadline',
+    expiredAnnouncement: 'Countdown complete',
+  },
+  urgency: { variant: 'low-stock', message: 'Example only: 3 pieces remain' },
   'cookie-consent': {
-    message: 'This site uses cookies according to its published policy.',
-    actions: true,
-    preferences: false,
-    visible: true,
+    title: 'Choose how this site uses data',
+    description: 'You can accept, reject, or review optional uses before making a choice.',
+    policyLabel: 'Read the privacy and cookie policy',
+    policyHref: '/policies/privacy-and-cookies',
+    acceptLabel: 'Accept optional uses',
+    rejectLabel: 'Reject optional uses',
+    customizeLabel: 'Customize choices',
+    preferencesTitle: 'Privacy preferences',
+    preferencesDescription: 'Review the example categories supplied by this preview target.',
+    preferences: true,
+    closePreferencesLabel: 'Close privacy preferences',
+    saveLabel: 'Save choices',
+    feedback: false,
+    open: true,
+    preferencesOpen: false,
+    busy: false,
   },
   'social-proof': {
-    message: 'Sample purchase: Celadon Study was purchased from the gallery.',
-    time: 'Recently',
+    message: 'Example only: a Celadon Study purchase was recorded.',
+    time: 'Sample time: recently',
     image: true,
-    imageAlt: 'Celadon stoneware study',
+    imageAlt: 'Textured stoneware vase',
     dismissAction: true,
     dismissLabel: 'Dismiss purchase notification',
     visible: true,
-  },
-  'announcement-extended': {
-    slides: true,
-    dismissAction: false,
-    dismissLabel: 'Dismiss announcement',
   },
 };
 
@@ -140,19 +179,21 @@ function variantClass(contract: ComponentContract, value: StudioPropertyValue): 
   return contract.variants.find((option) => option.name === value)?.className?.replace(/^\./, '') ?? null;
 }
 
+function sizeClass(contract: ComponentContract, value: StudioPropertyValue): string | null {
+  return contract.sizes.find((option) => option.name === value)?.className?.replace(/^\./, '') ?? null;
+}
+
 function MarketingMedia({
   className = '',
   kind,
   alt,
 }: {
   className?: string;
-  kind: 'hero' | 'popup' | 'social-proof';
+  kind: 'social-proof';
   alt: string;
 }) {
   const source = {
-    hero: editorialMedia.tableware,
-    popup: editorialMedia.texturedVase,
-    'social-proof': editorialMedia.artistInStudio,
+    'social-proof': editorialMedia.texturedVase,
   }[kind];
 
   return (
@@ -166,9 +207,9 @@ function MarketingMedia({
 
 function PaymentMark({ label, shortLabel }: { label: string; shortLabel: string }) {
   return (
-    <span role="listitem">
+    <li className="payment-icons__item">
       <svg
-        className="docs-studio__marketing-payment-mark"
+        className="payment-icons__mark"
         viewBox="0 0 48 28"
         role="img"
         aria-label={label}
@@ -178,7 +219,7 @@ function PaymentMark({ label, shortLabel }: { label: string; shortLabel: string 
           {shortLabel}
         </text>
       </svg>
-    </span>
+    </li>
   );
 }
 
@@ -196,10 +237,9 @@ export default function MarketingStudio({ contract, definition }: MarketingStudi
   const [values, setValues] = useState<StudioPropertyValues>(initialValues);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
-  const [popupVisible, setPopupVisible] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterFeedback, setNewsletterFeedback] = useState('One concise studio update each month.');
-  const [announcementVisible, setAnnouncementVisible] = useState(true);
+  const [newsletterStatus, setNewsletterStatus] = useState('');
+  const [analyticsConsent, setAnalyticsConsent] = useState(false);
 
   useEffect(() => {
     const read = () => {
@@ -223,407 +263,362 @@ export default function MarketingStudio({ contract, definition }: MarketingStudi
   function reset() {
     setValues({ ...initialValues });
     setTokenOverrides({});
-    setPopupVisible(true);
     setNewsletterEmail('');
-    setNewsletterFeedback('One concise studio update each month.');
-    setAnnouncementVisible(true);
+    setNewsletterStatus('');
+    setAnalyticsConsent(false);
   }
 
   function currentState(): string {
-    if (contract.slug === 'popup') return popupVisible ? 'overlayOpen' : 'overlayHidden';
-    if (contract.slug === 'cookie-consent' || contract.slug === 'social-proof') {
-      return values.visible === true ? 'visible' : 'hidden';
+    if (contract.slug === 'cookie-consent') {
+      if (values.open !== true) return 'closed';
+      if (values.preferencesOpen === true) return 'preferencesOpen';
+      if (values.busy === true) return 'busy';
+      return 'open';
+    }
+    if (contract.slug === 'social-proof') {
+      return values.visible === true && String(values.message || '').trim() ? 'visible' : 'hidden';
     }
     return 'default';
   }
 
   function renderHero() {
-    return (
-      <section className="hero docs-studio__marketing-hero" aria-labelledby={`studio-hero-title-${generatedId}`}>
-        {values.media === true && (
-          <div className="hero__media">
-            <MarketingMedia kind="hero" alt="Hand-thrown stoneware arranged in the gallery" />
-          </div>
-        )}
-        {values.overlay === true && <div className="hero__overlay" aria-hidden="true" />}
-        <div className="hero__content">
-          {String(values.label || '') && <span className="hero__label">{String(values.label)}</span>}
-          <h2 className="hero__title" id={`studio-hero-title-${generatedId}`}>{String(values.title)}</h2>
-          {String(values.description || '') && <p className="hero__description">{String(values.description)}</p>}
-          {values.actions === true && (
-            <div className="hero__actions">
-              <a className="btn" href="#studio-hero-collection" onClick={(event) => event.preventDefault()}>View collection</a>
-              <a className="btn btn--secondary" href="#studio-hero-story" onClick={(event) => event.preventDefault()}>Read the story</a>
-            </div>
-          )}
-        </div>
-      </section>
-    );
+    return <HeroArtwork
+      className="docs-studio__marketing-hero"
+      label={String(values.label || '')}
+      title={String(values.title || '')}
+      description={String(values.description || '')}
+      layout={String(values.layout || 'full') as 'full' | 'split' | 'text-only'}
+      height={String(values.height || 'default') as 'default' | 'fullscreen'}
+      mediaBehavior={String(values.mediaBehavior || 'none') as 'none' | 'parallax' | 'slideshow'}
+      media={values.media === true}
+      overlay={values.overlay === true}
+      actions={values.actions === true}
+      slides={values.slides === true}
+      autoplay={values.autoplay === true}
+      loop={values.loop !== false}
+      navigation={String(values.navigation || 'both') as 'both' | 'arrows' | 'indicators'}
+      autoplayInterval={Number(values.autoplayInterval) || 6000}
+      previousLabel={String(values.previousLabel || 'Previous slide')}
+      nextLabel={String(values.nextLabel || 'Next slide')}
+      pauseLabel={String(values.pauseLabel || 'Pause slideshow')}
+      playLabel={String(values.playLabel || 'Play slideshow')}
+      statusTemplate={String(values.statusTemplate || 'Slide {current} of {total}')}
+    />;
   }
 
   function submitNewsletter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setNewsletterFeedback(`Thanks, ${newsletterEmail}. You are on the preview list.`);
+    setNewsletterStatus('Preview only: no subscription was sent.');
   }
 
   function renderNewsletter() {
     const emailId = `studio-newsletter-email-${generatedId}`;
-    const messageId = `${emailId}-message`;
+    const titleId = `studio-newsletter-title-${generatedId}`;
+    const noteId = `${emailId}-note`;
+    const title = String(values.title || '').trim();
+    const description = String(values.description || '').trim();
+    const note = String(values.note || '').trim();
+
+    if (!title || values.form !== true) return null;
+
     return (
-      <section className="newsletter docs-studio__marketing-newsletter" aria-labelledby={`studio-newsletter-title-${generatedId}`}>
+      <section className="newsletter docs-studio__marketing-newsletter" aria-labelledby={titleId}>
         <div className="newsletter__content">
-          <h2 className="newsletter__title" id={`studio-newsletter-title-${generatedId}`}>{String(values.title)}</h2>
-          {String(values.description || '') && <p className="newsletter__description">{String(values.description)}</p>}
-          {values.form === true && (
-            <form className="newsletter__form" onSubmit={submitNewsletter}>
-              <div className="input">
-                <label className="input__label" htmlFor={emailId}>Email address</label>
-                <div className="input__control">
-                  <Mail className="input__icon input__icon--leading" aria-hidden="true" />
-                  <input
-                    className="input__field newsletter__input"
-                    id={emailId}
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="name@example.com"
-                    aria-describedby={messageId}
-                    required
-                    value={newsletterEmail}
-                    onChange={(event) => {
-                      setNewsletterEmail(event.target.value);
-                      setNewsletterFeedback('One concise studio update each month.');
-                    }}
-                  />
-                </div>
-                <span
-                  className="input__message docs-studio__marketing-newsletter-status"
-                  id={messageId}
-                  role="status"
-                  aria-live="polite"
-                >
-                  {newsletterFeedback}
-                </span>
+          <h2 className="newsletter__title" id={titleId}>{title}</h2>
+          {description && <p className="newsletter__description">{description}</p>}
+          <form className="newsletter__form" aria-labelledby={titleId} onSubmit={submitNewsletter}>
+            <div className="input">
+              <label className="input__label" htmlFor={emailId}>Email address</label>
+              <div className="input__control">
+                <Mail className="input__icon input__icon--leading" aria-hidden="true" />
+                <input
+                  className="input__field newsletter__input"
+                  id={emailId}
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="name@example.com"
+                  aria-describedby={note ? noteId : undefined}
+                  required
+                  value={newsletterEmail}
+                  onChange={(event) => {
+                    setNewsletterEmail(event.target.value);
+                    setNewsletterStatus('');
+                  }}
+                />
               </div>
-              <button className="btn" type="submit">Subscribe</button>
-            </form>
-          )}
-          {String(values.note || '') && <p className="newsletter__note">{String(values.note)}</p>}
+            </div>
+            <button className="btn" type="submit">Subscribe</button>
+          </form>
+          {newsletterStatus && <p className="newsletter__status" role="status">{newsletterStatus}</p>}
+          {note && <p className="newsletter__note" id={noteId}>{note}</p>}
         </div>
       </section>
     );
   }
 
   function renderTestimonials() {
+    const title = String(values.title || '').trim();
+    if (values.items !== true) return null;
+
+    const titleId = `studio-testimonials-title-${generatedId}`;
+    const Root = title ? 'section' : 'div';
+
     return (
-      <section className="testimonials docs-studio__marketing-testimonials" aria-labelledby={`studio-testimonials-title-${generatedId}`}>
-        <h2 className="testimonials__title" id={`studio-testimonials-title-${generatedId}`}>{String(values.title)}</h2>
-        {values.items === true && (
-          <div className="testimonials__grid" role="list">
-            {testimonialFixtures.map((item) => (
-              <figure className="testimonial" role="listitem" key={item.name}>
+      <Root
+        className="testimonials docs-studio__marketing-testimonials"
+        aria-labelledby={title ? titleId : undefined}
+      >
+        {title && <h2 className="testimonials__title" id={titleId}>{title}</h2>}
+        <ul className="testimonials__grid">
+          {testimonialFixtures.map((item) => (
+            <li className="testimonials__item" key={item.name}>
+              <figure className="testimonial">
+                <span className="testimonial__mark" aria-hidden="true">“</span>
                 <blockquote className="testimonial__quote"><p>{item.quote}</p></blockquote>
                 <figcaption className="testimonial__author">
                   <span className="avatar" aria-hidden="true">{item.initials}</span>
-                  <span>
+                  <span className="testimonial__identity">
                     <span className="testimonial__name">{item.name}</span>
                     <span className="testimonial__detail">{item.detail}</span>
                   </span>
                 </figcaption>
               </figure>
-            ))}
-          </div>
-        )}
-      </section>
-    );
-  }
-
-  function renderPopup() {
-    const popupId = `studio-marketing-popup-${generatedId}`;
-    const titleId = `${popupId}-title`;
-    const variant = variantClass(contract, values.variant);
-    return (
-      <div className="docs-studio__marketing-trigger-stage">
-        <button
-          className="btn docs-studio__marketing-trigger"
-          type="button"
-          aria-expanded={popupVisible}
-          aria-controls={popupId}
-          hidden={popupVisible}
-          onClick={() => setPopupVisible(true)}
-        >
-          Show popup
-        </button>
-        {popupVisible && (
-          <div className="popup-overlay docs-studio__marketing-popup-overlay" data-open>
-            <div
-              className={['popup', variant, 'docs-studio__marketing-popup'].filter(Boolean).join(' ')}
-              id={popupId}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={titleId}
-              data-open={values.variant === 'slide' || undefined}
-            >
-              {values.dismissAction === true && (
-                <button
-                  className="popup__close close-btn"
-                  type="button"
-                  aria-label={String(values.dismissLabel || 'Close popup')}
-                  onClick={() => setPopupVisible(false)}
-                >
-                  <X className="close-btn__icon" aria-hidden="true" />
-                </button>
-              )}
-              {values.media === true && (
-                <div className="popup__media">
-                  <MarketingMedia kind="popup" alt="A glazed stoneware vessel on a display plinth" />
-                </div>
-              )}
-              <div className="popup__body">
-                <h2 className="popup__title" id={titleId}>{String(values.title)}</h2>
-                {String(values.text || '') && <p className="popup__text">{String(values.text)}</p>}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+            </li>
+          ))}
+        </ul>
+      </Root>
     );
   }
 
   function renderTrustBadges() {
+    if (values.items !== true) return null;
+
     const classes = ['trust-badges', variantClass(contract, values.variant)].filter(Boolean).join(' ');
+    const accessibleLabel = String(values.accessibleLabel || '').trim();
     return (
-      <ul className={classes} aria-label="Purchase assurances">
-        {values.items === true && (
-          <>
-            <li className="trust-badge"><ShieldCheck aria-hidden="true" /><span>Secure checkout</span></li>
-            <li className="trust-badge"><Truck aria-hidden="true" /><span>Tracked delivery</span></li>
-            <li className="trust-badge"><PackageCheck aria-hidden="true" /><span>Careful packaging</span></li>
-          </>
-        )}
+      <ul className={classes} role="list" aria-label={accessibleLabel || undefined}>
+        <li className="trust-badge">
+          <ShieldCheck className="trust-badge__icon" aria-hidden="true" />
+          <span className="trust-badge__text">Example: secure checkout</span>
+        </li>
+        <li className="trust-badge">
+          <Truck className="trust-badge__icon" aria-hidden="true" />
+          <span className="trust-badge__text">Example: tracked delivery</span>
+        </li>
+        <li className="trust-badge">
+          <PackageCheck className="trust-badge__icon" aria-hidden="true" />
+          <span className="trust-badge__text">Example: careful packaging</span>
+        </li>
       </ul>
     );
   }
 
   function renderPaymentIcons() {
+    if (values.icons !== true) return null;
+
+    const classes = ['payment-icons', sizeClass(contract, values.size)].filter(Boolean).join(' ');
+    const accessibleLabel = String(values.accessibleLabel || '').trim();
     return (
-      <div
-        className={['payment-icons', values.small === true ? 'payment-icons--sm' : null].filter(Boolean).join(' ')}
+      <ul
+        className={classes}
         role="list"
-        aria-label="Accepted payment methods"
+        aria-label={accessibleLabel || undefined}
       >
-        {values.icons === true && (
-          <>
-            <PaymentMark label="Visa" shortLabel="VISA" />
-            <PaymentMark label="Mastercard" shortLabel="MC" />
-            <PaymentMark label="American Express" shortLabel="AMEX" />
-          </>
-        )}
-      </div>
+        <PaymentMark label="Example card method" shortLabel="CARD" />
+        <PaymentMark label="Example wallet method" shortLabel="WALLET" />
+        <PaymentMark label="Example bank transfer" shortLabel="BANK" />
+      </ul>
     );
   }
 
   function renderCountdown() {
-    const segments = [
-      { value: '02', label: 'Days' },
-      { value: '14', label: 'Hours' },
-      { value: '38', label: 'Minutes' },
-    ];
-    return (
-      <div
-        className={['countdown', variantClass(contract, values.variant)].filter(Boolean).join(' ')}
-        role="timer"
-        aria-label="2 days, 14 hours, and 38 minutes remaining in this static preview"
-      >
-        {values.segments === true && segments.map((segment, index) => (
-          <Fragment key={segment.label}>
-            {index > 0 && <span className="countdown__separator" aria-hidden="true">:</span>}
-            <div className="countdown__segment" aria-hidden="true">
-              <span className="countdown__number">{segment.value}</span>
-              <span className="countdown__label">{segment.label}</span>
-            </div>
-          </Fragment>
-        ))}
-      </div>
-    );
+    return <CountdownArtwork
+      className={variantClass(contract, values.variant) ?? undefined}
+      deadline={String(values.deadline || '')}
+      units={String(values.units || 'days-hours-minutes-seconds')}
+      fallbackText={String(values.fallbackText || '')}
+      expiredAnnouncement={String(values.expiredAnnouncement || '')}
+    />;
   }
 
   function renderUrgency() {
-    const variant = String(values.variant || 'low-stock');
+    const variant = String(values.variant || '');
+    const message = String(values.message || '').trim();
+    const variantOption = contract.variants.find((option) => option.name === variant);
+    if (!variantOption || !message) return null;
+
     const Cue = variant === 'selling-fast' ? Flame : variant === 'viewers' ? Eye : Clock3;
-    const showIcon = variant !== 'low-stock';
     return (
-      <p className={['urgency', variantClass(contract, values.variant)].filter(Boolean).join(' ')}>
-        {showIcon && <Cue aria-hidden="true" />}
-        <span>{String(values.message)}</span>
+      <p className={['urgency', variantClass(contract, variant)].filter(Boolean).join(' ')}>
+        <span className="urgency__cue" aria-hidden="true">
+          {variant !== 'low-stock' && <Cue />}
+        </span>
+        <span className="urgency__message">{message}</span>
       </p>
     );
   }
 
-  function renderCookiePreferences() {
-    if (values.preferences !== true) return null;
-    return (
-      <div className="cookie-preferences" aria-label="Preference preview">
-        <div className="cookie-preferences__category">
-          <div>
-            <div className="cookie-preferences__name">Optional site preferences</div>
-            <p className="cookie-preferences__desc">Review additional choices for this site.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   function renderCookieConsent() {
-    const bannerId = `studio-cookie-banner-${generatedId}`;
-    const visible = values.visible === true;
+    const managerId = `studio-consent-manager-${generatedId}`;
+    const open = values.open === true;
+    const preferencesOpen = open && values.preferencesOpen === true;
+    const busy = values.busy === true;
+    const feedback = values.feedback === true
+      ? busy
+        ? 'Preview target is applying the requested choice.'
+        : 'Preview target reconciled the latest request.'
+      : null;
+    const preferences = values.preferences === true ? (
+      <>
+        <div className="consent-manager__preference">
+          <CheckboxArtwork
+            label="Necessary site operation"
+            name="preview-consent-necessary"
+            value="necessary"
+            checked
+            disabled
+          />
+          <p className="consent-manager__preference-description">
+            Example target-required category; the Consent Manager does not define it.
+          </p>
+        </div>
+        <div className="consent-manager__preference">
+          <CheckboxArtwork
+            label="Analytics"
+            name="preview-consent-analytics"
+            value="analytics"
+            checked={analyticsConsent}
+            disabled={busy}
+            onChange={(event) => setAnalyticsConsent(event.currentTarget.checked)}
+          />
+          <p className="consent-manager__preference-description">
+            Example target-owned optional value used only by this documentation fixture.
+          </p>
+        </div>
+      </>
+    ) : null;
+
+    function closeAfterDecision() {
+      setValue('preferencesOpen', false);
+      setValue('open', false);
+    }
+
     return (
-      <div className="docs-studio__marketing-trigger-stage">
+      <div className="docs-studio__consent-target">
         <button
           className="btn btn--outline docs-studio__marketing-trigger"
           type="button"
-          aria-expanded={visible}
-          aria-controls={bannerId}
-          hidden={visible}
-          onClick={() => setValue('visible', true)}
+          aria-expanded={open}
+          aria-controls={managerId}
+          hidden={open}
+          onClick={() => setValue('open', true)}
         >
-          Show cookie notice
+          Show consent choices
         </button>
-        {visible && (
-          <aside
-            className="cookie-banner docs-studio__marketing-cookie-banner"
-            id={bannerId}
-            data-visible
-            aria-label="Cookie options"
-          >
-            <div className="cookie-banner__inner">
-              <div>
-                <p className="cookie-banner__text">
-                  {String(values.message)}{' '}
-                  <a href="#studio-cookie-policy" onClick={(event) => event.preventDefault()}>Read the cookie policy</a>.
-                </p>
-                {renderCookiePreferences()}
-              </div>
-              {values.actions === true && (
-                <div className="cookie-banner__actions">
-                  <button className="btn" type="button" onClick={() => setValue('preferences', values.preferences !== true)}>
-                    Review options
-                  </button>
-                  <button className="btn btn--outline" type="button" onClick={() => setValue('visible', false)}>
-                    Dismiss notice
-                  </button>
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
+        <ConsentManagerArtwork
+          id={managerId}
+          title={String(values.title || '')}
+          description={String(values.description || '')}
+          policyLabel={String(values.policyLabel || '')}
+          policyHref={String(values.policyHref || '')}
+          acceptLabel={String(values.acceptLabel || '')}
+          rejectLabel={String(values.rejectLabel || '')}
+          customizeLabel={String(values.customizeLabel || '')}
+          preferencesTitle={String(values.preferencesTitle || '')}
+          preferencesDescription={String(values.preferencesDescription || '')}
+          closePreferencesLabel={String(values.closePreferencesLabel || '')}
+          saveLabel={String(values.saveLabel || '')}
+          open={open}
+          preferencesOpen={preferencesOpen}
+          busy={busy}
+          preferences={preferences}
+          feedback={feedback}
+          closeIcon={<X className="close-btn__icon" aria-hidden="true" />}
+          modalOverlayClassName="docs-studio__consent-preferences-overlay"
+          onPreferencesOpenChange={(nextOpen) => setValue('preferencesOpen', nextOpen)}
+          onAcceptRequest={closeAfterDecision}
+          onRejectRequest={closeAfterDecision}
+          onCustomizeRequest={() => setValue('feedback', false)}
+          onSaveRequest={() => {
+            setValue('feedback', true);
+            setValue('preferencesOpen', false);
+          }}
+          onPolicyClick={(event) => event.preventDefault()}
+        />
       </div>
     );
   }
 
   function renderSocialProof() {
     const noticeId = `studio-social-proof-${generatedId}`;
-    const visible = values.visible === true;
+    const message = String(values.message || '').trim();
+    const time = String(values.time || '').trim();
+    const imageAlt = String(values.imageAlt || '').trim();
+    const dismissLabel = String(values.dismissLabel || '').trim();
+    const visible = values.visible === true && Boolean(message);
+    const hasDismissAction = values.dismissAction === true && Boolean(dismissLabel);
     return (
       <div className="docs-studio__marketing-trigger-stage">
-        <button
-          className="btn btn--outline docs-studio__marketing-trigger"
-          type="button"
-          aria-expanded={visible}
-          aria-controls={noticeId}
-          hidden={visible}
-          onClick={() => setValue('visible', true)}
-        >
-          Show notification
-        </button>
+        {message && (
+          <button
+            className="btn btn--outline docs-studio__marketing-trigger"
+            type="button"
+            aria-expanded={visible}
+            aria-controls={noticeId}
+            hidden={visible}
+            onClick={() => setValue('visible', true)}
+          >
+            Show notification
+          </button>
+        )}
         {visible && (
-          <aside
-            className="social-proof docs-studio__marketing-social-proof"
+          <div
+            className="toast toast--info social-proof is-visible docs-studio__marketing-social-proof"
             id={noticeId}
-            data-visible
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
+            aria-hidden="false"
           >
             {values.image === true && (
               <MarketingMedia
                 className="social-proof__image"
                 kind="social-proof"
-                alt={String(values.imageAlt || '')}
+                alt={imageAlt}
               />
             )}
-            <div>
-              <p className="social-proof__text">{String(values.message)}</p>
-              {String(values.time || '') && <span className="social-proof__time">{String(values.time)}</span>}
+            <div className="toast__content social-proof__content">
+              <p className="toast__message social-proof__text">{message}</p>
+              {time && <span className="social-proof__time">{time}</span>}
             </div>
-            {values.dismissAction === true && (
+            {hasDismissAction && (
               <button
-                className="social-proof__close"
+                className="close-btn toast__close social-proof__close"
                 type="button"
-                aria-label={String(values.dismissLabel || 'Dismiss notification')}
+                aria-label={dismissLabel}
                 onClick={() => setValue('visible', false)}
               >
-                <X aria-hidden="true" />
+                <X className="close-btn__icon" aria-hidden="true" />
               </button>
             )}
-          </aside>
+          </div>
         )}
       </div>
     );
   }
 
-  function renderAnnouncement() {
-    if (!announcementVisible) {
-      return <button className="btn" type="button" onClick={() => setAnnouncementVisible(true)}>Show announcement</button>;
-    }
-    const hasSlides = values.slides === true;
-    return (
-      <aside
-        className={[
-          'announcement',
-          hasSlides ? 'announcement-bar--rotating' : 'announcement-bar--countdown',
-          'docs-studio__marketing-announcement',
-        ].filter(Boolean).join(' ')}
-        aria-label="Limited-time gallery announcement"
-      >
-        {hasSlides ? (
-          <div className="announcement-bar__slides docs-studio__marketing-announcement-slides">
-            <div className="announcement-bar__slide">
-              <span>New studio works are now available</span>
-            </div>
-          </div>
-        ) : (
-          <><span>Studio event closes in</span>&nbsp;<strong>2 days, 14 hours</strong></>
-        )}
-        {values.dismissAction === true && (
-          <button
-            className="announcement-bar__dismiss"
-            type="button"
-            aria-label={String(values.dismissLabel || 'Dismiss announcement')}
-            onClick={() => setAnnouncementVisible(false)}
-          >
-            <X aria-hidden="true" />
-          </button>
-        )}
-      </aside>
-    );
-  }
-
   function renderPreview() {
-    if (contract.slug === 'hero') return renderHero();
+    if (contract.slug === 'hero' || contract.slug === 'hero-section') return renderHero();
     if (contract.slug === 'newsletter') return renderNewsletter();
     if (contract.slug === 'testimonials') return renderTestimonials();
-    if (contract.slug === 'popup') return renderPopup();
     if (contract.slug === 'trust-badges') return renderTrustBadges();
     if (contract.slug === 'payment-icons') return renderPaymentIcons();
     if (contract.slug === 'countdown') return renderCountdown();
     if (contract.slug === 'urgency') return renderUrgency();
     if (contract.slug === 'cookie-consent') return renderCookieConsent();
     if (contract.slug === 'social-proof') return renderSocialProof();
-    return renderAnnouncement();
+    return null;
   }
 
-  const overlayStage = ['popup', 'cookie-consent', 'social-proof'].includes(contract.slug);
+  const overlayStage = contract.slug === 'social-proof';
 
   return (
     <div className="docs-studio">

@@ -1,49 +1,60 @@
 ## Overview
 
-Order History is an authenticated, labelled region containing a target-owned collection of order rows. Each row presents a destination, date, readable status, and formatted total.
+Order History is a passive, optionally named container for one required native list of target-owned order summaries. Each summary composes canonical Link and Badge with a semantic date and an already-formatted total.
 
 <Preview
-  html={'<section class="order-list tg-preview-frame tg-preview-frame--lg" aria-label="Order history"><article class="order-row"><a class="order-row__number" href="#" aria-label="View order 1042">#1042</a><time class="order-row__date" datetime="2026-06-15">Jun 15, 2026</time><span class="badge order-row__status order-row__status--delivered">Delivered</span><span class="order-row__total">$120.00</span></article><article class="order-row"><a class="order-row__number" href="#" aria-label="View order 1038">#1038</a><time class="order-row__date" datetime="2026-05-28">May 28, 2026</time><span class="badge order-row__status order-row__status--shipped">Shipped</span><span class="order-row__total">$85.00</span></article><article class="order-row"><a class="order-row__number" href="#" aria-label="View order 1031">#1031</a><time class="order-row__date" datetime="2026-04-09">Apr 9, 2026</time><span class="badge order-row__status order-row__status--pending">Pending</span><span class="order-row__total">$64.00</span></article></section>'}
+  html={'<section class="order-list tg-preview-frame tg-preview-frame--lg" aria-label="Recent orders"><ul class="order-list__items"><li class="order-row"><a class="link order-row__number" href="#order-1048">Order #1048</a><time class="order-row__date" datetime="2026-07-08">July 8, 2026</time><span class="badge order-row__status">Shipped</span><span class="order-row__total"><bdi>$120.00</bdi></span></li><li class="order-row"><a class="link order-row__number" href="#order-1032">Order #1032</a><time class="order-row__date" datetime="2026-06-21">June 21, 2026</time><span class="badge badge--success order-row__status">Delivered</span><span class="order-row__total"><bdi>$248.00</bdi></span></li><li class="order-row"><a class="link order-row__number" href="#order-1017">Order #1017</a><time class="order-row__date" datetime="2026-05-14">May 14, 2026</time><span class="badge badge--error order-row__status">Cancelled</span><span class="order-row__total"><bdi>$86.00</bdi></span></li></ul></section>'}
   label="Order History"
 />
 
 ## Presentation
 
-`orders` is one required slot containing repeated order rows. Order number, date, status, total, destination, row count, and ordering are fixture or target data; they are not independent Order History properties.
+`orders` is one required non-empty composition slot. Every native list item contains a descriptive Link, one `time[datetime]`, one readable Badge, and one formatted total. Identifier, destination, date, status, Badge variant, total, row count, ordering, pagination, and target lifecycle remain fixture or target data; they are not independent Order History properties.
 
-The labels and status modifiers shown in the artwork demonstrate the current visual hooks only. The contract does not establish a canonical commerce status taxonomy. Each target maps its own order state to readable text and an appropriate Badge presentation.
+The root is a named `section` only when `label` is non-empty. With no label, use an ordinary `div.order-list`; do not create an unnamed section. The row moves through private stacked, two-track, and four-area layouts according to its container width while DOM order stays number, date, status, total.
+
+The shown status labels and Badge variants are target projections, not a canonical commerce taxonomy. Financial and fulfillment facts remain distinct in the target. U4 accepts one truthful localized Badge summary per row; when that cannot preserve the distinctions users need, use a richer target status composition outside U4 instead of inventing hidden U4 states.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Format dates, statuses, destinations, and totals from the same authoritative order record.</Do>
-  <Dont>Do not infer order state from color or presentation-only class names.</Dont>
+  <Do>Format dates, statuses, destinations, and totals from the same authoritative order record, then provide complete semantic values to the composition.</Do>
+  <Dont>Do not infer order state from Badge color, create U4-specific status modifiers, or duplicate canonical Link and Badge behavior.</Dont>
 </DoDont>
 
-- Sort and paginate the repeated rows according to target account behavior.
-- Keep the order number as a direct link to the corresponding detail view.
-- Use concise, customer-facing status copy derived from target data.
-- Provide a distinct empty state outside the repeated row slot when no orders exist.
+- Keep a real order-detail URL and descriptive visible Link text for each row.
+- Use conforming machine-readable `datetime` values independently of localized visible date copy.
+- Map target truth to canonical Badge variants only after choosing a readable status label.
+- Compose loading, error, expired-session, empty, filtering, and pagination UI outside passive U4.
+- Omit U4 when no complete order collection exists; do not render an empty list as if data loaded successfully.
 
 ## Accessibility
 
-- Protect order history behind the target authentication system.
-- Use `label` to name the region when surrounding headings do not already do so.
-- Keep order numbers as links with clear destination context.
-- Expose every status as readable text and never through color alone.
-- Use semantic dates and preserve a logical reading order at narrow widths.
+- Protect order history and destinations through the target authentication and authorization system.
+- Use `label` only when U4 needs its own accessible section name; otherwise preserve ordinary grouped flow content.
+- Keep native `ul/li`, Link, and `time` semantics. Visual grid areas do not create a grid widget or table.
+- Preserve normal Tab, Enter, and modified native Link activation; do not make the complete row a second interactive surface.
+- Expose every status as readable text and never through color alone. Static Badges are not live regions.
+- Keep DOM/reading order stable at narrow widths and isolate already-formatted totals bidirectionally.
+
+## Target Notes
+
+- Target-controlled account views project protected authoritative order records through canonical U4. Platform-owned non-replaceable screens use a documented native handoff without claiming U4 visual or functional parity.
+- Shopify v1 themes use the hosted current-account Order index rather than cloning it in Liquid. Full-page extensions and headless Customer Account API views are distinct target-controlled profiles; classic Liquid remains separately versioned compatibility.
+- Pagination, loading, empty/error/expired state, authorization, status wording, dates, totals, navigation, announcements and focus recovery remain with the owning target surface.
 
 ## References
 
 ### Dependencies
 
+- [Link](/components/link)
 - [Badge](/components/badge)
 
-The repeated rows in the artwork are fixture content inside `orders`; row data is not promoted to top-level contract properties.
+The repeated records in the artwork are fixture content inside `orders`; they do not establish neutral order, status, date, currency, query, pagination, or account lifecycle APIs.
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`label`</td><td>string</td><td>optional</td><td>Accessible name for the order-history region</td></tr>
-  <tr><td>`orders`</td><td>slot</td><td>required</td><td>Target-owned collection of order rows</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Accessible name; non-empty selects a named section and blank selects an ordinary div</td></tr>
+  <tr><td>`orders`</td><td>slot</td><td>required</td><td>Complete non-empty native order-list composition using canonical Link and Badge</td></tr>
 </PropTable>

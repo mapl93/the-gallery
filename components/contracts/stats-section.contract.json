@@ -1,13 +1,15 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "stats-section",
   "name": "Stats Counter",
   "registryId": "S11",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive metric-section shell with target-formatted repeated values and no assumed count-up runtime.",
-  "dependencies": [],
+  "summary": "Passive container-responsive metric section that composes a required native list of canonical Stat instances beneath an optional heading.",
+  "dependencies": [
+    "stat"
+  ],
   "source": {
     "registry": "registry.json#/components/stats-section",
     "css": {
@@ -22,42 +24,35 @@
       "selector": ".stats-section",
       "className": ".stats-section",
       "required": true,
-      "description": "Stats section root."
+      "description": "Titled thematic section or untitled generic root for one complete repeated-metric composition."
+    },
+    {
+      "name": "inner",
+      "selector": ".stats-section__inner",
+      "className": ".stats-section__inner",
+      "required": true,
+      "description": "Container-safe inner wrapper that owns maximum measure and section composition rhythm."
     },
     {
       "name": "title",
       "selector": ".stats-section__title",
       "className": ".stats-section__title",
       "required": false,
-      "description": "Optional section heading."
+      "description": "Optional visible contextual heading that names the thematic root."
     },
     {
       "name": "grid",
       "selector": ".stats-section__grid",
       "className": ".stats-section__grid",
       "required": true,
-      "description": "Responsive repeated-metric composition region."
+      "description": "Required target-owned native unordered list that composes the canonical Stat Group class."
     },
     {
       "name": "item",
       "selector": ".stats-section__item",
       "className": ".stats-section__item",
-      "required": false,
-      "description": "Repeated target-owned metric item."
-    },
-    {
-      "name": "number",
-      "selector": ".stats-section__number",
-      "className": ".stats-section__number",
-      "required": false,
-      "description": "Target-formatted metric value."
-    },
-    {
-      "name": "label",
-      "selector": ".stats-section__label",
-      "className": ".stats-section__label",
-      "required": false,
-      "description": "Visible metric label."
+      "required": true,
+      "description": "Repeated native list item that is also exactly one canonical Stat root; Stat owns all descendant anatomy."
     }
   ],
   "variants": [
@@ -65,7 +60,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "Single passive metric-section presentation."
     }
   ],
   "sizes": [
@@ -73,7 +68,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Single intrinsic size whose responsive density is private composition."
     }
   ],
   "states": [
@@ -82,26 +77,64 @@
       "selectors": [
         ".stats-section"
       ],
-      "description": "Resting stats presentation; the data-animate selector is a presentation hook rather than a complete state model."
+      "description": "Populated passive metric presentation with no authored animation or live-region behavior."
     }
   ],
   "behavior": [
     {
-      "name": "metricOwnership",
+      "name": "rootSemantics",
+      "selectors": [
+        ".stats-section",
+        ".stats-section__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty title produces a thematic section named by its visible heading; an untitled composition uses a generic root rather than an unnamed section."
+    },
+    {
+      "name": "canonicalStatComposition",
+      "selectors": [
+        ".stats-section__grid",
+        ".stats-section__item",
+        ".stat-group",
+        ".stat",
+        ".stat__value",
+        ".stat__label"
+      ],
+      "description": "The native list and item wrappers own repeated placement while every item consumes canonical Stat anatomy, typography, formatting metadata, and optional comparison behavior."
+    },
+    {
+      "name": "targetDataOwnership",
       "selectors": [
         ".stats-section__grid"
       ],
-      "description": "The target supplies, formats, orders, and updates metric values and labels. Repeated metrics remain target-owned records."
+      "description": "Targets own metric records, formatting, units, scope, order, freshness, comparison context, loading, empty, error, stale, and update-announcement policy."
     },
     {
-      "name": "countUpBoundary",
+      "name": "passiveUpdateBoundary",
       "selectors": [
-        ".stats-section__number[data-animate]"
+        ".stats-section"
       ],
-      "attributes": [
-        "data-animate"
+      "description": "Static metrics are not live regions and S11 performs no count-up. Targets may atomically update formatted child content and separately choose an appropriate user-relevant announcement without exposing intermediate frames."
+    },
+    {
+      "name": "responsiveComposition",
+      "selectors": [
+        ".stats-section",
+        ".stats-section__inner",
+        ".stats-section__grid",
+        ".stats-section__item"
       ],
-      "description": "Canonical CSS recognizes an existing transition hook, but this contract does not define count-up calculation, observation timing, announcements, or a public animation property."
+      "description": "An intrinsic repeated layout responds to component inline space without changing, duplicating, or visually reordering metrics."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".stats-section"
+      ],
+      "description": "Missing required metrics omits the root; an empty optional title omits only the heading and selects generic root semantics."
     }
   ],
   "properties": [
@@ -109,57 +142,77 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible section heading.",
+      "description": "Optional non-empty visible contextual heading; when present it names the thematic root.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".stats-section__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".stats-section__title"
+          }
+        ]
       }
     },
     {
       "name": "metrics",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned metric item compositions.",
+      "description": "One or more target-owned native list-item compositions, each containing one complete canonical Stat with formatted value and visible label.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".stats-section__grid", "classNames": [".stats-section__grid"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".stats-section__grid",
+            "classNames": [
+              ".stats-section__grid",
+              ".stats-section__item",
+              ".stat-group",
+              ".stat",
+              ".stat__value",
+              ".stat__label"
+            ]
+          }
+        ]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
-        "--color-text-primary",
-        "--color-text-secondary"
-      ],
-      "easing": [
-        "--easing-default"
+        "--color-text-primary"
       ],
       "typography": [
         "--font-family-heading",
-        "--typo-body-size",
-        "--typo-h1-size",
-        "--typo-h2-size"
+        "--tg-typography-h2-weight",
+        "--typo-h2-size",
+        "--typo-h2-line-height"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Pair every metric value with a visible label and preserve meaningful reading order across responsive columns.",
-    "Use locale-appropriate target formatting and do not place important meaning only in punctuation, color, or generated animation.",
-    "If values update after render, the target decides whether and how to announce the change without producing repetitive live-region output.",
-    "Reduced motion removes the existing transition hook."
+    "When title is present, render a thematic section associated with the visible contextual heading through aria-labelledby; use a generic root when title is absent.",
+    "Render parallel metrics as a native ul/li list and preserve source order across responsive columns.",
+    "Compose exactly one complete canonical Stat per item so every target-formatted value remains adjacent to a visible label and optional comparison.",
+    "Include units, scope, and visible direction text needed to understand each metric without relying on punctuation, color, or animation alone.",
+    "Do not add range-widget roles, section focus, keyboard behavior, count-up, live-region semantics, observer, timer, or neutral runtime.",
+    "If target data changes after render, update the formatted content atomically and choose announcement policy according to user relevance; never announce intermediate animation frames.",
+    "Leave locale formatting, business sentiment, data lifecycle, child Stat properties, and target editor behavior with their owning layers."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by conditional titled-section semantics, a native list of canonical Stat compositions, intrinsic container-responsive CSS, strict required-slot omission, and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps an optional contextual title and reorderable metric blocks to canonical Stat classes with editor attributes and no component runtime."
     },
     "react": {
       "status": "planned",

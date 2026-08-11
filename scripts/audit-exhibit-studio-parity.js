@@ -242,7 +242,7 @@ function main() {
   if (process.argv.includes('--write')) {
     fs.mkdirSync(path.dirname(reportJsonPath), { recursive: true });
     fs.writeFileSync(reportJsonPath, `${JSON.stringify(report, null, 2)}\n`);
-    fs.writeFileSync(reportMarkdownPath, `${toMarkdown(report)}\n`);
+    fs.writeFileSync(reportMarkdownPath, `${toMarkdown(report).trimEnd()}\n`);
   }
 
   console.log(JSON.stringify(report.summary, null, 2));

@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import QuantitySelectorArtwork from './QuantitySelectorArtwork';
 
 interface QuantitySelectorStudioProps {
   contract: ComponentContract;
@@ -44,6 +45,7 @@ function initialQuantityValues(contract: ComponentContract): StudioPropertyValue
   values.value = 1;
   values.min = 1;
   values.max = 8;
+  values.name = 'quantity';
   values.accessibleLabel = 'Quantity';
   values.decrementLabel = 'Decrease quantity';
   values.incrementLabel = 'Increase quantity';
@@ -110,7 +112,9 @@ function simulatedRootStyle(variant: string, state: string): CSSProperties {
     : '--color-input-default-focused-outer-border';
 
   return {
-    borderColor: `var(${border})`,
+    borderColor: semantic
+      ? `color-mix(in srgb, var(${border}) 70%, var(--color-text-primary))`
+      : `var(${border})`,
     outlineColor: focused ? `var(${ring})` : undefined,
   };
 }
@@ -157,16 +161,17 @@ export default function QuantitySelectorStudio({
     [baseTokenValues, tokenOverrides]
   );
   const variant = typeof values.variant === 'string' ? values.variant : 'default';
-  const current = numberValue(values.value) ?? 0;
+  const current = numberValue(values.value);
   const min = numberValue(values.min);
   const max = numberValue(values.max);
-  const step = Math.max(numberValue(values.step) ?? 1, Number.EPSILON);
+  const rawStep = numberValue(values.step);
+  const step = rawStep !== null && rawStep > 0 ? rawStep : 1;
   const disabled = values.disabled === true;
+  const readOnly = values.readOnly === true;
+  const required = values.required === true;
+  const name = typeof values.name === 'string' ? values.name : '';
   const activeTokens = activeColorTokens(variant, previewState);
-  const classes = [
-    'qty',
-    optionClass(contract.variants, values.variant),
-  ].filter(Boolean).join(' ');
+  const classes = [optionClass(contract.variants, values.variant)].filter(Boolean).join(' ');
   const feedback = variant === 'error'
     ? 'Choose a quantity within the available range.'
     : variant === 'warning'
@@ -175,17 +180,12 @@ export default function QuantitySelectorStudio({
         ? 'This quantity is available.'
         : 'Choose the number of pieces.';
 
-  function updateValue(direction: -1 | 1) {
-    const next = Number((current + direction * step).toFixed(10));
-    const clamped = Math.min(max ?? next, Math.max(min ?? next, next));
-    setValues((existing) => ({ ...existing, value: clamped }));
-  }
-
   function handleStateChange(state: string) {
     setPreviewState(state);
     setValues((currentValues) => ({
       ...currentValues,
       disabled: state === 'disabled',
+      readOnly: state === 'readOnly',
       value: state === 'buttonDisabled' && numberValue(currentValues.max) !== null
         ? currentValues.max
         : currentValues.value,
@@ -233,55 +233,31 @@ export default function QuantitySelectorStudio({
         >
           <div className="docs-studio__stage-inner">
             <div>
-              <div
+              <QuantitySelectorArtwork
+                value={current}
+                min={min}
+                max={max}
+                step={step}
+                name={name}
                 className={classes}
-                role="group"
-                aria-label="Quantity selector"
-                data-studio-state={previewState}
-                style={simulatedRootStyle(variant, previewState)}
-              >
-                <button
-                  className="qty__btn qty__btn--decrement"
-                  type="button"
-                  aria-label={String(values.decrementLabel || 'Decrease quantity')}
-                  disabled={disabled || (min !== null && current <= min)}
-                  style={previewState === 'buttonHover'
-                    ? { background: 'var(--color-surface-secondary)' }
-                    : undefined}
-                  onClick={() => updateValue(-1)}
-                >
-                  <svg className="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                    <path d="M5 12h14" />
-                  </svg>
-                </button>
-                <input
-                  className="qty__input"
-                  type="number"
-                  value={current}
-                  min={min ?? undefined}
-                  max={max ?? undefined}
-                  step={step}
-                  disabled={disabled}
-                  aria-label={String(values.accessibleLabel || 'Quantity')}
-                  aria-describedby={String(values.describedBy || '') || undefined}
-                  aria-invalid={variant === 'error' || undefined}
-                  onChange={(event) => setValues((currentValues) => ({
-                    ...currentValues,
-                    value: event.target.value === '' ? null : event.target.valueAsNumber,
-                  }))}
-                />
-                <button
-                  className="qty__btn qty__btn--increment"
-                  type="button"
-                  aria-label={String(values.incrementLabel || 'Increase quantity')}
-                  disabled={disabled || (max !== null && current >= max)}
-                  onClick={() => updateValue(1)}
-                >
-                  <svg className="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                </button>
-              </div>
+                disabled={disabled}
+                readOnly={readOnly}
+                required={required}
+                accessibleLabel={String(values.accessibleLabel || 'Quantity')}
+                decrementLabel={String(values.decrementLabel || 'Decrease quantity')}
+                incrementLabel={String(values.incrementLabel || 'Increase quantity')}
+                describedBy={String(values.describedBy || '')}
+                invalid={variant === 'error'}
+                studioState={previewState}
+                rootStyle={simulatedRootStyle(variant, previewState)}
+                decrementStyle={previewState === 'buttonHover'
+                  ? { background: 'var(--color-surface-secondary)' }
+                  : undefined}
+                onValueChange={(value) => setValues((currentValues) => ({
+                  ...currentValues,
+                  value,
+                }))}
+              />
               <p
                 id="quantity-feedback"
                 className="docs-studio__preview-message"

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "steps",
   "name": "Steps / Stepper",
   "registryId": "B14",
   "category": "layout",
   "status": "pilot",
-  "summary": "Horizontal or vertical progress indicator with generated connectors, active, completed, done, and upcoming step states, plus ordered progress semantics.",
+  "summary": "Passive horizontal or vertical ordered progress indicator with generated connectors, canonical upcoming/current/completed states, accessible state text, logical layout, and no implicit workflow navigation.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/steps",
@@ -36,7 +36,7 @@
       "selector": ".steps__item::before",
       "required": false,
       "generated": true,
-      "description": "Generated connector line before each step item except the first."
+      "description": "Generated decorative connector between adjacent steps; horizontal layout draws before later items and vertical layout draws after earlier items."
     },
     {
       "name": "indicator",
@@ -46,18 +46,39 @@
       "description": "Step number, icon, or completion mark."
     },
     {
+      "name": "content",
+      "selector": ".steps__content",
+      "className": ".steps__content",
+      "required": true,
+      "description": "Wraps the primary label, optional description, and accessible state text."
+    },
+    {
       "name": "title",
       "selector": ".steps__title",
       "className": ".steps__title",
-      "required": false,
+      "required": true,
       "description": "Primary step label."
+    },
+    {
+      "name": "description",
+      "selector": ".steps__description",
+      "className": ".steps__description",
+      "required": false,
+      "description": "Optional supplemental step description."
+    },
+    {
+      "name": "state",
+      "selector": ".steps__state",
+      "className": ".steps__state",
+      "required": false,
+      "description": "Visible or visually hidden text that exposes completion when the icon alone is decorative."
     },
     {
       "name": "label",
       "selector": ".steps__label",
       "className": ".steps__label",
       "required": false,
-      "description": "Alternate step label used by some implementations."
+      "description": "Compatibility alias for the primary title during migration; new implementations use steps__title."
     }
   ],
   "variants": [
@@ -94,9 +115,9 @@
       "description": "Vertical layout state."
     },
     {
-      "name": "firstItem",
-      "selectors": [".steps__item:first-child::before"],
-      "description": "First step hides the generated connector before it."
+      "name": "terminalConnectors",
+      "selectors": [".steps__item:first-child::before", ".steps--vertical .steps__item:last-child::before"],
+      "description": "Horizontal layout hides the connector before the first step; vertical layout instead hides the connector after the last step."
     },
     {
       "name": "completed",
@@ -111,14 +132,14 @@
     {
       "name": "done",
       "selectors": [".steps__item--done::before", ".steps__item--done .steps__indicator"],
-      "description": "Done step alias currently supported by the CSS adapter."
+      "description": "Compatibility alias for completed state during migration; new implementations use steps__item--completed."
     }
   ],
   "behavior": [
     {
       "name": "progressSemantics",
-      "attributes": ["aria-current=\"step\"", "aria-label", "aria-describedby"],
-      "description": "Expose the current step and provide a clear accessible name for the progress sequence."
+      "attributes": ["ol", "li", "aria-current=\"step\"", "aria-label", "aria-describedby"],
+      "description": "Render a labelled ordered list and expose at most one current step without inventing a custom Step role."
     },
     {
       "name": "orderedSequence",
@@ -127,13 +148,16 @@
     {
       "name": "orientation",
       "selectors": [".steps--vertical"],
-      "attributes": ["aria-orientation"],
-      "description": "Targets with explicit orientation semantics should synchronize them with the horizontal or vertical variant."
+      "description": "Orientation changes visual layout only; an ordinary ordered list does not receive aria-orientation."
     },
     {
       "name": "completedState",
       "selectors": [".steps__item--completed::before", ".steps__item--done::before"],
-      "description": "Completed and done states currently both represent prior completed progress in the CSS adapter."
+      "description": "Completed is canonical and includes non-color state text; done remains a temporary CSS compatibility alias."
+    },
+    {
+      "name": "passiveByDefault",
+      "description": "Steps has no implicit keyboard interaction, routing, validation, or roving focus. Interactive workflows compose native Link or Button controls in the owning target."
     }
   ],
   "properties": [
@@ -164,26 +188,34 @@
         "--radius-full"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
       ]
     }
   },
   "accessibility": [
-    "Use ordered markup or equivalent semantics so the step sequence is understandable without layout.",
-    "Mark the current step with aria-current=\"step\".",
-    "Do not communicate completion only by color; include text, icon, or state metadata.",
-    "Keep horizontal and vertical variants semantically equivalent."
+    "Use a labelled ordered list so the step sequence is understandable without visual layout.",
+    "Mark at most one current step with aria-current=\"step\"; do not apply aria-orientation to an ordinary list.",
+    "Do not communicate completion only by color or an aria-hidden icon; include equivalent state text.",
+    "Keep DOM order and semantics identical across horizontal, vertical, localized, RTL, and narrow layouts.",
+    "Keep the base component passive. If a target makes steps navigable, compose native Links or Buttons and certify routing, validation, focus, and disabled behavior separately."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css."
+      "notes": "Implemented as logical, overflow-safe ordered-list CSS with canonical completed/current/upcoming states and a temporary done/label compatibility bridge."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid can render ordered steps with the same class contract."
+      "notes": "Shopify Liquid can render ordered passive steps with the same class contract while the owning workflow controls navigation, validation, and announcements."
     },
     "react": {
       "status": "planned",

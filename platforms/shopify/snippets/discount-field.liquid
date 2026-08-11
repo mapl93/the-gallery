@@ -1,0 +1,77 @@
+{% doc %}
+  Renders the target-native Discount Field anatomy. The custom element uses
+  Shopify standard storefront actions to read and replace confirmed discount
+  codes; Shopify remains responsible for applicability, totals, warnings,
+  errors, section refresh, and persistence.
+
+  @param {string} [discount_id] - Stable DOM id prefix for this instance.
+{% enddoc %}
+
+{%- assign discount_id = discount_id | default: 'CartDiscount' -%}
+
+<tg-discount-field
+  data-applied-template="{{ 'cart.discount_applied' | t: code: '__CODE__' | escape }}"
+  data-removed-template="{{ 'cart.discount_removed' | t: code: '__CODE__' | escape }}"
+  data-remove-label-template="{{ 'cart.discount_remove_code' | t: code: '__CODE__' | escape }}"
+  data-empty-message="{{ 'cart.discount_empty' | t | escape }}"
+  data-unavailable-message="{{ 'cart.discount_unavailable' | t | escape }}"
+  data-error-message="{{ 'cart.discount_error' | t | escape }}"
+>
+  <details class="discount-field">
+    <summary class="discount-field__toggle">{{ 'cart.discount_toggle' | t }}</summary>
+
+    <div class="discount-field__panel">
+      <form class="discount-field__form" data-discount-form>
+        <div class="input discount-field__input" data-discount-input>
+          <label class="input__label" for="{{ discount_id }}Code">
+            {{ 'cart.discount_label' | t }}
+          </label>
+          <div class="input__control">
+            <input
+              class="input__field"
+              id="{{ discount_id }}Code"
+              name="discount"
+              type="text"
+              autocomplete="off"
+              required
+              aria-describedby="{{ discount_id }}Message"
+              data-discount-code
+            >
+          </div>
+          <p
+            class="input__message"
+            id="{{ discount_id }}Message"
+            role="alert"
+            hidden
+            data-discount-message
+          ></p>
+        </div>
+
+        <button
+          class="btn btn--outline discount-field__apply"
+          type="submit"
+          data-discount-apply
+        >
+          {{ 'cart.discount_apply' | t }}
+        </button>
+      </form>
+
+      <ul class="discount-field__codes" hidden data-discount-codes></ul>
+    </div>
+  </details>
+
+  <p role="status" aria-live="polite" data-discount-status></p>
+
+  <template data-discount-code-template>
+    <li class="discount-field__code-item">
+      <span class="discount-field__code"><bdi data-discount-code-value></bdi></span>
+      <button
+        class="btn btn--link discount-field__remove"
+        type="button"
+        data-discount-remove
+      >
+        {{ 'cart.remove' | t }}
+      </button>
+    </li>
+  </template>
+</tg-discount-field>

@@ -1,37 +1,141 @@
 ## Overview
 
-Article Body is the `.prose` container for target-owned semantic long-form content. It styles headings, paragraphs, lists, quotations, figures, code, tables, callouts, image compositions, and optional product embeds without replacing their native markup.
+Article Body is the article-specific consumer of the reusable Foundations
+`.prose` style contract. Its passive, non-landmark `.article-body.prose` root
+presents one required block of target-owned semantic long-form content and may
+extend it with an optional drop cap, authored pull quotes, passive callouts,
+media collections, named local overflow, and canonical commerce islands.
+
+Foundations is the sole owner of generic Prose typography and semantic-element
+styles. L3 does not parse content, become the surrounding `article`, or copy
+the markup or behavior of child components.
 
 ## Presentation
 
-<Preview html={'<div class="prose prose--drop-cap tg-preview-frame--lg"><p>Every vessel begins with a practical question: how should it feel when lifted from the table?</p><h2>Finding the proportion</h2><p>The answer emerges through small changes to the foot, wall, and rim.</p><blockquote>Form becomes useful when attention and repetition meet.<cite>Studio journal</cite></blockquote><figure><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Three clay vessels drying on a studio shelf" /><figcaption>Forms waiting for their first firing.</figcaption></figure></div>'} label="Article Body" />
+<Preview
+  html={`
+    <div class="article-body prose article-body--drop-cap tg-preview-frame--lg">
+      <p>Every vessel begins with a practical question: how should it feel when lifted from the table? Read the <a href="#records">kiln notebook</a>.</p>
+      <h2>Finding the proportion</h2>
+      <p>The answer emerges through small changes to the foot, wall, and rim.</p>
+      <figure class="article-body__pull-quote">
+        <blockquote cite="https://example.com/studio-notes"><p>Attention is part of the material.</p></blockquote>
+        <figcaption class="article-body__pull-quote-attribution">Marina Paz, <cite>Studio Notes</cite></figcaption>
+      </figure>
+      <div class="article-body__callout article-body__callout--note"><div><strong>Studio note</strong><p>Static authored guidance remains ordinary content, not an alert.</p></div></div>
+      <figure><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Three clay vessels drying on a studio shelf" /><figcaption>Forms waiting for their first firing.</figcaption></figure>
+      <div class="prose-excluded article-body__commerce-island">
+        <article class="card product-card" data-media-ratio="portrait">
+          <div class="product-card__media"><img class="product-card__image product-card__image--primary tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Warm stoneware vessel with a softly faceted profile" /></div>
+          <div class="product-card__body"><span class="product-card__vendor">Marina Paz Studio</span><h3 class="product-card__title"><a href="#featured-vessel">Wheel-thrown stoneware vessel</a></h3><span class="product-card__subtitle">One of one</span></div>
+          <div class="product-card__footer"><span class="price"><span class="price__current" aria-label="Price">$180.00</span></span></div>
+        </article>
+      </div>
+      <h3 id="records">Keeping useful records</h3>
+      <div class="prose__overflow article-body__overflow" role="region" aria-label="Firing schedule" tabindex="0"><table><caption>Sample firing schedule</caption><thead><tr><th scope="col">Stage</th><th scope="col">Temperature</th><th scope="col">Hold</th></tr></thead><tbody><tr><th scope="row">Maturity</th><td>1222°C</td><td>12 minutes</td></tr></tbody></table></div>
+    </div>
+  `}
+  label="Article Body"
+/>
 
-The default presentation uses `.prose`. The only additional public presentation property is `dropCap`, which adds `.prose--drop-cap` to the root. Optional rich compositions retain the canonical selectors documented below.
+The only root presentation property is `dropCap`. It adds
+`.article-body--drop-cap` to the `.article-body.prose` root, affects the first
+letter of the first direct paragraph, and returns to ordinary text in very
+narrow containers. All authored rich nodes remain inside the required
+`content` slot.
+
+Use `.prose__overflow.article-body__overflow` only as an explicitly named,
+keyboard-focusable wrapper around code or genuinely two-dimensional data that
+cannot reflow. Ordinary paragraphs, links, headings, lists, figures, callouts,
+and media collections remain in normal flow; neither Prose nor the page becomes
+a horizontal scroll region.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Supply real headings, lists, blockquotes, figures, code, and tables from the target content source.</Do>
-  <Dont>Do not flatten rich content into generic containers or use the drop cap as a substitute for text.</Dont>
+  <Do>Supply complete native semantic content in document order, use Article Body BEM extensions, and compose canonical child components inside `.prose-excluded`.</Do>
+  <Dont>Do not duplicate generic Prose rules, infer heading ranks, put attribution inside `blockquote`, assign alert semantics to static guidance, or emulate page-wide breakout inside Prose.</Dont>
 </DoDont>
 
-Keep the article hierarchy shallow and readable. Product destinations, imagery, and formatted prices inside `.prose__product-embed` remain commerce-target content rather than Article Body properties.
+- The target owns authoring, trust and sanitization, localization, link policy,
+  image meaning and delivery, heading hierarchy, table relationships, code
+  language, publishing, SEO, and analytics.
+- `.article-body__pull-quote` is an authored `figure` containing `blockquote`
+  and optional `.article-body__pull-quote-attribution` `figcaption`. A nested
+  `cite` identifies a cited work, not a person's name.
+- `.article-body__callout` remains ordinary grouped content. Compose canonical
+  Alert only when timing or importance truthfully requires alert or status
+  semantics.
+- Commerce in the article flow uses
+  `.prose-excluded.article-body__commerce-island` and canonical Product Card
+  and Price. Article Body owns neither product markup nor price formatting.
+- Genuinely full-bleed media belongs to host layout outside `.prose`; neither
+  Foundations Prose nor L3 exposes a viewport-breakout hook.
+- Legacy `.pull-quote`, `.pull-quote__attribution`, `.callout`,
+  `.callout__icon`, and callout-variant aliases remain for one pre-v1 migration
+  cycle. New markup uses Article Body BEM parts; remove the aliases before the
+  public v1 contract freezes.
+
+L3 owns no parser, editor, CMS schema, syntax highlighter, reading-time
+calculation, observer, event handler, controlled/uncontrolled state, asset, or
+neutral JavaScript.
 
 ## Accessibility
 
-- Preserve a logical heading hierarchy and native semantics for lists, quotations, figures, code, and tables.
-- Provide useful image alternatives and captions for informative media.
-- Keep wide code and table content horizontally accessible without clipping the page.
-- Preserve visible keyboard focus for inline links and linked product embeds.
-- Keep the canonical readable line length and do not rely on the drop cap to communicate meaning.
+- Preserve contextual heading ranks, native list/figure/pre/code/table
+  structure, captions, and header/data-cell relationships.
+- Keep quote attribution outside `blockquote`; associate pull-quote attribution
+  through `figure` and `figcaption`.
+- Give informative media useful contextual alternative text and decorative
+  media an empty alternative; captions do not replace required alt text.
+- Name every local overflow region and make it keyboard focusable only when
+  wide code or two-dimensional data needs scrolling.
+- Keep authored callouts passive and canonical child components outside Prose
+  descendant styling through the explicit exclusion boundary.
+- Preserve visible focus for links and local overflow, logical RTL flow,
+  320-CSS-pixel reflow, effective 200-percent text, user text spacing, forced
+  colors, and zero authored motion.
+- Omit the complete root when semantic content is absent; do not emit an empty
+  article landmark or use a drop cap as content.
 
 ## References
 
 <PropTable>
-  <tr><td>`content`</td><td>slot</td><td>required</td><td>Target-owned semantic long-form content</td></tr>
-  <tr><td>`dropCap`</td><td>boolean</td><td>`false`</td><td>Adds `.prose--drop-cap` to the root</td></tr>
+  <tr><td>`content`</td><td>slot</td><td>required</td><td>Non-empty target-owned semantic article content; omission removes the complete root</td></tr>
+  <tr><td>`dropCap`</td><td>boolean</td><td>`false`</td><td>Visual first-letter treatment on the first direct paragraph; meaning is unchanged</td></tr>
 </PropTable>
 
-Core anatomy: `.prose`, native `h2` through `h4`, `blockquote`, `figure`, `pre`, and `table`; `.pull-quote`, `.pull-quote__attribution`, `.callout`, and `.callout__icon`; `.prose__full-bleed`, `.prose__image-pair`, `.prose__image-grid`; and `.prose__product-embed`, `.prose__product-embed-info`, `.prose__product-embed-title`, and `.prose__product-embed-price`.
+Core anatomy: `.article-body.prose`; native contextual headings, paragraphs,
+lists, links, `blockquote`, `figure`/`figcaption`, `pre`/`code`, and `table`;
+`.article-body__pull-quote`, `.article-body__pull-quote-attribution`,
+`.article-body__callout`, `.article-body__callout-icon`,
+`.article-body__image-pair`, `.article-body__image-grid`,
+`.prose__overflow.article-body__overflow`, and
+`.prose-excluded.article-body__commerce-island`.
 
-Dependencies: none. The contract remains `pilot`; all semantic rich content is supplied by the target as one required slot.
+Dependencies: [Product Card](/components/product-card) and
+[Price](/components/price). Foundations Prose is a reusable style contract, not
+an additional registry component. The L3 contract remains `pilot`; no automatic
+`stable` promotion is implied.
+
+- [HTML grouping content](https://html.spec.whatwg.org/multipage/grouping-content.html)
+- [HTML `blockquote`](https://html.spec.whatwg.org/multipage/grouping-content.html#the-blockquote-element)
+- [HTML `figure`](https://html.spec.whatwg.org/multipage/grouping-content.html#the-figure-element)
+- [HTML `pre`](https://html.spec.whatwg.org/multipage/grouping-content.html#the-pre-element)
+- [HTML tables](https://html.spec.whatwg.org/multipage/tables.html#the-table-element)
+- [WAI Headings](https://www.w3.org/WAI/tutorials/page-structure/headings/)
+- [WAI Images](https://www.w3.org/WAI/tutorials/images/)
+- [WAI Tables](https://www.w3.org/WAI/tutorials/tables/)
+- [WCAG Reflow](https://www.w3.org/WAI/WCAG21/Understanding/reflow)
+- [WCAG Text Spacing](https://www.w3.org/WAI/WCAG21/Understanding/text-spacing)
+- [WCAG Resize Text](https://www.w3.org/WAI/WCAG21/Understanding/resize-text)
+- [WCAG Focus Visible](https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html)
+- [WAI-ARIA APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)
+- [Open UI components](https://open-ui.org/components/)
+- [Radix Themes Typography](https://www.radix-ui.com/themes/docs/components/text)
+- [Radix Themes Blockquote](https://www.radix-ui.com/themes/docs/components/blockquote)
+- [Radix Themes Callout](https://www.radix-ui.com/themes/docs/components/callout)
+- [Polaris Text](https://polaris-react.shopify.com/components/typography/text)
+- [Tailwind Typography](https://github.com/tailwindlabs/tailwindcss-typography)
+- [Shopify Liquid Article](https://shopify.dev/docs/api/liquid/objects/article)
+- [Shopify article template](https://shopify.dev/docs/storefronts/themes/architecture/templates/article)

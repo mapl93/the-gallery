@@ -4,6 +4,11 @@ Status: Accepted
 
 Date: 2026-07-12
 
+Superseded in part by ADR 0144 for Coming Soon: X1 is now the public page only,
+password access is an independent Shopify target surface, direct Input/Button/
+Link dependencies are recorded, and password presentation hooks are removed.
+The Countdown question remains open.
+
 ## Context
 
 Coming Soon, 404 Page, Gift Card, Policy Page, and Checkout Progress had
@@ -38,6 +43,10 @@ authorization result state.
 
 Coming Soon does not gain countdown anatomy or behavior. Whether it composes the
 standalone Countdown component and who owns timer calculation remain open.
+
+ADR 0144 later removes the password presentation hooks entirely after
+repository and Shopify target evidence confirms an independent password
+template. This historical decision no longer authorizes those hooks.
 
 ### Value-entry forms compose canonical field validation
 
@@ -84,6 +93,12 @@ cue.
 The contract does not make steps links or buttons and does not own routing,
 visited state, checkout state synchronization, or navigation availability.
 
+ADR 0163 later refines this boundary by making P4 a passive checkout-context
+profile of canonical Steps, requiring strict label/content omission, using a
+named component container for narrow stacking and recording Shopify native
+checkout as a future Checkout UI Extension mapping rather than theme Liquid.
+It does not resolve completed-step navigation or checkout-state ownership.
+
 ### Neutral-web CSS receives bounded hardening
 
 Canonical `pages.css` now uses existing public tokens to:
@@ -105,10 +120,10 @@ promotion to `stable`.
 
 ### Password and authentication ownership
 
-- Is password access a required Coming Soon capability, an optional target
-  composition, or a separate authentication surface?
-- Which layer owns authentication requests, errors, lockout, visibility,
-  dialog behavior, and focus restoration?
+- Resolved for neutral X1 by ADR 0144: password access is a separate
+  target-native surface and not Coming Soon anatomy.
+- Password authentication, security, errors, lockout, dialog/inline UX, focus,
+  dismissal, and restoration remain owned and reviewed by that target surface.
 
 ### Countdown behavior
 

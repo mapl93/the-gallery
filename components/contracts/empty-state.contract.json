@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "empty-state",
   "name": "Empty State",
   "registryId": "A13",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Empty state primitive for empty collections, carts, and search results with icon, title, message, and optional action composition.",
+  "summary": "Passive resolved-absence composition with required title content, optional supporting message and decorative icon, one canonical Button-or-Link action slot, and target-owned lifecycle, heading context, announcements, and replacement.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/empty-state",
@@ -22,34 +22,34 @@
       "selector": ".empty-state",
       "className": ".empty-state",
       "required": true,
-      "description": "Centered empty-state layout wrapper."
+      "description": "Ordinary passive grouping root that replaces the otherwise empty content area; it has no intrinsic role, live-region semantics, focus, or interaction."
     },
     {
       "name": "icon",
       "selector": ".empty-state__icon",
       "className": ".empty-state__icon",
       "required": false,
-      "description": "Optional visual icon or illustration."
+      "description": "Optional decorative icon hidden from assistive technology; it reinforces but never supplies the state meaning."
     },
     {
       "name": "title",
       "selector": ".empty-state__title",
       "className": ".empty-state__title",
       "required": true,
-      "description": "Primary empty-state heading."
+      "description": "Required non-empty visible title rendered by the host with the contextually correct native h1-h6 element. The CSS class and typography are heading-element agnostic."
     },
     {
       "name": "message",
       "selector": ".empty-state__message",
       "className": ".empty-state__message",
       "required": false,
-      "description": "Supporting explanation or next step."
+      "description": "Optional concise supporting explanation or next step, omitted when not supplied."
     },
     {
       "name": "action",
       "selector": null,
       "required": false,
-      "description": "Optional composed Button or Link that offers one clear recovery action."
+      "description": "One optional canonical Button or Link composition slot. Link navigates; Button performs a command; Empty State owns no local action style or behavior."
     }
   ],
   "variants": [
@@ -57,7 +57,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default empty state."
+      "description": "Single centered resolved-absence presentation. State classification and copy remain target-owned."
     }
   ],
   "sizes": [
@@ -65,26 +65,41 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default empty-state spacing."
+      "description": "One container-responsive composition with no public size property."
     }
   ],
   "states": [
     {
-      "name": "default",
+      "name": "resolved-empty",
       "selectors": [".empty-state"],
-      "description": "Default empty state."
+      "description": "Target has resolved that the surrounding content area has no content to show; this is not a loading state."
     }
   ],
   "behavior": [
     {
-      "name": "emptyContext",
+      "name": "resolvedAbsence",
       "selectors": [".empty-state__title", ".empty-state__message"],
-      "description": "The title and message should explain what is empty and what the user can do next."
+      "description": "The target decides that absence is resolved, classifies no-data versus no-results or other conditions, and supplies truthful concise copy. Empty State does not fetch, filter, diagnose, retry, or infer loading/error state."
+    },
+    {
+      "name": "contextualHeading",
+      "selectors": [".empty-state__title"],
+      "description": "The owning page, panel, dialog, or section supplies the contextually correct native h1-h6 element. Heading rank is not a target-agnostic property or visual Studio control, and the class renders consistently without native heading defaults."
     },
     {
       "name": "actionComposition",
       "selectors": [".empty-state"],
-      "description": "Optional actions should compose Button or Link rather than inventing local action styles."
+      "description": "At most one recovery action composes canonical Button or Link. The target owns label, destination or command, events, disabled/loading state, and post-activation focus."
+    },
+    {
+      "name": "dynamicAnnouncement",
+      "selectors": [".empty-state"],
+      "description": "Static or initial Empty State has no live role. When a search, filter, removal, or other update creates a qualifying status message, a pre-existing target Status/live region owns the announcement without moving focus or duplicating the visible title."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [".empty-state", ".empty-state__title", ".empty-state__message"],
+      "description": "Logical sizing, container-relative inline padding and emergency wrapping preserve short, long, localized, RTL, narrow-container and zoomed content."
     }
   ],
   "properties": [
@@ -92,7 +107,7 @@
       "name": "title",
       "type": "string",
       "required": true,
-      "description": "Concise heading that identifies what content is empty.",
+      "description": "Required non-empty visible content that identifies what is absent. The host supplies the native heading element separately as contextual markup, not as a component property.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".empty-state__title" }]
       }
@@ -101,7 +116,7 @@
       "name": "message",
       "type": "string",
       "required": false,
-      "description": "Optional supporting explanation or next step.",
+      "description": "Optional concise supporting explanation or next step, omitted rather than rendered empty.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".empty-state__message" }]
       }
@@ -110,7 +125,7 @@
       "name": "icon",
       "type": "slot",
       "required": false,
-      "description": "Optional decorative icon or illustration that reinforces the visible title.",
+      "description": "Optional decorative icon that reinforces the visible title. Meaningful illustration alternative text is outside the current contract.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".empty-state__icon", "classNames": [".empty-state__icon"] }]
       }
@@ -119,9 +134,9 @@
       "name": "action",
       "type": "slot",
       "required": false,
-      "description": "Optional composed Button or Link that offers one clear recovery action.",
+      "description": "One optional canonical Button or Link composition chosen and controlled by the target.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".empty-state", "classNames": [".btn"] }]
+        "web": [{ "kind": "slot", "selector": ".empty-state", "classNames": [".btn", ".link"] }]
       }
     }
   ],
@@ -133,46 +148,59 @@
         "--color-text-secondary"
       ],
       "spacing": [
-        "--space-layout-section-gap"
+        "--space-layout-section-gap",
+        "--tg-space-stack-md"
       ],
       "typography": [
-        "--typo-h3-size",
         "--font-family-heading",
-        "--typo-body-size"
+        "--tg-typography-h3-weight",
+        "--typo-h3-size",
+        "--typo-h3-line-height",
+        "--font-family-body",
+        "--tg-typography-body-default-weight",
+        "--typo-body-size",
+        "--typo-body-line-height"
       ]
     }
   },
   "accessibility": [
-    "Use clear title text that identifies the empty state.",
-    "Make optional actions keyboard accessible and descriptive.",
-    "Treat decorative icons as decorative when the title already communicates the state.",
-    "Do not use an empty state when content is still loading; use Skeleton or Spinner instead."
+    "Supply required non-empty title content and render it with the native h1-h6 element appropriate to the owning page, panel, dialog, or section; do not expose rank as visual configuration.",
+    "Keep the optional icon decorative and hidden because the visible title carries the meaning; the current contract does not support a meaningful illustration.",
+    "Compose one native canonical Link for navigation or Button for a command and preserve that component's keyboard, focus, disabled, loading, and accessible-name behavior.",
+    "Do not add Status or Alert to every root. Targets own pre-existing live-region output for dynamic no-results or destructive-update transitions that qualify as status messages.",
+    "Do not move focus merely to announce absence, trap focus, or leave stale underlying records and actions exposed beside the replacement.",
+    "Do not use Empty State while data is pending; use Skeleton or Spinner, and use Progress for measurable completion."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/primitives.css."
+      "kind": "css-composition",
+      "notes": "Canonical CSS implements passive container-responsive composition. Target markup owns contextual heading, lifecycle, announcement, focus, and one Button-or-Link action slot."
     },
     "shopify": {
       "status": "implemented",
-      "kind": "liquid-css-class"
+      "kind": "liquid-css-class",
+      "notes": "Dedicated snippet maps icon, title, message, and Link action and requires a validated target-supplied heading_tag. Main cart and 404 use H1; the cart drawer uses H3 under its H2 dialog title."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component",
+      "notes": "Framework target owns resolved state, contextual heading markup, announcements, canonical action, and replacement."
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component",
+      "notes": "Map slot presence and semantic presentation only; heading rank, lifecycle, Status, and action behavior are not visual properties."
     },
     "swiftui": {
       "status": "planned",
-      "kind": "style"
+      "kind": "style",
+      "notes": "Native target owns header traits, resolved data state, announcements, focus, and Button/Link action semantics."
     },
     "compose": {
       "status": "planned",
-      "kind": "composable"
+      "kind": "composable",
+      "notes": "Native target owns heading semantics, resolved data state, announcements, focus, and Button/Link action semantics."
     }
   }
 }

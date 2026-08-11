@@ -1,37 +1,75 @@
-{%- comment -%}
-  Snippet: product-form
-  Usage: {% render 'product-form', product: product %}
-{%- endcomment -%}
+{% doc %}
+Renders the canonical native product purchase form. The target product
+coordinator must keep the hidden variant id, option state, quantity rules,
+availability, pending state, and result feedback synchronized.
 
-{% form 'product', product, data-product-form: '' %}
-  <div class="product-form">
-    {% render 'variant-selector', product: product %}
+@param {product} product - Product submitted by the form.
+@param {string} [section_id] - Section id used to scope the generated form id.
+@param {string} [product_form_id] - Explicit unique native form id.
+@param {string} [class_name] - Optional additional canonical composition class.
+@param {variant} [current_variant] - Variant resolved by the owning product coordinator.
+@param {boolean} [show_quantity] - Whether to render the canonical Quantity Selector. Defaults to true.
 
-    <div style="display: flex; gap: 12px; align-items: flex-end;">
-      {% render 'quantity-selector' %}
-      <div class="price" style="margin-left: auto;">
-        <span class="price__current" data-product-price>
-          {{ product.selected_or_first_available_variant.price | money }}
-        </span>
-      </div>
+@example
+{% render 'product-form', product: product, section_id: section.id %}
+{% enddoc %}
+
+{%- liquid
+  if product_form_id == blank
+    assign product_form_id = 'product-form-' | append: section_id | append: '-' | append: product.id
+  endif
+  assign product_form_class = 'product-form'
+  if class_name != blank
+    assign product_form_class = product_form_class | append: ' ' | append: class_name
+  endif
+  if current_variant == blank
+    assign current_variant = product.selected_or_first_available_variant
+  endif
+  assign should_show_quantity = true
+  if show_quantity == false
+    assign should_show_quantity = false
+  endif
+  assign quantity_min = current_variant.quantity_rule.min | default: 1
+  assign quantity_step = current_variant.quantity_rule.increment | default: 1
+  assign quantity_max = current_variant.quantity_rule.max
+-%}
+
+{% form 'product', product, id: product_form_id, class: product_form_class, data-product-form: '' %}
+  {% unless product.has_only_default_variant %}
+    {% render 'variant-selector', product: product, product_form_id: product_form_id, selector_id: product_form_id %}
+  {% endunless %}
+
+  {% if should_show_quantity %}
+    {% render 'quantity-selector',
+      value: quantity_min,
+      min: quantity_min,
+      max: quantity_max,
+      step: quantity_step
+    %}
+  {% endif %}
+
+  <input type="hidden" name="id"
+         value="{{ current_variant.id }}"
+         data-product-selection
+         {% if current_variant == blank %}disabled{% endif %}>
+
+  {% if form.errors %}
+    <div class="product-form__message" role="alert">
+      {{ form.errors | default_errors }}
     </div>
+  {% endif %}
 
-    <input type="hidden" name="id"
-           value="{{ product.selected_or_first_available_variant.id }}"
-           data-variant-id>
-
-    <div class="product-form__actions">
-      <button class="btn btn--primary btn--lg product-form__submit"
-              type="submit"
-              {% unless product.selected_or_first_available_variant.available %}
-                disabled aria-disabled="true"
-              {% endunless %}>
-        {% if product.selected_or_first_available_variant.available %}
-          Add to Cart — {{ product.selected_or_first_available_variant.price | money }}
-        {% else %}
-          Sold Out
-        {% endif %}
-      </button>
-    </div>
+  <div class="product-form__actions">
+    <button class="btn btn--lg product-form__submit"
+            type="submit"
+            name="add"
+            value="add"
+            {% unless current_variant.available %}disabled{% endunless %}>
+      {% if current_variant.available %}
+        {{ 'products.add_to_cart' | t }}
+      {% else %}
+        {{ 'products.sold_out' | t }}
+      {% endif %}
+    </button>
   </div>
 {% endform %}

@@ -1,190 +1,76 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "tabs",
   "name": "Tabs",
   "registryId": "B7",
   "category": "layout",
   "status": "pilot",
-  "summary": "Tablist and panel navigation with selected tab state, hidden panel state, keyboard navigation behavior, and ARIA tab semantics.",
+  "summary": "Labelled horizontal tab set with paired panels, one selected item, roving focus, automatic or manual activation, disabled items, and target-owned controlled or uncontrolled selection.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/tabs",
-    "css": {
-      "file": "components/css/layout.css",
-      "selector": ".tabs"
-    },
+    "css": { "file": "components/css/layout.css", "selector": ".tabs" },
     "docs": "site/src/content/components/tabs.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".tabs",
-      "className": ".tabs",
-      "required": true,
-      "description": "Wrapper for tablist and panels."
-    },
-    {
-      "name": "list",
-      "selector": ".tabs__list",
-      "className": ".tabs__list",
-      "required": true,
-      "description": "Scrollable tablist container."
-    },
-    {
-      "name": "tab",
-      "selector": ".tabs__tab",
-      "className": ".tabs__tab",
-      "required": true,
-      "description": "Interactive tab control."
-    },
-    {
-      "name": "panel",
-      "selector": ".tabs__panel",
-      "className": ".tabs__panel",
-      "required": true,
-      "description": "Content panel associated with a tab."
-    }
+    { "name": "root", "selector": ".tabs", "className": ".tabs", "required": true, "description": "Wrapper that coordinates one selected tab and one visible panel." },
+    { "name": "list", "selector": ".tabs__list", "className": ".tabs__list", "required": true, "description": "Horizontally scrollable labelled tablist container." },
+    { "name": "tab", "selector": ".tabs__tab", "className": ".tabs__tab", "required": true, "description": "Repeatable native Button with tab role, selection state, and panel relationship." },
+    { "name": "panel", "selector": ".tabs__panel", "className": ".tabs__panel", "required": true, "description": "Repeatable panel paired with one tab and hidden when inactive." }
   ],
   "variants": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default horizontal tabs."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Default horizontal underline Tabs presentation." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default tab spacing."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Default tab and panel spacing." }
   ],
   "states": [
-    {
-      "name": "default",
-      "selectors": [".tabs"],
-      "description": "Resting tabs state."
-    },
-    {
-      "name": "hover",
-      "selectors": [".tabs__tab:hover"],
-      "description": "Pointer hover state on each tab."
-    },
-    {
-      "name": "selected",
-      "selectors": [".tabs__tab[aria-selected=\"true\"]"],
-      "description": "Selected tab state."
-    },
-    {
-      "name": "focusVisible",
-      "selectors": [".tabs__tab:focus-visible"],
-      "description": "Keyboard focus indicator on each tab."
-    },
-    {
-      "name": "panelHidden",
-      "selectors": [".tabs__panel[hidden]"],
-      "description": "Hidden inactive panel state."
-    }
+    { "name": "default", "selectors": [".tabs"], "description": "Resting horizontal tab set." },
+    { "name": "hover", "selectors": [".tabs__tab:hover:not(:disabled)"], "description": "Pointer hover emphasis on an enabled tab without changing selection." },
+    { "name": "selected", "selectors": [".tabs__tab[aria-selected=\"true\"]"], "description": "Exactly one selected tab whose panel is visible." },
+    { "name": "focusVisible", "selectors": [".tabs__tab:focus-visible", ".tabs__panel:focus-visible"], "description": "Keyboard focus remains distinct from selected state." },
+    { "name": "disabled", "selectors": [".tabs__tab:disabled"], "description": "Unavailable tab is skipped by selection and roving navigation." },
+    { "name": "panelHidden", "selectors": [".tabs__panel[hidden]"], "description": "Inactive panel is removed from rendering and sequential focus." }
   ],
   "behavior": [
-    {
-      "name": "tabSemantics",
-      "attributes": ["role=\"tablist\"", "role=\"tab\"", "role=\"tabpanel\"", "aria-selected", "aria-controls", "aria-labelledby"],
-      "description": "Tabs must expose linked tab and panel semantics."
-    },
-    {
-      "name": "keyboardNavigation",
-      "events": ["ArrowLeft", "ArrowRight", "Home", "End", "Enter", "Space"],
-      "description": "Keyboard navigation should move between tabs and activate the selected panel."
-    },
-    {
-      "name": "panelVisibility",
-      "selectors": [".tabs__panel[hidden]"],
-      "attributes": ["hidden"],
-      "description": "Only the active panel should be visible; inactive panels use hidden."
-    }
+    { "name": "tabSemantics", "attributes": ["role=\"tablist\"", "aria-label", "role=\"tab\"", "role=\"tabpanel\"", "aria-selected", "aria-controls", "aria-labelledby"], "description": "A labelled tablist contains linked tabs whose paired panels reference them in return." },
+    { "name": "rovingFocus", "attributes": ["tabindex=\"0\"", "tabindex=\"-1\""], "events": ["ArrowLeft", "ArrowRight", "Home", "End"], "description": "One enabled tab participates in sequential focus; horizontal navigation wraps among enabled tabs and respects rendered direction." },
+    { "name": "activation", "attributes": ["data-activation"], "events": ["focus", "click", "Enter", "Space", "change"], "description": "Automatic mode selects on focus when panels are preloaded; manual mode selects only on click, Enter, or Space." },
+    { "name": "panelVisibility", "selectors": [".tabs__panel[hidden]"], "attributes": ["hidden"], "description": "Exactly one selected tab and associated panel are active; every inactive panel uses native hidden." },
+    { "name": "panelFocus", "attributes": ["tabindex=\"0\""], "description": "When panel content has no appropriate first focus target, the panel enters the Tab sequence." },
+    { "name": "selectionOwnership", "events": ["change"], "description": "Targets may manage selection through controlled value or uncontrolled default value, but must emit one change equivalent and keep item states synchronized." },
+    { "name": "unsupportedModes", "description": "Vertical, closable, reorderable, routed, lazy, and responsive Accordion modes are not v1 behavior." }
   ],
   "properties": [
-    {
-      "name": "selected",
-      "type": "boolean",
-      "required": false,
-      "defaultValue": false,
-      "description": "Marks an individual tab as selected; the containing tab set must keep exactly one tab and panel active.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "attribute",
-            "selector": ".tabs__tab",
-            "attribute": "aria-selected",
-            "values": {
-              "true": "true",
-              "false": "false"
-            }
-          }
-        ]
-      }
-    }
+    { "name": "label", "type": "string", "required": true, "description": "Accessible name that identifies the purpose of the complete tablist.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tabs__list", "attribute": "aria-label", "valueFrom": "property" }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "One or more paired native tab Button and panel compositions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".tabs", "classNames": [".tabs__list", ".tabs__tab", ".tabs__panel"] }] } },
+    { "name": "selected", "type": "boolean", "required": false, "defaultValue": false, "description": "Marks an individual tab as selected; the containing set must keep exactly one enabled tab and panel active.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tabs__tab", "attribute": "aria-selected", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "activationMode", "type": "enum", "required": false, "values": ["automatic", "manual"], "defaultValue": "automatic", "description": "Determines whether moving focus selects immediately or waits for explicit activation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tabs", "attribute": "data-activation", "values": { "automatic": "automatic", "manual": "manual" } }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes an individual tab unavailable and removes it from roving selection.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".tabs__tab", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-border-subtle",
-        "--color-text-secondary",
-        "--color-text-primary",
-        "--color-text-accent",
-        "--color-border-focus"
-      ],
-      "transition": [
-        "--transition-fast"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
-      "typography": [
-        "--typo-body-size",
-        "--font-family-body"
-      ],
-      "spacing": [
-        "--space-layout-element-gap"
-      ]
+      "color": ["--color-border-subtle", "--color-text-secondary", "--color-text-primary", "--color-text-accent", "--color-text-disabled", "--color-border-focus"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size", "--typo-body-line-height", "--font-family-body"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"]
     }
   },
   "accessibility": [
-    "Use role=\"tablist\" on the list, role=\"tab\" on each trigger, and role=\"tabpanel\" on each panel.",
-    "Connect each tab and panel with aria-controls and aria-labelledby.",
-    "Set aria-selected=\"true\" only on the active tab.",
-    "Use hidden on inactive panels.",
-    "Support arrow key navigation between tabs."
+    "Provide an accessible name for the tablist and link every tab and panel pair in both directions.",
+    "Keep exactly one enabled tab selected and one panel visible; inactive panels use native hidden.",
+    "Implement roving tabindex with ArrowLeft, ArrowRight, Home, and End while skipping disabled tabs.",
+    "Use automatic activation only when panel content is preloaded and appears without noticeable latency; otherwise use manual activation.",
+    "Include text-only panels in sequential focus when they do not begin with an appropriate focusable element."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; tab selection behavior must be provided by the consuming target."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "style"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "composable"
-    }
+    "web": { "status": "implemented", "kind": "css-target-behavior", "notes": "Canonical CSS owns horizontal presentation; the consuming target owns roving focus, selection, ids, and change events." },
+    "shopify": { "status": "planned", "kind": "host-tabs-or-liquid-css-js", "notes": "Map to Shopify host Tabs value/defaultValue/change/controls/id when available; theme targets implement the neutral behavior." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

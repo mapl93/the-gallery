@@ -1,36 +1,38 @@
 ## Overview
 
-Blog Sidebar is a complementary-content container composed from repeatable target-owned sections. Sections may contain headings, destination lists, tags, or a target-provided search composition without creating separate root APIs for each content type.
+Blog Sidebar is one passive named complementary container for target-authored modules. It requires a useful accessible label and non-empty semantic sections; missing either omits the complete `aside` instead of leaving an unnamed or empty landmark. The initial v1 profile contains Recent Articles and Topics as native Link lists.
 
 ## Presentation
 
-<Preview html={'<aside class="blog-sidebar tg-preview-frame--sm" aria-label="More from the journal"><section class="blog-sidebar__section"><h2 class="blog-sidebar__title">Recent articles</h2><ul class="blog-sidebar__list"><li class="blog-sidebar__list-item"><a class="blog-sidebar__link" href="#">Learning from a test kiln</a></li><li class="blog-sidebar__list-item"><a class="blog-sidebar__link" href="#">Notes on local clay</a></li></ul></section><section class="blog-sidebar__section"><h2 class="blog-sidebar__title">Topics</h2><div class="tag-cloud"><a class="tag-cloud__item" href="#">Clay</a><a class="tag-cloud__item" href="#">Glaze</a><a class="tag-cloud__item" href="#">Process</a></div></section></aside>'} label="Blog Sidebar" />
+<Preview html={'<aside class="blog-sidebar tg-preview-frame--sm" aria-label="More from the journal"><section class="blog-sidebar__section"><h2 class="blog-sidebar__title" dir="auto">Recent notes</h2><ul class="blog-sidebar__list"><li class="blog-sidebar__list-item"><a class="link link--subtle blog-sidebar__link" href="#recent-slower-tools" dir="auto">The case for slower tools</a></li><li class="blog-sidebar__list-item"><a class="link link--subtle blog-sidebar__link" href="#recent-ash-glaze" dir="auto">Testing a new ash glaze</a></li><li class="blog-sidebar__list-item"><a class="link link--subtle blog-sidebar__link" href="#recent-firing" dir="auto">What survives the firing</a></li></ul></section><section class="blog-sidebar__section"><h2 class="blog-sidebar__title" dir="auto">Explore topics</h2><ul class="blog-sidebar__topics tag-cloud"><li class="blog-sidebar__topic tag-cloud__entry"><a class="link link--subtle blog-sidebar__topic-link tag-cloud__item" href="#topic-stoneware" dir="auto">Stoneware</a></li><li class="blog-sidebar__topic tag-cloud__entry"><a class="link link--subtle blog-sidebar__topic-link tag-cloud__item" href="#topic-glaze" dir="auto">Glaze</a></li><li class="blog-sidebar__topic tag-cloud__entry"><a class="link link--subtle blog-sidebar__topic-link tag-cloud__item" href="#topic-kiln" dir="auto">Kiln</a></li><li class="blog-sidebar__topic tag-cloud__entry"><a class="link link--subtle blog-sidebar__topic-link tag-cloud__item" href="#topic-tools" dir="auto">Tools</a></li></ul></section></aside>'} label="Blog Sidebar" />
 
-The component has one stacked presentation. `.blog-sidebar__section` repeats inside the root; list content uses `.blog-sidebar__list`, `.blog-sidebar__list-item`, and `.blog-sidebar__link`; tag-cloud content uses `.tag-cloud` and `.tag-cloud__item`.
+The component has one intrinsic stacked presentation. `.blog-sidebar__section` repeats inside the root. Recent Article links use `.blog-sidebar__list`; Topic links use `.blog-sidebar__topics`. The legacy `.tag-cloud*` selectors remain temporary migration aliases on the same native list elements and do not define public identity or compose Tag; they must be removed before the v1 contract freezes.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Group each complementary topic under a semantic section heading.</Do>
-  <Dont>Do not infer separate search, category, recent-post, or tag properties from the fixture.</Dont>
+  <Do>Use L8 only when the complete composition supports but remains separate from the surrounding main content.</Do>
+  <Dont>Do not turn its root into a search engine, filter controller, sticky rail, or API for every possible editorial module.</Dont>
 </DoDont>
 
-The target owns the section inventory and content. Whether Blog Sidebar composes the canonical Input and Tag components or owns independent search and tag APIs remains unresolved; the preview therefore does not introduce a search field or apply the `.tag` class.
+The target owns module order, limits, contextual heading ranks, content, routes, data, localization, and integration. Search appears only when a real target owner supplies its native search landmark, canonical Form, field semantics, Input, Button, query and result lifecycle. Newsletter and Search stay separate canonical or target compositions, not root booleans. Those modules keep their complete behavior and do not change L8's passive root contract.
 
 ## Accessibility
 
-- Use an `aside` or complementary landmark only when the content supplements the main article or blog listing.
-- Give the landmark a useful accessible name when the page contains more than one complementary region.
-- Use semantic headings and list markup for grouped destinations.
-- Preserve visible keyboard focus and touch-sized links and tags.
-- Any composed search field must retain its owning field label, validation, and submission semantics.
+- Require a non-empty localized `label` and non-empty `sections`; omit the complete root when either is absent.
+- Use the native `aside` only for genuinely complementary content, and distinguish repeated complementary landmarks with useful names.
+- Give each thematic section a visible contextual heading and preserve native `ul`/`li` structure for grouped destinations.
+- Use canonical anchors with `href` for navigation. Tag remains a passive/removable value label and is not placed on an anchor.
+- Preserve canonical Link focus, hover, forced-color, reduced-motion, and complete-label behavior.
+- Keep the layout intrinsic and logically reflowing; page columns, sticky placement, responsive order, hiding, and collapse remain host responsibilities.
 
 ## References
 
 <PropTable>
-  <tr><td>`sections`</td><td>slot</td><td>required</td><td>Target-owned search, category, recent-post, tag, or other sidebar sections</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Localized accessible name; blank omits the complete root</td></tr>
+  <tr><td>`sections`</td><td>slot</td><td>required</td><td>Non-empty target-authored semantic sections retaining their canonical module contracts</td></tr>
 </PropTable>
 
-Anatomy: `.blog-sidebar`, `.blog-sidebar__section`, `.blog-sidebar__title`, `.blog-sidebar__list`, `.blog-sidebar__list-item`, `.blog-sidebar__link`, `.tag-cloud`, and `.tag-cloud__item`.
+Anatomy: `.blog-sidebar`, `.blog-sidebar__section`, `.blog-sidebar__title`, `.blog-sidebar__list`, `.blog-sidebar__list-item`, `.blog-sidebar__link`, `.blog-sidebar__topics`, `.blog-sidebar__topic`, and `.blog-sidebar__topic-link`. Deprecated migration aliases: `.tag-cloud`, `.tag-cloud__entry`, and `.tag-cloud__item`.
 
-Dependency: [Tag](/components/tag). The contract remains `pilot`; whether that dependency owns tag-cloud items and whether Input owns sidebar search remain explicitly unresolved.
+Dependency: [Link](/components/link). Owner decision 51 accepts the public Blog Sidebar identity, initial Recent Articles + Topics profile, host-owned order/limits/headings, and separate Search/Newsletter composition. Shopify maps explicit Blog data through the same native lists. Contract status remains `pilot`; alias removal, real target placement, final visuals, component-specific design evidence, and explicit human stability review remain pending.

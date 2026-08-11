@@ -7,19 +7,11 @@ import {
   type FormEvent,
 } from 'react';
 import {
-  Check,
-  ChevronDown,
-  Heart,
-  Mail,
-  MapPin,
-  MessageCircle,
   PackageCheck,
-  Play,
   RefreshCw,
   ShieldCheck,
   Sparkles,
   Truck,
-  X,
 } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
@@ -28,7 +20,26 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import AccordionArtwork from './AccordionArtwork';
+import BeforeAfterArtwork, { beforeAfterFixtureMedia } from './BeforeAfterArtwork';
+import ComparisonTableArtwork, {
+  buildComparisonTableFixture,
+  type ComparisonInteraction,
+  type ComparisonSelectionMode,
+} from './ComparisonTableArtwork';
 import { editorialImage } from './editorialMedia';
+import MarqueeArtwork, {
+  marqueeFixtureItems,
+  type MarqueeDirection,
+  type MarqueePace,
+  type MarqueePresentation,
+} from './MarqueeArtwork';
+import LogoBarArtwork, {
+  logoBarFixtureMarks,
+  type LogoBarPresentation,
+} from './LogoBarArtwork';
+import ProductCardArtwork from './ProductCardArtwork';
+import StatArtwork from './StatArtwork';
 
 interface SectionsStudioProps {
   contract: ComponentContract;
@@ -38,15 +49,9 @@ interface SectionsStudioProps {
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
 const fixtures: Record<string, StudioPropertyValues> = {
-  'hero-section': {
-    variant: 'full', media: true, overlay: true, eyebrow: 'The summer exhibition',
-    title: 'Useful objects, considered slowly',
-    subtitle: 'A study of material, proportion, and the rituals that give objects meaning.',
-    actions: true, slides: false,
-  },
   'featured-collection': {
     variant: 'grid', title: 'Selected works', viewAllLabel: 'View the collection',
-    viewAllDestination: '#collection', products: true,
+    viewAllDestination: '/components/collection-grid', products: true,
   },
   'image-text': {
     variant: 'default', media: true, eyebrow: 'Material study', title: 'Clay remembers the hand',
@@ -56,8 +61,7 @@ const fixtures: Record<string, StudioPropertyValues> = {
   'gallery-grid': { variant: 'grid', title: 'In the gallery', items: true },
   lookbook: { title: 'Objects in place', items: true },
   'video-section': {
-    variant: 'contained', media: true, playAction: true,
-    playLabel: 'Play the studio film', caption: 'A quiet afternoon in the ceramics studio.',
+    variant: 'contained', media: true, caption: 'A quiet afternoon in the ceramics studio.',
   },
   'brand-story': {
     media: true, eyebrow: 'Our practice', title: 'A gallery built around attention', body: true, signature: true,
@@ -67,27 +71,154 @@ const fixtures: Record<string, StudioPropertyValues> = {
   },
   'contact-section': {
     title: 'Speak with the gallery', description: 'Ask about a work, commission, or private viewing.',
-    details: true, form: true,
+    formLabel: 'Send an inquiry to the gallery', details: true, form: true,
   },
   'stats-section': { title: 'The studio in numbers', metrics: true },
-  'logo-bar': { variant: 'static', label: 'Presented with', logos: true },
-  'comparison-table': { title: 'Choose your finish', table: true },
+  'logo-bar': {
+    presentation: 'static', label: 'Presented with', marks: true,
+    direction: 'forward', pace: 'default', pauseLabel: 'Pause logos', resumeLabel: 'Resume logos',
+  },
+  'comparison-table': {
+    title: 'Choose your finish', table: true, interaction: 'selectable',
+    selectionMode: 'single', selectedId: 'satin', selectedIds: ['satin', 'gloss'],
+  },
   'shipping-info': { items: true },
   'rich-text-section': { title: 'On useful beauty', body: true },
   'instagram-feed': {
-    heading: 'From the studio', handle: '@thegallery', handleDestination: '#studio', items: true, action: true,
+    heading: 'From the studio', handle: '@thegallery', handleDestination: '/components/instagram-feed', items: true, action: true,
   },
   'before-after': {
-    beforeMedia: true, afterMedia: true, beforeLabel: 'Raw clay', afterLabel: 'Final glaze', control: true,
+    label: 'Reveal the warm color treatment percentage',
+    description: 'Original and warm treatments of the same vessel.',
+    beforeMedia: true, afterMedia: true, beforeLabel: 'Original', afterLabel: 'Warm treatment',
+    value: 50, disabled: false, name: '',
   },
-  marquee: { items: true },
+  marquee: {
+    presentation: 'auto', label: 'Studio principles', items: true,
+    direction: 'forward', pace: 'default', pauseLabel: 'Pause scrolling', resumeLabel: 'Resume scrolling',
+  },
   'collage-section': { heading: 'Studies in form', items: true },
 };
+
+const featuredCollectionProducts = [
+  {
+    title: 'Ribbed stoneware vessel',
+    imageAlt: 'Tall ribbed stoneware vessel in a dark studio setting',
+    mediaIndex: 1,
+    vendor: 'The Gallery Studio',
+    subtitle: 'Ash glaze · one of one',
+    currentPrice: '$298.00',
+  },
+  {
+    title: 'Low serving bowl',
+    imageAlt: 'Low ceramic serving bowl arranged on a wooden table',
+    mediaIndex: 2,
+    vendor: 'Atelier Norte',
+    currentPrice: '$186.00',
+  },
+  {
+    title: 'Taza de gres torneada a mano',
+    imageAlt: 'Maker finishing a wheel-thrown stoneware cup',
+    mediaIndex: 3,
+    vendor: 'Taller Sur',
+    subtitle: 'Esmalte de ceniza',
+    currentPrice: '$124.00',
+  },
+  {
+    title: 'وعاء من الخزف الحجري',
+    imageAlt: 'Stoneware vessel with a pale mineral glaze',
+    mediaIndex: 4,
+    vendor: 'Bayt Studio',
+    currentPrice: '$210.00',
+  },
+  {
+    title: 'Quiet form No. 07',
+    imageAlt: 'Rounded ceramic form with a soft matte finish',
+    mediaIndex: 5,
+    subtitle: 'Porcelain · satin glaze',
+    currentPrice: '$340.00',
+  },
+  {
+    title: 'Pair of nesting dishes',
+    imageAlt: 'Two nesting ceramic dishes photographed from above',
+    mediaIndex: 6,
+    vendor: 'The Gallery Editions',
+    currentPrice: '$152.00',
+  },
+] as const;
+
+const instagramFeedItems = [
+  {
+    alt: 'Wheel-thrown stoneware forms drying on a studio board',
+    caption: 'Wheel-thrown forms',
+    destination: '/components/process-timeline',
+    mediaIndex: 1,
+  },
+  {
+    alt: 'Mineral glaze samples arranged after firing',
+    caption: 'Glaze tests',
+    mediaIndex: 2,
+  },
+  {
+    alt: 'One-of-one ceramic work wrapped for protected delivery',
+    caption: 'Packing one-of-one works',
+    destination: '/components/shipping-info',
+    mediaIndex: 3,
+  },
+  {
+    alt: 'Ceramic vessels installed on a quiet gallery shelf',
+    caption: 'Installation view',
+    mediaIndex: 4,
+  },
+  {
+    alt: 'Clay, oxide, and glaze samples in the material archive',
+    caption: 'Material archive',
+    destination: '/components/gallery-grid',
+    mediaIndex: 5,
+  },
+  {
+    alt: 'Late afternoon light crossing the ceramics studio',
+    caption: 'Studio light',
+    mediaIndex: 6,
+  },
+] as const;
+
+const collageItems = [
+  {
+    alt: 'Large hand-built vessel beside a linen chair',
+    caption: 'Sculptural scale',
+    featured: true,
+    mediaIndex: 1,
+  },
+  {
+    alt: 'Two stoneware cups on a timber table',
+    caption: 'Daily rituals',
+    destination: '/components/gallery-grid',
+    mediaIndex: 2,
+  },
+  {
+    alt: 'Mineral glaze samples arranged in a studio tray',
+    caption: 'Surface studies',
+    mediaIndex: 3,
+  },
+  {
+    alt: 'Low ceramic bowl in late afternoon light',
+    caption: 'Quiet utility',
+    destination: '/components/image-text',
+    mediaIndex: 4,
+  },
+  {
+    alt: 'Clay forms drying together on an open shelf',
+    caption: 'Works in progress',
+    mediaIndex: 5,
+  },
+] as const;
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
   if ('defaultValue' in property) return property.defaultValue ?? null;
   if (property.type === 'boolean' || property.type === 'slot') return false;
   if (property.type === 'number') return null;
+  if (property.type === 'string-list') return [];
   if (property.type === 'enum') {
     const options = property.valuesFrom === 'variants'
       ? contract.variants
@@ -125,21 +256,6 @@ function SectionMedia({ index = 1, className = '', alt }: { index?: number; clas
       src={editorialImage(index - 1)}
       alt={alt}
     />
-  );
-}
-
-function ProductCard({ index }: { index: number }) {
-  return (
-    <article className="product-card docs-studio__sections-product-card">
-      <div className="product-card__media">
-        <SectionMedia className="product-card__image product-card__image--primary" index={index} alt={`Ceramic study ${index}`} />
-      </div>
-      <div className="product-card__body">
-        <span className="product-card__vendor">The Gallery Studio</span>
-        <h3 className="product-card__title"><a href="#product" onClick={(event) => event.preventDefault()}>Study No. {index}</a></h3>
-      </div>
-      <div className="product-card__footer"><span className="price"><span className="price__current">${80 + index * 18}.00</span></span></div>
-    </article>
   );
 }
 
@@ -182,80 +298,234 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
     setFeedback('');
   }
 
-  function renderHero() {
-    const variant = optionClass(contract, values.variant);
-    const isSlides = values.variant === 'slideshow' && values.slides === true;
-    return (
-      <section className={['hero-section', variant, 'docs-studio__sections-hero'].filter(Boolean).join(' ')} aria-labelledby={`sections-hero-${uid}`}>
-        {values.media === true && (
-          <div className="hero-section__media">
-            {isSlides ? <div className="hero-section__slide"><SectionMedia index={1} alt="Stoneware vessels in the gallery" /></div> : <SectionMedia index={1} alt="Stoneware vessels in the gallery" />}
-          </div>
-        )}
-        {values.overlay === true && <div className="hero-section__overlay" aria-hidden="true" />}
-        <div className="hero-section__content">
-          {String(values.eyebrow || '') && <div className="hero-section__eyebrow">{String(values.eyebrow)}</div>}
-          <h2 className="hero-section__title" id={`sections-hero-${uid}`}>{String(values.title)}</h2>
-          {String(values.subtitle || '') && <p className="hero-section__subtitle">{String(values.subtitle)}</p>}
-          {values.actions === true && <div className="hero-section__actions"><a className="btn" href="#works" onClick={(e) => e.preventDefault()}>View works</a><a className="btn btn--secondary" href="#story" onClick={(e) => e.preventDefault()}>Our practice</a></div>}
-        </div>
-      </section>
-    );
-  }
-
   function renderFeaturedCollection() {
+    const title = String(values.title || '').trim();
+    if (!title || values.products !== true) return null;
+
+    const variantName = String(values.variant || 'grid');
     const variant = optionClass(contract, values.variant);
+    const isGrid = variantName === 'grid';
+    const isCarousel = variantName === 'carousel';
+    const viewAllLabel = String(values.viewAllLabel || '').trim();
+    const viewAllDestination = String(values.viewAllDestination || '').trim();
+    const rootDependency = isGrid ? 'collection-grid' : isCarousel ? 'carousel' : '';
+    const listDependency = isGrid ? 'collection-grid__items' : isCarousel ? 'carousel__track' : '';
+    const itemDependency = isGrid ? 'collection-grid__item' : isCarousel ? 'carousel__slide' : '';
+    const titleId = `sections-featured-${uid}`;
+
     return (
-      <section className={['featured-collection', variant, 'docs-studio__sections-featured'].filter(Boolean).join(' ')}>
-        <div className="featured-collection__header">
-          {String(values.title || '') && <h2 className="featured-collection__title">{String(values.title)}</h2>}
-          {String(values.viewAllLabel || '') && <a className="featured-collection__link" href={String(values.viewAllDestination || '#collection')} onClick={(e) => e.preventDefault()}>{String(values.viewAllLabel)}</a>}
-        </div>
-        {values.products === true && <div className="featured-collection__grid">{[1, 2, 3].map((index) => <ProductCard index={index} key={index} />)}</div>}
+      <section
+        className={['featured-collection', variant, rootDependency, 'docs-studio__sections-featured'].filter(Boolean).join(' ')}
+        aria-labelledby={titleId}
+      >
+        <header className="featured-collection__header">
+          <h2 className="featured-collection__title" id={titleId}>{title}</h2>
+          {viewAllLabel && viewAllDestination && (
+            <a className="link featured-collection__link" href={viewAllDestination}>{viewAllLabel}</a>
+          )}
+        </header>
+        <ul
+          className={['featured-collection__grid', listDependency].filter(Boolean).join(' ')}
+          role="list"
+          aria-labelledby={titleId}
+          tabIndex={isCarousel ? 0 : undefined}
+        >
+          {featuredCollectionProducts.map((product, index) => (
+            <li className={['featured-collection__item', itemDependency].filter(Boolean).join(' ')} key={product.title}>
+              <ProductCardArtwork
+                {...product}
+                href={`/components/product-card?work=${index + 1}`}
+                className="docs-studio__product-card docs-studio__product-card--compact docs-studio__sections-product-card"
+              />
+            </li>
+          ))}
+        </ul>
       </section>
     );
   }
 
   function renderImageText() {
+    const title = String(values.title || '').trim();
+    const hasMedia = values.media === true;
+    const hasBody = values.body === true;
+    if (!title || !hasMedia || !hasBody) return null;
+
+    const eyebrow = String(values.eyebrow || '').trim();
     const variant = optionClass(contract, values.variant);
+    const titleId = `sections-image-text-${uid}`;
     return (
-      <section className={['image-text', variant, 'docs-studio__sections-image-text'].filter(Boolean).join(' ')}>
-        {values.media === true && <div className="image-text__media"><SectionMedia index={2} alt="Hands shaping a vessel" /></div>}
+      <section
+        className={['image-text', variant, 'docs-studio__sections-image-text'].filter(Boolean).join(' ')}
+        aria-labelledby={titleId}
+      >
+        <div className="image-text__media">
+          <SectionMedia index={2} alt="Stoneware bowls and plates arranged on a wooden table" />
+        </div>
         <div className="image-text__content">
-          {String(values.eyebrow || '') && <div className="image-text__eyebrow">{String(values.eyebrow)}</div>}
-          <h2 className="image-text__title">{String(values.title)}</h2>
-          {values.body === true && <div className="image-text__body"><p>Every surface records pressure, time, and the decisions made while the clay is still responsive.</p></div>}
-          {values.action === true && <a className="image-text__cta btn" href="#material" onClick={(e) => e.preventDefault()}>Explore the material</a>}
+          {eyebrow && <p className="image-text__eyebrow">{eyebrow}</p>}
+          <h2 className="image-text__title" id={titleId}>{title}</h2>
+          <div className="image-text__body">
+            <p>Every surface records pressure, time, and the decisions made while the clay is still responsive.</p>
+          </div>
+          {values.action === true && (
+            <a className="image-text__cta btn" href="/components/material-library">Explore the material</a>
+          )}
         </div>
       </section>
     );
   }
 
   function renderMulticolumn() {
+    if (values.items !== true) return null;
+
+    const title = String(values.title || '').trim();
+    const titleId = `sections-multicolumn-${uid}`;
+    const Root = title ? 'section' : 'div';
     const items = [
       [Sparkles, 'Small batches', 'Each group is made slowly and finished by hand.'],
       [ShieldCheck, 'Durable materials', 'Glazes and forms are selected for everyday use.'],
       [RefreshCw, 'Considered cycles', 'Clay and packaging are reused whenever possible.'],
     ] as const;
-    return <section className="multicolumn docs-studio__sections-multicolumn">{String(values.title || '') && <div className="multicolumn__header"><h2 className="multicolumn__title">{String(values.title)}</h2></div>}{values.items === true && <div className="multicolumn__grid">{items.map(([Icon, title, text]) => <article className="multicolumn__item" key={title}><Icon className="multicolumn__icon" aria-hidden="true" /><h3 className="multicolumn__item-title">{title}</h3><p className="multicolumn__item-text">{text}</p></article>)}</div>}</section>;
+    return (
+      <Root
+        className="multicolumn docs-studio__sections-multicolumn"
+        aria-labelledby={title ? titleId : undefined}
+      >
+        {title && (
+          <div className="multicolumn__header">
+            <h2 className="multicolumn__title" id={titleId}>{title}</h2>
+          </div>
+        )}
+        <ul className="multicolumn__grid">
+          {items.map(([Icon, itemTitle, text]) => (
+            <li className="multicolumn__item" key={itemTitle}>
+              <Icon className="multicolumn__icon" aria-hidden="true" />
+              <h3 className="multicolumn__item-title">{itemTitle}</h3>
+              <p className="multicolumn__item-text">{text}</p>
+            </li>
+          ))}
+        </ul>
+      </Root>
+    );
   }
 
   function renderGallery() {
+    if (values.items !== true) return null;
     const variant = optionClass(contract, values.variant);
-    return <section className={['gallery-grid', variant, 'docs-studio__sections-gallery'].filter(Boolean).join(' ')}>{String(values.title || '') && <div className="gallery-grid__header"><h2 className="gallery-grid__title">{String(values.title)}</h2></div>}{values.items === true && <div className="gallery-grid__items">{[1, 2, 3, 4].map((index) => <div className="gallery-grid__item" tabIndex={0} key={index}><SectionMedia index={index} alt={`Gallery installation view ${index}`} /></div>)}</div>}</section>;
+    const title = String(values.title || '').trim();
+    const titleId = `sections-gallery-grid-${uid}`;
+    const Root = title ? 'section' : 'div';
+    const items = [
+      ['Textured ceramic vase against a dark studio backdrop', 1],
+      ['Handmade ceramic tableware arranged on linen', 2],
+      ['Ceramic artist standing beside work in the studio', 3],
+      ['Pastel ceramic tableware arranged on a dining table', 4],
+    ] as const;
+    return (
+      <Root
+        className={['gallery-grid', variant, 'docs-studio__sections-gallery'].filter(Boolean).join(' ')}
+        aria-labelledby={title ? titleId : undefined}
+      >
+        {title && <div className="gallery-grid__header"><h2 className="gallery-grid__title" id={titleId}>{title}</h2></div>}
+        <ul className="gallery-grid__items">
+          {items.map(([alt, index]) => <li className="gallery-grid__item" key={alt}><SectionMedia index={index} alt={alt} /></li>)}
+        </ul>
+      </Root>
+    );
   }
 
   function renderLookbook() {
-    return <section className="lookbook docs-studio__sections-lookbook">{String(values.title || '') && <div className="lookbook__header"><h2 className="lookbook__title">{String(values.title)}</h2></div>}{values.items === true && <div className="lookbook__grid">{[1, 2, 3, 4].map((index) => <div className={`lookbook__cell${index === 1 ? ' lookbook__cell--wide' : ''}`} tabIndex={0} key={index}><SectionMedia index={index + 1} alt={`Ceramic object in an interior ${index}`} /><div className="lookbook__caption">Stoneware study {index}</div>{index === 1 && <span className="lookbook__hotspot" aria-hidden="true" />}</div>)}</div>}</section>;
+    if (values.items !== true) return null;
+    const title = String(values.title || '').trim();
+    const titleId = `sections-lookbook-${uid}`;
+    const Root = title ? 'section' : 'div';
+    const items = [
+      {
+        alt: 'Textured stoneware vessel against a dark studio backdrop',
+        caption: 'Mineral study',
+        index: 1,
+        modifier: 'lookbook__cell--wide',
+      },
+      {
+        alt: 'Stoneware tableware arranged on linen',
+        caption: 'Objects for daily rituals',
+        index: 2,
+        modifier: 'lookbook__cell--tall',
+      },
+      {
+        alt: 'Ceramic artist shaping a vessel in the studio',
+        caption: 'The maker at work',
+        index: 3,
+      },
+      {
+        alt: 'Pastel tableware arranged on a dining surface',
+        caption: 'Soft forms, shared table',
+        index: 4,
+      },
+      {
+        alt: 'Potter shaping clay at the wheel',
+        caption: 'Wheel-thrown process',
+        index: 5,
+      },
+      {
+        alt: 'Ceramic vessels arranged on studio shelves',
+        caption: 'Archive of vessels',
+        index: 6,
+      },
+    ];
+
+    return (
+      <Root
+        className="lookbook docs-studio__sections-lookbook"
+        aria-labelledby={title ? titleId : undefined}
+      >
+        {title && <div className="lookbook__header"><h2 className="lookbook__title" id={titleId}>{title}</h2></div>}
+        <ol className="lookbook__grid">
+          {items.map((item) => (
+            <li
+              className={['lookbook__cell', item.modifier].filter(Boolean).join(' ')}
+              key={item.caption}
+            >
+              <figure className="lookbook__figure">
+                <SectionMedia index={item.index} alt={item.alt} />
+                <figcaption className="lookbook__caption">{item.caption}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ol>
+      </Root>
+    );
   }
 
   function renderVideo() {
+    if (values.media !== true) return null;
     const variant = optionClass(contract, values.variant);
-    return <figure className={['video-section', variant, 'docs-studio__sections-video'].filter(Boolean).join(' ')}>{values.media === true && <div className="video-section__wrapper"><SectionMedia className="video-section__poster" index={4} alt="Still from the studio film" />{values.playAction === true && <button className="video-section__play" type="button" aria-label={String(values.playLabel || 'Play video')}><Play aria-hidden="true" /></button>}</div>}{String(values.caption || '') && <figcaption className="video-section__caption">{String(values.caption)}</figcaption>}</figure>;
+    const caption = String(values.caption || '').trim();
+    return <figure className={['video-section', variant].filter(Boolean).join(' ')}><div className="video-section__wrapper"><SectionMedia className="video-section__media" index={4} alt="A ceramicist centering clay on a pottery wheel" /></div>{caption && <figcaption className="video-section__caption">{caption}</figcaption>}</figure>;
   }
 
   function renderBrandStory() {
-    return <section className="brand-story docs-studio__sections-brand"><div className="brand-story__grid">{values.media === true && <div className="brand-story__media"><SectionMedia index={5} alt="The maker at a workbench" /></div>}<div className="brand-story__content">{String(values.eyebrow || '') && <div className="brand-story__eyebrow">{String(values.eyebrow)}</div>}<h2 className="brand-story__title">{String(values.title)}</h2>{values.body === true && <div className="brand-story__text"><p>We work with independent makers whose practices value material intelligence, restraint, and lasting use.</p><p>The gallery gives those objects enough room to be seen closely.</p></div>}{values.signature === true && <div className="brand-story__signature docs-studio__sections-signature" aria-label="The Gallery">The Gallery</div>}</div></div></section>;
+    const title = String(values.title || '').trim();
+    if (!title || values.media !== true || values.body !== true) return null;
+
+    const eyebrow = String(values.eyebrow || '').trim();
+    const titleId = `sections-brand-story-${uid}`;
+    return (
+      <section className="brand-story image-text" aria-labelledby={titleId}>
+        <div className="image-text__media">
+          <SectionMedia index={5} alt="A ceramicist shaping a vessel at a wheel in the studio" />
+        </div>
+        <div className="image-text__content">
+          {eyebrow && <p className="image-text__eyebrow">{eyebrow}</p>}
+          <h2 className="image-text__title" id={titleId}>{title}</h2>
+          <div className="image-text__body">
+            <p>We work with independent makers whose practices value material intelligence, restraint, and lasting use.</p>
+            <p>The gallery gives those objects enough room to be seen closely.</p>
+          </div>
+          {values.signature === true && <footer className="brand-story__signature">The Gallery</footer>}
+        </div>
+      </section>
+    );
   }
 
   function renderFaq() {
@@ -264,61 +534,370 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
       ['Can I request a private viewing?', 'The gallery can arrange a remote or in-person viewing for available works.'],
       ['How should I care for the ceramics?', 'Use a soft cloth and avoid sudden temperature changes unless the work states otherwise.'],
     ];
-    return <section className="faq-section docs-studio__sections-faq">{(String(values.title || '') || String(values.subtitle || '')) && <div className="faq-section__header">{String(values.title || '') && <h2 className="faq-section__title">{String(values.title)}</h2>}{String(values.subtitle || '') && <p className="faq-section__subtitle">{String(values.subtitle)}</p>}</div>}{values.items === true && <div className="accordion">{items.map(([title, content], index) => { const expanded = openFaq === index; const trigger = `sections-faq-trigger-${uid}-${index}`; const panel = `sections-faq-panel-${uid}-${index}`; return <div className="accordion__item" key={title}><button className="accordion__trigger" id={trigger} type="button" aria-expanded={expanded} aria-controls={panel} onClick={() => setOpenFaq(expanded ? -1 : index)}><span>{title}</span><ChevronDown className="accordion__icon" aria-hidden="true" /></button><div className="accordion__panel" id={panel} role="region" aria-labelledby={trigger}><div className="accordion__panel-inner"><div className="accordion__content">{content}</div></div></div></div>; })}</div>}</section>;
+    if (values.items !== true || items.length === 0) return null;
+
+    const title = String(values.title || '').trim();
+    const subtitle = String(values.subtitle || '').trim();
+    const titleId = title ? `sections-faq-${uid}` : undefined;
+    const Root = title ? 'section' : 'div';
+
+    return (
+      <Root className="faq-section" aria-labelledby={titleId}>
+        {(title || subtitle) && (
+          <header className="faq-section__header">
+            {title && <h2 className="faq-section__title" id={titleId}>{title}</h2>}
+            {subtitle && <p className="faq-section__subtitle">{subtitle}</p>}
+          </header>
+        )}
+        <AccordionArtwork
+          className="faq-section__list"
+          idPrefix={`sections-faq-${uid}`}
+          items={items.map(([question, answer]) => ({
+            key: question,
+            title: question,
+            className: 'faq-section__item',
+            content: <p>{answer}</p>,
+          }))}
+          expandedItems={items.map((_, index) => openFaq === index)}
+          onToggle={(index) => setOpenFaq((current) => current === index ? -1 : index)}
+          headingLevel={title ? 3 : 2}
+        />
+      </Root>
+    );
   }
 
   function submitContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setFeedback(`Thank you${email ? `, ${email}` : ''}. Your preview message was received.`);
+    setFeedback('Preview only: no message was sent.');
   }
 
   function renderContact() {
+    const title = String(values.title || '').trim();
+    const description = String(values.description || '').trim();
+    const formLabel = String(values.formLabel || '').trim();
+    const hasDetails = values.details === true;
+    const hasInfo = Boolean(title || description || hasDetails);
+    if (values.form !== true || !formLabel) return null;
+
+    const titleId = title ? `sections-contact-title-${uid}` : undefined;
     const emailId = `sections-contact-email-${uid}`;
     const messageId = `sections-contact-message-${uid}`;
-    const feedbackId = `sections-contact-feedback-${uid}`;
-    return <section className="contact-section docs-studio__sections-contact"><div className="contact-section__grid"><div className="contact-section__info">{String(values.title || '') && <h2 className="contact-section__title">{String(values.title)}</h2>}{String(values.description || '') && <p className="contact-section__text">{String(values.description)}</p>}{values.details === true && <><div className="contact-section__detail"><Mail aria-hidden="true" /><span>studio@thegallery.example</span></div><div className="contact-section__detail"><MapPin aria-hidden="true" /><span>Private viewings by appointment</span></div></>}</div>{values.form === true && <form className="contact-section__form" onSubmit={submitContact}><div className="input"><label className="input__label" htmlFor={emailId}>Email</label><div className="input__control"><input className="input__field" id={emailId} type="email" value={email} required aria-describedby={feedback ? feedbackId : undefined} onChange={(e) => setEmail(e.target.value)} /></div></div><div className="input textarea"><label className="input__label" htmlFor={messageId}>Message</label><div className="input__control"><textarea className="input__field textarea__field" id={messageId} value={message} required onChange={(e) => setMessage(e.target.value)} /></div></div><button className="btn" type="submit">Send inquiry</button>{feedback && <p className="input__message" id={feedbackId} role="status">{feedback}</p>}</form>}</div></section>;
+    const Root = title ? 'section' : 'div';
+
+    return (
+      <Root className="contact-section" aria-labelledby={titleId}>
+        <div className="contact-section__grid">
+          {hasInfo && (
+            <div className="contact-section__info">
+              {(title || description) && (
+                <header className="contact-section__header">
+                  {title && <h2 className="contact-section__title" id={titleId}>{title}</h2>}
+                  {description && <p className="contact-section__text">{description}</p>}
+                </header>
+              )}
+              {hasDetails && (
+                <address className="contact-section__details">
+                  <ul>
+                    <li className="contact-section__detail">
+                      <a href="mailto:studio@thegallery.example">studio@thegallery.example</a>
+                    </li>
+                    <li className="contact-section__detail">
+                      <span>Private viewings by appointment</span>
+                    </li>
+                  </ul>
+                </address>
+              )}
+            </div>
+          )}
+          <form className="contact-section__form" aria-label={formLabel} method="post" onSubmit={submitContact}>
+            <div className="input">
+              <label className="input__label" htmlFor={emailId}>Email (required)</label>
+              <div className="input__control">
+                <input
+                  className="input__field"
+                  id={emailId}
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  required
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setFeedback('');
+                  }}
+                />
+              </div>
+            </div>
+            <div className="input">
+              <label className="input__label" htmlFor={messageId}>Message (required)</label>
+              <div className="input__control">
+                <textarea
+                  className="input__field textarea__field"
+                  id={messageId}
+                  name="message"
+                  value={message}
+                  required
+                  data-min-lines="4"
+                  onChange={(event) => {
+                    setMessage(event.target.value);
+                    setFeedback('');
+                  }}
+                />
+              </div>
+            </div>
+            <button className="btn" type="submit">Send inquiry</button>
+            {feedback && <p className="contact-section__status" role="status">{feedback}</p>}
+          </form>
+        </div>
+      </Root>
+    );
   }
 
   function renderStats() {
-    return <section className="stats-section docs-studio__sections-stats">{String(values.title || '') && <h2 className="stats-section__title">{String(values.title)}</h2>}{values.metrics === true && <div className="stats-section__grid">{[['18', 'Independent makers'], ['42', 'New works'], ['7', 'Material studies']].map(([number, label]) => <div className="stats-section__item" key={label}><div className="stats-section__number">{number}</div><div className="stats-section__label">{label}</div></div>)}</div>}</section>;
+    if (values.metrics !== true) return null;
+
+    const title = String(values.title || '').trim();
+    const Root = title ? 'section' : 'div';
+    const titleId = title ? `sections-stats-${uid}` : undefined;
+    const metrics = [
+      ['18', 'Independent makers'],
+      ['42', 'New works'],
+      ['7', 'Material studies'],
+    ] as const;
+
+    return (
+      <Root
+        className="stats-section docs-studio__sections-stats"
+        aria-labelledby={titleId}
+      >
+        <div className="stats-section__inner">
+          {title && <h2 className="stats-section__title" id={titleId}>{title}</h2>}
+          <ul className="stats-section__grid stat-group">
+            {metrics.map(([value, label]) => (
+              <StatArtwork
+                as="li"
+                value={value}
+                label={label}
+                className="stats-section__item"
+                key={label}
+              />
+            ))}
+          </ul>
+        </div>
+      </Root>
+    );
   }
 
   function renderLogoBar() {
-    const variant = optionClass(contract, values.variant);
-    return <section className={['logo-bar', variant, 'docs-studio__sections-logo-bar'].filter(Boolean).join(' ')}>{String(values.label || '') && <div className="logo-bar__label">{String(values.label)}</div>}{values.logos === true && <div className="logo-bar__logos" aria-label="Gallery partners">{['Form', 'Matter', 'Atelier', 'Index'].map((label) => <span className="docs-studio__sections-logo" key={label}>{label}</span>)}</div>}</section>;
+    return (
+      <LogoBarArtwork
+        marks={values.marks === true ? logoBarFixtureMarks : []}
+        label={String(values.label || '')}
+        presentation={String(values.presentation || 'static') as LogoBarPresentation}
+        direction={String(values.direction || 'forward') as MarqueeDirection}
+        pace={String(values.pace || 'default') as MarqueePace}
+        pauseLabel={String(values.pauseLabel || '')}
+        resumeLabel={String(values.resumeLabel || '')}
+        className="docs-studio__sections-logo-bar"
+      />
+    );
   }
 
   function renderComparison() {
-    return <section className="comparison-table docs-studio__sections-comparison" tabIndex={0}>{String(values.title || '') && <h2 className="comparison-table__title">{String(values.title)}</h2>}{values.table === true && <table><thead><tr><th scope="col">Quality</th><th className="comparison-table__highlight" scope="col">Satin</th><th scope="col">Gloss</th></tr></thead><tbody><tr><th scope="row">Soft reflection</th><td className="comparison-table__highlight"><Check className="comparison-table__check" aria-label="Included" /></td><td><X className="comparison-table__cross" aria-label="Not included" /></td></tr><tr><th scope="row">Dishwasher suitable</th><td className="comparison-table__highlight"><Check className="comparison-table__check" aria-label="Included" /></td><td><Check className="comparison-table__check" aria-label="Included" /></td></tr></tbody></table>}</section>;
+    return (
+      <ComparisonTableArtwork
+        title={String(values.title || '')}
+        fixture={values.table === true ? buildComparisonTableFixture() : null}
+        interaction={String(values.interaction || 'passive') as ComparisonInteraction}
+        selectionMode={String(values.selectionMode || 'single') as ComparisonSelectionMode}
+        selectedId={String(values.selectedId || '')}
+        selectedIds={Array.isArray(values.selectedIds) ? values.selectedIds : []}
+        onSelectionChange={(selection) => setValues((current) => ({
+          ...current,
+          ...(Array.isArray(selection)
+            ? { selectedIds: selection }
+            : { selectedId: selection }),
+        }))}
+        className="docs-studio__sections-comparison"
+      />
+    );
   }
 
   function renderShipping() {
+    if (values.items !== true) return null;
+
     const items = [[Truck, 'Careful delivery', 'Tracked delivery with protective packing.'], [PackageCheck, 'Gallery checked', 'Every work is inspected before dispatch.'], [ShieldCheck, 'Insured transit', 'Coverage is included until arrival.']] as const;
-    return <section className="shipping-info docs-studio__sections-shipping">{values.items === true && items.map(([Icon, label, text]) => <div className="shipping-info__item" key={label}><Icon className="shipping-info__icon" aria-hidden="true" /><div className="shipping-info__label">{label}</div><div className="shipping-info__text">{text}</div></div>)}</section>;
+    return (
+      <ul className="shipping-info" role="list">
+        {items.map(([Icon, label, text]) => (
+          <li className="shipping-info__item" key={label}>
+            <Icon className="shipping-info__icon" aria-hidden="true" />
+            <p className="shipping-info__label">{label}</p>
+            <p className="shipping-info__text">{text}</p>
+          </li>
+        ))}
+      </ul>
+    );
   }
 
   function renderRichText() {
-    return <article className="rich-text-section docs-studio__sections-rich-text">{String(values.title || '') && <h2 className="rich-text-section__title">{String(values.title)}</h2>}{values.body === true && <div className="rich-text-section__body"><p>The most useful objects rarely ask for attention. They earn it slowly through proportion, touch, and repetition.</p><blockquote>A vessel becomes familiar through use, but never entirely ordinary.</blockquote><h3>Material as record</h3><p>Clay preserves a sequence of decisions. <a href="#process" onClick={(e) => e.preventDefault()}>Read about the process</a>.</p></div>}</article>;
+    if (values.body !== true) return null;
+
+    const title = String(values.title || '').trim();
+    const titleId = `sections-rich-text-${uid}`;
+    const Root = title ? 'section' : 'div';
+    return (
+      <Root
+        className="rich-text-section docs-studio__sections-rich-text"
+        aria-labelledby={title ? titleId : undefined}
+      >
+        {title && <h2 className="rich-text-section__title" id={titleId}>{title}</h2>}
+        <div className="rich-text-section__body">
+          <p>The most useful objects rarely ask for attention. They earn it slowly through proportion, touch, and repetition.</p>
+          <blockquote>
+            <p>A vessel becomes familiar through use, but never entirely ordinary.</p>
+            <cite>Studio journal</cite>
+          </blockquote>
+          <h3>Material as record</h3>
+          <p>Clay preserves a sequence of decisions:</p>
+          <ul>
+            <li>pressure held at the rim</li>
+            <li>the pace of drying</li>
+            <li>the final layer of glaze</li>
+          </ul>
+          <p>See how those decisions become form in the <a href="/components/process-timeline">making process</a>.</p>
+        </div>
+      </Root>
+    );
   }
 
   function renderInstagram() {
-    return <section className="instagram-feed docs-studio__sections-instagram">{(String(values.heading || '') || String(values.handle || '')) && <div className="instagram-feed__header">{String(values.heading || '') && <h2 className="instagram-feed__heading">{String(values.heading)}</h2>}{String(values.handle || '') && <a className="instagram-feed__handle" href={String(values.handleDestination || '#studio')} onClick={(e) => e.preventDefault()}>{String(values.handle)}</a>}</div>}{values.items === true && <div className="instagram-feed__grid">{[1, 2, 3, 4, 5, 6].map((index) => <div className="instagram-feed__item" tabIndex={0} key={index}><SectionMedia index={index} alt={`Studio detail ${index}`} /><div className="instagram-feed__overlay"><span className="instagram-feed__stat"><Heart aria-hidden="true" /> {20 + index}</span><span className="instagram-feed__stat"><MessageCircle aria-hidden="true" /> {index}</span></div></div>)}</div>}{values.action === true && <div className="instagram-feed__cta"><a className="btn btn--outline" href="#social" onClick={(e) => e.preventDefault()}>Visit the studio journal</a></div>}</section>;
+    if (values.items !== true) return null;
+
+    const heading = String(values.heading || '').trim();
+    const handle = String(values.handle || '').trim();
+    const handleDestination = String(values.handleDestination || '').trim();
+    const hasHandle = Boolean(handle && handleDestination);
+    const headingId = `sections-instagram-${uid}`;
+    const Root = heading ? 'section' : 'div';
+
+    return (
+      <Root
+        className="instagram-feed docs-studio__sections-instagram"
+        aria-labelledby={heading ? headingId : undefined}
+      >
+        {(heading || hasHandle) && (
+          <header className="instagram-feed__header">
+            {heading && <h2 className="instagram-feed__heading" id={headingId}>{heading}</h2>}
+            {hasHandle && <a className="instagram-feed__handle" href={handleDestination}>{handle}</a>}
+          </header>
+        )}
+        <ul className="instagram-feed__grid">
+          {instagramFeedItems.map((item) => {
+            const figure = (
+              <figure className="instagram-feed__figure">
+                <SectionMedia
+                  className="instagram-feed__media"
+                  index={item.mediaIndex}
+                  alt={item.alt}
+                />
+                <figcaption className="instagram-feed__caption">{item.caption}</figcaption>
+              </figure>
+            );
+
+            return (
+              <li className="instagram-feed__item" key={item.caption}>
+                {'destination' in item
+                  ? <a className="instagram-feed__link" href={item.destination}>{figure}</a>
+                  : figure}
+              </li>
+            );
+          })}
+        </ul>
+        {values.action === true && (
+          <div className="instagram-feed__cta">
+            <a className="btn btn--outline" href="/components/gallery-grid">Browse the visual archive</a>
+          </div>
+        )}
+      </Root>
+    );
   }
 
   function renderBeforeAfter() {
-    return <figure className="before-after docs-studio__sections-before-after">{values.beforeMedia === true && <SectionMedia className="before-after__image" index={2} alt="Raw clay before glazing" />}{values.afterMedia === true && <div className="before-after__overlay"><SectionMedia index={3} alt="Finished glazed ceramic" /></div>}{values.control === true && <div className="before-after__handle" aria-hidden="true" />}{String(values.beforeLabel || '') && <figcaption className="before-after__label before-after__label--before">{String(values.beforeLabel)}</figcaption>}{String(values.afterLabel || '') && <span className="before-after__label before-after__label--after">{String(values.afterLabel)}</span>}</figure>;
+    return (
+      <BeforeAfterArtwork
+        label={String(values.label || '')}
+        description={String(values.description || '')}
+        beforeMedia={values.beforeMedia === true ? beforeAfterFixtureMedia.before : null}
+        afterMedia={values.afterMedia === true ? beforeAfterFixtureMedia.after : null}
+        beforeLabel={String(values.beforeLabel || '')}
+        afterLabel={String(values.afterLabel || '')}
+        value={Number(values.value ?? 50)}
+        disabled={values.disabled === true}
+        name={String(values.name || '')}
+        className="docs-studio__sections-before-after"
+      />
+    );
   }
 
   function renderMarquee() {
-    return <div className="marquee docs-studio__sections-marquee" aria-label="Gallery themes">{values.items === true && <div className="marquee__track">{['Form', 'Material', 'Ritual', 'Use'].map((item, index) => <span key={item} className="marquee__item">{item} <span className="marquee__separator" aria-hidden="true">/</span>{index === 3 ? '' : ''}</span>)}</div>}</div>;
+    return (
+      <MarqueeArtwork
+        items={values.items === true ? marqueeFixtureItems : []}
+        label={String(values.label || '')}
+        presentation={String(values.presentation || 'auto') as MarqueePresentation}
+        direction={String(values.direction || 'forward') as MarqueeDirection}
+        pace={String(values.pace || 'default') as MarqueePace}
+        pauseLabel={String(values.pauseLabel || '')}
+        resumeLabel={String(values.resumeLabel || '')}
+        className="docs-studio__sections-marquee"
+      />
+    );
   }
 
   function renderCollage() {
-    return <section className="collage-section docs-studio__sections-collage">{String(values.heading || '') && <div className="collage-section__header"><h2 className="collage-section__heading">{String(values.heading)}</h2></div>}{values.items === true && <div className="collage-section__grid">{[1, 2, 3, 4, 5].map((index) => <div className={`collage-section__item${index === 1 ? ' collage-section__item--feature' : ''}`} tabIndex={0} key={index}><SectionMedia index={index} alt={`Material study ${index}`} /><div className="collage-section__caption">Study {index}</div></div>)}</div>}</section>;
+    if (values.items !== true) return null;
+
+    const heading = String(values.heading || '').trim();
+    const headingId = `sections-collage-${uid}`;
+    const Root = heading ? 'section' : 'div';
+
+    return (
+      <Root
+        className="collage-section docs-studio__sections-collage"
+        aria-labelledby={heading ? headingId : undefined}
+      >
+        {heading && (
+          <header className="collage-section__header">
+            <h2 className="collage-section__heading" id={headingId}>{heading}</h2>
+          </header>
+        )}
+        <ul className="collage-section__grid">
+          {collageItems.map((item) => {
+            const figure = (
+              <figure className="collage-section__figure">
+                <SectionMedia className="collage-section__media" index={item.mediaIndex} alt={item.alt} />
+                <figcaption className="collage-section__caption">{item.caption}</figcaption>
+              </figure>
+            );
+
+            return (
+              <li
+                className={`collage-section__item${'featured' in item && item.featured ? ' collage-section__item--feature' : ''}`}
+                key={item.caption}
+              >
+                {'destination' in item
+                  ? <a className="collage-section__link" href={item.destination}>{figure}</a>
+                  : figure}
+              </li>
+            );
+          })}
+        </ul>
+      </Root>
+    );
   }
 
   function renderPreview() {
-    if (contract.slug === 'hero-section') return renderHero();
     if (contract.slug === 'featured-collection') return renderFeaturedCollection();
     if (contract.slug === 'image-text') return renderImageText();
     if (contract.slug === 'multicolumn') return renderMulticolumn();

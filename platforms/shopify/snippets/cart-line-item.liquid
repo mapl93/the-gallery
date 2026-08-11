@@ -1,0 +1,107 @@
+{%- comment -%}
+  Snippet: cart-line-item
+  Usage inside a native cart form and ul.cart-lines:
+  {% render 'cart-line-item', item: item %}
+
+  Optional parameters:
+  - show_quantity: defaults to true
+  - show_remove: defaults to true
+
+  The parent cart target owns form/Ajax submission, pending and error state,
+  section refresh, status announcements, focus after removal, and persistence.
+{%- endcomment -%}
+
+{%- liquid
+  assign render_quantity = true
+  if show_quantity == false
+    assign render_quantity = false
+  endif
+
+  assign render_remove = true
+  if show_remove == false
+    assign render_remove = false
+  endif
+
+  assign line_title = item.product.title | default: item.title
+  assign quantity_label = 'cart.quantity_for' | t: title: line_title
+  assign decrement_label = 'cart.decrease_quantity' | t: title: line_title
+  assign increment_label = 'cart.increase_quantity' | t: title: line_title
+-%}
+
+<li class="cart-line" data-cart-line="{{ item.key | escape }}">
+  {% if item.image %}
+    {{ item.image | image_url: width: 200 | image_tag:
+       class: 'cart-line__image', alt: '', loading: 'lazy' }}
+  {% endif %}
+
+  <div class="cart-line__info">
+    {% if item.url != blank %}
+      <a class="cart-line__title" href="{{ item.url }}">{{ line_title }}</a>
+    {% else %}
+      <span class="cart-line__title">{{ line_title }}</span>
+    {% endif %}
+
+    {%- capture line_details -%}
+      {% unless item.variant.title == 'Default Title' %}
+        <span>{{ item.variant.title }}</span>
+      {% endunless %}
+
+      {% if item.selling_plan_allocation %}
+        <span>{{ item.selling_plan_allocation.selling_plan.name }}</span>
+      {% endif %}
+
+      {% if item.properties.size > 0 %}
+        <dl>
+          {% for property in item.properties %}
+            {%- assign property_first_character = property.first | slice: 0 -%}
+            {% if property.last != blank and property_first_character != '_' %}
+              <div>
+                <dt>{{ property.first }}:</dt>
+                <dd>
+                  {% if property.last contains '/uploads/' %}
+                    <a href="{{ property.last }}" target="_blank" rel="noopener">{{ property.last | split: '/' | last }}</a>
+                  {% else %}
+                    {{ property.last }}
+                  {% endif %}
+                </dd>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </dl>
+      {% endif %}
+
+      {% if item.discount_allocations.size > 0 %}
+        <ul>
+          {% for allocation in item.discount_allocations %}
+            <li>{{ allocation.discount_application.title }}: <bdi>-{{ allocation.amount | money }}</bdi></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {%- endcapture -%}
+    {% if line_details != blank %}
+      <div class="cart-line__details">{{ line_details }}</div>
+    {% endif %}
+
+    {% if render_quantity %}
+      {% render 'quantity-selector', item: item,
+         accessible_label: quantity_label,
+         decrement_label: decrement_label,
+         increment_label: increment_label,
+         class_name: 'cart-line__quantity' %}
+    {% endif %}
+
+    {% if render_remove %}
+      <div class="cart-line__actions">
+        <button class="btn btn--link cart-line__remove" type="submit"
+                name="updates[{{ item.key }}]" value="0"
+                aria-label="{{ 'cart.remove_item' | t: title: line_title | escape }}">
+          {{ 'cart.remove' | t }}
+        </button>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="cart-line__price">
+    {% render 'price', line_item: item %}
+  </div>
+</li>

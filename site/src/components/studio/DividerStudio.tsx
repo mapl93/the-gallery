@@ -100,6 +100,11 @@ export default function DividerStudio({ contract, definition }: DividerStudioPro
               className={['divider', variantClass].filter(Boolean).join(' ')}
               data-orientation={values.orientation === 'vertical' ? 'vertical' : undefined}
               aria-hidden={values.semantics === 'decorative' ? 'true' : undefined}
+              aria-orientation={
+                values.semantics === 'structural' && values.orientation === 'vertical'
+                  ? 'vertical'
+                  : undefined
+              }
             />
           </div>
         </section>

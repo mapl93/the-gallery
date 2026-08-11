@@ -1,40 +1,64 @@
 ## Overview
 
-Article Hero introduces an article with a required title and optional category, media, and target-formatted metadata. It supports full-image, split, and text-only editorial presentations.
+Article Hero is a passive native `header` that introduces the surrounding article with one required complete contextual heading and optional category, media, and target-formatted metadata. It supports full-image, split, and text-only editorial presentations without owning article data, navigation, or runtime behavior.
 
 ## Presentation
 
-<Preview html={'<header class="article-hero article-hero--split tg-preview-frame--lg"><div class="article-hero__media"><img class="tg-preview-media tg-preview-media--landscape" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Hands shaping a clay vessel on a pottery wheel" /></div><div class="article-hero__content"><p class="article-hero__category">Studio Practice</p><h1 class="article-hero__title">The quiet decisions behind every vessel</h1><div class="article-hero__meta"><time datetime="2026-07-12">July 12, 2026</time><span>By Marina Costa</span></div></div></header>'} label="Article Hero" />
+<Preview html={'<header class="article-hero article-hero--split"><div class="article-hero__layout"><div class="article-hero__media"><img class="tg-preview-media tg-preview-media--landscape" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Hands shaping a clay vessel on a pottery wheel" /></div><div class="article-hero__content"><p class="article-hero__category">Studio Practice</p><h2 class="article-hero__title">The quiet decisions behind every vessel</h2><div class="article-hero__meta"><span>By Marina Costa</span><span class="article-hero__meta-separator" aria-hidden="true">/</span><time datetime="2026-07-12">July 12, 2026</time><span class="article-hero__meta-separator" aria-hidden="true">/</span><time datetime="PT7M">7 min read</time></div></div></div></header>'} label="Article Hero" />
 
-`full` maps to `.article-hero--image`, `split` maps to `.article-hero--split`, and `text-only` maps to `.article-hero--text`. Full media uses `.article-hero__bg` with an optional `.article-hero__overlay`; split media uses `.article-hero__media`.
+`full` maps to `.article-hero--image`, `split` maps to `.article-hero--split`, and `text-only` maps to `.article-hero--text`. The root owns a named inline-size container and the private `.article-hero__layout` responds to available component width. Full media uses `.article-hero__bg` plus a visual-only `.article-hero__overlay`; split media uses `.article-hero__media`.
+
+When the selected full or split media slot is absent, the renderer adds private `.article-hero--without-media`. The complete content then remains readable in normal colors without an empty split track, inverse text over transparency, or an invented substitute image.
+
+Unsupported variant input normalizes to `full` before that derived state is
+calculated, so malformed input cannot retain inverse media styling without
+media.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Choose the presentation from the article context and available media.</Do>
-  <Dont>Do not require media for the text-only presentation or treat fixture metadata as a component default.</Dont>
+  <Do>Choose the presentation from the article context and available media, retain a complete title, and supply semantic target metadata.</Do>
+  <Dont>Do not use Article Hero as the article boundary, page shell, action surface, date formatter, reading-time calculator, or image-content policy.</Dont>
 </DoDont>
 
-The target supplies full or split media and formats publication, author, and reading metadata. Use the full-image presentation only when text remains legible over the complete responsive crop.
+Use full-image only when the complete responsive crop and private contrast overlay keep category, title, and metadata compliant. Prefer split or text-only when media cannot support overlaid text. The target chooses the heading rank, image alternative, localized metadata order/format, and any independent category or author destinations.
 
 ## Accessibility
 
-- Use a page-appropriate heading level for the article title, normally the page `h1`.
-- Give informative media useful alternative text and decorative media an empty `alt` value.
-- Verify overlaid title, category, and metadata contrast across every image crop, theme, and viewport.
-- Keep metadata such as publication dates in semantic elements, including `time` with a machine-readable `datetime` value.
+- Compose the native `header` inside the target article/page and choose a heading level that fits the surrounding hierarchy; a standalone article normally uses `h1`, while this docs fixture uses `h2`.
+- Give informative media useful contextual alternative text and decorative media `alt=""`. Full versus split placement does not determine image meaning.
+- Verify overlaid category, title, and metadata contrast against every image crop, theme, and viewport. The visual overlay is `aria-hidden` and is not public configuration.
+- Use machine-readable `time[datetime]` values for dates and durations and hide visual-only separators from assistive technology.
+- Preserve complete wrapping content, normal DOM reading order, forced-colors readability, intrinsic reflow, and zero motion/runtime dependency.
 
 ## References
 
 <PropTable>
   <tr><td>`variant`</td><td>enum</td><td>`full`</td><td>`full`, `split`, or `text-only`</td></tr>
-  <tr><td>`backgroundMedia`</td><td>slot</td><td>optional</td><td>Target-owned full-image media</td></tr>
-  <tr><td>`splitMedia`</td><td>slot</td><td>optional</td><td>Target-owned split media</td></tr>
-  <tr><td>`category`</td><td>string</td><td>optional</td><td>Article category label</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible article title</td></tr>
-  <tr><td>`metadata`</td><td>slot</td><td>optional</td><td>Target-owned publication, author, and reading metadata</td></tr>
+  <tr><td>`backgroundMedia`</td><td>slot</td><td>optional</td><td>Target-owned full-image media; omission derives the private readable fallback</td></tr>
+  <tr><td>`splitMedia`</td><td>slot</td><td>optional</td><td>Target-owned split media; omission derives the private one-column fallback</td></tr>
+  <tr><td>`category`</td><td>string</td><td>optional</td><td>Compact article-context label; destination policy remains target-owned</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Complete visible contextual heading text</td></tr>
+  <tr><td>`metadata`</td><td>slot</td><td>optional</td><td>Target-owned publication, author, duration, or taxonomy composition</td></tr>
 </PropTable>
 
-Anatomy: `.article-hero`, `.article-hero__bg`, `.article-hero__overlay`, `.article-hero__media`, `.article-hero__content`, `.article-hero__category`, `.article-hero__title`, and `.article-hero__meta`.
+Anatomy: `.article-hero`, `.article-hero__layout`, `.article-hero__bg`, `.article-hero__overlay`, `.article-hero__media`, `.article-hero__content`, `.article-hero__category`, `.article-hero__title`, `.article-hero__meta`, and `.article-hero__meta-separator`.
 
-Dependencies: none. The contract remains `pilot`, and its media and metadata slots do not define a target content model.
+Dependencies: none. The contract remains `pilot`; heading rank, media meaning/crop, metadata formatting/order, links, article query, SEO, analytics, and final visual treatment remain target or human-review responsibilities.
+
+- [HTML `header`](https://html.spec.whatwg.org/multipage/sections.html#the-header-element)
+- [HTML `article`](https://html.spec.whatwg.org/multipage/sections.html#the-article-element)
+- [HTML headings and outlines](https://html.spec.whatwg.org/multipage/sections.html#headings-and-outlines)
+- [HTML `time`](https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-time-element)
+- [WAI Images Tutorial](https://www.w3.org/WAI/tutorials/images/)
+- [WCAG Contrast Minimum](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
+- [WCAG Technique G145: contrast over patterned backgrounds](https://www.w3.org/WAI/WCAG22/Techniques/general/G145.html)
+- [WCAG Reflow](https://www.w3.org/WAI/WCAG21/Understanding/reflow)
+- [WAI-ARIA APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)
+- [Open UI components](https://open-ui.org/components/)
+- [Radix Themes components](https://www.radix-ui.com/themes/docs/components)
+- [Radix Themes layout guidance](https://www.radix-ui.com/themes/docs/overview/layout)
+- [Polaris Page](https://polaris-react.shopify.com/components/layout-and-structure/page)
+- [Shopify article template](https://shopify.dev/docs/storefronts/themes/architecture/templates/article)
+- [Shopify Liquid `article`](https://shopify.dev/docs/api/liquid/objects/article)
+- [Shopify Storefront API Article](https://shopify.dev/docs/api/storefront/latest/objects/article)

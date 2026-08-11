@@ -54,10 +54,9 @@ components/contracts/cart-note.contract.json
 components/contracts/cart-page.contract.json
 components/contracts/cart-summary.contract.json
 components/contracts/cart-upsell.contract.json
-components/contracts/category-nav.contract.json
+components/contracts/filter-bar.contract.json
 components/contracts/ceramics-faq.contract.json
 components/contracts/ceramics-glossary.contract.json
-components/contracts/certificate-details.contract.json
 components/contracts/certificate.contract.json
 components/contracts/checkbox.contract.json
 components/contracts/checkout-progress.contract.json
@@ -96,7 +95,7 @@ components/contracts/featured-collection.contract.json
 components/contracts/field-wrapper.contract.json
 components/contracts/fieldset.contract.json
 components/contracts/file-upload.contract.json
-components/contracts/filters.contract.json
+components/contracts/filter-panel.contract.json
 components/contracts/firing-info.contract.json
 components/contracts/footer.contract.json
 components/contracts/form.contract.json
@@ -137,6 +136,7 @@ components/contracts/password-reset.contract.json
 components/contracts/payment-icons.contract.json
 components/contracts/photo-reviews.contract.json
 components/contracts/pin-input.contract.json
+components/contracts/pickup-location-selector.contract.json
 components/contracts/policy-page.contract.json
 components/contracts/popover.contract.json
 components/contracts/popup.contract.json
@@ -178,7 +178,7 @@ components/contracts/stat.contract.json
 components/contracts/stats-section.contract.json
 components/contracts/steps.contract.json
 components/contracts/sticky-atc.contract.json
-components/contracts/store-pickup.contract.json
+components/contracts/store-locator.contract.json
 components/contracts/studio-tour.contract.json
 components/contracts/subscription-option.contract.json
 components/contracts/switch.contract.json

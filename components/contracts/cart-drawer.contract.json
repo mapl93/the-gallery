@@ -1,71 +1,217 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "cart-drawer",
   "name": "Cart Drawer",
   "registryId": "C6",
   "category": "global",
   "status": "pilot",
-  "summary": "Cart drawer content with line items, remove action, and compact summary.",
-  "dependencies": ["drawer", "price", "quantity-selector"],
+  "summary": "Canonical Cart Line Item collection and optional compact target summary composed inside Drawer.",
+  "dependencies": [
+    "drawer",
+    "cart-line-item"
+  ],
   "source": {
     "registry": "registry.json#/components/cart-drawer",
-    "css": { "file": "components/css/global.css", "selector": ".cart-item" },
+    "css": {
+      "file": "components/css/global.css",
+      "selector": ".cart-drawer__summary"
+    },
     "docs": "site/src/content/components/cart-drawer.mdx"
   },
   "anatomy": [
-    { "name": "item", "selector": ".cart-item", "className": ".cart-item", "required": true, "description": "Cart drawer line item." },
-    { "name": "image", "selector": ".cart-item__image", "className": ".cart-item__image", "required": false, "description": "Line item image." },
-    { "name": "details", "selector": ".cart-item__details", "className": ".cart-item__details", "required": true, "description": "Line item detail wrapper." },
-    { "name": "title", "selector": ".cart-item__title", "className": ".cart-item__title", "required": true, "description": "Line item title link." },
-    { "name": "variant", "selector": ".cart-item__variant", "className": ".cart-item__variant", "required": false, "description": "Line item variant text." },
-    { "name": "actions", "selector": ".cart-item__actions", "className": ".cart-item__actions", "required": false, "description": "Line item actions wrapper." },
-    { "name": "remove", "selector": ".cart-item__remove", "className": ".cart-item__remove", "required": false, "description": "Remove action." },
-    { "name": "summary", "selector": ".cart-summary", "className": ".cart-summary", "required": false, "description": "Compact cart summary." },
-    { "name": "summaryRow", "selector": ".cart-summary__row", "className": ".cart-summary__row", "required": false, "description": "Compact summary row." },
-    { "name": "summaryTotal", "selector": ".cart-summary__total", "className": ".cart-summary__total", "required": false, "description": "Compact summary total." }
+    {
+      "name": "lineItems",
+      "selector": ".cart-lines",
+      "className": ".cart-lines",
+      "required": false,
+      "description": "Optional canonical Cart Line Item collection for a populated target cart."
+    },
+    {
+      "name": "summary",
+      "selector": ".cart-drawer__summary",
+      "className": ".cart-drawer__summary",
+      "required": false,
+      "description": "Optional target-formatted compact description list for populated carts."
+    },
+    {
+      "name": "summaryRow",
+      "selector": ".cart-drawer__summary-row",
+      "className": ".cart-drawer__summary-row",
+      "required": false,
+      "description": "Term and target-formatted value association inside the compact summary."
+    },
+    {
+      "name": "summaryTotal",
+      "selector": ".cart-drawer__summary-total",
+      "className": ".cart-drawer__summary-total",
+      "required": false,
+      "description": "Optional emphasized final summary row."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default cart drawer content." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One cart composition inside canonical Drawer."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default compact drawer item layout." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Drawer bounds and Cart Line Item containers own responsive geometry."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".cart-item"], "description": "Default cart item state." },
-    { "name": "separatedItems", "selectors": [".cart-item + .cart-item"], "description": "Separator between drawer line items." },
-    { "name": "removeHover", "selectors": [".cart-item__remove:hover"], "description": "Remove action hover state." },
-    { "name": "summaryTotal", "selectors": [".cart-summary__total"], "description": "Emphasized compact summary total." }
+    {
+      "name": "populated",
+      "selectors": [
+        ".cart-lines"
+      ],
+      "description": "One or more canonical target-owned Cart Line Item records."
+    },
+    {
+      "name": "summaryTotal",
+      "selectors": [
+        ".cart-drawer__summary-total"
+      ],
+      "description": "Emphasized compact target-formatted total."
+    }
   ],
   "behavior": [
-    { "name": "drawerComposition", "selectors": [".cart-item"], "description": "Cart Drawer should inherit Drawer focus management and dismissal when rendered as an overlay." },
-    { "name": "removeLine", "selectors": [".cart-item__remove"], "events": ["click"], "description": "Remove action should remove the line and update summary totals." },
-    { "name": "summaryTotals", "selectors": [".cart-summary", ".cart-summary__row", ".cart-summary__total"], "description": "Compact summary should update from commerce cart state." }
+    {
+      "name": "drawerComposition",
+      "selectors": [
+        ".cart-lines",
+        ".cart-drawer__summary"
+      ],
+      "description": "Cart Drawer supplies commerce content to canonical Drawer and does not duplicate its open, placement, naming, focus, dismissal, or lifecycle API."
+    },
+    {
+      "name": "lineItemComposition",
+      "selectors": [
+        ".cart-lines",
+        ".cart-line"
+      ],
+      "description": "Populated target records consume canonical Cart Line Item, including its Price, Quantity Selector and optional Button dependencies, without parallel markup or behavior."
+    },
+    {
+      "name": "summarySemantics",
+      "selectors": [
+        ".cart-drawer__summary",
+        ".cart-drawer__summary-row",
+        ".cart-drawer__summary-total"
+      ],
+      "attributes": [
+        "dl",
+        "dt",
+        "dd"
+      ],
+      "description": "Optional summary labels and complete target-formatted values use description-list associations and update from target cart truth."
+    },
+    {
+      "name": "targetOwnedCart",
+      "description": "The target owns line identity, quantity constraints, mutations, formatted totals, empty/error/status content, post-removal focus, checkout and persistence."
+    },
+    {
+      "name": "emptyTargetContent",
+      "description": "When lineItems is absent, the target supplies meaningful empty content and omits the compact summary; Cart Drawer does not choose the empty-state visual."
+    }
   ],
   "properties": [
-    { "name": "lineItems", "type": "slot", "required": false, "description": "Ordered target-owned cart item records composed from the documented image, details, Price, Quantity Selector, and remove-action anatomy. It may be absent for an empty cart.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-item", "classNames": [".cart-item"] }] } },
-    { "name": "summary", "type": "slot", "required": false, "description": "Optional target-formatted compact cart summary rows and total.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary", "classNames": [".cart-summary"] }] } }
+    {
+      "name": "lineItems",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Render target-authored empty content and omit the compact summary.",
+      "description": "Optional canonical Cart Line Item collection populated from target cart records.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-lines",
+            "classNames": [
+              ".cart-lines",
+              ".cart-line"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "summary",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit the compact summary.",
+      "description": "Optional target-formatted compact description-list rows, rendered only with populated line items.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-drawer__summary",
+            "classNames": [
+              ".cart-drawer__summary",
+              ".cart-drawer__summary-row"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-secondary", "--color-feedback-error-default"],
-      "radius": ["--radius-sm"],
-      "typography": ["--typo-body-size", "--typo-h4-size"],
-      "spacing": ["--space-layout-touch-target"]
+      "color": [
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-h4-size",
+        "--typo-h4-line-height",
+        "--typo-body-size",
+        "--typo-body-line-height"
+      ]
     }
   },
   "accessibility": [
-    "Preserve Drawer focus management while the cart drawer is open.",
-    "Product images need useful alt text or should be hidden if duplicated by adjacent text.",
-    "Remove actions need accessible names that include product context.",
-    "Announce cart totals or item count changes when line items update."
+    "Compose canonical Drawer modal naming, focus containment, Escape dismissal, scroll partition, inertness, and logical focus restoration without duplicating that public API.",
+    "Use canonical Cart Line Item list and line semantics for every populated target record rather than a Drawer-specific line implementation.",
+    "Use one description list for compact summary label/value associations and omit it for empty content.",
+    "Announce confirmed mutation, error, item-count, and total results once through a target-owned status channel; do not make Price or the summary live independently.",
+    "After target-confirmed removal, place focus on a surviving logical line action or the Drawer title according to the surrounding target policy."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify cart line keys, quantities, remove actions, and cart totals." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css-target-composition",
+      "notes": "The docs target composes canonical Drawer and Cart Line Item with a compact summary; production cart state remains target-owned."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-target-behavior",
+      "notes": "Liquid maps cart records into canonical Cart Line Item plus localized summary and checkout. Production Drawer lifecycle, mutation/section refresh, pending/error/status, and editor/store proof remain required."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

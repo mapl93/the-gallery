@@ -10,7 +10,7 @@ const iconCatalogueSchemaPath = path.join(iconCataloguesDir, 'icon-catalogue.sch
 const sitePackagePath = path.join(rootDir, 'site', 'package.json');
 const siteLockPath = path.join(rootDir, 'site', 'package-lock.json');
 
-const propertyKinds = new Set(['text', 'number', 'select', 'segmented', 'state', 'icon', 'slot-composition', 'toggle']);
+const propertyKinds = new Set(['text', 'collection', 'number', 'select', 'segmented', 'state', 'icon', 'slot-composition', 'toggle']);
 const tokenKinds = new Set(['token', 'token-pair', 'token-swatch']);
 const allKinds = new Set([...propertyKinds, ...tokenKinds]);
 
@@ -274,6 +274,10 @@ function validatePropertyControl(errors, control, contract, propertiesByName, la
 
   if (control.kind === 'text' && (properties.length !== 1 || properties[0].type !== 'string')) {
     errors.push(`${label} text controls require exactly one string property`);
+  }
+  if (control.kind === 'collection'
+      && (properties.length !== 1 || properties[0].type !== 'string-list')) {
+    errors.push(`${label} collection controls require exactly one string-list property`);
   }
   if (control.kind === 'number' && (properties.length !== 1 || properties[0].type !== 'number')) {
     errors.push(`${label} number controls require exactly one number property`);

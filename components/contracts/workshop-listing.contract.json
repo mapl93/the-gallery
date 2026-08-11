@@ -1,12 +1,104 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "workshop-listing", "name": "Workshop Listing", "registryId": "R7", "category": "ceramics", "status": "pilot", "summary": "Workshop/class cards with date, level, price, and spot availability.", "dependencies": ["button"],
-  "source": { "registry": "registry.json#/components/workshop-listing", "css": { "file": "components/css/ceramics.css", "selector": ".workshop-grid" }, "docs": "site/src/content/components/workshop-listing.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".workshop-grid", "className": ".workshop-grid", "required": true, "description": "Repeated workshop-card region." }, { "name": "card", "selector": ".workshop-card", "className": ".workshop-card", "required": true, "description": "Single workshop summary." }, { "name": "image", "selector": ".workshop-card__image", "className": ".workshop-card__image", "required": false, "description": "Optional workshop media." }, { "name": "body", "selector": ".workshop-card__body", "className": ".workshop-card__body", "required": true, "description": "Workshop summary content." }, { "name": "date", "selector": ".workshop-card__date", "className": ".workshop-card__date", "required": false, "description": "Target-formatted schedule text." }, { "name": "title", "selector": ".workshop-card__title", "className": ".workshop-card__title", "required": true, "description": "Workshop title." }, { "name": "level", "selector": ".workshop-card__level", "className": ".workshop-card__level", "required": false, "description": "Optional target-supplied level text." }, { "name": "description", "selector": ".workshop-card__description", "className": ".workshop-card__description", "required": false, "description": "Optional workshop summary." }, { "name": "footer", "selector": ".workshop-card__footer", "className": ".workshop-card__footer", "required": false, "description": "Price, availability, and optional Button-composed action region." }, { "name": "price", "selector": ".workshop-card__price", "className": ".workshop-card__price", "required": false, "description": "Target-formatted workshop price." }, { "name": "spots", "selector": ".workshop-card__spots", "className": ".workshop-card__spots", "required": false, "description": "Target-supplied availability text." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default workshop-card grid." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Responsive card grid." }],
-  "states": [{ "name": "default", "selectors": [".workshop-grid"], "description": "Default listing presentation." }, { "name": "lowAvailability", "selectors": [".workshop-card__spots--low"], "description": "Visual warning hook paired with explicit availability text." }, { "name": "full", "selectors": [".workshop-card__spots--full"], "description": "Visual unavailable hook paired with explicit full text." }],
-  "behavior": [{ "name": "listingOwnership", "selectors": [".workshop-grid", ".workshop-card"], "description": "Targets own workshop records, schedules, prices, availability freshness, destinations, and ordering." }, { "name": "bookingBoundary", "selectors": [".workshop-card__footer"], "description": "Workshop actions may compose Button, but this contract does not define booking, registration, payment, or availability reservation behavior." }],
-  "properties": [{ "name": "workshops", "type": "slot", "required": true, "description": "Target-owned workshop cards without a prescribed CMS or booking model.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".workshop-grid", "classNames": [".workshop-grid"] }] } }],
-  "tokens": { "public": { "color": ["--color-border-subtle", "--color-feedback-error-default", "--color-feedback-warning-default", "--color-text-accent", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-h4-size"], "radius": ["--radius-lg"], "spacing": ["--space-layout-grid-gap"], "shadow": ["--shadow-md"], "transition": ["--transition-fast"], "easing": ["--easing-default"] } },
-  "accessibility": ["Keep schedule, level, price, and availability information available as text.", "Use semantic time and currency formatting supplied by the target.", "Composed Button actions retain their own focus, disabled, and busy semantics.", "Do not rely on warning or error color alone for availability."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "workshop-listing",
+  "name": "Workshop Listing",
+  "registryId": "R7",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Passive target-authored workshop summary list composed from canonical Card, Price, Badge, and Button without owning booking behavior.",
+  "dependencies": ["card", "price", "badge", "button"],
+  "source": {
+    "registry": "registry.json#/components/workshop-listing",
+    "css": { "file": "components/css/ceramics.css", "selector": ".workshop-grid" },
+    "docs": "site/src/content/components/workshop-listing.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".workshop-grid", "className": ".workshop-grid", "required": true, "description": "Native unnumbered list emitted only with at least one valid target-authored workshop record." },
+    { "name": "item", "selector": ".workshop-grid__item", "className": ".workshop-grid__item", "required": true, "description": "Direct native list item containing one independently complete workshop summary." },
+    { "name": "card", "selector": ".workshop-card", "className": ".workshop-card", "required": true, "description": "Native article composed with canonical Card and named by its visible contextual heading." },
+    { "name": "image", "selector": ".workshop-card__image", "className": ".workshop-card__image", "required": false, "description": "Optional canonical Card media region with context-appropriate informative or decorative alternative text." },
+    { "name": "body", "selector": ".workshop-card__body", "className": ".workshop-card__body", "required": true, "description": "Canonical Card body containing required title and optional summary metadata." },
+    { "name": "date", "selector": ".workshop-card__date", "className": ".workshop-card__date", "required": false, "description": "Complete target-localized schedule text; use native time only with a corresponding valid machine-readable datetime." },
+    { "name": "title", "selector": ".workshop-card__title", "className": ".workshop-card__title", "required": true, "description": "Visible contextual heading that names the workshop article." },
+    { "name": "level", "selector": ".workshop-card__level", "className": ".workshop-card__level", "required": false, "description": "Optional complete target-authored level, format, or audience text." },
+    { "name": "description", "selector": ".workshop-card__description", "className": ".workshop-card__description", "required": false, "description": "Optional concise workshop summary." },
+    { "name": "footer", "selector": ".workshop-card__footer", "className": ".workshop-card__footer", "required": false, "description": "Optional canonical Card footer emitted only when price, availability, or action content exists." },
+    { "name": "price", "selector": ".workshop-card__price", "className": ".workshop-card__price", "required": false, "description": "Optional canonical Price composition with a complete target-formatted value." },
+    { "name": "spots", "selector": ".workshop-card__spots", "className": ".workshop-card__spots", "required": false, "description": "Optional passive canonical Badge with complete visible availability text." },
+    { "name": "action", "selector": ".workshop-card__action", "className": ".workshop-card__action", "required": false, "description": "Optional canonical Button composition; a details destination uses a native anchor and remains distinct from booking behavior." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "One canonical intrinsic list/card presentation; target records decide which optional regions are present." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Grid and card anatomy respond to their actual available inline size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".workshop-grid", ".workshop-card__spots"], "description": "Passive listing with optional truthful available-status canonical Success Badge." },
+    { "name": "lowAvailability", "selectors": [".workshop-card__spots"], "description": "The availability slot composes canonical Warning Badge with complete target-defined limited-availability text; the threshold is not R7 logic." },
+    { "name": "full", "selectors": [".workshop-card__spots"], "description": "The availability slot composes canonical Error Badge with complete full text; it does not automatically disable a distinct details destination." }
+  ],
+  "behavior": [
+    { "name": "semanticCollection", "selectors": [".workshop-grid", ".workshop-grid__item", ".workshop-card", ".workshop-card__title"], "description": "R7 uses native ul/li/article/heading structure in target order with no grid widget role, roving focus, selection model, or whole-card interactive wrapper." },
+    { "name": "strictRecordOmission", "selectors": [".workshop-grid", ".workshop-grid__item"], "description": "Records without stable identity or non-empty title omit; duplicate identities omit after the first; no valid records omit the complete R7 root." },
+    { "name": "scheduleTruth", "selectors": [".workshop-card__date"], "description": "Targets own schedule occurrence, time zone, localization, cancellation and freshness. Native time requires visible content and a corresponding valid datetime; R7 never calculates or reformats dates." },
+    { "name": "canonicalComposition", "selectors": [".workshop-card", ".workshop-card__image", ".workshop-card__body", ".workshop-card__footer", ".workshop-card__price", ".workshop-card__spots", ".workshop-card__action"], "description": "Surface/media/body/footer, formatted price, passive status and action semantics remain owned by canonical Card, Price, Badge and Button rather than parallel R7 implementations." },
+    { "name": "availabilityBoundary", "selectors": [".workshop-card__spots"], "description": "Targets own capacity, thresholds, waitlists, status freshness and any announcement. Static fixture Badges are not live regions, and Full does not by itself determine whether details navigation is available." },
+    { "name": "destinationBoundary", "selectors": [".workshop-card__action"], "description": "Details navigation uses a native anchor with descriptive context. Registration, reservation, authentication, payment, cancellation, errors and confirmation require a separately owned target workflow." },
+    { "name": "passiveRuntime", "selectors": [".workshop-grid", ".workshop-card"], "description": "R7 owns no listener, observer, request, timer, controlled/uncontrolled store, focus movement, live region, persistence, booking state, animation, or neutral JavaScript." }
+  ],
+  "properties": [
+    {
+      "name": "workshops",
+      "type": "slot",
+      "required": true,
+      "description": "Required non-empty target-owned ordered workshop-card composition using canonical parts without a prescribed CMS, event, capacity, or booking model.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".workshop-grid", "classNames": [".workshop-grid", ".workshop-grid__item", ".workshop-card"] }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-surface-secondary",
+        "--color-text-accent",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--font-family-heading",
+        "--tg-font-weight-regular",
+        "--tg-font-weight-semibold",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-h4-line-height",
+        "--typo-h4-size"
+      ],
+      "spacing": ["--space-layout-element-gap", "--space-layout-grid-gap"]
+    }
+  },
+  "accessibility": [
+    "Preserve native ul > li > article collection semantics and associate every article with its visible contextual heading.",
+    "Use native time only with a valid datetime that corresponds to the complete visible localized schedule; keep time zone and cancellation context visible when needed.",
+    "Give informative media a concise context-appropriate alternative and decorative or fully redundant media an empty alternative; never derive alt text mechanically from the title.",
+    "Compose canonical Price for complete target-formatted commerce content and canonical passive Badge for availability; keep all meaning in visible text rather than color alone.",
+    "Use native anchors for details navigation and keep the visible label inside the accessible name; do not use a no-op button or make the whole card clickable around nested controls.",
+    "Do not automatically disable details navigation when availability is Full; a target-owned booking action may have a different independently verified unavailable state.",
+    "Keep static availability out of live regions. A target that refreshes capacity owns announcement timing, deduplication, errors, and user context.",
+    "Preserve canonical Card and Button focus/motion behavior, logical source order, full wrapping, RTL, text enlargement, forced colors, and keyboard navigation."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "html-css-composition", "notes": "Native list/articles/time/link plus canonical Card, Price, Badge and Button composition in components/css/ceramics.css with zero R7 JavaScript." },
+    "shopify": { "status": "planned", "kind": "liquid-css-theme-block", "notes": "Requires approved workshop resource/metaobject, schedule/time-zone/locale, price/capacity freshness, destination/booking service, editor validation and first consumer." },
+    "webflow": { "status": "planned", "kind": "cms-css-composition", "notes": "CMS supplies ordered complete records and real destinations; canonical source CSS is copied by the existing target pipeline." },
+    "react": { "status": "planned", "kind": "thin-component" },
+    "angular": { "status": "planned", "kind": "thin-component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-list-card" },
+    "compose": { "status": "planned", "kind": "native-list-card" }
+  }
 }

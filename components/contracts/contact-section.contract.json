@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "contact-section",
   "name": "Contact Form",
   "registryId": "S10",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive contact-information and native-form shell that preserves dependency-owned field and Button behavior.",
+  "summary": "Container-responsive context wrapper around one required named native form composed from canonical Input, Textarea, and Button.",
   "dependencies": [
     "input",
     "textarea",
@@ -26,49 +26,70 @@
       "selector": ".contact-section",
       "className": ".contact-section",
       "required": true,
-      "description": "Contact section root."
+      "description": "Context root rendered as a title-labelled native section when titled and as a generic grouping when untitled."
     },
     {
       "name": "grid",
       "selector": ".contact-section__grid",
       "className": ".contact-section__grid",
       "required": true,
-      "description": "Responsive information and form layout."
+      "description": "Intrinsic information-and-form layout whose visual and source order remain aligned."
     },
     {
       "name": "info",
       "selector": ".contact-section__info",
       "className": ".contact-section__info",
       "required": false,
-      "description": "Optional contact-information region."
+      "description": "Optional information region omitted when title, description, and contact details are all absent."
+    },
+    {
+      "name": "header",
+      "selector": ".contact-section__header",
+      "className": ".contact-section__header",
+      "required": false,
+      "description": "Optional introduction present only when a title or description is supplied."
     },
     {
       "name": "title",
       "selector": ".contact-section__title",
       "className": ".contact-section__title",
       "required": false,
-      "description": "Optional contact heading."
+      "description": "Optional non-empty visible heading whose target-unique id names the native section."
     },
     {
       "name": "text",
       "selector": ".contact-section__text",
       "className": ".contact-section__text",
       "required": false,
-      "description": "Optional supporting contact copy."
+      "description": "Optional supporting contact copy that never substitutes for a visible section title."
+    },
+    {
+      "name": "details",
+      "selector": ".contact-section__details",
+      "className": ".contact-section__details",
+      "required": false,
+      "description": "Optional target-owned ordered contact-information list."
     },
     {
       "name": "detail",
       "selector": ".contact-section__detail",
       "className": ".contact-section__detail",
       "required": false,
-      "description": "Repeated target-owned contact detail."
+      "description": "Repeated contact detail using a native actionable link when the value is actionable."
     },
     {
       "name": "form",
       "selector": ".contact-section__form",
       "className": ".contact-section__form",
       "required": true,
-      "description": "Native form composition using field and Button dependencies."
+      "description": "Required accessible native form composed from canonical Input, Textarea, and Button."
+    },
+    {
+      "name": "status",
+      "selector": ".contact-section__status",
+      "className": ".contact-section__status",
+      "required": false,
+      "description": "Optional target-owned truthful form-level response whose live semantics depend on timing and severity."
     }
   ],
   "variants": [
@@ -76,7 +97,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "One optional contact-information region followed by one required native form."
     }
   ],
   "sizes": [
@@ -84,7 +105,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "One intrinsic size whose measure, column threshold, and container-relative inset remain private composition."
     }
   ],
   "states": [
@@ -93,30 +114,121 @@
       "selectors": [
         ".contact-section"
       ],
-      "description": "Resting section presentation; field validation, focus, and disabled states belong to composed dependencies."
+      "description": "Complete contact context; field, action, validation, and response lifecycle states remain dependency- or target-owned."
+    },
+    {
+      "name": "detailLinkFocusVisible",
+      "selectors": [
+        ".contact-section__detail a:focus-visible"
+      ],
+      "description": "Visible keyboard focus for a native actionable contact detail."
     }
   ],
   "behavior": [
+    {
+      "name": "requiredComposition",
+      "selectors": [
+        ".contact-section",
+        ".contact-section__form"
+      ],
+      "description": "Targets omit the complete wrapper when the native form composition is absent or the required localized form label is blank."
+    },
+    {
+      "name": "conditionalSectionSemantics",
+      "selectors": [
+        ".contact-section",
+        ".contact-section__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty visible title creates and names a native thematic section; an untitled wrapper is a generic div and description alone does not create a section landmark."
+    },
     {
       "name": "nativeFormSemantics",
       "selectors": [
         ".contact-section__form"
       ],
-      "description": "The target renders a native form and owns action, method, submission, pending response, success, failure, retry, and anti-abuse behavior."
+      "attributes": [
+        "<form>",
+        "aria-label",
+        "action",
+        "method"
+      ],
+      "events": [
+        "submit",
+        "reset",
+        "formdata",
+        "invalid",
+        "constraint validation"
+      ],
+      "description": "The target renders one native form named by formLabel and owns action, method, submission, pending, confirmed success, failure, retry, anti-abuse, persistence, and response policy."
     },
     {
       "name": "fieldComposition",
       "selectors": [
-        ".contact-section__form"
+        ".contact-section__form",
+        ".input",
+        ".input__field",
+        ".textarea__field"
       ],
-      "description": "Composed Input and Textarea fields preserve their own label, message, native value, disabled, hover, focus-visible, and Default, Error, Success, and Warning validation contracts. If a target composes Select in this slot, Select keeps the same dependency-owned obligations; Select is not added to the current registry dependency list by this contract-only pass."
+      "description": "Composed Input and Textarea remain the sole native value, name, constraints, validity, message, disabled/read-only, focus, hover, and controlled/uncontrolled owners."
     },
     {
       "name": "actionComposition",
       "selectors": [
+        ".contact-section__form",
+        ".btn"
+      ],
+      "attributes": [
+        "type=\"submit\"",
+        "disabled",
+        "aria-busy"
+      ],
+      "description": "Submit actions compose canonical Button and preserve Button-owned activation, disabled, busy, loading-placement, and focus behavior."
+    },
+    {
+      "name": "contactDetails",
+      "selectors": [
+        ".contact-section__details",
+        ".contact-section__detail",
+        ".contact-section__detail a"
+      ],
+      "attributes": [
+        "mailto:",
+        "tel:"
+      ],
+      "description": "Targets keep contact details in authored order, use native links for actionable values, and use address only for relevant contact information rather than arbitrary metadata."
+    },
+    {
+      "name": "responseLifecycle",
+      "selectors": [
+        ".contact-section__status"
+      ],
+      "attributes": [
+        "role=\"status\" for confirmed non-blocking asynchronous feedback",
+        "role=\"alert\" or linked error-summary semantics for dynamically presented blocking errors"
+      ],
+      "description": "Form-level response is truthful, target-owned, and never repurposed as the description of only one field."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".contact-section",
+        ".contact-section__grid",
+        ".contact-section__info",
+        ".contact-section__details",
         ".contact-section__form"
       ],
-      "description": "Submit and secondary actions compose Button and preserve Button-owned activation, disabled, busy, and focus behavior."
+      "description": "Short, long, empty, localized, RTL, and unbroken content remains contained through logical component-width-aware composition without viewport- or Studio-owned layout rules."
+    },
+    {
+      "name": "zeroNeutralRuntime",
+      "selectors": [
+        ".contact-section"
+      ],
+      "description": "Contact Form itself owns no field store, listener, observer, request, timer, layout read, custom element, asset, animation, or neutral runtime."
     }
   ],
   "properties": [
@@ -124,87 +236,157 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible contact heading.",
+      "unsetBehavior": "Render no title and use a generic root instead of an unnamed native section.",
+      "description": "Optional non-empty visible contextual heading; targets choose the contextual heading rank and unique id.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".contact-section__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".contact-section__title"
+          }
+        ]
       }
     },
     {
       "name": "description",
       "type": "string",
       "required": false,
-      "description": "Optional supporting contact copy.",
+      "unsetBehavior": "Omit the description without leaving an empty node or rhythm.",
+      "description": "Optional supporting contact copy that never replaces the visible title as a section name.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".contact-section__text" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".contact-section__text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "formLabel",
+      "type": "string",
+      "required": true,
+      "unsetBehavior": "Omit the complete Contact Form when the localized accessible form label is empty.",
+      "description": "Required non-empty localized accessible name for the native form landmark; it does not replace visible field labels.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".contact-section__form",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "form"
+            ]
+          }
+        ]
       }
     },
     {
       "name": "details",
       "type": "slot",
       "required": false,
-      "description": "Target-owned repeated contact details and their native link semantics when applicable.",
+      "unsetBehavior": "Omit the contact-information list; also omit the information region if no title or description remains.",
+      "description": "Optional target-owned ordered contact-detail composition using native links and appropriate contact semantics.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".contact-section__detail", "classNames": [".contact-section__detail"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".contact-section__details",
+            "classNames": [
+              ".contact-section__details",
+              ".contact-section__detail"
+            ]
+          }
+        ]
       }
     },
     {
       "name": "form",
       "type": "slot",
       "required": true,
-      "description": "Native target-owned form content composed from field and Button contracts.",
+      "unsetBehavior": "Omit the complete Contact Form when no valid native form composition is supplied.",
+      "description": "Required target-owned native form composition built from canonical Input, Textarea, and Button.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".contact-section__form", "classNames": [".contact-section__form"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".contact-section__form",
+            "classNames": [
+              ".contact-section__form",
+              ".input",
+              ".textarea__field",
+              ".btn"
+            ]
+          }
+        ]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
+        "--color-border-focus",
         "--color-text-primary",
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-typography-body-default-weight",
+        "--tg-typography-h2-weight",
+        "--typo-body-line-height",
         "--typo-body-size",
+        "--typo-h2-line-height",
         "--typo-h2-size"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Use a native form with an accessible name, associated labels and messages, and a logical source and tab order.",
-    "Input, Textarea, and any target-composed Select preserve Default, Error, Success, and Warning presentation across label, control, message, indicator, hover, and focused outer ring.",
-    "Only Error uses aria-invalid=true; all validation messages are programmatically associated and remain distinguishable without color alone.",
-    "Button-composed submission preserves visible focus, touch size, disabled and busy behavior, and target-owned response announcements."
+    "Render a native title-labelled section only when a visible title exists; otherwise use a generic div.",
+    "Give the native form a required non-empty localized accessible name and keep visual/source/tab order aligned.",
+    "Associate every native field with a visible label and give every submitted control a stable name.",
+    "Use native input types, required, autocomplete, length, readonly, disabled, and constraint-validation semantics instead of recreating them with ARIA or script.",
+    "Communicate required status visibly and use aria-describedby only for messages that actually describe the referenced field.",
+    "Use aria-invalid=true only for Error; Success and Warning remain distinguishable without claiming invalid state.",
+    "Use native mailto and tel links for actionable contact details and preserve visible focus.",
+    "Use one explicit canonical submit Button and preserve its disabled, busy, accessible-name, and focus behavior.",
+    "Announce only confirmed submission outcomes; a preview that performs no request must say that no message was sent.",
+    "For multiple target validation errors, prefer a concise linked summary before the fields and preserve entered non-sensitive values."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "component-composition",
+      "notes": "Conditional section semantics and intrinsic S10 CSS compose one named native form from canonical Input, Textarea, and Button; targets own the submission lifecycle."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Localized merchant section uses Shopify's contact form tag, platform field names, server errors, confirmed success, canonical classes, and zero S10 JavaScript."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-composition"
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-composition",
+      "notes": "The current Studio design reference points to Button and cannot certify Contact Form aesthetics."
     },
     "swiftui": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-composition"
     },
     "compose": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-composition"
     }
   }
 }

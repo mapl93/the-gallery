@@ -1,37 +1,211 @@
-{%- comment -%}
-  Snippet: product-gallery
-  Usage: {% render 'product-gallery', product: product %}
-{%- endcomment -%}
+{% doc %}
+Renders the canonical rich-media Product Gallery from Shopify product.media.
+Selection is manual and stable-id based. Video, external video, model, AR and
+image detail activate only through explicit target-native actions.
 
-<div class="product-gallery" data-product-gallery>
-  <div class="product-gallery__main" data-gallery-main>
-    {{ product.selected_or_first_available_variant.featured_image
-       | default: product.featured_image
-       | image_url: width: 1200
-       | image_tag: class: 'product-gallery__main-image',
-         alt: product.title, loading: 'eager',
-         widths: '400,600,800,1000,1200',
-         sizes: '(min-width: 768px) 50vw, 100vw' }}
+@param {product} product - Product whose media collection is rendered.
+@param {string} [image_detail] - `lightbox` or `none`; defaults to `lightbox`.
+@param {boolean} [loop] - Whether previous/next wraps; defaults to false.
+
+@example
+{% render 'product-gallery', product: product, image_detail: 'lightbox', loop: false %}
+{% enddoc %}
+
+{%- if product != blank and product.media.size > 0 -%}
+  {%- liquid
+    assign current_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media | default: product.media.first
+    assign gallery_image_detail = image_detail | default: 'lightbox'
+    assign gallery_loop = loop | default: false
+    assign gallery_id = 'product-gallery-' | append: product.id
+    assign lightbox_id = gallery_id | append: '-lightbox'
+    assign lightbox_title_id = lightbox_id | append: '-title'
+    assign lightbox_caption_id = lightbox_id | append: '-caption'
+    assign lightbox_images = product.media | where: 'media_type', 'image'
+    assign lightbox_initial = current_media
+    unless current_media.media_type == 'image'
+      assign lightbox_initial = lightbox_images.first
+    endunless
+  -%}
+
+  <div
+    class="product-gallery"
+    id="{{ gallery_id }}"
+    data-product-gallery
+    data-gallery-current-id="{{ current_media.id }}"
+    data-loop="{{ gallery_loop }}"
+    data-image-detail="{{ gallery_image_detail }}"
+  >
+    <div class="product-gallery__layout">
+      <div class="product-gallery__main" data-gallery-viewport>
+        {%- for media in product.media -%}
+          {%- assign media_alt = media.alt | default: product.title -%}
+          <div
+            class="product-gallery__media product-gallery__media--{{ media.media_type | replace: '_', '-' }}"
+            data-gallery-media-id="{{ media.id }}"
+            data-gallery-media-type="{{ media.media_type | replace: '_', '-' }}"
+            data-gallery-label="{{ 'products.media.view' | t: index: forloop.index, total: product.media.size, title: media_alt | escape }}"
+            data-gallery-caption="{{ media_alt | escape }}"
+            {% unless media.id == current_media.id %}hidden{% endunless %}
+          >
+            {%- case media.media_type -%}
+              {%- when 'image' -%}
+                {%- capture gallery_image -%}
+                  {{ media.preview_image
+                     | image_url: width: 1600
+                     | image_tag: class: 'product-gallery__main-image',
+                       alt: media_alt, loading: 'eager',
+                       widths: '400,600,800,1000,1200,1600',
+                       sizes: '(min-width: 768px) 50vw, 100vw' }}
+                {%- endcapture -%}
+                {%- if gallery_image_detail == 'lightbox' -%}
+                  <button
+                    class="product-gallery__image-action"
+                    type="button"
+                    aria-label="{{ 'products.media.open_detail' | t: title: media_alt | escape }}"
+                    data-gallery-open-detail
+                  >
+                    {{ gallery_image }}
+                  </button>
+                {%- else -%}
+                  {{ gallery_image }}
+                {%- endif -%}
+
+              {%- when 'video' -%}
+                <div class="product-gallery__poster" data-gallery-poster>
+                  {{ media.preview_image | image_url: width: 1600 | image_tag: alt: media_alt, loading: 'lazy', widths: '400,600,800,1000,1200,1600', sizes: '(min-width: 768px) 50vw, 100vw' }}
+                  <button class="product-gallery__activate btn" type="button" data-gallery-activate>
+                    <span class="btn__icon">{% render 'icon', name: 'play', size: 20 %}</span>
+                    <span>{{ 'products.media.play_video' | t }}</span>
+                  </button>
+                </div>
+                <div class="product-gallery__interactive" data-gallery-active-slot hidden></div>
+                <template data-gallery-template>
+                  {{ media | video_tag: controls: true, preload: 'none', image_size: '1600x' }}
+                </template>
+
+              {%- when 'external_video' -%}
+                <div class="product-gallery__poster" data-gallery-poster>
+                  {{ media.preview_image | image_url: width: 1600 | image_tag: alt: media_alt, loading: 'lazy', widths: '400,600,800,1000,1200,1600', sizes: '(min-width: 768px) 50vw, 100vw' }}
+                  <button class="product-gallery__activate btn" type="button" data-gallery-activate>
+                    <span class="btn__icon">{% render 'icon', name: 'play', size: 20 %}</span>
+                    <span>{{ 'products.media.play_video' | t }}</span>
+                  </button>
+                </div>
+                <div class="product-gallery__interactive" data-gallery-active-slot hidden></div>
+                <template data-gallery-template>
+                  {{ media | external_video_tag }}
+                </template>
+
+              {%- when 'model' -%}
+                <div class="product-gallery__poster" data-gallery-poster>
+                  {{ media.preview_image | image_url: width: 1600 | image_tag: alt: media_alt, loading: 'lazy', widths: '400,600,800,1000,1200,1600', sizes: '(min-width: 768px) 50vw, 100vw' }}
+                  <button class="product-gallery__activate btn" type="button" data-gallery-activate>
+                    <span class="btn__icon">{% render 'icon', name: 'box', size: 20 %}</span>
+                    <span>{{ 'products.media.view_model' | t }}</span>
+                  </button>
+                  <div class="product-gallery__ar">
+                    <button
+                      class="btn btn--secondary"
+                      type="button"
+                      data-shopify-xr
+                      data-shopify-model3d-id="{{ media.id }}"
+                      data-shopify-title="{{ product.title | escape }}"
+                      data-shopify-xr-hidden
+                    >
+                      {{ 'products.media.view_in_space' | t }}
+                    </button>
+                  </div>
+                </div>
+                <div class="product-gallery__interactive" data-gallery-active-slot hidden></div>
+                <template data-gallery-template>
+                  {{ media | model_viewer_tag: image_size: '1600x', toggleable: true }}
+                </template>
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+
+        {%- if product.media.size > 1 -%}
+          <button class="product-gallery__nav product-gallery__nav--prev icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.previous' | t }}" data-gallery-action="previous">
+            <span class="icon-btn__icon">{% render 'icon', name: 'chevron-left' %}</span>
+          </button>
+          <button class="product-gallery__nav product-gallery__nav--next icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.next' | t }}" data-gallery-action="next">
+            <span class="icon-btn__icon">{% render 'icon', name: 'chevron-right' %}</span>
+          </button>
+        {%- endif -%}
+      </div>
+
+      {%- if product.media.size > 1 -%}
+        <div class="product-gallery__thumbs" role="group" aria-label="{{ 'products.media.views' | t | escape }}">
+          {%- for media in product.media -%}
+            {%- assign media_alt = media.alt | default: product.title -%}
+            <button
+              class="product-gallery__thumb"
+              type="button"
+              {% if media.id == current_media.id %}aria-current="true"{% endif %}
+              aria-label="{{ 'products.media.view' | t: index: forloop.index, total: product.media.size, title: media_alt | escape }}"
+              data-gallery-media-id="{{ media.id }}"
+            >
+              {{ media.preview_image | image_url: width: 160 | image_tag: alt: '', loading: 'lazy' }}
+              {%- unless media.media_type == 'image' -%}
+                <span class="badge product-gallery__media-badge" aria-hidden="true">
+                  {%- case media.media_type -%}
+                    {%- when 'video' -%}{{ 'products.media.video_badge' | t }}
+                    {%- when 'external_video' -%}{{ 'products.media.external_video_badge' | t }}
+                    {%- when 'model' -%}{{ 'products.media.model_badge' | t }}
+                  {%- endcase -%}
+                </span>
+              {%- endunless -%}
+            </button>
+          {%- endfor -%}
+        </div>
+
+        <div class="product-gallery__dots" role="group" aria-label="{{ 'products.media.pages' | t | escape }}">
+          {%- for media in product.media -%}
+            {%- assign media_alt = media.alt | default: product.title -%}
+            <button
+              class="product-gallery__dot"
+              type="button"
+              {% if media.id == current_media.id %}aria-current="true"{% endif %}
+              aria-label="{{ 'products.media.view' | t: index: forloop.index, total: product.media.size, title: media_alt | escape }}"
+              data-gallery-media-id="{{ media.id }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <p class="product-gallery__status visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-gallery-status></p>
+    </div>
+
+    {%- if gallery_image_detail == 'lightbox' and lightbox_initial != blank -%}
+      <div class="modal-overlay lightbox lightbox--open" aria-hidden="true" data-gallery-lightbox hidden>
+        <div class="modal lightbox__dialog" id="{{ lightbox_id }}" role="dialog" aria-modal="true" aria-labelledby="{{ lightbox_title_id }}" aria-describedby="{{ lightbox_caption_id }}" tabindex="-1">
+          <div class="modal__header lightbox__header">
+            <h2 class="modal__title lightbox__title visually-hidden" id="{{ lightbox_title_id }}">{{ 'products.media.detail_title' | t }}</h2>
+            <button class="close-btn modal__close lightbox__close" type="button" aria-label="{{ 'products.media.close_detail' | t }}" data-gallery-lightbox-close>
+              {% render 'icon', name: 'close', size: 20 %}
+            </button>
+          </div>
+          <div class="modal__body lightbox__body">
+            <figure class="lightbox__content">
+              <div class="lightbox__viewport">
+                {{ lightbox_initial.preview_image | image_url: width: 2000 | image_tag: class: 'lightbox__image', alt: lightbox_initial.alt, loading: 'eager' }}
+              </div>
+              <div class="lightbox__counter" dir="ltr" aria-hidden="true" data-gallery-lightbox-counter></div>
+              <figcaption class="lightbox__caption" id="{{ lightbox_caption_id }}" data-gallery-lightbox-caption>{{ lightbox_initial.alt | default: product.title | escape }}</figcaption>
+            </figure>
+            <div class="lightbox__zoom" role="group" aria-label="{{ 'products.media.zoom_controls' | t }}">
+              <button class="lightbox__zoom-action icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.zoom_out' | t }}" data-gallery-zoom="out" disabled>{% render 'icon', name: 'minus' %}</button>
+              <button class="lightbox__zoom-action icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.reset_zoom' | t }}" data-gallery-zoom="reset" disabled>{% render 'icon', name: 'rotate-ccw' %}</button>
+              <button class="lightbox__zoom-action icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.zoom_in' | t }}" data-gallery-zoom="in">{% render 'icon', name: 'plus' %}</button>
+            </div>
+            {%- if lightbox_images.size > 1 -%}
+              <button class="lightbox__nav lightbox__nav--prev icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.previous_image' | t }}" data-gallery-lightbox-action="previous">{% render 'icon', name: 'chevron-left' %}</button>
+              <button class="lightbox__nav lightbox__nav--next icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.next_image' | t }}" data-gallery-lightbox-action="next">{% render 'icon', name: 'chevron-right' %}</button>
+            {%- endif -%}
+            <p class="lightbox__status visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-gallery-lightbox-status></p>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
   </div>
-
-  {% if product.images.size > 1 %}
-    <div class="product-gallery__thumbs" role="listbox" aria-label="Product images">
-      {% for image in product.images %}
-        <button class="product-gallery__thumb" role="option"
-                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-                data-gallery-thumb="{{ forloop.index0 }}">
-          {{ image | image_url: width: 160 | image_tag:
-             alt: image.alt | default: product.title, loading: 'lazy' }}
-        </button>
-      {% endfor %}
-    </div>
-
-    <div class="product-gallery__dots" role="tablist">
-      {% for image in product.images %}
-        <button class="product-gallery__dot"
-                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-                aria-label="Image {{ forloop.index }}"></button>
-      {% endfor %}
-    </div>
-  {% endif %}
-</div>
+{%- endif -%}

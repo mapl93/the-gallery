@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "video-section",
   "name": "Video Section",
   "registryId": "S7",
   "category": "sections",
   "status": "pilot",
-  "summary": "Contained or full-width media shell with poster, optional play intent, and target-owned playback behavior.",
+  "summary": "Passive contained or full-width media figure with required target-owned media, optional visible caption, and no neutral playback claim.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/video-section",
@@ -22,35 +22,28 @@
       "selector": ".video-section",
       "className": ".video-section",
       "required": true,
-      "description": "Video section root."
+      "description": "Native figure grouping one complete target-owned media composition and its optional visible caption."
     },
     {
       "name": "wrapper",
       "selector": ".video-section__wrapper",
       "className": ".video-section__wrapper",
       "required": true,
-      "description": "Aspect-ratio media and control positioning region."
+      "description": "Passive media containment region with private aspect ratio, fallback surface and variant-owned radius."
     },
     {
-      "name": "poster",
-      "selector": ".video-section__poster",
-      "className": ".video-section__poster",
-      "required": false,
-      "description": "Optional target-owned poster or media element."
-    },
-    {
-      "name": "play",
-      "selector": ".video-section__play",
-      "className": ".video-section__play",
-      "required": false,
-      "description": "Optional native button expressing play intent."
+      "name": "media",
+      "selector": ".video-section__media",
+      "className": ".video-section__media",
+      "required": true,
+      "description": "Required target-owned poster, native video, embed, or complete accessible player composition."
     },
     {
       "name": "caption",
       "selector": ".video-section__caption",
       "className": ".video-section__caption",
       "required": false,
-      "description": "Optional visible media caption."
+      "description": "Optional native figcaption providing visible editorial context for the media."
     }
   ],
   "variants": [
@@ -58,7 +51,7 @@
       "name": "contained",
       "className": null,
       "default": true,
-      "description": "Default padded presentation with rounded media."
+      "description": "Default padded presentation with rounded media containment."
     },
     {
       "name": "fullwidth",
@@ -72,7 +65,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Intrinsic size filling available component space with a private review-candidate media ratio."
     }
   ],
   "states": [
@@ -81,31 +74,39 @@
       "selectors": [
         ".video-section"
       ],
-      "description": "Resting media presentation."
-    },
-    {
-      "name": "hover",
-      "selectors": [
-        ".video-section__play:hover"
-      ],
-      "description": "Pointer emphasis on the optional play-intent control."
-    },
-    {
-      "name": "playFocusVisible",
-      "selectors": [
-        ".video-section__play:focus-visible"
-      ],
-      "description": "Visible keyboard focus on the optional play-intent button."
+      "description": "Passive resting media figure; any player state belongs to the target-owned media subtree."
     }
   ],
   "behavior": [
     {
-      "name": "playbackOwnership",
+      "name": "figureComposition",
+      "selectors": [
+        ".video-section",
+        ".video-section__caption"
+      ],
+      "description": "The root is a native figure and a supplied caption is its native figcaption; the caption provides editorial context rather than synchronized media alternatives."
+    },
+    {
+      "name": "mediaOwnership",
       "selectors": [
         ".video-section__wrapper",
-        ".video-section__play"
+        ".video-section__media"
       ],
-      "description": "The target owns media loading, play and pause state, controls, autoplay policy, captions, transcripts, errors, and synchronization; canonical CSS supplies only the visual shell."
+      "description": "The target owns media type, sources, loading, poster, controls, playback, tracks, captions, descriptions, transcript, errors, provider consent, policy, events and analytics."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".video-section"
+      ],
+      "description": "Missing required media omits the complete root; an empty optional caption omits only figcaption."
+    },
+    {
+      "name": "runtimeBoundary",
+      "selectors": [
+        ".video-section"
+      ],
+      "description": "Neutral Web adds no playback action, component state, media API call, listener, observer, request, timer, layout measurement, custom element or authored motion."
     }
   ],
   "properties": [
@@ -124,34 +125,16 @@
       "name": "media",
       "type": "slot",
       "required": true,
-      "description": "Target-owned poster, video, embed, or player composition.",
+      "description": "Complete target-owned passive media or accessible player composition.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".video-section__wrapper", "classNames": [".video-section__wrapper"] }]
-      }
-    },
-    {
-      "name": "playAction",
-      "type": "slot",
-      "required": false,
-      "description": "Optional native button that expresses play intent without prescribing playback implementation.",
-      "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".video-section__play", "classNames": [".video-section__play"] }]
-      }
-    },
-    {
-      "name": "playLabel",
-      "type": "string",
-      "required": false,
-      "description": "Contextual accessible name for the optional play-intent button.",
-      "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".video-section__play", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }]
+        "web": [{ "kind": "slot", "selector": ".video-section__media", "classNames": [".video-section__media"] }]
       }
     },
     {
       "name": "caption",
       "type": "string",
       "required": false,
-      "description": "Optional visible media caption.",
+      "description": "Optional visible editorial context rendered as native figcaption; not synchronized captions or transcript.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".video-section__caption" }]
       }
@@ -160,43 +143,44 @@
   "tokens": {
     "public": {
       "color": [
-        "--color-border-focus",
+        "--color-surface-secondary",
         "--color-text-secondary"
       ],
-      "easing": [
-        "--easing-default"
-      ],
       "radius": [
-        "--radius-full",
         "--radius-lg"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ],
-      "transition": [
-        "--transition-fast"
-      ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--tg-typography-body-caption-weight",
+        "--typo-caption-line-height",
+        "--typo-caption-size"
       ]
     }
   },
   "accessibility": [
-    "A poster image needs useful alternative text only when it conveys information not available in adjacent text or the media label.",
-    "The optional play-intent control is a native button with a contextual accessible name, visible focus, and a touch-sized target.",
-    "The target player owns keyboard controls, captions, transcripts, audio descriptions, autoplay policy, and current playback state.",
-    "Reduced motion removes play-control scaling transitions."
+    "Render one complete target-owned media composition inside a native figure and use native figcaption only for optional visible editorial context.",
+    "Give informative poster imagery contextual alternative text and hide decorative or redundant imagery with an empty alternative according to target content context.",
+    "Do not render a play button, tabindex, action name, pressed state or cursor unless a target supplies a real complete player result.",
+    "The target player owns keyboard controls, visible focus, labels, contrast, current playback state, loading and error communication, autoplay policy and media events.",
+    "Meaningful media still needs applicable synchronized captions, descriptions, transcript and accessible player support; visible figcaption is not a substitute.",
+    "Neutral Video Section adds no authored motion or runtime and leaves provider privacy, consent, loading and analytics with the owning target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented as strict native figure composition with required target media, optional figcaption, contained/full-width CSS and zero neutral runtime or playback claim."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "section",
+      "notes": "Copied CSS is available; a dedicated Liquid/schema profile remains blocked on the accepted hosted-versus-external media, captions/transcript, consent, autoplay and fallback policy."
     },
     "react": {
       "status": "planned",

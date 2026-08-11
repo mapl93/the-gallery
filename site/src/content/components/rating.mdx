@@ -1,39 +1,52 @@
 ## Overview
 
-Read-only rating display with full- and half-star anatomy plus optional review-count text.
+Canonical passive rating projection for a target-supplied value from zero
+through five in half-step increments. Rating exposes one named star image,
+shape-distinct full/half/empty anatomy, `default | lg` presentation, and an
+optional independently readable localized review count.
 
-<Preview html={"<div class=\"rating\" role=\"img\" aria-label=\"4.5 out of 5 stars, based on 24 reviews\"><div class=\"rating__stars\" aria-hidden=\"true\"><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--half\">★</span></div><span class=\"rating__count\">(24)</span></div>"} label="Rating Stars" />
+<Preview html={'<span class="rating" data-rating="3.5"><span class="rating__stars" role="img" aria-label="3.5 out of 5 stars"><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--half" aria-hidden="true">☆</span><span class="rating__star" aria-hidden="true">☆</span></span><span class="rating__count" dir="auto">24 reviews</span></span>'} label="Rating" />
 
 ## Presentation
 
-Rating has one classless presentation and one size. Filled, half-filled, and empty stars are structural states inside the star group; they are not interactive choices.
+`ratingValue` is required target-normalized data in `0.5` steps. The target
+generates the five decorative states; neutral Web styles the supplied markup and
+adds no parser, rounding service or runtime. Invalid required value/label
+composition emits no Rating root in the shared renderer.
 
-The target adapter composes the star sequence from its rating data. The neutral web CSS styles that supplied anatomy but does not parse a numeric value or generate the sequence.
-
-<Preview html={"<div class=\"rating\" role=\"img\" aria-label=\"3.5 out of 5 stars\"><div class=\"rating__stars\" aria-hidden=\"true\"><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--filled\">★</span><span class=\"rating__star rating__star--half\">★</span><span class=\"rating__star\">★</span></div></div>"} label="Partial Rating" />
+<Preview html={'<span class="rating rating--lg" data-rating="4.5"><span class="rating__stars" role="img" aria-label="4.5 out of 5 stars"><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--filled" aria-hidden="true">★</span><span class="rating__star rating__star--half" aria-hidden="true">☆</span></span></span>'} label="Large Rating without count" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use Rating to display a value already resolved by the target adapter.</Do>
-  <Dont>Do not use this passive component to collect a rating; use Star Input instead.</Dont>
+  <Do>Use Rating for a supplied passive half-step value in commerce or review content.</Do>
+  <Dont>Do not normalize provider data or collect a person's rating inside this component; use Star Input for value entry.</Dont>
 </DoDont>
+
+Provider scale normalization, rounding, missing/zero policy, aggregates,
+structured data, dynamic announcements and an optional adjacent review Link
+remain target-owned. `reviewCount` is passive complete localized text, not an
+implicit destination.
 
 ## Accessibility
 
-<Callout type="info">
-  Rating Stars is display-only. Use Star Input for interactive review input.
-</Callout>
-
-- Provide a text alternative for the rating value (e.g., "4 out of 5 stars").
-- Hide decorative star glyphs from assistive technology when a rating label is provided.
-- Do not rely on color alone to communicate rating value.
+- Provide a non-empty complete localized `accessibleLabel` that agrees with the
+  supplied value and visual star sequence.
+- Expose that label once on `.rating__stars[role="img"]`; hide each star.
+- Preserve solid, partial-fill and outline forms so state is not color-only.
+- Keep optional count text outside the image and include its localized noun.
+- Rating is unfocusable, non-live and has no controlled/uncontrolled input
+  lifecycle.
 
 ## References
 
 <PropTable>
-  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Localized rating value and scale for assistive technology</td></tr>
-  <tr><td>`reviewCount`</td><td>string</td><td>none</td><td>Optional localized count text beside the stars</td></tr>
+  <tr><td>`ratingValue`</td><td>number</td><td>required</td><td>Target-supplied `0..5` value in `0.5` steps</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Complete localized rating value and scale</td></tr>
+  <tr><td>`reviewCount`</td><td>string</td><td>none</td><td>Optional complete localized passive count</td></tr>
+  <tr><td>`size`</td><td>`default | lg`</td><td>`default`</td><td>Visual size only</td></tr>
 </PropTable>
 
-Required anatomy is `.rating` with an aria-hidden `.rating__stars` group containing `.rating__star` elements. `.rating__star--filled` and `.rating__star--half` represent the supplied rating value; `.rating__count` is optional.
+ADR 0235 consolidates the former V2 Star Rating display into A11 Rating. The
+deprecated migration page owns no implementation or selector alias. Star Input
+remains a distinct native radio group.

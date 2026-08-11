@@ -1,14 +1,17 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "featured-collection",
   "name": "Featured Collection",
   "registryId": "S2",
   "category": "sections",
   "status": "pilot",
-  "summary": "Featured commerce section that composes target-owned Product Card items in grid, carousel, or spotlight presentation.",
+  "summary": "Named passive merchandising section that composes a finite target-owned Product Card list in grid, carousel, or spotlight presentation.",
   "dependencies": [
-    "product-card"
+    "link",
+    "carousel",
+    "product-card",
+    "collection-grid"
   ],
   "source": {
     "registry": "registry.json#/components/featured-collection",
@@ -24,35 +27,49 @@
       "selector": ".featured-collection",
       "className": ".featured-collection",
       "required": true,
-      "description": "Featured collection section root."
+      "description": "Thematic section named by its required visible title; conditionally composes the canonical Collection Grid or Carousel root class."
     },
     {
       "name": "header",
       "selector": ".featured-collection__header",
       "className": ".featured-collection__header",
-      "required": false,
-      "description": "Optional heading and view-all region."
+      "required": true,
+      "description": "Header grouping for the required title and optional complete view-all Link."
     },
     {
       "name": "title",
       "selector": ".featured-collection__title",
       "className": ".featured-collection__title",
-      "required": false,
-      "description": "Optional section heading."
+      "required": true,
+      "description": "Non-empty visible contextual heading whose id names the section and product list."
     },
     {
       "name": "link",
       "selector": ".featured-collection__link",
       "className": ".featured-collection__link",
       "required": false,
-      "description": "Optional native link to the target-owned collection destination."
+      "description": "Optional canonical Link rendered only from a complete label and destination pair."
     },
     {
-      "name": "grid",
+      "name": "list",
       "selector": ".featured-collection__grid",
       "className": ".featured-collection__grid",
       "required": true,
-      "description": "Ordered Product Card composition region."
+      "description": "Native product ul that conditionally composes Collection Grid items layout or the focusable Carousel track."
+    },
+    {
+      "name": "item",
+      "selector": ".featured-collection__item",
+      "className": ".featured-collection__item",
+      "required": true,
+      "description": "One or more native li elements that preserve target-supplied product order and conditionally compose dependency item classes."
+    },
+    {
+      "name": "productCard",
+      "selector": ".featured-collection__item > .product-card",
+      "className": ".product-card",
+      "required": true,
+      "description": "Exactly one canonical Product Card composition inside each product item."
     }
   ],
   "variants": [
@@ -60,19 +77,19 @@
       "name": "grid",
       "className": null,
       "default": true,
-      "description": "Default responsive Product Card grid."
+      "description": "Default native list that composes the canonical Collection Grid root, items, and item classes."
     },
     {
       "name": "carousel",
       "className": ".featured-collection--carousel",
       "default": false,
-      "description": "Horizontally scrollable snap presentation."
+      "description": "Focusable native horizontal product list that composes canonical Carousel track and slide geometry without autoplay, loop, dots, or an independent controller."
     },
     {
       "name": "spotlight",
       "className": ".featured-collection--spotlight",
       "default": false,
-      "description": "Grid presentation with the first supplied item visually emphasized."
+      "description": "Container-responsive native list that gives the first supplied Product Card more parent-layout space without changing product order or Product Card internals."
     }
   ],
   "sizes": [
@@ -80,7 +97,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Single intrinsic size whose density and item geometry are private responsive composition."
     }
   ],
   "states": [
@@ -89,23 +106,32 @@
       "selectors": [
         ".featured-collection"
       ],
-      "description": "Resting section presentation; carousel and spotlight are variants rather than states."
-    },
-    {
-      "name": "viewAllFocusVisible",
-      "selectors": [
-        ".featured-collection__link:focus-visible"
-      ],
-      "description": "Visible keyboard focus on the optional collection link."
+      "description": "Populated passive section with a required title and at least one Product Card."
     }
   ],
   "behavior": [
     {
-      "name": "productComposition",
+      "name": "namedSection",
       "selectors": [
+        ".featured-collection",
+        ".featured-collection__title",
         ".featured-collection__grid"
       ],
-      "description": "The target supplies, orders, limits, and refreshes repeated commerce records; each rendered child preserves Product Card ownership and semantics."
+      "attributes": [
+        "aria-labelledby",
+        "id",
+        "role=\"list\""
+      ],
+      "description": "The required visible heading names both the thematic section and native product list."
+    },
+    {
+      "name": "productComposition",
+      "selectors": [
+        ".featured-collection__grid",
+        ".featured-collection__item",
+        ".featured-collection__item > .product-card"
+      ],
+      "description": "The target supplies one or more ordered Product Cards; list and item wrappers preserve native semantics while every child retains Product Card ownership."
     },
     {
       "name": "viewAllNavigation",
@@ -113,10 +139,32 @@
         ".featured-collection__link"
       ],
       "attributes": [
-        "href",
-        "aria-label"
+        "href"
       ],
-      "description": "When present, the view-all action is a native link whose destination and accessible name are supplied by the target."
+      "events": [
+        "native navigation"
+      ],
+      "description": "A complete optional label/destination pair composes the canonical native Link; partial pairs are omitted."
+    },
+    {
+      "name": "responsiveComposition",
+      "selectors": [
+        ".featured-collection",
+        ".featured-collection__grid",
+        ".featured-collection__item"
+      ],
+      "events": [
+        "container resize",
+        "native scroll"
+      ],
+      "description": "Grid and Spotlight respond to the component container; Carousel preserves native direct scrolling and logical Scroll Snap without neutral JavaScript."
+    },
+    {
+      "name": "targetDataOwnership",
+      "selectors": [
+        ".featured-collection"
+      ],
+      "description": "Targets own collection selection, query, sorting, item limit, commercial spotlight order, inventory, price freshness, loading, empty, error, analytics, and update announcements; the neutral component is omitted when required content is empty."
     }
   ],
   "properties": [
@@ -126,62 +174,99 @@
       "required": false,
       "defaultValue": "grid",
       "valuesFrom": "variants",
-      "description": "Grid, horizontal carousel, or first-item spotlight presentation.",
+      "description": "Grid, passive horizontal Carousel list, or first-record Spotlight presentation.",
       "targetMappings": {
-        "web": [{ "kind": "optionClass", "selector": ".featured-collection", "source": "variants" }]
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".featured-collection",
+            "source": "variants"
+          }
+        ]
       }
     },
     {
       "name": "title",
       "type": "string",
-      "required": false,
-      "description": "Optional visible section heading.",
+      "required": true,
+      "description": "Non-empty visible contextual heading that names the section and native product list.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".featured-collection__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".featured-collection__title"
+          }
+        ]
       }
     },
     {
       "name": "viewAllLabel",
       "type": "string",
       "required": false,
-      "description": "Visible label for the optional collection link.",
+      "unsetBehavior": "Omit the view-all Link unless viewAllDestination is also a non-empty real destination.",
+      "description": "Visible label for the optional canonical collection Link; valid only as a complete pair with viewAllDestination.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".featured-collection__link" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".featured-collection__link"
+          }
+        ]
       }
     },
     {
       "name": "viewAllDestination",
       "type": "string",
       "required": false,
-      "description": "Target-owned destination for the optional collection link.",
+      "unsetBehavior": "Omit the view-all Link unless viewAllLabel is also non-empty.",
+      "description": "Real target-owned collection destination for the optional canonical Link; valid only as a complete pair with viewAllLabel.",
       "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".featured-collection__link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }]
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".featured-collection__link",
+            "attribute": "href",
+            "valueFrom": "property",
+            "elements": [
+              "a"
+            ]
+          }
+        ]
       }
     },
     {
       "name": "products",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned Product Card compositions.",
+      "description": "Ordered slot containing one or more canonical Product Card compositions; empty content omits the section.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".featured-collection__grid", "classNames": [".featured-collection__grid"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".featured-collection__grid",
+            "classNames": [
+              ".featured-collection__grid",
+              ".featured-collection__item"
+            ]
+          }
+        ]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
-        "--color-border-focus",
-        "--color-text-accent",
         "--color-text-primary"
       ],
       "typography": [
         "--font-family-heading",
-        "--typo-body-size",
+        "--tg-typography-h2-weight",
+        "--typo-h2-line-height",
         "--typo-h2-size"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-grid-gap",
         "--space-layout-section-gap",
         "--space-layout-touch-target"
@@ -189,20 +274,24 @@
     }
   },
   "accessibility": [
-    "Associate the section with its visible heading when one is present.",
-    "Each composed Product Card preserves its own image alternatives, names, prices, actions, focus, and status semantics.",
-    "The optional view-all control is a descriptive native link with a visible focus indicator and touch-sized target.",
-    "Horizontal carousel presentation remains keyboard-scrollable and does not hide required Product Card content."
+    "Require a non-empty visible heading and associate both the section and native product list through aria-labelledby.",
+    "Use ul and li semantics without APG Grid roles, roving focus, slide group roles, or a second Arrow-key model.",
+    "Each item contains exactly one canonical Product Card and preserves its image alternatives, name, Price, actions, focus, and status semantics.",
+    "Render the optional view-all control only as a descriptive canonical native Link with a real destination.",
+    "Make the Carousel product list keyboard-focusable and natively scrollable while preserving ordinary child Tab order.",
+    "Preserve source order in every presentation and omit the section when its required title or products are empty.",
+    "Leave loading, empty, error, data refresh, inventory, pricing, result announcements, and commercial ordering with the owning target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by native section/list anatomy and conditional Link, Collection Grid, Carousel, and Product Card class composition with no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps a selected collection, title, presentation, bounded target product count, derived view-all Link, and canonical Product Card snippet."
     },
     "react": {
       "status": "planned",

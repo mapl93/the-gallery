@@ -1,14 +1,14 @@
 ## Overview
 
-Compact quantity control with native number semantics and progressively enhanced step buttons.
+Editable quantity field with one native number input as its value owner and progressively enhanced, explicitly named step actions.
 
-<Preview html={"<div class=\"qty\" role=\"group\" aria-label=\"Quantity selector\" data-qty><button class=\"qty__btn qty__btn--decrement\" type=\"button\" aria-label=\"Decrease quantity\" data-qty-minus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\" /></svg></button><input class=\"qty__input\" type=\"number\" value=\"1\" min=\"1\" max=\"8\" step=\"1\" aria-label=\"Quantity\" data-qty-input /><button class=\"qty__btn qty__btn--increment\" type=\"button\" aria-label=\"Increase quantity\" data-qty-plus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" /></svg></button></div>"} label="Quantity Selector" />
+<Preview html={"<div class=\"qty\" role=\"group\" aria-label=\"Quantity selector\" data-qty><button class=\"qty__btn qty__btn--decrement\" type=\"button\" aria-label=\"Decrease quantity\" data-qty-minus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\" /></svg></button><input class=\"qty__input\" type=\"number\" name=\"quantity\" value=\"1\" min=\"1\" max=\"8\" step=\"1\" required aria-label=\"Quantity\" data-qty-input /><button class=\"qty__btn qty__btn--increment\" type=\"button\" aria-label=\"Increase quantity\" data-qty-plus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" /></svg></button></div>"} label="Quantity Selector" />
 
 ## Presentation
 
 Default, Error, Success, and Warning share the same control anatomy. Validation feedback is composed through a field wrapper and associated with the native input.
 
-The validation modifiers are `.qty--error`, `.qty--success`, and `.qty--warning`.
+The validation modifiers are `.qty--error`, `.qty--success`, and `.qty--warning`. Semantic boundaries are contrast-reinforced without introducing component-specific public colors. Hover preserves the selected family; focus adds its matching outer ring.
 
 <Preview html={"<div><div class=\"qty qty--warning\" role=\"group\" aria-label=\"Quantity selector\" data-qty><button class=\"qty__btn qty__btn--decrement\" type=\"button\" aria-label=\"Decrease quantity\" data-qty-minus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\" /></svg></button><input class=\"qty__input\" type=\"number\" value=\"8\" min=\"1\" max=\"8\" aria-label=\"Quantity\" aria-describedby=\"quantity-warning\" data-qty-input /><button class=\"qty__btn qty__btn--increment\" type=\"button\" aria-label=\"Increase quantity\" data-qty-plus><svg class=\"qty__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\" /></svg></button></div><p id=\"quantity-warning\" class=\"tg-preview-note\">Only eight pieces are currently available.</p></div>"} label="Validation composition" />
 
@@ -19,6 +19,23 @@ The validation modifiers are `.qty--error`, `.qty--success`, and `.qty--warning`
   <Dont>Don't keep the buttons active past a valid boundary.</Dont>
 </DoDont>
 
+<DoDont>
+  <Do>Keep the number input editable when customers may type a known quantity directly.</Do>
+  <Dont>Do not replace the native input with text plus two buttons or a hidden mirror value.</Dont>
+</DoDont>
+
+### Native step ownership
+
+The neutral Web enhancer calls the input's native `stepDown()` and `stepUp()` methods. This preserves the browser's step base, decimal alignment, `min`, `max`, and validity rules instead of reimplementing them in JavaScript. An absent, invalid, or non-positive adapter value falls back to `step="1"`.
+
+Step buttons dispatch `input` and `change` only when the native value actually changes. Arrow Up and Arrow Down continue to work directly on the number input. Inventory availability, asynchronous cart updates, pending treatment, and recovery remain target-owned.
+
+### State ownership
+
+Static HTML uses `value` as the initial quantity and lets the native input own subsequent edits. Framework adapters may use `value` for controlled operation or `defaultValue` for uncontrolled operation, always on the same input.
+
+`readOnly` keeps the input focusable and submittable while disabling both step actions. `disabled` removes the field from interaction and successful form submission. Form reset restores the initial value and the enhancer recalculates button availability.
+
 ## Accessibility
 
 <Callout type="info">
@@ -28,8 +45,10 @@ The validation modifiers are `.qty--error`, `.qty--success`, and `.qty--warning`
 - Provide a visible label or equivalent accessible name.
 - Name increment and decrement buttons clearly.
 - Respect min, max, step, disabled, and inventory constraints.
+- Add `name` when the value participates in form submission and `required` when an empty quantity must fail native validation.
 - Associate validation feedback with `aria-describedby`; only Error sets `aria-invalid="true"`.
 - Preserve native Arrow Up and Arrow Down behavior on the number field.
+- Do not add `role="spinbutton"`; `input[type="number"]` already exposes the native numeric role and value semantics.
 
 ## API Reference
 
@@ -38,6 +57,9 @@ The validation modifiers are `.qty--error`, `.qty--success`, and `.qty--warning`
   <tr><td>`value`</td><td>`number`</td><td>required</td><td>Current quantity</td></tr>
   <tr><td>`min` / `max`</td><td>`number`</td><td>unset</td><td>Optional native boundaries</td></tr>
   <tr><td>`step`</td><td>`number`</td><td>`1`</td><td>Increment used by native and enhanced stepping</td></tr>
+  <tr><td>`name`</td><td>`string`</td><td>unset</td><td>Native form field name</td></tr>
+  <tr><td>`required`</td><td>`boolean`</td><td>`false`</td><td>Requires a non-empty valid number</td></tr>
+  <tr><td>`readOnly`</td><td>`boolean`</td><td>`false`</td><td>Keeps the value focusable and submittable while disabling edits</td></tr>
   <tr><td>`disabled`</td><td>`boolean`</td><td>`false`</td><td>Disables the field and both buttons</td></tr>
   <tr><td>`accessibleLabel`</td><td>`string`</td><td>required</td><td>Accessible name for the number field</td></tr>
   <tr><td>`decrementLabel` / `incrementLabel`</td><td>`string`</td><td>required</td><td>Accessible names for step buttons</td></tr>

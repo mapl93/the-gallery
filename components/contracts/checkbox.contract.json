@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "checkbox",
   "name": "Checkbox",
   "registryId": "A5",
@@ -84,7 +84,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "One 20px control size aligned with the first line of 16px label text."
+      "description": "One 20px control centered on the first 24px line of 16px label text; the wrapping label supplies the larger activation area."
     }
   ],
   "states": [
@@ -120,17 +120,17 @@
     },
     {
       "name": "errorFocusVisible",
-      "selectors": [".checkbox--error", ".checkbox__input:focus-visible"],
+      "selectors": [".checkbox--error .checkbox__input:focus-visible"],
       "description": "Focused Error variant with the lighter Error outer ring."
     },
     {
       "name": "successFocusVisible",
-      "selectors": [".checkbox--success", ".checkbox__input:focus-visible"],
+      "selectors": [".checkbox--success .checkbox__input:focus-visible"],
       "description": "Focused Success variant with the lighter Success outer ring."
     },
     {
       "name": "warningFocusVisible",
-      "selectors": [".checkbox--warning", ".checkbox__input:focus-visible"],
+      "selectors": [".checkbox--warning .checkbox__input:focus-visible"],
       "description": "Focused Warning variant with the lighter Warning outer ring."
     }
   ],
@@ -140,6 +140,17 @@
       "selectors": [".checkbox__input", ".checkbox__input:checked"],
       "events": ["click", "Space", "change"],
       "description": "Pointer activation, label activation, and Space use native checkbox selection behavior."
+    },
+    {
+      "name": "selectionOwnership",
+      "selectors": [".checkbox__input"],
+      "attributes": [
+        "checked content attribute establishes defaultChecked in static HTML",
+        "checked IDL property represents live selection",
+        "indeterminate IDL property represents live mixed presentation"
+      ],
+      "events": ["input", "change", "form reset"],
+      "description": "Static HTML remains natively uncontrolled after its initial checkedness. Framework adapters may bind checked and indeterminate live properties with native events for controlled use without introducing a second selection owner."
     },
     {
       "name": "labelAssociation",
@@ -240,7 +251,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Controls the native selected state.",
+      "description": "Represents native selection; static web markup establishes initial checkedness while controlled adapters bind the live checked property.",
       "targetMappings": {
         "web": [{
           "kind": "attribute",
@@ -256,7 +267,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Initial mixed state synchronized to the native indeterminate property by progressive enhancement.",
+      "description": "Initial mixed state synchronized by progressive enhancement; controlled adapters bind the live native indeterminate property.",
       "targetMappings": {
         "web": [{
           "kind": "attribute",
@@ -338,7 +349,7 @@
         "--space-input-icon-size",
         "--space-input-icon-gap"
       ],
-      "typography": ["--typo-body-size"],
+      "typography": ["--typo-body-size", "--typo-body-line-height"],
       "radius": ["--radius-sm"],
       "transition": ["--transition-fast"],
       "easing": ["--easing-default"],
@@ -350,6 +361,8 @@
     "Associate a visible label by wrapping the input or using matching for/id attributes.",
     "Use checked, required, disabled, name, and value on the native input rather than duplicating their behavior.",
     "Use native indeterminate for mixed state; data-indeterminate is only its progressive initialization contract.",
+    "Treat checked and indeterminate as independent native properties: indeterminate wins visually while form submission still follows checked.",
+    "Use the wrapping label as the full pointer target and preserve at least the 24px label line box around the 20px visual control.",
     "Use aria-invalid=\"true\" only for Error and aria-describedby for associated feedback from Field Wrapper.",
     "Do not communicate validation or selection through color alone; checked and indeterminate retain distinct generated indicators.",
     "Preserve native checkbox appearance in forced-colors mode."
@@ -358,14 +371,18 @@
     "web": {
       "status": "implemented",
       "kind": "css-js",
-      "notes": "Canonical CSS styles native states and shared theme.js initializes data-indeterminate as the native mixed property."
+      "notes": "Canonical CSS styles native states and shared theme.js initializes data-indeterminate; static HTML remains uncontrolled after initial checkedness."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-js",
       "notes": "Shopify renders native checkbox markup and the shared theme.js progressively initializes mixed state."
     },
-    "react": { "status": "planned", "kind": "component" },
+    "react": {
+      "status": "planned",
+      "kind": "component",
+      "notes": "A future adapter binds checked and indeterminate live properties with native input/change events or supplies uncontrolled initial values."
+    },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "style" },
     "compose": { "status": "planned", "kind": "composable" }

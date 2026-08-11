@@ -1,68 +1,100 @@
 ## Overview
 
-404 Page presents a missing-page message with optional illustration, search, recovery links, and suggested content. Search handling, routes, and suggested records remain owned by the consuming target.
+404 Page is a missing-resource composition with a required explanation and at
+least one useful target-owned recovery path. It composes canonical Empty State,
+Input, Button, and Link; the server or application still owns HTTP status,
+caching, routing, search, suggested records, localization, and analytics.
 
 <Preview
-  html={'<main class="page-404 tg-preview-frame--md" aria-labelledby="page-404-preview-title"><div class="page-404__code">404</div><h1 class="page-404__heading" id="page-404-preview-title">Page not found</h1><p class="page-404__text">The requested page is unavailable. Choose a recovery destination to continue.</p><nav class="page-404__links" aria-label="Recovery links"><a class="page-404__link" href="#">Return to the gallery</a><a class="page-404__link" href="#">Contact support</a></nav></main>'}
+  html={'<section class="page-404 tg-preview-frame--md" aria-labelledby="page-404-preview-title"><div class="empty-state page-404__core"><p class="page-404__code" aria-hidden="true">404</p><h2 class="empty-state__title page-404__heading" id="page-404-preview-title">This work is not on view</h2><p class="empty-state__message page-404__text">The requested page is unavailable. Choose a recovery destination to continue.</p><a class="btn page-404__primary-action" href="/">Return to the gallery</a></div><form class="page-404__search" role="search" aria-label="Search the gallery" action="/components" method="get"><div class="input page-404__search-field"><label class="input__label" for="page-404-preview-search">Search the gallery</label><div class="page-404__search-row"><div class="input__control"><input class="input__field" id="page-404-preview-search" name="q" type="search" placeholder="Artists, works, or collections" aria-describedby="page-404-preview-search-message" required /></div><button class="btn page-404__search-action" type="submit">Search</button></div><p class="input__message" id="page-404-preview-search-message">Search handling remains target-owned.</p></div></form><nav class="page-404__links" aria-label="More recovery links"><a class="link page-404__link" href="/components">Browse components</a><a class="link page-404__link" href="/architecture">Read the architecture</a></nav><section class="page-404__suggestions" aria-labelledby="page-404-preview-suggestions"><h3 class="page-404__suggestions-heading" id="page-404-preview-suggestions">Continue exploring</h3><ul class="page-404__suggestion-list"><li class="page-404__suggestion-item"><a class="link page-404__suggestion-link" href="/components/product-card">Product Card</a></li><li class="page-404__suggestion-item"><a class="link page-404__suggestion-link" href="/components/gallery-grid">Gallery Grid</a></li><li class="page-404__suggestion-item"><a class="link page-404__suggestion-link" href="/components/artist-profile">Artist Profile</a></li></ul></section></section>'}
   label="404 Page"
 />
 
 ## Presentation
 
-The centered root contains a required page-level heading and explanatory message. The visible error code, illustration, native search form, recovery-link group, and suggested-content region are optional and independent.
+The container-responsive root centers a canonical Empty State explanation,
+optional visible code, optional recovery search, additional navigation, and an
+optional native list of suggestions. A visually primary destination can sit in
+the Empty State core; additional destinations remain ordinary canonical Links.
 
-Recovery destinations and copy in the artwork are preview fixtures. The component provides layout and focus presentation but does not define route availability, search submission, or suggestion data.
+The illustration, copy, search query, routes, and suggested records in Exhibit
+and Studio are fixtures, not defaults. The optional code is redundant visual
+metadata and is hidden from accessibility because the required heading explains
+the state in words.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Explain that the page is unavailable and provide at least one target-owned recovery path.</Do>
-  <Dont>Do not imply that search, routes, or suggested records are supplied by the component.</Dont>
+  <Do>Explain the absence clearly and provide at least one real, useful recovery path.</Do>
+  <Dont>Do not turn P1 into an HTTP response, router, search service, recommendation engine, or generic service-error screen.</Dont>
 </DoDont>
 
-- Keep the message concise and distinguish it from a temporary loading or service-error state.
-- Use the illustration only when it supports the message; it must not carry essential information alone.
-- Preserve native link semantics for recovery destinations and native form semantics when search is supplied.
+- Keep the heading and message non-empty; omit the complete composition when
+  either is unavailable.
+- Supply at least one of search, recovery destinations, or suggested
+  destinations. Empty recovery shells are invalid.
+- Use one clearly primary destination and keep additional choices restrained.
+- Keep search action, query schema, results, errors, and analytics with the
+  consuming target.
+- Keep suggestion source, ranking, availability, and localization target-owned.
 
 ## Accessibility
 
-- Use one page-level heading that clearly communicates the missing-page state.
-- Place recovery destinations in a labelled navigation landmark when more than one is present.
-- Give an optional search form an accessible name and preserve visible focus on its field and submit action.
-- Provide useful alternative text for meaningful illustration media and hide purely decorative media from assistive technology.
-- Keep recovery-link labels descriptive without relying on surrounding visual context.
+- Place the composition inside the one document-level `main` owned by a
+  standalone target. Inside another page, use a labelled contextual section.
+- Use a visible contextual heading and preserve the host document hierarchy;
+  P1 does not expose a universal heading-level property.
+- Mark the optional illustration decorative and hide the redundant visible code
+  from assistive technology.
+- Compose search from a named native form, visible Input label, named
+  `type="search"` field, associated message, and visible submit Button.
+- Use descriptive real `href` values; do not cancel placeholder fragments.
+- Render suggestions as a labelled native list and preserve target-authored
+  order, canonical focus, forced-colors, reduced-motion, keyboard, and touch
+  behavior.
 
 ## References
 
-**Contract:** `page-404` v0.2.0, `pilot`.
+**Contract:** `page-404` v0.3.0, `pilot`.
 
-**Dependencies:** None declared.
+**Dependencies:** Empty State, Input, Button, and Link.
 
 **Anatomy**
 
 | Part | Selector | Requirement |
 | --- | --- | --- |
 | Root | `.page-404` | Required |
-| Illustration | `.page-404__illustration` | Optional |
-| Error code | `.page-404__code` | Optional |
-| Heading | `.page-404__heading` | Required |
-| Message | `.page-404__text` | Required |
+| Empty-state core | `.page-404__core` | Required |
+| Illustration | `.page-404__illustration` | Optional, decorative |
+| Error code | `.page-404__code` | Optional, redundant |
+| Heading | `.page-404__heading` | Required, non-empty |
+| Message | `.page-404__text` | Required, non-empty |
+| Primary recovery | `.page-404__primary-action` | Optional |
 | Search form | `.page-404__search` | Optional |
-| Search field hook | `.page-404__search-input` | Optional |
-| Search submit action | `.page-404__search-btn` | Optional |
-| Recovery-link group | `.page-404__links` | Optional |
-| Recovery link | `.page-404__link` | Optional |
+| Search field | `.page-404__search-field` | Conditional with search |
+| Search row | `.page-404__search-row` | Conditional with search |
+| Search action | `.page-404__search-action` | Conditional with search |
+| Recovery navigation | `.page-404__links` | Optional |
+| Recovery link | `.page-404__link` | Conditional with navigation |
 | Suggestions region | `.page-404__suggestions` | Optional |
-| Suggestions heading | `.page-404__suggestions-heading` | Optional |
+| Suggestions heading | `.page-404__suggestions-heading` | Conditional with suggestions |
+| Suggestion list | `.page-404__suggestion-list` | Conditional with suggestions |
+| Suggestion item | `.page-404__suggestion-item` | Conditional with suggestions |
+| Suggestion link | `.page-404__suggestion-link` | Conditional with suggestions |
 
 **API Reference**
 
 <PropTable>
-  <tr><td>`illustration`</td><td>slot</td><td>optional</td><td>Target-owned missing-page media</td></tr>
-  <tr><td>`code`</td><td>string</td><td>optional</td><td>Visible error code</td></tr>
-  <tr><td>`heading`</td><td>string</td><td>required</td><td>Missing-page heading</td></tr>
-  <tr><td>`message`</td><td>string</td><td>required</td><td>Explanatory recovery message</td></tr>
-  <tr><td>`search`</td><td>slot</td><td>optional</td><td>Target-owned search form and submission action</td></tr>
-  <tr><td>`recoveryLinks`</td><td>slot</td><td>optional</td><td>Target-owned recovery destinations</td></tr>
-  <tr><td>`suggestions`</td><td>slot</td><td>optional</td><td>Target-owned suggested-content heading and items</td></tr>
+  <tr><td>`illustration`</td><td>slot</td><td>optional</td><td>Decorative Empty State media</td></tr>
+  <tr><td>`code`</td><td>string</td><td>optional</td><td>Visible redundant status code</td></tr>
+  <tr><td>`heading`</td><td>string</td><td>required</td><td>Non-empty contextual missing-resource heading</td></tr>
+  <tr><td>`message`</td><td>string</td><td>required</td><td>Non-empty explanatory recovery message</td></tr>
+  <tr><td>`search`</td><td>slot</td><td>optional</td><td>Target-owned native form composed from Input and Button</td></tr>
+  <tr><td>`recoveryLinks`</td><td>slot</td><td>optional</td><td>Primary and additional canonical destinations</td></tr>
+  <tr><td>`suggestions`</td><td>slot</td><td>optional</td><td>Target-owned heading and native Link list</td></tr>
 </PropTable>
+
+At least one recovery path across `search`, `recoveryLinks`, or `suggestions` is
+required for a valid rendered composition. P1 owns no controlled/uncontrolled
+store; canonical Input and the consuming target retain normal value and request
+ownership.

@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "breadcrumb",
   "name": "Breadcrumb",
   "registryId": "B8",
   "category": "layout",
   "status": "pilot",
-  "summary": "Navigation trail layout component with item, link, separator, current-page anatomy, hover state, and nav landmark requirements.",
+  "summary": "Named navigation trail with an ordered hierarchy, repeatable linked items, hidden visual separators, current-page state, visible focus, and wrap-safe long content.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/breadcrumb",
@@ -25,11 +25,18 @@
       "description": "Navigation trail wrapper."
     },
     {
+      "name": "list",
+      "selector": ".breadcrumb__list",
+      "className": ".breadcrumb__list",
+      "required": true,
+      "description": "Ordered list that preserves the hierarchical sequence and item count."
+    },
+    {
       "name": "item",
       "selector": ".breadcrumb__item",
       "className": ".breadcrumb__item",
-      "required": false,
-      "description": "Optional wrapper for a breadcrumb segment."
+      "required": true,
+      "description": "Repeatable ordered-list item containing one destination or the current page and an optional hidden separator."
     },
     {
       "name": "link",
@@ -78,7 +85,12 @@
     {
       "name": "linkHover",
       "selectors": [".breadcrumb__link:hover"],
-      "description": "Pointer hover state on a breadcrumb link."
+      "description": "Pointer hover keeps primary text contrast and adds the accent underline to a breadcrumb link."
+    },
+    {
+      "name": "linkFocusVisible",
+      "selectors": [".breadcrumb__link:focus-visible"],
+      "description": "Keyboard focus remains visually distinct on each linked ancestor."
     },
     {
       "name": "current",
@@ -90,8 +102,14 @@
     {
       "name": "navigationLandmark",
       "selectors": [".breadcrumb"],
-      "attributes": ["<nav>", "aria-label=\"Breadcrumb\""],
+      "attributes": ["<nav>", "aria-label"],
       "description": "Breadcrumbs should render as a named navigation landmark."
+    },
+    {
+      "name": "orderedHierarchy",
+      "selectors": [".breadcrumb__list", ".breadcrumb__item"],
+      "attributes": ["<ol>", "<li>"],
+      "description": "The path is an ordered hierarchy of one or more list items from broadest ancestor to current page."
     },
     {
       "name": "currentPage",
@@ -104,6 +122,11 @@
       "selectors": [".breadcrumb__separator"],
       "attributes": ["aria-hidden=\"true\""],
       "description": "Visual separators should not be announced as extra breadcrumb items."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [".breadcrumb__list", ".breadcrumb__current", ".breadcrumb__link"],
+      "description": "Long and localized labels wrap without hiding hierarchy; collapse, ellipsis, and overflow menus are unsupported v1 target extensions."
     }
   ],
   "properties": [
@@ -145,7 +168,8 @@
         "--color-text-secondary",
         "--color-text-accent",
         "--color-text-disabled",
-        "--color-text-primary"
+        "--color-text-primary",
+        "--color-border-focus"
       ],
       "transition": [
         "--transition-fast"
@@ -154,18 +178,22 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
       ],
       "spacing": [
-        "--space-layout-element-gap"
+        "--space-layout-element-gap",
+        "--space-layout-touch-target"
       ]
     }
   },
   "accessibility": [
-    "Use nav with aria-label=\"Breadcrumb\" for the breadcrumb region.",
+    "Use a named nav landmark with an ordered list and list items for the complete hierarchy.",
     "Mark the current page with aria-current=\"page\".",
     "Hide purely visual separators from assistive technology.",
-    "Keep breadcrumb labels concise and ordered from broadest to current page."
+    "Keep breadcrumb labels concise and ordered from broadest to current page.",
+    "Preserve a visible focus indicator and the complete path when content wraps."
   ],
   "adapters": {
     "web": {
@@ -176,7 +204,7 @@
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid can render breadcrumb links and current item with the same class contract."
+      "notes": "The Shopify snippet renders the same nav, ordered-list, item, link, separator, and current-page class contract."
     },
     "react": {
       "status": "planned",

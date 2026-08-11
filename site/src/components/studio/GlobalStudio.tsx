@@ -2,8 +2,10 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent,
   type MouseEvent,
 } from 'react';
 import {
@@ -12,9 +14,7 @@ import {
   Heart,
   Home,
   Menu,
-  Minus,
   Package,
-  Plus,
   Search,
   ShoppingBag,
   User,
@@ -27,6 +27,8 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import CartLineItemArtwork from './CartLineItemArtwork';
+import AnnouncementArtwork, { type AnnouncementMode } from './AnnouncementArtwork';
 import { editorialMedia } from './editorialMedia';
 
 interface GlobalStudioProps {
@@ -40,7 +42,6 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
   header: {
     logo: true,
     logoHref: '#home',
-    logoLabel: 'The Gallery home',
     navigationLabel: 'Primary navigation',
     navigation: true,
     actions: true,
@@ -48,11 +49,34 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     mobileMenuTrigger: true,
   },
   'announcement-bar': {
-    label: 'Gallery announcement',
     message: true,
+    countdown: true,
+    messages: true,
+    label: 'Gallery announcements',
+    dismissLabel: 'Dismiss announcement',
+    previousLabel: 'Previous announcement',
+    nextLabel: 'Next announcement',
+    pauseLabel: 'Pause announcements',
+    playLabel: 'Play announcements',
+    counterTemplate: '{current}/{total}',
+    statusTemplate: 'Message {current} of {total}',
+  },
+  'announcement-extended': {
+    message: true,
+    countdown: true,
+    messages: true,
+    label: 'Gallery announcements',
+    dismissLabel: 'Dismiss announcement',
+    previousLabel: 'Previous announcement',
+    nextLabel: 'Next announcement',
+    pauseLabel: 'Pause announcements',
+    playLabel: 'Play announcements',
+    counterTemplate: '{current}/{total}',
+    statusTemplate: 'Message {current} of {total}',
   },
   footer: {
     linkGroups: true,
+    brand: true,
     metadata: true,
   },
   'mobile-menu': {
@@ -60,7 +84,9 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
   },
   'search-overlay': {
     open: true,
-    inputLabel: 'Search the gallery',
+    title: 'Search The Gallery',
+    dismissLabel: 'Close search',
+    inputLabel: 'Search artists, works, and collections',
     query: '',
     placeholder: 'Search artists, works, and collections',
     results: true,
@@ -137,9 +163,21 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [quantity, setQuantity] = useState(1);
-  const [removed, setRemoved] = useState(false);
+  const [quantities, setQuantities] = useState({ celadon: 1, incense: 1 });
+  const [removedLines, setRemovedLines] = useState<string[]>([]);
   const [feedback, setFeedback] = useState('');
+  const overlayTriggerRef = useRef<HTMLButtonElement>(null);
+  const announcementTriggerRef = useRef<HTMLButtonElement>(null);
+  const overlayPanelRef = useRef<HTMLElement>(null);
+  const overlayInitialFocusRef = useRef<HTMLElement>(null);
+  const overlayReturnFocusRef = useRef<HTMLElement | null>(null);
+  const overlayWasOpenRef = useRef(false);
+  const megaMenuRef = useRef<HTMLElement>(null);
+  const megaMenuWasOpenRef = useRef(false);
+
+  const managedOverlayOpen = contract.slug === 'mobile-menu' || contract.slug === 'cart-drawer'
+    ? drawerOpen
+    : contract.slug === 'search-overlay' && values.open === true;
 
   useEffect(() => {
     const read = () => {
@@ -157,10 +195,49 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   useEffect(() => {
     setValues(initialValues);
     setDrawerOpen(true);
-    setQuantity(1);
-    setRemoved(false);
+    setQuantities({ celadon: 1, incense: 1 });
+    setRemovedLines([]);
     setFeedback('');
   }, [initialValues]);
+
+  useEffect(() => {
+    if (contract.slug !== 'mobile-menu'
+        && contract.slug !== 'search-overlay'
+        && contract.slug !== 'cart-drawer') return undefined;
+
+    if (managedOverlayOpen) {
+      overlayWasOpenRef.current = true;
+      const frame = requestAnimationFrame(() => {
+        (overlayInitialFocusRef.current ?? overlayPanelRef.current)?.focus();
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    if (!overlayWasOpenRef.current) return undefined;
+    overlayWasOpenRef.current = false;
+    const returnTarget = overlayReturnFocusRef.current?.isConnected
+      ? overlayReturnFocusRef.current
+      : overlayTriggerRef.current;
+    overlayReturnFocusRef.current = null;
+    const frame = requestAnimationFrame(() => returnTarget?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, managedOverlayOpen]);
+
+  useEffect(() => {
+    if (contract.slug !== 'mega-menu') return undefined;
+    const open = values.open === true;
+
+    if (open) {
+      megaMenuWasOpenRef.current = true;
+      return undefined;
+    }
+
+    if (!megaMenuWasOpenRef.current) return undefined;
+    megaMenuWasOpenRef.current = false;
+    if (!megaMenuRef.current?.contains(document.activeElement)) return undefined;
+    const frame = requestAnimationFrame(() => overlayTriggerRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, values.open]);
 
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
 
@@ -172,8 +249,8 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
     setValues({ ...initialValues });
     setTokenOverrides({});
     setDrawerOpen(true);
-    setQuantity(1);
-    setRemoved(false);
+    setQuantities({ celadon: 1, incense: 1 });
+    setRemovedLines([]);
     setFeedback('');
   }
 
@@ -183,6 +260,7 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   }
 
   function openPropertyOverlay() {
+    if (contract.slug === 'search-overlay') rememberOverlayInvoker();
     updateValues({ open: true });
     setFeedback(`${contract.name} opened in this local preview.`);
   }
@@ -193,8 +271,62 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   }
 
   function openDrawer() {
+    if (contract.slug === 'mobile-menu' || contract.slug === 'cart-drawer') rememberOverlayInvoker();
     setDrawerOpen(true);
     setFeedback(`${contract.name} opened in this local preview.`);
+  }
+
+  function rememberOverlayInvoker() {
+    const activeElement = document.activeElement;
+    overlayReturnFocusRef.current = activeElement instanceof HTMLElement && activeElement !== document.body
+      ? activeElement
+      : null;
+  }
+
+  function handleManagedOverlayKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (contract.slug === 'mobile-menu' || contract.slug === 'cart-drawer') closeDrawer();
+      if (contract.slug === 'search-overlay') closePropertyOverlay();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+    const panel = overlayPanelRef.current;
+    if (!panel) return;
+    const focusable = Array.from(panel.querySelectorAll<HTMLElement>([
+      'a[href]',
+      'button:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(','))).filter((element) => (
+      !element.hidden && element.getAttribute('aria-hidden') !== 'true'
+    ));
+
+    if (focusable.length === 0) {
+      event.preventDefault();
+      panel.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const activeElement = document.activeElement;
+    if (event.shiftKey && (activeElement === first || !panel.contains(activeElement))) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function handleMegaMenuKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== 'Escape' || values.open !== true) return;
+    event.preventDefault();
+    closePropertyOverlay();
   }
 
   function renderHeader() {
@@ -220,24 +352,28 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
         <div className="header__actions">
           {values.actions === true && (
             <>
-              <button className="docs-studio__global-icon-action" type="button" aria-label="Search" onClick={() => setFeedback('Search action selected locally.')}>
-                <Search aria-hidden="true" />
+              <button className="btn btn--outline btn--icon-only header__action docs-studio__global-icon-action" type="button" aria-label="Search" onClick={() => setFeedback('Search action selected locally.')}>
+                <Search className="btn__icon" aria-hidden="true" />
               </button>
-              <button className="docs-studio__global-icon-action" type="button" aria-label="Account" onClick={() => setFeedback('Account action selected locally.')}>
-                <User aria-hidden="true" />
+              <button className="btn btn--outline btn--icon-only header__action docs-studio__global-icon-action" type="button" aria-label="Account" onClick={() => setFeedback('Account action selected locally.')}>
+                <User className="btn__icon" aria-hidden="true" />
               </button>
-              <button className="docs-studio__global-icon-action" type="button" aria-label="Cart" onClick={() => setFeedback('Cart action selected locally.')}>
-                <ShoppingBag aria-hidden="true" />
-                {String(values.cartCount || '') && <span className="header__cart-count">{String(values.cartCount)}</span>}
+              <button
+                className="btn btn--outline btn--icon-only header__action docs-studio__global-icon-action"
+                type="button"
+                aria-label={String(values.cartCount || '') ? `Cart, ${String(values.cartCount)} items` : 'Cart'}
+                onClick={() => setFeedback('Cart action selected locally.')}
+              >
+                <ShoppingBag className="btn__icon" aria-hidden="true" />
+                {String(values.cartCount || '') && <span className="header__cart-count" aria-hidden="true">{String(values.cartCount)}</span>}
               </button>
             </>
           )}
           {values.mobileMenuTrigger === true && (
             <button
-              className="btn btn--outline btn--icon-only header__hamburger docs-studio__global-header-menu"
+              className="btn btn--outline btn--icon-only header__action header__hamburger docs-studio__global-header-menu"
               type="button"
               aria-label="Open menu"
-              aria-expanded="false"
               onClick={() => setFeedback('Menu trigger selected locally.')}
             >
               <Menu className="btn__icon" aria-hidden="true" />
@@ -249,12 +385,47 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   }
 
   function renderAnnouncement() {
+    if (values.visible !== true) {
+      return (
+        <button
+          ref={announcementTriggerRef}
+          className="btn docs-studio__global-reopen"
+          type="button"
+          onClick={() => {
+            updateValues({ visible: true });
+            setFeedback('Announcement restored in this target-simulated preview.');
+          }}
+        >
+          Show announcement
+        </button>
+      );
+    }
+
     return (
-      <section className="announcement" aria-label={String(values.label || '') || undefined}>
-        {values.message === true && (
-          <span>Complimentary shipping on selected works. <a href="#shipping" onClick={preventNavigation}>View details</a></span>
-        )}
-      </section>
+      <AnnouncementArtwork
+        mode={String(values.mode || 'static') as AnnouncementMode}
+        label={String(values.label || '')}
+        message={values.message === true}
+        countdown={values.countdown === true}
+        messages={values.messages === true}
+        visible={values.visible === true}
+        dismissible={values.dismissible === true}
+        dismissLabel={String(values.dismissLabel || '')}
+        autoplay={values.autoplay === true}
+        autoplayInterval={Number(values.autoplayInterval) || 6000}
+        previousLabel={String(values.previousLabel || '')}
+        nextLabel={String(values.nextLabel || '')}
+        pauseLabel={String(values.pauseLabel || '')}
+        playLabel={String(values.playLabel || '')}
+        counterTemplate={String(values.counterTemplate || '')}
+        statusTemplate={String(values.statusTemplate || '')}
+        onNavigate={preventNavigation}
+        onDismissRequest={() => {
+          updateValues({ visible: false });
+          setFeedback('Announcement dismissal requested and reconciled by the preview target.');
+          requestAnimationFrame(() => requestAnimationFrame(() => announcementTriggerRef.current?.focus()));
+        }}
+      />
     );
   }
 
@@ -263,20 +434,22 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
       <footer className="footer docs-studio__global-footer">
         {values.linkGroups === true && (
           <div className="footer__grid">
-            <section>
-              <h2 className="footer__heading">The Gallery</h2>
-              <p className="docs-studio__global-footer-copy">Objects and stories shaped by independent artists.</p>
-            </section>
+            {values.brand === true && (
+              <div className="footer__brand">
+                <h2 className="footer__heading" id={`${id}-footer-brand`}>The Gallery</h2>
+                <p className="footer__copy">Objects and stories shaped by independent artists.</p>
+              </div>
+            )}
             {[
               ['Explore', 'New works', 'Artists'],
               ['Visit', 'Exhibitions', 'Journal'],
               ['Support', 'Shipping', 'Contact'],
             ].map(([heading, first, second]) => (
-              <nav aria-label={heading} key={heading}>
-                <h2 className="footer__heading">{heading}</h2>
+              <nav className="footer__group" aria-labelledby={`${id}-footer-${heading.toLowerCase()}`} key={heading}>
+                <h2 className="footer__heading" id={`${id}-footer-${heading.toLowerCase()}`}>{heading}</h2>
                 <ul className="footer__links">
-                  <li><a href={`#${first}`} onClick={preventNavigation}>{first}</a></li>
-                  <li><a href={`#${second}`} onClick={preventNavigation}>{second}</a></li>
+                  <li><a className="footer__link" href={`#${first}`} onClick={preventNavigation}>{first}</a></li>
+                  <li><a className="footer__link" href={`#${second}`} onClick={preventNavigation}>{second}</a></li>
                 </ul>
               </nav>
             ))}
@@ -284,8 +457,8 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
         )}
         {values.metadata === true && (
           <div className="footer__bottom">
-            <span>© 2026 The Gallery</span>
-            <span>Buenos Aires · Worldwide</span>
+            <span className="footer__meta">© 2026 The Gallery</span>
+            <span className="footer__meta">Buenos Aires · Worldwide</span>
           </div>
         )}
       </footer>
@@ -315,23 +488,49 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   function renderMobileMenu() {
     return (
       <div className="docs-studio__global-overlay-surface">
-        {!drawerOpen && (
-          <button className="btn docs-studio__global-reopen" type="button" onClick={openDrawer}>
+        {!drawerOpen ? (
+          <button
+            ref={overlayTriggerRef}
+            className="btn docs-studio__global-reopen"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls={`${id}-mobile-menu`}
+            aria-expanded="false"
+            onClick={openDrawer}
+          >
             <Menu className="btn__icon btn__icon--leading" aria-hidden="true" />Open mobile menu
           </button>
+        ) : (
+          <>
+            <div className="drawer-overlay is-open docs-studio__global-drawer-overlay" aria-hidden="false" />
+            <aside
+              ref={(node) => { overlayPanelRef.current = node; }}
+              className="drawer drawer--left is-open docs-studio__global-drawer"
+              id={`${id}-mobile-menu`}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`${id}-mobile-menu-title`}
+              tabIndex={-1}
+              onKeyDown={handleManagedOverlayKeyDown}
+            >
+              <header className="drawer__header">
+                <h2 className="drawer__title" id={`${id}-mobile-menu-title`}>Menu</h2>
+                <button
+                  ref={(node) => { overlayInitialFocusRef.current = node; }}
+                  className="close-btn drawer__close"
+                  type="button"
+                  aria-label="Close mobile menu"
+                  onClick={closeDrawer}
+                >
+                  <X className="close-btn__icon" aria-hidden="true" />
+                </button>
+              </header>
+              <nav className="drawer__body" aria-label="Mobile navigation">
+                {renderMobileItems()}
+              </nav>
+            </aside>
+          </>
         )}
-        <div className={`drawer-overlay docs-studio__global-drawer-overlay${drawerOpen ? ' is-open' : ''}`} aria-hidden={!drawerOpen} />
-        <aside className={`drawer drawer--left docs-studio__global-drawer${drawerOpen ? ' is-open' : ''}`} aria-hidden={!drawerOpen} aria-labelledby={`${id}-mobile-menu-title`}>
-          <header className="drawer__header">
-            <h2 id={`${id}-mobile-menu-title`}>Menu</h2>
-            <button className="drawer__close" type="button" aria-label="Close mobile menu" onClick={closeDrawer}>
-              <X aria-hidden="true" />
-            </button>
-          </header>
-          <nav className="drawer__body" aria-label="Mobile navigation">
-            {renderMobileItems()}
-          </nav>
-        </aside>
       </div>
     );
   }
@@ -339,125 +538,208 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   function renderSearchOverlay() {
     const open = values.open === true;
     const query = String(values.query || '');
+    const title = String(values.title || 'Search');
+    const dismissLabel = String(values.dismissLabel || 'Close search');
     return (
       <div className="docs-studio__global-overlay-surface">
-        {!open && (
-          <button className="btn docs-studio__global-reopen" type="button" onClick={openPropertyOverlay}>
+        {!open ? (
+          <button
+            ref={overlayTriggerRef}
+            className="btn docs-studio__global-reopen"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls={`${id}-search-overlay`}
+            aria-expanded="false"
+            onClick={openPropertyOverlay}
+          >
             <Search className="btn__icon btn__icon--leading" aria-hidden="true" />Open search
           </button>
-        )}
-        <section className={`search-overlay docs-studio__global-search${open ? ' is-open' : ''}`} aria-hidden={!open}>
-          <div className="search-box">
-            <div className="docs-studio__global-overlay-heading">
-              <h2>Search</h2>
-              <button className="docs-studio__global-overlay-close" type="button" aria-label="Close search" onClick={closePropertyOverlay}>
-                <X aria-hidden="true" />
-              </button>
-            </div>
-            <input
-              className="search-box__input"
-              type="search"
-              aria-label={String(values.inputLabel || '')}
-              value={query}
-              placeholder={String(values.placeholder || '') || undefined}
-              onChange={(event) => updateValues({ query: event.target.value })}
-            />
-            {values.results === true && (
-              <div className="search-results" aria-label="Preview results">
-                {[
-                  ['Moon Jar No. 4', '$180.00'],
-                  ['Celadon Study', '$120.00'],
-                  ['Soft Geometry', '$210.00'],
-                ].map(([title, price], index) => (
-                  <a className="search-result" href={`#result-${index}`} onClick={preventNavigation} key={title}>
-                    <FixtureImage className={`search-result__image docs-studio__global-media docs-studio__global-media--${index + 1}`} alt={`${title} ceramic work`} />
-                    <span>
-                      <span className="search-result__title">{title}</span>
-                      <span className="search-result__price">{price}</span>
-                    </span>
-                  </a>
-                ))}
+        ) : (
+          <div
+            ref={(node) => { overlayPanelRef.current = node; }}
+            className="search-overlay is-open docs-studio__global-search"
+            id={`${id}-search-overlay`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`${id}-search-title`}
+            tabIndex={-1}
+            onKeyDown={handleManagedOverlayKeyDown}
+          >
+            <form className="search-box" role="search" onSubmit={(event) => event.preventDefault()}>
+              <div className="search-box__header">
+                <h2 className="search-box__title" id={`${id}-search-title`}>{title}</h2>
+                <button className="close-btn search-box__close" type="button" aria-label={dismissLabel} onClick={closePropertyOverlay}>
+                  <X className="close-btn__icon" aria-hidden="true" />
+                </button>
               </div>
-            )}
+              <label className="visually-hidden search-box__label" htmlFor={`${id}-search-input`}>
+                {String(values.inputLabel || '')}
+              </label>
+              <input
+                ref={(node) => { overlayInitialFocusRef.current = node; }}
+                className="search-box__input"
+                id={`${id}-search-input`}
+                type="search"
+                value={query}
+                placeholder={String(values.placeholder || '') || undefined}
+                onChange={(event) => updateValues({ query: event.target.value })}
+              />
+              {values.results === true && (
+                <ul className="search-results" aria-label="Preview results">
+                  {[
+                    ['Moon Jar No. 4', '$180.00'],
+                    ['Celadon Study', '$120.00'],
+                    ['Soft Geometry', '$210.00'],
+                  ].map(([resultTitle, price], index) => (
+                    <li className="search-results__item" key={resultTitle}>
+                      <a className="search-result" href={`#result-${index}`} onClick={preventNavigation}>
+                        <FixtureImage className={`search-result__image docs-studio__global-media docs-studio__global-media--${index + 1}`} alt={`${resultTitle} ceramic work`} />
+                        <span className="search-result__content">
+                          <span className="search-result__title">{resultTitle}</span>
+                          <span className="search-result__price">{price}</span>
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </form>
           </div>
-        </section>
-      </div>
-    );
-  }
-
-  function renderQuantity() {
-    return (
-      <div className="qty" role="group" aria-label="Quantity">
-        <button className="qty__btn qty__btn--decrement" type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity((current) => Math.max(1, current - 1))}>
-          <Minus className="qty__icon" aria-hidden="true" />
-        </button>
-        <input className="qty__input" type="number" min={1} value={quantity} aria-label="Quantity" onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))} />
-        <button className="qty__btn qty__btn--increment" type="button" aria-label="Increase quantity" onClick={() => setQuantity((current) => current + 1)}>
-          <Plus className="qty__icon" aria-hidden="true" />
-        </button>
+        )}
       </div>
     );
   }
 
   function renderCartDrawer() {
-    const subtotal = 120 * quantity + (removed ? 0 : 84);
+    const celadonVisible = values.lineItems === true && !removedLines.includes('celadon');
+    const incenseVisible = values.lineItems === true && !removedLines.includes('incense');
+    const empty = !celadonVisible && !incenseVisible;
+    const subtotal = (celadonVisible ? 120 * quantities.celadon : 0)
+      + (incenseVisible ? 84 * quantities.incense : 0);
+
+    function removeLine(line: 'celadon' | 'incense', productName: string) {
+      setRemovedLines((current) => current.includes(line) ? current : [...current, line]);
+      setFeedback(`${productName} removed from the local preview.`);
+      requestAnimationFrame(() => {
+        const nextAction = overlayPanelRef.current?.querySelector<HTMLElement>('.cart-line__remove');
+        (nextAction ?? overlayInitialFocusRef.current)?.focus();
+      });
+    }
+
+    function updateQuantity(
+      line: 'celadon' | 'incense',
+      productName: string,
+      max: number,
+      nextValue: number | null,
+    ) {
+      const next = Math.min(max, Math.max(1, nextValue ?? 1));
+      setQuantities((current) => ({ ...current, [line]: next }));
+      setFeedback(`${productName} quantity changed to ${next} in the local preview.`);
+    }
+
     return (
       <div className="docs-studio__global-overlay-surface">
-        {!drawerOpen && (
-          <button className="btn docs-studio__global-reopen" type="button" onClick={openDrawer}>
+        {!drawerOpen ? (
+          <button
+            ref={overlayTriggerRef}
+            className="btn docs-studio__global-reopen"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls={`${id}-cart-drawer`}
+            aria-expanded="false"
+            onClick={openDrawer}
+          >
             <ShoppingBag className="btn__icon btn__icon--leading" aria-hidden="true" />Open cart drawer
           </button>
-        )}
-        <div className={`drawer-overlay docs-studio__global-drawer-overlay${drawerOpen ? ' is-open' : ''}`} aria-hidden={!drawerOpen} />
-        <aside className={`drawer docs-studio__global-drawer docs-studio__global-cart-drawer${drawerOpen ? ' is-open' : ''}`} aria-hidden={!drawerOpen} aria-labelledby={`${id}-cart-title`}>
-          <header className="drawer__header">
-            <h2 id={`${id}-cart-title`}>Your cart</h2>
-            <button className="drawer__close" type="button" aria-label="Close cart drawer" onClick={closeDrawer}>
-              <X aria-hidden="true" />
-            </button>
-          </header>
-          <div className="drawer__body">
-            {values.lineItems === true && (
-              <div aria-label="Cart items">
-                <article className="cart-item">
-                  <FixtureImage className="cart-item__image docs-studio__global-media docs-studio__global-media--1" alt="Celadon stoneware bowl" />
-                  <div className="cart-item__details">
-                    <a className="cart-item__title" href="#celadon-bowl" onClick={preventNavigation}>Celadon bowl</a>
-                    <div className="cart-item__variant">Medium · Moss glaze</div>
-                    <span className="price"><span className="price__current">$120.00</span></span>
-                    <div className="cart-item__actions">
-                      {renderQuantity()}
-                    </div>
-                  </div>
-                </article>
-                {!removed && (
-                  <article className="cart-item">
-                    <FixtureImage className="cart-item__image docs-studio__global-media docs-studio__global-media--2" alt="Porcelain incense holder" />
-                    <div className="cart-item__details">
-                      <a className="cart-item__title" href="#incense-holder" onClick={preventNavigation}>Incense holder</a>
-                      <div className="cart-item__variant">Small · Cloud glaze</div>
-                      <span className="price"><span className="price__current">$84.00</span></span>
-                      <div className="cart-item__actions">
-                        <button className="cart-item__remove" type="button" onClick={() => {
-                          setRemoved(true);
-                          setFeedback('Incense holder removed from the local preview.');
-                        }}>Remove</button>
-                      </div>
-                    </div>
-                  </article>
+        ) : (
+          <>
+            <div className="drawer-overlay is-open docs-studio__global-drawer-overlay" aria-hidden="false" />
+            <aside
+              ref={(node) => { overlayPanelRef.current = node; }}
+              className="drawer is-open docs-studio__global-drawer docs-studio__global-cart-drawer"
+              id={`${id}-cart-drawer`}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`${id}-cart-title`}
+              tabIndex={-1}
+              onKeyDown={handleManagedOverlayKeyDown}
+            >
+              <header className="drawer__header">
+                <h2 className="drawer__title" id={`${id}-cart-title`}>Your cart</h2>
+                <button
+                  ref={(node) => { overlayInitialFocusRef.current = node; }}
+                  className="close-btn drawer__close"
+                  type="button"
+                  aria-label="Close cart drawer"
+                  onClick={closeDrawer}
+                >
+                  <X className="close-btn__icon" aria-hidden="true" />
+                </button>
+              </header>
+              <div className="drawer__body">
+                {empty ? (
+                  <p>Your cart is empty.</p>
+                ) : (
+                  <ul className="cart-lines">
+                    {celadonVisible && (
+                      <CartLineItemArtwork
+                        lineKey="celadon"
+                        title="Celadon bowl"
+                        href="#celadon-bowl"
+                        onNavigate={preventNavigation}
+                        details="Medium · Moss glaze"
+                        imageSrc={editorialMedia.ceramicsShelves}
+                        imageAlt=""
+                        imageClassName="docs-studio__global-media docs-studio__global-media--1"
+                        currentPrice={`$${(120 * quantities.celadon).toFixed(2)}`}
+                        currentPriceLabel="Price"
+                        quantity={quantities.celadon}
+                        quantityMin={1}
+                        quantityMax={8}
+                        quantityName="updates[celadon]"
+                        onQuantityChange={(next) => updateQuantity('celadon', 'Celadon bowl', 8, next)}
+                        removeLabel="Remove"
+                        removeAccessibleLabel="Remove Celadon bowl from cart"
+                        onRemove={() => removeLine('celadon', 'Celadon bowl')}
+                      />
+                    )}
+                    {incenseVisible && (
+                      <CartLineItemArtwork
+                        lineKey="incense"
+                        title="Incense holder"
+                        href="#incense-holder"
+                        onNavigate={preventNavigation}
+                        details="Small · Cloud glaze"
+                        imageSrc={editorialMedia.ceramicsShelves}
+                        imageAlt=""
+                        imageClassName="docs-studio__global-media docs-studio__global-media--2"
+                        currentPrice={`$${(84 * quantities.incense).toFixed(2)}`}
+                        currentPriceLabel="Price"
+                        quantity={quantities.incense}
+                        quantityMin={1}
+                        quantityMax={6}
+                        quantityName="updates[incense]"
+                        onQuantityChange={(next) => updateQuantity('incense', 'Incense holder', 6, next)}
+                        removeLabel="Remove"
+                        removeAccessibleLabel="Remove Incense holder from cart"
+                        onRemove={() => removeLine('incense', 'Incense holder')}
+                      />
+                    )}
+                  </ul>
                 )}
               </div>
-            )}
-          </div>
-          {values.summary === true && (
-            <footer className="drawer__footer">
-              <div className="cart-summary">
-                <div className="cart-summary__row"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-                <div className="cart-summary__row cart-summary__total"><span>Total</span><span>${subtotal.toFixed(2)}</span></div>
-              </div>
-            </footer>
-          )}
-        </aside>
+              {values.summary === true && !empty && (
+                <footer className="drawer__footer">
+                  <dl className="cart-drawer__summary">
+                    <div className="cart-drawer__summary-row"><dt>Subtotal</dt><dd><bdi>${subtotal.toFixed(2)}</bdi></dd></div>
+                    <div className="cart-drawer__summary-row cart-drawer__summary-total"><dt>Total</dt><dd><bdi>${subtotal.toFixed(2)}</bdi></dd></div>
+                  </dl>
+                </footer>
+              )}
+              <p className="visually-hidden" role="status" aria-live="polite">{feedback}</p>
+            </aside>
+          </>
+        )}
       </div>
     );
   }
@@ -465,16 +747,32 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   function renderMegaMenu() {
     const open = values.open === true;
     return (
-      <div className="docs-studio__global-mega-shell">
+      <div className="docs-studio__global-mega-shell" onKeyDown={handleMegaMenuKeyDown}>
         <div className="docs-studio__global-mega-trigger-row">
           <span>The Gallery</span>
-          {!open && <button className="btn btn--outline btn--sm" type="button" aria-expanded="false" onClick={openPropertyOverlay}>Open collections</button>}
+          <button
+            ref={overlayTriggerRef}
+            className="btn btn--outline btn--sm"
+            type="button"
+            aria-expanded={open}
+            aria-controls={`${id}-mega-menu`}
+            onClick={open ? closePropertyOverlay : openPropertyOverlay}
+          >
+            {open ? 'Close collections' : 'Open collections'}
+          </button>
         </div>
-        <nav className={`mega-menu docs-studio__global-mega${open ? ' is-open' : ''}`} aria-label={String(values.label || '')} aria-hidden={!open}>
+        <nav
+          ref={(node) => { megaMenuRef.current = node; }}
+          className={`mega-menu docs-studio__global-mega${open ? ' is-open' : ''}`}
+          id={`${id}-mega-menu`}
+          aria-label={String(values.label || '')}
+          aria-hidden={!open}
+          inert={!open}
+        >
           <div className="docs-studio__global-mega-close-row">
             <span>Explore</span>
-            <button className="docs-studio__global-overlay-close" type="button" aria-label="Close collections menu" onClick={closePropertyOverlay}>
-              <X aria-hidden="true" />
+            <button className="close-btn docs-studio__global-overlay-close" type="button" aria-label="Close collections menu" onClick={closePropertyOverlay}>
+              <X className="close-btn__icon" aria-hidden="true" />
             </button>
           </div>
           <div className="mega-menu__inner">
@@ -484,16 +782,22 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
                   ['Collections', 'New works', 'Vessels', 'Sculpture'],
                   ['Artists', 'Mara Vidal', 'Noa Kim', 'Lucía Serra'],
                 ].map(([heading, ...links]) => (
-                  <div className="mega-menu__column" key={heading}>
-                    <h2 className="mega-menu__heading">{heading}</h2>
-                    {links.map((link, index) => <a className="mega-menu__link" href={`#${link}`} aria-current={heading === 'Collections' && index === 0 ? 'page' : undefined} onClick={preventNavigation} key={link}>{link}</a>)}
-                  </div>
+                  <section className="mega-menu__column" aria-labelledby={`${id}-mega-${heading.toLowerCase()}`} key={heading}>
+                    <h2 className="mega-menu__heading" id={`${id}-mega-${heading.toLowerCase()}`}>{heading}</h2>
+                    <ul className="mega-menu__list">
+                      {links.map((link, index) => (
+                        <li className="mega-menu__list-item" key={link}>
+                          <a className="mega-menu__link" href={`#${link}`} aria-current={heading === 'Collections' && index === 0 ? 'page' : undefined} onClick={preventNavigation}>{link}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
                 ))}
               </>
             )}
             {values.promo === true && (
-              <a className="mega-menu__promo docs-studio__global-mega-promo" href="#studio-visit" aria-label="Visit the summer studio exhibition" onClick={preventNavigation}>
-                <FixtureImage className="docs-studio__global-media docs-studio__global-media--3" alt="Summer studio exhibition installation" />
+              <a className="mega-menu__promo docs-studio__global-mega-promo" href="#studio-visit" onClick={preventNavigation}>
+                <FixtureImage className="docs-studio__global-media docs-studio__global-media--3" alt="" />
                 <span className="mega-menu__promo-content">
                   <span className="mega-menu__promo-title">Summer studio</span>
                   <span className="mega-menu__promo-link">Enter exhibition</span>
@@ -501,14 +805,16 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
               </a>
             )}
             {values.featured === true && (
-              <div className="mega-menu__featured" aria-label="Featured destinations">
+              <ul className="mega-menu__featured" aria-label="Featured destinations">
                 {['Quiet forms', 'New rituals'].map((name, index) => (
-                  <a className="mega-menu__featured-item" href={`#featured-${index}`} onClick={preventNavigation} key={name}>
-                    <FixtureImage className={`mega-menu__featured-img docs-studio__global-media docs-studio__global-media--${index + 1}`} alt={`${name} collection`} />
-                    <span className="mega-menu__featured-name">{name}</span>
-                  </a>
+                  <li className="mega-menu__featured-entry" key={name}>
+                    <a className="mega-menu__featured-item" href={`#featured-${index}`} onClick={preventNavigation}>
+                      <FixtureImage className={`mega-menu__featured-img docs-studio__global-media docs-studio__global-media--${index + 1}`} alt="" />
+                      <span className="mega-menu__featured-name">{name}</span>
+                    </a>
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         </nav>
@@ -524,19 +830,31 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
           <strong>Works for daily rituals</strong>
         </div>
         <nav className="bottom-nav docs-studio__global-bottom-nav" aria-label={String(values.label || '')}>
-          {values.items === true && [
-            { label: 'Home', Icon: Home, current: true },
-            { label: 'Browse', Icon: Grid2X2 },
-            { label: 'Saved', Icon: Heart },
-            { label: 'Orders', Icon: Package },
-            { label: 'Cart', Icon: ShoppingBag, badge: '2' },
-          ].map(({ label, Icon, current, badge }) => (
-            <a className="bottom-nav__item" href={`#${label.toLowerCase()}`} aria-current={current ? 'page' : undefined} onClick={preventNavigation} key={label}>
-              <Icon className="bottom-nav__icon" aria-hidden="true" />
-              <span className="bottom-nav__label">{label}</span>
-              {badge && <span className="bottom-nav__badge" aria-label={`${badge} items`}>{badge}</span>}
-            </a>
-          ))}
+          {values.items === true && (
+            <ul className="bottom-nav__list">
+              {[
+                { label: 'Home', Icon: Home, current: true },
+                { label: 'Browse', Icon: Grid2X2 },
+                { label: 'Saved', Icon: Heart },
+                { label: 'Orders', Icon: Package },
+                { label: 'Cart', Icon: ShoppingBag, badge: '2' },
+              ].map(({ label, Icon, current, badge }) => (
+                <li className="bottom-nav__entry" key={label}>
+                  <a
+                    className="bottom-nav__item"
+                    href={`#${label.toLowerCase()}`}
+                    aria-current={current ? 'page' : undefined}
+                    aria-label={badge ? `${label}, ${badge} items` : undefined}
+                    onClick={preventNavigation}
+                  >
+                    <Icon className="bottom-nav__icon" aria-hidden="true" />
+                    <span className="bottom-nav__label">{label}</span>
+                    {badge && <span className="bottom-nav__badge" aria-hidden="true">{badge}</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </nav>
       </div>
     );
@@ -544,7 +862,7 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
 
   function renderPreview() {
     if (contract.slug === 'header') return renderHeader();
-    if (contract.slug === 'announcement-bar') return renderAnnouncement();
+    if (contract.slug === 'announcement-bar' || contract.slug === 'announcement-extended') return renderAnnouncement();
     if (contract.slug === 'footer') return renderFooter();
     if (contract.slug === 'mobile-menu') return renderMobileMenu();
     if (contract.slug === 'search-overlay') return renderSearchOverlay();
@@ -554,6 +872,9 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
   }
 
   function currentState() {
+    if (contract.slug === 'announcement-bar' || contract.slug === 'announcement-extended') {
+      return values.visible !== true ? 'closed' : String(values.mode || 'static');
+    }
     if (contract.slug === 'search-overlay') return values.open === true ? 'open' : 'closed';
     if (contract.slug === 'mega-menu') return values.open === true ? 'openClass' : 'closed';
     return 'default';
@@ -586,7 +907,7 @@ export default function GlobalStudio({ contract, definition }: GlobalStudioProps
         >
           <div className={`docs-studio__stage-inner docs-studio__global-stage-inner docs-studio__global-stage-inner--${contract.slug}`}>
             {renderPreview()}
-            {feedback && <p className="docs-studio__global-feedback" role="status" aria-live="polite">{feedback}</p>}
+            {feedback && contract.slug !== 'cart-drawer' && <p className="docs-studio__global-feedback" role="status" aria-live="polite">{feedback}</p>}
           </div>
         </section>
       </div>

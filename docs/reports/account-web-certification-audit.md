@@ -42,3 +42,24 @@ The Account category is technically complete for the current neutral-web pilot
 cycle. All nine contracts remain `pilot`; promotion to `stable` still requires
 the owner review and open product-boundary decisions documented in
 `docs/OPEN-QUESTIONS.md`.
+
+## 2026-07-17 Refinement Addendum
+
+The browser statements above record the earlier pilot fixture and are not the
+current U8/U9 certification result. Subsequent dependency-ordered refinement
+supersedes them as follows:
+
+- Wishlist is now a passive target-controlled labelled collection of canonical
+  Product Cards and optional canonical Empty State. Remove is a named command,
+  not `aria-pressed`; saved state, mutation, count transition, focus/status,
+  privacy, and persistence are target-owned.
+- Account Settings is now a passive heading-labelled section shell. Its shared
+  fixture composes one explicit profile Form and independent immediate
+  Switches; it has no global Save behavior or internal status/persistence
+  claim. Account schema, Form boundaries, consent, and persistence remain
+  target-owned.
+
+The current component evidence lives in
+`docs/reports/wishlist-web-refinement-audit.md` and
+`docs/reports/account-settings-web-refinement-audit.md`. Both remain `pilot`
+and `refined-decision-needed`; neither is promoted to `stable`.

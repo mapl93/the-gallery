@@ -1,48 +1,62 @@
 ## Overview
 
-Selectable recurring-purchase option with pricing, savings, delivery frequency, and supporting terms.
+Subscription / Recurring Option is the complete purchase-options group for one current product and variant. It composes canonical Fieldset, Radio, Price, and optional passive Badge so a buyer can choose one-time purchase or one concrete recurring allocation. Every recurring choice visibly states what is charged at checkout, the amount per delivery, and the cadence. The target supplies eligible records, verified savings, terms, and final commerce payload mapping.
 
-<Preview html={"<div class=\"subscription-option is-selected\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\"><div class=\"subscription-option__header\"><span class=\"subscription-option__radio\" aria-hidden=\"true\"></span><span class=\"subscription-option__label\">Subscribe &amp; save</span><span class=\"subscription-option__savings\">Save 15%</span><span class=\"subscription-option__price\">$102.00</span></div><div class=\"subscription-option__details\"><div class=\"subscription-option__frequency\"><label class=\"subscription-option__frequency-label\" for=\"delivery-frequency\">Delivery frequency</label><div class=\"subscription-option__frequency-control\"><select class=\"subscription-option__frequency-select\" id=\"delivery-frequency\" aria-describedby=\"frequency-message\"><option>Every 2 weeks</option><option>Every month</option><option>Every 2 months</option></select><svg class=\"subscription-option__frequency-indicator\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></div><p class=\"subscription-option__frequency-message\" id=\"frequency-message\">Change or cancel before the next delivery.</p></div><p class=\"subscription-option__note\">Renews automatically at the selected frequency.</p></div></div>"} label="Subscription Option" />
+<Preview html={'<fieldset class="fieldset subscription-option tg-preview-frame tg-preview-frame--md" aria-describedby="subscription-preview-description"><legend class="fieldset__legend subscription-option__legend">Purchase options</legend><p class="fieldset__description subscription-option__description" id="subscription-preview-description">Choose one-time purchase or a recurring delivery plan.</p><div class="fieldset__content subscription-option__choices"><div class="subscription-option__item" data-kind="one-time"><div class="subscription-option__header"><label class="radio subscription-option__choice"><input class="radio__input" id="subscription-preview-one-time" type="radio" name="purchase-option-preview" value="one-time" checked required aria-describedby="subscription-preview-one-time-summary"><span class="radio__label" dir="auto">One-time purchase</span></label><div class="subscription-option__summary" id="subscription-preview-one-time-summary"><span class="subscription-option__price-label" dir="auto">One-time price:</span><span class="price subscription-option__checkout-price"><span class="price__current"><bdi class="price__value">$120.00</bdi></span></span></div></div></div><div class="subscription-option__item" data-kind="recurring"><div class="subscription-option__header"><label class="radio subscription-option__choice"><input class="radio__input" id="subscription-preview-monthly" type="radio" name="purchase-option-preview" value="plan-monthly" required aria-describedby="subscription-preview-monthly-summary subscription-preview-monthly-recurring"><span class="radio__label" dir="auto">Deliver every month</span></label><div class="subscription-option__summary" id="subscription-preview-monthly-summary"><span class="badge badge--success subscription-option__savings" dir="auto">Save 15%</span><span class="subscription-option__price-label" dir="auto">Due today:</span><span class="price subscription-option__checkout-price"><span class="price__current"><bdi class="price__value">$102.00</bdi></span></span></div></div><div class="subscription-option__recurring" id="subscription-preview-monthly-recurring"><span class="subscription-option__price-label" dir="auto">Per delivery:</span><span class="price subscription-option__delivery-price"><span class="price__current"><bdi class="price__value">$102.00</bdi></span></span><p class="subscription-option__cadence" dir="auto"><span class="subscription-option__meta-label">Cadence: </span>Every month</p></div><div class="subscription-option__details"><div class="subscription-option__terms" id="subscription-preview-monthly-terms" dir="auto">Renews monthly. Pause or cancel before the next renewal.</div></div></div></div></fieldset>'} label="Subscription / Recurring Option" />
 
 ## Presentation
 
-Selection is expressed by the root border and radio indicator. The frequency field appears only for the selected option and uses the shared `default`, `error`, `success`, and `warning` validation language.
+D10 preserves a quiet bordered-card direction for each choice, but the component is now one semantic group rather than one recurring card beside target-owned markup. The root is a native canonical Fieldset with a first visible Legend. Every item contains one canonical Radio; the card is layout and does not duplicate `role="radio"`, `aria-checked`, tabindex, click, keyboard, or selection state.
+
+One-time purchase is selected initially whenever it exists. Each eligible recurring allocation becomes its own peer Radio instead of appearing in a nested Select. This keeps every real plan directly comparable and gives the native group one value. Subscription-only merchandise omits one-time purchase and must still provide at least two meaningful recurring choices; otherwise use a simpler non-Radio presentation.
+
+The Radio label stays concise. Its associated content visibly exposes the checkout amount, optional verified savings, per-delivery amount, and cadence. Optional target-authored terms become visible inline only for the selected record. Selection and detail styling derive from native `:checked`; the component adds no neutral runtime.
+
+The layout is intrinsic. Metadata wraps inside each option and stacks below the label in narrow containers. Logical properties, readable text, canonical focus, dark mode, forced colors, reduced motion, RTL, and text-spacing overrides remain supported without a viewport breakpoint.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show the recurring price, savings, delivery frequency, and renewal terms before selection.</Do>
-  <Dont>Do not preselect a subscription when the customer could mistake it for a one-time purchase.</Dont>
+  <Do>Render one current, target-validated set of purchase options with explicit localized checkout, per-delivery, cadence, savings, and terms information.</Do>
+  <Dont>Do not collapse several eligible plans into one generic “Subscribe” Radio plus a nested Select, invent savings, or silently replace a stale plan id with another choice.</Dont>
 </DoDont>
 
-- Keep one-time and recurring choices in the same radio group.
-- State whether the customer can pause, change, or cancel the subscription.
-- Use warning for recoverable schedule attention and error for an invalid frequency choice.
+- Supply at least two valid option records with unique stable ids, visible labels, target-formatted checkout prices, and at most one `oneTime` record.
+- A `recurring` record also requires a target-formatted per-delivery price and readable cadence. Omit malformed records; omit the complete component if fewer than two valid choices remain.
+- Select one-time initially whenever it exists. A subscription-only group may begin unselected under required validation until its target policy chooses a valid default.
+- Render savings only from a verified localized target calculation. Badge remains passive.
+- Keep material renewal, billing, delivery, commitment, pause, and cancellation terms as target-authored inline content for the selected plan.
+- The product coordinator owns product and variant identity, selling-plan groups and eligibility, record ordering, selected id, stale-value repair, localized prices, target payload conversion, CTA synchronization, loading and errors, announcements, cart, and checkout.
+- Unknown controlled values render no checked Radio. The coordinator must clear or replace them atomically after product, variant, market, or eligibility changes.
+- Shopify maps native `sellingPlanAllocations` into the neutral records and converts the selected value back to `selling_plan`; Shopify identifiers never become neutral source defaults.
 
 ## Accessibility
 
-- Use native radio controls or complete `radiogroup` and `radio` semantics with keyboard support.
-- Keep `aria-checked` synchronized with the selected visual state.
-- Connect the frequency label and message to the select control.
-- Format prices and savings through the target commerce layer.
-- Do not use the field indicator as the only carrier of validation meaning.
+- Preserve the native Fieldset, first visible Legend, and at least two same-name native Radios. Do not add redundant `radiogroup` or `radio` roles.
+- Keep one group value owner. Native Web receives Tab, logical arrow keys, Space, mutual exclusion, required validity, FormData, `input`/`change`, disabled propagation, and reset without component keyboard JavaScript.
+- Give each Radio a concise localized option label and associate its complete amount, cadence, savings, and selected terms with `aria-describedby`.
+- Keep checkout charge, per-delivery amount, and cadence visible and explicit even when both prices happen to match. Do not rely on proximity, abbreviation, color, or Badge alone.
+- Keep selected terms in normal reading order. Unchecked terms use `display:none`, so they are not misleadingly announced or focusable.
+- Static Price and Badge content is not a live region. The target may update one pre-existing localized status only after a meaningful asynchronous commerce result.
+- Preserve canonical Radio focus, effective 200% text, user text spacing, RTL, dark mode, reduced motion, forced colors, and narrow-container wrapping.
 
 ## References
 
+D10 exposes group-level semantics and one repeated option-record slot:
+
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning` for the frequency field</td></tr>
-  <tr><td>`selected`</td><td>boolean</td><td>`false`</td><td>Selected option state</td></tr>
-  <tr><td>`label`</td><td>string</td><td>required</td><td>Purchase option label</td></tr>
-  <tr><td>`price`</td><td>string</td><td>required</td><td>Target-formatted recurring price</td></tr>
-  <tr><td>`savings`</td><td>string</td><td>optional</td><td>Savings statement</td></tr>
-  <tr><td>`frequencyLabel`</td><td>string</td><td>required when selected</td><td>Visible frequency label</td></tr>
-  <tr><td>`frequency`</td><td>string</td><td>required when selected</td><td>Selected delivery frequency</td></tr>
-  <tr><td>`frequencyMessage`</td><td>string</td><td>optional</td><td>Helper or validation message</td></tr>
-  <tr><td>`frequencyIndicator`</td><td>slot</td><td>optional</td><td>Decorative frequency indicator</td></tr>
-  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables selection and frequency editing</td></tr>
-  <tr><td>`note`</td><td>string</td><td>optional</td><td>Recurring purchase terms</td></tr>
-  <tr><td>`.subscription-option--error`</td><td>class</td><td>optional</td><td>Error validation family</td></tr>
-  <tr><td>`.subscription-option--success`</td><td>class</td><td>optional</td><td>Success validation family</td></tr>
-  <tr><td>`.subscription-option--warning`</td><td>class</td><td>optional</td><td>Warning validation family</td></tr>
-  <tr><td>`.subscription-option.is-selected`</td><td>state</td><td>optional</td><td>Selected option state</td></tr>
+  <tr><td>`legend`</td><td>string</td><td>required</td><td>Visible localized purchase-options group label</td></tr>
+  <tr><td>`description`</td><td>string</td><td>optional</td><td>Associated group guidance</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Native form name shared by every Radio</td></tr>
+  <tr><td>`options`</td><td>slot</td><td>required</td><td>Ordered records with `id`, `kind`, `label`, `checkoutPrice`; recurring records add `perDeliveryPrice` and `cadence`, with optional `savings`, `terms`, `disabled`, and one initial checked projection</td></tr>
+  <tr><td>`oneTimePriceLabel`</td><td>string</td><td>required</td><td>Visible localized label for the one-time amount</td></tr>
+  <tr><td>`checkoutChargeLabel`</td><td>string</td><td>required</td><td>Visible localized label for each recurring checkout charge</td></tr>
+  <tr><td>`perDeliveryLabel`</td><td>string</td><td>required</td><td>Visible localized label for each recurring delivery amount</td></tr>
+  <tr><td>`cadenceLabel`</td><td>string</td><td>required</td><td>Visible localized label for cadence values</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`true`</td><td>Requires one native Radio selection</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the native Fieldset and every choice</td></tr>
 </PropTable>
+
+Static and uncontrolled Web markup uses one `checked` or `defaultChecked` Radio. Controlled framework adapters project one selected option id and one value-change callback. Both strategies retain one logical group owner; there is no second selected class, root ARIA mirror, plan Select, or D10 state store.
+
+Primary evidence: [WHATWG radio state](https://html.spec.whatwg.org/multipage/input.html#radio-button-state-(type=radio)), [WAI-ARIA APG Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), [Open UI Radio Button research](https://open-ui.org/components/radio-button.research/), [Radix Radio Group](https://www.radix-ui.com/primitives/docs/components/radio-group), [Shopify Polaris Choice List](https://shopify.dev/docs/api/checkout-ui-extensions/latest/components/forms/choicelist), [Shopify selling plans](https://shopify.dev/docs/apps/build/purchase-options/subscriptions/selling-plans), and [Shopify SellingPlanAllocation](https://shopify.dev/docs/api/storefront/latest/objects/SellingPlanAllocation).

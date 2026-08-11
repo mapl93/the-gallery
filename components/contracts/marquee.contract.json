@@ -1,147 +1,82 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "marquee",
   "name": "Scrolling Text Marquee",
   "registryId": "S18",
   "category": "sections",
   "status": "pilot",
-  "summary": "Horizontal repeated-content presentation with existing motion hooks and intentionally unresolved duplication and runtime ownership.",
-  "dependencies": [],
+  "summary": "Progressively enhanced ordered content strip with an authoritative native list, static fallback, distance-normalized logical motion, one inert visual copy, and canonical Button pause/resume.",
+  "dependencies": ["button"],
   "source": {
     "registry": "registry.json#/components/marquee",
-    "css": {
-      "file": "components/css/sections.css",
-      "selector": ".marquee"
-    },
+    "css": { "file": "components/css/sections.css", "selector": ".marquee" },
     "docs": "site/src/content/components/marquee.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".marquee",
-      "className": ".marquee",
-      "required": true,
-      "description": "Clipped marquee presentation root."
-    },
-    {
-      "name": "track",
-      "selector": ".marquee__track",
-      "className": ".marquee__track",
-      "required": true,
-      "description": "Target-owned repeated-content track."
-    },
-    {
-      "name": "item",
-      "selector": ".marquee__item",
-      "className": ".marquee__item",
-      "required": false,
-      "description": "Repeated target-owned content item."
-    },
-    {
-      "name": "separator",
-      "selector": ".marquee__separator",
-      "className": ".marquee__separator",
-      "required": false,
-      "description": "Optional decorative separator between items."
-    }
+    { "name": "root", "selector": ".marquee", "className": ".marquee", "required": true, "description": "Generic root, or section when the optional visible label names it; omitted when no valid items exist." },
+    { "name": "label", "selector": ".marquee__label", "className": ".marquee__label", "required": false, "description": "Optional visible contextual label; its id labels a section root." },
+    { "name": "viewport", "selector": ".marquee__viewport", "className": ".marquee__viewport", "required": true, "description": "Clipped visual viewport only after Auto enhancement; overflow remains readable in every static fallback." },
+    { "name": "track", "selector": ".marquee__track", "className": ".marquee__track", "required": true, "description": "Presentation track animated by CSS after bounded distance measurement." },
+    { "name": "sourceGroup", "selector": ".marquee__group--source", "className": ".marquee__group--source", "required": true, "description": "The one authoritative native list in target-authored order." },
+    { "name": "visualCopy", "selector": ".marquee__group--copy", "className": ".marquee__group--copy", "required": false, "generated": true, "description": "At most one runtime-created visual copy, aria-hidden, inert, non-interactive and absent from the semantic data source." },
+    { "name": "item", "selector": ".marquee__item", "className": ".marquee__item", "required": true, "description": "Native list item containing one concise target-owned phrase or composed mark." },
+    { "name": "control", "selector": ".marquee__control", "className": ".marquee__control", "required": false, "description": "Canonical compact outline Button revealed only for a valid Auto enhancement and labelled with the next Pause or Resume action." }
   ],
   "variants": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default variant."
-    }
+    { "name": "auto", "className": ".marquee--auto", "default": true, "description": "Starts logical continuous motion when enhancement is valid and the user has not requested reduced motion." },
+    { "name": "static", "className": ".marquee--static", "default": false, "description": "Readable intrinsic wrapping list with no visual copy, motion control or component runtime work." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default size."
-    }
+    { "name": "default", "className": null, "default": true, "description": "One container-responsive presentation; type, gaps and track geometry remain private." }
   ],
   "states": [
-    {
-      "name": "default",
-      "selectors": [
-        ".marquee"
-      ],
-      "description": "Existing continuously translated presentation."
-    },
-    {
-      "name": "pausedByPointerOrFocus",
-      "selectors": [
-        ".marquee:hover .marquee__track",
-        ".marquee:focus-within .marquee__track"
-      ],
-      "description": "Existing pause presentation while the region is hovered or contains keyboard focus."
-    }
+    { "name": "static", "selectors": [".marquee--static", ".marquee[data-marquee-state=\"static\"]"], "description": "Authored list wraps normally and no motion control is available." },
+    { "name": "pending", "selectors": [".marquee--auto:not([data-marquee-enhanced=\"true\"])"], "description": "No-JavaScript and pre-enhancement Auto markup stays readable and static." },
+    { "name": "playing", "selectors": [".marquee[data-marquee-state=\"playing\"]"], "description": "CSS track animation runs at the measured duration for the selected semantic pace." },
+    { "name": "temporarilyPaused", "selectors": [".marquee[data-marquee-state=\"paused\"][data-hover-paused=\"true\"]"], "description": "Pointer presence suspends motion without changing the durable user preference." },
+    { "name": "userPaused", "selectors": [".marquee[data-user-paused=\"true\"]"], "description": "Focus entry or Pause activation creates a durable pause until explicit Resume." },
+    { "name": "hiddenPaused", "selectors": [".marquee[data-hidden-paused=\"true\"]"], "description": "Animation work is suspended while the document is hidden." },
+    { "name": "reducedMotion", "selectors": [".marquee[data-reduced-motion=\"true\"]"], "description": "The source list is static, the visual copy is hidden and the motion control is omitted." }
   ],
   "behavior": [
-    {
-      "name": "contentAndMotionBoundary",
-      "selectors": [
-        ".marquee"
-      ],
-      "description": "The target owns content duplication, continuity, direction, speed, runtime controls, and announcements. This contract does not expose motion settings or require duplicated content; reduced motion renders a static wrapping track."
-    }
+    { "name": "progressiveEnhancement", "selectors": [".marquee[data-marquee]"], "events": ["marqueeplaybackchange"], "description": "Invalid, empty, one-item, static, reduced-motion, or failed enhancement preserves the source list and does not expose an inert control." },
+    { "name": "boundedVisualDuplication", "selectors": [".marquee__group--source", ".marquee__group--copy"], "description": "Runtime creates at most one exact visual copy from the authoritative list, removes duplicate ids, makes descendants unfocusable, and marks the complete copy aria-hidden and inert." },
+    { "name": "distanceNormalizedPace", "selectors": [".marquee__track"], "events": ["resize"], "description": "A shared ResizeObserver performs bounded initialization/resize measurements and maps slow, default, or fast to private pixels-per-second velocities; CSS owns every animation frame." },
+    { "name": "logicalDirection", "selectors": [".marquee[data-direction=\"forward\"]", ".marquee[data-direction=\"reverse\"]"], "description": "Forward moves toward inline-start and reveals subsequent content from inline-end; physical travel reverses automatically in RTL." },
+    { "name": "pauseResume", "selectors": [".marquee__control"], "events": ["click", "pointerenter", "pointerleave", "focusin", "visibilitychange", "marqueeplaybackchange"], "description": "Canonical Button toggles durable pause; hover pauses temporarily; focus entering durably pauses; hidden documents suspend; only explicit Resume clears the user pause." },
+    { "name": "stateOwnership", "selectors": [".marquee"], "events": ["marqueeplaybackchange"], "description": "Neutral Web is uncontrolled for the live component lifetime. Framework adapters may project controlled state around the same state and event without adding a second owner." }
   ],
   "properties": [
-    {
-      "name": "items",
-      "type": "slot",
-      "required": true,
-      "description": "Ordered target-owned text or content items; duplication for continuous motion is not part of the semantic value.",
-      "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".marquee__track", "classNames": [".marquee__track"] }]
-      }
-    }
+    { "name": "presentation", "type": "enum", "required": false, "defaultValue": "auto", "valuesFrom": "variants", "description": "Auto progressive motion or an explicitly static presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".marquee", "source": "variants" }, { "kind": "attribute", "selector": ".marquee", "attribute": "data-presentation", "values": { "auto": "auto", "static": "static" } }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Optional visible contextual label; blank omits both the label and section landmark.", "targetMappings": { "web": [{ "kind": "content", "selector": ".marquee__label" }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "One authoritative ordered native list of at least one concise target-owned item; Auto enhancement requires at least two.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".marquee__group--source", "classNames": [".marquee__group", ".marquee__group--source", ".marquee__item"] }] } },
+    { "name": "direction", "type": "enum", "required": false, "defaultValue": "forward", "values": ["forward", "reverse"], "description": "Logical motion direction independent of physical left/right.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".marquee", "attribute": "data-direction", "values": { "forward": "forward", "reverse": "reverse" } }] } },
+    { "name": "pace", "type": "enum", "required": false, "defaultValue": "default", "values": ["slow", "default", "fast"], "description": "Semantic distance-normalized velocity preset; raw duration remains private.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".marquee", "attribute": "data-pace", "values": { "slow": "slow", "default": "default", "fast": "fast" } }] } },
+    { "name": "pauseLabel", "type": "string", "required": true, "description": "Localized visible next-action label used while Auto motion can be paused.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".marquee__control", "attribute": "data-pause-label", "valueFrom": "property", "elements": ["button"] }, { "kind": "content", "selector": ".marquee__control" }] } },
+    { "name": "resumeLabel", "type": "string", "required": true, "description": "Localized visible next-action label used while Auto motion is durably paused.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".marquee__control", "attribute": "data-resume-label", "valueFrom": "property", "elements": ["button"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-border-subtle",
-        "--color-text-primary",
-        "--color-text-secondary"
-      ],
-      "typography": [
-        "--font-family-heading"
-      ]
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap"],
+      "typography": ["--font-family-heading", "--font-family-body", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Keep one semantic copy of each item in a logical reading order and hide any visual duplicates from assistive technology.",
-    "Do not place unique essential information only in continuously moving content.",
-    "Pause motion while focus is within the region and render a static wrapping track when reduced motion is requested.",
-    "Interactive content, if a target supplies it, uses native controls and remains reachable without chasing moving content."
+    "Keep one authoritative native list in meaningful target-authored order and hide every visual copy from accessibility APIs and focus navigation.",
+    "Do not use Marquee as the only location for critical policy, price, availability, status, deadline, instruction or error information.",
+    "Expose one localized canonical Button for persistent Pause and Resume whenever Auto enhancement is active.",
+    "Pause durably when focus enters, temporarily while hovered, and while the document is hidden; never announce frames, loop boundaries or visual copies.",
+    "Render a readable static list and omit the motion control for reduced motion, missing JavaScript, failed enhancement, invalid content or one item.",
+    "Preserve logical order, keyboard access, visible focus, RTL direction, forced colors, localization, narrow containers and 200 percent text zoom."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "native-component"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "native-component"
-    }
+    "web": { "status": "implemented", "kind": "css-js-composition", "notes": "Canonical CSS and shared progressive runtime provide bounded duplication, measurement, playback state and Button control." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Map ordered blocks and semantic settings to the same static baseline and storefront enhancement; editor preview remains static until target implementation is certified." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
   }
 }

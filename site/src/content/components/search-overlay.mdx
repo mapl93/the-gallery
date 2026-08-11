@@ -1,14 +1,14 @@
 ## Overview
 
-Search Overlay presents a native search field and optional target-owned result content in a full-screen surface. It exposes open presentation without choosing a search provider or overlay controller.
+Search Overlay is a named modal search dialog with a visible title, canonical dismiss action, labelled native query field, and optional target-owned result content. It does not choose a search provider or imply combobox behavior.
 
-<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button type="button" data-preview-trigger aria-expanded="true" aria-controls="search-overlay-preview">Open search</button><section class="search-overlay is-open tg-preview-overlay-layer" id="search-overlay-preview"><form class="search-box tg-preview-frame--md" role="search"><div class="tg-preview-inline tg-preview-inline--spread"><label class="tg-preview-note" for="search-overlay-query">Search the gallery</label><button type="button" data-preview-close>Close search</button></div><input class="search-box__input" id="search-overlay-query" type="search" value="vase" placeholder="Search objects and artists" /><div class="search-results" aria-label="Search results"><a class="search-result" href="#search-artisan-vase"><span class="search-result__image tg-preview-media tg-preview-media--avatar" aria-hidden="true"></span><span><span class="search-result__title">Artisan Vase</span><span class="search-result__price">$120.00</span></span></a></div></form></section></div>'} label="Search Overlay" layout="overlay" interaction={{ selector: '.search-overlay', toggle: 'is-open', triggerLabel: 'Open Search', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
+<Preview html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button type="button" data-preview-trigger aria-haspopup="dialog" aria-expanded="true" aria-controls="search-overlay-preview">Open search</button><div class="search-overlay is-open tg-preview-overlay-layer" id="search-overlay-preview" role="dialog" aria-modal="true" aria-labelledby="search-overlay-title" aria-hidden="false"><form class="search-box tg-preview-frame--md" role="search"><div class="search-box__header"><h2 class="search-box__title" id="search-overlay-title">Search The Gallery</h2><button class="close-btn search-box__close" type="button" aria-label="Close search" data-preview-close><span class="close-btn__icon" aria-hidden="true">×</span></button></div><label class="visually-hidden search-box__label" for="search-overlay-query">Search artists, works, and collections</label><input class="search-box__input" id="search-overlay-query" type="search" value="vase" placeholder="Search objects and artists" /><ul class="search-results" aria-label="Search results"><li class="search-results__item"><a class="search-result" href="#search-artisan-vase"><span class="search-result__image tg-preview-media tg-preview-media--avatar" aria-hidden="true"></span><span class="search-result__content"><span class="search-result__title">Artisan Vase</span><span class="search-result__price">$120.00</span></span></a></li></ul></form></div></div>'} label="Search Overlay" layout="overlay" interaction={{ selector: '.search-overlay', toggle: 'is-open', triggerLabel: 'Open Search', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }} />
 
 ## Presentation
 
-The artwork uses documentation-owned trigger and close controls to exercise `.is-open` inside a contained stage. Those controls are fixture behavior, not Search Overlay anatomy or public properties. At runtime, `open` must also keep the visible class and accessible hidden state synchronized.
+The shared Exhibit/Studio renderer uses the same fixture and canonical implementation. Its documentation target demonstrates input focus on open, contained `Tab`, `Escape`, named Close Button dismissal, removal of closed focusables, and restoration to the trigger. Production targets still own background inertness, scroll locking, mutual exclusion, and lifecycle cleanup.
 
-`inputLabel`, `query`, and optional `placeholder` map to the native search input. `results` is one optional target-owned region that may contain result, loading, empty, or error content. Endpoints, ranking, debounce, result records, price formatting, and announcements are not component defaults.
+`title` names the modal from visible text and `dismissLabel` names its canonical Close Button. `inputLabel`, `query`, and optional `placeholder` map to the native search control. `results` is optional target-owned result, loading, empty, error, or status content. Endpoints, ranking, debounce, records, price formatting, and announcements are not defaults.
 
 ## Usage Guidelines
 
@@ -18,27 +18,31 @@ The artwork uses documentation-owned trigger and close controls to exercise `.is
 </DoDont>
 
 - Keep placeholder text supplemental to the accessible label.
-- Use native links for navigable results.
+- Use native lists and links for navigable results; compose the separate Combobox contract only when its interaction is genuinely required.
+- Choose one query owner: controlled target state or intentionally initialized native state.
 - Keep provider, cancellation, caching, and analytics policy in the consuming target.
 
 ## Accessibility
 
-- Provide `inputLabel`; placeholder text does not replace an accessible name.
-- Keep `aria-hidden` synchronized with the visual open state.
-- The target overlay runtime must provide a named dismissal action, focus entry, `Escape` handling, focus restoration, and any required scroll locking.
-- Announce changing result status according to an accepted target policy without excessive live-region output.
+- Provide visible `title`, contextual `dismissLabel`, and native `inputLabel`; placeholder text does not replace either name.
+- Expose `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` only while interaction behind the overlay is actually blocked.
+- Keep open presentation and accessible availability synchronized; closed content must not remain focusable.
+- Move focus to the query, contain `Tab`, close on `Escape`, and restore focus logically.
+- Announce changing result status only from truthful target-owned content; do not create an unconditional live region.
 - Give informative result media useful alternative text; hide decorative thumbnails from assistive technology.
 
 ## References
 
 <PropTable>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible localized dialog title</td></tr>
+  <tr><td>`dismissLabel`</td><td>string</td><td>required</td><td>Contextual accessible name for the Close Button</td></tr>
   <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Synchronizes `.is-open` with `aria-hidden`</td></tr>
-  <tr><td>`inputLabel`</td><td>string</td><td>required</td><td>Accessible name for the native search input</td></tr>
-  <tr><td>`query`</td><td>string</td><td>optional</td><td>Current native input value</td></tr>
+  <tr><td>`inputLabel`</td><td>string</td><td>required</td><td>Native label for the search input</td></tr>
+  <tr><td>`query`</td><td>string</td><td>optional</td><td>Controlled current value or intentional native initial value</td></tr>
   <tr><td>`placeholder`</td><td>string</td><td>optional</td><td>Supplemental hint for an empty query</td></tr>
   <tr><td>`results`</td><td>slot</td><td>optional</td><td>Target-owned result, loading, empty, or error content</td></tr>
 </PropTable>
 
-Anatomy: `.search-overlay`, required `.search-box` and `.search-box__input`, optional `.search-results`, and optional `.search-result` with `.search-result__image`, `.search-result__title`, and `.search-result__price`. Dependencies: none.
+Anatomy: required `.search-overlay`, `.search-box`, `.search-box__header`, `.search-box__title`, `.search-box__close`, `.search-box__label`, and `.search-box__input`; optional `.search-results`, `.search-results__item`, `.search-result`, `.search-result__image`, `.search-result__content`, `.search-result__title`, and `.search-result__price`. Dependency: [Close Button](/components/close-button).
 
-Search service, result announcement, trigger, dismissal, focus, and stacking coordination remain open target boundaries.
+Search service, result announcement policy, trigger placement, backdrop dismissal, inertness, scroll locking, and stacking coordination remain target boundaries.

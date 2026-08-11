@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "countdown",
-  "name": "Countdown Timer",
+  "name": "Countdown",
   "registryId": "G7",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Presentational countdown segments with default, compact inline, and card treatments; calculation and expiration behavior remain outside the source contract.",
+  "summary": "Deadline-driven remaining-time counter with drift-safe shared scheduling, stable configured units, retained zero expiry, and target-owned commercial consequences.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/countdown",
@@ -22,35 +22,63 @@
       "selector": ".countdown",
       "className": ".countdown",
       "required": true,
-      "description": "Countdown segment collection."
+      "description": "Native time element carrying one absolute deadline and the progressive-enhancement marker."
+    },
+    {
+      "name": "fallback",
+      "selector": ".countdown__fallback",
+      "className": ".countdown__fallback",
+      "required": true,
+      "description": "Localized static deadline text retained when JavaScript is unavailable or the deadline is invalid."
+    },
+    {
+      "name": "display",
+      "selector": ".countdown__display",
+      "className": ".countdown__display",
+      "required": true,
+      "description": "Generated-value presentation hidden until a valid deadline is enhanced."
+    },
+    {
+      "name": "item",
+      "selector": ".countdown__item",
+      "className": ".countdown__item",
+      "required": true,
+      "description": "Stable wrapper for one configured unit and its optional preceding separator."
     },
     {
       "name": "segment",
       "selector": ".countdown__segment",
       "className": ".countdown__segment",
       "required": true,
-      "description": "Repeated time-unit group."
+      "description": "Visual value and localized unit pair."
     },
     {
       "name": "number",
       "selector": ".countdown__number",
       "className": ".countdown__number",
       "required": true,
-      "description": "Displayed value for one time unit."
+      "description": "Locale-formatted current value for one selected unit."
     },
     {
       "name": "label",
       "selector": ".countdown__label",
       "className": ".countdown__label",
       "required": true,
-      "description": "Visible unit label for one value."
+      "description": "Locale-formatted visible unit label."
     },
     {
       "name": "separator",
       "selector": ".countdown__separator",
       "className": ".countdown__separator",
       "required": false,
-      "description": "Optional visual separator between segments."
+      "description": "Decorative separator hidden for the first selected unit."
+    },
+    {
+      "name": "announcement",
+      "selector": ".countdown__announcement",
+      "className": ".countdown__announcement",
+      "required": false,
+      "description": "Optional polite status node populated once when a supplied expiry announcement exists."
     }
   ],
   "variants": [
@@ -58,19 +86,19 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Stacked value and unit labels."
+      "description": "Open value-and-unit treatment without segment surfaces."
     },
     {
       "name": "inline",
       "className": ".countdown--inline",
       "default": false,
-      "description": "Compact inline value and unit pairs for constrained contexts."
+      "description": "Compact value-and-unit pairs for banners and constrained compositions."
     },
     {
       "name": "cards",
       "className": ".countdown--cards",
       "default": false,
-      "description": "Segments rendered on padded card surfaces."
+      "description": "Each selected unit uses a padded surface."
     }
   ],
   "sizes": [
@@ -78,26 +106,95 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Responsive segment sizing supplied by canonical CSS."
+      "description": "Intrinsic wrapping and tabular values adapt to the available container."
     }
   ],
   "states": [
     {
-      "name": "default",
+      "name": "running",
       "selectors": [
-        ".countdown"
+        ".countdown[data-countdown-state=\"running\"]"
       ],
-      "description": "Presentational values supplied by the consuming target."
+      "description": "A valid future deadline is projected from the current clock."
+    },
+    {
+      "name": "expired",
+      "selectors": [
+        ".countdown[data-countdown-state=\"expired\"]"
+      ],
+      "description": "The deadline was reached; every selected unit remains visible at zero."
+    },
+    {
+      "name": "invalid",
+      "selectors": [
+        ".countdown[data-countdown-state=\"invalid\"]"
+      ],
+      "description": "The deadline is missing, ambiguous, or invalid; only ordinary fallback content remains."
     }
   ],
   "behavior": [
     {
-      "name": "suppliedValues",
+      "name": "absoluteDeadline",
+      "selectors": [
+        ".countdown"
+      ],
+      "attributes": [
+        "datetime with explicit Z or numeric UTC offset",
+        "data-countdown"
+      ],
+      "description": "Enhancement accepts only an unambiguous absolute ISO date-time. Date-only and floating local date-time values do not become timers."
+    },
+    {
+      "name": "deadlineProjection",
       "selectors": [
         ".countdown__number",
         ".countdown__label"
       ],
-      "description": "The source layer presents values and unit labels supplied by a target; it does not define date math, tick cadence, time zones, synchronization, or expiration behavior."
+      "events": [
+        "scheduled unit boundary",
+        "visibilitychange",
+        "pageshow",
+        "window focus"
+      ],
+      "description": "Remaining time is recomputed from deadline minus the current clock, never by decrementing stored display values."
+    },
+    {
+      "name": "sharedScheduler",
+      "selectors": [
+        ".countdown"
+      ],
+      "description": "All connected Countdown instances share one timeout scheduled for the nearest selected-unit boundary; hidden documents own no active countdown timeout and disconnected roots are pruned."
+    },
+    {
+      "name": "stableUnits",
+      "selectors": [
+        ".countdown__item"
+      ],
+      "attributes": [
+        "data-countdown-units",
+        "data-countdown-unit"
+      ],
+      "description": "One non-empty ordered unit preset selects days, hours, minutes, and seconds. Selected items remain structurally stable and show explicit zeroes."
+    },
+    {
+      "name": "expiry",
+      "selectors": [
+        ".countdown[data-countdown-state=\"expired\"]"
+      ],
+      "events": [
+        "countdownexpire"
+      ],
+      "description": "The first running-to-expired transition clamps values to zero, exposes derived state, emits one bubbling event, and optionally announces supplied neutral completion copy once."
+    },
+    {
+      "name": "targetReaction",
+      "selectors": [
+        ".countdown"
+      ],
+      "events": [
+        "countdownexpire"
+      ],
+      "description": "Consumers may retain, hide, replace, or react to the expired state. Countdown does not infer launch, offer, price, purchase, redirect, persistence, analytics, or other domain effects."
     }
   ],
   "properties": [
@@ -105,8 +202,9 @@
       "name": "variant",
       "type": "enum",
       "required": false,
+      "defaultValue": "default",
       "valuesFrom": "variants",
-      "description": "Default, inline, or card presentation.",
+      "description": "Default, Inline, or Cards visual presentation.",
       "targetMappings": {
         "web": [
           {
@@ -118,18 +216,102 @@
       }
     },
     {
-      "name": "segments",
-      "type": "slot",
+      "name": "deadline",
+      "type": "string",
       "required": true,
-      "description": "Target-supplied repeated value and unit groups.",
+      "description": "Absolute ISO date-time including Z or a numeric UTC offset; maps to the native time datetime value.",
       "targetMappings": {
         "web": [
           {
-            "kind": "slot",
+            "kind": "attribute",
             "selector": ".countdown",
-            "classNames": [
-              ".countdown"
+            "attribute": "datetime",
+            "valueFrom": "property",
+            "elements": [
+              "time"
             ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "units",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "days-hours-minutes-seconds",
+      "values": [
+        "days-hours-minutes-seconds",
+        "days-hours-minutes",
+        "days-hours-seconds",
+        "days-hours",
+        "days-minutes-seconds",
+        "days-minutes",
+        "days-seconds",
+        "days",
+        "hours-minutes-seconds",
+        "hours-minutes",
+        "hours-seconds",
+        "hours",
+        "minutes-seconds",
+        "minutes",
+        "seconds"
+      ],
+      "description": "Non-empty canonical-order selection of displayed units; all four are enabled by default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".countdown",
+            "attribute": "data-countdown-units",
+            "values": {
+              "days-hours-minutes-seconds": "days-hours-minutes-seconds",
+              "days-hours-minutes": "days-hours-minutes",
+              "days-hours-seconds": "days-hours-seconds",
+              "days-hours": "days-hours",
+              "days-minutes-seconds": "days-minutes-seconds",
+              "days-minutes": "days-minutes",
+              "days-seconds": "days-seconds",
+              "days": "days",
+              "hours-minutes-seconds": "hours-minutes-seconds",
+              "hours-minutes": "hours-minutes",
+              "hours-seconds": "hours-seconds",
+              "hours": "hours",
+              "minutes-seconds": "minutes-seconds",
+              "minutes": "minutes",
+              "seconds": "seconds"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "fallbackText",
+      "type": "string",
+      "required": true,
+      "description": "Localized static deadline statement shown before enhancement, without JavaScript, or for an invalid deadline.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".countdown__fallback"
+          }
+        ]
+      }
+    },
+    {
+      "name": "expiredAnnouncement",
+      "type": "string",
+      "required": false,
+      "defaultValue": "",
+      "unsetBehavior": "No live announcement is emitted; derived state and countdownexpire remain available.",
+      "description": "Optional localized neutral phrase announced once on a running-to-expired transition; it must not invent campaign meaning.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".countdown",
+            "attribute": "data-countdown-expired-announcement",
+            "valueFrom": "property"
           }
         ]
       }
@@ -145,48 +327,56 @@
       ],
       "typography": [
         "--font-family-heading",
+        "--tg-font-weight-medium",
+        "--tg-typography-body-caption-line-height",
+        "--tg-typography-body-caption-size",
+        "--tg-typography-h2-weight",
         "--typo-body-size",
+        "--typo-h2-line-height",
         "--typo-h2-size"
       ],
       "radius": [
         "--radius-md"
       ],
       "spacing": [
-        "--space-layout-touch-target"
+        "--space-layout-element-gap"
       ]
     }
   },
   "accessibility": [
-    "Keep every number associated with a visible or programmatic unit label.",
-    "Expose a concise complete time-remaining phrase when visual segmentation would be verbose or ambiguous to assistive technology.",
-    "Do not announce every tick through a live region.",
-    "The consuming target must define and communicate expiration behavior before treating the countdown as functional."
+    "Apply role=timer only after a valid deadline is actively calculated; static fallback content remains ordinary time text.",
+    "Keep the visual segments aria-hidden and expose one complete localized current phrase as the timer name.",
+    "Preserve timer's implicit aria-live=off behavior so per-unit updates are not repeatedly announced.",
+    "If supplied, announce neutral expiry copy only once; never announce every second.",
+    "Selected units remain present at zero and values never become negative.",
+    "Countdown itself is not focusable and adds no keyboard model, time-limit action, redirect, or context change."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Presentational CSS is implemented; calculation and expiration behavior are unresolved."
+      "kind": "css-progressive-enhancement-js",
+      "notes": "Canonical CSS plus components/js/theme.js implement absolute-deadline validation, localized projection, one shared visibility-aware scheduler, derived running/expired state, and a single countdownexpire event."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "liquid-css-js",
+      "notes": "Canonical CSS/runtime are copied, but a target-native merchant data surface and truthful placement remain intentionally unselected."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-adapter"
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "static-component-states"
     },
     "swiftui": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-deadline-component"
     },
     "compose": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-deadline-component"
     }
   }
 }

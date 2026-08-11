@@ -1,103 +1,110 @@
-{%- comment -%}
-  Section: Main Cart
-  Full cart page with line items, quantities, and checkout.
-{%- endcomment -%}
+<script src="{{ 'discount-field.js' | asset_url }}" defer></script>
 
 <section class="section">
   <div class="container">
-    <h1 style="font-family: var(--font-family-heading); font-size: var(--typo-h1-size); margin-bottom: var(--space-layout-section-gap);">
-      Your Cart
-    </h1>
-
-    {%- if cart.item_count > 0 -%}
+    {%- unless cart.empty? -%}
+      {%- assign cart_summary_placement = section.settings.summary_placement | default: 'sticky' -%}
       {% form 'cart', cart %}
-        <div class="cart-page">
-          {%- comment -%} Cart Items {%- endcomment -%}
-          <div class="cart-page__items">
-            {%- for item in cart.items -%}
-              <div class="cart-item">
-                <a href="{{ item.url }}">
-                  {%- if item.image != blank -%}
-                    {{ item.image | image_url: width: 160 | image_tag:
-                       class: 'cart-item__image', alt: item.title, loading: 'lazy' }}
+        <section
+          class="cart-page{% if cart_summary_placement == 'flow' %} cart-page--summary-flow{% endif %}"
+          aria-labelledby="CartPageTitle"
+          {% if cart_summary_placement == 'sticky' %}style="--_cart-page-summary-offset: calc(4rem + var(--space-layout-element-gap) + env(safe-area-inset-top));"{% endif %}
+        >
+          <header class="cart-page__header">
+            <h1 class="cart-page__title" id="CartPageTitle">
+              {{ 'cart.title' | t }}
+            </h1>
+            <p class="cart-page__count">
+              <bdi>{{ 'cart.item_count' | t: count: cart.item_count }}</bdi>
+            </p>
+            <a class="cart-page__continue" href="{{ routes.all_products_collection_url }}">
+              {{ 'cart.continue_shopping' | t }}
+            </a>
+          </header>
+
+          <div class="cart-page__layout">
+            <div class="cart-page__items">
+              <ul class="cart-lines">
+                {%- for item in cart.items -%}
+                  {%- if settings.gift_wrap_enabled and settings.gift_wrap_product != blank and item.product_id == settings.gift_wrap_product.id -%}
+                    {% render 'cart-line-item', item: item, show_quantity: false %}
+                  {%- else -%}
+                    {% render 'cart-line-item', item: item %}
                   {%- endif -%}
-                </a>
-                <div class="cart-item__details">
-                  <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
-                  {%- if item.variant.title != 'Default Title' -%}
-                    <p class="cart-item__variant">{{ item.variant.title }}</p>
-                  {%- endif -%}
-
-                  <div class="cart-item__actions">
-                    {% render 'quantity-selector', item: item %}
-                    <span class="price__current">{{ item.final_line_price | money }}</span>
-                  </div>
-
-                  <button class="cart-item__remove" type="button"
-                          onclick="this.closest('.cart-item').querySelector('input').value='0'; this.closest('form').submit();">
-                    Remove
-                  </button>
-                </div>
-              </div>
-            {%- endfor -%}
-          </div>
-
-          {%- comment -%} Cart Summary {%- endcomment -%}
-          <div class="cart-page__summary">
-            <div class="cart-summary">
-              <div class="cart-summary__row cart-summary__total">
-                <span>Subtotal</span>
-                <span>{{ cart.total_price | money }}</span>
-              </div>
+                {%- endfor -%}
+              </ul>
             </div>
 
-            <p style="font-size: calc(var(--typo-body-size) * 0.75); color: var(--color-text-secondary); margin: 8px 0;">
-              Shipping calculated at checkout
-            </p>
-
-            <button type="submit" name="update" class="btn btn--secondary btn--full" style="margin-top: 12px;">
-              Update Cart
-            </button>
-
-            <button type="submit" name="checkout" class="btn btn--primary btn--full" style="margin-top: 8px;">
-              Checkout
-            </button>
+            <div class="cart-page__summary">
+              {% render 'cart-summary', summary_id: 'CartPageSummary', show_express: true %}
+            </div>
           </div>
-        </div>
+        </section>
+
+        {%- if section.settings.show_cart_note -%}
+          {% render 'cart-note',
+             expanded: section.settings.cart_note_expanded,
+             note_id: 'CartPageNote' %}
+        {%- endif -%}
+
+        {%- if settings.gift_wrap_enabled and settings.gift_wrap_product != blank -%}
+          {% render 'gift-wrap',
+             gift_wrap_product: settings.gift_wrap_product,
+             gift_wrap_id: 'CartPageGiftWrap' %}
+        {%- endif -%}
+
+        <button type="submit" name="update" class="btn btn--outline btn--full">
+          {{ 'cart.update' | t }}
+        </button>
       {% endform %}
+
+      <div class="main-cart__discount">
+        {% render 'discount-field', discount_id: 'CartPageDiscount' %}
+      </div>
     {%- else -%}
-      {% render 'empty-state',
+      {% render 'cart-empty',
+         heading_tag: 'h1',
          icon: 'shopping-bag',
-         title: 'Your cart is empty',
-         message: 'Discover our handcrafted pieces.',
-         cta_text: 'Continue Shopping',
-         cta_url: '/collections/all' %}
-    {%- endif -%}
+         title: 'cart.empty' | t,
+         message: 'cart.empty_message' | t,
+         action_label: 'cart.continue_shopping' | t,
+         href: routes.all_products_collection_url %}
+    {%- endunless -%}
   </div>
 </section>
 
-<style>
-  .cart-page {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-layout-grid-gap);
-  }
-  @media (min-width: 1024px) {
-    .cart-page { grid-template-columns: 2fr 1fr; }
-  }
-  .cart-page__summary {
-    background: var(--color-surface-secondary);
-    padding: var(--space-layout-element-gap);
-    border-radius: var(--radius-lg);
-    align-self: start;
-    position: sticky;
-    top: 100px;
-  }
-</style>
-
 {% schema %}
 {
-  "name": "Cart Page",
-  "settings": []
+  "name": "t:sections.main_cart.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "summary_placement",
+      "label": "t:sections.main_cart.settings.summary_placement",
+      "options": [
+        {
+          "value": "sticky",
+          "label": "t:sections.main_cart.settings.summary_placement_sticky"
+        },
+        {
+          "value": "flow",
+          "label": "t:sections.main_cart.settings.summary_placement_flow"
+        }
+      ],
+      "default": "sticky"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_note",
+      "label": "t:sections.main_cart.settings.show_cart_note",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "cart_note_expanded",
+      "label": "t:sections.main_cart.settings.cart_note_expanded",
+      "default": false
+    }
+  ]
 }
 {% endschema %}

@@ -1,0 +1,262 @@
+{%- liquid
+  assign comments_default_title = 'comments.heading' | t
+  assign comments_title = section.settings.title | default: comments_default_title | strip
+  assign comments_empty_title = 'comments.empty_title' | t
+  assign comments_empty_message = 'comments.empty_message' | t
+  assign comments_title_id = 'CommentsTitle-' | append: section.id
+  assign comments_anchor_id = 'Comments-' | append: article.id
+  assign comments_anchor = '#' | append: comments_anchor_id
+  assign comments_form_id = 'CommentForm-' | append: section.id
+  assign comments_form_title_id = comments_form_id | append: '-title'
+  assign comments_author_id = comments_form_id | append: '-author'
+  assign comments_email_id = comments_form_id | append: '-email'
+  assign comments_body_id = comments_form_id | append: '-body'
+
+  assign comments_heading_level = section.settings.heading_level | default: '2' | plus: 0
+  case comments_heading_level
+    when 3
+      assign comments_heading_tag = 'h3'
+    when 4
+      assign comments_heading_tag = 'h4'
+    when 5
+      assign comments_heading_tag = 'h5'
+    else
+      assign comments_heading_level = 2
+      assign comments_heading_tag = 'h2'
+  endcase
+  assign comments_child_heading_level = comments_heading_level | plus: 1
+  if comments_child_heading_level > 6
+    assign comments_child_heading_level = 6
+  endif
+  assign comments_child_heading_tag = 'h' | append: comments_child_heading_level
+
+  assign comments_per_page = section.settings.comments_per_page | default: 10
+  assign comments_has_pending = false
+  if comment.status == 'pending' and comment.content != blank
+    assign comments_has_pending = true
+  endif
+-%}
+
+{%- if article != blank and article.comments_enabled? and comments_title != blank -%}
+  <section class="comments" id="{{ comments_anchor_id }}" aria-labelledby="{{ comments_title_id }}">
+    <{{ comments_heading_tag }} class="comments__title" id="{{ comments_title_id }}" dir="auto">
+      {{ comments_title | escape }}
+      <span class="comments__count" dir="auto">
+        {{- 'comments.count' | t: count: article.comments_count -}}
+      </span>
+    </{{ comments_heading_tag }}>
+
+    {%- paginate article.comments by comments_per_page -%}
+      {%- if article.comments_count > 0 or comments_has_pending -%}
+        <ol class="comments__thread">
+          {%- if comments_has_pending -%}
+            <li class="comments__item">
+              <article class="comment" id="Comment-{{ comment.id }}" aria-labelledby="CommentAuthor-{{ comment.id }}">
+                <div class="comment__body">
+                  <header class="comment__header">
+                    <span class="comment__author" id="CommentAuthor-{{ comment.id }}" dir="auto">{{ comment.author | escape }}</span>
+                    <span class="comment__status">{{ 'comments.pending' | t }}</span>
+                  </header>
+                  <div class="comment__content" dir="auto">{{ comment.content }}</div>
+                </div>
+              </article>
+            </li>
+          {%- endif -%}
+
+          {%- for article_comment in article.comments -%}
+            <li class="comments__item">
+              <article
+                class="comment"
+                id="Comment-{{ article_comment.id }}"
+                aria-labelledby="CommentAuthor-{{ article_comment.id }} CommentDate-{{ article_comment.id }}"
+              >
+                <div class="comment__body">
+                  <header class="comment__header">
+                    <span class="comment__author" id="CommentAuthor-{{ article_comment.id }}" dir="auto">{{ article_comment.author | escape }}</span>
+                    <time
+                      class="comment__date"
+                      id="CommentDate-{{ article_comment.id }}"
+                      datetime="{{ article_comment.created_at | date: '%Y-%m-%dT%H:%M:%S%z' }}"
+                    >
+                      {{- article_comment.created_at | date: format: 'date' -}}
+                    </time>
+                  </header>
+                  <div class="comment__content" dir="auto">{{ article_comment.content }}</div>
+                </div>
+              </article>
+            </li>
+          {%- endfor -%}
+        </ol>
+
+        {% render 'pagination', paginate: paginate, anchor: comments_anchor, class_name: 'comments__pagination' %}
+      {%- else -%}
+        {% render 'empty-state',
+          heading_tag: comments_child_heading_tag,
+          title: comments_empty_title,
+          message: comments_empty_message,
+          root_class: 'comments__empty'
+        %}
+      {%- endif -%}
+    {%- endpaginate -%}
+
+    {%- if section.settings.show_composer -%}
+      {% form 'new_comment', article, id: comments_form_id, class: 'comment-form', aria-labelledby: comments_form_title_id %}
+        <{{ comments_child_heading_tag }} class="comment-form__title" id="{{ comments_form_title_id }}">
+          {{- 'comments.form_title' | t -}}
+        </{{ comments_child_heading_tag }}>
+
+        {%- if form.errors -%}
+          <div class="comment-form__status" role="alert" tabindex="-1" autofocus>
+            <p>{{ 'comments.error_heading' | t }}</p>
+            <ul>
+              {%- for field in form.errors -%}
+                {%- liquid
+                  assign comments_error_target = comments_form_id
+                  case field
+                    when 'author'
+                      assign comments_error_target = comments_author_id
+                    when 'email'
+                      assign comments_error_target = comments_email_id
+                    when 'body'
+                      assign comments_error_target = comments_body_id
+                  endcase
+                -%}
+                <li>
+                  <a href="#{{ comments_error_target }}">
+                    {{- form.errors.translated_fields[field] }} — {{ form.errors.messages[field] -}}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- elsif form.posted_successfully? -%}
+          <p class="comment-form__status" role="status" tabindex="-1" autofocus>
+            {%- if article.moderated? -%}
+              {{- 'comments.success_moderated' | t -}}
+            {%- else -%}
+              {{- 'comments.success' | t -}}
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+
+        <div class="input{% if form.errors contains 'author' %} input--error{% endif %}">
+          <label class="input__label" for="{{ comments_author_id }}">{{ 'comments.author_label' | t }}</label>
+          <div class="input__control">
+            <input
+              class="input__field"
+              id="{{ comments_author_id }}"
+              name="comment[author]"
+              type="text"
+              autocomplete="name"
+              value="{{ form.author | escape }}"
+              required
+              {% if form.errors contains 'author' %}aria-invalid="true" aria-describedby="{{ comments_author_id }}-error"{% endif %}
+            >
+          </div>
+          {%- if form.errors contains 'author' -%}
+            <p class="input__message" id="{{ comments_author_id }}-error">
+              {{- form.errors.translated_fields.author }} — {{ form.errors.messages.author -}}
+            </p>
+          {%- endif -%}
+        </div>
+
+        <div class="input{% if form.errors contains 'email' %} input--error{% endif %}">
+          <label class="input__label" for="{{ comments_email_id }}">{{ 'comments.email_label' | t }}</label>
+          <div class="input__control">
+            <input
+              class="input__field"
+              id="{{ comments_email_id }}"
+              name="comment[email]"
+              type="email"
+              autocomplete="email"
+              autocapitalize="off"
+              spellcheck="false"
+              value="{{ form.email | escape }}"
+              required
+              {% if form.errors contains 'email' %}aria-invalid="true" aria-describedby="{{ comments_email_id }}-error"{% endif %}
+            >
+          </div>
+          {%- if form.errors contains 'email' -%}
+            <p class="input__message" id="{{ comments_email_id }}-error">
+              {{- form.errors.translated_fields.email }} — {{ form.errors.messages.email -}}
+            </p>
+          {%- endif -%}
+        </div>
+
+        <div class="input{% if form.errors contains 'body' %} input--error{% endif %}">
+          <label class="input__label" for="{{ comments_body_id }}">{{ 'comments.body_label' | t }}</label>
+          <div class="input__control">
+            <textarea
+              class="input__field textarea__field"
+              id="{{ comments_body_id }}"
+              name="comment[body]"
+              required
+              data-min-lines="4"
+              {% if form.errors contains 'body' %}aria-invalid="true" aria-describedby="{{ comments_body_id }}-error"{% endif %}
+            >{{ form.body }}</textarea>
+          </div>
+          {%- if form.errors contains 'body' -%}
+            <p class="input__message" id="{{ comments_body_id }}-error">
+              {{- form.errors.translated_fields.body }} — {{ form.errors.messages.body -}}
+            </p>
+          {%- endif -%}
+        </div>
+
+        {%- if article.moderated? -%}
+          <p class="comment-form__moderation">{{ 'comments.moderated' | t }}</p>
+        {%- endif -%}
+
+        <button class="btn" type="submit">{{ 'comments.submit' | t }}</button>
+      {% endform %}
+    {%- endif -%}
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.comments.name",
+  "enabled_on": {
+    "templates": ["article"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.comments.settings.title",
+      "info": "t:sections.comments.settings.title_info"
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "label": "t:sections.comments.settings.heading_level",
+      "options": [
+        { "value": "2", "label": "t:sections.comments.options.heading_2" },
+        { "value": "3", "label": "t:sections.comments.options.heading_3" },
+        { "value": "4", "label": "t:sections.comments.options.heading_4" },
+        { "value": "5", "label": "t:sections.comments.options.heading_5" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "comments_per_page",
+      "label": "t:sections.comments.settings.comments_per_page",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "show_composer",
+      "label": "t:sections.comments.settings.show_composer",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.comments.name"
+    }
+  ]
+}
+{% endschema %}

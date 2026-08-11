@@ -40,15 +40,16 @@ Warning are included following the field-wide validation requirement in ADRs
   explicit behavior requirements.
 - Select remains non-searchable. Combobox continues to own search, filtering,
   asynchronous results, and free-form input.
-- Studio renders the accepted anatomy directly in React and marks it as already
-  enhanced. Exhibit invokes the distributed web enhancer inside its shadow root.
+- Exhibit and Studio mount the same registered React renderer and fixture under
+  ADR 0087. The distributed web enhancer is exercised separately against the
+  same contract and canonical CSS.
 
 ## Final Evidence
 
 - Automated gate: pass; no structural failures or web manifest drift.
-- Contract: 11 anatomy parts, 4 variants, 1 size, 12 states, 11 behavior rules,
-  4 semantic properties, and 52 public tokens.
-- Studio: 4 groups, 25 controls, all 4 semantic properties bound, 21 token
+- Contract: 11 anatomy parts, 4 variants, 1 size, 12 states, 14 behavior rules,
+  6 semantic properties, and 52 public tokens.
+- Studio: 4 groups, 27 controls, all 6 semantic properties bound, 21 token
   controls, 43 referenced public tokens, and a renderer that uses the canonical
   Select classes.
 - Closed field: `46px` high with `16px / 24px` value typography and the shared
@@ -85,17 +86,11 @@ Warning are included following the field-wide validation requirement in ADRs
 - Label activation opens the enhanced trigger.
 - A form reset restores both native value and visible trigger label; native
   disabled changes synchronize to the trigger.
-- Studio Error resolves label, inner border, message, and indicator to
-  `rgb(239, 68, 68)`. The focused outer ring resolves to
-  `rgb(254, 226, 226)` at `4px`, while both the native value owner and trigger
-  expose the associated message and `aria-invalid="true"`.
-- Studio Success resolves the same anatomy to `rgb(16, 185, 129)`. Its focused
-  outer ring resolves to `rgb(209, 250, 229)` at `4px`; the message remains
-  associated and neither control exposes `aria-invalid`.
-- Studio Warning resolves label, inner border, message, and indicator to
-  `rgb(245, 158, 11)` in light mode. Its focused outer ring resolves to
-  `rgb(254, 243, 199)` at `4px`; the message remains associated and neither
-  control exposes `aria-invalid` or alert semantics.
+- Batch 08 contrast reconciliation keeps the accepted source tokens while using
+  private mixes: default boundary `3.07:1` light / `5.19:1` dark; semantic
+  boundary/indicator minimum `3.86:1` light / `8.64:1` dark; semantic label
+  minimum `5.36:1` / `10.06:1`. Error alone exposes `aria-invalid="true"`;
+  Success and Warning remain associated non-invalid feedback.
 - Real pointer hover preserves the active Error, Success, or Warning trigger
   border instead of applying the neutral Default hover border.
 - Dark theme resolves the listbox to the dark primary surface, subtle border,
@@ -107,6 +102,35 @@ Warning are included following the field-wide validation requirement in ADRs
   and `rgb(250, 250, 250)` for option text.
 - The final browser pass reports no Select or React runtime errors. The only
   console error is the pre-existing missing `/favicon.ico` request.
+
+## Expanded v1 Refinement Evidence — 2026-07-13
+
+- The contract is now `0.6.0`. `name` and `required` map to the native form
+  owner; the visible trigger exposes `role="combobox"` and mirrors
+  `aria-required="true"`.
+- Multiple selection, `size` greater than one, and `<optgroup>` content now skip
+  the flat single-choice enhancer and remain functional native controls. A
+  browser probe confirmed no generated trigger and a visible native field for
+  grouped and multiple cases.
+- An empty flat select enhances without an exception and creates zero generated
+  options. The author still owns providing a meaningful choice set.
+- A direct enhancer probe generated 49 options from one hidden prompt plus 48
+  localized choices. The open popup measured `360px x 240px`, scrolled
+  vertically, kept the hidden prompt out of the visible choices, and produced no
+  page overflow.
+- The same probe preserved native `name="country"`, native `required`,
+  `aria-describedby`, and `aria-required="true"` on the combobox.
+- Reduced-motion testing initially found the field still transitioning at
+  `0.1s`. Canonical CSS now resolves both field and indicator transition duration
+  to `0s` and removes indicator rotation while expanded state remains semantic.
+- Exhibit and Studio were captured at `390 x 844`, `768 x 1024`, `1280 x 800`,
+  and `1600 x 1000`; all eight images are under
+  `output/playwright/refinement-calibration/`.
+- Forced-colors/reduced-motion extreme evidence is
+  `select-extreme-enhancer-forced-colors-reduced-motion-desktop.png`.
+- Current shared runtime measures `5,263 B` gzip against the `8 KiB` ceiling;
+  primitives CSS measures `10,378 B` against the `10.3 KiB` family ceiling;
+  Neutral Web components CSS measures `57,952 B` against `64 KiB`.
 
 ## Owner Review Required
 

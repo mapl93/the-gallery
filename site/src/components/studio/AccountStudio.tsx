@@ -2,21 +2,17 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type FormEvent,
 } from 'react';
 import {
-  Bell,
-  Check,
-  ChevronDown,
   Heart,
   LockKeyhole,
-  Mail,
   MapPin,
   Package,
   Plus,
-  ShieldCheck,
 } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
@@ -25,21 +21,27 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import AuthFormsArtwork from './AuthFormsArtwork';
+import PasswordResetArtwork from './PasswordResetArtwork';
+import AccountDashboardArtwork from './AccountDashboardArtwork';
+import AccountSettingsArtwork, {
+  AccountSettingsSectionArtwork,
+} from './AccountSettingsArtwork';
+import OrderHistoryArtwork, { type OrderHistoryItem } from './OrderHistoryArtwork';
+import OrderDetailArtwork, { type OrderDetailLineItem } from './OrderDetailArtwork';
+import AddressBookArtwork, { type AddressBookRecord } from './AddressBookArtwork';
+import AddressFormArtwork from './AddressFormArtwork';
+import EmptyStateArtwork from './EmptyStateArtwork';
+import InputArtwork from './InputArtwork';
+import ProductCardArtwork from './ProductCardArtwork';
+import SwitchArtwork from './SwitchArtwork';
+import type { StepsArtworkItem } from './StepsArtwork';
+import WishlistArtwork from './WishlistArtwork';
 import { editorialMedia } from './editorialMedia';
 
 interface AccountStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
-}
-
-interface FieldProps {
-  id: string;
-  label: string;
-  type?: string;
-  value: string;
-  autoComplete?: string;
-  required?: boolean;
-  onChange: (value: string) => void;
 }
 
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
@@ -88,6 +90,7 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     title: 'Saved works',
     count: '3 items',
     products: true,
+    emptyState: true,
   },
   'account-settings': {
     sections: true,
@@ -95,21 +98,144 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
 };
 
 const accountCards = [
-  { title: 'Orders', description: 'Track recent purchases and view receipts.', icon: Package },
-  { title: 'Addresses', description: 'Manage shipping and billing destinations.', icon: MapPin },
-  { title: 'Saved works', description: 'Return to pieces you have collected here.', icon: Heart },
+  {
+    id: 'orders',
+    title: 'Orders',
+    description: 'Track recent purchases and view receipts.',
+    href: '#orders',
+    linkLabel: 'View orders',
+    icon: <Package className="account-card__icon" aria-hidden="true" />,
+  },
+  {
+    id: 'addresses',
+    title: 'Addresses',
+    description: 'Manage shipping and billing destinations.',
+    href: '#addresses',
+    linkLabel: 'Manage addresses',
+    icon: <MapPin className="account-card__icon" aria-hidden="true" />,
+  },
+  {
+    id: 'saved-works',
+    title: 'Saved works',
+    description: 'Return to pieces you have collected here.',
+    href: '#saved-works',
+    linkLabel: 'View saved works',
+    icon: <Heart className="account-card__icon" aria-hidden="true" />,
+  },
 ];
 
-const orders = [
-  { number: '#1048', date: 'July 8, 2026', status: 'Shipped', state: 'shipped', total: '$120.00' },
-  { number: '#1032', date: 'June 21, 2026', status: 'Delivered', state: 'delivered', total: '$248.00' },
-  { number: '#1017', date: 'May 14, 2026', status: 'Cancelled', state: 'cancelled', total: '$86.00' },
+const orders: readonly OrderHistoryItem[] = [
+  {
+    id: '1048',
+    numberLabel: 'Order #1048',
+    href: '#order-1048',
+    dateLabel: 'July 8, 2026',
+    dateTime: '2026-07-08',
+    statusLabel: 'Shipped',
+    statusVariant: 'info',
+    totalLabel: '$120.00',
+  },
+  {
+    id: '1032',
+    numberLabel: 'Order #1032',
+    href: '#order-1032',
+    dateLabel: 'June 21, 2026',
+    dateTime: '2026-06-21',
+    statusLabel: 'Delivered',
+    statusVariant: 'success',
+    totalLabel: '$248.00',
+  },
+  {
+    id: '1017',
+    numberLabel: 'Order #1017',
+    href: '#order-1017',
+    dateLabel: 'May 14, 2026',
+    dateTime: '2026-05-14',
+    statusLabel: 'Cancelled',
+    statusVariant: 'error',
+    totalLabel: '$86.00',
+  },
+];
+
+const orderDetailTracking: readonly StepsArtworkItem[] = [
+  { id: 'confirmed', title: 'Confirmed', status: 'completed' },
+  { id: 'prepared', title: 'Prepared', status: 'completed' },
+  { id: 'shipped', title: 'Shipped', status: 'current' },
+  { id: 'delivered', title: 'Delivered', status: 'upcoming' },
+];
+
+const orderDetailLineItems: readonly OrderDetailLineItem[] = [
+  {
+    id: 'order-1048-celadon-study-4',
+    title: 'Celadon Study No. 4',
+    href: '#product',
+    details: ['Celadon / Medium', 'Quantity 1'],
+    imageSrc: editorialMedia.texturedVase,
+    imageAlt: '',
+    currentPrice: '$120.00',
+    currentPriceLabel: 'Price',
+  },
+];
+
+const addressBookRecords: readonly AddressBookRecord[] = [
+  {
+    id: 'alex-morgan',
+    recipient: 'Alex Morgan',
+    lines: ['18 Gallery Lane', 'Buenos Aires, C1001'],
+    isDefault: true,
+    defaultLabel: 'Default',
+    actions: [
+      {
+        id: 'edit',
+        label: 'Edit',
+        accessibleLabel: 'Edit address for Alex Morgan',
+        variant: 'link',
+        size: 'sm',
+      },
+    ],
+  },
+  {
+    id: 'studio',
+    recipient: 'Studio',
+    lines: ['42 Workshop Road', 'Mendoza, M5500'],
+    actions: [
+      {
+        id: 'edit',
+        label: 'Edit',
+        accessibleLabel: 'Edit address for Studio',
+        variant: 'link',
+        size: 'sm',
+      },
+    ],
+  },
 ];
 
 const wishlistProducts = [
-  { title: 'Celadon Study No. 4', vendor: 'Lucia Ferrer', price: '$120.00' },
-  { title: 'Contour Vessel', vendor: 'Mara Vidal', price: '$148.00' },
-  { title: 'Ash Glaze Bowl', vendor: 'Noah Sato', price: '$86.00' },
+  {
+    productId: 'celadon-study-no-4',
+    variantId: 'celadon-study-no-4-large-seafoam',
+    title: 'Celadon Study No. 4',
+    selection: 'Large · Seafoam',
+    vendor: 'Lucia Ferrer',
+    price: '$120.00',
+  },
+  {
+    productId: 'celadon-study-no-4',
+    variantId: 'celadon-study-no-4-small-porcelain',
+    title: 'Celadon Study No. 4',
+    selection: 'Small · Porcelain white',
+    vendor: 'Lucia Ferrer',
+    price: '$112.00',
+  },
+  {
+    productId: 'ash-glaze-bowl',
+    variantId: 'ash-glaze-bowl-small-ash-grey',
+    title: 'Ash Glaze Bowl',
+    selection: 'Small · Ash grey',
+    vendor: 'Noah Sato',
+    price: '$86.00',
+    availabilityLabel: 'No longer available',
+  },
 ];
 
 const countries = ['Argentina', 'Mexico', 'Spain'];
@@ -144,29 +270,6 @@ function resolveTokens(control: StudioControl, contract: ComponentContract): str
   return category.filter((token) => pattern.test(token));
 }
 
-function Field({ id, label, type = 'text', value, autoComplete, required, onChange }: FieldProps) {
-  return (
-    <div className="input docs-studio__account-field">
-      <label className="input__label" htmlFor={id}>{label}</label>
-      <div className="input__control">
-        <input
-          className="input__field"
-          id={id}
-          type={type}
-          value={value}
-          autoComplete={autoComplete}
-          required={required}
-          onChange={(event) => onChange(event.target.value)}
-        />
-      </div>
-    </div>
-  );
-}
-
-function AccountMedia({ className = '', alt = '' }: { className?: string; alt?: string }) {
-  return <img src={editorialMedia.artistInStudio} alt={alt} className={`${className} docs-studio__account-media`} />;
-}
-
 export default function AccountStudio({ contract, definition }: AccountStudioProps) {
   const id = useId();
   const initialValues = useMemo(() => initialFixtureValues(contract), [contract]);
@@ -183,24 +286,26 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [email, setEmail] = useState('alex@example.com');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [authFeedback, setAuthFeedback] = useState('');
   const [resetEmail, setResetEmail] = useState('alex@example.com');
   const [resetSent, setResetSent] = useState(false);
+  const resetConfirmationRef = useRef<HTMLDivElement>(null);
+  const [dashboardFeedback, setDashboardFeedback] = useState('');
+  const [orderFeedback, setOrderFeedback] = useState('');
+  const [orderDetailFeedback, setOrderDetailFeedback] = useState('');
   const [addressFeedback, setAddressFeedback] = useState('');
   const [addressFirstName, setAddressFirstName] = useState('Alex');
   const [addressLastName, setAddressLastName] = useState('Morgan');
   const [addressLine, setAddressLine] = useState('18 Gallery Lane');
   const [addressCity, setAddressCity] = useState('Buenos Aires');
   const [addressCountry, setAddressCountry] = useState('Argentina');
-  const [addressCountryOpen, setAddressCountryOpen] = useState(false);
-  const [addressCountryHighlight, setAddressCountryHighlight] = useState(0);
   const [addressFormFeedback, setAddressFormFeedback] = useState('');
-  const [savedProducts, setSavedProducts] = useState(() => wishlistProducts.map(() => true));
-  const [wishlistTouched, setWishlistTouched] = useState(false);
+  const [wishlistFeedback, setWishlistFeedback] = useState('');
   const [profileName, setProfileName] = useState('Alex Morgan');
   const [profileEmail, setProfileEmail] = useState('alex@example.com');
-  const [emailUpdates, setEmailUpdates] = useState(true);
-  const [smsUpdates, setSmsUpdates] = useState(false);
+  const [compactAccountLayout, setCompactAccountLayout] = useState(true);
+  const [orderThumbnails, setOrderThumbnails] = useState(false);
   const [settingsFeedback, setSettingsFeedback] = useState('');
 
   useEffect(() => {
@@ -217,6 +322,12 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
     return () => observer.disconnect();
   }, [studioTokens]);
 
+  useEffect(() => {
+    if (contract.slug !== 'password-reset' || !resetSent) return undefined;
+    const frame = requestAnimationFrame(() => resetConfirmationRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, resetSent]);
+
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
 
   function reset() {
@@ -224,24 +335,25 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
     setTokenOverrides({});
     setEmail('alex@example.com');
     setPassword('');
+    setPasswordVisible(false);
     setAuthFeedback('');
     setResetEmail('alex@example.com');
     setResetSent(false);
+    setDashboardFeedback('');
+    setOrderFeedback('');
+    setOrderDetailFeedback('');
     setAddressFeedback('');
     setAddressFirstName('Alex');
     setAddressLastName('Morgan');
     setAddressLine('18 Gallery Lane');
     setAddressCity('Buenos Aires');
     setAddressCountry('Argentina');
-    setAddressCountryOpen(false);
-    setAddressCountryHighlight(0);
     setAddressFormFeedback('');
-    setSavedProducts(wishlistProducts.map(() => true));
-    setWishlistTouched(false);
+    setWishlistFeedback('');
     setProfileName('Alex Morgan');
     setProfileEmail('alex@example.com');
-    setEmailUpdates(true);
-    setSmsUpdates(false);
+    setCompactAccountLayout(true);
+    setOrderThumbnails(false);
     setSettingsFeedback('');
   }
 
@@ -251,33 +363,33 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
       setAuthFeedback('Demo sign-in submitted. No credentials were sent.');
     };
     return (
-      <section className="auth docs-studio__auth">
-        <header className="auth__header">
-          <h2 className="auth__title">{String(values.title)}</h2>
-          {String(values.subtitle || '') && <p className="auth__subtitle">{String(values.subtitle)}</p>}
-        </header>
-        {values.form === true && (
-          <form className="auth__form" onSubmit={submit}>
-            <Field id={`${id}-auth-email`} label="Email address" type="email" value={email} autoComplete="username" required onChange={setEmail} />
-            <Field id={`${id}-auth-password`} label="Password" type="password" value={password} autoComplete="current-password" required onChange={setPassword} />
-            {values.forgotAction === true && (
-              <div className="auth__forgot"><a href="#reset" onClick={(event) => event.preventDefault()}>Forgot password?</a></div>
-            )}
-            <button className="btn btn--full" type="submit">Sign in</button>
-          </form>
-        )}
+      <>
+        <AuthFormsArtwork
+          id={`${id}-auth`}
+          className="docs-studio__auth"
+          title={String(values.title || '')}
+          subtitle={String(values.subtitle || '')}
+          form={values.form === true}
+          forgotAction={values.forgotAction === true}
+          dividerLabel={String(values.dividerLabel || '')}
+          socialActions={values.socialActions === true}
+          footer={values.footer === true}
+          email={email}
+          password={password}
+          passwordVisible={passwordVisible}
+          onEmailChange={(event) => setEmail(event.target.value)}
+          onPasswordChange={(event) => setPassword(event.target.value)}
+          onPasswordVisibleChange={setPasswordVisible}
+          onSubmit={submit}
+          onAlternativeAction={(method) => setAuthFeedback(
+            method === 'email-link'
+              ? 'Demo email-link sign-in selected. No request was sent.'
+              : 'Demo single sign-on selected. No request was sent.'
+          )}
+          onNavigate={(event) => event.preventDefault()}
+        />
         <p className="docs-studio__account-feedback" role="status" aria-live="polite">{authFeedback}</p>
-        {values.socialActions === true && (
-          <>
-            {String(values.dividerLabel || '') && <div className="auth__divider">{String(values.dividerLabel)}</div>}
-            <div className="auth__social">
-              <button className="auth__social-btn" type="button"><Mail aria-hidden="true" />Continue with email link</button>
-              <button className="auth__social-btn" type="button"><ShieldCheck aria-hidden="true" />Continue with single sign-on</button>
-            </div>
-          </>
-        )}
-        {values.footer === true && <p className="auth__footer">New to the gallery? <a href="#register" onClick={(event) => event.preventDefault()}>Create an account</a></p>}
-      </section>
+      </>
     );
   }
 
@@ -287,313 +399,394 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
       setResetSent(true);
     };
     return (
-      <section className="password-reset docs-studio__password-reset">
-        {values.icon === true && <LockKeyhole className="password-reset__icon" aria-hidden="true" />}
-        <h2 className="password-reset__title">{String(values.title)}</h2>
-        <p className="password-reset__text">{String(values.text)}</p>
-        {resetSent && String(values.successMessage || '') ? (
-          <div className="password-reset__success" role="status">{String(values.successMessage)}</div>
-        ) : values.form === true ? (
-          <form className="password-reset__form" onSubmit={submit}>
-            <Field id={`${id}-reset-email`} label="Email address" type="email" value={resetEmail} autoComplete="email" required onChange={setResetEmail} />
-            <button className="btn btn--full" type="submit">Send reset link</button>
-          </form>
-        ) : null}
-      </section>
+      <PasswordResetArtwork
+        id={`${id}-reset`}
+        className="docs-studio__password-reset"
+        title={String(values.title || '')}
+        text={String(values.text || '')}
+        icon={values.icon === true
+          ? <LockKeyhole className="password-reset__icon" aria-hidden="true" />
+          : undefined}
+        form={values.form === true}
+        email={resetEmail}
+        successMessage={String(values.successMessage || '')}
+        showSuccess={resetSent}
+        confirmationRef={resetConfirmationRef}
+        onEmailChange={(event) => {
+          setResetEmail(event.target.value);
+          setResetSent(false);
+        }}
+        onSubmit={submit}
+      />
     );
   }
 
   function renderDashboard() {
+    const greeting = String(values.greeting || '');
+    const hasCompleteComposition = greeting.trim().length > 0 && values.cards === true;
+
     return (
-      <section className="account-dashboard docs-studio__account-dashboard">
-        <header className="account-dashboard__header">
-          <h2 className="account-dashboard__greeting">{String(values.greeting)}</h2>
-          {values.headerActions === true && <div className="account-dashboard__actions"><button className="btn btn--outline btn--sm" type="button">Sign out</button></div>}
-        </header>
-        {values.cards === true && (
-          <div className="account-dashboard__grid">
-            {accountCards.map(({ title, description, icon: Icon }) => (
-              <article className="account-card" key={title}>
-                <Icon className="account-card__icon" aria-hidden="true" />
-                <h3 className="account-card__title">{title}</h3>
-                <p className="account-card__description">{description}</p>
-                <a className="account-card__link" href={`#${title.toLowerCase().replace(' ', '-')}`} onClick={(event) => event.preventDefault()}>View {title.toLowerCase()}</a>
-              </article>
-            ))}
-          </div>
+      <>
+        <AccountDashboardArtwork
+          id={`${id}-dashboard`}
+          className="docs-studio__account-dashboard"
+          greeting={greeting}
+          headerActions={values.headerActions === true ? (
+            <button
+              className="btn btn--outline btn--sm"
+              type="button"
+              onClick={() => setDashboardFeedback('Demo sign-out action selected. No session changed.')}
+            >
+              Sign out
+            </button>
+          ) : undefined}
+          destinations={values.cards === true ? accountCards : []}
+          onNavigate={(destination, event) => {
+            event.preventDefault();
+            setDashboardFeedback(`Demo navigation to ${destination.title} selected. No route changed.`);
+          }}
+        />
+        {hasCompleteComposition && dashboardFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {dashboardFeedback}
+          </p>
         )}
-      </section>
+      </>
     );
   }
 
   function renderOrderHistory() {
+    const hasCompleteComposition = values.orders === true;
+
     return (
-      <section className="order-list docs-studio__order-list" aria-label={String(values.label || '') || undefined}>
-        {values.orders === true && orders.map((order) => (
-          <article className="order-row" key={order.number}>
-            <a className="order-row__number" href={`#order-${order.number.slice(1)}`} onClick={(event) => event.preventDefault()}>{order.number}</a>
-            <span className="order-row__date">{order.date}</span>
-            <span className={`order-row__status order-row__status--${order.state}`}>{order.status}</span>
-            <span className="order-row__total">{order.total}</span>
-          </article>
-        ))}
-      </section>
+      <>
+        <OrderHistoryArtwork
+          className="docs-studio__order-list"
+          label={String(values.label || '')}
+          orders={hasCompleteComposition ? orders : []}
+          onNavigate={(order, event) => {
+            event.preventDefault();
+            setOrderFeedback(`Demo navigation to ${order.numberLabel} selected. No route changed.`);
+          }}
+        />
+        {hasCompleteComposition && orderFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {orderFeedback}
+          </p>
+        )}
+      </>
     );
   }
 
   function renderOrderDetail() {
-    const tracking = [
-      { label: 'Confirmed', state: 'done' },
-      { label: 'Prepared', state: 'done' },
-      { label: 'Shipped', state: 'active' },
-      { label: 'Delivered', state: '' },
-    ];
+    const title = String(values.title || '');
+    const hasCompleteComposition = title.trim().length > 0 && values.lineItems === true;
+
     return (
-      <section className="order-detail docs-studio__order-detail">
-        <header className="order-detail__header">
-          <h2 className="order-detail__title">{String(values.title)}</h2>
-          {values.meta === true && <span className="order-detail__meta">Placed July 8, 2026</span>}
-        </header>
-        {values.tracking === true && (
-          <div className="order-tracking" aria-label="Order progress">
-            {tracking.map((step) => (
-              <div
-                className={`order-tracking__step${step.state ? ` order-tracking__step--${step.state}` : ''}`}
-                aria-current={step.state === 'active' ? 'step' : undefined}
-                key={step.label}
-              >
-                <span className="order-tracking__dot" aria-hidden="true" />
-                <span className="order-tracking__label">{step.label}</span>
-              </div>
-            ))}
-          </div>
+      <>
+        <OrderDetailArtwork
+          className="docs-studio__order-detail"
+          title={title}
+          meta={values.meta === true ? (
+            <>Placed <time dateTime="2026-07-08">July 8, 2026</time></>
+          ) : undefined}
+          trackingLabel={values.tracking === true ? 'Order progress' : ''}
+          trackingItems={values.tracking === true ? orderDetailTracking : []}
+          lineItemsLabel={values.lineItems === true ? 'Purchased items' : ''}
+          lineItems={values.lineItems === true ? orderDetailLineItems : []}
+          onLineItemNavigate={(item, event) => {
+            event.preventDefault();
+            setOrderDetailFeedback(`Demo navigation to ${item.title} selected. No route changed.`);
+          }}
+        />
+        {hasCompleteComposition && orderDetailFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {orderDetailFeedback}
+          </p>
         )}
-        {values.lineItems === true && (
-          <div className="order-detail__items">
-            <article className="cart-line docs-studio__account-order-line">
-              <AccountMedia className="cart-line__image" alt="Celadon glazed stoneware vessel" />
-              <div className="cart-line__info">
-                <a className="cart-line__title" href="#product" onClick={(event) => event.preventDefault()}>Celadon Study No. 4</a>
-                <span className="cart-line__variant">Celadon / Medium</span>
-                <span className="docs-studio__account-order-quantity">Quantity 1</span>
-              </div>
-              <div className="cart-line__prices"><span className="cart-line__price">$120.00</span></div>
-            </article>
-          </div>
-        )}
-      </section>
+      </>
     );
   }
 
   function renderAddressBook() {
+    const hasCompleteComposition = values.addresses === true;
+
     return (
-      <div className="docs-studio__address-book">
-        {values.addresses === true && (
-          <section className="address-grid">
-            <article className="address-card address-card--default">
-              <span className="address-card__default-tag">Default</span>
-              <h3 className="address-card__name">Alex Morgan</h3>
-              <p className="address-card__text">18 Gallery Lane{`\n`}Buenos Aires, C1001</p>
-              <div className="address-card__actions"><button className="btn btn--link btn--sm" type="button" onClick={() => setAddressFeedback('Default address ready to edit.')}>Edit</button></div>
-            </article>
-            <article className="address-card">
-              <h3 className="address-card__name">Studio</h3>
-              <p className="address-card__text">42 Workshop Road{`\n`}Mendoza, M5500</p>
-              <div className="address-card__actions"><button className="btn btn--link btn--sm" type="button" onClick={() => setAddressFeedback('Studio address ready to edit.')}>Edit</button></div>
-            </article>
-            {String(values.newAddressLabel || '') && (
-              <button className="address-card address-card--new" type="button" onClick={() => setAddressFeedback('New address form opened.')}> <Plus aria-hidden="true" /><span>{String(values.newAddressLabel)}</span></button>
-            )}
-          </section>
+      <>
+        <AddressBookArtwork
+          className="docs-studio__address-book"
+          records={hasCompleteComposition ? addressBookRecords : []}
+          newAddressLabel={String(values.newAddressLabel || '')}
+          newAddressIcon={<Plus className="btn__icon btn__icon--leading" aria-hidden="true" />}
+          onAction={(record) => setAddressFeedback(
+            `Demo edit action for ${record.recipient} selected. No address changed.`,
+          )}
+          onNewAddress={() => setAddressFeedback(
+            'Demo add-address action selected. No form opened.',
+          )}
+        />
+        {hasCompleteComposition && addressFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {addressFeedback}
+          </p>
         )}
-        <p className="docs-studio__account-feedback" role="status" aria-live="polite">{addressFeedback}</p>
-      </div>
+      </>
     );
   }
 
   function renderAddressForm() {
-    const submit = (event: FormEvent) => {
+    const hasCompleteComposition = values.fields === true;
+    const submit = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setAddressFormFeedback('Address saved in this preview.');
+      const namedFields = [...new FormData(event.currentTarget).keys()];
+      setAddressFormFeedback(
+        `Demo submit received ${namedFields.length} named address fields. No address was saved.`,
+      );
     };
+
+    const requestFixtureCancellation = () => {
+      setAddressFormFeedback(
+        'Demo close or navigation requested. Draft values were not reset or submitted.',
+      );
+    };
+
     return (
-      <form className="address-form docs-studio__address-form" onSubmit={submit}>
-        {values.fields === true && (
-          <div className="address-form__fields">
-            <div className="address-form__row">
-              <Field id={`${id}-address-first`} label="First name" value={addressFirstName} autoComplete="given-name" required onChange={setAddressFirstName} />
-              <Field id={`${id}-address-last`} label="Last name" value={addressLastName} autoComplete="family-name" required onChange={setAddressLastName} />
-            </div>
-            <Field id={`${id}-address-line`} label="Address" value={addressLine} autoComplete="street-address" required onChange={setAddressLine} />
-            <div className="address-form__row">
-              <Field id={`${id}-address-city`} label="City" value={addressCity} autoComplete="address-level2" required onChange={setAddressCity} />
-              <div className={`select select--enhanced docs-studio__account-field${addressCountryOpen ? ' select--open' : ''}`}>
-                <label className="select__label" id={`${id}-address-country-label`} htmlFor={`${id}-address-country-trigger`}>Country</label>
-                <div className="select__control">
-                  <select
-                    className="select__field select__native"
-                    id={`${id}-address-country`}
-                    name="country"
-                    value={addressCountry}
-                    autoComplete="country-name"
-                    required
-                    tabIndex={-1}
-                    aria-hidden="true"
-                    onChange={(event) => setAddressCountry(event.target.value)}
-                  >
-                    {countries.map((country) => <option key={country}>{country}</option>)}
-                  </select>
-                  <button
-                    className="select__field select__trigger"
-                    id={`${id}-address-country-trigger`}
-                    type="button"
-                    aria-haspopup="listbox"
-                    aria-expanded={addressCountryOpen}
-                    aria-controls={`${id}-address-country-listbox`}
-                    aria-labelledby={`${id}-address-country-label`}
-                    aria-activedescendant={addressCountryOpen ? `${id}-address-country-option-${addressCountryHighlight}` : undefined}
-                    onClick={() => {
-                      setAddressCountryHighlight(countries.indexOf(addressCountry));
-                      setAddressCountryOpen((open) => !open);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Escape') {
-                        setAddressCountryOpen(false);
-                        return;
-                      }
-                      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                        event.preventDefault();
-                        const direction = event.key === 'ArrowDown' ? 1 : -1;
-                        setAddressCountryOpen(true);
-                        setAddressCountryHighlight((current) => (current + direction + countries.length) % countries.length);
-                        return;
-                      }
-                      if ((event.key === 'Enter' || event.key === ' ') && addressCountryOpen) {
-                        event.preventDefault();
-                        setAddressCountry(countries[addressCountryHighlight]);
-                        setAddressCountryOpen(false);
-                      }
-                    }}
-                  >
-                    <span className="select__value">{addressCountry}</span>
-                    <ChevronDown className="select__indicator" aria-hidden="true" />
-                  </button>
-                  <div
-                    className="select__listbox"
-                    id={`${id}-address-country-listbox`}
-                    role="listbox"
-                    aria-labelledby={`${id}-address-country-label`}
-                    hidden={!addressCountryOpen}
-                  >
-                    {countries.map((country, index) => (
-                      <div
-                        className="select__option"
-                        id={`${id}-address-country-option-${index}`}
-                        key={country}
-                        role="option"
-                        tabIndex={-1}
-                        aria-selected={country === addressCountry}
-                        data-highlighted={index === addressCountryHighlight || undefined}
-                        onPointerMove={() => setAddressCountryHighlight(index)}
-                        onClick={() => {
-                          setAddressCountry(country);
-                          setAddressCountryOpen(false);
-                        }}
-                      >
-                        <span className="select__option-label">{country}</span>
-                        <Check className="select__option-check" aria-hidden="true" />
-                      </div>
-                    ))}
+      <>
+        <AddressFormArtwork
+          className="docs-studio__address-form"
+          onSubmit={submit}
+          fields={hasCompleteComposition ? (
+            <>
+              <div className="form__row form__row--2col address-form__row">
+                <InputArtwork
+                  className="docs-studio__account-field"
+                  id={`${id}-address-first`}
+                  label="First name"
+                  name="givenName"
+                  value={addressFirstName}
+                  autoComplete="given-name"
+                  required
+                  onChange={(event) => setAddressFirstName(event.target.value)}
+                />
+                <InputArtwork
+                  className="docs-studio__account-field"
+                  id={`${id}-address-last`}
+                  label="Last name"
+                  name="familyName"
+                  value={addressLastName}
+                  autoComplete="family-name"
+                  required
+                  onChange={(event) => setAddressLastName(event.target.value)}
+                />
+              </div>
+              <InputArtwork
+                className="docs-studio__account-field"
+                id={`${id}-address-line`}
+                label="Address"
+                name="addressLine1"
+                value={addressLine}
+                autoComplete="address-line1"
+                required
+                onChange={(event) => setAddressLine(event.target.value)}
+              />
+              <div className="form__row form__row--2col address-form__row">
+                <InputArtwork
+                  className="docs-studio__account-field"
+                  id={`${id}-address-city`}
+                  label="City"
+                  name="city"
+                  value={addressCity}
+                  autoComplete="address-level2"
+                  required
+                  onChange={(event) => setAddressCity(event.target.value)}
+                />
+                <div className="select docs-studio__account-field">
+                  <label className="select__label" htmlFor={`${id}-address-country`}>Country</label>
+                  <div className="select__control">
+                    <select
+                      className="select__field"
+                      id={`${id}-address-country`}
+                      name="country"
+                      value={addressCountry}
+                      autoComplete="country-name"
+                      required
+                      onChange={(event) => setAddressCountry(event.target.value)}
+                    >
+                      <option value="">Choose a country</option>
+                      {countries.map((country) => (
+                        <option value={country} key={country}>{country}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          ) : null}
+          actions={values.actions === true ? (
+            <>
+              <button className="btn btn--outline" type="button" onClick={requestFixtureCancellation}>
+                Cancel
+              </button>
+              <button className="btn" type="submit">Save address</button>
+            </>
+          ) : null}
+        />
+        {hasCompleteComposition && addressFormFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {addressFormFeedback}
+          </p>
         )}
-        {values.actions === true && <div className="address-form__actions"><button className="btn btn--outline" type="button" onClick={() => setAddressFormFeedback('Changes discarded in this preview.')}>Cancel</button><button className="btn" type="submit">Save address</button></div>}
-        <p className="docs-studio__account-feedback" role="status" aria-live="polite">{addressFormFeedback}</p>
-      </form>
+      </>
     );
   }
 
   function renderWishlist() {
-    const savedCount = savedProducts.filter(Boolean).length;
-    const displayCount = wishlistTouched ? `${savedCount} ${savedCount === 1 ? 'item' : 'items'}` : String(values.count || '');
     return (
-      <section className="wishlist docs-studio__wishlist">
-        <header className="wishlist__header"><h2 className="wishlist__title">{String(values.title)}</h2>{displayCount && <span className="wishlist__count" aria-live="polite">{displayCount}</span>}</header>
-        {values.products === true && (
-          <div className="wishlist__grid">
-            {wishlistProducts.map((product, index) => (
-              <article className="product-card docs-studio__wishlist-product" key={product.title}>
-                <div className="product-card__media">
-                  <AccountMedia className="product-card__image" alt={`${product.title} artwork fixture`} />
+      <>
+        <WishlistArtwork
+          className="docs-studio__wishlist"
+          title={String(values.title || '')}
+          titleId={`${id}-wishlist-title`}
+          count={String(values.count || '')}
+          products={values.products === true ? wishlistProducts.map((product, index) => (
+            <li
+              className="wishlist__item"
+              key={product.variantId}
+              data-saved-product-id={product.productId}
+              data-saved-variant-id={product.variantId}
+            >
+              <ProductCardArtwork
+                title={product.title}
+                href="#product"
+                imageAlt={`${product.title}, ${product.selection}, ceramic artwork fixture`}
+                mediaIndex={index + 1}
+                vendor={product.vendor}
+                subtitle={product.selection}
+                badgeLabel={product.availabilityLabel}
+                currentPrice={product.price}
+                className="docs-studio__product-card docs-studio__wishlist-product"
+                footerAction={(
                   <button
-                    className="wishlist-btn docs-studio__wishlist-toggle"
+                    className="btn btn--outline btn--sm"
                     type="button"
-                    aria-label={`${savedProducts[index] ? 'Remove' : 'Save'} ${product.title}`}
-                    aria-pressed={savedProducts[index]}
-                    onClick={() => {
-                      setSavedProducts((current) => current.map((saved, itemIndex) => itemIndex === index ? !saved : saved));
-                      setWishlistTouched(true);
-                    }}
+                    aria-label={`Remove ${product.title}, ${product.selection}, from saved works`}
+                    onClick={() => setWishlistFeedback(
+                      `Demo removal requested for ${product.title}, ${product.selection}. No saved item was changed.`,
+                    )}
                   >
-                    <Heart fill={savedProducts[index] ? 'currentColor' : 'none'} aria-hidden="true" />
+                    Remove
                   </button>
-                </div>
-                <div className="product-card__body">
-                  <span className="product-card__vendor">{product.vendor}</span>
-                  <h3 className="product-card__title"><a href="#product" onClick={(event) => event.preventDefault()}>{product.title}</a></h3>
-                </div>
-                <div className="product-card__footer"><span className="price"><span className="price__current">{product.price}</span></span></div>
-              </article>
-            ))}
-          </div>
+                )}
+              />
+            </li>
+          )) : null}
+          emptyState={values.emptyState === true ? (
+            <EmptyStateArtwork
+              className="docs-studio__wishlist-empty"
+              title="No saved works yet"
+              titleElement="h3"
+              message="Explore the collection and save works to return to later."
+              icon={<Heart />}
+              action={<a className="btn btn--outline" href="/components/product-card">Explore works</a>}
+            />
+          ) : undefined}
+        />
+        {wishlistFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {wishlistFeedback}
+          </p>
         )}
-      </section>
+      </>
     );
   }
 
   function renderSettings() {
-    const submit = (event: FormEvent) => {
+    const submitProfile = (event: FormEvent) => {
       event.preventDefault();
-      setSettingsFeedback('Settings saved in this preview.');
+      setSettingsFeedback('Demo profile submission received. No account settings were saved.');
     };
+
     return (
-      <form className="account-settings docs-studio__account-settings" onSubmit={submit}>
-        {values.sections === true && (
-          <>
-            <section className="account-settings__section">
-              <h2 className="account-settings__section-title">Profile</h2>
-              <p className="account-settings__section-description">Update the details used across your account.</p>
-              <div className="docs-studio__account-settings-fields">
-                <Field id={`${id}-settings-name`} label="Name" value={profileName} autoComplete="name" onChange={setProfileName} />
-                <Field id={`${id}-settings-email`} label="Email address" type="email" value={profileEmail} autoComplete="email" onChange={setProfileEmail} />
-              </div>
-            </section>
-            <section className="account-settings__section">
-              <h2 className="account-settings__section-title">Notifications</h2>
-              <p className="account-settings__section-description">Choose how you receive order and collection updates.</p>
-              <div className="docs-studio__account-switches">
-                <label className="switch">
-                  <input className="switch__input" type="checkbox" role="switch" checked={emailUpdates} onChange={(event) => setEmailUpdates(event.target.checked)} />
-                  <span className="switch__track" aria-hidden="true"><span className="switch__thumb" /></span>
-                  <span className="switch__label"><Bell aria-hidden="true" />Email updates</span>
-                </label>
-                <label className="switch">
-                  <input className="switch__input" type="checkbox" role="switch" checked={smsUpdates} onChange={(event) => setSmsUpdates(event.target.checked)} />
-                  <span className="switch__track" aria-hidden="true"><span className="switch__thumb" /></span>
-                  <span className="switch__label"><ShieldCheck aria-hidden="true" />Security messages</span>
-                </label>
-              </div>
-            </section>
-            <section className="account-settings__section docs-studio__account-settings-actions">
-              <button className="btn" type="submit">Save changes</button>
-              <span className="docs-studio__account-feedback" role="status" aria-live="polite">{settingsFeedback}</span>
-            </section>
-          </>
+      <>
+        <AccountSettingsArtwork
+          sections={values.sections === true ? (
+            <>
+              <AccountSettingsSectionArtwork
+                id={`${id}-settings-profile`}
+                title="Profile"
+                description="Update the details used across your account."
+              >
+                <form className="form" autoComplete="on" onSubmit={submitProfile}>
+                  <div className="form__row" data-columns="one">
+                    <InputArtwork
+                      id={`${id}-settings-name`}
+                      label="Name"
+                      name="displayName"
+                      value={profileName}
+                      autoComplete="name"
+                      onChange={(event) => setProfileName(event.target.value)}
+                    />
+                    <InputArtwork
+                      id={`${id}-settings-email`}
+                      label="Email address"
+                      type="email"
+                      name="email"
+                      value={profileEmail}
+                      autoComplete="email"
+                      onChange={(event) => setProfileEmail(event.target.value)}
+                    />
+                  </div>
+                  <div className="form__actions">
+                    <button className="btn" type="submit" name="intent" value="update-profile">
+                      Update profile
+                    </button>
+                  </div>
+                </form>
+              </AccountSettingsSectionArtwork>
+              <AccountSettingsSectionArtwork
+                id={`${id}-settings-display`}
+                title="Display"
+                description="These demo display preferences take effect immediately and are not consent records."
+              >
+                <div
+                  className="account-settings__controls"
+                  role="group"
+                  aria-labelledby={`${id}-settings-display-title`}
+                  aria-describedby={`${id}-settings-display-description`}
+                >
+                  <SwitchArtwork
+                    id={`${id}-settings-compact-layout`}
+                    label="Compact account layout"
+                    name="compactAccountLayout"
+                    value="enabled"
+                    checked={compactAccountLayout}
+                    onChange={(event) => {
+                      setCompactAccountLayout(event.target.checked);
+                      setSettingsFeedback('Demo compact-layout change requested. No account setting was saved.');
+                    }}
+                  />
+                  <SwitchArtwork
+                    id={`${id}-settings-order-thumbnails`}
+                    label="Show order thumbnails"
+                    name="orderThumbnails"
+                    value="enabled"
+                    checked={orderThumbnails}
+                    onChange={(event) => {
+                      setOrderThumbnails(event.target.checked);
+                      setSettingsFeedback('Demo order-thumbnail change requested. No account setting was saved.');
+                    }}
+                  />
+                </div>
+              </AccountSettingsSectionArtwork>
+            </>
+          ) : null}
+        />
+        {settingsFeedback && (
+          <p className="docs-studio__account-feedback" role="status" aria-live="polite">
+            {settingsFeedback}
+          </p>
         )}
-      </form>
+      </>
     );
   }
 
@@ -621,7 +814,16 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
           stateValue="default"
           tokenValues={tokenValues}
           activeTokens={activeTokens}
-          onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))}
+          onPropertiesChange={(next) => {
+            setValues((current) => ({ ...current, ...next }));
+            if (contract.slug === 'account-dashboard') setDashboardFeedback('');
+            if (contract.slug === 'order-history') setOrderFeedback('');
+            if (contract.slug === 'order-detail') setOrderDetailFeedback('');
+            if (contract.slug === 'address-book') setAddressFeedback('');
+            if (contract.slug === 'address-form') setAddressFormFeedback('');
+            if (contract.slug === 'wishlist') setWishlistFeedback('');
+            if (contract.slug === 'account-settings') setSettingsFeedback('');
+          }}
           onSlotIconChange={() => undefined}
           onStateChange={() => undefined}
           onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))}

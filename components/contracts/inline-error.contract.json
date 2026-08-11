@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "inline-error",
   "name": "Inline Error",
   "registryId": "H12",
   "category": "forms",
   "status": "pilot",
-  "summary": "Inline field-level error contract with error surface, optional icon, live-region guidance, and control association requirements.",
+  "summary": "Text-first field error message with a required message node, optional decorative icon, explicit static/dynamic announcement policy, and control-association requirements.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/inline-error",
@@ -23,6 +23,13 @@
       "className": ".inline-error",
       "required": true,
       "description": "Inline validation error message wrapper."
+    },
+    {
+      "name": "message",
+      "selector": ".inline-error__message",
+      "className": ".inline-error__message",
+      "required": true,
+      "description": "Visible text identifying the error and, when known, how to correct it."
     },
     {
       "name": "icon",
@@ -52,7 +59,17 @@
     {
       "name": "default",
       "selectors": [".inline-error"],
-      "description": "Error message is visible."
+      "description": "Static associated error text with no automatic live announcement."
+    },
+    {
+      "name": "politeAnnouncement",
+      "selectors": [".inline-error[role=\"status\"]", ".inline-error[aria-live=\"polite\"]"],
+      "description": "Routine dynamically updated feedback is announced without interrupting the current task."
+    },
+    {
+      "name": "assertiveAnnouncement",
+      "selectors": [".inline-error[role=\"alert\"]", ".inline-error[aria-live=\"assertive\"]"],
+      "description": "Urgent dynamically inserted feedback may interrupt the current announcement."
     }
   ],
   "behavior": [
@@ -65,8 +82,8 @@
     {
       "name": "announcement",
       "selectors": [".inline-error"],
-      "attributes": ["role=\"alert\"", "aria-live=\"polite\""],
-      "description": "Targets should announce newly inserted error messages without interrupting unrelated interaction."
+      "attributes": ["role=\"status\"", "role=\"alert\"", "aria-live=\"polite\"", "aria-live=\"assertive\"", "aria-atomic=\"true\""],
+      "description": "Static messages default to no live role. Targets deliberately choose polite or assertive announcement for dynamic feedback and own the live-region lifecycle."
     },
     {
       "name": "iconSemantics",
@@ -76,9 +93,9 @@
     }
   ],
   "properties": [
-    { "name": "message", "type": "string", "required": true, "description": "Visible error message associated with an invalid field.", "targetMappings": { "web": [{ "kind": "content", "selector": ".inline-error" }] } },
+    { "name": "message", "type": "string", "required": true, "description": "Visible text identifying the invalid field's error and, when known, how to correct it.", "targetMappings": { "web": [{ "kind": "content", "selector": ".inline-error__message" }] } },
     { "name": "icon", "type": "slot", "required": false, "description": "Optional decorative error icon that does not replace the message.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".inline-error__icon", "classNames": [".inline-error__icon"] }] } },
-    { "name": "announcement", "type": "enum", "required": false, "values": ["none", "polite", "assertive"], "defaultValue": "polite", "description": "Live-announcement priority when the message is inserted dynamically.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".inline-error", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } }, { "kind": "attribute", "selector": ".inline-error", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } }] } }
+    { "name": "announcement", "type": "enum", "required": false, "values": ["none", "polite", "assertive"], "defaultValue": "none", "description": "Explicit live-announcement priority for dynamically inserted or updated feedback; static associated errors remain none.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".inline-error", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } }, { "kind": "attribute", "selector": ".inline-error", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } }] } }
   ],
   "tokens": {
     "public": {
@@ -90,7 +107,11 @@
         "--radius-sm"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-sm-line-height"
+      ],
+      "spacing": [
+        "--space-input-label-size"
       ]
     }
   },
@@ -98,14 +119,16 @@
     "Use text, not icon or color alone, to explain the error.",
     "Associate the message with the invalid control using aria-describedby.",
     "Set aria-invalid=\"true\" on the invalid control.",
-    "Announce dynamically inserted errors with a polite live region or equivalent target behavior.",
-    "Keep decorative icons hidden from assistive technology."
+    "Default static errors to no live role when the invalid control already references the message.",
+    "Use polite announcement for routine dynamic feedback and assertive only when interruption is necessary.",
+    "Keep decorative icons hidden from assistive technology.",
+    "Reject empty messages; icon and color never replace explanatory text."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; announcement and form-control association are target responsibilities."
+      "notes": "Implemented by class composition in components/css/forms.css with no runtime; association, insertion timing, and live-region lifecycle remain target responsibilities."
     },
     "shopify": {
       "status": "implemented",

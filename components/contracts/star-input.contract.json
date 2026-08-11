@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "star-input",
   "name": "Star Rating (Interactive)",
   "registryId": "V3",
   "category": "reviews",
   "status": "pilot",
-  "summary": "Native radio group for choosing one integer rating from one through five.",
+  "summary": "Native ascending radio group for choosing one integer rating from one through five with symmetric validation presentation.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/star-input",
@@ -29,6 +29,13 @@
       "description": "Visible group question, preferably rendered as the fieldset legend."
     },
     {
+      "name": "choices",
+      "selector": ".star-input__choices",
+      "className": ".star-input__choices",
+      "required": true,
+      "description": "Fixed one-through-five visual row that preserves the native ascending DOM and keyboard order."
+    },
+    {
       "name": "choice",
       "selector": ".star-input__label",
       "className": ".star-input__label",
@@ -43,11 +50,18 @@
       "description": "Visually hidden native radio that retains focus, keyboard, validation, reset, and form-submission behavior."
     },
     {
+      "name": "choiceLabel",
+      "selector": ".star-input__label-text",
+      "className": ".star-input__label-text",
+      "required": true,
+      "description": "Localized text content that gives each native radio a readable one-through-five choice name while remaining visually hidden in the star treatment."
+    },
+    {
       "name": "indicator",
       "selector": ".star-input__indicator",
       "className": ".star-input__indicator",
-      "required": false,
-      "description": "Optional decorative star icon inside a choice label."
+      "required": true,
+      "description": "Decorative outline-or-fill star icon inside a choice label; icon source and path remain target-owned."
     }
   ],
   "properties": [
@@ -88,6 +102,18 @@
       }
     },
     {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation selected independently from the checked rating value.",
+      "targetMappings": {
+        "web": [
+          { "kind": "optionClass", "selector": ".star-input", "source": "variants" }
+        ]
+      }
+    },
+    {
       "name": "required",
       "type": "boolean",
       "required": false,
@@ -107,7 +133,7 @@
       "description": "Makes every native radio choice unavailable.",
       "targetMappings": {
         "web": [
-          { "kind": "attribute", "selector": ".star-input__radio", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }
+          { "kind": "attribute", "selector": ".star-input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }
         ]
       }
     },
@@ -124,7 +150,10 @@
     }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default native radio-group rating input." }
+    { "name": "default", "className": null, "default": true, "description": "Default native radio-group rating input." },
+    { "name": "error", "className": ".star-input--error", "default": false, "description": "Invalid rating presentation paired with aria-invalid and associated feedback." },
+    { "name": "success", "className": ".star-input--success", "default": false, "description": "Accepted rating presentation paired with associated feedback." },
+    { "name": "warning", "className": ".star-input--warning", "default": false, "description": "Rating requiring attention, paired with associated feedback." }
   ],
   "sizes": [
     { "name": "default", "className": null, "default": true, "description": "Default 28px star icon inside the existing touch-target token." }
@@ -149,7 +178,13 @@
       "name": "disabled",
       "selectors": [".star-input__label:has(.star-input__radio:disabled)"],
       "description": "Unavailable native rating choice."
-    }
+    },
+    { "name": "error", "selectors": [".star-input--error"], "description": "Invalid rating group; visual treatment is reinforced by associated feedback and aria-invalid." },
+    { "name": "success", "selectors": [".star-input--success"], "description": "Accepted rating group; visual treatment is reinforced by associated feedback." },
+    { "name": "warning", "selectors": [".star-input--warning"], "description": "Rating group requiring attention; visual treatment is reinforced by associated feedback." },
+    { "name": "errorFocusVisible", "selectors": [".star-input--error .star-input__label:has(.star-input__radio:focus-visible)"], "description": "Focused Error choice with the matching outer validation ring." },
+    { "name": "successFocusVisible", "selectors": [".star-input--success .star-input__label:has(.star-input__radio:focus-visible)"], "description": "Focused Success choice with the matching outer validation ring." },
+    { "name": "warningFocusVisible", "selectors": [".star-input--warning .star-input__label:has(.star-input__radio:focus-visible)"], "description": "Focused Warning choice with the matching outer validation ring." }
   ],
   "behavior": [
     {
@@ -157,20 +192,48 @@
       "selectors": [".star-input__radio"],
       "attributes": ["type=\"radio\"", "name", "value", "checked", "required", "disabled"],
       "events": ["change"],
-      "description": "Five native radios share one name and retain browser selection, arrow-key movement, validation, form reset, and submission semantics."
+      "description": "Five native radios appear in ascending one-through-five DOM and visual order, share one name, and retain browser selection, arrow-key movement, validation, form reset, and submission semantics."
     },
     {
       "name": "choiceLabels",
-      "selectors": [".star-input__label"],
-      "description": "Each choice has a readable label such as 4 stars; the decorative indicator does not replace that name."
+      "selectors": [".star-input__label", ".star-input__label-text"],
+      "description": "Each choice contains localized text such as 4 stars; the decorative indicator does not replace that name and CSS-disabled output retains readable content."
+    },
+    {
+      "name": "validationSemantics",
+      "selectors": [".star-input--error", ".star-input--success", ".star-input--warning"],
+      "attributes": ["aria-invalid=\"true\" only for Error", "aria-describedby references visible feedback owned by the containing form composition"],
+      "description": "Error, Success, and Warning cover legend, choice outlines/fills, hover, and focus while associated text keeps validation from relying on color alone."
+    },
+    {
+      "name": "selectionOwnership",
+      "selectors": [".star-input__radio"],
+      "attributes": ["checked establishes default checkedness in static HTML", "one controlled group value in framework adapters"],
+      "events": ["input", "change", "form reset"],
+      "description": "Static Web delegates live selection to the native named group; controlled adapters own one group value and update it through change rather than controlling five independent booleans."
     }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-button-primary-bg-default", "--color-border-focus", "--color-text-primary"],
-      "spacing": ["--space-layout-touch-target"],
+      "color": [
+        "--color-input-default-unfocused-inner-border",
+        "--color-input-default-hover-inner-border",
+        "--color-input-default-focused-outer-border",
+        "--color-input-error-unfocused-inner-border",
+        "--color-input-error-unfocused-label",
+        "--color-input-error-focused-outer-border",
+        "--color-input-success-unfocused-inner-border",
+        "--color-input-success-unfocused-label",
+        "--color-input-success-focused-outer-border",
+        "--color-input-warning-unfocused-inner-border",
+        "--color-input-warning-unfocused-label",
+        "--color-input-warning-focused-outer-border",
+        "--color-button-primary-bg-default",
+        "--color-text-primary"
+      ],
+      "spacing": ["--space-layout-touch-target", "--space-input-icon-gap"],
       "radius": ["--radius-sm"],
-      "typography": ["--typo-body-sm-size"],
+      "typography": ["--typo-body-sm-size", "--typo-body-sm-line-height"],
       "motion": ["--motion-transition-micro"],
       "opacity": ["--opacity-disabled"]
     }
@@ -178,8 +241,11 @@
   "accessibility": [
     "Use one native radio group with a visible legend or equivalent group label.",
     "Give every radio a readable choice label such as 1 star or 5 stars.",
+    "Keep native and visual choice order ascending from one through five; do not use CSS direction reversal to reorder the radio group.",
     "Preserve native keyboard selection, validation, form reset, and submission behavior.",
     "Keep the native radio focusable and project focus-visible styling onto the touch-sized label.",
+    "Error uses aria-invalid and associated feedback; Success and Warning use associated feedback without aria-invalid, and hover/focus preserve the active validation family.",
+    "Static Web should use native checked default state; framework adapters should use either one controlled value plus change handling or an uncontrolled default, never five independent checked booleans.",
     "Use Star Rating instead when the value is read-only."
   ],
   "adapters": {

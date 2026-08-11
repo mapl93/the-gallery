@@ -1,0 +1,84 @@
+{% doc %}
+Renders the canonical Image with Text composition for Shopify section adapters.
+
+@param {image} image - Required Shopify image resource.
+@param {boolean} image_decorative - Whether the image is decorative.
+@param {string} image_alt - Explicit image alternative text.
+@param {string} eyebrow - Optional editorial label.
+@param {string} title - Required visible section heading.
+@param {string} body - Required sanitized rich-text content.
+@param {string} heading_id - Required target-unique heading id.
+@param {string} presentation - Canonical presentation name.
+@param {string} image_sizes - Responsive image sizes value.
+@param {string} action_label - Optional action label.
+@param {string} action_url - Optional action destination.
+@param {string} after_body - Optional target-owned markup after the narrative.
+@param {string} root_classes - Optional contextual classes on the canonical root.
+
+@example
+{% render 'image-text-composition', image: section.settings.image, title: section.settings.title, body: section.settings.body, heading_id: heading_id %}
+{% enddoc %}
+
+{% liquid
+  assign resolved_alt = image_alt | strip
+  if resolved_alt == blank and image != blank
+    assign resolved_alt = image.alt | strip
+  endif
+  if image_decorative
+    assign resolved_alt = ''
+  endif
+
+  assign resolved_title = title | strip
+  assign resolved_body = body | strip_html | strip
+  assign resolved_presentation = presentation | default: 'default'
+  case resolved_presentation
+    when 'reversed', 'stacked', 'overlay', 'offset'
+    else
+      assign resolved_presentation = 'default'
+  endcase
+
+  assign resolved_sizes = image_sizes | default: '(min-width: 768px) 50vw, 100vw'
+  assign resolved_root_classes = root_classes | strip
+  assign resolved_action_label = action_label | strip
+  assign has_image_semantics = false
+  if image_decorative or resolved_alt != blank
+    assign has_image_semantics = true
+  endif
+  assign has_action = false
+  if resolved_action_label != blank and action_url != blank
+    assign has_action = true
+  endif
+%}
+
+{% if image != blank and has_image_semantics and resolved_title != blank and resolved_body != blank and heading_id != blank %}
+  <section
+    class="image-text{% if resolved_root_classes != blank %} {{ resolved_root_classes | escape }}{% endif %}{% unless resolved_presentation == 'default' %} image-text--{{ resolved_presentation }}{% endunless %}"
+    aria-labelledby="{{ heading_id }}"
+  >
+    <div class="image-text__media">
+      {{ image | image_url: width: 1920 | image_tag:
+        alt: resolved_alt,
+        loading: 'lazy',
+        widths: '360, 540, 720, 960, 1200, 1440, 1920',
+        sizes: resolved_sizes
+      }}
+    </div>
+
+    <div class="image-text__content">
+      {% if eyebrow != blank %}
+        <p class="image-text__eyebrow">{{ eyebrow | escape }}</p>
+      {% endif %}
+
+      <h2 class="image-text__title" id="{{ heading_id }}">{{ resolved_title | escape }}</h2>
+      <div class="image-text__body">{{ body }}</div>
+
+      {% if after_body != blank %}
+        {{ after_body }}
+      {% endif %}
+
+      {% if has_action %}
+        <a class="image-text__cta btn" href="{{ action_url }}">{{ resolved_action_label | escape }}</a>
+      {% endif %}
+    </div>
+  </section>
+{% endif %}

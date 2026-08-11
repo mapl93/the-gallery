@@ -1,0 +1,131 @@
+{% liquid
+  assign section_title = section.settings.title | strip
+  assign heading_id = 'Multicolumn-' | append: section.id | append: '-Title'
+  assign valid_item_count = 0
+
+  for block in section.blocks
+    assign item_title = block.settings.title | strip
+    assign item_text = block.settings.text | strip
+    if item_title != blank or item_text != blank
+      assign valid_item_count = valid_item_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if valid_item_count > 0 %}
+  {% if section_title != blank %}
+    <section class="multicolumn" aria-labelledby="{{ heading_id }}">
+  {% else %}
+    <div class="multicolumn">
+  {% endif %}
+    {% if section_title != blank %}
+      <div class="multicolumn__header">
+        <h2 class="multicolumn__title" id="{{ heading_id }}">{{ section_title | escape }}</h2>
+      </div>
+    {% endif %}
+
+    <ul class="multicolumn__grid">
+      {% for block in section.blocks %}
+        {% liquid
+          assign item_title = block.settings.title | strip
+          assign item_text = block.settings.text | strip
+          assign item_alt = block.settings.image_alt | strip
+          if item_alt == blank and block.settings.image != blank
+            assign item_alt = block.settings.image.alt | strip
+          endif
+          if block.settings.image_decorative
+            assign item_alt = ''
+          endif
+
+          assign has_image_semantics = false
+          if block.settings.image_decorative or item_alt != blank
+            assign has_image_semantics = true
+          endif
+        %}
+
+        {% if item_title != blank or item_text != blank %}
+          <li class="multicolumn__item" {{ block.shopify_attributes }}>
+            {% if block.settings.image != blank and has_image_semantics %}
+              {{ block.settings.image | image_url: width: 192 | image_tag:
+                alt: item_alt,
+                class: 'multicolumn__icon',
+                loading: 'lazy',
+                widths: '48, 96, 144, 192',
+                sizes: '48px'
+              }}
+            {% endif %}
+
+            {% if item_title != blank %}
+              <h3 class="multicolumn__item-title">{{ item_title | escape }}</h3>
+            {% endif %}
+
+            {% if item_text != blank %}
+              <p class="multicolumn__item-text">{{ item_text | escape }}</p>
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% if section_title != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.multicolumn.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.multicolumn.settings.title"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "t:sections.multicolumn.blocks.item.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.multicolumn.blocks.item.settings.image"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_decorative",
+          "label": "t:sections.multicolumn.blocks.item.settings.image_decorative",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "t:sections.multicolumn.blocks.item.settings.image_alt"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.multicolumn.blocks.item.settings.title"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "t:sections.multicolumn.blocks.item.settings.text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.multicolumn.name",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

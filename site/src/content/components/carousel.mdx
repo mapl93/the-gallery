@@ -1,28 +1,36 @@
 ## Overview
 
-Horizontal scroll carousel with snap, nav buttons, and dots.
+Finite, user-controlled native scroll-snap carousel with named slides, canonical Icon Button navigation, synchronized pagination, and a polite position status.
 
 ## Presentation
 
-<Preview html={"<div class=\"carousel tg-preview-carousel\" aria-label=\"Artwork studies\"><div class=\"carousel__track\" tabindex=\"0\"><div class=\"carousel__slide tg-preview-carousel-slide\" aria-label=\"1 of 3: Celadon study\">Celadon study</div></div><div class=\"carousel__nav carousel__nav--prev\"><button class=\"carousel__nav-btn\" type=\"button\" aria-label=\"Previous slide\" disabled>←</button></div><div class=\"carousel__nav carousel__nav--next\"><button class=\"carousel__nav-btn\" type=\"button\" aria-label=\"Next slide\">→</button></div><div class=\"carousel__dots\" aria-label=\"Choose slide\"><button class=\"carousel__dot carousel__dot--active\" type=\"button\" aria-label=\"Go to Celadon study\" aria-current=\"true\"></button><button class=\"carousel__dot\" type=\"button\" aria-label=\"Go to Ash glaze study\"></button><button class=\"carousel__dot\" type=\"button\" aria-label=\"Go to Porcelain study\"></button></div></div>"} label="Carousel / Slider" />
+<Preview html={"<div class=\"carousel tg-preview-carousel\" role=\"region\" aria-roledescription=\"carousel\" aria-label=\"Artwork studies\"><div class=\"carousel__track\" id=\"artwork-slides\" tabindex=\"0\" aria-label=\"Artwork slides\"><article class=\"carousel__slide tg-preview-carousel-slide\" role=\"group\" aria-roledescription=\"slide\" aria-label=\"1 of 3: Celadon study\">Celadon study</article><article class=\"carousel__slide tg-preview-carousel-slide\" role=\"group\" aria-roledescription=\"slide\" aria-label=\"2 of 3: Ash glaze study\">Ash glaze study</article><article class=\"carousel__slide tg-preview-carousel-slide\" role=\"group\" aria-roledescription=\"slide\" aria-label=\"3 of 3: Porcelain study\">Porcelain study</article></div><div class=\"carousel__nav carousel__nav--prev\"><button class=\"icon-btn icon-btn--round carousel__nav-btn\" type=\"button\" aria-label=\"Previous slide\" aria-controls=\"artwork-slides\" disabled>←</button></div><div class=\"carousel__nav carousel__nav--next\"><button class=\"icon-btn icon-btn--round carousel__nav-btn\" type=\"button\" aria-label=\"Next slide\" aria-controls=\"artwork-slides\">→</button></div><div class=\"carousel__dots\" aria-label=\"Choose slide\"><button class=\"carousel__dot carousel__dot--active\" type=\"button\" aria-label=\"Go to Celadon study\" aria-controls=\"artwork-slides\" aria-current=\"true\"></button><button class=\"carousel__dot\" type=\"button\" aria-label=\"Go to Ash glaze study\" aria-controls=\"artwork-slides\"></button><button class=\"carousel__dot\" type=\"button\" aria-label=\"Go to Porcelain study\" aria-controls=\"artwork-slides\"></button></div><p class=\"carousel__status visually-hidden\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">1 of 3: Celadon study</p></div>"} label="Carousel / Slider" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use carousel when users need to browse a compact set of related slides.</Do>
-  <Dont>Don't hide essential content only inside a carousel.</Dont>
+  <Do>Use carousel for a small, finite set of related content that remains directly scrollable.</Do>
+  <Dont>Don't hide essential content only inside a carousel or add autoplay, loop, or root-wide arrow interception without a new product decision.</Dont>
 </DoDont>
 
 ## Accessibility
 
 <Callout type="warning">
-  Auto-advancing carousels need pause controls and must respect reduced motion preferences.
+  v1 is user-controlled and finite. Autoplay would require an explicit pause control and a new accepted contract decision.
 </Callout>
 
-- Give previous, next, and dot controls accessible names.
-- Keep the active dot synchronized with `aria-current="true"`.
-- Ensure slide content and controls are reachable by keyboard.
+- Name the carousel region and expose every slide as a named group with its position in the set.
+- Give previous, next, and dot controls accessible names and connect them to the track.
+- Keep visible slide, `aria-current`, disabled bounds, and polite status synchronized after buttons, dots, touch, wheel, or native keyboard scrolling.
+- Leave arrow keys with the focused scroll viewport or descendant content; do not intercept them at the carousel root.
+- Use logical placement for RTL and remove authored smooth motion under reduced motion.
 - All images must have descriptive `alt` text.
+
+### Dependencies
+
+This component uses:
+
+- [Icon Button](/components/icon-button)
 
 ## References
 
@@ -39,4 +47,5 @@ Horizontal scroll carousel with snap, nav buttons, and dots.
   <tr><td>`.carousel__dots`</td><td>element</td><td>—</td><td>Slide pagination wrapper</td></tr>
   <tr><td>`.carousel__dot`</td><td>element</td><td>`aria-current`</td><td>Slide pagination dot</td></tr>
   <tr><td>`.carousel__dot--active`</td><td>modifier</td><td>—</td><td>Active dot state</td></tr>
+  <tr><td>`.carousel__status`</td><td>element</td><td>`role="status"`</td><td>Optional synchronized position announcement</td></tr>
 </PropTable>

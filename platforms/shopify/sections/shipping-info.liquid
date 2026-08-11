@@ -1,0 +1,80 @@
+{% liquid
+  assign valid_item_count = 0
+
+  for block in section.blocks
+    assign item_label = block.settings.label | strip
+    if block.type == 'item' and item_label != blank
+      assign valid_item_count = valid_item_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if valid_item_count > 0 %}
+  <ul class="shipping-info" role="list">
+    {% for block in section.blocks %}
+      {% liquid
+        assign item_label = block.settings.label | strip
+        assign item_text = block.settings.text | strip
+      %}
+
+      {% if block.type == 'item' and item_label != blank %}
+        <li class="shipping-info__item" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            {{ block.settings.image | image_url: width: 160 | image_tag:
+              alt: '',
+              class: 'shipping-info__icon',
+              loading: 'lazy',
+              widths: '40, 80, 120, 160',
+              sizes: '40px'
+            }}
+          {% endif %}
+
+          <p class="shipping-info__label">{{ item_label | escape }}</p>
+
+          {% if item_text != blank %}
+            <p class="shipping-info__text">{{ item_text | escape }}</p>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.shipping_info.name",
+  "blocks": [
+    {
+      "type": "item",
+      "name": "t:sections.shipping_info.blocks.item.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.shipping_info.blocks.item.settings.image"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:sections.shipping_info.blocks.item.settings.label"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "t:sections.shipping_info.blocks.item.settings.text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.shipping_info.name",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

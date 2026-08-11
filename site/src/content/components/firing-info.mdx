@@ -1,40 +1,80 @@
 ## Overview
 
-Firing Info presents target-supplied technical terms and formatted values in a compact description-list surface.
+Firing Schedule presents one technically reviewed firing program through two required, synchronized forms: a temperature-over-real-time ramp chart and one canonical Data Table row per planned segment. It may compare a controlled observed series with the plan, but it never programs, starts, controls, polls, validates, or certifies a kiln.
 
-<Preview html={'<section class="firing-info tg-preview-frame tg-preview-frame--sm" aria-labelledby="firing-info-title"><h2 class="firing-info__title" id="firing-info-title">Firing details</h2><dl class="firing-info__list"><div class="firing-info__item"><dt>Technique</dt><dd>High-fire reduction</dd></div><div class="firing-info__item"><dt>Temperature</dt><dd>1280 C</dd></div><div class="firing-info__item"><dt>Cone</dt><dd>10</dd></div><div class="firing-info__item"><dt>Atmosphere</dt><dd>Reduction</dd></div></dl></section>'} label="Kiln / Firing Info" />
+`firing-info` remains the internal pre-v1 migration slug. The public component name and canonical root selector are Firing Schedule and `.firing-schedule`; legacy Kiln / Firing Info naming and `.firing-info` exist only until the public contract freezes.
+
+<Preview html={'<section class="firing-schedule firing-info tg-preview-frame" aria-labelledby="firing-schedule-title" data-view="both" data-display-unit="celsius" data-actual-status="complete"><header class="firing-schedule__header firing-info__header"><h2 class="firing-schedule__title firing-info__title" id="firing-schedule-title">Firing schedule</h2></header><p class="firing-schedule__summary">Starts at <bdi>20&nbsp;°C</bdi> · Planned duration <bdi>11 h 33 min</bdi> · Observed series complete</p><figure class="firing-schedule__chart"><div class="firing-schedule__chart-scroll" tabindex="0" aria-label="Firing schedule chart scroll area"><svg class="firing-schedule__plot" viewBox="0 0 720 320" role="img" aria-labelledby="firing-chart-title firing-chart-description"><title id="firing-chart-title">Planned and observed firing temperature over elapsed time</title><desc id="firing-chart-description">Planned and observed temperature over 11 hours 42 minutes, reaching up to 1,220 degrees Celsius. Observed data is complete. Largest segment deviation is 7 degrees Celsius.</desc><g class="firing-schedule__grid" aria-hidden="true"><line x1="64" x2="698" y1="272" y2="272"></line><line x1="64" x2="698" y1="209" y2="209"></line><line x1="64" x2="698" y1="146" y2="146"></line><line x1="64" x2="698" y1="83" y2="83"></line><line x1="64" x2="698" y1="20" y2="20"></line></g><g class="firing-schedule__axes" aria-hidden="true"><text x="54" y="276" text-anchor="end">0</text><text x="54" y="213" text-anchor="end">313</text><text x="54" y="150" text-anchor="end">625</text><text x="54" y="87" text-anchor="end">938</text><text x="54" y="24" text-anchor="end">1,250</text><text x="64" y="294">0 h</text><text x="370" y="294">5.8 h</text><text x="662" y="294">11.7 h</text><text class="firing-schedule__axis-name" x="381" y="312" text-anchor="middle">Elapsed time</text></g><path class="firing-schedule__series firing-schedule__series--planned" d="M 64 268 L 164 232 L 190 232 L 335 151 L 498 26 L 516 26 L 690 88"></path><path class="firing-schedule__series firing-schedule__series--actual" d="M 64 268 L 162 232 L 189 232 L 336 153 L 504 27 L 523 28 L 698 87"></path></svg></div><ul class="firing-schedule__legend" role="list" aria-label="Visible chart series"><li><span class="firing-schedule__legend-line firing-schedule__legend-line--planned" aria-hidden="true"></span>Planned</li><li><span class="firing-schedule__legend-line firing-schedule__legend-line--actual" aria-hidden="true"></span>Actual</li></ul><figcaption>Planned and observed temperature over 11 h 42 min, reaching up to 1,220&nbsp;°C. Observed data is complete.</figcaption></figure><div class="table-wrapper firing-schedule__table" tabindex="0" aria-label="Firing schedule segments scroll area"><table class="table firing-schedule__data-table"><caption class="visually-hidden">Firing schedule segments</caption><thead><tr><th scope="col">Segment</th><th scope="col">Rate</th><th scope="col">Target</th><th scope="col">Hold</th><th scope="col">Planned duration</th><th scope="col">Actual duration</th><th scope="col">Reached</th><th scope="col">Deviation</th></tr></thead><tbody><tr data-segment-id="preheat"><th scope="row">Preheat</th><td>100&nbsp;°C/h</td><td>200&nbsp;°C</td><td>30 min</td><td>2 h 18 min</td><td>1 h 50 min</td><td>198&nbsp;°C</td><td>−2&nbsp;°C</td></tr><tr data-segment-id="peak"><th scope="row">Peak firing</th><td>Full rate · estimated 3 h</td><td>1,220&nbsp;°C</td><td>20 min</td><td>3 h 20 min</td><td>3 h 26 min</td><td>1,213&nbsp;°C</td><td>−7&nbsp;°C</td></tr></tbody></table></div></section>'} label="Firing Schedule" />
 
 ## Presentation
 
-The `details` slot is required and the title is optional. Every item pairs a term with a target-formatted value.
+The normalized source requires one finite `startingTemperatureCelsius` and one ordered non-empty `segments` collection. Every segment has a stable `segmentId`, a positive Celsius-per-hour rate or `full`, a target Celsius temperature, and a non-negative hold duration in seconds. Neutral source derives every planned ramp duration, accumulated time, chart point, and table duration from this single program.
 
-The component defines description-list anatomy only. Field inventory, units, qualifiers, values, ordering, and ceramics data records remain target-owned.
+A `full` segment must include a positive, target-reviewed `estimatedRampSeconds`. The table labels that duration as estimated. Without it, the complete schedule is invalid because the segment cannot be placed truthfully on the real-time horizontal axis.
+
+Optional `actualSamples` are strictly increasing elapsed-second/Celsius observations controlled by the target. They draw one observed curve and never become thousands of table rows. Optional `actualSummaries` correlate observed duration, reached temperature, and deviation to planned rows through `segmentId`.
+
+`view` accepts `planned`, `actual`, or `both`. When it is unset, valid observed data selects `both`; otherwise it selects `planned`. `actual` is unavailable without observations and safely resolves to `planned`. `displayUnit` defaults to `celsius`; `fahrenheit` converts the entire table, axes, summaries, and legend from the same normalized source rather than receiving duplicate datasets.
+
+`actualStatus` is `collecting` or `complete`. A collecting series may be partial and is labelled as such. Target updates replace the controlled sample array at a bounded cadence; the component never connects to equipment and never announces each sample.
 
 ## Guidelines
 
 <DoDont>
-  <Do>Use familiar terms and include units or qualifiers directly in each value.</Do>
-  <Dont>Do not treat the fixture fields as a required firing-data schema.</Dont>
+  <Do>Supply one technically reviewed normalized program, stable segment identifiers, real durations, provenance, and truthful collecting/complete observed data.</Do>
+  <Dont>Do not use the component to enter controller commands, start a firing, infer material safety, or compare independently drawn planned data with the table.</Dont>
 </DoDont>
 
-- Include only details the target can source accurately.
-- Keep terminology consistent within the containing product or editorial context.
-- Order details for the reader rather than according to an assumed database shape.
+- Preserve real accumulated time on the horizontal axis; ramp and hold widths must correspond to duration.
+- Keep the canonical Data Table as the detailed representation and one row per planned segment.
+- Use observed summary columns only when they are target-correlated to the matching stable `segmentId`.
+- Keep safety procedures, equipment instructions, validation, alarms, live control, and technical approval in separately governed systems and content.
+- Treat fixture temperatures, rates, holds, deviations, labels, and sample cadence as documentation evidence, not production defaults.
 
 ## Accessibility
 
-- Use description-list semantics for firing terms and values.
-- Include units and qualifiers in readable text.
-- Keep each term adjacent to its value in source order.
-- Do not communicate firing conditions through visual styling alone.
+- Render the chart as one informative `svg[role="img"]` with a non-empty localized `<title>`, concise `<desc>`, and visible `figcaption` summarizing visible series, time, range, lifecycle, and relevant deviation.
+- Keep raw chart points out of sequential keyboard focus. The named chart scroll owner and canonical table scroll owner retain visible focus when horizontal scrolling is required.
+- Preserve native table, caption, row/column headers, and `scope`; do not replace passive tabular data with a grid widget.
+- Distinguish Planned and Actual with visible legend text plus dashed versus solid line treatment, not color alone.
+- Do not put otherwise unavailable data only in hover tooltips and do not announce sample-by-sample updates.
+- The Data Table is the primary long-form alternative for segment detail; the chart summary communicates the overall comparison without duplicating every raw sample.
 
 ## Specification
 
-**Dependencies:** None.
+**Dependency:** canonical Data Table.
 
-**Anatomy:** `.firing-info`, optional title, required `.firing-info__list`, and repeated `.firing-info__item` records containing `dt` and `dd` elements.
+**Anatomy:** conditional `.firing-schedule` section/div; optional header/title; required visible summary; required informative chart, named scroll owner, axes, legend and caption; required `.firing-schedule__table` canonical Data Table with one row per planned segment. `.firing-info` is a temporary pre-v1 root alias only.
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Firing information heading</td></tr>
-  <tr><td>`details`</td><td>slot</td><td>required</td><td>Target-owned firing terms and formatted values</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible contextual heading; a non-empty value selects named-section semantics</td></tr>
+  <tr><td>`startingTemperatureCelsius`</td><td>number</td><td>required</td><td>Finite normalized planned-program start</td></tr>
+  <tr><td>`segments`</td><td>slot</td><td>required non-empty</td><td>Ordered stable records with rate/full estimate, target Celsius temperature, and hold seconds</td></tr>
+  <tr><td>`actualSamples`</td><td>slot</td><td>optional</td><td>Strictly increasing controlled elapsed-second/Celsius observations for the actual curve</td></tr>
+  <tr><td>`actualSummaries`</td><td>slot</td><td>optional</td><td>Target-reviewed actual duration/reached/deviation records correlated by `segmentId`</td></tr>
+  <tr><td>`view`</td><td>enum</td><td>optional</td><td>`planned`, `actual`, or `both`; default derives from actual-data availability</td></tr>
+  <tr><td>`displayUnit`</td><td>enum</td><td>optional</td><td>`celsius` or `fahrenheit`; defaults to Celsius</td></tr>
+  <tr><td>`actualStatus`</td><td>enum</td><td>optional</td><td>`collecting` or `complete`; applies only with actual data</td></tr>
 </PropTable>
+
+**Targets**
+
+- **Neutral Web:** canonical CSS, native table/SVG markup, and framework-independent `components/js/firing-schedule.js` model; target owns localized labels and controlled source updates.
+- **Shopify:** planned until a normalized schedule/observation source, technical validation, provenance, safety/editor policy, and first consumer are approved.
+- **Webflow:** target code maps verified structured records to the neutral model; CMS strings alone are insufficient for the derived chart.
+- **React / Angular:** thin view layer consumes the neutral model and canonical Data Table without a second planned-series store.
+- **Figma:** future component covers planned/actual/both, Celsius/Fahrenheit, collecting/complete, narrow/wide scroll containment, long/localized data, themes, forced colors, and print; current generic references are not approval.
+- **SwiftUI / Compose / future:** platform chart and native table/list share one normalized program and controlled observed stream; equipment connectivity remains outside the component.
+
+**References**
+
+- [WAI complex images curriculum](https://www.w3.org/WAI/curricula/content-author-modules/images/)
+- [WAI SVG text-alternative guidance](https://www.w3.org/WAI/tutorials/images/tips/)
+- [WAI ACT rule for named SVG graphics](https://www.w3.org/WAI/standards-guidelines/act/rules/7d6734/)
+- [SVG 2 document structure and accessible descriptions](https://www.w3.org/TR/SVG/struct.html)
+- [HTML table model](https://html.spec.whatwg.org/dev/tables.html)
+- [Open UI Table](https://open-ui.org/components/table/)
+- [Shopify Polaris Table](https://shopify.dev/docs/api/app-home/web-components/layout-and-structure/table)
+- [Radix Primitives overview](https://www.radix-ui.com/primitives/docs/overview/introduction)
+
+Owner decision 60 accepts this semantic direction only. Schema validation, observed-data evidence, safety review, final visual review, identity migration completion, and explicit human stability review remain required. R6 stays `pilot`.

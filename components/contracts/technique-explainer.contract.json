@@ -1,22 +1,123 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "technique-explainer", "name": "Technique Explainer", "registryId": "R3", "category": "ceramics", "status": "pilot", "summary": "Alternating image + text steps explaining craft techniques.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/technique-explainer", "css": { "file": "components/css/ceramics.css", "selector": ".technique-explainer" }, "docs": "site/src/content/components/technique-explainer.mdx" },
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "technique-explainer",
+  "name": "Technique Explainer",
+  "registryId": "R3",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Passive target-owned ordered explanation with a stable text core, optional target-composed details and media, meaningful native sequence, and no progress or workflow state.",
+  "dependencies": [],
+  "source": {
+    "registry": "registry.json#/components/technique-explainer",
+    "css": { "file": "components/css/ceramics.css", "selector": ".technique-explainer" },
+    "docs": "site/src/content/components/technique-explainer.mdx"
+  },
   "anatomy": [
-    { "name": "root", "selector": ".technique-explainer", "className": ".technique-explainer", "required": true, "description": "Technique explainer section." },
-    { "name": "header", "selector": ".technique-explainer__header", "className": ".technique-explainer__header", "required": false, "description": "Optional heading region." },
-    { "name": "title", "selector": ".technique-explainer__title", "className": ".technique-explainer__title", "required": false, "description": "Technique heading." },
-    { "name": "step", "selector": ".technique-step", "className": ".technique-step", "required": true, "description": "Single ordered technique step." },
-    { "name": "stepNumber", "selector": ".technique-step__number", "className": ".technique-step__number", "required": false, "description": "Visible target-formatted step number." },
-    { "name": "stepName", "selector": ".technique-step__name", "className": ".technique-step__name", "required": true, "description": "Step heading." },
-    { "name": "stepDescription", "selector": ".technique-step__description", "className": ".technique-step__description", "required": true, "description": "Step explanation." },
-    { "name": "stepMedia", "selector": ".technique-step__media", "className": ".technique-step__media", "required": false, "description": "Optional step media." }
+    { "name": "root", "selector": ".technique-explainer", "className": ".technique-explainer", "required": true, "description": "Named native section when a visible title is supplied; otherwise a generic container. Omitted when the required steps composition is absent or empty." },
+    { "name": "header", "selector": ".technique-explainer__header", "className": ".technique-explainer__header", "required": false, "description": "Optional header emitted only with a visible title." },
+    { "name": "title", "selector": ".technique-explainer__title", "className": ".technique-explainer__title", "required": false, "description": "Visible contextual heading and section label when supplied." },
+    { "name": "sequence", "selector": ".technique-explainer__steps", "className": ".technique-explainer__steps", "required": true, "description": "Native ordered list containing complete target-owned steps in meaningful source order." },
+    { "name": "step", "selector": ".technique-step", "className": ".technique-step", "required": true, "description": "Direct native list item containing one complete explanatory step." },
+    { "name": "stepContent", "selector": ".technique-step__content", "className": ".technique-step__content", "required": true, "description": "Text content wrapper that always precedes optional supporting media in DOM order." },
+    { "name": "stepNumber", "selector": ".technique-step__number", "className": ".technique-step__number", "required": false, "description": "Derived visible ordinal hidden from assistive technology because native ordered-list semantics already expose sequence." },
+    { "name": "stepName", "selector": ".technique-step__name", "className": ".technique-step__name", "required": true, "description": "Required non-empty visible contextual heading for the step." },
+    { "name": "stepDescription", "selector": ".technique-step__description", "className": ".technique-step__description", "required": true, "description": "Required non-empty complete target-authored explanation with no clamping." },
+    { "name": "stepDetails", "selector": ".technique-step__details", "className": ".technique-step__details", "required": false, "description": "Optional bounded target-composed supporting content for applicable reviewed facts such as materials, duration, temperature or tools; it defines no universal record fields." },
+    { "name": "stepMedia", "selector": ".technique-step__media", "className": ".technique-step__media", "required": false, "description": "Optional supporting native figure or target media wrapper with context-appropriate alternative text." }
   ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Alternating wide layout that stacks in source order on narrow viewports." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Responsive explanatory layout." }],
-  "states": [{ "name": "default", "selectors": [".technique-explainer"], "description": "Passive editorial presentation." }],
-  "behavior": [{ "name": "orderedExplanation", "selectors": [".technique-step", ".technique-step__number"], "description": "Targets preserve meaningful step order in source and may use ordered-list semantics; visual alternation never changes reading order." }],
-  "properties": [{ "name": "title", "type": "string", "required": false, "description": "Optional technique heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".technique-explainer__title" }] } }, { "name": "steps", "type": "slot", "required": true, "description": "Target-owned ordered technique steps and media.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".technique-step", "classNames": [".technique-step"] }] } }],
-  "tokens": { "public": { "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-h1-size", "--typo-h2-size", "--typo-h3-size"], "radius": ["--radius-lg"], "spacing": ["--space-layout-container", "--space-layout-section-gap"] } },
-  "accessibility": ["Preserve technique steps in logical source order.", "Use headings or list semantics that reflect the containing document.", "Describe informative process media and hide decorative media from assistive technology."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Passive ordered editorial presentation; wide visual alternation never changes source order." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Container-responsive layout governed by the actual host width." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".technique-explainer"], "description": "Passive document presentation with no current, complete, loading, selected, disabled, focus, or workflow state." }
+  ],
+  "behavior": [
+    {
+      "name": "semanticRoot",
+      "selectors": [".technique-explainer", ".technique-explainer__title"],
+      "attributes": ["aria-labelledby only when the visible title is present"],
+      "description": "A visible title produces a named native section; without a title the composition uses a generic div and emits no dangling label relationship."
+    },
+    {
+      "name": "nonEmptySequence",
+      "selectors": [".technique-explainer__steps", ".technique-step", ".technique-step__name", ".technique-step__description"],
+      "description": "The required steps slot supplies at least one complete record with stable key, non-empty name, and non-empty description; otherwise the complete R3 root is omitted."
+    },
+    {
+      "name": "meaningfulOrder",
+      "selectors": [".technique-explainer__steps", ".technique-step"],
+      "description": "Targets preserve meaningful authored step order as a native ordered list with direct list items. Visual layout never reorders list items."
+    },
+    {
+      "name": "derivedOrdinal",
+      "selectors": [".technique-step__number"],
+      "attributes": ["aria-hidden=true"],
+      "description": "The optional visual ordinal derives from list position and is not duplicated as target record data; native list semantics remain the accessible source of sequence."
+    },
+    {
+      "name": "extensibleDetails",
+      "selectors": [".technique-step__content", ".technique-step__details"],
+      "description": "Each step keeps required name and description as its stable core and may compose target-specific reviewed details without converting possible materials, duration, temperature, tools or other facts into neutral fields. Safety warnings and precautions use separately reviewed rich content or canonical Alert composition, never an arbitrary untyped detail."
+    },
+    {
+      "name": "supportingMedia",
+      "selectors": [".technique-step__content", ".technique-step__media", ".technique-step__media img"],
+      "attributes": ["alt"],
+      "description": "Step text remains complete without media and always precedes media in DOM order. Informative media gets a truthful contextual alternative; decorative or redundant image media uses alt=\"\"."
+    },
+    {
+      "name": "containerResponsiveAlternation",
+      "selectors": [".technique-explainer", ".technique-step", ".technique-step__content", ".technique-step__media"],
+      "description": "Canonical CSS stacks content then media in narrow hosts and may alternate the supporting media side in wide hosts using the component container while preserving the same DOM and reading sequence."
+    },
+    {
+      "name": "passiveBoundary",
+      "selectors": [".technique-explainer", ".technique-explainer__steps", ".technique-step"],
+      "description": "Neutral R3 is not progress, navigation, selection, disclosure, task status, or a workflow controller and owns no interactive role, tabindex, current/completed state, event, or keyboard model."
+    },
+    {
+      "name": "targetOwnedContent",
+      "selectors": [".technique-explainer__steps", ".technique-step__name", ".technique-step__description", ".technique-step__media"],
+      "description": "Targets own records, locale, revision, vocabulary, safety and factual review, media rights, alternatives, loading, mappings, and lifecycle; the neutral contract defines only durable composition."
+    },
+    {
+      "name": "zeroRuntime",
+      "selectors": [".technique-explainer"],
+      "description": "The neutral component owns no listener, observer, timer, request, state store, progress update, navigation, persistence, announcement, analytics, or target service."
+    }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional visible contextual heading; its presence selects named-section semantics.", "targetMappings": { "web": [{ "kind": "content", "selector": ".technique-explainer__title" }] } },
+    { "name": "steps", "type": "slot", "required": true, "description": "Required non-empty target-owned native ordered step composition. Every record has a stable name/description core and may compose optional reviewed details and contextual media; no workflow or universal process schema is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".technique-explainer__steps", "classNames": [".technique-explainer__steps", ".technique-step"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-typography-body-default-weight", "--tg-typography-h1-weight", "--tg-typography-h2-weight", "--tg-typography-h3-weight", "--typo-body-line-height", "--typo-body-size", "--typo-h1-line-height", "--typo-h1-size", "--typo-h2-line-height", "--typo-h2-size", "--typo-h3-line-height", "--typo-h3-size"],
+      "radius": ["--radius-lg"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
+    }
+  },
+  "accessibility": [
+    "Use a contextual visible heading when R3 should be a document section; title-absent compositions remain generic and emit no broken label reference.",
+    "Render one native ordered list with direct native list items in meaningful authored source order.",
+    "Keep every step understandable through its required visible name and complete text; do not rely on image, alternating side, color, or decorative number.",
+    "Keep target-composed details inside the owning list item and give their internal structure its native semantics. Do not place safety warnings or precautions in an arbitrary untyped detail; use reviewed rich content or canonical Alert composition.",
+    "Treat the large visual number as a redundant derived ordinal and hide it from assistive technology while preserving native list semantics.",
+    "Keep text before optional media in DOM order and ensure visual alternation never suggests a conflicting step sequence.",
+    "Give informative media context-specific alternatives and decorative or fully redundant image media alt=\"\".",
+    "Do not add progressbar, tab, disclosure, link, button, tabindex, aria-current, selected/completed state, roving focus, keyboard behavior, or live announcements to passive neutral R3."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css", "notes": "Conditional native section/div, ordered list/items, complete text, optional contextual media, named-container CSS, meaningful source order, and zero R3 JavaScript." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Requires approved record source, editorial/safety review, section/block schema, order/limits, localization, media policy, and first template consumer." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
+  }
 }

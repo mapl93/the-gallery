@@ -6,6 +6,8 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import InputArtwork from './InputArtwork';
+import TextareaArtwork from './TextareaArtwork';
 import { getStudioLucideIcon } from './lucideCatalogue';
 
 interface InputStudioProps {
@@ -42,11 +44,15 @@ function initialInputValues(contract: ComponentContract): StudioPropertyValues {
 
   if (contract.slug === 'textarea') {
     values.label = 'Message';
+    values.name = 'message';
+    values.autocomplete = 'off';
     values.placeholder = 'Write a message...';
     values.message = 'Share any details that will help us respond.';
   } else {
-    values.label = 'Email address';
-    values.placeholder = 'name@example.com';
+    values.label = 'Full name';
+    values.name = 'full-name';
+    values.autocomplete = 'name';
+    values.placeholder = 'Ada Lovelace';
     values.message = 'We will only use this for your receipt.';
   }
   return values;
@@ -121,6 +127,9 @@ function activeColorTokens(
       `--color-input-default-${stateName}-value`,
       '--color-input-default-unfocused-value',
     ]),
+    'placeholder-color': firstAllowed('placeholder-color', [
+      '--color-input-default-unfocused-placeholder',
+    ]),
     border: firstAllowed('border', [
       `--color-input-${variant}-${variantState}-inner-border`,
       `--color-input-default-${stateName}-inner-border`,
@@ -138,6 +147,10 @@ function activeColorTokens(
       `--color-input-${variant}-unfocused-icon`,
       '--color-input-default-unfocused-icon',
     ]),
+    'focus-ring': firstAllowed('focus-ring', [
+      `--color-input-${variant}-focused-outer-border`,
+      '--color-input-default-focused-outer-border',
+    ]),
   };
 }
 
@@ -153,26 +166,26 @@ function simulatedFieldStyle(
   const simulated = state === 'hover' || focused;
   if (!simulated) return {};
 
-  const outerBorder = variant === 'error'
-    ? '--color-input-error-focused-outer-border'
-    : variant === 'success'
-      ? '--color-input-success-focused-outer-border'
-      : variant === 'warning'
-        ? '--color-input-warning-focused-outer-border'
-      : '--color-input-default-focused-outer-border';
+  const semanticVariant = variant === 'error' || variant === 'success' || variant === 'warning';
+  const borderColor = activeTokens.border
+    ? semanticVariant
+      ? `color-mix(in srgb, var(${activeTokens.border}) 70%, var(--color-text-primary))`
+      : `var(${activeTokens.border})`
+    : undefined;
 
   return {
     background: activeTokens.fill ? `var(${activeTokens.fill})` : undefined,
     color: activeTokens['value-color'] ? `var(${activeTokens['value-color']})` : undefined,
-    borderColor: activeTokens.border ? `var(${activeTokens.border})` : undefined,
-    outlineColor: focused ? `var(${outerBorder})` : undefined,
+    borderColor,
+    outlineColor: focused && activeTokens['focus-ring']
+      ? `var(${activeTokens['focus-ring']})`
+      : undefined,
   };
 }
 
 export default function InputStudio({ contract, definition }: InputStudioProps) {
   const generatedId = useId().replace(/:/g, '');
   const fieldId = `studio-input-${generatedId}`;
-  const messageId = `${fieldId}-message`;
   const initialValues = useMemo(() => initialInputValues(contract), [contract]);
   const initialSlotIconValues = useMemo(() => initialSlotIcons(definition), [definition]);
   const studioTokens = useMemo(
@@ -220,8 +233,14 @@ export default function InputStudio({ contract, definition }: InputStudioProps) 
   );
   const label = typeof values.label === 'string' ? values.label : '';
   const value = typeof values.value === 'string' ? values.value : '';
+  const name = typeof values.name === 'string' ? values.name : '';
+  const autocomplete = typeof values.autocomplete === 'string' ? values.autocomplete : '';
   const placeholder = typeof values.placeholder === 'string' ? values.placeholder : '';
   const message = typeof values.message === 'string' ? values.message : '';
+  const required = values.required === true;
+  const readOnly = values.readOnly === true;
+  const minLength = typeof values.minLength === 'number' ? values.minLength : undefined;
+  const maxLength = typeof values.maxLength === 'number' ? values.maxLength : undefined;
   const resize = typeof values.resize === 'string' ? values.resize : 'vertical';
   const minLines = typeof values.minLines === 'number' ? values.minLines : 4;
   const maxLines = typeof values.maxLines === 'number' ? values.maxLines : null;
@@ -231,11 +250,10 @@ export default function InputStudio({ contract, definition }: InputStudioProps) 
   const isTextarea = contract.slug === 'textarea';
   const LeadingIcon = getStudioLucideIcon(slotIconValues.leading);
   const TrailingIcon = getStudioLucideIcon(slotIconValues.trailing);
-  const classes = [
-    'input',
-    isTextarea ? 'docs-studio__preview-textarea' : 'docs-studio__preview-input',
-    optionClass(contract.variants, values.variant),
-  ].filter(Boolean).join(' ');
+  const artworkClassName = isTextarea
+    ? 'docs-studio__preview-textarea'
+    : ['docs-studio__preview-input', optionClass(contract.variants, values.variant)]
+      .filter(Boolean).join(' ');
   const fieldStyle = simulatedFieldStyle(activeTokens, previewState, variant);
 
   useEffect(() => {
@@ -249,6 +267,7 @@ export default function InputStudio({ contract, definition }: InputStudioProps) 
     setValues((current) => ({
       ...current,
       disabled: state === 'disabled',
+      readOnly: state === 'readOnly',
       variant: state === 'errorFocusVisible'
         ? 'error'
         : state === 'successFocusVisible'
@@ -286,6 +305,10 @@ export default function InputStudio({ contract, definition }: InputStudioProps) 
                 merged.maxLines = nextMin;
               }
             }
+            const nextMinLength = typeof merged.minLength === 'number' ? merged.minLength : 0;
+            if (typeof merged.maxLength === 'number' && merged.maxLength < nextMinLength) {
+              merged.maxLength = nextMinLength;
+            }
             return merged;
           })}
           onSlotIconChange={(slot, iconName) => (
@@ -304,72 +327,73 @@ export default function InputStudio({ contract, definition }: InputStudioProps) 
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <div className={classes}>
-              <label className="input__label" htmlFor={fieldId}>{label}</label>
-              <div className="input__control">
-                {leadingIcon && LeadingIcon && (
+            {isTextarea ? (
+              <TextareaArtwork
+                id={fieldId}
+                className={artworkClassName}
+                label={label}
+                value={value}
+                name={name}
+                placeholder={placeholder}
+                autoComplete={autocomplete}
+                required={required}
+                readOnly={readOnly}
+                minLength={minLength}
+                maxLength={maxLength}
+                disabled={disabled}
+                variant={variant as 'default' | 'error' | 'success' | 'warning'}
+                message={message}
+                messageRole={variant === 'error' ? 'alert' : undefined}
+                resize={resize as 'vertical' | 'horizontal' | 'both'}
+                minLines={minLines}
+                maxLines={maxLines ?? undefined}
+                dataState={previewState}
+                fieldStyle={fieldStyle}
+                fieldRef={textareaRef}
+                onChange={(event) => setValues((current) => ({
+                  ...current,
+                  value: event.target.value,
+                }))}
+              />
+            ) : (
+              <InputArtwork
+                id={fieldId}
+                className="docs-studio__preview-input"
+                label={label}
+                value={value}
+                name={name}
+                placeholder={placeholder}
+                autoComplete={autocomplete}
+                required={required}
+                readOnly={readOnly}
+                minLength={minLength}
+                maxLength={maxLength}
+                disabled={disabled}
+                variant={variant as 'default' | 'error' | 'success' | 'warning'}
+                message={message}
+                messageRole={variant === 'error' ? 'alert' : undefined}
+                leadingIcon={leadingIcon && LeadingIcon ? (
                   <LeadingIcon
                     className="input__icon input__icon--leading"
                     aria-hidden="true"
                     focusable="false"
                   />
-                )}
-                {isTextarea ? (
-                  <textarea
-                    ref={textareaRef}
-                    className="input__field textarea__field"
-                    id={fieldId}
-                    value={value}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    aria-invalid={variant === 'error' || undefined}
-                    aria-describedby={message ? messageId : undefined}
-                    data-resize={resize === 'vertical' ? undefined : resize}
-                    data-min-lines={minLines === 4 ? undefined : minLines}
-                    data-max-lines={maxLines ?? undefined}
-                    data-studio-state={previewState}
-                    style={fieldStyle}
-                    onChange={(event) => setValues((current) => ({
-                      ...current,
-                      value: event.target.value,
-                    }))}
-                  />
-                ) : (
-                  <input
-                    className="input__field"
-                    id={fieldId}
-                    type="text"
-                    value={value}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    aria-invalid={variant === 'error' || undefined}
-                    aria-describedby={message ? messageId : undefined}
-                    data-studio-state={previewState}
-                    style={fieldStyle}
-                    onChange={(event) => setValues((current) => ({
-                      ...current,
-                      value: event.target.value,
-                    }))}
-                  />
-                )}
-                {trailingIcon && TrailingIcon && (
+                ) : undefined}
+                trailingIcon={trailingIcon && TrailingIcon ? (
                   <TrailingIcon
                     className="input__icon input__icon--trailing"
                     aria-hidden="true"
                     focusable="false"
                   />
-                )}
-              </div>
-              {message && (
-                <span
-                  className="input__message"
-                  id={messageId}
-                  role={variant === 'error' ? 'alert' : undefined}
-                >
-                  {message}
-                </span>
-              )}
-            </div>
+                ) : undefined}
+                dataState={previewState}
+                fieldStyle={fieldStyle}
+                onChange={(event) => setValues((current) => ({
+                  ...current,
+                  value: event.target.value,
+                }))}
+              />
+            )}
           </div>
         </section>
       </div>

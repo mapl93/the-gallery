@@ -1,0 +1,96 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "pickup-location-selector",
+  "name": "Pickup Location Selector",
+  "registryId": "D9",
+  "category": "product",
+  "status": "pilot",
+  "summary": "Product-context location search and single pickup-intent selection composed from canonical Input, Button, and native Radio without reserving inventory.",
+  "dependencies": ["input", "button", "radio"],
+  "source": {
+    "registry": "registry.json#/components/pickup-location-selector",
+    "css": { "file": "components/css/product.css", "selector": ".pickup-location-selector" },
+    "docs": "site/src/content/components/pickup-location-selector.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".pickup-location-selector", "className": ".pickup-location-selector", "required": true, "description": "Named product-context search and selection surface for the exact current product, variant, and market." },
+    { "name": "header", "selector": ".location-search__header", "className": ".location-search__header", "required": true, "description": "Visible heading and optional explanatory copy." },
+    { "name": "heading", "selector": ".location-search__heading", "className": ".location-search__heading", "required": true, "description": "Visible section heading and accessible root name." },
+    { "name": "description", "selector": ".location-search__description", "className": ".location-search__description", "required": false, "description": "Optional explanation of scope and non-reservation meaning." },
+    { "name": "searchForm", "selector": ".location-search__form", "className": ".location-search__form", "required": true, "description": "Native search form composing one canonical Input and Button." },
+    { "name": "query", "selector": ".location-search__query", "className": ".location-search__query", "required": true, "description": "Canonical labelled search Input for manual address, city, region, or postal-code queries." },
+    { "name": "searchAction", "selector": ".location-search__submit", "className": ".location-search__submit", "required": true, "description": "Canonical submit Button that requests target-owned search results." },
+    { "name": "useLocationAction", "selector": ".location-search__geolocate", "className": ".location-search__geolocate", "required": false, "description": "Optional explicit canonical Button that alone may initiate target geolocation permission." },
+    { "name": "status", "selector": ".location-search__status", "className": ".location-search__status", "required": false, "description": "One concise target-authored result, loading, empty, error, retry, or selection status." },
+    { "name": "choiceGroup", "selector": ".pickup-location-selector__group", "className": ".pickup-location-selector__group", "required": true, "description": "Native Fieldset containing the eligible pickup-location choices." },
+    { "name": "choiceGroupLabel", "selector": ".pickup-location-selector__legend", "className": ".pickup-location-selector__legend", "required": true, "description": "First Legend that names the pickup-location choice." },
+    { "name": "results", "selector": ".pickup-location-selector__results", "className": ".pickup-location-selector__results", "required": true, "description": "Complete native list of eligible locations supplied in target order." },
+    { "name": "result", "selector": ".pickup-location-selector__result", "className": ".pickup-location-selector__result", "required": true, "description": "One target-supplied eligible location with a stable id and text-complete pickup context." },
+    { "name": "choice", "selector": ".pickup-location-selector__choice", "className": ".pickup-location-selector__choice", "required": true, "description": "Canonical native Radio whose value is the stable location id." },
+    { "name": "resultDetails", "selector": ".location-search__result-details", "className": ".location-search__result-details", "required": true, "description": "Address, readable availability, readiness, hours, and optional distance associated with the Radio." },
+    { "name": "map", "selector": ".location-search__map", "className": ".location-search__map", "required": false, "description": "Optional target-owned synchronized map that never replaces the complete list workflow." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "One searchable list-first pickup selection surface." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic size with a private component-container stacking threshold." }
+  ],
+  "states": [
+    { "name": "ready", "selectors": [".pickup-location-selector__results"], "description": "Eligible target results and the complete Radio list are available." },
+    { "name": "selected", "selectors": [".pickup-location-selector__result[data-selected]", ".pickup-location-selector__choice"], "description": "One stable location id is current pickup intent; this is not a reservation." },
+    { "name": "loading", "selectors": [".location-search[data-status=\"loading\"] .location-search__status", ".location-search__status"], "description": "Target search is pending; stale results are suppressed and controls are temporarily unavailable." },
+    { "name": "empty", "selectors": [".location-search__status"], "description": "The completed search has no eligible locations and manual search remains available." },
+    { "name": "error", "selectors": [".location-search[data-status=\"error\"] .location-search__status", ".location-search__status"], "description": "Target search failed with truthful retry guidance and no stale eligible choices." }
+  ],
+  "behavior": [
+    { "name": "manualSearch", "selectors": [".location-search__form", ".location-search__query", ".location-search__submit"], "attributes": ["role=\"search\"", "type=\"search\"", "visible label", "native submit"], "events": ["input", "change", "submit", "reset"], "description": "Manual search remains available regardless of geolocation or map support. The target owns geocoding, requests, ordering, cancellation, retry, stale suppression, results, history, privacy, and analytics." },
+    { "name": "explicitGeolocation", "selectors": [".location-search__geolocate"], "events": ["click", "Space", "Enter", "location request"], "description": "Geolocation may be requested only after the explicit localized action; mounting, focusing, typing, search submission, or opening the surface never prompts permission." },
+    { "name": "singleSelection", "selectors": [".pickup-location-selector__group", ".pickup-location-selector__choice"], "attributes": ["fieldset", "legend", "shared name", "stable location-id value", "checked"], "events": ["click", "Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "change", "locationSelect"], "description": "Canonical native Radios own one selection. Stateful targets control selectedLocationId/onLocationSelect or initialize native checkedness without independent item booleans." },
+    { "name": "pickupIntent", "selectors": [".pickup-location-selector__choice"], "events": ["locationSelect with stable location id", "product coordinator reconciliation"], "description": "Selection records pickup intent only for the exact current product, variant, and market. It never reserves inventory or promises fulfilment; Product Form, Cart, or Checkout confirms or rejects it truthfully." },
+    { "name": "resultLifecycle", "selectors": [".pickup-location-selector", ".location-search__status", ".pickup-location-selector__results"], "attributes": ["data-status", "aria-busy", "role=\"status\"", "role=\"alert\" for error"], "events": ["loading", "ready", "empty", "error", "retry", "context change"], "description": "The shared product/fulfilment coordinator owns status truth, exact merchandise context, provider authority, stale suppression, focus, and concise announcements. Invalid or stale choices are removed atomically." },
+    { "name": "optionalMap", "selectors": [".location-search__map", ".pickup-location-selector__results"], "description": "A capable target may add a synchronized map. List and map project the same selectedLocationId; map failure or absence leaves every result, detail, and selection action available in the list." },
+    { "name": "dependencyComposition", "selectors": [".location-search__query", ".location-search__submit", ".location-search__geolocate", ".pickup-location-selector__choice"], "description": "D9 consumes canonical Input, Button, and Radio markup, focus, form, validation, disabled, and keyboard behavior without recreating their implementations." }
+  ],
+  "properties": [
+    { "name": "heading", "type": "string", "required": true, "unsetBehavior": "Omit the complete component when the visible heading is empty.", "description": "Visible section heading and accessible root name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__heading" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional product-context and non-reservation explanation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__description" }] } },
+    { "name": "queryLabel", "type": "string", "required": true, "unsetBehavior": "Omit the complete component when the canonical search Input cannot be visibly named.", "description": "Visible localized label for manual location search.", "targetMappings": { "web": [{ "kind": "content", "selector": ".input__label" }] } },
+    { "name": "query", "type": "string", "required": false, "defaultValue": "", "description": "Current manual search value; framework targets may control it or use native initial value semantics.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".input__field", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "queryPlaceholder", "type": "string", "required": false, "description": "Optional non-label search hint.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".input__field", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "searchLabel", "type": "string", "required": true, "description": "Visible localized canonical search Button label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__submit" }] } },
+    { "name": "useLocationLabel", "type": "string", "required": false, "unsetBehavior": "Omit the geolocation action without affecting manual search.", "description": "Optional explicit localized geolocation action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__geolocate" }] } },
+    { "name": "selectionLabel", "type": "string", "required": true, "description": "Visible Legend naming the eligible pickup choice.", "targetMappings": { "web": [{ "kind": "content", "selector": ".pickup-location-selector__legend" }] } },
+    { "name": "locations", "type": "slot", "required": true, "description": "Target-ordered native list of one or more eligible records with stable ids, names, addresses, and text-complete pickup availability.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".pickup-location-selector__results", "classNames": [".pickup-location-selector__results", ".pickup-location-selector__result", ".pickup-location-selector__choice", ".location-search__result-details"] }] } },
+    { "name": "selectedLocationId", "type": "string", "required": false, "defaultValue": "", "description": "Current stable location id or empty when no pickup intent is selected.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pickup-location-selector__group", "attribute": "data-selected-location-id", "valueFrom": "property" }] } },
+    { "name": "status", "type": "enum", "required": false, "defaultValue": "ready", "values": ["ready", "loading", "empty", "error"], "description": "Coherent target-owned search lifecycle projection.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pickup-location-selector", "attribute": "data-status", "values": { "ready": "ready", "loading": "loading", "empty": "empty", "error": "error" } }] } },
+    { "name": "statusMessage", "type": "string", "required": false, "description": "Concise truthful target-authored result, selection, loading, empty, error, or retry message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__status" }] } },
+    { "name": "map", "type": "slot", "required": false, "description": "Optional target-owned synchronized map with attribution and failure handling; never the sole result or selection route.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".location-search__map", "classNames": [".location-search__map"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-border-subtle", "--color-border-default", "--color-text-primary", "--color-text-secondary", "--color-feedback-error-default", "--color-feedback-error-bg", "--color-feedback-success-default", "--color-button-primary-bg-default"],
+      "spacing": ["--space-layout-element-gap", "--space-input-icon-size", "--space-input-icon-gap"],
+      "typography": ["--font-family-heading", "--typo-h4-size", "--typo-h4-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--tg-font-weight-semibold"],
+      "radius": ["--radius-md"]
+    }
+  },
+  "accessibility": [
+    "Use a visible heading to name the section and one visibly labelled canonical search Input; placeholder text never replaces either name.",
+    "Keep manual search available without geolocation or a map. Request device location only after the explicit localized Button action and provide target-owned privacy disclosure.",
+    "Group eligible location Radios in a native Fieldset with a first Legend. Give every Radio a stable location-id value, visible name, and associated text-complete address and availability details.",
+    "Retain native Radio Tab, Space, arrow-key, checked, focus, and form behavior; control one selectedLocationId rather than independent item booleans.",
+    "Expose one coherent busy/result status and alert only new errors. Remove stale choices before presenting a new exact product/variant/market snapshot.",
+    "Do not communicate eligibility or selection by color, border, pin, or map alone. The complete list remains usable under map failure, forced colors, zoom, text spacing, RTL, reduced motion, and narrow containers.",
+    "Selection must not announce inventory reservation or fulfilment confirmation; the owning transaction surface reports acceptance, rejection, or stale recovery."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css-target-behavior", "notes": "Canonical Input/Button/Radio composition, native search/choice semantics, states, list-first layout, optional map slot, and container response are implemented; provider and transaction coordination remain target-owned." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Shopify can map selected-variant store availability, but search/geocoding, intent persistence, exact market/product coordinator integration, cart/checkout confirmation, localization, editor, and live-store proof remain required." },
+    "react": { "status": "implemented", "kind": "composed-component", "notes": "Docs target demonstrates one controlled query, selectedLocationId, result status, and shared renderer without making React canonical." },
+    "figma": { "status": "planned", "kind": "component-composition" },
+    "swiftui": { "status": "planned", "kind": "native-search-radio-list" },
+    "compose": { "status": "planned", "kind": "native-search-radio-list" }
+  }
+}

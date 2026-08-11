@@ -1,54 +1,77 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "policy-page",
   "name": "Policy Page Template",
   "registryId": "P3",
   "category": "pages",
   "status": "pilot",
-  "summary": "Readable legal-content composition with a dated header, optional table of contents, and target-owned semantic rich body.",
-  "dependencies": [],
+  "summary": "Passive self-contained policy document with required title and semantic body, optional independent update metadata, optional named canonical in-page navigation, intrinsic containment, and zero neutral runtime.",
+  "dependencies": ["link"],
   "source": {
     "registry": "registry.json#/components/policy-page",
     "css": { "file": "components/css/pages.css", "selector": ".policy-page" },
     "docs": "site/src/content/components/policy-page.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".policy-page", "className": ".policy-page", "required": true, "description": "Contained readable-width policy page." },
-    { "name": "header", "selector": ".policy-page__header", "className": ".policy-page__header", "required": true, "description": "Policy title and update metadata region." },
-    { "name": "title", "selector": ".policy-page__title", "className": ".policy-page__title", "required": true, "description": "Page-level policy title." },
-    { "name": "date", "selector": ".policy-page__date", "className": ".policy-page__date", "required": false, "description": "Optional visible last-updated date supplied and formatted by the target." },
-    { "name": "toc", "selector": ".policy-page__toc", "className": ".policy-page__toc", "required": false, "description": "Optional table-of-contents region." },
-    { "name": "tocTitle", "selector": ".policy-page__toc-title", "className": ".policy-page__toc-title", "required": false, "description": "Optional table-of-contents heading." },
-    { "name": "tocList", "selector": ".policy-page__toc-list", "className": ".policy-page__toc-list", "required": false, "description": "Ordered target-owned section links." },
-    { "name": "tocLink", "selector": ".policy-page__toc-link", "className": ".policy-page__toc-link", "required": false, "description": "In-page link to a target-supplied policy section." },
-    { "name": "body", "selector": ".policy-page__body", "className": ".policy-page__body", "required": true, "description": "Target-owned semantic legal content preserving headings, paragraphs, lists, links, media, tables, and code where present." }
+    { "name": "root", "selector": ".policy-page", "className": ".policy-page", "required": true, "description": "Contextual labelled article containing one complete policy document; standalone targets host it inside their document main." },
+    { "name": "header", "selector": ".policy-page__header", "className": ".policy-page__header", "required": true, "description": "Policy title and optional update metadata region." },
+    { "name": "title", "selector": ".policy-page__title", "className": ".policy-page__title", "required": true, "description": "Non-empty visible contextual heading with a target-unique id naming the article." },
+    { "name": "date", "selector": ".policy-page__date", "className": ".policy-page__date", "required": false, "description": "Optional target-formatted visible update metadata; becomes time[datetime] only when an exact machine value is independently supplied." },
+    { "name": "toc", "selector": ".policy-page__toc", "className": ".policy-page__toc", "required": false, "description": "Optional navigation region named by its visible table-of-contents title." },
+    { "name": "tocTitle", "selector": ".policy-page__toc-title", "className": ".policy-page__toc-title", "required": false, "description": "Conditionally required non-empty visible heading naming a supplied table of contents." },
+    { "name": "tocList", "selector": ".policy-page__toc-list", "className": ".policy-page__toc-list", "required": false, "description": "Native ordered list preserving policy-section order." },
+    { "name": "tocLink", "selector": ".policy-page__toc-link", "className": ".policy-page__toc-link", "required": false, "description": "Canonical Link anchor whose fragment resolves to one unique body section." },
+    { "name": "body", "selector": ".policy-page__body", "className": ".policy-page__body", "required": true, "description": "Required non-empty target-owned semantic legal document body." },
+    { "name": "section", "selector": ".policy-page__section", "className": ".policy-page__section", "required": false, "description": "Optional target-owned native thematic section with a stable id when referenced by the table of contents." },
+    { "name": "sectionTitle", "selector": ".policy-page__section-title", "className": ".policy-page__section-title", "required": false, "description": "Contextual body heading whose target-owned rank follows the host document hierarchy." },
+    { "name": "overflow", "selector": ".policy-page__overflow", "className": ".policy-page__overflow", "required": false, "description": "Optional named keyboard-scrollable wrapper used only for genuinely two-dimensional content that cannot reflow." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default policy-page presentation." }
+    { "name": "default", "className": null, "default": true, "description": "One complete legal-document presentation; policy type, source, layout measures and target capabilities are not variants." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default readable content width." }
+    { "name": "default", "className": null, "default": true, "description": "One readable semantic type scale whose contextual heading tags remain target-owned." }
   ],
   "states": [
-    { "name": "default", "selectors": [".policy-page"], "description": "Default policy-page presentation." },
-    { "name": "tocLinkHover", "selectors": [".policy-page__toc-link:hover"], "description": "Table-of-contents link hover presentation." },
-    { "name": "tocLinkFocusVisible", "selectors": [".policy-page__toc-link:focus-visible"], "description": "Visible keyboard focus on table-of-contents links." },
-    { "name": "bodyLinkFocusVisible", "selectors": [".policy-page__body a:focus-visible"], "description": "Visible keyboard focus on links within policy content." },
-    { "name": "bodyFlow", "selectors": [".policy-page__body > * + *"], "description": "Rich-body vertical rhythm." }
+    { "name": "default", "selectors": [".policy-page"], "description": "Passive resting policy document." },
+    { "name": "bodyLinkHover", "selectors": [".policy-page__body a:not(.link):hover"], "description": "Contextual native-link hover when target-authored body markup cannot attach canonical Link classes." },
+    { "name": "bodyLinkFocusVisible", "selectors": [".policy-page__body a:not(.link):focus-visible"], "description": "Visible keyboard focus on an unclassed target-authored body link." },
+    { "name": "overflowFocusVisible", "selectors": [".policy-page__overflow:focus-visible"], "description": "Visible focus on an explicitly named keyboard-scrollable wide-content region." }
   ],
   "behavior": [
     {
-      "name": "tableOfContents",
-      "selectors": [".policy-page__toc", ".policy-page__toc-link"],
-      "attributes": ["href"],
-      "events": ["click"],
-      "description": "When supplied, table-of-contents links target stable section identifiers in the same document and preserve body-section order. Generation and synchronization remain target-owned."
+      "name": "requiredDocument",
+      "selectors": [".policy-page", ".policy-page__title", ".policy-page__body"],
+      "attributes": ["aria-labelledby", "id"],
+      "description": "A non-empty title and non-empty semantic body are both required. Missing either omits the complete article rather than leaving an empty or incorrectly named shell."
     },
     {
-      "name": "legalContentBoundary",
+      "name": "updateMetadata",
+      "selectors": [".policy-page__date"],
+      "attributes": ["datetime"],
+      "description": "Visible target-formatted update text is independent from an optional exact machine-readable datetime. Targets never parse localized display text; a machine value alone renders nothing."
+    },
+    {
+      "name": "tableOfContents",
+      "selectors": [".policy-page__toc", ".policy-page__toc-title", ".policy-page__toc-list", ".policy-page__toc-link", ".policy-page__section"],
+      "attributes": ["aria-labelledby", "id", "href"],
+      "description": "A supplied table of contents requires a non-empty visible title, native ordered list and canonical Links. Each fragment resolves to one unique body section in matching order; generation, synchronization and active tracking remain target-owned."
+    },
+    {
+      "name": "semanticContent",
+      "selectors": [".policy-page__body", ".policy-page__section", ".policy-page__section-title", ".policy-page__overflow"],
+      "description": "Targets preserve authored paragraphs, contextual headings, lists, emphasis, quotations, figures, links, tables, code, dates and media. Wide two-dimensional content uses an explicitly named keyboard-scrollable wrapper without flattening the surrounding prose."
+    },
+    {
+      "name": "contentOwnership",
       "selectors": [".policy-page__body"],
-      "description": "The target supplies semantic legal content. This contract styles the resulting document but does not define a CMS schema, revision model, localization pipeline, or policy-source API."
+      "description": "The target owns legal content, accuracy, trust, sanitization, parsing, revisions, effective dates, localization, policy inventory, section identifiers, external-link policy, media and publishing."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [".policy-page"],
+      "description": "P3 owns no controlled or uncontrolled state, event handler, observer, request, timer, parser, formatter, sanitizer, generated id, active-section tracker, focus relocation, authored motion, asset or neutral JavaScript."
     }
   ],
   "properties": [
@@ -56,56 +79,72 @@
       "name": "title",
       "type": "string",
       "required": true,
-      "description": "Page-level policy title.",
+      "unsetBehavior": "Omit the complete component when the title is empty.",
+      "description": "Non-empty visible policy-document title; targets choose its contextual heading rank and unique id.",
       "targetMappings": { "web": [{ "kind": "content", "selector": ".policy-page__title" }] }
     },
     {
       "name": "updatedDate",
       "type": "string",
       "required": false,
-      "description": "Optional target-formatted visible last-updated date; machine-readable date semantics remain markup-owned.",
+      "unsetBehavior": "Omit update metadata and ignore updatedDateTime.",
+      "description": "Optional target-formatted visible update metadata; it is never parsed into a machine value.",
       "targetMappings": { "web": [{ "kind": "content", "selector": ".policy-page__date" }] }
+    },
+    {
+      "name": "updatedDateTime",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Render updatedDate as ordinary text when visible update metadata exists; omit the datetime attribute.",
+      "description": "Optional exact machine-readable datetime used independently with visible updatedDate text.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".policy-page__date", "attribute": "datetime", "valueFrom": "property", "elements": ["time"] }] }
     },
     {
       "name": "tocTitle",
       "type": "string",
       "required": false,
-      "description": "Optional table-of-contents heading.",
+      "unsetBehavior": "Omit the complete table of contents when tocItems is absent or this title is empty.",
+      "description": "Visible heading that conditionally names a supplied table of contents; its native rank remains target-owned.",
       "targetMappings": { "web": [{ "kind": "content", "selector": ".policy-page__toc-title" }] }
     },
     {
       "name": "tocItems",
       "type": "slot",
       "required": false,
-      "description": "Target-owned in-page links ordered to match policy sections.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".policy-page__toc-list", "classNames": [".policy-page__toc-list", ".policy-page__toc-link"] }] }
+      "unsetBehavior": "Omit the complete table of contents and ignore tocTitle.",
+      "description": "Target-owned native ordered list of canonical Links synchronized with unique body-section identifiers.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".policy-page__toc-list", "classNames": [".policy-page__toc-list", ".policy-page__toc-link", ".link"] }] }
     },
     {
       "name": "body",
       "type": "slot",
       "required": true,
-      "description": "Target-owned semantic policy document content.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".policy-page__body", "classNames": [".policy-page__body"] }] }
+      "unsetBehavior": "Omit the complete component when no non-empty semantic body is supplied.",
+      "description": "Required non-empty target-owned semantic policy document; content trust, markup and publishing remain target responsibilities.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".policy-page__body", "classNames": [".policy-page__body", ".policy-page__section", ".policy-page__section-title", ".policy-page__overflow"] }] }
     }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary", "--color-surface-secondary", "--color-text-accent", "--color-border-focus"],
-      "spacing": ["--layout-gutter", "--space-layout-touch-target"],
+      "color": ["--color-border-default", "--color-border-focus", "--color-border-subtle", "--color-surface-primary", "--color-surface-secondary", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--layout-gutter", "--space-layout-element-gap", "--space-layout-section-gap", "--space-layout-touch-target", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"],
       "radius": ["--radius-md"],
-      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-sm-size", "--typo-body-size", "--typo-article-size", "--typo-article-line-height", "--typo-h3-size", "--typo-h4-size"]
+      "typography": ["--font-family-body", "--font-family-heading", "--font-family-mono", "--tg-typography-h2-weight", "--tg-typography-h3-weight", "--typo-article-line-height", "--typo-article-size", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-caption-line-height", "--typo-caption-size", "--typo-h2-line-height", "--typo-h2-size", "--typo-h3-line-height", "--typo-h3-size", "--typo-h4-line-height", "--typo-h4-size"]
     }
   },
   "accessibility": [
-    "Use one page-level title followed by a logical, non-skipping heading hierarchy in the policy body.",
-    "Render a visible last-updated date when supplied and use machine-readable date markup when the target has an exact value.",
-    "Keep table-of-contents links in document order and point each link to a unique section identifier.",
-    "Preserve semantic lists, tables, links, quotations, and other legal-content structures from the target source.",
-    "Keep long text, media, tables, and code contained at narrow widths without removing keyboard access to horizontal overflow."
+    "Require a non-empty visible title and non-empty semantic body; omit the complete article when either is missing.",
+    "Use one document main. Exhibit and Studio render a contextual labelled article; standalone targets host it inside their main and choose contextual heading ranks.",
+    "Supply visible update text and exact machine-readable datetime independently; never parse localized text or render a machine value without visible metadata.",
+    "Omit an incomplete table of contents. When supplied, use a visible name, native ordered list, canonical Links, matching descriptive labels and unique same-document targets in body order.",
+    "Preserve native paragraphs, logical headings, lists, emphasis, quotations, figures, links, tables, code, dates and media in authored order.",
+    "Keep prose and media contained through narrow widths, localization, RTL, 200 percent text, 400 percent zoom, forced colors and user styles.",
+    "Wrap genuinely two-dimensional content in a target-named keyboard-scrollable region; do not make passive prose or the article itself focusable.",
+    "Add no custom ARIA widget role, active-section announcement, focus relocation, smooth-scroll requirement, authored motion or neutral runtime."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/pages.css; legal content and table-of-contents generation remain target-owned." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map target policy content without this contract defining Shopify or cross-target CMS ownership." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Contextual article, independent update metadata, optional named canonical Link navigation, semantic body flow, intrinsic containment and zero neutral runtime are implemented in canonical Pages CSS and target markup." },
+    "shopify": { "status": "implemented", "kind": "liquid-snippet", "notes": "A strict reusable snippet maps one supplied Liquid policy object's title/body to canonical P3 anatomy and truthfully omits date/index data absent from the platform object." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

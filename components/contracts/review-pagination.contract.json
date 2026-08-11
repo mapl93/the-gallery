@@ -1,87 +1,83 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "review-pagination",
   "name": "Review Pagination",
   "registryId": "V9",
   "category": "reviews",
   "status": "pilot",
-  "summary": "Contained review navigation controls with native-link or native-button semantics supplied by the target.",
-  "dependencies": [],
+  "summary": "Review-result profile of canonical Pagination with a specific navigation name, target-supplied finite page items, and target-owned provider and result lifecycle.",
+  "dependencies": ["pagination"],
   "source": {
     "registry": "registry.json#/components/review-pagination",
     "css": { "file": "components/css/reviews.css", "selector": ".review-pagination" },
     "docs": "site/src/content/components/review-pagination.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".review-pagination", "className": ".review-pagination", "required": true, "description": "Horizontally contained navigation region, preferably rendered as a labelled nav element." },
-    { "name": "list", "selector": ".review-pagination__list", "className": ".review-pagination__list", "required": false, "description": "Optional semantic list wrapper for the target-supplied controls." },
-    { "name": "item", "selector": ".review-pagination__item", "className": ".review-pagination__item", "required": false, "description": "Optional semantic list item wrapper." },
-    { "name": "control", "selector": ".review-pagination__btn", "className": ".review-pagination__btn", "required": true, "description": "Repeated native anchor for navigation or native button for a target-owned in-place paging strategy." },
-    { "name": "ellipsis", "selector": ".review-pagination__ellipsis", "className": ".review-pagination__ellipsis", "required": false, "description": "Optional passive omission marker hidden from the control sequence." }
+    { "name": "rootProfile", "selector": ".review-pagination", "className": ".review-pagination", "required": true, "description": "Review-context hook layered on the required canonical Pagination navigation root; it adds no independent visual or keyboard behavior." },
+    { "name": "list", "selector": ".pagination__list", "className": ".pagination__list", "required": true, "description": "Required canonical Pagination native list preserving destination order and grouping." },
+    { "name": "item", "selector": ".pagination__item", "className": ".pagination__item", "required": true, "description": "Repeated canonical Pagination list item containing exactly one destination, current page, or ellipsis." },
+    { "name": "link", "selector": ".pagination__link", "className": ".pagination__link", "required": false, "description": "Canonical Link destination for an available page, previous page, or next page." },
+    { "name": "current", "selector": ".pagination__current", "className": ".pagination__current", "required": true, "description": "Exactly one canonical non-interactive current-page indicator when the component renders." },
+    { "name": "ellipsis", "selector": ".pagination__ellipsis", "className": ".pagination__ellipsis", "required": false, "description": "Optional canonical passive skipped-range marker hidden from assistive technology." }
   ],
   "properties": [
     {
       "name": "label",
       "type": "string",
       "required": true,
-      "description": "Accessible name identifying the navigation as review pagination.",
+      "description": "Localized accessible name that identifies this navigation as review pagination.",
       "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-pagination", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] }
     },
     {
-      "name": "controls",
-      "type": "slot",
+      "name": "currentPage",
+      "type": "number",
       "required": true,
-      "description": "Target-owned previous, numbered, omitted, and next controls with current and unavailable state.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-pagination__btn", "classNames": [".review-pagination__btn"] }] }
-    }
-  ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default contained navigation controls." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Touch-sized controls in a horizontally contained sequence." }],
-  "states": [
-    { "name": "default", "selectors": [".review-pagination"], "description": "Navigation region with target-supplied controls." },
-    { "name": "hover", "selectors": [".review-pagination__btn:hover:not(:disabled):not([aria-disabled=\"true\"]):not([aria-current=\"page\"])"], "description": "Fine-pointer feedback for an available non-current control." },
-    { "name": "focusVisible", "selectors": [".review-pagination__btn:focus-visible"], "description": "Visible keyboard focus on a native control." },
-    { "name": "current", "selectors": [".review-pagination__btn[aria-current=\"page\"]"], "description": "Current target-supplied page." },
-    { "name": "disabled", "selectors": [".review-pagination__btn:disabled", ".review-pagination__btn[aria-disabled=\"true\"]"], "description": "Unavailable native button or target-disabled link presentation." }
-  ],
-  "behavior": [
-    {
-      "name": "navigationBoundary",
-      "selectors": [".review-pagination__btn"],
-      "attributes": ["aria-label", "aria-current=\"page\"", "disabled", "aria-disabled=\"true\""],
-      "description": "Targets choose links, in-place buttons, URL state, page-window size, cursor versus offset strategy, loading, and focus/result behavior. The neutral component supplies no paging algorithm."
+      "min": 1,
+      "step": 1,
+      "description": "Positive target projection matching the one rendered canonical current item; it does not define total pages or a page-window algorithm.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-pagination", "attribute": "data-current-page", "valueFrom": "property", "elements": ["nav"] }] }
     },
     {
-      "name": "currentPage",
-      "selectors": [".review-pagination__btn[aria-current=\"page\"]"],
-      "attributes": ["aria-current=\"page\""],
-      "description": "Exactly one numbered control is marked current when the selected strategy exposes page numbers."
+      "name": "pageItems",
+      "type": "slot",
+      "required": true,
+      "description": "Finite target-supplied canonical Pagination list containing previous, page, current, ellipsis, and next items with real destination URLs.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".pagination__list", "classNames": [".pagination__item", ".pagination__link", ".pagination__current", ".pagination__ellipsis"] }] }
     }
   ],
-  "tokens": {
-    "public": {
-      "color": ["--color-border-subtle", "--color-text-primary", "--color-border-default", "--color-surface-secondary", "--color-surface-statement", "--color-border-focus", "--color-text-secondary"],
-      "radius": ["--radius-sm"],
-      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"],
-      "typography": ["--typo-body-sm-size"],
-      "motion": ["--motion-transition-micro"],
-      "opacity": ["--opacity-disabled"]
-    }
-  },
+  "variants": [{ "name": "default", "className": null, "default": true, "description": "Review-context profile of canonical Pagination." }],
+  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Canonical Pagination touch-friendly size and intrinsic wrapping." }],
+  "states": [
+    { "name": "default", "selectors": [".review-pagination"], "description": "Named review navigation using canonical Pagination presentation." },
+    { "name": "linkHover", "selectors": [".pagination__link:hover"], "description": "Canonical available-destination hover state." },
+    { "name": "current", "selectors": [".pagination__current"], "description": "One canonical non-interactive current-page state." }
+  ],
+  "behavior": [
+    { "name": "paginationComposition", "selectors": [".review-pagination", ".pagination__list", ".pagination__item", ".pagination__link", ".pagination__current", ".pagination__ellipsis"], "description": "Review Pagination consumes canonical Pagination structure, Link destinations, current-page treatment, ellipses, boundary omission, wrapping, RTL, forced-colors, reduced-motion, and zero-runtime behavior without recreating them." },
+    { "name": "navigationLandmark", "selectors": [".review-pagination"], "attributes": ["<nav>", "aria-label"], "description": "The profile remains a specifically named native navigation landmark that distinguishes review pages from other navigation regions." },
+    { "name": "nativeLinks", "selectors": [".pagination__link"], "attributes": ["<a>", "href"], "description": "Every available destination is a canonical native Link with a real target-owned URL and ordinary Tab, Enter, browser-history, and modified-activation behavior." },
+    { "name": "currentPage", "selectors": [".pagination__current"], "attributes": ["aria-current=\"page\""], "description": "Exactly one non-interactive canonical item represents the current page; it is not a button, self-link, or disabled pseudo-control." },
+    { "name": "boundaryOmission", "selectors": [".pagination__link"], "description": "Previous is omitted on the first page and next is omitted on the last page instead of leaving dead disabled focus stops." },
+    { "name": "ellipsis", "selectors": [".pagination__ellipsis"], "attributes": ["aria-hidden=\"true\""], "description": "Every ellipsis is passive, hidden from assistive technology, and never rendered as a link or button." },
+    { "name": "targetOwnedLifecycle", "selectors": [".review-pagination", ".pagination__list"], "description": "The provider or target owns total pages, page-window calculation, URLs or cursor translation, requests, loading/errors, result replacement, history, scroll, focus, announcements, analytics and prefetch." },
+    { "name": "contentResilience", "selectors": [".pagination__list", ".pagination__item", ".pagination__link", ".pagination__current"], "description": "The finite supplied item window wraps inside its actual container without review-specific scrolling, CSS hiding, reordering, or viewport assumptions." }
+  ],
+  "tokens": { "public": {} },
   "accessibility": [
-    "Use a nav element with a specific accessible label for review navigation.",
-    "Prefer native links when controls navigate to URLs and native buttons only for a target-owned in-place paging flow.",
-    "Expose the current numbered page with aria-current=\"page\".",
-    "Give previous and next controls names that include direction and unavailable state.",
-    "Do not leave aria-disabled links activatable; omit their href or prevent every input modality according to the selected target pattern.",
-    "Keep the control sequence keyboard reachable when it overflows horizontally."
+    "Render a specifically named native navigation landmark containing the canonical Pagination list.",
+    "Use native canonical Links with href for every available destination and preserve normal Tab and Enter behavior.",
+    "Mark exactly one non-interactive current item with aria-current=\"page\".",
+    "Omit unavailable previous or next destinations instead of leaving disabled controls in sequential focus.",
+    "Hide passive ellipsis items from assistive technology and never make them interactive.",
+    "Give icon-only previous and next Links localized accessible names and hide decorative icons.",
+    "Leave review loading, result announcements, focus restoration, scrolling, pending/error state, history, URL synchronization and provider behavior to one target coordinator."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Touch targets, horizontal containment, focus, current, disabled, forced-colors, and reduced-motion presentation are implemented." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must choose a provider-compatible pagination strategy and native control semantics." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css-composition", "notes": "The review root profile consumes canonical Pagination and Link markup, presentation and behavior; it adds no visual token or neutral runtime." },
+    "shopify": { "status": "planned", "kind": "provider-pagination-profile", "notes": "A selected review-provider app block may map its finite page model to canonical Pagination; no provider-neutral review Liquid is authorized." },
+    "react": { "status": "planned", "kind": "component-profile" },
+    "figma": { "status": "planned", "kind": "component-profile" },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }
   }

@@ -1,22 +1,59 @@
-<section class="collection-hero {% if collection.image %}collection-hero--with-image{% endif %}">
-  {% if collection.image %}
+{% liquid
+  assign show_collection_image = false
+  if section.settings.show_image and collection.image != blank
+    assign show_collection_image = true
+  endif
+
+  assign collection_image_alt = collection.image.alt | default: ''
+%}
+
+<section class="collection-hero{% if show_collection_image %} collection-hero--with-image{% endif %}">
+  {% if show_collection_image %}
     {{ collection.image | image_url: width: 1920 | image_tag:
-       class: 'collection-hero__image', alt: collection.title,
-       loading: 'eager', widths: '768,1024,1440,1920',
-       sizes: '100vw' }}
+      class: 'collection-hero__image',
+      alt: collection_image_alt,
+      loading: 'eager',
+      fetchpriority: 'high',
+      widths: '768, 1024, 1440, 1920',
+      sizes: '100vw'
+    }}
   {% endif %}
+
   <div class="collection-hero__content">
-    <h1 class="collection-hero__title">{{ collection.title }}</h1>
-    {% if collection.description != blank %}
-      <div class="collection-hero__description">{{ collection.description }}</div>
+    <h1 class="collection-hero__title">{{ collection.title | escape }}</h1>
+
+    {% if section.settings.show_description and collection.description != blank %}
+      <p class="collection-hero__description">{{ collection.description | strip_html | escape }}</p>
     {% endif %}
-    <p class="collection-hero__count">{{ collection.products_count }} pieces</p>
+
+    {% if section.settings.show_count %}
+      <p class="collection-hero__count">{{ 'collections.product_count' | t: count: collection.products_count }}</p>
+    {% endif %}
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "Collection Hero",
-  "settings": []
+  "name": "t:sections.collection_hero.name",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:sections.collection_hero.settings.show_description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "t:sections.collection_hero.settings.show_image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "t:sections.collection_hero.settings.show_count",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

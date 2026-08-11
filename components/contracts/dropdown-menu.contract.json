@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "dropdown-menu",
   "name": "Dropdown Menu",
   "registryId": "B11",
   "category": "layout",
   "status": "pilot",
-  "summary": "Action menu contract with trigger-owned open state, menu item anatomy, labels, separators, shortcuts, danger item styling, disabled state, and menu keyboard behavior.",
+  "summary": "Button-triggered immediate action menu with labelled groups, separators, roving menuitem focus, disabled and danger states, shortcut hints, dismissal, and controlled or uncontrolled open ownership.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/dropdown-menu",
@@ -37,6 +37,13 @@
       "className": ".dropdown__item",
       "required": true,
       "description": "Interactive command inside the menu."
+    },
+    {
+      "name": "group",
+      "selector": ".dropdown__group",
+      "className": ".dropdown__group",
+      "required": false,
+      "description": "Optional role=group wrapper for a labelled set of related menu commands."
     },
     {
       "name": "itemIcon",
@@ -102,7 +109,7 @@
     },
     {
       "name": "itemHover",
-      "selectors": [".dropdown__item:hover"],
+      "selectors": [".dropdown__item:not(:disabled):not([aria-disabled=\"true\"]):not([data-disabled]):hover"],
       "description": "Pointer hover state on a menu item."
     },
     {
@@ -117,8 +124,8 @@
     },
     {
       "name": "itemDisabled",
-      "selectors": [".dropdown__item:disabled"],
-      "description": "Unavailable item state."
+      "selectors": [".dropdown__item:disabled", ".dropdown__item[aria-disabled=\"true\"]", ".dropdown__item[data-disabled]"],
+      "description": "Unavailable command mapped through native, ARIA, or adapter data state."
     }
   ],
   "behavior": [
@@ -134,18 +141,28 @@
     },
     {
       "name": "menuSemantics",
-      "attributes": ["role=\"menu\"", "role=\"menuitem\"", "aria-disabled"],
-      "description": "The menu and items must expose menu semantics when native button lists are not sufficient for the target."
+      "attributes": ["role=\"menu\"", "role=\"group\"", "role=\"menuitem\"", "role=\"separator\"", "aria-labelledby", "aria-disabled"],
+      "description": "The menu is named by its trigger; optional groups own labelled menuitems, static separators divide groups, and unavailable commands expose disabled state."
+    },
+    {
+      "name": "focusEntry",
+      "events": ["Enter", "Space", "ArrowDown", "ArrowUp"],
+      "description": "Enter or Space opens and focuses the first command; optional ArrowDown/ArrowUp open and focus the first/last command."
     },
     {
       "name": "keyboardNavigation",
-      "events": ["ArrowDown", "ArrowUp", "Home", "End", "Enter", "Space", "Escape"],
-      "description": "Keyboard navigation moves the highlighted item, activates commands, and closes the menu with Escape."
+      "events": ["ArrowDown", "ArrowUp", "Home", "End", "printable character", "Enter", "Space", "Escape", "Tab"],
+      "description": "Roving focus moves through commands with arrows/Home/End, may support printable typeahead, activates with Enter/Space, returns focus on Escape, and closes without trapping on Tab."
     },
     {
       "name": "dismissal",
       "events": ["Escape", "outside click", "item select"],
       "description": "The menu closes after Escape, outside interaction, or a completed command unless the target documents a persistent menu pattern."
+    },
+    {
+      "name": "stateOwnership",
+      "events": ["openChange", "select"],
+      "description": "Targets may use controlled open or uncontrolled default-open state; disabled commands emit no selection."
     }
   ],
   "properties": [
@@ -188,7 +205,9 @@
         "--color-surface-primary",
         "--color-surface-secondary",
         "--color-border-subtle",
+        "--color-border-focus",
         "--color-text-primary",
+        "--color-text-secondary",
         "--color-text-disabled",
         "--color-feedback-error-default"
       ],
@@ -209,22 +228,32 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-layout-touch-target"
       ]
     }
   },
   "accessibility": [
     "Use a button as the trigger and keep aria-expanded synchronized with the open state.",
-    "Close the menu on Escape and outside interaction.",
-    "Support arrow key navigation between enabled items.",
-    "Use disabled or aria-disabled for unavailable items and skip them during keyboard activation.",
+    "Move focus into the menu when it opens and maintain one roving tabindex among menuitems.",
+    "Close on Escape, restore trigger focus, and close on outside interaction or completed selection.",
+    "Support ArrowUp/ArrowDown, Home/End, optional printable typeahead, and non-trapping Tab exit.",
+    "Use labelled role=group wrappers and role=separator where visual groups are present.",
+    "Use native, aria-disabled, or adapter data state for unavailable items and never activate them.",
     "Reserve danger styling for destructive actions and keep the label explicit."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; open state, focus movement, and command execution must be provided by the consuming target."
+      "notes": "Canonical CSS implements portable/native visibility, group/item anatomy, focus, disabled, danger, responsive and special-media states; the consuming target owns roving focus, typeahead, dismissal, positioning, and command execution."
     },
     "shopify": {
       "status": "planned",

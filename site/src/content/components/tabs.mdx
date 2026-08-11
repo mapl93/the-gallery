@@ -1,37 +1,50 @@
 ## Overview
 
-Tab navigation with panels.
+Tabs switches among related peer panels in one local context. The horizontal set
+has one accessible name, one selected tab, roving focus, and one visible panel.
 
 ## Presentation
 
-<Preview html={"<div class=\"tabs\"><div class=\"tabs__list\" role=\"tablist\" aria-label=\"Artwork details\"><button class=\"tabs__tab\" id=\"overview-tab\" type=\"button\" role=\"tab\" aria-selected=\"true\" aria-controls=\"overview-panel\">Overview</button><button class=\"tabs__tab\" id=\"details-tab\" type=\"button\" role=\"tab\" aria-selected=\"false\" aria-controls=\"details-panel\" tabindex=\"-1\">Details</button><button class=\"tabs__tab\" id=\"shipping-tab\" type=\"button\" role=\"tab\" aria-selected=\"false\" aria-controls=\"shipping-panel\" tabindex=\"-1\">Shipping</button></div><div class=\"tabs__panel\" id=\"overview-panel\" role=\"tabpanel\" aria-labelledby=\"overview-tab\">A hand-thrown vessel shaped through a slow, iterative studio process.</div><div class=\"tabs__panel\" id=\"details-panel\" role=\"tabpanel\" aria-labelledby=\"details-tab\" hidden>Satin celadon glaze, signed base, and one-of-one variation.</div><div class=\"tabs__panel\" id=\"shipping-panel\" role=\"tabpanel\" aria-labelledby=\"shipping-tab\" hidden>Packed in the studio and dispatched within three business days.</div></div>"} label="Tabs" />
+<Preview html={'<div class="tabs" data-activation="automatic"><div class="tabs__list" role="tablist" aria-label="Artwork details"><button class="tabs__tab" id="overview-tab" type="button" role="tab" aria-selected="true" aria-controls="overview-panel">Overview</button><button class="tabs__tab" id="details-tab" type="button" role="tab" aria-selected="false" aria-controls="details-panel" tabindex="-1">Details</button><button class="tabs__tab" id="shipping-tab" type="button" role="tab" aria-selected="false" aria-controls="shipping-panel" tabindex="-1">Shipping</button></div><div class="tabs__panel" id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">A hand-thrown vessel shaped through a slow, iterative studio process.</div><div class="tabs__panel" id="details-panel" role="tabpanel" aria-labelledby="details-tab" tabindex="0" hidden>Satin celadon glaze, signed base, and one-of-one variation.</div><div class="tabs__panel" id="shipping-panel" role="tabpanel" aria-labelledby="shipping-tab" tabindex="0" hidden>Packed in the studio and dispatched within three business days.</div></div>'} label="Tabs" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use tabs to switch between related panels at the same hierarchy level.</Do>
-  <Dont>Don't use tabs as primary site navigation or for unrelated destinations.</Dont>
+  <Do>Use Tabs for related, preloaded content panels at the same hierarchy level.</Do>
+  <Dont>Don't use Tabs for primary navigation, sequential steps, form choices, or unrelated destinations.</Dont>
 </DoDont>
+
+Use automatic activation only when a focused tab can reveal its preloaded panel
+without noticeable latency. Use manual activation when selection requires Enter
+or Space. Vertical, closable, reorderable, routed, lazy, and responsive Accordion
+modes are outside the v1 contract.
 
 ## Accessibility
 
 <Callout type="warning">
-  Tabs require keyboard behavior in the target adapter, not just visual classes.
+  Styling alone does not create Tabs. The target must coordinate selection,
+  roving focus, ids, keyboard events, hidden panels, and one change event.
 </Callout>
 
-- Use `role="tablist"`, `role="tab"`, and `role="tabpanel"`.
-- Use `aria-selected`, `aria-controls`, and `aria-labelledby` to connect tabs and panels.
-- Hide inactive panels with `hidden`.
-- Support arrow key navigation between tabs.
+- Label the `tablist` and connect each `tab`/`tabpanel` pair with
+  `aria-controls` and `aria-labelledby`.
+- Keep exactly one enabled tab selected and one panel visible.
+- ArrowLeft/ArrowRight wrap among enabled tabs; Home/End move to the first/last
+  enabled tab. Manual mode waits for Enter, Space, or click to select.
+- Include a text-only panel in the Tab sequence when it has no appropriate first
+  focusable descendant.
+- Skip disabled tabs and preserve visible focus independently from selection.
 
 ## References
 
 <PropTable>
-  <tr><td>`selected`</td><td>boolean</td><td>`false`</td><td>Selected state for an individual tab</td></tr>
-  <tr><td>`.tabs`</td><td>class</td><td>—</td><td>Base tabs styles</td></tr>
-  <tr><td>`.tabs__list`</td><td>class</td><td>—</td><td>Scrollable tab list</td></tr>
-  <tr><td>`.tabs__tab`</td><td>class</td><td>—</td><td>Tab trigger</td></tr>
-  <tr><td>`.tabs__panel`</td><td>class</td><td>—</td><td>Associated content panel</td></tr>
-  <tr><td>`aria-selected`</td><td>attribute</td><td>`false`</td><td>Controls selected tab styling</td></tr>
-  <tr><td>`hidden`</td><td>attribute</td><td>—</td><td>Hides inactive panels</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Accessible tablist name</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Paired tab and panel compositions</td></tr>
+  <tr><td>`selected`</td><td>boolean</td><td>`false`</td><td>Per-tab selected state; exactly one per set</td></tr>
+  <tr><td>`activationMode`</td><td>`automatic | manual`</td><td>`automatic`</td><td>Focus selection policy</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Per-tab unavailable state</td></tr>
+  <tr><td>`.tabs`</td><td>class</td><td>—</td><td>Selection root</td></tr>
+  <tr><td>`.tabs__list`</td><td>class</td><td>—</td><td>Labelled horizontal tablist</td></tr>
+  <tr><td>`.tabs__tab`</td><td>class</td><td>—</td><td>Native tab Button</td></tr>
+  <tr><td>`.tabs__panel`</td><td>class</td><td>—</td><td>Associated panel; inactive panels use `hidden`</td></tr>
 </PropTable>

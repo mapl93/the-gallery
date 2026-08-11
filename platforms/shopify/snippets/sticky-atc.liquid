@@ -1,0 +1,82 @@
+{% doc %}
+Renders the initial product-context Sticky Add-to-Cart composition associated
+with an existing canonical Product Form. The target coordinator owns live
+variant, quantity, price, availability, visibility, purchase result, and fixed
+surface collision behavior.
+
+@param {product} product - Product summarized by the sticky surface.
+@param {string} product_form_id - Existing unique native Product Form id.
+@param {boolean} [visible] - Whether the target initially exposes the surface.
+@param {boolean} [show_image] - Whether to render the initial product image.
+@param {boolean} [show_price] - Whether to render canonical Price.
+@param {boolean} [pending] - Whether target purchase work is initially pending.
+
+@example
+{% render 'sticky-atc', product: product, product_form_id: product_form_id, visible: false %}
+{% enddoc %}
+
+{%- if product != blank -%}
+  {%- if product_form_id != blank -%}
+    {%- liquid
+      assign current_variant = product.selected_or_first_available_variant
+      assign action_disabled = false
+      unless current_variant.available
+        assign action_disabled = true
+      endunless
+      if pending
+        assign action_disabled = true
+      endif
+      assign sticky_image = current_variant.featured_image | default: product.featured_image
+      assign sticky_image_alt = sticky_image.alt | default: product.title
+    -%}
+
+    <div
+      class="sticky-atc{% if visible %} sticky-atc--visible{% endif %}"
+      data-sticky-atc
+      data-product-id="{{ product.id }}"
+      data-product-form-id="{{ product_form_id | escape }}"
+      {% unless visible %}aria-hidden="true" inert{% endunless %}
+    >
+      <div class="sticky-atc__inner">
+        <div class="sticky-atc__info">
+          {%- if show_image and sticky_image != blank -%}
+            {{ sticky_image
+              | image_url: width: 96
+              | image_tag:
+                class: 'sticky-atc__image',
+                alt: sticky_image_alt,
+                loading: 'lazy',
+                widths: '48, 96',
+                sizes: '48px'
+            }}
+          {%- endif -%}
+
+          <span class="sticky-atc__title" dir="auto">{{ product.title | escape }}</span>
+
+          {%- unless show_price == false -%}
+            <div class="sticky-atc__price">
+              {% render 'price', product: product %}
+            </div>
+          {%- endunless -%}
+        </div>
+
+        <button
+          class="btn sticky-atc__action"
+          type="submit"
+          form="{{ product_form_id | escape }}"
+          name="add"
+          value="add"
+          data-sticky-atc-submit
+          {% if action_disabled %}disabled{% endif %}
+          {% if pending %}aria-busy="true"{% endif %}
+        >
+          {% if current_variant.available %}
+            {{ 'products.add_to_cart' | t }}
+          {% else %}
+            {{ 'products.sold_out' | t }}
+          {% endif %}
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}

@@ -1,0 +1,200 @@
+{%- liquid
+  assign related_default_title = 'related_articles.heading' | t
+  assign related_title = section.settings.title | default: related_default_title
+  assign related_title_id = 'RelatedArticlesTitle-' | append: section.id
+
+  assign related_heading_level = section.settings.heading_level | default: '2' | plus: 0
+  case related_heading_level
+    when 3
+      assign related_heading_tag = 'h3'
+    when 4
+      assign related_heading_tag = 'h4'
+    when 5
+      assign related_heading_tag = 'h5'
+    else
+      assign related_heading_level = 2
+      assign related_heading_tag = 'h2'
+  endcase
+  assign related_card_heading_level = related_heading_level | plus: 1
+
+  assign related_current_id = ''
+  if article != blank
+    assign related_current_id = article.id
+  endif
+
+  assign related_valid_count = 0
+  assign related_seen_ids = '|'
+  for related_candidate in section.settings.articles
+    assign related_candidate_valid = true
+    if related_candidate == blank or related_candidate.title == blank or related_candidate.url == blank
+      assign related_candidate_valid = false
+    endif
+    if related_current_id != blank and related_candidate.id == related_current_id
+      assign related_candidate_valid = false
+    endif
+    assign related_candidate_marker = related_candidate.id | prepend: '|' | append: '|'
+    if related_seen_ids contains related_candidate_marker
+      assign related_candidate_valid = false
+    endif
+    if related_candidate_valid
+      assign related_seen_ids = related_seen_ids | append: related_candidate.id | append: '|'
+      assign related_valid_count = related_valid_count | plus: 1
+    endif
+    if related_valid_count >= 3
+      break
+    endif
+  endfor
+-%}
+
+{%- if related_title != blank and related_valid_count > 0 -%}
+  <section class="related-articles" aria-labelledby="{{ related_title_id }}">
+    <{{ related_heading_tag }} class="related-articles__title" id="{{ related_title_id }}" dir="auto">
+      {{ related_title | escape }}
+    </{{ related_heading_tag }}>
+
+    <ul class="related-articles__grid">
+      {%- assign related_rendered_count = 0 -%}
+      {%- assign related_seen_ids = '|' -%}
+      {%- for related_candidate in section.settings.articles -%}
+        {%- assign related_candidate_valid = true -%}
+        {%- if related_candidate == blank or related_candidate.title == blank or related_candidate.url == blank -%}
+          {%- assign related_candidate_valid = false -%}
+        {%- endif -%}
+        {%- if related_current_id != blank and related_candidate.id == related_current_id -%}
+          {%- assign related_candidate_valid = false -%}
+        {%- endif -%}
+        {%- assign related_candidate_marker = related_candidate.id | prepend: '|' | append: '|' -%}
+        {%- if related_seen_ids contains related_candidate_marker -%}
+          {%- assign related_candidate_valid = false -%}
+        {%- endif -%}
+
+        {%- if related_candidate_valid -%}
+          {%- assign related_seen_ids = related_seen_ids | append: related_candidate.id | append: '|' -%}
+          <li class="related-articles__item">
+            {% render 'article-card',
+              article: related_candidate,
+              variant: section.settings.card_variant,
+              surface: section.settings.card_surface,
+              excerpt_lines: section.settings.excerpt_lines,
+              heading_level: related_card_heading_level,
+              show_image: section.settings.show_image,
+              show_date: section.settings.show_date,
+              show_excerpt: section.settings.show_excerpt,
+              show_author: section.settings.show_author
+            %}
+          </li>
+          {%- assign related_rendered_count = related_rendered_count | plus: 1 -%}
+        {%- endif -%}
+
+        {%- if related_rendered_count >= 3 -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:sections.related_articles.name",
+  "enabled_on": {
+    "templates": ["article"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.related_articles.settings.title",
+      "info": "t:sections.related_articles.settings.title_info"
+    },
+    {
+      "type": "article_list",
+      "id": "articles",
+      "label": "t:sections.related_articles.settings.articles",
+      "info": "t:sections.related_articles.settings.articles_info",
+      "limit": 3
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "label": "t:sections.related_articles.settings.heading_level",
+      "options": [
+        { "value": "2", "label": "t:sections.related_articles.options.heading_2" },
+        { "value": "3", "label": "t:sections.related_articles.options.heading_3" },
+        { "value": "4", "label": "t:sections.related_articles.options.heading_4" },
+        { "value": "5", "label": "t:sections.related_articles.options.heading_5" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.related_articles.settings.card_heading"
+    },
+    {
+      "type": "select",
+      "id": "card_variant",
+      "label": "t:sections.related_articles.settings.card_variant",
+      "options": [
+        { "value": "standard", "label": "t:sections.related_articles.options.standard" },
+        { "value": "minimal", "label": "t:sections.related_articles.options.minimal" },
+        { "value": "horizontal", "label": "t:sections.related_articles.options.horizontal" },
+        { "value": "editorial", "label": "t:sections.related_articles.options.editorial" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "card_surface",
+      "label": "t:sections.related_articles.settings.card_surface",
+      "options": [
+        { "value": "default", "label": "t:sections.related_articles.options.default_surface" },
+        { "value": "flat", "label": "t:sections.related_articles.options.flat" },
+        { "value": "elevated", "label": "t:sections.related_articles.options.elevated" }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "t:sections.related_articles.settings.show_image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "t:sections.related_articles.settings.show_date",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "t:sections.related_articles.settings.show_excerpt",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "excerpt_lines",
+      "label": "t:sections.related_articles.settings.excerpt_lines",
+      "options": [
+        { "value": "none", "label": "t:sections.related_articles.options.no_limit" },
+        { "value": "2", "label": "t:sections.related_articles.options.two_lines" },
+        { "value": "3", "label": "t:sections.related_articles.options.three_lines" },
+        { "value": "4", "label": "t:sections.related_articles.options.four_lines" }
+      ],
+      "default": "none",
+      "visible_if": "{{ section.settings.show_excerpt }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "t:sections.related_articles.settings.show_author",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.related_articles.name"
+    }
+  ]
+}
+{% endschema %}

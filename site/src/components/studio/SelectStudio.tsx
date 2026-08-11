@@ -145,6 +145,7 @@ function simulatedFieldStyle(
   state: string,
   variant: string
 ): CSSProperties {
+  const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
   const focused = [
     'focusVisible',
     'errorFocusVisible',
@@ -164,7 +165,11 @@ function simulatedFieldStyle(
   return {
     backgroundColor: activeTokens.fill ? `var(${activeTokens.fill})` : undefined,
     color: activeTokens['value-color'] ? `var(${activeTokens['value-color']})` : undefined,
-    borderColor: activeTokens.border ? `var(${activeTokens.border})` : undefined,
+    borderColor: activeTokens.border
+      ? semantic
+        ? `color-mix(in srgb, var(${activeTokens.border}) 70%, var(--color-text-primary))`
+        : `var(${activeTokens.border})`
+      : undefined,
     outlineColor: focused ? `var(${outerBorder})` : undefined,
   };
 }
@@ -234,7 +239,9 @@ export default function SelectStudio({ contract, definition }: SelectStudioProps
   );
   const label = typeof values.label === 'string' ? values.label : '';
   const message = typeof values.message === 'string' ? values.message : '';
+  const name = typeof values.name === 'string' ? values.name : '';
   const disabled = values.disabled === true;
+  const required = values.required === true;
   const selectedIndex = previewOptions.findIndex((option) => option.value === selectedValue);
   const selectedOption = previewOptions[selectedIndex] ?? previewOptions[0];
   const fieldStyle = simulatedFieldStyle(activeTokens, previewState, variant);
@@ -370,8 +377,10 @@ export default function SelectStudio({ contract, definition }: SelectStudioProps
                 <select
                   className="select__field select__native"
                   id={nativeId}
+                  name={name || undefined}
                   value={selectedValue}
                   disabled={disabled}
+                  required={required}
                   tabIndex={-1}
                   aria-hidden="true"
                   aria-invalid={variant === 'error' || undefined}
@@ -394,7 +403,9 @@ export default function SelectStudio({ contract, definition }: SelectStudioProps
                   className="select__field select__trigger"
                   id={triggerId}
                   type="button"
+                  role="combobox"
                   disabled={disabled}
+                  aria-required={required || undefined}
                   aria-haspopup="listbox"
                   aria-expanded={open}
                   aria-controls={listboxId}

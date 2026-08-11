@@ -1,17 +1,17 @@
 ## Overview
 
-Artist Card is a compact artist summary with optional portrait, badge, medium, location, and piece count around a required artist name.
+Artist Card is a passive artist summary with optional portrait, canonical Badge, medium, location, and target-formatted piece count around a required artist name.
 
 <Preview
-  html={'<article class="artist-card tg-preview-card"><div class="artist-card__portrait"><img class="tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Portrait of ceramic artist Maria Garcia" /><span class="artist-card__badge">Featured</span></div><h2 class="artist-card__name">Maria Garcia</h2><span class="artist-card__medium">Ceramics</span><span class="artist-card__location">Buenos Aires</span><span class="artist-card__piece-count">42 pieces</span></article>'}
+  html={'<article class="artist-card tg-preview-card"><div class="artist-card__portrait tg-preview-media tg-preview-media--portrait" aria-hidden="true"><span class="badge artist-card__badge">Featured</span></div><h2 class="artist-card__name">Maria Garcia</h2><p class="artist-card__medium">Ceramics</p><p class="artist-card__location">Buenos Aires</p><p class="artist-card__piece-count">42 pieces</p></article>'}
   label="Artist Card"
 />
 
 ## Presentation
 
-`name` is required. Portrait, badge, medium, location, and target-formatted piece count are optional. The card follows the width of its containing layout and applies portrait emphasis only for fine-pointer hover or focus within target-owned interaction.
+`name` is required. Portrait, Badge, medium, location, and target-formatted piece count are optional and should be omitted when empty. Badge is rendered through the canonical Badge component and appears only with a portrait. The card follows the width of its containing layout.
 
-The artwork is deliberately passive. ADR 0080 does not decide whether Artist Card is always navigational, optionally interactive, or passive in some compositions. The contract therefore exposes no `href` or activation property.
+The shared artwork is deliberately passive. ADR 0080 does not decide whether Artist Card is always navigational, optionally interactive, or passive in some compositions. The contract therefore exposes no `href` or activation property. Targets may use a native `a[href]` or `button` root for one coherent activation; only enabled native roots receive pointer and hover motion, while native roots preserve visible keyboard focus and disabled button semantics.
 
 ## Usage Guidelines
 
@@ -20,20 +20,21 @@ The artwork is deliberately passive. ADR 0080 does not decide whether Artist Car
   <Dont>Do not add click handling to a passive container or assume every card navigates.</Dont>
 </DoDont>
 
-- Keep badge text short and use it only for meaningful artist context.
+- Keep Badge text short and use it only for meaningful artist context over a present portrait.
 - Format the piece count in the target rather than deriving grammar in the card.
 - When activation is decided, use native link or button markup and avoid nested controls.
+- Do not add Card surface styling or a generic Card dependency until that visual shell is explicitly accepted.
 
 ## Accessibility
 
-- Give meaningful portraits useful alternative text and mark decorative portraits accordingly.
+- Choose portrait alternative text from its purpose: describe informative portraits concisely and use empty alternative text when decorative or redundant.
 - When the target makes the card interactive, use native link or button markup instead of click handling on a passive container.
 - Ensure an interactive card has a descriptive accessible name, visible focus, and no nested interactive controls.
-- Do not rely on portrait hover motion to communicate identity or availability.
+- Choose the artist-name heading level from the containing document outline, omit empty optional elements, and do not rely on portrait hover motion to communicate identity or availability.
 
 ## References
 
-**Dependencies:** None.
+**Dependencies:** Badge. Artist Card does not yet compose the generic Card shell.
 
 **Anatomy:** required `.artist-card` root and `.artist-card__name`; optional `.artist-card__portrait` and portrait image, `.artist-card__badge`, `.artist-card__medium`, `.artist-card__location`, and `.artist-card__piece-count`.
 
@@ -41,7 +42,7 @@ The artwork is deliberately passive. ADR 0080 does not decide whether Artist Car
 
 <PropTable>
   <tr><td>`portrait`</td><td>slot</td><td>optional</td><td>Target-owned portrait media</td></tr>
-  <tr><td>`badge`</td><td>string</td><td>optional</td><td>Short artist badge</td></tr>
+  <tr><td>`badge`</td><td>string</td><td>optional</td><td>Short canonical Badge label shown with portrait</td></tr>
   <tr><td>`name`</td><td>string</td><td>required</td><td>Artist display name</td></tr>
   <tr><td>`medium`</td><td>string</td><td>optional</td><td>Artist medium</td></tr>
   <tr><td>`location`</td><td>string</td><td>optional</td><td>Human-readable location</td></tr>

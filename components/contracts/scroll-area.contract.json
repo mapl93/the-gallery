@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "scroll-area",
   "name": "Scroll Area",
   "registryId": "B16",
   "category": "layout",
   "status": "pilot",
-  "summary": "Native scroll container with tokenized scrollbar track/thumb styling, hover state, and keyboard-accessible scroll-region requirements.",
+  "summary": "Single native overflow container with optional region naming, visible keyboard focus, standards-based scrollbar styling, coarse-pointer affordance, and forced-colors fallback without custom scroll runtime.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/scroll-area",
@@ -22,7 +22,7 @@
       "selector": ".scroll-area",
       "className": ".scroll-area",
       "required": true,
-      "description": "Scrollable content region."
+      "description": "Single native overflow container; consumer content remains ordinary descendants."
     },
     {
       "name": "scrollbar",
@@ -72,6 +72,13 @@
       "name": "thumbHover",
       "selectors": [".scroll-area::-webkit-scrollbar-thumb:hover"],
       "description": "Pointer hover state on supported scrollbar thumbs."
+    },
+    {
+      "name": "focus",
+      "selectors": [
+        ".scroll-area:focus-visible"
+      ],
+      "description": "Visible keyboard focus for a directly scrollable named region."
     }
   ],
   "behavior": [
@@ -83,12 +90,27 @@
     {
       "name": "keyboardAccess",
       "attributes": ["tabindex", "aria-label", "aria-labelledby"],
-      "description": "When a scroll area contains overflow not reachable through child focus, the region should be focusable and named."
+      "description": "When overflow is not reachable through child focus, the consumer supplies a label and maps the same root to role=region and tabindex=0; otherwise redundant landmark and focus stops are omitted."
     },
     {
       "name": "scrollbarStyling",
       "selectors": [".scroll-area::-webkit-scrollbar-thumb", ".scroll-area::-webkit-scrollbar-thumb:hover"],
       "description": "Scrollbar styling is progressive enhancement and must not remove platform scroll affordances."
+    },
+    {
+      "name": "pointerAndContrastAdaptation",
+      "selectors": [
+        ".scroll-area"
+      ],
+      "events": [
+        "pointer: coarse",
+        "forced-colors"
+      ],
+      "description": "Coarse pointers receive the platform auto-width scrollbar and forced colors restores system scrollbar colors."
+    },
+    {
+      "name": "runtimeBoundary",
+      "description": "The base component adds no wrapper geometry, drag simulation, observers, listeners, timers, or runtime assets."
     }
   ],
   "properties": [
@@ -108,7 +130,8 @@
     "public": {
       "color": [
         "--color-border-subtle",
-        "--color-border-default"
+        "--color-border-default",
+        "--color-border-focus"
       ],
       "radius": [
         "--radius-full"
@@ -117,20 +140,21 @@
   },
   "accessibility": [
     "Preserve native scrolling and platform scrollbar behavior.",
-    "Make the scroll region focusable and named when keyboard users need to scroll overflow content directly.",
+    "Make the root a focusable named region only when keyboard users need to scroll overflow content directly and descendant focus does not already provide access.",
     "Do not hide scrollbars when overflow content needs to be discoverable.",
-    "Ensure content inside the scroll area remains reachable by keyboard and assistive technology."
+    "Ensure content inside the scroll area remains reachable by keyboard and assistive technology.",
+    "Preserve visible focus, system scrollbar colors in forced-colors, and platform-sized scroll affordances for coarse pointers."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css with progressive WebKit scrollbar styling."
+      "notes": "Implemented as one native overflow node in components/css/layout.css; CSS Scrollbars styling is primary and WebKit pseudo-elements are progressive target enhancement."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid can render scroll regions with the same class contract."
+      "notes": "Shopify Liquid renders the same native overflow class contract and supplies role, tabindex, and accessible naming only when its content requires direct keyboard scrolling."
     },
     "react": {
       "status": "planned",

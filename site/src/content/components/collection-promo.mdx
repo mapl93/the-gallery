@@ -1,48 +1,100 @@
 ## Overview
 
-Editorial promotion that can sit among Product Cards without becoming another product.
+First-party passive editorial article that may occupy one Collection Grid item
+without becoming a Product Card. It presents one required heading, optional
+media and eyebrow, and at most one explicit canonical Link destination.
+Sponsored or paid placement is outside the neutral v1 contract.
 
-<Preview html={"<article class=\"collection-promo collection-promo--span-2 tg-preview-frame--md\"><div class=\"collection-promo__media tg-preview-media tg-preview-media--landscape\" role=\"img\" aria-label=\"Celadon vessels in the gallery\"></div><div class=\"collection-promo__overlay\"></div><div class=\"collection-promo__content\"><span class=\"collection-promo__eyebrow\">Curated edit</span><h3 class=\"collection-promo__title\">Objects for the daily ritual</h3><a class=\"collection-promo__cta\" href=\"#collection-edit\">Explore the edit</a></div></article>"} label="Collection Promo Tile" />
+<Preview html={"<article class=\"collection-promo collection-promo--span-2 tg-preview-frame--md\"><img class=\"collection-promo__media\" src=\"/media/editorial/ceramic-tableware.jpg\" alt=\"Celadon vessels arranged in a quiet gallery setting\" width=\"1800\" height=\"1200\"><div class=\"collection-promo__overlay\" aria-hidden=\"true\"></div><div class=\"collection-promo__content\"><p class=\"collection-promo__eyebrow\">Curated edit</p><h3 class=\"collection-promo__title\">Objects for the daily ritual</h3><a class=\"link collection-promo__cta\" href=\"#collection-edit\"><span>Explore the edit</span><span class=\"collection-promo__cta-icon\" aria-hidden=\"true\">→</span></a></div></article>"} label="Collection Promo Tile" />
 
 ## Presentation
 
-Without media, the statement surface pairs with primary text. With media, the overlay establishes contrast and the content switches to inverse text. `span-2` occupies two collection columns on wider viewports and returns to one on mobile.
+Without media, the statement surface uses primary text. With media, E6 adds one
+passive bounded overlay and switches visible content to inverse text. The media
+remains a native target-supplied image: use a concise contextual alternative
+when it adds meaning and `alt=""` when it is decorative or repeats nearby copy.
 
-### Default
+`span-2` is a request to the owning Collection Grid, not a width on the article.
+The parent `li.collection-grid__item` spans two tracks only when the Grid
+container has at least two. In narrower containers the same source-order item
+remains one track. Internal density follows the tile's own container rather than
+the viewport.
 
-<Preview html={"<article class=\"collection-promo tg-preview-frame--sm\"><div class=\"collection-promo__content\"><span class=\"collection-promo__eyebrow\">New arrival</span><h3 class=\"collection-promo__title\">A quiet seasonal edit</h3><a class=\"collection-promo__cta\" href=\"#seasonal\">Explore</a></div></article>"} label="Default" />
+### Default without media
 
-### Span 2
+<Preview html={"<article class=\"collection-promo tg-preview-frame--sm\"><div class=\"collection-promo__content\"><p class=\"collection-promo__eyebrow\">New arrival</p><h3 class=\"collection-promo__title\">A quiet seasonal edit</h3><a class=\"link collection-promo__cta\" href=\"#seasonal\"><span>Explore the seasonal edit</span><span class=\"collection-promo__cta-icon\" aria-hidden=\"true\">→</span></a></div></article>"} label="Default without media" />
 
-<Preview html={"<article class=\"collection-promo collection-promo--span-2 tg-preview-frame--md\"><div class=\"collection-promo__media tg-preview-media tg-preview-media--landscape\" role=\"img\" aria-label=\"Studio collection\"></div><div class=\"collection-promo__overlay\"></div><div class=\"collection-promo__content\"><span class=\"collection-promo__eyebrow\">Editorial</span><h3 class=\"collection-promo__title\">A wider story tile</h3><a class=\"collection-promo__cta\" href=\"#story\">Read the story</a></div></article>"} label="Span 2" />
+### Span 2 in canonical Collection Grid
+
+<Preview html={"<div class=\"collection-grid tg-preview-frame--md\" data-columns=\"3\"><ul class=\"collection-grid__items\"><li class=\"collection-grid__item\"><article class=\"collection-promo collection-promo--span-2\"><img class=\"collection-promo__media\" src=\"/media/editorial/ceramic-tableware.jpg\" alt=\"\" width=\"1800\" height=\"1200\"><div class=\"collection-promo__overlay\" aria-hidden=\"true\"></div><div class=\"collection-promo__content\"><p class=\"collection-promo__eyebrow\">Editorial</p><h3 class=\"collection-promo__title\">A wider story tile</h3><a class=\"link collection-promo__cta\" href=\"#story\"><span>Read the story</span><span class=\"collection-promo__cta-icon\" aria-hidden=\"true\">→</span></a></div></article></li></ul></div>"} label="Span 2 in Collection Grid" />
+
+The current height, crop, padding, overlay, type, radius and icon are private
+visual candidates. They are not consumer properties and still require human
+visual review.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Make the promoted destination distinct from neighboring products.</Do>
-  <Dont>Do not use the tile to disguise an advertisement as a Product Card.</Dont>
+  <Do>Make the editorial destination and its relationship to the collection clear.</Do>
+  <Dont>Do not disguise a paid placement or unrelated advertisement as a Product Card.</Dont>
 </DoDont>
 
-- Keep one clear destination and concise copy.
-- Use meaningful media only when it adds to the promotion.
-- Confirm that a two-column span still preserves the intended collection rhythm.
+- Keep one coherent editorial purpose, one heading and at most one destination.
+- Pair `ctaLabel` and `href`; if either is absent, omit the complete CTA.
+- Do not make the root clickable with JavaScript, pseudo-element overlays or
+  duplicate links. The visible canonical Link is the only focus stop.
+- Keep source order aligned with Collection Grid order. Do not use dense packing,
+  CSS order or automatic position changes to feature the promotion.
+- Omit the complete tile when the required title is empty. Do not invent copy,
+  destination, image alternative or commercial disclosure.
+- A target may omit E6 when it cannot preserve pagination, product counts,
+  logical order, reflow or truthful promotional policy.
+- The target owns eligible pages, insertion index, frequency, audience and
+  source order. Inserting E6 must not alter product query, order, pagination,
+  counts or filter/sort truth.
 
 ## Accessibility
 
-- Keep CTA text descriptive outside its visual context.
-- Provide alternative text only when media conveys information not present in copy.
-- Verify overlay contrast across the complete crop range.
-- Preserve visible keyboard focus on the CTA.
+- Render one passive `article` with one required visible heading. The owning
+  page selects a heading rank appropriate to its document outline.
+- Use a native `a[href]` with descriptive visible text. Pointer click and Enter
+  retain browser navigation behavior and the root has no role or `tabindex`.
+- Keep the overlay and directional icon `aria-hidden="true"`.
+- Decide image alt from context: informative media gets concise meaning;
+  decorative or redundant media gets empty alt.
+- Verify all title, eyebrow and CTA text against the composited media crop, not
+  only against named tokens. The no-media statement surface must also pass.
+- Let long/localized and unbroken title/link text wrap. Preserve RTL source order,
+  logical icon direction, visible focus, forced colors and 200% text/zoom reflow.
+- E6 adds no animation or runtime; canonical Link removes its decorative
+  transition under reduced motion.
+
+WAI recommends native links with visible names and contextual image alternatives.
+Open UI documents full-card click delegation as incubating and records tradeoffs
+in current wrapper, overlay and JavaScript workarounds. The Gallery therefore
+keeps the explicit native CTA.
 
 ## References
 
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default` or `span-2`</td></tr>
-  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Promotional media</td></tr>
-  <tr><td>`mediaAlt`</td><td>string</td><td>optional</td><td>Meaningful media alternative text</td></tr>
-  <tr><td>`eyebrow`</td><td>string</td><td>optional</td><td>Short promotional context</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Promotional title</td></tr>
-  <tr><td>`ctaLabel`</td><td>string</td><td>optional</td><td>Visible link label</td></tr>
-  <tr><td>`href`</td><td>string</td><td>optional</td><td>Promotional destination</td></tr>
-  <tr><td>`.collection-promo--span-2`</td><td>class</td><td>optional</td><td>Two-column variant</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default` or parent-owned `span-2` request</td></tr>
+  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-supplied native media</td></tr>
+  <tr><td>`mediaAlt`</td><td>string</td><td>optional / may be empty</td><td>Contextual informative or decorative alternative</td></tr>
+  <tr><td>`eyebrow`</td><td>string</td><td>optional</td><td>Short visible editorial context</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible article heading</td></tr>
+  <tr><td>`ctaLabel`</td><td>string</td><td>optional pair</td><td>Visible canonical Link label; requires `href`</td></tr>
+  <tr><td>`href`</td><td>string</td><td>optional pair</td><td>Native destination; requires `ctaLabel`</td></tr>
+  <tr><td>`.collection-grid__item`</td><td>parent anatomy</td><td>required in Grid</td><td>Owns list membership and real Span 2 placement</td></tr>
+  <tr><td>Runtime</td><td>none</td><td>`0 B`</td><td>Native Link navigation only</td></tr>
 </PropTable>
+
+- [WAI-ARIA APG Link Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/link/)
+- [WAI accessible names and descriptions](https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/)
+- [WAI image alt decision tree](https://www.w3.org/WAI/tutorials/images/decision-tree/)
+- [WCAG 2.2 contrast minimum](https://www.w3.org/TR/WCAG22/#contrast-minimum)
+- [Open UI Card research](https://open-ui.org/components/card.research/)
+- [Open UI Link Area Delegation explainer](https://open-ui.org/components/link-area-delegation.explainer/)
+- [Radix Themes Card](https://www.radix-ui.com/themes/docs/components/card)
+- [Shopify Polaris Card](https://polaris-react.shopify.com/components/layout-and-structure/card)
+- [Shopify theme blocks](https://shopify.dev/docs/storefronts/themes/architecture/blocks/index)
+- [Shopify sections and blocks best practices](https://shopify.dev/docs/storefronts/themes/best-practices/templates-sections-blocks)

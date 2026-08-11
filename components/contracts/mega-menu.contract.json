@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "mega-menu",
   "name": "Mega Menu",
   "registryId": "C7",
   "category": "global",
   "status": "pilot",
-  "summary": "Multi-column navigation menu with link columns, promo blocks, and featured collection rows.",
+  "summary": "Non-modal site-navigation disclosure with labelled native link groups, optional promotional and featured destinations, controlled visibility, ordinary link keyboard behavior, container response, and target-owned trigger policy.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/mega-menu",
@@ -14,17 +14,20 @@
     "docs": "site/src/content/components/mega-menu.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".mega-menu", "className": ".mega-menu", "required": true, "description": "Mega menu popover container." },
-    { "name": "inner", "selector": ".mega-menu__inner", "className": ".mega-menu__inner", "required": true, "description": "Responsive menu grid." },
-    { "name": "column", "selector": ".mega-menu__column", "className": ".mega-menu__column", "required": false, "description": "Link column." },
-    { "name": "heading", "selector": ".mega-menu__heading", "className": ".mega-menu__heading", "required": false, "description": "Column heading." },
-    { "name": "link", "selector": ".mega-menu__link", "className": ".mega-menu__link", "required": false, "description": "Menu link." },
-    { "name": "promo", "selector": ".mega-menu__promo", "className": ".mega-menu__promo", "required": false, "description": "Promotional media link." },
+    { "name": "root", "selector": ".mega-menu", "className": ".mega-menu", "required": true, "description": "Labelled non-modal site-navigation disclosure controlled by an external target-owned Button." },
+    { "name": "inner", "selector": ".mega-menu__inner", "className": ".mega-menu__inner", "required": true, "description": "Container-responsive bounded navigation grid." },
+    { "name": "column", "selector": ".mega-menu__column", "className": ".mega-menu__column", "required": false, "description": "Optional navigation group labelled by its visible heading." },
+    { "name": "heading", "selector": ".mega-menu__heading", "className": ".mega-menu__heading", "required": false, "description": "Visible navigation-group heading." },
+    { "name": "list", "selector": ".mega-menu__list", "className": ".mega-menu__list", "required": false, "description": "Native list of destinations in one labelled group." },
+    { "name": "listItem", "selector": ".mega-menu__list-item", "className": ".mega-menu__list-item", "required": false, "description": "Native list item containing one destination link." },
+    { "name": "link", "selector": ".mega-menu__link", "className": ".mega-menu__link", "required": false, "description": "Native site destination link with optional current-page state." },
+    { "name": "promo", "selector": ".mega-menu__promo", "className": ".mega-menu__promo", "required": false, "description": "Optional single promotional destination link whose visible text supplies its name." },
     { "name": "promoContent", "selector": ".mega-menu__promo-content", "className": ".mega-menu__promo-content", "required": false, "description": "Promotional overlay content." },
     { "name": "promoTitle", "selector": ".mega-menu__promo-title", "className": ".mega-menu__promo-title", "required": false, "description": "Promo title." },
     { "name": "promoLink", "selector": ".mega-menu__promo-link", "className": ".mega-menu__promo-link", "required": false, "description": "Promo link text." },
-    { "name": "featured", "selector": ".mega-menu__featured", "className": ".mega-menu__featured", "required": false, "description": "Featured collection grid." },
-    { "name": "featuredItem", "selector": ".mega-menu__featured-item", "className": ".mega-menu__featured-item", "required": false, "description": "Featured item link." },
+    { "name": "featured", "selector": ".mega-menu__featured", "className": ".mega-menu__featured", "required": false, "description": "Labelled native featured-destination list and responsive grid." },
+    { "name": "featuredEntry", "selector": ".mega-menu__featured-entry", "className": ".mega-menu__featured-entry", "required": false, "description": "Native featured-destination list item." },
+    { "name": "featuredItem", "selector": ".mega-menu__featured-item", "className": ".mega-menu__featured-item", "required": false, "description": "Native featured destination link." },
     { "name": "featuredImage", "selector": ".mega-menu__featured-img", "className": ".mega-menu__featured-img", "required": false, "description": "Featured item image." },
     { "name": "featuredName", "selector": ".mega-menu__featured-name", "className": ".mega-menu__featured-name", "required": false, "description": "Featured item name." }
   ],
@@ -40,22 +43,26 @@
     { "name": "closed", "selectors": [".mega-menu"], "description": "Default hidden mega menu state." },
     { "name": "openAria", "selectors": [".mega-menu[aria-hidden=\"false\"]"], "description": "Open state controlled through aria-hidden." },
     { "name": "openClass", "selectors": [".mega-menu.is-open"], "description": "Open state controlled through class." },
-    { "name": "linkHover", "selectors": [".mega-menu__link:hover"], "description": "Menu link hover state." },
-    { "name": "currentPage", "selectors": [".mega-menu__link[aria-current=\"page\"]"], "description": "Current menu destination state." },
-    { "name": "featuredHover", "selectors": [".mega-menu__featured-item:hover .mega-menu__featured-img"], "description": "Featured item image hover motion." }
+    { "name": "linkHover", "selectors": [".mega-menu__link:hover", ".mega-menu__featured-item:hover"], "description": "Fine-pointer hover state on ordinary destination links." },
+    { "name": "linkFocus", "selectors": [".mega-menu__link:focus-visible", ".mega-menu__promo:focus-visible", ".mega-menu__featured-item:focus-visible"], "description": "Visible keyboard focus on every destination type." },
+    { "name": "currentPage", "selectors": [".mega-menu__link[aria-current=\"page\"]", ".mega-menu__promo[aria-current=\"page\"]", ".mega-menu__featured-item[aria-current=\"page\"]"], "description": "Actual current destination with non-color text emphasis." },
+    { "name": "featuredHover", "selectors": [".mega-menu__featured-item:hover .mega-menu__featured-img"], "description": "Fine-pointer featured-media hover motion." }
   ],
   "behavior": [
-    { "name": "openState", "selectors": [".mega-menu", ".mega-menu.is-open", ".mega-menu[aria-hidden=\"false\"]"], "attributes": ["aria-hidden"], "description": "Open state should synchronize visual visibility and accessibility state." },
-    { "name": "menuNavigation", "selectors": [".mega-menu__link"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "Links should navigate and expose current-page state where applicable." },
-    { "name": "promoNavigation", "selectors": [".mega-menu__promo"], "attributes": ["href"], "events": ["click"], "description": "Promo blocks should be links when they navigate." },
-    { "name": "featuredNavigation", "selectors": [".mega-menu__featured-item"], "attributes": ["href"], "events": ["click"], "description": "Featured items should navigate to collection or product destinations." }
+    { "name": "openState", "selectors": [".mega-menu", ".mega-menu.is-open", ".mega-menu[aria-hidden=\"false\"]"], "attributes": ["aria-hidden", "inert"], "description": "Controlled open state synchronizes visual visibility, pointer availability, immediate descendant focus availability, and accessibility-tree exposure." },
+    { "name": "siteNavigation", "selectors": [".mega-menu__list", ".mega-menu__link", ".mega-menu__featured"], "attributes": ["href", "aria-current"], "events": ["Tab", "Shift+Tab", "Enter", "click"], "description": "Groups use native lists and ordinary links with normal document Tab order; menu/menubar roles, roving focus, arrow navigation, and focus trapping are not used." },
+    { "name": "disclosureController", "attributes": ["aria-expanded", "aria-controls", "Escape"], "description": "An external target-owned Button controls the surface and owns activation, dismissal, focus restoration when moved, pointer intent, and mobile substitution." },
+    { "name": "promoNavigation", "selectors": [".mega-menu__promo"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "A promo is one native destination link named by visible text; decorative media uses an empty alternative." },
+    { "name": "featuredNavigation", "selectors": [".mega-menu__featured", ".mega-menu__featured-item"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "Featured destinations form a labelled native list of ordinary links." },
+    { "name": "responsiveContainment", "selectors": [".mega-menu", ".mega-menu__inner", ".mega-menu__featured"], "description": "The surface evaluates narrow layouts against its own inline size, preserves bounded block scrolling, and never creates page inline overflow." },
+    { "name": "motionAndContrast", "events": ["prefers-reduced-motion", "forced-colors"], "description": "Reduced motion removes layer/media transforms and forced colors restores system surface, link, current, focus, and promo contrast." }
   ],
   "properties": [
     { "name": "label", "type": "string", "required": true, "description": "Accessible name for the mega-menu navigation region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".mega-menu", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
-    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls visual visibility and accessible hidden state. Consumer targets still own trigger relationships, keyboard entry, dismissal, and focus restoration.", "targetMappings": { "web": [{ "kind": "class", "selector": ".mega-menu", "classNames": [".is-open"] }, { "kind": "attribute", "selector": ".mega-menu", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] } },
-    { "name": "columns", "type": "slot", "required": false, "description": "Optional target-owned labelled navigation columns and native links.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mega-menu__column", "classNames": [".mega-menu__column"] }] } },
-    { "name": "promo", "type": "slot", "required": false, "description": "Optional promotional media link with a useful accessible name.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mega-menu__promo", "classNames": [".mega-menu__promo"] }] } },
-    { "name": "featured", "type": "slot", "required": false, "description": "Optional target-owned featured destination links and media.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mega-menu__featured", "classNames": [".mega-menu__featured"] }] } }
+    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls visible and accessible hidden state. The target remains the only controlled owner of trigger relationships, activation, dismissal, and restoration.", "targetMappings": { "web": [{ "kind": "class", "selector": ".mega-menu", "classNames": [".is-open"] }, { "kind": "attribute", "selector": ".mega-menu", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] } },
+    { "name": "columns", "type": "slot", "required": false, "description": "Optional target-owned visible-heading-labelled groups with native lists and destination links.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mega-menu__column", "classNames": [".mega-menu__column"] }] } },
+    { "name": "promo", "type": "slot", "required": false, "description": "Optional single promotional destination link with visible naming and normally decorative media.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mega-menu__promo", "classNames": [".mega-menu__promo"] }] } },
+    { "name": "featured", "type": "slot", "required": false, "description": "Optional target-owned labelled native list of featured destination links and media.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mega-menu__featured", "classNames": [".mega-menu__featured"] }] } }
   ],
   "tokens": {
     "public": {
@@ -63,20 +70,23 @@
       "spacing": ["--layout-content-width", "--layout-gutter", "--space-layout-touch-target"],
       "radius": ["--radius-md", "--radius-sm"],
       "shadow": ["--shadow-lg"],
-      "typography": ["--font-family-heading", "--typo-body-size", "--typo-body-sm-size", "--typo-h4-size"],
-      "transition": ["--transition-default", "--transition-fast"],
+      "typography": ["--font-family-heading", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--typo-h4-size", "--typo-h4-line-height"],
+      "z-index": ["--z-dropdown"],
+      "transition": ["--transition-base", "--transition-fast"],
       "easing": ["--easing-default"]
     }
   },
   "accessibility": [
-    "Expose the menu as navigation with a clear label from the triggering context.",
-    "Synchronize aria-hidden with visual open state.",
-    "Support keyboard entry, Escape dismissal, and focus return in the target adapter.",
-    "Ensure promo and featured media links have useful accessible names."
+    "Expose the surface as a clearly labelled native navigation landmark with visible-heading-labelled native destination lists.",
+    "Synchronize aria-hidden, inert, and visual state with an external Button's aria-expanded and aria-controls relationship.",
+    "Keep ordinary Link Tab and activation behavior; do not use application-menu roles, roving focus, arrow-key navigation, or a focus trap.",
+    "Keep closed descendants out of focus and accessibility APIs; target adapters provide Escape/intentional dismissal and restore focus when they moved it.",
+    "Use visible text to name promo and featured links, avoid duplicate image alternatives, and mark only the actual current destination with aria-current=page.",
+    "Preserve visible focus, logical geometry, reduced motion, forced colors, and bounded localized content."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map nested navigation, promo blocks, featured blocks, and trigger state from theme settings." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical CSS provides controlled presentation, native grouped-link structure, container response, focus/current/special-media states, and no neutral runtime; target code owns the disclosure controller." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Liquid should map menu/linklist and promo/featured blocks while target JavaScript owns the external Button lifecycle, route state, dismissal, and mobile substitution." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

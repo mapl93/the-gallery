@@ -1,36 +1,86 @@
 ## Overview
 
-Reading Progress provides a fixed top-edge track and a target-controlled visual indicator. It does not define how reading progress is calculated, synchronized, or exposed to assistive technology.
+Reading Progress is a decorative visual cue for the viewport's position inside
+one explicitly defined article range. It does not claim that content was read,
+understood or completed, and it is not a task Progress, Scrollbar, Meter or live
+status.
+
+The host owns placement. It may place the canonical component in flow, sticky or
+fixed while coordinating safe areas, Header offsets and stacking.
 
 ## Presentation
 
-<Preview html={'<div class="reading-progress tg-preview-static tg-preview-frame"><div class="reading-progress__bar tg-preview-w-50"></div></div>'} label="Reading Progress" />
+<Preview html={'<div class="reading-progress" aria-hidden="true" data-reading-progress data-reading-mode="controlled" data-reading-value="44" data-reading-state="controlled" data-value="44" style="--_reading-progress-scale: .44"><div class="reading-progress__bar"></div></div>'} label="Reading Progress" />
 
-The root uses `.reading-progress`; the required indicator slot uses `.reading-progress__bar`. The target supplies the measured width and any target-required state or semantics. The preview is intentionally visual and does not select a progressbar or decorative contract.
+The default Controlled mode receives one bounded `0..100` article-position
+value. Automatic mode is available to capable targets only when they explicitly
+associate an article source. Neutral Web may also associate a containing scroll
+root; otherwise it uses the document viewport.
+
+Automatic measurement is article-relative: 0 starts when the article's block
+start reaches the scrollport start, and 100 is reached when the article's block
+end reaches the scrollport end. Short, disconnected or invalid ranges omit the
+indicator instead of displaying stale state.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Treat the indicator as target-owned until a reading-state architecture is accepted.</Do>
-  <Dont>Do not infer scroll calculation, synchronization, or live announcements from the width transition.</Dont>
+  <Do>Use it as an optional sighted-reader cue alongside native headings, landmarks, browser scrolling and an optional Table of Contents.</Do>
+  <Dont>Do not use it as proof that somebody read or completed the article, and do not expose `progressbar`, `scrollbar`, `meter` or live-region semantics.</Dont>
 </DoDont>
 
-Whether Reading Progress and Table of Contents share a neutral reading-state enhancement or receive state independently from each target remains unresolved. Whether Reading Progress is semantic or decorative also remains unresolved.
+- Choose Controlled when a target already owns reading state or cannot safely
+  measure scrolling.
+- Choose Automatic only with one explicit article association. Add an explicit
+  scroll root for embedded reading surfaces.
+- Do not mix a supplied value with Automatic output.
+- Let the page/layout own fixed, sticky or in-flow placement and collision
+  policy.
+- Omit the cue for short content or when source geometry is unavailable.
 
 ## Accessibility
 
-- Do not add `aria-live`, `role="status"`, or continuous scroll announcements without an accepted behavior decision.
-- If a target chooses progressbar semantics, provide a useful accessible name and synchronized bounded values.
-- If a target chooses a decorative indicator, keep it out of the accessibility tree.
-- Keep the fixed visual track from intercepting pointer interaction with page content.
-- Honor the canonical reduced-motion fallback.
+- The root is always `aria-hidden="true"`, non-focusable, non-live and
+  pointer-transparent.
+- The component has no keyboard model and never intercepts native scrolling.
+- Native article structure and Table of Contents remain the accessible
+  navigation model.
+- The fill originates from logical inline start, including RTL, and remains
+  visible in forced colors.
+- Continuous visual updates are coalesced to animation frames and have no extra
+  interpolation, so reduced motion requires no alternate animation.
 
-## References
+## API Reference
 
 <PropTable>
-  <tr><td>`indicator`</td><td>slot</td><td>required</td><td>Target-owned visual indicator, state, and any target-required semantics</td></tr>
+  <tr><td>`mode`</td><td>`controlled | automatic`</td><td>optional</td><td>Exclusive measurement path; Controlled is default</td></tr>
+  <tr><td>`value`</td><td>`number` 0..100</td><td>Controlled only</td><td>Target-owned normalized article position</td></tr>
+  <tr><td>`targetId`</td><td>`string`</td><td>Automatic only</td><td>Explicit article source identifier</td></tr>
+  <tr><td>`scrollRootId`</td><td>`string`</td><td>optional Automatic</td><td>Explicit embedded scroll container; omission uses the document viewport</td></tr>
 </PropTable>
 
 Anatomy: `.reading-progress` and `.reading-progress__bar`.
 
-Dependencies: none. The contract remains `pilot`; progress calculation, scroll synchronization, and semantic ownership are explicitly unresolved.
+Runtime outputs are `data-reading-state="controlled|automatic|unavailable|invalid"`,
+bounded `data-value` while available, and a private transform scale. The
+decorative component emits no event.
+
+Neutral Web attaches scroll/resize work only while Automatic instances exist,
+shares listeners by scroll source, coalesces writes through one animation frame,
+observes relevant geometry and cleans up disconnected roots. It performs no
+polling, request, storage or analytics work.
+
+Shopify currently receives canonical CSS/runtime but remains planned until a
+specific article/template owner, source association and Theme Editor lifecycle
+are selected. React/Angular map Controlled values or target references without
+creating competing stores. Figma shows static values only; native targets map
+the same decorative meaning through native geometry.
+
+References: [HTML progress](https://html.spec.whatwg.org/multipage/form-elements.html#the-progress-element),
+[WAI-ARIA progressbar](https://www.w3.org/TR/wai-aria-1.2/#progressbar),
+[CSS Scroll-driven Animations](https://www.w3.org/TR/scroll-animations-1/),
+[Radix Progress](https://www.radix-ui.com/primitives/docs/components/progress),
+and [Shopify Progress](https://shopify.dev/docs/api/customer-account-ui-extensions/latest/web-components/feedback-and-status-indicators/progress).
+
+The contract remains `pilot`. Visual approval and any Shopify source/placement
+decision require explicit human review.

@@ -1,23 +1,25 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "pagination",
   "name": "Pagination",
   "registryId": "E4",
   "category": "collection",
   "status": "pilot",
-  "summary": "Collection page navigation with links, current page, and ellipsis.",
-  "dependencies": [],
+  "summary": "Named native page navigation with an ordered list, canonical destination links, one non-interactive current page, passive ellipses, boundary omission, and target-owned URLs and page windows.",
+  "dependencies": ["link"],
   "source": {
     "registry": "registry.json#/components/pagination",
     "css": { "file": "components/css/collection.css", "selector": ".pagination" },
     "docs": "site/src/content/components/pagination.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".pagination", "className": ".pagination", "required": true, "description": "Pagination navigation container." },
-    { "name": "link", "selector": ".pagination__link", "className": ".pagination__link", "required": false, "description": "Page, previous, or next link." },
-    { "name": "current", "selector": ".pagination__current", "className": ".pagination__current", "required": false, "description": "Current page indicator." },
-    { "name": "ellipsis", "selector": ".pagination__ellipsis", "className": ".pagination__ellipsis", "required": false, "description": "Skipped page range indicator." }
+    { "name": "root", "selector": ".pagination", "className": ".pagination", "required": true, "description": "Named native navigation landmark for one bounded result set." },
+    { "name": "list", "selector": ".pagination__list", "className": ".pagination__list", "required": true, "description": "Native unordered list preserving destination order and grouping." },
+    { "name": "item", "selector": ".pagination__item", "className": ".pagination__item", "required": true, "description": "Repeatable native list item containing one link, current page, or ellipsis." },
+    { "name": "link", "selector": ".pagination__link", "className": ".pagination__link", "required": false, "description": "Canonical native Link for an available page, previous destination, or next destination." },
+    { "name": "current", "selector": ".pagination__current", "className": ".pagination__current", "required": true, "description": "Exactly one non-interactive current-page indicator when Pagination renders." },
+    { "name": "ellipsis", "selector": ".pagination__ellipsis", "className": ".pagination__ellipsis", "required": false, "description": "Passive skipped-range indicator hidden from assistive technology." }
   ],
   "variants": [
     { "name": "default", "className": null, "default": true, "description": "Default pagination." }
@@ -27,38 +29,45 @@
   ],
   "states": [
     { "name": "default", "selectors": [".pagination"], "description": "Default pagination state." },
-    { "name": "hover", "selectors": [".pagination__link:hover"], "description": "Page link hover state." },
-    { "name": "focus", "selectors": [".pagination__link:focus-visible"], "description": "Visible page-link focus state." },
-    { "name": "disabled", "selectors": [".pagination__link[aria-disabled=\"true\"]"], "description": "Unavailable previous or next navigation state." },
-    { "name": "current", "selectors": [".pagination__current"], "description": "Current page state." }
+    { "name": "linkHover", "selectors": [".pagination__link:hover"], "description": "Available destination hover state." },
+    { "name": "current", "selectors": [".pagination__current"], "description": "One non-interactive current-page state." }
   ],
   "behavior": [
-    { "name": "navigation", "selectors": [".pagination__link", ".pagination__current"], "attributes": ["<nav>", "aria-label", "href", "aria-current=\"page\""], "events": ["click"], "description": "Pagination should use navigation semantics and mark the current page." },
-    { "name": "ellipsis", "selectors": [".pagination__ellipsis"], "description": "Ellipsis is informational and should not be presented as an unavailable link." }
+    { "name": "navigationLandmark", "selectors": [".pagination"], "attributes": ["<nav>", "aria-label"], "description": "Pagination renders as a specifically named native navigation landmark." },
+    { "name": "orderedDestinations", "selectors": [".pagination__list", ".pagination__item"], "attributes": ["<ul>", "<li>"], "description": "One native list preserves page and directional destination order without a composite-widget role." },
+    { "name": "nativeLinks", "selectors": [".pagination__link"], "attributes": ["<a>", "href"], "description": "Every available destination composes canonical Link with a real target-owned URL, native activation, visible focus, and reduced-motion behavior." },
+    { "name": "currentPage", "selectors": [".pagination__current"], "attributes": ["aria-current=\"page\""], "description": "Exactly one non-interactive item represents the current page; it is not a disabled pseudo-link." },
+    { "name": "boundaryOmission", "selectors": [".pagination__link"], "description": "Previous is omitted on the first page and next is omitted on the last page instead of leaving focusable aria-disabled anchors." },
+    { "name": "ellipsis", "selectors": [".pagination__ellipsis"], "attributes": ["aria-hidden=\"true\""], "description": "Ellipsis is passive, hidden from assistive technology, and never presented as a link." },
+    { "name": "targetOwnedLifecycle", "selectors": [".pagination", ".pagination__list"], "description": "The target owns total pages, page-window calculation, URLs, requests, result replacement, loading/error status, history, scroll, focus, announcements, analytics, and prefetch." },
+    { "name": "contentResilience", "selectors": [".pagination__list", ".pagination__item", ".pagination__link", ".pagination__current"], "description": "The supplied finite item window wraps inside its container without CSS hiding, reordering, or viewport assumptions." }
   ],
   "properties": [
     { "name": "label", "type": "string", "required": true, "description": "Accessible name for the pagination navigation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pagination", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
-    { "name": "currentPage", "type": "number", "required": true, "min": 1, "step": 1, "description": "Current page number used to generate readable content and aria-current.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pagination", "attribute": "data-current-page", "valueFrom": "property", "elements": ["nav"] }] } },
-    { "name": "pageItems", "type": "slot", "required": true, "description": "Ordered previous, page, ellipsis, and next navigation items.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".pagination", "classNames": [".pagination"] }] } }
+    { "name": "currentPage", "type": "number", "required": true, "min": 1, "step": 1, "description": "Positive current-page projection matching the one rendered aria-current item; it does not define total pages or a page-window algorithm.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pagination", "attribute": "data-current-page", "valueFrom": "property", "elements": ["nav"] }] } },
+    { "name": "pageItems", "type": "slot", "required": true, "description": "Finite target-supplied list of previous, page, current, ellipsis, and next items with real destination URLs.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".pagination__list", "classNames": [".pagination__item", ".pagination__link", ".pagination__current", ".pagination__ellipsis"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-secondary", "--color-surface-secondary", "--color-text-primary", "--color-text-disabled", "--color-border-focus", "--color-button-primary-bg-default", "--color-button-primary-text-default"],
+      "color": ["--color-text-secondary", "--color-surface-secondary", "--color-text-disabled", "--color-button-primary-bg-default", "--color-button-primary-text-default"],
       "spacing": ["--space-button-min-height", "--space-layout-section-gap"],
       "radius": ["--radius-md"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"],
       "typography": ["--typo-body-size"]
     }
   },
   "accessibility": [
-    "Wrap pagination in a navigation landmark with an accessible label.",
-    "Mark the current page with aria-current or equivalent target-native state.",
-    "Keep previous and next links descriptive."
+    "Render a specifically named navigation landmark containing a native list.",
+    "Use native anchors with href for every available destination and normal Tab and Enter behavior.",
+    "Mark exactly one non-interactive current page with aria-current=\"page\".",
+    "Omit unavailable previous or next destinations instead of leaving CSS-disabled anchors in the tab order.",
+    "Hide passive ellipsis items from assistive technology and never make them interactive.",
+    "Give icon-only previous and next links localized accessible names and hide decorative icons.",
+    "Keep the semantic minimum destination target, visible focus ring, forced-color distinction, and wrap-safe localized content.",
+    "Leave result announcements, focus restoration, scrolling, pending/error state, history, and URL synchronization to one target coordinator."
   ],
   "adapters": {
     "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify paginate objects to links and current state." },
+    "shopify": { "status": "implemented", "kind": "section-adapter", "notes": "main-collection.liquid maps Shopify paginate parts, native URLs, localized labels, current state, ellipses, and boundary omission to the canonical anatomy." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

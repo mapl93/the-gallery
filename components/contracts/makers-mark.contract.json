@@ -1,11 +1,309 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "makers-mark", "name": "Maker's Mark", "registryId": "R9", "category": "ceramics", "status": "pilot", "summary": "Artisan stamp/mark badge with artist name and studio.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/makers-mark", "css": { "file": "components/css/ceramics.css", "selector": ".makers-mark" }, "docs": "site/src/content/components/makers-mark.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".makers-mark", "className": ".makers-mark", "required": true, "description": "Passive maker identity surface." }, { "name": "stamp", "selector": ".makers-mark__stamp", "className": ".makers-mark__stamp", "required": false, "description": "Optional maker mark image." }, { "name": "info", "selector": ".makers-mark__info", "className": ".makers-mark__info", "required": true, "description": "Maker identity text." }, { "name": "artist", "selector": ".makers-mark__artist", "className": ".makers-mark__artist", "required": true, "description": "Artist or maker name." }, { "name": "studio", "selector": ".makers-mark__studio", "className": ".makers-mark__studio", "required": false, "description": "Optional studio text." }, { "name": "year", "selector": ".makers-mark__year", "className": ".makers-mark__year", "required": false, "description": "Optional target-formatted year text." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default maker identity presentation." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Compact contained identity layout." }], "states": [{ "name": "default", "selectors": [".makers-mark"], "description": "Passive identity state." }],
-  "behavior": [{ "name": "identityOwnership", "selectors": [".makers-mark__artist", ".makers-mark__studio", ".makers-mark__year"], "description": "Targets supply maker identity and provenance text; the contract does not define an artist or studio record model." }],
-  "properties": [{ "name": "stamp", "type": "slot", "required": false, "description": "Optional target-owned maker-mark image or graphic.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".makers-mark__stamp", "classNames": [".makers-mark__stamp"] }] } }, { "name": "artist", "type": "string", "required": true, "description": "Visible artist or maker name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".makers-mark__artist" }] } }, { "name": "studio", "type": "string", "required": false, "description": "Optional studio text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".makers-mark__studio" }] } }, { "name": "year", "type": "string", "required": false, "description": "Optional target-formatted year.", "targetMappings": { "web": [{ "kind": "content", "selector": ".makers-mark__year" }] } }],
-  "tokens": { "public": { "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size"], "radius": ["--radius-md"] } },
-  "accessibility": ["Keep the maker identity available as text.", "Provide useful alternative text for an informative stamp or hide a decorative stamp.", "Do not present the mark as proof of authenticity unless a target provides and owns that claim."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "makers-mark",
+  "name": "Maker's Mark",
+  "registryId": "R9",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Maker attribution with required visible identity, optional canonical profile Link, and optional target-owned stamp, studio context, and formatted year wording.",
+  "dependencies": [
+    "link"
+  ],
+  "source": {
+    "registry": "registry.json#/components/makers-mark",
+    "css": {
+      "file": "components/css/ceramics.css",
+      "selector": ".makers-mark"
+    },
+    "docs": "site/src/content/components/makers-mark.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".makers-mark",
+      "className": ".makers-mark",
+      "required": true,
+      "description": "Passive generic maker-attribution group rendered only with a non-empty visible artist value."
+    },
+    {
+      "name": "stamp",
+      "selector": ".makers-mark__stamp",
+      "className": ".makers-mark__stamp",
+      "required": false,
+      "description": "Optional bounded wrapper for target-owned passive stamp image, graphic, mark, or text composition."
+    },
+    {
+      "name": "info",
+      "selector": ".makers-mark__info",
+      "className": ".makers-mark__info",
+      "required": true,
+      "description": "Visible maker identity text group."
+    },
+    {
+      "name": "artist",
+      "selector": ".makers-mark__artist",
+      "className": ".makers-mark__artist",
+      "required": true,
+      "description": "Required non-empty visible artist, maker, collective, or target display name."
+    },
+    {
+      "name": "artistLink",
+      "selector": ".makers-mark__artist-link",
+      "className": ".makers-mark__artist-link",
+      "required": false,
+      "description": "Optional native canonical Link on the complete visible maker identity when a real target-owned profile destination exists."
+    },
+    {
+      "name": "studio",
+      "selector": ".makers-mark__studio",
+      "className": ".makers-mark__studio",
+      "required": false,
+      "description": "Optional complete target-formatted studio context."
+    },
+    {
+      "name": "year",
+      "selector": ".makers-mark__year",
+      "className": ".makers-mark__year",
+      "required": false,
+      "description": "Optional complete target-formatted year wording without automatic parsing or provenance meaning."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Quiet passive maker-attribution presentation."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Compact bounded attribution surface with intrinsic narrow response."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".makers-mark"
+      ],
+      "description": "Passive identity content with no hover, focus, selection, verification, or live state."
+    },
+    {
+      "name": "linked",
+      "selectors": [
+        ".makers-mark__artist-link"
+      ],
+      "description": "Optional canonical Link navigation on the visible identity; the root, stamp, studio and year remain passive."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "requiredIdentityOmission",
+      "selectors": [
+        ".makers-mark",
+        ".makers-mark__artist"
+      ],
+      "description": "Trim the required artist value and omit the complete root when it is empty; optional parts never keep an invalid shell alive."
+    },
+    {
+      "name": "genericContainerBoundary",
+      "selectors": [
+        ".makers-mark"
+      ],
+      "description": "Neutral Web defaults to a generic non-landmark container. Targets may choose aside, article, section, address, or another semantic element only when host document context independently justifies it."
+    },
+    {
+      "name": "stampAlternativeOwnership",
+      "selectors": [
+        ".makers-mark__stamp"
+      ],
+      "description": "Targets own stamp markup and alternatives: informative marks expose equivalent text, while marks that duplicate the adjacent visible identity are decorative or hidden. Stamp presentation alone never proves authenticity."
+    },
+    {
+      "name": "identityOwnership",
+      "selectors": [
+        ".makers-mark__artist",
+        ".makers-mark__studio",
+        ".makers-mark__year"
+      ],
+      "description": "Targets supply complete localized identity and context strings. The contract does not define artist, studio, vendor, product, year, provenance, or certificate records and does not parse display text."
+    },
+    {
+      "name": "optionalCanonicalProfileLink",
+      "selectors": [
+        ".makers-mark__artist-link",
+        ".link"
+      ],
+      "attributes": [
+        "href"
+      ],
+      "events": [
+        "link activation",
+        "target navigation"
+      ],
+      "description": "A non-empty target-owned profile href progressively wraps the complete visible identity in one native canonical Link. Missing destination leaves ordinary complete text; R9 owns no scripted navigation, profile loading, mutation, authenticity, or result lifecycle."
+    },
+    {
+      "name": "intrinsicResponse",
+      "selectors": [
+        ".makers-mark",
+        ".makers-mark__stamp",
+        ".makers-mark__info"
+      ],
+      "description": "Logical geometry, complete wrapping, bounded stamp media, private measure, and component-width stamp alignment preserve source order without a public responsive mode."
+    }
+  ],
+  "properties": [
+    {
+      "name": "stamp",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned passive maker-mark media or graphic with context-appropriate accessibility.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".makers-mark__stamp",
+            "classNames": [
+              ".makers-mark__stamp"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "artist",
+      "type": "string",
+      "required": true,
+      "description": "Required non-empty visible maker, artist, collective, or target display name.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".makers-mark__artist"
+          }
+        ]
+      }
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Render the complete visible artist identity as ordinary text with no empty or scripted Link.",
+      "description": "Optional real target-owned maker-profile destination for the canonical Link on the complete visible identity.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".makers-mark__artist-link",
+            "attribute": "href",
+            "valueFrom": "property",
+            "elements": [
+              "a"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "studio",
+      "type": "string",
+      "required": false,
+      "description": "Optional complete target-owned studio context.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".makers-mark__studio"
+          }
+        ]
+      }
+    },
+    {
+      "name": "year",
+      "type": "string",
+      "required": false,
+      "description": "Optional complete target-formatted year wording whose factual meaning remains target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".makers-mark__year"
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--font-family-body",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-small-weight",
+        "--tg-typography-body-caption-weight",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ],
+      "radius": [
+        "--radius-md"
+      ]
+    }
+  },
+  "accessibility": [
+    "Keep the full maker identity available as visible text and omit the complete component when that required text is empty.",
+    "Use a generic non-landmark root by default; add complementary, article, section, address, or other document semantics only when the target context independently requires them.",
+    "Do not use cite for a person's or organization's name and do not use address unless the content is actual contact information for its nearest article or body.",
+    "Use native image or graphic semantics and an equivalent alternative when the stamp adds information; use an empty alternative or aria-hidden when it duplicates the adjacent visible identity.",
+    "Do not encode maker identity only in the visual stamp, generate an accessible name from initials, or announce the same identity twice.",
+    "Do not present the mark, border, year, icon, code, badge, or visual treatment as proof of authenticity, verification, certification, authorship, manufacture, or provenance without a separately owned substantiated target record.",
+    "Keep the root, stamp, studio, and year out of the tab order. When a real profile destination exists, use one native canonical Link on the complete visible identity and preserve its focus, Enter, modified activation, history, forced-color, and reduced-motion behavior.",
+    "Omit the Link completely when href is blank; do not synthesize a click handler, empty href, whole-surface activation, profile loading state, or authenticity meaning.",
+    "Preserve complete localized strings, automatic direction, text resizing, user text spacing, forced colors, and meaningful source order without truncation."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Generic attribution markup, strict required-identity omission, optional native canonical profile Link, contextual stamp semantics, complete text wrapping, and intrinsic logical CSS are implemented without R9-owned JavaScript."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js",
+      "notes": "Select an approved maker source and product relationship before mapping product.vendor, metafields, metaobjects, stamp media, localization, editor validation, or authenticity claims."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
+  }
 }

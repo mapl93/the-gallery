@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.4.0",
+  "contractVersion": "0.5.0",
   "slug": "textarea",
   "name": "Textarea",
   "registryId": "A4",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Multi-line value-entry field that composes the canonical Input anatomy, validation variants, feedback semantics, and interaction states while exposing configurable resize direction.",
+  "summary": "Native multi-line value-entry field that composes Input form and validation semantics while exposing configurable resize direction and line bounds.",
   "dependencies": ["input"],
   "source": {
     "registry": "registry.json#/components/textarea",
@@ -109,6 +109,11 @@
       "description": "Inherited native unavailable state."
     },
     {
+      "name": "readOnly",
+      "selectors": [".textarea__field:read-only:not(:disabled)"],
+      "description": "Focusable native state whose multi-line value can be selected and submitted but not edited."
+    },
+    {
       "name": "errorFocusVisible",
       "selectors": [".input--error .input__field:focus-visible"],
       "description": "Focused Error variant with semantic inner and outer borders."
@@ -153,6 +158,23 @@
       "description": "Unavailable textareas use the native disabled attribute for form and focus behavior."
     },
     {
+      "name": "nativeValueOwnership",
+      "selectors": [".textarea__field"],
+      "attributes": [
+        "element text content establishes the initial HTML value",
+        "value IDL property represents the live value"
+      ],
+      "events": ["input", "change", "form reset"],
+      "description": "Static HTML remains natively uncontrolled after its initial text content. Framework adapters may bind the live value property and native events for controlled use without introducing a second value owner."
+    },
+    {
+      "name": "nativeFormSemantics",
+      "selectors": [".textarea__field"],
+      "attributes": ["name", "required", "readonly", "autocomplete", "minlength", "maxlength"],
+      "events": ["constraint validation", "form submit"],
+      "description": "Stable multi-line form semantics stay on the sole native textarea owner; visual required communication remains author content in the visible label or associated instructions."
+    },
+    {
       "name": "resizeDirection",
       "selectors": [
         ".textarea__field",
@@ -192,6 +214,102 @@
       "description": "Current multi-line value of the native textarea.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".textarea__field" }]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name used to identify the submitted multi-line value.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "name",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Participates in native required-value constraint validation; the visible label or associated instructions must also communicate the requirement.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "required",
+          "values": { "true": "", "false": null },
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Prevents native editing while preserving focus, selection, and form submission.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "readonly",
+          "values": { "true": "", "false": null },
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "autocomplete",
+      "type": "string",
+      "required": false,
+      "description": "Native autofill hint, including standard autocomplete tokens and optional section or address-group prefixes.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "autocomplete",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "minLength",
+      "type": "number",
+      "required": false,
+      "minimum": 0,
+      "step": 1,
+      "description": "Optional native minimum character length used by constraint validation.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "minlength",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
+      }
+    },
+    {
+      "name": "maxLength",
+      "type": "number",
+      "required": false,
+      "minimum": 0,
+      "step": 1,
+      "description": "Optional native maximum character length accepted by the textarea.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".textarea__field",
+          "attribute": "maxlength",
+          "valueFrom": "property",
+          "elements": ["textarea"]
+        }]
       }
     },
     {
@@ -360,7 +478,9 @@
     "Use aria-describedby to connect supporting and validation messages when present.",
     "Use aria-invalid=\"true\" only for Error; Success and Warning do not expose invalid state.",
     "Do not rely on validation color alone; include concise associated feedback text.",
-    "Use native disabled when the field is unavailable.",
+    "Use native required, readonly, disabled, autocomplete, minlength, and maxlength semantics instead of recreating them with ARIA or script.",
+    "Communicate a required textarea visibly in the label or associated instructions; the native required attribute alone is not a visual instruction.",
+    "Use readOnly when content remains focusable, selectable, and submittable; use disabled only when the field is unavailable.",
     "Choose vertical, horizontal, or bidirectional resizing to match the available layout without hiding content or feedback.",
     "Use positive whole numbers for minLines and maxLines, and keep maxLines greater than or equal to minLines."
   ],
@@ -368,14 +488,18 @@
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Composes canonical Input classes with textarea__field in components/css/primitives.css."
+      "notes": "Composes canonical Input classes with a native textarea; static HTML is uncontrolled after its initial text content while adapters may bind the live value property and native events."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid renders native textarea elements with input__field and textarea__field classes."
+      "notes": "Shopify Liquid renders native textarea elements, form attributes, and the input__field/textarea__field class composition."
     },
-    "react": { "status": "planned", "kind": "component" },
+    "react": {
+      "status": "planned",
+      "kind": "component",
+      "notes": "A future adapter maps controlled value/onInput or uncontrolled initial content to the same native textarea owner."
+    },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "style" },
     "compose": { "status": "planned", "kind": "composable" }

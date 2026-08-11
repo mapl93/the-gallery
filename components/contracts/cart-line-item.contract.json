@@ -1,81 +1,422 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "cart-line-item",
   "name": "Cart Line Item",
   "registryId": "K2",
   "category": "cart",
   "status": "pilot",
-  "summary": "Individual cart line item with product image, title, variant text, quantity controls, remove/save actions, and price.",
-  "dependencies": ["quantity-selector", "price"],
+  "summary": "Canonical target-controlled cart or order line composition with product identity, Price, optional Quantity Selector, and optional line actions.",
+  "dependencies": [
+    "button",
+    "price",
+    "quantity-selector"
+  ],
   "source": {
     "registry": "registry.json#/components/cart-line-item",
-    "css": { "file": "components/css/cart.css", "selector": ".cart-line" },
+    "css": {
+      "file": "components/css/cart.css",
+      "selector": ".cart-line"
+    },
     "docs": "site/src/content/components/cart-line-item.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".cart-line", "className": ".cart-line", "required": true, "description": "Cart line container." },
-    { "name": "image", "selector": ".cart-line__image", "className": ".cart-line__image", "required": true, "description": "Product image." },
-    { "name": "info", "selector": ".cart-line__info", "className": ".cart-line__info", "required": true, "description": "Product info wrapper." },
-    { "name": "title", "selector": ".cart-line__title", "className": ".cart-line__title", "required": true, "description": "Product title link." },
-    { "name": "variant", "selector": ".cart-line__variant", "className": ".cart-line__variant", "required": false, "description": "Selected variant text." },
-    { "name": "quantity", "selector": ".cart-line__quantity", "className": ".cart-line__quantity", "required": false, "description": "Quantity Selector dependency region." },
-    { "name": "actions", "selector": ".cart-line__actions", "className": ".cart-line__actions", "required": false, "description": "Secondary line actions." },
-    { "name": "remove", "selector": ".cart-line__remove", "className": ".cart-line__remove", "required": false, "description": "Remove action." },
-    { "name": "save", "selector": ".cart-line__save", "className": ".cart-line__save", "required": false, "description": "Save-for-later action." },
-    { "name": "prices", "selector": ".cart-line__prices", "className": ".cart-line__prices", "required": true, "description": "Current and optional compare-at price wrapper." },
-    { "name": "price", "selector": ".cart-line__price", "className": ".cart-line__price", "required": true, "description": "Line price." },
-    { "name": "comparePrice", "selector": ".cart-line__price-compare", "className": ".cart-line__price-compare", "required": false, "description": "Compare-at line price." }
+    {
+      "name": "collection",
+      "selector": ".cart-lines",
+      "className": ".cart-lines",
+      "required": true,
+      "description": "Native list and inline-size container for one or more line records."
+    },
+    {
+      "name": "root",
+      "selector": ".cart-line",
+      "className": ".cart-line",
+      "required": true,
+      "description": "Native list item for one target-owned line identity."
+    },
+    {
+      "name": "image",
+      "selector": ".cart-line__image",
+      "className": ".cart-line__image",
+      "required": false,
+      "description": "Optional bounded product media, decorative when adjacent identity repeats its meaning."
+    },
+    {
+      "name": "info",
+      "selector": ".cart-line__info",
+      "className": ".cart-line__info",
+      "required": true,
+      "description": "Product identity, details, Price, Quantity Selector, and action wrapper."
+    },
+    {
+      "name": "title",
+      "selector": ".cart-line__title",
+      "className": ".cart-line__title",
+      "required": true,
+      "description": "Required visible identity rendered as one link only when a truthful destination exists."
+    },
+    {
+      "name": "details",
+      "selector": ".cart-line__details",
+      "className": ".cart-line__details",
+      "required": false,
+      "description": "Optional target-authored selected variant, properties, selling-plan, fulfilment, or discount detail."
+    },
+    {
+      "name": "price",
+      "selector": ".cart-line__price",
+      "className": ".cart-line__price",
+      "required": true,
+      "description": "Required canonical Price composition region."
+    },
+    {
+      "name": "quantity",
+      "selector": ".cart-line__quantity",
+      "className": ".cart-line__quantity",
+      "required": false,
+      "description": "Optional canonical Quantity Selector composition region."
+    },
+    {
+      "name": "actions",
+      "selector": ".cart-line__actions",
+      "className": ".cart-line__actions",
+      "required": false,
+      "description": "Optional wrapper for target-supported canonical Button requests."
+    },
+    {
+      "name": "remove",
+      "selector": ".cart-line__remove",
+      "className": ".cart-line__remove",
+      "required": false,
+      "description": "Optional target-controlled removal Button with product context in its accessible name."
+    },
+    {
+      "name": "save",
+      "selector": ".cart-line__save",
+      "className": ".cart-line__save",
+      "required": false,
+      "description": "Optional target-controlled save-for-later Button rendered only with a real persistence capability."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default cart line item." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One semantic line composition; optional controls distinguish editable from read-only usage."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive cart line item layout." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One intrinsic layout that responds to the cart-lines container."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".cart-line"], "description": "Default cart line state." },
-    { "name": "titleHover", "selectors": [".cart-line__title:hover"], "description": "Product title hover state." },
-    { "name": "removeHover", "selectors": [".cart-line__remove:hover"], "description": "Remove action hover state." },
-    { "name": "actionFocus", "selectors": [".cart-line__title:focus-visible", ".cart-line__remove:focus-visible", ".cart-line__save:focus-visible"], "description": "Visible title and secondary-action focus states." }
+    {
+      "name": "default",
+      "selectors": [
+        ".cart-line"
+      ],
+      "description": "Readable target line with no component-owned mutation state."
+    },
+    {
+      "name": "linkedTitleHover",
+      "selectors": [
+        ".cart-line__title:any-link:hover"
+      ],
+      "description": "Pointer hover on the optional single product destination."
+    },
+    {
+      "name": "linkedTitleFocus",
+      "selectors": [
+        ".cart-line__title:any-link:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the optional product destination."
+    },
+    {
+      "name": "narrowContainer",
+      "selectors": [
+        "@container cart-lines (max-width: 36rem)"
+      ],
+      "description": "Price and actions reflow from the actual parent content width rather than the viewport."
+    }
   ],
   "behavior": [
-    { "name": "quantityUpdate", "selectors": [".cart-line"], "events": ["change"], "description": "Quantity changes should update the cart line, totals, and available inventory state." },
-    { "name": "removeLine", "selectors": [".cart-line__remove"], "events": ["click"], "description": "Remove action should remove the line item and update the cart summary." },
-    { "name": "priceFormatting", "selectors": [".cart-line__price", ".cart-line__price-compare"], "description": "Line prices should be formatted by the commerce target." }
+    {
+      "name": "nativeCollection",
+      "selectors": [
+        ".cart-lines",
+        ".cart-line"
+      ],
+      "attributes": [
+        "ul",
+        "li"
+      ],
+      "description": "One native list contains one list item per stable target line identity; the line is not a widget or article."
+    },
+    {
+      "name": "singleDestination",
+      "selectors": [
+        ".cart-line__title"
+      ],
+      "attributes": [
+        "optional href"
+      ],
+      "description": "A truthful destination renders one title link; otherwise the same required identity renders as plain text and adjacent media is not a duplicate link."
+    },
+    {
+      "name": "priceComposition",
+      "selectors": [
+        ".cart-line__price",
+        ".price"
+      ],
+      "description": "Canonical Price owns current, compare-at, unit, labels, bidirectional isolation, formatting boundary, and passive semantics."
+    },
+    {
+      "name": "quantityComposition",
+      "selectors": [
+        ".cart-line__quantity",
+        ".qty"
+      ],
+      "events": [
+        "input",
+        "change",
+        "target mutation result"
+      ],
+      "description": "Canonical Quantity Selector retains the sole native value and step behavior; the target persists changes and reconciles inventory, prices, totals, errors, and status."
+    },
+    {
+      "name": "targetActions",
+      "selectors": [
+        ".cart-line__remove",
+        ".cart-line__save"
+      ],
+      "events": [
+        "click",
+        "target mutation result"
+      ],
+      "description": "Optional canonical Buttons request removal or save-for-later; pending, success, error, rollback, persistence, focus placement, totals, and announcements remain target responsibilities."
+    },
+    {
+      "name": "controlledLine",
+      "selectors": [
+        ".cart-line"
+      ],
+      "description": "The parent target owns line identity, content, constraints, mutation and persistence. Cart Line Item owns no store, formatter, hidden value, optimistic policy, network client, or live region."
+    }
   ],
   "properties": [
-    { "name": "image", "type": "slot", "required": true, "description": "Product image.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-line__image", "classNames": [".cart-line__image"] }] } },
-    { "name": "imageAlt", "type": "string", "required": true, "description": "Product image alternative text.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-line__image", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__title" }] } },
-    { "name": "href", "type": "string", "required": true, "description": "Product destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-line__title", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
-    { "name": "variant", "type": "string", "required": false, "description": "Selected variant description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__variant" }] } },
-    { "name": "quantitySelector", "type": "slot", "required": false, "description": "Quantity Selector dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-line__quantity", "classNames": [".cart-line__quantity"] }] } },
-    { "name": "removeLabel", "type": "string", "required": false, "description": "Remove action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__remove" }] } },
-    { "name": "saveLabel", "type": "string", "required": false, "description": "Save-for-later action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__save" }] } },
-    { "name": "price", "type": "string", "required": true, "description": "Target-formatted line price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__price" }] } },
-    { "name": "comparePrice", "type": "string", "required": false, "description": "Optional target-formatted compare-at price.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-line__price-compare" }] } }
+    {
+      "name": "media",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit the media element and collapse its grid track.",
+      "description": "Optional target-owned product media. Alternative text belongs to the rendered media and is empty when adjacent identity repeats its meaning.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-line__image",
+            "classNames": [
+              ".cart-line__image"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Non-empty visible product or line identity.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".cart-line__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Render the required title as plain text rather than an anchor.",
+      "description": "Optional truthful product destination used by the one title link.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".cart-line__title",
+            "attribute": "href",
+            "valueFrom": "property",
+            "elements": [
+              "a"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "details",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit the details wrapper.",
+      "description": "Optional target-authored selected variant, properties, selling-plan, fulfilment, discount, or equivalent line detail.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-line__details",
+            "classNames": [
+              ".cart-line__details"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "price",
+      "type": "slot",
+      "required": true,
+      "description": "Canonical Price composition containing complete target-formatted current, optional compare-at, and optional unit-price meaning.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-line__price",
+            "classNames": [
+              ".cart-line__price",
+              ".price"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "quantitySelector",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit editable quantity controls for a read-only or non-adjustable line.",
+      "description": "Canonical Quantity Selector composition with target-owned form name, value constraints, mutation and inventory policy.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-line__quantity",
+            "classNames": [
+              ".cart-line__quantity",
+              ".qty"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "removeAction",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit removal when the target cannot truthfully remove the line.",
+      "description": "Canonical target-controlled Button request with line identity in its accessible name.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-line__remove",
+            "classNames": [
+              ".cart-line__remove",
+              ".btn"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "saveAction",
+      "type": "slot",
+      "required": false,
+      "unsetBehavior": "Omit save-for-later when the target has no persistence capability.",
+      "description": "Canonical target-controlled Button request for a supported save-for-later service.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-line__save",
+            "classNames": [
+              ".cart-line__save",
+              ".btn"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-accent", "--color-text-secondary", "--color-text-disabled", "--color-feedback-error-default"],
-      "radius": ["--radius-sm"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"],
-      "typography": ["--font-family-heading", "--typo-body-size"]
+      "color": [
+        "--color-border-subtle",
+        "--color-border-focus",
+        "--color-text-primary",
+        "--color-text-accent",
+        "--color-text-secondary"
+      ],
+      "radius": [
+        "--radius-sm"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-layout-touch-target"
+      ],
+      "typography": [
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-small-weight",
+        "--font-family-heading",
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ]
     }
   },
   "accessibility": [
-    "Product images need useful alt text or should be hidden if duplicated by adjacent product text.",
-    "Remove and save actions need clear accessible names that include the product context.",
-    "Quantity updates should not silently change totals without feedback."
+    "Render populated line collections as a native ul with one li per target line identity; do not add article or widget semantics.",
+    "Keep at most one product destination and use decorative adjacent media when title or details repeat its meaning.",
+    "Compose canonical Price and Quantity Selector so their native semantics, labels, value ownership, constraints, and formatting boundaries remain intact.",
+    "Remove and save Buttons need product-context accessible names, visible focus, truthful disabled or busy state, and target-owned result feedback.",
+    "The surrounding cart or order target owns mutation announcements and logical focus placement after confirmed line removal."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify cart line data, quantity updates, discounts, and line keys." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Canonical list/line CSS composes Button, Price, and Quantity Selector; a target controller owns line data and mutations."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-js",
+      "notes": "Liquid maps cart line keys, localized product detail and money, native update/removal form semantics, and optional Ajax/section refresh; runtime mutation evidence remains target-owned."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

@@ -1,0 +1,89 @@
+{% doc %}
+Renders a product-context Quick View composition. The target controller owns
+invocation, modal lifecycle, product loading, variant synchronization, purchase
+results, cart refresh, status, and focus restoration.
+
+@param {product} product - Product rendered in the Quick View.
+@param {string} [quick_view_id] - Unique dialog id.
+@param {string} [section_id] - Section id used to scope the product form.
+@param {boolean} [open] - Whether the target initially presents the dialog.
+@param {boolean} [show_product_form] - Whether to render canonical Product Form.
+@param {boolean} [show_full_link] - Whether to render the complete-product Link.
+@param {string} [description] - Optional concise plaintext product excerpt.
+
+@example
+{% render 'quick-view', product: product, section_id: section.id, open: false %}
+{% enddoc %}
+
+{%- if product != blank -%}
+  {%- liquid
+    assign resolved_quick_view_id = quick_view_id
+    if resolved_quick_view_id == blank
+      assign resolved_quick_view_id = 'quick-view-' | append: product.id
+    endif
+    assign quick_view_title_id = resolved_quick_view_id | append: '-title'
+    assign product_form_id = resolved_quick_view_id | append: '-form'
+  -%}
+
+  <div
+    class="modal-overlay quick-view-overlay"
+    aria-hidden="{% if open %}false{% else %}true{% endif %}"
+    data-quick-view-overlay
+    {% unless open %}hidden{% endunless %}
+  >
+    <div
+      class="modal quick-view"
+      id="{{ resolved_quick_view_id | escape }}"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="{{ quick_view_title_id | escape }}"
+      data-quick-view
+    >
+      <div class="modal__header">
+        <h2 class="modal__title" id="{{ quick_view_title_id | escape }}">
+          {{ product.title | escape }}
+        </h2>
+        <button
+          class="close-btn modal__close"
+          type="button"
+          aria-label="{{ 'products.quick_view.close' | t: title: product.title | escape }}"
+          data-quick-view-close
+        >
+          {% render 'icon', name: 'close', size: 20 %}
+        </button>
+      </div>
+
+      <div class="modal__body">
+        <div class="quick-view__layout">
+          <div class="quick-view__gallery">
+            {% render 'product-gallery', product: product, image_detail: 'none' %}
+          </div>
+
+          <div class="quick-view__info">
+            {%- if product.vendor != blank -%}
+              <p class="quick-view__vendor" dir="auto">{{ product.vendor | escape }}</p>
+            {%- endif -%}
+
+            <div class="quick-view__price">
+              {% render 'price', product: product %}
+            </div>
+
+            {%- if description != blank -%}
+              <p class="quick-view__description" dir="auto">{{ description | strip_html | escape }}</p>
+            {%- endif -%}
+
+            {%- unless show_product_form == false -%}
+              {% render 'product-form', product: product, section_id: section_id, product_form_id: product_form_id, class_name: 'quick-view__form' %}
+            {%- endunless -%}
+
+            {%- unless show_full_link == false -%}
+              <a class="link quick-view__full-link" href="{{ product.url | escape }}">
+                {{ 'products.quick_view.view_full_details' | t }}
+              </a>
+            {%- endunless -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}

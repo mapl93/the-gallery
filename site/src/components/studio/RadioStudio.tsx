@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import RadioArtwork from './RadioArtwork';
 
 interface RadioStudioProps {
   contract: ComponentContract;
@@ -64,10 +65,6 @@ function collectStudioTokens(definition: StudioDefinition, contract: ComponentCo
   )];
 }
 
-function optionClass(options: ComponentContract['variants'], value: StudioPropertyValue): string | null {
-  return options.find((option) => option.name === value)?.className?.replace(/^\./, '') ?? null;
-}
-
 function activeColorTokens(
   variant: string,
   state: string,
@@ -98,7 +95,8 @@ function activeColorTokens(
 
 function simulatedControlStyle(
   activeTokens: Record<string, string | null>,
-  state: string
+  state: string,
+  variant: string
 ): CSSProperties {
   const focused = [
     'focusVisible',
@@ -110,7 +108,9 @@ function simulatedControlStyle(
 
   return {
     borderColor: activeTokens['control-color']
-      ? `var(${activeTokens['control-color']})`
+      ? variant === 'error' || variant === 'success' || variant === 'warning'
+        ? `color-mix(in srgb, var(${activeTokens['control-color']}) 70%, var(--color-text-primary))`
+        : `var(${activeTokens['control-color']})`
       : undefined,
     outline: focused && activeTokens['focus-ring']
       ? `4px solid var(${activeTokens['focus-ring']})`
@@ -171,18 +171,20 @@ export default function RadioStudio({ contract, definition }: RadioStudioProps) 
     () => activeColorTokens(variant, previewState, checked),
     [variant, previewState, checked]
   );
-  const classes = [
-    'radio',
-    'docs-studio__preview-radio',
-    optionClass(contract.variants, values.variant),
-  ].filter(Boolean).join(' ');
+  const controlStyle = simulatedControlStyle(activeTokens, previewState, variant);
+  const classes = 'docs-studio__preview-radio';
 
   function handleStateChange(state: string) {
     setPreviewState(state);
     setValues((current) => ({
       ...current,
-      checked: state === 'checked' ? true : current.checked,
+      checked: state === 'checked'
+        ? true
+        : state === 'requiredInvalid'
+          ? false
+          : current.checked,
       disabled: state === 'disabled',
+      required: state === 'requiredInvalid' ? true : current.required,
       variant: state === 'errorFocusVisible'
         ? 'error'
         : state === 'successFocusVisible'
@@ -226,26 +228,25 @@ export default function RadioStudio({ contract, definition }: RadioStudioProps) 
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <label className={classes}>
-              <input
-                className="radio__input"
-                type="radio"
-                name={name || undefined}
-                value={value}
-                checked={checked}
-                disabled={disabled}
-                required={required}
-                aria-invalid={variant === 'error' || undefined}
-                aria-describedby={describedBy}
-                data-studio-state={previewState}
-                style={simulatedControlStyle(activeTokens, previewState)}
-                onChange={(event) => setValues((current) => ({
-                  ...current,
-                  checked: event.target.checked,
-                }))}
-              />
-              <span className="radio__label">{label}</span>
-            </label>
+            <RadioArtwork
+              className={classes}
+              label={label}
+              name={name}
+              value={value}
+              checked={checked}
+              disabled={disabled}
+              required={required}
+              variant={variant === 'error' || variant === 'success' || variant === 'warning'
+                ? variant
+                : 'default'}
+              describedBy={describedBy}
+              studioState={previewState}
+              inputStyle={controlStyle}
+              onCheckedChange={(next) => setValues((current) => ({
+                ...current,
+                checked: next,
+              }))}
+            />
           </div>
         </section>
       </div>

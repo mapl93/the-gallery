@@ -1,12 +1,12 @@
 ## Overview
 
-Responsive collection layout that composes ordered Product Card children.
+Passive, container-responsive product list that composes one canonical Product Card per item.
 
-<Preview html={"<div class=\"collection-grid tg-preview-frame tg-preview-collection-grid\" data-columns=\"3\"><article class=\"product-card\"><div class=\"product-card__media\"><div class=\"product-card__image tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\">Vase</h3></div></article><article class=\"product-card\"><div class=\"product-card__media\"><div class=\"product-card__image tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\">Bowl</h3></div></article><article class=\"product-card\"><div class=\"product-card__media\"><div class=\"product-card__image tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\">Plate</h3></div></article></div>"} label="Collection Grid" />
+<Preview html={"<div class=\"collection-grid tg-preview-frame tg-preview-collection-grid\" data-columns=\"4\"><ul class=\"collection-grid__items\" role=\"list\"><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#quiet-form\">Quiet Form</a></h3></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#carved-vessel\">Carved Vessel</a></h3></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#chawan\">茶碗 · Chawan</a></h3></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#archive\">Night Archive</a></h3></div></article></li></ul></div>"} label="Collection Grid" />
 
 ## Presentation
 
-The grid uses two columns on small screens, three at tablet widths, and four on desktop by default. `data-columns` maps values from two through six to the existing `--grid-columns` customization hook.
+The root responds to its own inline size. It uses one column in unusually constrained embeds, two at the base width, three at the intermediate threshold, and four in wide containers by default. `data-columns` requests two through six columns for the wide mode without changing the smaller responsive modes.
 
 ## Usage Guidelines
 
@@ -16,12 +16,14 @@ The grid uses two columns on small screens, three at tablet widths, and four on 
 </DoDont>
 
 - Use consistent media aspect ratios across sibling cards.
-- Choose a desktop column count that preserves readable titles and prices.
+- Choose a wide-container column count that preserves readable titles and prices.
 - Let pagination or progressive loading own result boundaries.
+- Compose Empty Collection outside the list when no results need recovery guidance.
 
 ## Accessibility
 
 - Preserve DOM order so reading and keyboard order match the visual grid.
+- Use native `ul`/`li` semantics; do not add the APG `grid` role or arrow-key focus management to a passive product list.
 - Keep each Product Card's accessible name independent from the grid container.
 - Announce result-count changes outside the grid when filtering is asynchronous.
 
@@ -34,8 +36,10 @@ The grid uses two columns on small screens, three at tablet widths, and four on 
 ### API Reference
 
 <PropTable>
-  <tr><td>`columns`</td><td>number</td><td>`4`</td><td>Desktop columns from 2 through 6</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered Product Card children</td></tr>
-  <tr><td>`.collection-grid`</td><td>class</td><td>required</td><td>Responsive grid container</td></tr>
-  <tr><td>`data-columns`</td><td>attribute</td><td>`4`</td><td>Web mapping for `--grid-columns`</td></tr>
+  <tr><td>`columns`</td><td>number</td><td>`4`</td><td>Wide-container Product Card columns from 2 through 6</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered canonical Product Cards, each in one native list item</td></tr>
+  <tr><td>`.collection-grid`</td><td>class</td><td>required</td><td>Neutral root and inline-size query container</td></tr>
+  <tr><td>`.collection-grid__items`</td><td>class</td><td>required</td><td>Native list and responsive CSS grid</td></tr>
+  <tr><td>`.collection-grid__item`</td><td>class</td><td>repeated</td><td>Native list item containing one Product Card</td></tr>
+  <tr><td>`data-columns`</td><td>attribute</td><td>`4`</td><td>Web mapping for the wide column request</td></tr>
 </PropTable>

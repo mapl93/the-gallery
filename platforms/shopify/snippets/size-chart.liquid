@@ -1,0 +1,209 @@
+{% doc %}
+  Renders a bounded, product-associated Size Chart from the merchant-owned
+  custom.size_chart metaobject reference. Each presentation is a complete,
+  independently authored three-column table; this snippet never converts or
+  infers measurements.
+
+  @param {product} product - Product whose custom.size_chart reference is rendered.
+  @param {string} [size_chart_id] - Target-unique native dialog id.
+
+  @example
+  {% render 'size-chart', product: product, size_chart_id: 'size-chart-main' %}
+{% enddoc %}
+
+{%- liquid
+  assign chart = product.metafields.custom.size_chart.value
+  assign resolved_id = size_chart_id
+  if resolved_id == blank
+    assign resolved_id = 'size-chart-' | append: product.id
+  endif
+
+  assign title = chart.title.value
+  assign primary_label = chart.primary_label.value
+  assign primary_caption = chart.primary_caption.value
+  assign primary_row_header = chart.primary_row_header.value
+  assign primary_first_header = chart.primary_first_header.value
+  assign primary_second_header = chart.primary_second_header.value
+  assign primary_rows = chart.primary_rows.value
+
+  assign primary_row_count = 0
+  for row in primary_rows limit: 20
+    if row.row_label.value != blank and row.first_value.value != blank and row.second_value.value != blank
+      assign primary_row_count = primary_row_count | plus: 1
+    endif
+  endfor
+
+  assign secondary_label = chart.secondary_label.value
+  assign secondary_caption = chart.secondary_caption.value
+  assign secondary_row_header = chart.secondary_row_header.value
+  assign secondary_first_header = chart.secondary_first_header.value
+  assign secondary_second_header = chart.secondary_second_header.value
+  assign secondary_rows = chart.secondary_rows.value
+
+  assign secondary_row_count = 0
+  for row in secondary_rows limit: 20
+    if row.row_label.value != blank and row.first_value.value != blank and row.second_value.value != blank
+      assign secondary_row_count = secondary_row_count | plus: 1
+    endif
+  endfor
+
+  assign primary_valid = false
+  if primary_label != blank and primary_caption != blank and primary_row_header != blank and primary_first_header != blank and primary_second_header != blank and primary_row_count > 0
+    assign primary_valid = true
+  endif
+
+  assign secondary_valid = false
+  if secondary_label != blank and secondary_caption != blank and secondary_row_header != blank and secondary_first_header != blank and secondary_second_header != blank and secondary_row_count > 0
+    assign secondary_valid = true
+  endif
+
+  assign chart_valid = false
+  if title != blank and primary_valid
+    assign chart_valid = true
+  endif
+
+  assign title_id = resolved_id | append: '-title'
+  assign unit_legend_id = resolved_id | append: '-unit-legend'
+-%}
+
+{%- if chart_valid -%}
+  <tg-size-chart class="size-chart">
+    <button
+      class="btn btn--link size-chart__trigger"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="{{ resolved_id | escape }}"
+      aria-expanded="false"
+      data-size-chart-trigger
+    >
+      {{ 'products.size_chart.trigger' | t }}
+    </button>
+
+    <dialog
+      class="modal-overlay size-chart__overlay"
+      id="{{ resolved_id | escape }}"
+      aria-labelledby="{{ title_id | escape }}"
+      aria-hidden="true"
+      data-size-chart-dialog
+    >
+      <div class="modal size-chart__dialog" data-size-chart-surface>
+        <div class="modal__header">
+          <h2 class="modal__title" id="{{ title_id | escape }}" tabindex="-1" data-size-chart-title>
+            {{ title | escape }}
+          </h2>
+          <button
+            class="close-btn modal__close"
+            type="button"
+            aria-label="{{ 'products.size_chart.close' | t: title: title | escape }}"
+            data-size-chart-close
+          >
+            {% render 'icon', name: 'close', size: 20 %}
+          </button>
+        </div>
+
+        <div class="modal__body size-chart__content">
+          {%- if secondary_valid -%}
+            <fieldset class="segmented size-chart__units" aria-labelledby="{{ unit_legend_id | escape }}">
+              <legend class="segmented__legend" id="{{ unit_legend_id | escape }}">
+                {{ 'products.size_chart.presentation' | t }}
+              </legend>
+              <div class="segmented__options">
+                <label class="segmented__item">
+                  <input
+                    class="segmented__input"
+                    type="radio"
+                    name="{{ resolved_id | escape }}-presentation"
+                    value="primary"
+                    checked
+                    data-size-chart-choice
+                  >
+                  <span class="segmented__label"><bdi>{{ primary_label | escape }}</bdi></span>
+                </label>
+                <label class="segmented__item">
+                  <input
+                    class="segmented__input"
+                    type="radio"
+                    name="{{ resolved_id | escape }}-presentation"
+                    value="secondary"
+                    data-size-chart-choice
+                  >
+                  <span class="segmented__label"><bdi>{{ secondary_label | escape }}</bdi></span>
+                </label>
+              </div>
+            </fieldset>
+          {%- endif -%}
+
+          <div data-size-chart-panel="primary">
+            <div
+              class="table-wrapper size-chart__chart"
+              tabindex="0"
+              role="region"
+              aria-label="{{ 'products.size_chart.scroll_area' | t: title: primary_caption | escape }}"
+            >
+              <table class="table">
+                <caption>{{ primary_caption | escape }}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{{ primary_row_header | escape }}</th>
+                    <th scope="col">{{ primary_first_header | escape }}</th>
+                    <th scope="col">{{ primary_second_header | escape }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- for row in primary_rows limit: 20 -%}
+                    {%- if row.row_label.value != blank and row.first_value.value != blank and row.second_value.value != blank -%}
+                      <tr>
+                        <th scope="row"><bdi>{{ row.row_label.value | escape }}</bdi></th>
+                        <td><bdi>{{ row.first_value.value | escape }}</bdi></td>
+                        <td><bdi>{{ row.second_value.value | escape }}</bdi></td>
+                      </tr>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {%- if secondary_valid -%}
+            <div data-size-chart-panel="secondary" hidden>
+              <div
+                class="table-wrapper size-chart__chart"
+                tabindex="0"
+                role="region"
+                aria-label="{{ 'products.size_chart.scroll_area' | t: title: secondary_caption | escape }}"
+              >
+                <table class="table">
+                  <caption>{{ secondary_caption | escape }}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">{{ secondary_row_header | escape }}</th>
+                      <th scope="col">{{ secondary_first_header | escape }}</th>
+                      <th scope="col">{{ secondary_second_header | escape }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {%- for row in secondary_rows limit: 20 -%}
+                      {%- if row.row_label.value != blank and row.first_value.value != blank and row.second_value.value != blank -%}
+                        <tr>
+                          <th scope="row"><bdi>{{ row.row_label.value | escape }}</bdi></th>
+                          <td><bdi>{{ row.first_value.value | escape }}</bdi></td>
+                          <td><bdi>{{ row.second_value.value | escape }}</bdi></td>
+                        </tr>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- if chart.notes.value != blank -%}
+            <div class="size-chart__notes">
+              {{ chart.notes | metafield_tag }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </dialog>
+  </tg-size-chart>
+{%- endif -%}

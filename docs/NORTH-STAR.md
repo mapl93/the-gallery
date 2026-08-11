@@ -193,7 +193,9 @@ The current repo already has a strong base:
 - New DTCG-style token source structure in `tokens/source/`.
 - Source-token compiler and migration parity checks for theme/viewport matrices.
 - Neutral web token target in `platforms/web/tokens.css`, including compatibility aliases for current component CSS.
-- Neutral web component adapter output in `platforms/web/index.css`, `components.css`, `theme.js`, `adapter.manifest.json`, and `adapter.summary.json`.
+- Neutral web component adapter output in `platforms/web/index.css`, copied CSS
+  modules, selective runtime loader/modules, compatibility bundles,
+  `adapter.manifest.json`, and `adapter.summary.json`.
 - Shopify token wrapper generated from the neutral web token target.
 - Shopify adapter manifest and validation for generated/copied assets, Liquid selector inventory, and contract maturity warnings.
 - First component contract schema with 183 validated contracts in `components/contracts/`, covering every component in `registry.json`: Button is `stable` and the remaining 182 contracts are `pilot`.

@@ -1,39 +1,49 @@
 ## Overview
 
-Before / After presents two target-owned media layers with optional visible labels and divider or control content. The source does not establish dragging or range behavior.
+Before / After compares two spatially aligned media states through one native range control. It is useful for treatment, restoration, material, process, or customization comparisons where a direct reveal adds meaning.
+
+Use two separate figures when the media do not show the same subject and framing. Use Slider / Range directly when selecting a number is the task rather than comparing media.
 
 ## Presentation
 
-<Preview html={'<figure class="before-after"><img class="before-after__image tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Unfired ceramic vessel before glazing" /><div class="before-after__overlay"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="The same ceramic vessel after its glaze firing" /></div><div class="before-after__handle" aria-hidden="true"></div><figcaption><span class="before-after__label before-after__label--before">Before firing</span><span class="before-after__label before-after__label--after">After firing</span></figcaption></figure>'} label="Before / After" />
+<Preview html={'<figure class="before-after slider" style="--_slider-progress:50%"><div class="before-after__stage slider__track"><div class="before-after__media-frame"><img class="before-after__image" src="/media/editorial/textured-vase.jpg" alt="Textured ceramic vessel in the original neutral color treatment" draggable="false" style="filter:grayscale(1) saturate(.65) brightness(1.06)" /><span class="before-after__label before-after__label--before" dir="auto">Original</span><div class="before-after__overlay"><img class="before-after__image" src="/media/editorial/textured-vase.jpg" alt="The same textured ceramic vessel with the warm color treatment applied" draggable="false" style="filter:sepia(.16) saturate(1.22) contrast(1.04)" /><span class="before-after__label before-after__label--after" dir="auto">Warm treatment</span></div></div><div class="before-after__divider" aria-hidden="true"></div><input class="before-after__input slider__input" id="before-after-exhibit" name="treatmentReveal" type="range" min="0" max="100" step="1" value="50" aria-describedby="before-after-exhibit-description" /></div><label class="before-after__control-label visually-hidden" for="before-after-exhibit">Reveal the warm color treatment percentage</label><figcaption class="before-after__description" id="before-after-exhibit-description" dir="auto">Original and warm treatments of the same vessel.</figcaption></figure>'} label="Before / After Image Slider" />
 
-The artwork is a passive comparison using the current clipped overlay presentation. `.before-after__handle` may contain a target-owned divider or control, but no drag, pointer capture, range value, keyboard increment, or synchronization behavior is implied.
+The revealed percentage is fixed to `0–100`, defaults to `50`, and advances in steps of `1`. The same canonical Slider input owns value, focus, pointer, touch, keyboard, form submission, reset, `input`, and `change`; the clip and decorative divider only reflect that native owner.
+
+Without shared enhancement, the authored comparison remains static and the unsynchronized input is hidden. No inactive draggable affordance is presented.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use matched media with the same framing so the comparison is meaningful.</Do>
-  <Dont>Do not describe the component as a slider unless the target provides complete native or ARIA range behavior.</Dont>
+  <Do>Use matched media with the same subject, crop, dimensions, and focal point so movement communicates a real change.</Do>
+  <Dont>Do not use unrelated images, add a second drag engine, or expose crop and divider geometry as semantic API.</Dont>
 </DoDont>
 
-Keep visible labels concise and let the target decide whether comparison is passive or interactive.
+The accessible comparison label should explain what the percentage reveals. Visible Before and After state labels and the description are optional supporting content.
 
 ## Accessibility
 
-- Give both informative media layers alternatives that distinguish their states.
-- Keep before and after labels available as text, not embedded only in imagery.
-- Hide a purely decorative divider from assistive technology.
-- If a target makes the control interactive, it must define an accessible name, current value, minimum and maximum, keyboard operation, pointer behavior, and announcements.
+- Provide a non-empty localized label for the native range input.
+- Preserve native `min="0"`, `max="100"`, `step="1"`, current value, Arrow, Home, End, pointer, touch, form, and reset behavior.
+- Give both matched media useful distinct alternatives, or use an equivalent concise grouped description without redundant announcements.
+- Keep the divider decorative and unfocusable; the range input is the only interaction owner.
+- Do not announce every value through a live region. Native range semantics already expose changes.
+- The component introduces no motion, so reduced-motion mode behaves identically.
 
 ## References
 
-**Dependencies:** None.
+**Dependency:** canonical Slider / Range (`H2`).
 
-**Anatomy:** `.before-after`, `.before-after__image`, `.before-after__overlay`, `.before-after__handle`, its visual pseudo-elements, `.before-after__label`, `.before-after__label--before`, and `.before-after__label--after`.
+**Required composition:** localized `label`, `beforeMedia`, and `afterMedia`. Missing required content omits the complete root.
 
 <PropTable>
-  <tr><td>`beforeMedia`</td><td>slot</td><td>required</td><td>Target-owned base comparison image</td></tr>
-  <tr><td>`afterMedia`</td><td>slot</td><td>required</td><td>Target-owned clipped overlay image</td></tr>
-  <tr><td>`beforeLabel`</td><td>string</td><td>optional</td><td>Visible label for the base image</td></tr>
-  <tr><td>`afterLabel`</td><td>string</td><td>optional</td><td>Visible label for the clipped image</td></tr>
-  <tr><td>`control`</td><td>slot</td><td>optional</td><td>Target-owned control or divider with no implied behavior</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Localized accessible name describing the revealed percentage</td></tr>
+  <tr><td>`description`</td><td>string</td><td>optional</td><td>Visible comparison caption associated with the input</td></tr>
+  <tr><td>`beforeMedia`</td><td>slot</td><td>required</td><td>Base target-owned matched media</td></tr>
+  <tr><td>`afterMedia`</td><td>slot</td><td>required</td><td>Revealed target-owned matched media</td></tr>
+  <tr><td>`beforeLabel`</td><td>string</td><td>optional</td><td>Visible label for the base state</td></tr>
+  <tr><td>`afterLabel`</td><td>string</td><td>optional</td><td>Visible label for the revealed state</td></tr>
+  <tr><td>`value`</td><td>number</td><td>`50`</td><td>Revealed percentage, clamped to `0–100` in steps of `1`</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Makes the native control unavailable without hiding the comparison</td></tr>
+  <tr><td>`name`</td><td>string</td><td>optional</td><td>Native form field name</td></tr>
 </PropTable>

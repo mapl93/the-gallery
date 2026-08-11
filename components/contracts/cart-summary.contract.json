@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "cart-summary",
   "name": "Cart Summary",
   "registryId": "K3",
   "category": "cart",
   "status": "pilot",
-  "summary": "Sticky cart summary with subtotal rows, total row, note, checkout CTA, express checkout area, and divider.",
+  "summary": "Passive target-controlled cart summary with native name/value rows, a canonical primary checkout Button, optional expectation note, and optional target-native express checkout composition.",
   "dependencies": ["button"],
   "source": {
     "registry": "registry.json#/components/cart-summary",
@@ -14,55 +14,67 @@
     "docs": "site/src/content/components/cart-summary.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".cart-summary", "className": ".cart-summary", "required": true, "description": "Summary container." },
-    { "name": "title", "selector": ".cart-summary__title", "className": ".cart-summary__title", "required": true, "description": "Summary title." },
-    { "name": "row", "selector": ".cart-summary__row", "className": ".cart-summary__row", "required": true, "description": "Single summary row." },
-    { "name": "totalRow", "selector": ".cart-summary__row--total", "className": ".cart-summary__row--total", "required": true, "description": "Total row." },
-    { "name": "value", "selector": ".cart-summary__value", "className": ".cart-summary__value", "required": true, "description": "Summary value." },
-    { "name": "note", "selector": ".cart-summary__note", "className": ".cart-summary__note", "required": false, "description": "Checkout note." },
-    { "name": "checkout", "selector": ".cart-summary__checkout", "className": ".cart-summary__checkout", "required": true, "description": "Checkout action." },
-    { "name": "express", "selector": ".cart-summary__express", "className": ".cart-summary__express", "required": false, "description": "Express checkout area." },
-    { "name": "divider", "selector": ".cart-summary__divider", "className": ".cart-summary__divider", "required": false, "description": "Divider between checkout options." }
+    { "name": "root", "selector": ".cart-summary", "className": ".cart-summary", "required": true, "description": "Named passive summary section controlled by the target." },
+    { "name": "title", "selector": ".cart-summary__title", "className": ".cart-summary__title", "required": true, "description": "Required non-empty visible section heading." },
+    { "name": "rows", "selector": ".cart-summary__rows", "className": ".cart-summary__rows", "required": true, "description": "Native description list containing one coherent target snapshot." },
+    { "name": "row", "selector": ".cart-summary__row", "className": ".cart-summary__row", "required": true, "description": "A div-wrapped dt/dd name/value group." },
+    { "name": "label", "selector": ".cart-summary__label", "className": ".cart-summary__label", "required": true, "description": "Complete localized row name rendered as dt." },
+    { "name": "value", "selector": ".cart-summary__value", "className": ".cart-summary__value", "required": true, "description": "Complete target-formatted row value rendered as dd with direction isolation." },
+    { "name": "totalRow", "selector": ".cart-summary__row--total", "className": ".cart-summary__row--total", "required": true, "description": "Required emphasized total name/value group." },
+    { "name": "note", "selector": ".cart-summary__note", "className": ".cart-summary__note", "required": false, "description": "Concise target-authored checkout expectation or qualification." },
+    { "name": "checkout", "selector": ".cart-summary__checkout", "className": ".cart-summary__checkout", "required": true, "description": "Canonical primary checkout Button controlled by the target." },
+    { "name": "express", "selector": ".cart-summary__express", "className": ".cart-summary__express", "required": false, "description": "Opaque target-native express checkout composition." },
+    { "name": "divider", "selector": ".cart-summary__divider", "className": ".cart-summary__divider", "required": false, "description": "Optional target-authored separator within the express composition." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default sticky summary." }
+    { "name": "default", "className": null, "default": true, "description": "Single neutral summary presentation." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default sidebar summary size." }
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic size controlled by the parent container." }
   ],
   "states": [
-    { "name": "default", "selectors": [".cart-summary"], "description": "Default cart summary state." },
-    { "name": "total", "selectors": [".cart-summary__row--total"], "description": "Emphasized total row state." },
-    { "name": "dividerLines", "selectors": [".cart-summary__divider::before", ".cart-summary__divider::after"], "description": "Generated divider lines." }
+    { "name": "default", "selectors": [".cart-summary"], "description": "Available passive snapshot and checkout action." },
+    { "name": "total", "selectors": [".cart-summary__row--total"], "description": "Required emphasized total row." },
+    { "name": "checkoutDisabled", "selectors": [".cart-summary__checkout"], "description": "Target marks checkout unavailable with disabled and supplies a visible reason." },
+    { "name": "checkoutBusy", "selectors": [".cart-summary__checkout"], "description": "Canonical Button aria-busy plus disabled state prevents duplicate target activation while preserving its label." },
+    { "name": "compactContainer", "selectors": ["@container cart-summary (max-width: 20rem)"], "description": "Rows stack from their real parent width without changing DOM order." }
   ],
   "behavior": [
-    { "name": "checkout", "selectors": [".cart-summary__checkout"], "events": ["click"], "description": "Checkout action should hand off to the target checkout flow." },
-    { "name": "totals", "selectors": [".cart-summary__row", ".cart-summary__value"], "description": "Rows should update with subtotal, shipping, discounts, taxes, and total from commerce state." }
+    { "name": "associationList", "selectors": [".cart-summary__rows", ".cart-summary__row", ".cart-summary__label", ".cart-summary__value"], "elements": ["dl", "div", "dt", "dd", "bdi"], "description": "Rows preserve native name/value relationships and mixed-direction target strings." },
+    { "name": "coherentSnapshot", "selectors": [".cart-summary__rows", ".cart-summary__row--total"], "description": "The target supplies truthful rows from one cart snapshot and includes at least one total row." },
+    { "name": "checkoutAction", "selectors": [".cart-summary__checkout"], "attributes": ["type", "name", "value", "disabled", "aria-busy"], "events": ["activated checkout request"], "description": "One canonical Button hands off to target form, router, SDK, or native checkout behavior." },
+    { "name": "expressComposition", "selectors": [".cart-summary__express"], "description": "The target/provider owns complete express action markup, accessible names, state and lifecycle; neutral source does not inspect provider internals." },
+    { "name": "parentPlacement", "selectors": [".cart-summary"], "description": "The parent target owns sticky placement, offset, scrolling and focus-obscuration avoidance; K3 itself is not sticky." },
+    { "name": "targetState", "selectors": [".cart-summary", ".cart-summary__checkout"], "description": "Target owns raw cart data, formatting, estimates, checkout request/result/error, provider availability, status cadence and focus." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Summary title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__title" }] } },
-    { "name": "rows", "type": "slot", "required": true, "description": "Subtotal, shipping, discount, tax, and total rows.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary__row", "classNames": [".cart-summary__row"] }] } },
-    { "name": "note", "type": "string", "required": false, "description": "Checkout expectation note.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__note" }] } },
-    { "name": "checkoutLabel", "type": "string", "required": true, "description": "Primary checkout action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__checkout" }] } },
-    { "name": "checkoutDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables checkout while cart state is unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-summary__checkout", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
-    { "name": "express", "type": "slot", "required": false, "description": "Optional target-native express checkout actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary__express", "classNames": [".cart-summary__express"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Required non-empty visible summary heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__title" }] } },
+    { "name": "rows", "type": "slot", "required": true, "description": "Required semantic row composition containing at least one total dt/dd group.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary__rows", "classNames": [".cart-summary__rows", ".cart-summary__row", ".cart-summary__label", ".cart-summary__value", ".cart-summary__row--total"] }] } },
+    { "name": "note", "type": "string", "required": false, "description": "Optional concise target-authored checkout expectation or qualification.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__note" }] } },
+    { "name": "checkoutLabel", "type": "string", "required": true, "description": "Required non-empty visible label for the primary checkout Button.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-summary__checkout" }] } },
+    { "name": "checkoutDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects target-owned checkout unavailability to canonical Button disabled behavior.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-summary__checkout", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "checkoutBusy", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects target-owned asynchronous checkout work to canonical Button busy and disabled behavior.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-summary__checkout", "attribute": "aria-busy", "values": { "true": "true", "false": null }, "elements": ["button"] }, { "kind": "attribute", "selector": ".cart-summary__checkout", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "express", "type": "slot", "required": false, "description": "Optional opaque target-native express checkout composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-summary__express", "classNames": [".cart-summary__express"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-border-subtle", "--color-text-disabled"],
+      "color": ["--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-border-subtle"],
       "radius": ["--radius-lg"],
-      "typography": ["--font-family-heading", "--typo-h4-size", "--typo-body-size"]
+      "spacing": ["--space-layout-element-gap"],
+      "typography": ["--tg-font-weight-semibold", "--tg-font-weight-bold", "--font-family-heading", "--font-family-body", "--typo-h4-size", "--typo-h4-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Use readable labels for every summary value.",
-    "Keep checkout action reachable after totals update.",
-    "Do not rely on sticky positioning as the only way to access checkout."
+    "Use a visible heading and native dl, dt, and dd relationships; add no cart-summary widget role or live region.",
+    "Keep the primary checkout Button before optional express actions in DOM and focus order.",
+    "Disabled checkout requires a visible target explanation; busy checkout preserves its label and prevents duplicate activation.",
+    "Announce cart or checkout results once through a parent target status with complete context instead of making each value live.",
+    "Do not rely on target sticky placement as the only way to access checkout or allow it to obscure focused content."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify cart totals, discounts, shipping/tax messaging, and checkout URL." },
-    "react": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "semantic-html-css", "notes": "Named passive section, native association list, canonical Button and target-owned composition." },
+    "shopify": { "status": "planned", "kind": "liquid-css-form-provider-slot", "notes": "Dedicated Liquid maps cart facts, named checkout submission and optional provider-owned accelerated checkout; runtime/editor/live-store proof remains required." },
+    "react": { "status": "planned", "kind": "controlled-component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }

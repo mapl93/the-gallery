@@ -1,12 +1,14 @@
 ## Overview
 
-One-time code input with individual character cells.
+Pin Input captures one numeric verification code through real, independently
+clickable and focusable native character inputs. It does not use a hidden
+full-code field: every visible segment is a form owner.
 
 ## Presentation
 
 Pin Input supports `default`, `error`, `success`, and `warning` validation families across every cell in the group.
 
-<Preview html={"<div class=\"pin-input\"><input class=\"pin-input__field pin-input__field--filled\" type=\"text\" inputmode=\"numeric\" autocomplete=\"one-time-code\" maxlength=\"1\" value=\"4\" aria-label=\"Digit 1\" /><input class=\"pin-input__field pin-input__field--filled\" type=\"text\" inputmode=\"numeric\" maxlength=\"1\" value=\"2\" aria-label=\"Digit 2\" /><input class=\"pin-input__field\" type=\"text\" inputmode=\"numeric\" maxlength=\"1\" aria-label=\"Digit 3\" /><input class=\"pin-input__field\" type=\"text\" inputmode=\"numeric\" maxlength=\"1\" aria-label=\"Digit 4\" /></div>"} label="Pin Input / OTP" />
+<Preview html={'<div class="field pin-input" role="group" aria-labelledby="pin-label" aria-describedby="pin-description" data-pin-input data-complete="false"><span class="field__label field__label--required pin-input__legend" id="pin-label">Verification code</span><div class="field__control pin-input__fields"><input class="pin-input__field pin-input__field--filled" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="1" name="verificationCode" value="4" required aria-label="Code character 1 of 6" aria-describedby="pin-description" /><input class="pin-input__field pin-input__field--filled" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="1" name="verificationCode" value="2" required aria-label="Code character 2 of 6" aria-describedby="pin-description" /><input class="pin-input__field" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="1" name="verificationCode" required aria-label="Code character 3 of 6" aria-describedby="pin-description" /><input class="pin-input__field" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="1" name="verificationCode" required aria-label="Code character 4 of 6" aria-describedby="pin-description" /><input class="pin-input__field" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="1" name="verificationCode" required aria-label="Code character 5 of 6" aria-describedby="pin-description" /><input class="pin-input__field" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="1" name="verificationCode" required aria-label="Code character 6 of 6" aria-describedby="pin-description" /></div><span class="field__description" id="pin-description">Enter the six-digit code.</span></div>'} label="Pin Input / OTP" />
 
 ## Usage Guidelines
 
@@ -18,20 +20,36 @@ Pin Input supports `default`, `error`, `success`, and `warning` validation famil
 ## Accessibility
 
 <Callout type="tip">
-  Pin Input owns the cell layout; focus movement, paste distribution, and validation are target-owned behavior.
+  Shared Web enhancement coordinates numeric typing, Backspace, logical arrows,
+  paste, autofill distribution, filled state and reset across the same real
+  fields. Verification, submission consequences and live result messages remain
+  target-owned.
 </Callout>
 
 - Provide a visible group label for the full one-time-code input.
 - Use `autocomplete="one-time-code"` when capturing verification codes.
-- Keep every cell keyboard reachable and support paste for full-code entry.
+- Keep every cell in normal Tab order, directly clickable and independently
+  focusable. Logical arrows supplement rather than replace Tab.
+- Give all ordered segments the same non-empty `name`. Static Web reconstructs
+  the code with `new FormData(form).getAll(name).join('')`.
+- Give every segment a localized positional accessible name and associate group
+  guidance or validation with all segments.
+- Do not add a hidden mirrored input, auto-submit on completion, or announce
+  each keystroke.
 
 ## References
 
 <PropTable>
-  <tr><td>`.pin-input`</td><td>class</td><td>—</td><td>Wrapper that lays out individual one-time-code cells</td></tr>
+  <tr><td>`.field.pin-input`</td><td>classes</td><td>required</td><td>Field Wrapper-composed labelled code group</td></tr>
+  <tr><td>`.pin-input__legend`</td><td>element</td><td>required</td><td>Visible complete-code label</td></tr>
+  <tr><td>`.pin-input__fields`</td><td>element</td><td>required</td><td>Ordered real segment controls</td></tr>
   <tr><td>`.pin-input--error`</td><td>modifier</td><td>—</td><td>Error validation family</td></tr>
   <tr><td>`.pin-input--success`</td><td>modifier</td><td>—</td><td>Success validation family</td></tr>
   <tr><td>`.pin-input--warning`</td><td>modifier</td><td>—</td><td>Warning validation family</td></tr>
   <tr><td>`.pin-input__field`</td><td>element</td><td>`type="text"`</td><td>Single character native input cell</td></tr>
   <tr><td>`.pin-input__field--filled`</td><td>state</td><td>—</td><td>Cell state after a character has been entered</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible group label</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Same submission name repeated on every ordered segment</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native requiredness for every segment plus visible marker</td></tr>
+  <tr><td>`readOnly`</td><td>boolean</td><td>`false`</td><td>Preserves independent focus while preventing edits</td></tr>
 </PropTable>

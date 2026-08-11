@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "progress",
   "name": "Progress Bar / Circle",
   "registryId": "A22",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Progress indicator primitive with determinate bar, circle display, and indeterminate loading states.",
+  "summary": "Read-only progress primitive with determinate Bar/Circle, Bar-only Indeterminate, and independent visible and accessible value text.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/progress",
@@ -17,11 +17,11 @@
     { "name": "root", "selector": ".progress", "className": ".progress", "required": true, "description": "Progress bar wrapper." },
     { "name": "label", "selector": ".progress__label", "className": ".progress__label", "required": false, "description": "Progress label row." },
     { "name": "labelText", "selector": ".progress__label-text", "className": ".progress__label-text", "required": false, "description": "Visible operation label inside the label row." },
-    { "name": "value", "selector": ".progress__value", "className": ".progress__value", "required": false, "description": "Visible numeric value." },
+    { "name": "value", "selector": ".progress__value", "className": ".progress__value", "required": false, "description": "Optional compact visible value for Bar." },
     { "name": "track", "selector": ".progress__track", "className": ".progress__track", "required": true, "description": "Progress track." },
     { "name": "bar", "selector": ".progress__bar", "className": ".progress__bar", "required": true, "description": "Progress fill bar." },
     { "name": "circle", "selector": ".progress-circle", "className": ".progress-circle", "required": false, "description": "Circular progress wrapper." },
-    { "name": "circleText", "selector": ".progress-circle__text", "className": ".progress-circle__text", "required": false, "description": "Circular progress label." }
+    { "name": "circleText", "selector": ".progress-circle__text", "className": ".progress-circle__text", "required": false, "description": "Optional compact visible value for Circle." }
   ],
   "variants": [
     { "name": "bar", "className": null, "default": true, "description": "Default bar progress." },
@@ -35,18 +35,19 @@
     { "name": "indeterminate", "selectors": [".progress--indeterminate .progress__bar", "@keyframes progress-indeterminate"], "description": "Unknown completion value; available only for the bar presentation." }
   ],
   "behavior": [
-    { "name": "progressbarSemantics", "selectors": [".progress", ".progress__bar", ".progress-circle"], "attributes": ["role=\"progressbar\"", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-label"], "description": "Determinate progress should expose current value and range." },
-    { "name": "indeterminateSemantics", "selectors": [".progress--indeterminate"], "attributes": ["aria-busy=\"true\""], "description": "Indeterminate progress should communicate pending state without a false numeric value." }
+    { "name": "progressbarSemantics", "selectors": [".progress", ".progress__bar", ".progress-circle"], "attributes": ["role=\"progressbar\"", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-label"], "description": "Determinate progress requires a non-empty operation name, a strictly increasing finite range, and a finite current value clamped within that range; invalid required composition emits no root." },
+    { "name": "indeterminateSemantics", "selectors": [".progress--indeterminate"], "attributes": ["aria-busy=\"true\""], "description": "Indeterminate Bar omits aria-valuenow, aria-valuetext, and visible value text; the consumer's updated region owns authoritative aria-busy state." }
   ],
   "properties": [
     { "name": "accessibleLabel", "type": "string", "required": true, "description": "Accessible name for the operation whose progress is represented.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-label", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-label", "valueFrom": "property" }] } },
     { "name": "label", "type": "string", "required": false, "description": "Optional visible operation label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".progress__label-text" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Bar or circular presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".progress", "source": "variants" }] } },
-    { "name": "value", "type": "number", "required": false, "unsetBehavior": "Omitted only while indeterminate is true.", "description": "Current determinate value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuenow", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuenow", "valueFrom": "property" }] } },
+    { "name": "value", "type": "number", "required": false, "unsetBehavior": "Omitted only while indeterminate is true.", "description": "Current determinate value, clamped by the target to the declared range.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuenow", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuenow", "valueFrom": "property" }] } },
     { "name": "min", "type": "number", "required": false, "defaultValue": 0, "description": "Minimum determinate value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuemin", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuemin", "valueFrom": "property" }] } },
-    { "name": "max", "type": "number", "required": false, "defaultValue": 100, "description": "Maximum determinate value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuemax", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuemax", "valueFrom": "property" }] } },
-    { "name": "valueText", "type": "string", "required": false, "description": "Optional localized visible value text and accessible value description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".progress__value" }, { "kind": "content", "selector": ".progress-circle__text" }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-valuetext", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuetext", "valueFrom": "property" }] } },
-    { "name": "indeterminate", "type": "boolean", "required": false, "defaultValue": false, "description": "Uses unknown-duration bar motion and omits a numeric current value.", "targetMappings": { "web": [{ "kind": "class", "selector": ".progress", "classNames": [".progress--indeterminate"] }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-busy", "values": { "true": "true", "false": null } }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-valuenow", "removeWhen": [true] }] } }
+    { "name": "max", "type": "number", "required": false, "defaultValue": 100, "description": "Maximum determinate value; must be greater than min.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuemax", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuemax", "valueFrom": "property" }] } },
+    { "name": "displayValue", "type": "string", "required": false, "description": "Optional intentionally compact visible value for determinate Bar or Circle; it is not derived from valueText.", "targetMappings": { "web": [{ "kind": "content", "selector": ".progress__value" }, { "kind": "content", "selector": ".progress-circle__text" }] } },
+    { "name": "valueText", "type": "string", "required": false, "description": "Optional complete localized accessible value description for determinate progress; maps only to aria-valuetext and is not displayed.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".progress", "attribute": "aria-valuetext", "valueFrom": "property" }, { "kind": "attribute", "selector": ".progress-circle", "attribute": "aria-valuetext", "valueFrom": "property" }] } },
+    { "name": "indeterminate", "type": "boolean", "required": false, "defaultValue": false, "description": "Uses unknown-duration Bar motion and omits numeric and textual determinate values.", "targetMappings": { "web": [{ "kind": "class", "selector": ".progress", "classNames": [".progress--indeterminate"] }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-busy", "values": { "true": "true", "false": null } }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-valuenow", "removeWhen": [true] }, { "kind": "attribute", "selector": ".progress", "attribute": "aria-valuetext", "removeWhen": [true] }] } }
   ],
   "tokens": {
     "public": {
@@ -54,12 +55,15 @@
       "radius": ["--radius-full"],
       "transition": ["--transition-base"],
       "easing": ["--easing-out"],
-      "typography": ["--typo-body-size"]
+      "typography": ["--typo-body-sm-size", "--typo-body-sm-line-height", "--typo-caption-size", "--typo-caption-line-height"]
     }
   },
   "accessibility": [
     "Use progressbar semantics for determinate progress.",
-    "Expose value text when the percentage matters to users.",
+    "Expose a complete localized valueText through aria-valuetext only when it helps users interpret the raw value.",
+    "Keep optional displayValue compact and intentionally authored for the available Bar or Circle geometry; do not derive it from valueText.",
+    "Do not copy, truncate, scale, or fall back between displayValue and valueText.",
+    "Keep max greater than min and clamp the current value to the valid range.",
     "Do not announce frequent progress updates too aggressively.",
     "Respect reduced-motion preferences for indeterminate animation."
   ],

@@ -1,58 +1,84 @@
 ## Overview
 
-Checkout Progress is an informational ordered sequence of target-supplied complete, current, and upcoming steps. It exposes an accessible sequence label but does not own routing, navigation availability, visited state, validation gates, or synchronization with checkout state.
+Checkout Progress is a passive checkout-context profile of canonical Steps. It
+communicates target-supplied completed, current, and upcoming stages without
+owning routing, navigation availability, visited state, validation gates,
+persistence, announcements, or synchronization with checkout state.
 
 <Preview
-  html={'<section class="tg-preview-frame--md" aria-labelledby="checkout-progress-preview-title"><h2 class="visually-hidden" id="checkout-progress-preview-title">Checkout progress</h2><ol class="checkout-progress" aria-label="Checkout progress"><li class="checkout-progress__step" data-status="complete"><span class="checkout-progress__indicator" aria-hidden="true">1</span><span class="checkout-progress__label">Cart, complete</span></li><li class="checkout-progress__step" data-status="current" aria-current="step"><span class="checkout-progress__indicator" aria-hidden="true">2</span><span class="checkout-progress__label">Shipping</span></li><li class="checkout-progress__step"><span class="checkout-progress__indicator" aria-hidden="true">3</span><span class="checkout-progress__label">Payment</span></li></ol></section>'}
+  html={'<section class="tg-preview-frame--md" aria-labelledby="checkout-progress-preview-title"><h2 class="visually-hidden" id="checkout-progress-preview-title">Checkout progress</h2><div class="checkout-progress"><ol class="steps checkout-progress__list" aria-label="Checkout progress"><li class="steps__item steps__item--completed"><span class="steps__indicator" aria-hidden="true">✓</span><span class="steps__content"><span class="steps__title">Information</span><span class="steps__state visually-hidden">Completed</span></span></li><li class="steps__item steps__item--active" aria-current="step"><span class="steps__indicator" aria-hidden="true">2</span><span class="steps__content"><span class="steps__title">Shipping</span></span></li><li class="steps__item"><span class="steps__indicator" aria-hidden="true">3</span><span class="steps__content"><span class="steps__title">Payment</span></span></li></ol></div></section>'}
   label="Checkout Progress"
 />
 
 ## Presentation
 
-The ordered-list root, repeated steps, visible indicators, and visible labels are required. A generated decorative connector appears between adjacent steps. Upcoming steps use the default presentation, while `data-status="complete"` and `data-status="current"` select the two explicit status presentations.
+The passive P4 wrapper contains the same labelled ordered list, items,
+indicators, content, titles, optional descriptions, and status text as canonical
+Steps. Wide containers retain the horizontal Steps presentation. Narrow P4
+containers stack items and hide decorative connectors without changing DOM
+order or using private Steps geometry.
 
-The artwork keeps completion visible in text as well as color and places `aria-current="step"` only on the current step. Step labels and statuses are fixtures supplied by the target, not component defaults.
+The artwork exposes completion with a visible check and visually hidden state
+text, places `aria-current="step"` only on the current item, and keeps every
+stage title visible. Labels and statuses are target fixtures, not defaults.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Supply complete, current, and upcoming statuses from one authoritative checkout state.</Do>
-  <Dont>Do not make steps links or buttons unless a target separately owns the full navigation contract.</Dont>
+  <Do>Project all stages and their status from one authoritative checkout state.</Do>
+  <Dont>Do not make steps links or buttons unless the target owns saved data, navigation availability, validation, routing, focus, errors, and announcements.</Dont>
 </DoDont>
 
-- Keep steps in checkout order and expose exactly one current step when the sequence has a current location.
-- Provide a visible word or meaningful symbol for completion instead of relying on color.
-- Keep every label visible when the layout stacks at narrow widths.
-- Leave route transitions, visited state, availability, and validation gates to the target.
+- Omit the complete component when its accessible name or ordered step content is absent.
+- Keep stages in checkout order and expose at most one current item.
+- Communicate the current stage in the host page title or primary heading as well as this supporting sequence.
+- Provide completion text and a visible non-color cue.
+- Use canonical Steps to customize stage presentation; P4 adds no duplicate token API.
 
 ## Accessibility
 
-- Render the component as an ordered list with an accessible sequence label.
-- Apply `aria-current="step"` only to the current step.
-- Expose complete status through visible text or a meaningful symbol in addition to color.
-- Keep labels visible and in source order across horizontal and stacked layouts.
-- Treat generated connectors as decorative and exclude them from the accessibility tree.
-- Do not add link or button semantics unless a target explicitly supplies checkout navigation behavior.
+- Render the sequence as a non-empty labelled canonical ordered list.
+- Apply `aria-current="step"` to at most one current item.
+- Expose completed meaning through equivalent state text and a visible check or other non-color cue.
+- Keep every title visible and in source order across horizontal, stacked, localized, RTL, zoomed, and forced-colors modes.
+- P4 is passive and creates no focus stops or custom keyboard commands.
+- Do not use `progressbar`, `tablist`, selected, checked, or `aria-orientation` semantics for the ordinary list.
+
+## Target Translation
+
+Neutral Web and Webflow compose the P4 wrapper with canonical Steps markup and
+target-owned checkout state. React and Angular remain thin profiles over their
+Steps adapter. Figma, SwiftUI, and Compose require equivalent ordered/current/
+completed meaning after target review.
+
+Shopify theme Liquid does not own the native checkout surface. A future Shopify
+mapping requires an approved Checkout UI Extension target and supported Shopify
+components/data; P4 must not claim that copied neutral DOM/CSS controls the
+information, shipping, or payment steps.
 
 ## References
 
-**Contract:** `checkout-progress` v0.2.0, `pilot`.
+**Contract:** `checkout-progress` v0.3.0, `pilot`.
 
-**Dependencies:** None declared.
+**Dependencies:** Steps / Stepper.
 
 **Anatomy**
 
 | Part | Selector | Requirement |
 | --- | --- | --- |
-| Ordered root | `.checkout-progress` | Required |
-| Step | `.checkout-progress__step` | Required, repeated |
-| Connector | `.checkout-progress__step::after` | Optional, generated |
-| Indicator | `.checkout-progress__indicator` | Required |
-| Label | `.checkout-progress__label` | Required |
+| Root profile | `.checkout-progress` | Required; passive container wrapper |
+| Ordered list | `.steps.checkout-progress__list` | Required, labelled, non-empty |
+| Step | `.steps__item` | Required, repeated |
+| Connector | `.steps__item::before` | Optional, generated, hidden in narrow P4 |
+| Indicator | `.steps__indicator` | Required |
+| Content | `.steps__content` | Required |
+| Title | `.steps__title` | Required |
+| Description | `.steps__description` | Optional |
+| State text | `.steps__state` | Conditional for completed meaning |
 
 **API Reference**
 
 <PropTable>
-  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Accessible name for the checkout sequence</td></tr>
-  <tr><td>`steps`</td><td>slot</td><td>required</td><td>Ordered target-owned records with status, indicator content, and label text</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Non-empty localized name for the ordered checkout sequence</td></tr>
+  <tr><td>`steps`</td><td>slot</td><td>required</td><td>Non-empty target-owned canonical Steps items with localized content and status</td></tr>
 </PropTable>

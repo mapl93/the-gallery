@@ -1,36 +1,46 @@
 ## Overview
 
-Lookbook composes an ordered, asymmetric set of target-owned media cells with optional item-level spans, captions, and hotspot content. Item destinations and hotspot behavior remain unresolved.
+Lookbook presents a finite, source-ordered editorial sequence of target-owned media. Its asymmetric layout is passive: wide and tall modifiers change only geometry, while optional captions remain visible and any interaction belongs to a complete native target composition.
 
 ## Presentation
 
-<Preview html={'<section class="lookbook tg-preview-frame" aria-labelledby="lookbook-title"><header class="lookbook__header"><h2 class="lookbook__title" id="lookbook-title">Studio lookbook</h2></header><div class="lookbook__grid"><figure class="lookbook__cell lookbook__cell--wide"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Stoneware vessels arranged across a long worktable" /><figcaption class="lookbook__caption">The mineral series</figcaption></figure><figure class="lookbook__cell lookbook__cell--tall"><img class="tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Tall vase with a layered ash glaze" /><figcaption class="lookbook__caption">Ash glaze study</figcaption></figure><figure class="lookbook__cell"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Small bowls grouped by warm neutral tone" /><figcaption class="lookbook__caption">Daily forms</figcaption></figure></div></section>'} label="Lookbook" />
+<Preview html={'<section class="lookbook tg-preview-frame" aria-labelledby="lookbook-title"><header class="lookbook__header"><h2 class="lookbook__title" id="lookbook-title">Studio lookbook</h2></header><ol class="lookbook__grid"><li class="lookbook__cell lookbook__cell--wide"><figure class="lookbook__figure"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Stoneware vessels arranged across a long worktable" /><figcaption class="lookbook__caption">The mineral series</figcaption></figure></li><li class="lookbook__cell lookbook__cell--tall"><figure class="lookbook__figure"><img class="tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Tall vase with a layered ash glaze" /><figcaption class="lookbook__caption">Ash glaze study</figcaption></figure></li><li class="lookbook__cell"><figure class="lookbook__figure"><img class="tg-preview-media" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Small bowls grouped by warm neutral tone" /><figcaption class="lookbook__caption">Daily forms</figcaption></figure></li></ol></section>'} label="Lookbook" />
 
-Wide and tall modifiers belong to individual `.lookbook__cell` elements. Captions and hotspots are item-level compositions; their presence does not establish navigation, disclosure, selection, or commerce behavior.
+The renderer used by Exhibit and Studio follows the same `ol`/`li` and `figure`/`figcaption` composition. It does not create focusable cells, placeholder hotspots, hover-only content, or neutral runtime behavior.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Build a deliberate visual sequence and keep essential captions available without pointer hover.</Do>
-  <Dont>Do not add hotspot destinations or popovers until the target owns their native elements and complete behavior.</Dont>
+  <Do>Build a deliberate source order and keep every supplied caption available without pointer hover.</Do>
+  <Dont>Do not use span, crop, coordinates, or visual placement as the only way to communicate meaning.</Dont>
 </DoDont>
 
-Use span modifiers sparingly so the reading order remains understandable when the grid collapses.
+Use `.lookbook__cell--wide` and `.lookbook__cell--tall` sparingly. The layout responds to the component container and preserves sparse source-flow placement.
+
+An optional target hotspot must have a real result. Use a native link for direct navigation, such as a product destination. A button that opens contextual content must compose Popover or an equivalent complete target implementation with open state, focus, dismissal, and relationship semantics.
 
 ## Accessibility
 
-- Give informative media useful alternative text and use semantic captions where they add context.
-- Keep DOM order meaningful independently of wide or tall visual spans.
-- Use native interactive elements only when a destination or command has been established.
-- Any target-owned hotspot must have an accessible name, visible focus, keyboard activation, and a defined result.
+- A non-empty title creates a thematic section named by its visible heading; omit the section landmark when there is no title.
+- Use native ordered-list markup and keep DOM order meaningful across all layout spans and widths.
+- Group captioned media with `figure` and `figcaption`; provide contextual alternatives for informative media and hide decorative media correctly.
+- Keep captions persistent. Do not make passive cells focusable, clickable, selectable, or hover-emphasized.
+- Give every target-owned link or button an accessible name, visible focus, keyboard activation, and a defined result.
+- Lookbook adds no authored motion, JavaScript, observer, listener, timer, request, or layout measurement.
+
+## Target Translation
+
+- **Web:** target-owned native list items and figures consume the neutral CSS contract.
+- **Shopify:** reorderable image blocks map merchant content to complete figures; an optional product resource becomes a native product link with block-owned coordinates.
+- **Future targets:** preserve source order, persistent caption availability, native activation semantics, and target-owned media delivery.
 
 ## References
 
-**Dependencies:** None.
+**Dependencies:** None. Disclosure hotspots may compose canonical Popover; Lookbook does not reimplement it.
 
-**Anatomy:** `.lookbook`, `.lookbook__header`, `.lookbook__title`, `.lookbook__grid`, `.lookbook__cell`, `.lookbook__cell--wide`, `.lookbook__cell--tall`, `.lookbook__caption`, and `.lookbook__hotspot`.
+**Anatomy:** `.lookbook`, `.lookbook__header`, `.lookbook__title`, `.lookbook__grid`, `.lookbook__cell`, `.lookbook__cell--wide`, `.lookbook__cell--tall`, `.lookbook__figure`, `.lookbook__caption`, and `.lookbook__hotspot`.
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible lookbook heading</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered target-owned cells, spans, captions, and hotspot compositions</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible contextual heading and thematic-section name</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Source-ordered complete target-owned item compositions</td></tr>
 </PropTable>

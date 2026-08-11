@@ -124,12 +124,13 @@ export default function SkeletonStudio({ contract, definition }: SkeletonStudioP
           <div className="docs-studio__stage-inner">
             <div
               className={`docs-studio__preview-skeleton docs-studio__preview-skeleton--${variant}`}
-              role="status"
+              role="region"
               aria-busy="true"
-              aria-label="Loading content"
+              aria-label="Loading preview content"
             >
               <div className={classes} aria-hidden="true" />
             </div>
+            <span className="visually-hidden" role="status">Loading content</span>
           </div>
         </section>
       </div>

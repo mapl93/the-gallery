@@ -1,30 +1,31 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "auth-forms",
   "name": "Auth Forms (Login / Register)",
   "registryId": "U1",
   "category": "account",
   "status": "pilot",
-  "summary": "Login and registration form shell with header, form stack, divider, social actions, footer link, and forgot-password link.",
-  "dependencies": ["input", "button", "form"],
+  "summary": "Passive, labelled authentication-entry shell composing canonical Form, field, action, link, and divider dependencies while targets own credentials, requests, sessions, providers, and account access.",
+  "dependencies": ["form", "field-wrapper", "input", "password-input", "button", "link", "divider"],
   "source": {
     "registry": "registry.json#/components/auth-forms",
     "css": { "file": "components/css/account.css", "selector": ".auth" },
     "docs": "site/src/content/components/auth-forms.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".auth", "className": ".auth", "required": true, "description": "Auth form container." },
-    { "name": "header", "selector": ".auth__header", "className": ".auth__header", "required": false, "description": "Auth header." },
-    { "name": "title", "selector": ".auth__title", "className": ".auth__title", "required": true, "description": "Auth title." },
-    { "name": "subtitle", "selector": ".auth__subtitle", "className": ".auth__subtitle", "required": false, "description": "Auth supporting text." },
-    { "name": "form", "selector": ".auth__form", "className": ".auth__form", "required": true, "description": "Auth form stack." },
-    { "name": "divider", "selector": ".auth__divider", "className": ".auth__divider", "required": false, "description": "Separator between auth methods." },
-    { "name": "dividerLine", "selector": ".auth__divider::before", "generated": true, "required": false, "description": "Generated divider line." },
-    { "name": "social", "selector": ".auth__social", "className": ".auth__social", "required": false, "description": "Social authentication button group." },
-    { "name": "socialButton", "selector": ".auth__social-btn", "className": ".auth__social-btn", "required": false, "description": "Social authentication action." },
-    { "name": "footer", "selector": ".auth__footer", "className": ".auth__footer", "required": false, "description": "Auth footer text and links." },
-    { "name": "forgot", "selector": ".auth__forgot", "className": ".auth__forgot", "required": false, "description": "Forgot-password link wrapper." }
+    { "name": "root", "selector": ".auth", "className": ".auth", "required": true, "description": "Section labelled by its visible authentication-flow title; omitted when title or Form composition is invalid." },
+    { "name": "header", "selector": ".auth__header", "className": ".auth__header", "required": true, "description": "Required title and optional supporting-copy group." },
+    { "name": "title", "selector": ".auth__title", "className": ".auth__title", "required": true, "description": "Visible heading that labels the authentication section." },
+    { "name": "subtitle", "selector": ".auth__subtitle", "className": ".auth__subtitle", "required": false, "description": "Optional supporting guidance." },
+    { "name": "form", "selector": ".auth__form", "className": ".auth__form", "required": true, "description": "Complete canonical Form composition containing target-owned fields, validation, and primary submission." },
+    { "name": "forgot", "selector": ".auth__forgot", "className": ".auth__forgot", "required": false, "description": "Optional recovery navigation wrapper containing a canonical Link." },
+    { "name": "alternatives", "selector": ".auth__alternatives", "className": ".auth__alternatives", "required": false, "description": "Optional alternative authentication method group." },
+    { "name": "divider", "selector": ".auth__divider", "className": ".auth__divider", "required": false, "description": "Optional visible method label arranged between two decorative canonical Dividers." },
+    { "name": "dividerRule", "selector": ".auth__divider .divider", "className": ".divider", "required": false, "description": "Decorative canonical Divider instance; two are composed around the label when it exists." },
+    { "name": "dividerLabel", "selector": ".auth__divider-label", "className": ".auth__divider-label", "required": false, "description": "Visible localized alternative-method label." },
+    { "name": "social", "selector": ".auth__social", "className": ".auth__social", "required": false, "description": "Target-owned alternative authentication actions composed from canonical Buttons." },
+    { "name": "footer", "selector": ".auth__footer", "className": ".auth__footer", "required": false, "description": "Optional account-mode navigation or legal content composed with canonical Link when navigational." }
   ],
   "variants": [
     { "name": "default", "className": null, "default": true, "description": "Default auth form shell." }
@@ -33,46 +34,49 @@
     { "name": "default", "className": null, "default": true, "description": "Default narrow account form width." }
   ],
   "states": [
-    { "name": "default", "selectors": [".auth"], "description": "Default auth form state." },
-    { "name": "socialHover", "selectors": [".auth__social-btn:hover"], "description": "Social auth button hover state." },
-    { "name": "socialFocus", "selectors": [".auth__social-btn:focus-visible"], "description": "Visible keyboard focus on social authentication actions." },
-    { "name": "footerLinkFocus", "selectors": [".auth__footer a:focus-visible", ".auth__forgot a:focus-visible"], "description": "Visible keyboard focus on auth support links." },
-    { "name": "footerLinks", "selectors": [".auth__footer a", ".auth__forgot a"], "description": "Auth footer and forgot-password link state." }
+    { "name": "default", "selectors": [".auth"], "description": "Valid title plus required Form composition." },
+    { "name": "withSubtitle", "selectors": [".auth__subtitle"], "description": "Optional supporting guidance is present." },
+    { "name": "withRecovery", "selectors": [".auth__forgot .link"], "description": "Optional canonical password-recovery Link is present." },
+    { "name": "withAlternatives", "selectors": [".auth__alternatives", ".auth__social .btn"], "description": "One or more target-owned alternative authentication Buttons are present." },
+    { "name": "withFooter", "selectors": [".auth__footer"], "description": "Optional account-mode navigation or legal footer is present." }
   ],
   "behavior": [
-    { "name": "formSubmission", "selectors": [".auth__form"], "events": ["submit"], "description": "Auth form should submit login or registration data to the account target." },
-    { "name": "inputComposition", "selectors": [".auth__form"], "description": "Auth Forms should compose Input, Button, and Form primitives for field semantics and validation." },
-    { "name": "socialAuth", "selectors": [".auth__social-btn"], "events": ["click"], "description": "Social auth actions should hand off to target authentication providers." }
+    { "name": "requiredComposition", "selectors": [".auth", ".auth__title", ".auth__form"], "description": "Trimmed title and complete Form are required; invalid required content omits the whole shell rather than leaving an unnamed or non-functional surface." },
+    { "name": "formSubmission", "selectors": [".auth__form"], "attributes": ["native form", "named controls", "explicit submitter", "autocomplete purpose tokens"], "events": ["input", "change", "submit", "reset", "constraint validation"], "description": "Form and field dependencies preserve native value, validity, autofill, paste, keyboard, submission, and reset; the target owns credential handling and responses." },
+    { "name": "passwordComposition", "selectors": [".auth__form .password-input"], "events": ["input", "change", "click", "Space", "Enter"], "description": "Canonical Password Input owns the single password value and visibility action; U1 does not mirror the secret or duplicate reveal behavior." },
+    { "name": "recoveryNavigation", "selectors": [".auth__forgot .link"], "attributes": ["href"], "events": ["click"], "description": "Recovery is native Link navigation to the target-owned route or flow." },
+    { "name": "alternativeAuthentication", "selectors": [".auth__social .btn"], "attributes": ["type=button", "provider- or method-specific accessible name"], "events": ["click", "Space", "Enter"], "description": "Alternative methods cannot submit the credential Form accidentally and hand off to the target provider or hosted flow." },
+    { "name": "targetLifecycle", "selectors": [".auth"], "description": "Pending, disabled policy, generic server errors, announcements, focus, rate limits, MFA/passkeys, redirects, session truth, and account access remain target-owned and are composed outside U1." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Authentication form title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__title" }] } },
-    { "name": "subtitle", "type": "string", "required": false, "description": "Supporting authentication guidance.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__subtitle" }] } },
-    { "name": "form", "type": "slot", "required": true, "description": "Form dependency containing target-owned authentication fields and submission.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__form", "classNames": [".auth__form"] }] } },
-    { "name": "forgotAction", "type": "slot", "required": false, "description": "Password-recovery link composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__forgot", "classNames": [".auth__forgot"] }] } },
-    { "name": "dividerLabel", "type": "string", "required": false, "description": "Readable separator between authentication methods.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__divider" }] } },
-    { "name": "socialActions", "type": "slot", "required": false, "description": "Target-owned social authentication actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__social", "classNames": [".auth__social"] }] } },
-    { "name": "footer", "type": "slot", "required": false, "description": "Supporting account-mode navigation or legal content.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__footer", "classNames": [".auth__footer"] }] } }
+    { "name": "title", "type": "string", "required": true, "unsetBehavior": "Omit the complete Auth Forms shell when title is empty or whitespace-only.", "description": "Non-empty visible title that labels the authentication section.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__title" }] } },
+    { "name": "subtitle", "type": "string", "required": false, "unsetBehavior": "Omit the supporting paragraph.", "description": "Optional supporting authentication guidance.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__subtitle" }] } },
+    { "name": "form", "type": "slot", "required": true, "unsetBehavior": "Omit the complete Auth Forms shell when no complete Form is supplied.", "description": "Complete canonical Form containing target-owned named fields, validation, primary submission, and optional recovery Link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__form", "classNames": [".form", ".auth__form"] }] } },
+    { "name": "forgotAction", "type": "slot", "required": false, "unsetBehavior": "Omit the recovery wrapper.", "description": "Canonical Link composition for target-owned password or account recovery navigation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__forgot", "classNames": [".auth__forgot", ".link"] }] } },
+    { "name": "dividerLabel", "type": "string", "required": false, "unsetBehavior": "Omit the labelled Divider composition while retaining valid individually named alternative actions.", "description": "Optional visible localized label separating primary and alternative authentication methods.", "targetMappings": { "web": [{ "kind": "content", "selector": ".auth__divider-label" }] } },
+    { "name": "socialActions", "type": "slot", "required": false, "unsetBehavior": "Omit the complete alternatives region and its divider.", "description": "Target-owned alternative authentication actions such as social providers, SSO, or email link, composed from canonical Buttons; the accepted property name is retained for compatibility.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__social", "classNames": [".auth__social", ".btn"] }] } },
+    { "name": "footer", "type": "slot", "required": false, "unsetBehavior": "Omit the footer.", "description": "Optional supporting account-mode navigation or legal content; navigation composes canonical Link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".auth__footer", "classNames": [".auth__footer"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-primary", "--color-text-secondary", "--color-text-disabled", "--color-border-subtle", "--color-border-default", "--color-border-focus", "--color-surface-primary", "--color-surface-secondary", "--color-text-accent"],
-      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
-      "radius": ["--radius-md"],
-      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"],
-      "transition": ["--transition-fast"],
-      "easing": ["--easing-default"]
+      "color": ["--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"],
+      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-h2-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Associate every input with a label and error description.",
-    "Composed fields preserve the dependency-owned default, error, success, and warning validation families; aria-invalid is reserved for error.",
-    "Do not expose account forms or data without the target authentication flow.",
-    "Social auth buttons need provider-specific accessible names.",
-    "Password recovery should be reachable from login forms."
+    "Use a section labelled by the required visible title; do not invent an authentication ARIA role or composite keyboard model.",
+    "Associate every native field with a visible label and target-supplied text feedback; aria-invalid is reserved for actual error state.",
+    "Use correct native type, name, and autocomplete purpose tokens and do not block paste, autofill, password managers, or the canonical password reveal action.",
+    "Alternative authentication Buttons need method- or provider-specific names and type=button so they cannot submit the credential Form accidentally.",
+    "Password recovery and account-mode navigation use canonical Links with real target destinations.",
+    "Target error responses should avoid disclosing account existence and own announcements, focus, pending, disabled, retry, rate-limit, MFA/passkey, redirect, and session behavior.",
+    "Access to account data remains target-authenticated; a visible U1 shell does not establish authentication or authorization.",
+    "Canonical Button, Link, Divider, Input, Password Input, Field Wrapper, and Form retain their keyboard, focus, contrast, forced-colors, reduced-motion, validation, and controlled or uncontrolled behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify customer login, registration, and recovery forms." },
+    "web": { "status": "implemented", "kind": "css-html-composition", "notes": "Labelled passive shell implemented in Account CSS and composed from canonical Form, field, action, Link, and Divider contracts with no U1 runtime." },
+    "shopify": { "status": "planned", "kind": "current-customer-account-delegation", "notes": "Shopify v1 delegates authentication to the current hosted authorization/account experience and authenticated Customer Account API or extension profile; it does not render a theme-owned U1 credential form. Classic Liquid requires a separately versioned compatibility adapter. Live handoff or headless proof remains required before target readiness." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

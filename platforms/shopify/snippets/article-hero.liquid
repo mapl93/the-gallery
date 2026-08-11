@@ -1,0 +1,145 @@
+{% doc %}
+Renders one canonical Article Hero from a Shopify article resource.
+
+@param {article} article - Article resource supplied by the owning article composition.
+@param {string} [variant] - full, split, or text-only.
+@param {number} [heading_level] - Contextual heading rank from 1 through 6.
+@param {boolean} [show_image] - Whether available article media is rendered.
+@param {boolean} [show_date] - Whether the published date is rendered.
+@param {boolean} [show_author] - Whether the article author is rendered.
+@param {string} [blog_label] - Optional passive context label supplied by the owning composition.
+@param {string} [image_alt] - Optional contextual alt-text override.
+@param {boolean} [image_is_decorative] - Uses an empty alt value when the owning composition determines the image is decorative.
+@param {string} [image_loading] - lazy by default; eager only for an explicitly prioritized placement.
+@param {string} [image_sizes] - Target-owned responsive sizes value; 100vw by default.
+
+@example
+{% render 'article-hero', article: article, variant: 'full', heading_level: 1, blog_label: blog.title, image_loading: 'eager' %}
+{% enddoc %}
+
+{%- liquid
+  assign article_hero_variant = 'full'
+  assign article_hero_variant_class = 'article-hero--image'
+  case variant
+    when 'split'
+      assign article_hero_variant = 'split'
+      assign article_hero_variant_class = 'article-hero--split'
+    when 'text-only'
+      assign article_hero_variant = 'text-only'
+      assign article_hero_variant_class = 'article-hero--text'
+  endcase
+
+  assign article_hero_heading_level = heading_level | default: 1 | plus: 0
+  case article_hero_heading_level
+    when 2
+      assign article_hero_heading = 'h2'
+    when 3
+      assign article_hero_heading = 'h3'
+    when 4
+      assign article_hero_heading = 'h4'
+    when 5
+      assign article_hero_heading = 'h5'
+    when 6
+      assign article_hero_heading = 'h6'
+    else
+      assign article_hero_heading = 'h1'
+  endcase
+
+  assign article_hero_show_image = true
+  assign article_hero_show_date = true
+  assign article_hero_show_author = true
+  if show_image == false
+    assign article_hero_show_image = false
+  endif
+  if show_date == false
+    assign article_hero_show_date = false
+  endif
+  if show_author == false
+    assign article_hero_show_author = false
+  endif
+
+  assign article_hero_has_media = false
+  if article_hero_show_image and article.image != blank and article_hero_variant != 'text-only'
+    assign article_hero_has_media = true
+  endif
+
+  assign article_hero_without_media = false
+  if article_hero_variant != 'text-only' and article_hero_has_media == false
+    assign article_hero_without_media = true
+  endif
+
+  assign article_hero_has_date = false
+  if article_hero_show_date and article.published_at != blank
+    assign article_hero_has_date = true
+  endif
+
+  assign article_hero_has_author = false
+  if article_hero_show_author and article.author != blank
+    assign article_hero_has_author = true
+  endif
+
+  assign article_hero_loading = 'lazy'
+  if image_loading == 'eager'
+    assign article_hero_loading = 'eager'
+  endif
+
+  assign article_hero_sizes = '100vw'
+  if image_sizes != blank
+    assign article_hero_sizes = image_sizes
+  endif
+
+  assign article_hero_image_alt = article.image.alt | default: ''
+  if image_alt != blank
+    assign article_hero_image_alt = image_alt
+  endif
+  if image_is_decorative == true
+    assign article_hero_image_alt = ''
+  endif
+-%}
+
+{%- if article != blank and article.title != blank -%}
+  <header class="article-hero {{ article_hero_variant_class }}{% if article_hero_without_media %} article-hero--without-media{% endif %}">
+    <div class="article-hero__layout">
+      {%- if article_hero_has_media and article_hero_variant == 'full' -%}
+        <div class="article-hero__bg">
+          {{ article.image | image_url: width: 2400 | image_tag:
+            alt: article_hero_image_alt,
+            loading: article_hero_loading,
+            sizes: article_hero_sizes,
+            widths: '480, 720, 960, 1200, 1600, 2000, 2400' }}
+        </div>
+        <div class="article-hero__overlay" aria-hidden="true"></div>
+      {%- elsif article_hero_has_media and article_hero_variant == 'split' -%}
+        <div class="article-hero__media">
+          {{ article.image | image_url: width: 1600 | image_tag:
+            alt: article_hero_image_alt,
+            loading: article_hero_loading,
+            sizes: article_hero_sizes,
+            widths: '320, 480, 720, 960, 1200, 1600' }}
+        </div>
+      {%- endif -%}
+
+      <div class="article-hero__content">
+        {%- if blog_label != blank -%}
+          <p class="article-hero__category">{{ blog_label | escape }}</p>
+        {%- endif -%}
+
+        <{{ article_hero_heading }} class="article-hero__title">{{ article.title | escape }}</{{ article_hero_heading }}>
+
+        {%- if article_hero_has_author or article_hero_has_date -%}
+          <div class="article-hero__meta">
+            {%- if article_hero_has_author -%}
+              <span>{{ article.author | escape }}</span>
+            {%- endif -%}
+            {%- if article_hero_has_author and article_hero_has_date -%}
+              <span class="article-hero__meta-separator" aria-hidden="true">/</span>
+            {%- endif -%}
+            {%- if article_hero_has_date -%}
+              <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'date' }}</time>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </header>
+{%- endif -%}

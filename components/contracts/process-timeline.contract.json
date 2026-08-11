@@ -1,81 +1,301 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "process-timeline",
   "name": "Process Timeline",
   "registryId": "F2",
   "category": "storytelling",
   "status": "pilot",
-  "summary": "Horizontal scrollable process steps with numbers and images.",
+  "summary": "Named, intrinsically responsive ordered process lane with visible numbering and optional target-owned media.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/process-timeline",
-    "css": { "file": "components/css/storytelling.css", "selector": ".process-timeline" },
+    "css": {
+      "file": "components/css/storytelling.css",
+      "selector": ".process-timeline"
+    },
     "docs": "site/src/content/components/process-timeline.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".process-timeline", "className": ".process-timeline", "required": true, "description": "Process timeline section." },
-    { "name": "title", "selector": ".process-timeline__title", "className": ".process-timeline__title", "required": true, "description": "Timeline heading." },
-    { "name": "track", "selector": ".process-timeline__track", "className": ".process-timeline__track", "required": true, "description": "Ordered scrollable step track." },
-    { "name": "step", "selector": ".process-step", "className": ".process-step", "required": true, "description": "Repeated process step." },
-    { "name": "stepNumber", "selector": ".process-step__number", "className": ".process-step__number", "required": true, "description": "Visible step sequence number." },
-    { "name": "stepImage", "selector": ".process-step__image", "className": ".process-step__image", "required": false, "description": "Optional step media region." },
-    { "name": "stepImageMedia", "selector": ".process-step__image img", "className": null, "required": false, "description": "Step image supplied by the target." },
-    { "name": "stepTitle", "selector": ".process-step__title", "className": ".process-step__title", "required": true, "description": "Step heading." },
-    { "name": "stepDescription", "selector": ".process-step__description", "className": ".process-step__description", "required": false, "description": "Optional step explanation." }
+    {
+      "name": "root",
+      "selector": ".process-timeline",
+      "className": ".process-timeline",
+      "required": true,
+      "description": "Native process-timeline section named by its visible contextual heading."
+    },
+    {
+      "name": "title",
+      "selector": ".process-timeline__title",
+      "className": ".process-timeline__title",
+      "required": true,
+      "description": "Visible process heading that labels the section and ordered lane."
+    },
+    {
+      "name": "track",
+      "selector": ".process-timeline__track",
+      "className": ".process-timeline__track",
+      "required": true,
+      "description": "Native ordered one-row lane that distributes available inline space and scrolls horizontally when its steps do not fit."
+    },
+    {
+      "name": "step",
+      "selector": ".process-step",
+      "className": ".process-step",
+      "required": true,
+      "description": "Direct repeated ordered-list item supplied by the target."
+    },
+    {
+      "name": "stepNumber",
+      "selector": ".process-step__number",
+      "className": ".process-step__number",
+      "required": true,
+      "description": "Visible generated sequence marker hidden from assistive technology because the native ordered list exposes position."
+    },
+    {
+      "name": "stepImage",
+      "selector": ".process-step__image",
+      "className": ".process-step__image",
+      "required": false,
+      "description": "Optional passive step media region omitted completely when no image is supplied."
+    },
+    {
+      "name": "stepImageMedia",
+      "selector": ".process-step__image img",
+      "className": null,
+      "required": false,
+      "description": "Native step image supplied by the target with context-appropriate alternative text."
+    },
+    {
+      "name": "stepTitle",
+      "selector": ".process-step__title",
+      "className": ".process-step__title",
+      "required": true,
+      "description": "Required contextual heading for one process stage."
+    },
+    {
+      "name": "stepDescription",
+      "selector": ".process-step__description",
+      "className": ".process-step__description",
+      "required": false,
+      "description": "Optional concise explanation of one process stage."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default ordered process timeline." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default ordered editorial process lane."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Horizontal overflow on narrow viewports and a wrapping grid on wider viewports." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Equal intrinsic tracks expand when supplied steps fit and form one horizontally scrollable lane when they do not."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".process-timeline"], "description": "Default timeline state." },
-    { "name": "trackFocus", "selectors": [".process-timeline__track:focus-visible"], "description": "Visible keyboard focus when an overflowing track is made focusable." }
+    {
+      "name": "default",
+      "selectors": [
+        ".process-timeline"
+      ],
+      "description": "Required title and ordered step composition with any accepted optional step content."
+    },
+    {
+      "name": "trackFocus",
+      "selectors": [
+        ".process-timeline__track:focus-visible"
+      ],
+      "description": "Visible keyboard focus on the native lane so overflowing content can be scrolled without a pointer."
+    }
   ],
   "behavior": [
     {
       "name": "orderedSteps",
-      "selectors": [".process-timeline__track", ".process-step"],
-      "description": "Adapters should preserve process order and expose step numbering as text rather than relying on connector decoration."
+      "selectors": [
+        ".process-timeline__track",
+        ".process-step"
+      ],
+      "description": "Adapters use a native ordered list with direct list items and preserve authored process order independently of available inline space."
     },
     {
-      "name": "responsiveOverflow",
-      "selectors": [".process-timeline__track"],
-      "description": "On narrow viewports the track scrolls horizontally with snap alignment; adapters should make an overflowing region keyboard-scrollable and provide an accessible name when needed."
+      "name": "sectionLabelling",
+      "selectors": [
+        ".process-timeline",
+        ".process-timeline__title",
+        ".process-timeline__track"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "The native section and ordered lane reference a target-unique id on the same visible contextual heading; heading rank remains owned by the surrounding document."
+    },
+    {
+      "name": "nativeOverflow",
+      "selectors": [
+        ".process-timeline__track"
+      ],
+      "attributes": [
+        "tabindex"
+      ],
+      "description": "The one-row lane distributes free inline space and uses native horizontal overflow and snap only when supplied steps exceed it. Targets ensure an overflowing lane is sequentially focusable without intercepting native scroll keys."
+    },
+    {
+      "name": "visibleSequence",
+      "selectors": [
+        ".process-step__number"
+      ],
+      "attributes": [
+        "aria-hidden"
+      ],
+      "description": "Every step has a visible generated decimal marker. It is aria-hidden to avoid duplicating the position already exposed by native ordered-list semantics; decorative connectors never carry order alone."
+    },
+    {
+      "name": "optionalStepContent",
+      "selectors": [
+        ".process-step__image",
+        ".process-step__description"
+      ],
+      "description": "Optional image and description parts are independently omitted without empty wrappers or changes to the required number/title order."
+    },
+    {
+      "name": "imageAlternative",
+      "selectors": [
+        ".process-step__image img"
+      ],
+      "attributes": [
+        "alt"
+      ],
+      "description": "Targets provide concise useful alternative text for informative step images or an empty alternative for decorative media and retain step meaning when media is absent."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".process-timeline__title",
+        ".process-timeline__track",
+        ".process-step__title",
+        ".process-step__description"
+      ],
+      "description": "Localized, unbroken, zoomed, short, long and repeated content remains contained; only the named lane can scroll horizontally."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".process-timeline"
+      ],
+      "description": "Process Timeline owns no controlled or uncontrolled state, listener, observer, custom key handling, live region, animation, asset or network work. Data and media loading remain target responsibilities."
     }
   ],
   "properties": [
     {
-      "name": "title", "type": "string", "required": true, "description": "Process timeline heading.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".process-timeline__title" }] }
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Visible process heading used as the section and ordered-lane label; its contextual native heading level remains target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".process-timeline__title"
+          }
+        ]
+      }
     },
     {
-      "name": "steps", "type": "slot", "required": true, "description": "Ordered target-owned process steps.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".process-timeline__track", "classNames": [".process-timeline__track", ".process-step"] }] }
+      "name": "steps",
+      "type": "slot",
+      "required": true,
+      "description": "Ordered target-owned process-step composition with required titles and optional media/descriptions.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".process-timeline__track",
+            "classNames": [
+              ".process-timeline__track",
+              ".process-step"
+            ]
+          }
+        ]
+      }
     }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-decorative", "--color-border-focus", "--color-border-subtle", "--color-surface-statement", "--color-text-inverse", "--color-text-primary", "--color-text-secondary"],
-      "typography": ["--font-family-heading", "--typo-body-size", "--typo-h2-size"],
-      "radius": ["--radius-full", "--radius-md"],
-      "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
+      "color": [
+        "--color-border-decorative",
+        "--color-border-focus",
+        "--color-surface-statement",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-heading",
+        "--typo-h2-size",
+        "--typo-h2-line-height",
+        "--tg-typography-h2-weight",
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--tg-font-weight-semibold",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height",
+        "--tg-typography-body-small-weight",
+        "--tg-font-weight-bold"
+      ],
+      "radius": [
+        "--radius-full",
+        "--radius-md"
+      ],
+      "spacing": [
+        "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
+        "--space-layout-section-gap"
+      ]
     }
   },
   "accessibility": [
-    "Use a heading level appropriate to the surrounding page for the timeline title and each step title.",
-    "Preserve logical step order in the source regardless of responsive layout.",
-    "Give meaningful step images useful alternative text and mark decorative images accordingly.",
-    "Do not use decorative connector lines or visual scroll position as the only indication of sequence."
+    "Associate the native section and ordered lane with the same visible contextual heading through a target-unique aria-labelledby/id pair.",
+    "Use a native ordered list with direct list items and preserve authored source order across every available inline size.",
+    "Keep the visible decimal marker aria-hidden because native ordered-list semantics expose the same position; never rely on connector decoration or scroll position for sequence.",
+    "Ensure an overflowing lane is sequentially keyboard reachable with visible focus and preserve native arrow and Space scrolling without custom key handlers.",
+    "Use native heading levels appropriate to the surrounding document for the timeline and each step title; visual classes do not mandate h2 or h3.",
+    "Give informative step media concise useful alternative text, use alt=\"\" when it is decorative, and omit optional media/description wrappers when absent.",
+    "Allow localized, unbroken, repeated and 200-percent-zoom content to reflow without page-level horizontal overflow.",
+    "Do not add Timeline widget, progress, carousel, current-step, selection, live-region, controlled-state or auto-advance semantics."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/storytelling.css with native ordered semantics and intrinsic one-row overflow."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Dedicated merchant-configurable Liquid section maps ordered blocks, optional image/description content, editor attributes, localized labels and native overflow without target runtime."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

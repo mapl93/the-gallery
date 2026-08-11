@@ -1,41 +1,84 @@
 ## Overview
 
-Care Instructions groups concise, text-first guidance with optional supporting icons and recommended or discouraged emphasis.
+Care Instructions presents passive, target-owned care guidance as a related text-first collection. It supplies durable document/list semantics and intrinsic responsive composition, not a checklist, alert, acknowledgement flow, product-care schema, claim validation, or target data service.
 
-<Preview html={'<section class="care-instructions care-instructions--do tg-preview-frame tg-preview-frame--md" aria-labelledby="care-title"><h2 class="care-instructions__title" id="care-title">Recommended care</h2><div class="care-instructions__grid"><article class="care-item"><p class="care-item__label">Wash by hand</p><p class="care-item__description">Use mild soap and a soft cloth.</p></article><article class="care-item"><p class="care-item__label">Dry completely</p><p class="care-item__description">Let the base dry before storage.</p></article><article class="care-item"><p class="care-item__label">Handle temperature changes gradually</p><p class="care-item__description">Avoid moving directly between extreme temperatures.</p></article></div></section>'} label="Care Instructions" />
+<Preview html={'<section class="care-instructions tg-preview-frame tg-preview-frame--md" aria-labelledby="care-title"><header class="care-instructions__header"><h2 class="care-instructions__title" id="care-title">Piece-specific care</h2></header><ul class="care-instructions__list care-instructions__grid" role="list"><li class="care-item"><span class="care-item__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 8c3-2 5 2 8 0s5 2 8 0"/><path d="M3 14c3-2 5 2 8 0s5 2 8 0"/></svg></span><p class="care-item__label">Follow the care card</p><p class="care-item__description">Use the guidance supplied for the individual piece.</p></li><li class="care-item"><p class="care-item__label">Confirm appliance use</p><p class="care-item__description">Use a dishwasher or microwave only when the piece record allows it.</p></li><li class="care-item"><p class="care-item__label">Ask before treating</p><p class="care-item__description">Contact the maker before using abrasive, chemical, or repair treatments.</p></li></ul></section>'} label="Care Instructions" />
 
 ## Presentation
 
-`items` is required and `title` is optional. Each item requires a text label and can add explanatory detail or a supporting icon.
+The required `items` slot supplies one or more complete target-owned records. Every item requires a stable identity and non-empty visible instruction label. Explanatory detail and redundant supporting icon are optional. `title` is optional.
 
-The default treatment is neutral. `do` maps to `.care-instructions--do` and `dont` maps to `.care-instructions--dont`; legacy item-level hooks remain implementation facts. Icons and color only support the written guidance.
+With a title, the root is a named native section; without one, it is a generic container with no dangling label relationship. The collection is one native `ul` with direct `li` items. The compatibility selector `.care-instructions__grid` may coexist on that same list; it is not a second wrapper.
+
+`variant` accepts `default`, `do`, or `dont`; `do` maps to `.care-instructions--do` and `dont` maps to `.care-instructions--dont`. Do and Don't change supporting icon color for one homogeneous set but create no status, validation, urgency, or accessible state. The visible heading and each instruction must communicate recommendation or prohibition without color or icon.
+
+One instance always represents one homogeneous neutral, recommended, or avoid set. Compose separate Care Instructions instances for recommended and avoid guidance instead of adding per-item tone. Public semantic values remain `default`, `do`, and `dont`; targets may present friendlier localized visible vocabulary such as Recommended/Avoid.
+
+The demonstrated wording, icons, heading level, item order, count, grid threshold, alignment, and treatment are fixture/presentation details, not defaults or a public product-care record schema.
+
+### Behavior boundary
+
+Care Instructions owns no controlled/uncontrolled value, selected/checked/completed/acknowledged state, event, focus, keyboard model, dismissal, disclosure, request, timer, persistence, live announcement, analytics, warranty, safety review, or claim validation.
+
+If a product needs confirmation or choices, compose behavior-specific canonical components such as Checkbox, Radio, Button, Alert, Form, or a separately accepted workflow. Do not add their roles or states to passive R4 by implication.
+
+### Responsive behavior
+
+Canonical R4 CSS derives column count from the actual component width. Narrow hosts use one column; wider hosts add columns when each record retains its readable minimum. Complete labels and descriptions wrap without clamping. Studio owns no separate R4 breakpoint or margin correction.
 
 ## Guidelines
 
 <DoDont>
-  <Do>Write each instruction so its meaning is complete without an icon or color treatment.</Do>
-  <Dont>Do not mix recommended and discouraged guidance under a root variant that implies one shared meaning.</Dont>
+  <Do>Write each instruction so its meaning and any recommendation or prohibition remain complete without the icon or color treatment.</Do>
+  <Dont>Do not present generic fixture copy as verified care guidance for every product, material, finish, attachment, or jurisdiction.</Dont>
 </DoDont>
 
-- Use `do` for a set of recommended actions and `dont` for a set of discouraged actions.
-- Keep explanations practical and specific to the target-provided care guidance.
-- Use the neutral variant when the set contains informational instructions.
+- Use `default` for neutral information, `do` for one homogeneous recommended set, and `dont` for one homogeneous discouraged set.
+- Keep labels concise and make optional details practical, qualified, product-specific, and current.
+- Hide redundant icons from assistive technology; put unique meaning in visible text.
+- Omit incomplete records and omit the root when no complete items remain.
+- Keep safety, legal, editorial, localization, product applicability, revision, recall, and regulatory ownership in the target layer.
+- Use another semantic composition for choices, acknowledgements, alerts, validation, status, warnings requiring interaction, or task completion.
+- Keep legal or safety warnings in separately reviewed rich content or canonical Alert; never infer them from the care tone.
 
 ## Accessibility
 
-- Express every instruction in text.
-- Do not rely on success or error color to distinguish recommended and discouraged care.
-- Hide decorative icons from assistive technology.
-- Use a heading level appropriate to the surrounding document.
+- Use a contextual visible heading when the guidance is a thematic page section. Untitled compositions remain generic containers.
+- Preserve one native `ul > li` collection. `role="list"` retains list exposure where visual markers are removed.
+- Keep every required instruction label visible and understandable without icon, color, grid position, or item order.
+- Mark redundant supporting icons `aria-hidden="true"`; do not add duplicate icon labels.
+- Ensure Do/Don't meaning is present in visible authored wording, not inferred from green/red.
+- Allow long, localized, RTL, zoomed, and user-spaced text to wrap without clipping or truncation.
+- Do not add checkbox, option, alert, error, status, button, link, `tabindex`, selected/checked/acknowledged/completed state, roving focus, keyboard behavior, or live regions to passive neutral R4.
 
 ## Specification
 
-**Dependencies:** None.
+**Dependencies:** None for the passive neutral implementation. A future confirmation or choice workflow composes separately accepted canonical behavior components rather than expanding R4 by implication.
 
-**Anatomy:** `.care-instructions`, optional title, required grid and repeated `.care-item` records with optional icon, required label, and optional description.
+**Anatomy:** conditional `.care-instructions` section/div; optional header and title; required native `.care-instructions__list.care-instructions__grid`; repeated direct native `.care-item` items; optional redundant icon; required visible label; optional complete description.
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Care guidance heading</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned care instructions</td></tr>
-  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `do`, or `dont`</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible contextual heading; selects named-section semantics when non-empty</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required non-empty</td><td>Target-owned native unordered care composition with complete labels, optional details, and optional decorative icons</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `do`, or `dont` supporting treatment for one homogeneous set</td></tr>
 </PropTable>
+
+### Targets
+
+- **Neutral Web:** conditional native section/div, `ul/li`, complete visible text, optional decorative icons, intrinsic canonical CSS, homogeneous supporting tone, and zero R4 JavaScript.
+- **Shopify:** planned until product data source, content authority, safety/legal review, section/block schema, limits/order, localization, symbol policy, and first consumer are approved.
+- **Webflow / React / Angular:** preserve native unordered children and target-owned content/claim lifecycle; keep acknowledgement or choices separate.
+- **Figma / native targets:** represent optional title, repeated items, optional icon/detail, three treatments, and adaptive columns; registered generic Figma nodes are not R4 visual approval.
+
+### References
+
+- [HTML unordered list](https://html.spec.whatwg.org/dev/grouping-content.html#the-ul-element)
+- [HTML section](https://html.spec.whatwg.org/dev/sections.html#the-section-element)
+- [WCAG Info and Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html)
+- [WCAG Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)
+- [WAI Decorative Images](https://www.w3.org/WAI/tutorials/images/decorative/)
+- [WAI-ARIA APG patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)
+- [Open UI List research](https://open-ui.org/components/list.research/)
+- [Polaris List](https://polaris-react.shopify.com/components/lists/list)
+- [Polaris Description List](https://polaris-react.shopify.com/components/lists/description-list)
+- [Radix Accessible Icon](https://www.radix-ui.com/primitives/docs/utilities/accessible-icon)

@@ -6,7 +6,7 @@ Searchable text field with a filterable listbox for autocomplete and richer opti
 
 Combobox supports `default`, `error`, `success`, and `warning` validation families independently of its open state.
 
-<Preview html={"<div class=\"field tg-preview-frame--sm\"><label class=\"field__label\" for=\"combobox-demo\">Artwork</label><div class=\"combobox combobox--open tg-preview-anchor-stage tg-preview-anchor-stage--field\"><input id=\"combobox-demo\" class=\"combobox__input\" data-preview-trigger type=\"text\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"combobox-demo-list\" aria-activedescendant=\"combobox-demo-option\" value=\"Cer\" /><div id=\"combobox-demo-list\" class=\"combobox__listbox\" role=\"listbox\"><button id=\"combobox-demo-option\" class=\"combobox__option\" type=\"button\" role=\"option\" data-highlighted aria-selected=\"true\"><span>Ceramic study</span><svg class=\"combobox__check\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></button><button class=\"combobox__option\" type=\"button\" role=\"option\" aria-selected=\"false\">Celadon vessel</button></div></div></div>"} label="Combobox / Autocomplete" layout="anchored" interaction={{"selector":".combobox","toggle":"combobox--open","triggerLabel":"Open Combobox","triggerSelector":"[data-preview-trigger]","startVisible":true}} />
+<Preview html={"<div class=\"field tg-preview-frame--sm\"><label class=\"field__label\" for=\"combobox-demo\">Artwork</label><div class=\"combobox combobox--open tg-preview-anchor-stage tg-preview-anchor-stage--field\"><input id=\"combobox-demo\" class=\"combobox__input\" type=\"text\" role=\"combobox\" name=\"artwork\" autocomplete=\"off\" placeholder=\"Search artworks\" aria-autocomplete=\"list\" aria-expanded=\"true\" aria-controls=\"combobox-demo-list\" /><div id=\"combobox-demo-list\" class=\"combobox__listbox\" role=\"listbox\" aria-label=\"Artwork results\"><div class=\"combobox__option\" role=\"option\" data-value=\"Ceramic study\" aria-selected=\"false\">Ceramic study</div><div class=\"combobox__option\" role=\"option\" data-value=\"Celadon vessel\" aria-selected=\"false\">Celadon vessel</div><div class=\"combobox__option\" role=\"option\" data-value=\"Porcelain bowl\" aria-selected=\"false\">Porcelain bowl</div><div class=\"combobox__option\" role=\"option\" data-value=\"Stoneware vase\" aria-selected=\"false\">Stoneware vase</div><div class=\"combobox__option\" role=\"option\" data-value=\"Terracotta form\" aria-selected=\"false\">Terracotta form</div><div class=\"combobox__empty\" role=\"status\" hidden>No artworks found.</div></div></div></div>"} label="Combobox / Autocomplete" layout="anchored" />
 
 ## Usage Guidelines
 
@@ -19,15 +19,21 @@ Combobox supports `default`, `error`, `success`, and `warning` validation famili
 
 - Associate the visible label with the input.
 - Keep `aria-expanded`, `aria-controls`, and `aria-activedescendant` synchronized.
-- Use `role="listbox"` and `role="option"` for the popup and options.
-- Support Arrow keys, Home, End, Enter, and Escape without moving DOM focus from the input.
+- Use `role="listbox"` and non-interactive `role="option"` elements. Options are not Tab stops and cannot contain links, buttons, or other interactive descendants.
+- Support Arrow Up/Down, Enter, Escape, and Tab without moving DOM focus from the input or overriding ordinary text-editing keys.
+- Highlight is temporary navigation state. It must not replace the selected or arbitrary typed value until the user commits with Enter or pointer selection.
+- Authored options are filtered locally. Remote loading, ranking, caching, and virtualization remain target-owned.
+- The native text input owns `name`, required validity, FormData, `input`/`change`, and reset; do not add a mirrored hidden value.
 
 ## References
 
 <PropTable>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Visible accessible input name</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>Validation presentation</td></tr>
   <tr><td>`value`</td><td>string</td><td>empty</td><td>Editable search value</td></tr>
+  <tr><td>`name`</td><td>string</td><td>optional</td><td>Native form field name</td></tr>
   <tr><td>`placeholder`</td><td>string</td><td>`Search artworks`</td><td>Empty-value hint</td></tr>
+  <tr><td>`autocomplete`</td><td>string</td><td>`off`</td><td>Native text-field autocomplete hint</td></tr>
   <tr><td>`open`</td><td>boolean</td><td>`false`</td><td>Listbox visibility and expanded state</td></tr>
   <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Native input availability</td></tr>
   <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required state</td></tr>
@@ -39,6 +45,7 @@ Combobox supports `default`, `error`, `success`, and `warning` validation famili
   <tr><td>`.combobox--warning`</td><td>modifier</td><td>—</td><td>Warning validation family</td></tr>
   <tr><td>`.combobox__input`</td><td>class</td><td>—</td><td>Editable native text input</td></tr>
   <tr><td>`.combobox__listbox`</td><td>class</td><td>—</td><td>Filterable option popup</td></tr>
-  <tr><td>`.combobox__option`</td><td>class</td><td>—</td><td>Selectable option</td></tr>
+  <tr><td>`.combobox__option`</td><td>class</td><td>`role="option"`</td><td>Non-interactive selectable suggestion</td></tr>
   <tr><td>`.combobox__check`</td><td>class</td><td>—</td><td>Optional selected check</td></tr>
+  <tr><td>`.combobox__empty`</td><td>class</td><td>`role="status"`</td><td>Optional no-results message outside the option set</td></tr>
 </PropTable>

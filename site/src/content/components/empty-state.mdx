@@ -1,21 +1,28 @@
 ## Overview
 
-Resolved empty-content composition for collections, carts, and search results.
+Passive resolved-absence composition for collections, carts, search results, and other target-owned content areas.
 
-<Preview html={"<div class=\"empty-state\"><div class=\"empty-state__icon\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m21 8-9 5-9-5\"/><path d=\"M3 8l9-5 9 5v8l-9 5-9-5Z\"/><path d=\"M12 13v8\"/></svg></div><h2 class=\"empty-state__title\">Nothing here yet</h2><p class=\"empty-state__message\">Start browsing to discover unique artisan pieces.</p><a class=\"btn\" href=\"/components\">Explore components</a></div>"} label="Empty State" />
+<Preview html={"<div class=\"empty-state\"><div class=\"empty-state__icon\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 10a4 4 0 0 1-8 0\"/><path d=\"M3.103 6.034h17.794\"/><path d=\"M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z\"/></svg></div><h2 class=\"empty-state__title\">Nothing here yet</h2><p class=\"empty-state__message\">Start browsing to discover unique artisan pieces.</p><a class=\"btn\" href=\"/components\">Explore components</a></div>"} label="Empty State" />
 
 ## Presentation
 
-Title is required. Icon, message, and action are independent optional slots. Actions compose Button or Link; Empty State does not own a local action style.
+Title is required non-empty content. Icon, message, and one action are independent optional slots. The icon is decorative. The action composes canonical Button or Link; Empty State does not own its label, destination, event, state, or a local action style.
 
 The artwork, copy, and action shown in Studio are preview fixtures, not component defaults.
+
+The title class is independent of its native heading tag. The owning page, section, panel, or dialog must supply the contextually correct native `h1` through `h6`. Heading rank is host composition context, not a visual Studio control or target-agnostic property.
 
 ## Usage Guidelines
 
 <DoDont>
   <Do>Explain what is empty and offer one clear next step when an action can resolve it.</Do>
-  <Dont>Don't show an empty state while content is still loading.</Dont>
+  <Dont>Don't show Empty State while content is loading, or use it as a generic error without a truthful diagnosis.</Dont>
 </DoDont>
+
+- Replace the missing content area instead of leaving stale rows, controls, totals, or results visible beside the Empty State.
+- Prefer concise, contextual copy. Omit the message or action when neither adds a useful next step.
+- Use Link when the recovery action navigates and Button when it performs a command.
+- Choose one primary action. Additional education, error recovery, permissions, filtering, and query state remain target composition.
 
 ## Accessibility
 
@@ -24,8 +31,17 @@ The artwork, copy, and action shown in Studio are preview fixtures, not componen
 </Callout>
 
 - Use clear title text that identifies the empty state.
-- Make optional actions keyboard accessible and descriptive.
-- Treat decorative icons as decorative when the title already communicates the state.
+- Use a contextual native heading rank and keep the visible hierarchy meaningful. The title must never be empty.
+- Make the optional canonical action keyboard accessible, descriptive, and semantically accurate as Link or Button.
+- Keep the icon hidden from assistive technology because title text communicates the state. A meaningful illustration is not supported by the current narrow slot.
+- Initial or static empty content needs no live role. If search, filtering, deletion, or another update dynamically produces a qualifying status message, announce it through a target-owned live region that already exists before the update.
+- Do not move focus merely to announce absence, trap focus, or duplicate the visible title in every composed Empty State.
+
+## Responsive And Targets
+
+Block padding follows the semantic section rhythm, while inline padding is capped by the actual container so panels and narrow slots retain readable measure. Long localized title, message, and action content may wrap; the component adds no breakpoint, query parser, formatter, event, asset, or runtime.
+
+Neutral Web provides only composition classes. Shopify requires a validated adapter-only `heading_tag`: main cart and 404 use H1, while the cart drawer uses H3 beneath its H2 dialog title. React, Angular, SwiftUI, and Compose must keep data lifecycle, announcements, focus, contextual heading markup, and action behavior in the target.
 
 ## References
 
@@ -35,3 +51,5 @@ The artwork, copy, and action shown in Studio are preview fixtures, not componen
   <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Decorative icon or illustration</td></tr>
   <tr><td>`action`</td><td>slot</td><td>optional</td><td>Composed Button or Link</td></tr>
 </PropTable>
+
+There is no loading, error, result-count, heading-level, announcement, action-label, destination, callback, variant, size, event, focus, or controlled/uncontrolled property. `title` supplies content only; the host supplies native heading rank separately as contextual markup.

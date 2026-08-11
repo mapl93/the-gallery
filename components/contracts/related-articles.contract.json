@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "related-articles",
   "name": "Related Articles",
   "registryId": "L10",
   "category": "blog",
   "status": "pilot",
-  "summary": "Related/recommended article grid with next/prev navigation.",
+  "summary": "Passive fail-closed named list of one to three explicitly curated canonical Article Cards, with deterministic exclusions, intrinsic layout, and zero neutral runtime.",
   "dependencies": ["article-card"],
   "source": {
     "registry": "registry.json#/components/related-articles",
@@ -14,44 +14,75 @@
     "docs": "site/src/content/components/related-articles.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".related-articles", "className": ".related-articles", "required": true, "description": "Related-article section container." },
-    { "name": "title", "selector": ".related-articles__title", "className": ".related-articles__title", "required": false, "description": "Optional related-articles section title." },
-    { "name": "grid", "selector": ".related-articles__grid", "className": ".related-articles__grid", "required": true, "description": "Responsive Article Card composition grid." }
+    { "name": "root", "selector": ".related-articles", "className": ".related-articles", "required": true, "description": "Native thematic section named by its visible heading and omitted when the heading or article collection is empty." },
+    { "name": "title", "selector": ".related-articles__title", "className": ".related-articles__title", "required": true, "description": "Non-empty visible localized contextual heading whose target-unique id names the section." },
+    { "name": "articles", "selector": ".related-articles__grid", "className": ".related-articles__grid", "required": true, "description": "Native unordered list and intrinsic visual grid of one to three explicitly curated Article Card compositions." },
+    { "name": "articleItem", "selector": ".related-articles__item", "className": ".related-articles__item", "required": true, "description": "Native list item containing exactly one complete canonical Article Card composition." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default responsive related-article grid." }
+    { "name": "default", "className": null, "default": true, "description": "One passive named article-recommendation collection." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "One, two, or three columns according to available viewport width." }
+    { "name": "default", "className": null, "default": true, "description": "One fluid intrinsic size whose grid adapts to the component's available inline space." }
   ],
   "states": [
-    { "name": "default", "selectors": [".related-articles"], "description": "Default related-articles section state." }
+    { "name": "default", "selectors": [".related-articles"], "description": "Passive projection of a complete target-authored recommendation collection with no root interaction or value state." },
+    { "name": "articleDestination", "selectors": [".article-card__primary-link"], "description": "Each canonical Article Card owns its one native linked media/title destination, hover, and focus-visible behavior; L10 adds no activation state." }
   ],
   "behavior": [
-    { "name": "targetRecommendations", "selectors": [".related-articles__grid"], "description": "The target selects and supplies related articles as Article Card compositions." }
+    { "name": "requiredComposition", "selectors": [".related-articles", ".related-articles__title", ".related-articles__grid"], "attributes": ["aria-labelledby", "id"], "description": "A non-empty visible title and at least one complete Article Card are required. Missing either omits the complete root rather than emitting an unnamed or empty region." },
+    { "name": "namedSection", "selectors": [".related-articles", ".related-articles__title"], "attributes": ["aria-labelledby", "id"], "description": "Neutral Web uses one native section named by the target-unique id of its visible contextual heading without a redundant explicit role." },
+    { "name": "nativeCollection", "selectors": [".related-articles__grid", ".related-articles__item"], "description": "Article recommendations use native ul and li semantics in explicit curator order with no listbox, grid widget, feed, carousel, selection or roving focus model." },
+    { "name": "canonicalArticleCards", "selectors": [".related-articles__item", ".article-card"], "description": "Every list item contains one complete canonical Article Card. Article Card retains article, heading, Link, media, Badge, metadata, focus and optional-content ownership." },
+    { "name": "curatedV1Source", "selectors": [".related-articles__grid"], "description": "The v1 target supplies one explicitly curated ordered set of at most three Article Cards, excludes the current article and duplicates, and preserves curator order. No tag fallback, inferred relevance, automatic ranking or personalization is used." },
+    { "name": "targetRecommendations", "selectors": [".related-articles__grid"], "description": "Targets own the curated records, source storage, routes, freshness, tracking, analytics, SEO, loading, error, refresh and no-result policy while enforcing the accepted current-article, duplicate and maximum-count rules." },
+    { "name": "articlePagePlacement", "selectors": [".related-articles"], "description": "The article-page host places L10 after primary article content and before Comments. Author Card and Share Actions may be positioned around that boundary without changing L10." },
+    { "name": "intrinsicResponse", "selectors": [".related-articles", ".related-articles__grid", ".related-articles__item"], "description": "The visual grid responds to its own available inline size, uses logical geometry and preserves complete localized and unbroken content without viewport-derived component breakpoints." },
+    { "name": "passiveRuntime", "selectors": [".related-articles"], "description": "L10 owns no controlled or uncontrolled value, listener, observer, timer, request, cache, storage, live region, focus manager, measurement script, asset, animation or neutral JavaScript." },
+    { "name": "articleNavigationBoundary", "selectors": [".related-articles"], "description": "Previous/Next Article Navigation is not registered in v1. The legacy .article-nav family is never L10 anatomy, API, state, fixture, behavior or adapter mapping and may become a future canonical component or explicit target composition." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": false, "description": "Optional visible section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".related-articles__title" }] } },
-    { "name": "articles", "type": "slot", "required": true, "description": "Target-owned collection of related Article Card compositions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".related-articles__grid", "classNames": [".related-articles__grid"] }] } }
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when the trimmed visible heading is empty.",
+      "description": "Required non-empty localized contextual heading that visibly identifies and programmatically names the article collection.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".related-articles__title" }] }
+    },
+    {
+      "name": "articles",
+      "type": "slot",
+      "required": true,
+      "unsetBehavior": "Omit the complete root when no complete Article Card composition remains.",
+      "description": "One to three explicitly curated canonical Article Cards in curator order after removing the current article and duplicates; no tag fallback or personalized ranking is inferred.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".related-articles__grid", "classNames": [".related-articles__grid", ".related-articles__item", ".article-card"] }] }
+    }
   ],
   "tokens": {
     "public": {
       "color": ["--color-border-subtle", "--color-text-primary"],
-      "typography": ["--font-family-heading", "--typo-h3-size"],
-      "spacing": ["--space-layout-grid-gap", "--space-layout-section-gap"]
+      "typography": ["--font-family-heading", "--tg-typography-h3-weight", "--typo-h3-line-height", "--typo-h3-size"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-grid-gap", "--space-layout-section-gap"]
     }
   },
   "accessibility": [
-    "Use a heading level that fits the surrounding article page hierarchy.",
-    "Preserve each composed Article Card's separate heading, destination, image alternative text, and focus behavior.",
-    "Do not include next/previous article navigation in this public property surface until .article-nav ownership is decided."
+    "Require a non-empty visible contextual heading and at least one complete Article Card; omit invalid composition rather than expose an unnamed or empty region.",
+    "Associate the native section with its target-unique visible heading id through aria-labelledby without adding redundant role, aria-label or tabindex.",
+    "Use native ul and direct li semantics; do not add listbox, grid widget, feed, carousel, toolbar, selection, current-item or roving-tabindex behavior.",
+    "Preserve every canonical Article Card's native article summary, contextual heading rank, single required primary Link containing its contextual media and complete title, media alternative, Badge, metadata and complete content.",
+    "Keep native Link Tab, Enter, context-menu and modifier-key behavior. L10 owns no keyboard handling, root/item activation or live announcements.",
+    "Preserve complete localized headings and article titles, logical RTL flow, unbroken wrapping, 320 CSS-pixel reflow, effective 200-percent text and user text spacing without clamps.",
+    "Preserve canonical Article Card, Badge and Link contrast, focus-visible and forced-color behavior; L10 itself adds no motion and requires no reduced-motion exception.",
+    "Place L10 after primary article content and before Comments in article-page compositions; surrounding Author Card and Share Actions remain host-owned.",
+    "Do not include previous/next article navigation in this public property surface. No such component is registered in v1, and legacy .article-nav is never L10."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Related-article grid CSS is implemented; adjacent .article-nav ownership remains unresolved." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map target-selected article recommendations to Article Card compositions." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "semantic-html-css", "notes": "Canonical Blog CSS and the shared Exhibit/Studio renderer implement a fail-closed named native list of canonical Article Cards, intrinsic layout and zero L10 runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-section-css", "notes": "A Theme Editor section maps Shopify's ordered article_list setting with limit three into canonical Article Cards, excludes the current article and duplicates, omits empty output, and exposes only contextual heading plus canonical child-card presentation settings. Article-template placement remains host-owned." },
+    "react": { "status": "planned", "kind": "passive-composition" },
+    "figma": { "status": "planned", "kind": "component-with-repeatable-article-card-slot" },
+    "swiftui": { "status": "planned", "kind": "native-section-grid-composition" },
+    "compose": { "status": "planned", "kind": "native-section-grid-composition" }
   }
 }

@@ -1,45 +1,83 @@
 ## Overview
 
-Horizontal scroll product carousel (related products, recently viewed).
+Product Slider is a finite, user-controlled horizontal product list for related,
+recommended, complementary, or recently viewed products. It composes the
+canonical Carousel scroll model, Icon Button controls, and Product Card items;
+the owning target supplies the product collection and any recommendation data.
 
-<Preview html={"<section class=\"product-slider tg-preview-frame\"><div class=\"product-slider__header\"><h2 class=\"product-slider__title\">You May Also Like</h2><div class=\"product-slider__nav\"><button class=\"icon-btn icon-btn--sm\" aria-label=\"Previous\">←</button><button class=\"icon-btn icon-btn--sm\" aria-label=\"Next\">→</button></div></div><div class=\"product-slider__track\"><article class=\"product-card\"><div class=\"product-card__media\"><div class=\"product-card__image tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\">Vase</h3><span class=\"price\"><span class=\"price__current\">$90</span></span></div></article><article class=\"product-card\"><div class=\"product-card__media\"><div class=\"product-card__image tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\">Bowl</h3><span class=\"price\"><span class=\"price__current\">$75</span></span></div></article></div></section>"} label="Product Slider" />
+<Preview html={'<section class="carousel product-slider tg-preview-frame" aria-labelledby="product-slider-example-title"><div class="product-slider__header"><h2 class="product-slider__title" id="product-slider-example-title">Related works</h2><div class="product-slider__nav" role="group" aria-labelledby="product-slider-example-title"><button class="icon-btn icon-btn--round carousel__nav-btn product-slider__nav-button product-slider__nav-button--previous" type="button" aria-label="Previous products" aria-controls="product-slider-example-track" data-product-slider-previous disabled><span aria-hidden="true">←</span></button><button class="icon-btn icon-btn--round carousel__nav-btn product-slider__nav-button product-slider__nav-button--next" type="button" aria-label="Next products" aria-controls="product-slider-example-track" data-product-slider-next><span aria-hidden="true">→</span></button></div></div><ul class="carousel__track product-slider__track" id="product-slider-example-track" tabindex="0" aria-labelledby="product-slider-example-title"><li class="carousel__slide product-slider__item"><article class="card product-card"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait"></div></div><div class="product-card__body"><h3 class="product-card__title"><a href="#product">Celadon Study No. 4</a></h3></div><div class="product-card__footer"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$102.00</bdi></span></span></div></article></li><li class="carousel__slide product-slider__item"><article class="card product-card"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait"></div></div><div class="product-card__body"><h3 class="product-card__title"><a href="#product">Tall vessel with carved ash glaze</a></h3></div><div class="product-card__footer"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$138.00</bdi></span></span></div></article></li><li class="carousel__slide product-slider__item"><article class="card product-card"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait"></div></div><div class="product-card__body"><h3 class="product-card__title"><a href="#product">Cuenco de gres</a></h3></div><div class="product-card__footer"><span class="price"><span class="price__current"><span class="price__label">Precio: </span><bdi class="price__value">€84.00</bdi></span></span></div></article></li></ul></section>'} label="Product Slider" />
 
 ## Presentation
 
-The native horizontal track owns scrolling and snap behavior. Product collections remain consumer data, while optional navigation controls provide a non-drag entry point.
+The visible heading names both the contextual section and its focusable native
+list. The track shows two cards initially, three at a 48rem component container,
+and four at 64rem. Those thresholds respond to the component container, not the
+page viewport. Header text wraps without colliding with controls, and Product
+Card retains ownership of media, typography, Price, badges, focus, and actions.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Optimize product images for web — use WebP format and responsive srcset.</Do>
-  <Dont>Don't overload product components with too many badges or CTAs — keep it clean.</Dont>
+  <Do>Supply a short, meaningful, non-empty product collection and let every item render the canonical Product Card.</Do>
+  <Dont>Use Product Slider as an autoplaying hero, infinite feed, or replacement for a collection grid.</Dont>
+  <Do>Keep previous and next labels localized and synchronized with real finite bounds.</Do>
+  <Dont>Duplicate Product Card markup or page by a physical fraction of the track width.</Dont>
 </DoDont>
+
+Recommendation source, loading, empty/error handling, recently viewed storage,
+inventory, quick-add results, analytics, and pagination belong to the target or
+application. Omit the component when no valid item exists.
 
 ## Accessibility
 
-<Callout type="tip">
-  Product components are designed to work together. The product page combines gallery, info, form, and related products.
-</Callout>
+- Render a contextual heading and reference it from the section and track.
+- Preserve native `ul`/`li` semantics and normal Product Card link/Button order.
+- Make the native overflow track keyboard focusable; do not intercept arrow keys
+  at the component root.
+- Use canonical Icon Buttons with localized names, `aria-controls`, and native
+  `disabled` bounds. Activation keeps focus on the control while another item is
+  reachable; if the control becomes disabled at a bound, focus moves to the named
+  track instead of falling back to the document.
+- Synchronize first/middle/last bounds after explicit, touch, wheel, scrollbar,
+  or keyboard scrolling.
+- Target exact adjacent items with logical scrolling so gaps, responsive card
+  counts, variable text, and RTL do not depend on physical offsets.
+- Do not autoplay or loop in v1. Canonical Carousel supplies visible focus,
+  reduced-motion, forced-colors, and RTL behavior.
 
-- Expose previous and next controls with clear accessible names.
-- Keep every Product Card reachable by keyboard and touch.
-- Do not rely only on drag gestures to reveal additional products.
+## Technical Specification
+
+Product Slider layers public dependency classes rather than copying behavior:
+
+- root: `.carousel.product-slider`
+- track: `.carousel__track.product-slider__track`
+- item: `.carousel__slide.product-slider__item`
+- controls: `.icon-btn.icon-btn--round.carousel__nav-btn.product-slider__nav-button`
+- item content: one `.card.product-card` per list item
+
+The target owns current item and overflow as derived state. Framework adapters
+may provide controlled and uncontrolled current IDs when application coordination
+requires them, but both modes must serialize to one scroll position and one pair
+of finite disabled bounds.
 
 ## References
 
 ### Dependencies
 
-This component uses:
-
+- [Carousel / Slider](/components/carousel)
 - [Icon Button](/components/icon-button)
 - [Product Card](/components/product-card)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`.product-slider`</td><td>class</td><td>—</td><td>Base product slider styles</td></tr>
-  <tr><td>`.product-slider__header`</td><td>class</td><td>—</td><td>Header row for title and navigation</td></tr>
-  <tr><td>`.product-slider__title`</td><td>class</td><td>—</td><td>Slider title</td></tr>
-  <tr><td>`.product-slider__nav`</td><td>class</td><td>—</td><td>Previous and next controls</td></tr>
-  <tr><td>`.product-slider__track`</td><td>class</td><td>—</td><td>Horizontally scrolling Product Card track</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible heading and accessible-name source</td></tr>
+  <tr><td>`previousLabel`</td><td>string</td><td>conditional</td><td>Localized name for the optional previous control</td></tr>
+  <tr><td>`nextLabel`</td><td>string</td><td>conditional</td><td>Localized name for the optional next control</td></tr>
+  <tr><td>`navigation`</td><td>slot</td><td>optional</td><td>Canonical finite Icon Button controls</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Non-empty canonical Product Card collection</td></tr>
 </PropTable>
+
+Current index, product count, overflow, recommendation intent/provider, loading,
+errors, persistence, analytics, and virtualization are target-owned rather than
+public Product Slider properties.

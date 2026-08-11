@@ -1,0 +1,103 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "filter-bar",
+  "name": "Filter Bar",
+  "registryId": "L7",
+  "category": "blog",
+  "status": "pilot",
+  "summary": "Compact horizontal in-place filter composition with explicit single or multiple selection, canonical choice controls, one controlled selected-value collection, and immediate target-owned query commitment.",
+  "dependencies": ["segmented-control", "checkbox"],
+  "source": {
+    "registry": "registry.json#/components/filter-bar",
+    "css": { "file": "components/css/blog.css", "selector": ".filter-bar" },
+    "docs": "site/src/content/components/filter-bar.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".filter-bar", "className": ".filter-bar", "required": true, "description": "Native fieldset and compact horizontal filter boundary; it is never a navigation landmark." },
+    { "name": "legend", "selector": ".filter-bar__legend", "className": ".filter-bar__legend", "required": true, "description": "Visible localized group label; single mode uses the equivalent canonical Segmented Control legend." },
+    { "name": "options", "selector": ".filter-bar__options", "className": ".filter-bar__options", "required": true, "description": "Ordered wrapping option bar; single mode uses the equivalent canonical Segmented Control options surface." },
+    { "name": "choice", "selector": ".filter-bar__choice", "className": ".filter-bar__choice", "required": true, "description": "Multiple-mode presentation hook composed on a canonical Checkbox; single mode composes canonical Segmented Control items." },
+    { "name": "input", "selector": ".filter-bar__input", "className": ".filter-bar__input", "required": true, "description": "Multiple-mode canonical native checkbox; single mode uses canonical same-name radio inputs." },
+    { "name": "label", "selector": ".filter-bar__label", "className": ".filter-bar__label", "required": true, "description": "Complete visible multiple-mode choice label; single mode uses canonical segment labels." }
+  ],
+  "variants": [
+    { "name": "single", "className": ".filter-bar--single", "default": true, "description": "At most one selected value through canonical radio-backed Segmented Control composition." },
+    { "name": "multiple", "className": ".filter-bar--multiple", "default": false, "description": "Zero or more selected values through independent canonical Checkboxes." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "One compact intrinsic size that wraps from available container space." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".filter-bar"], "description": "Available filter group with a valid option collection and possibly no selection." },
+    { "name": "selected", "selectors": [".filter-bar__choice.checkbox:has(.checkbox__input:checked)", ".filter-bar.segmented .segmented__options"], "description": "Controlled selected values projected to the corresponding native checked controls." },
+    { "name": "hover", "selectors": [".filter-bar__choice.checkbox:hover:not(:has(.checkbox__input:disabled))", ".filter-bar.segmented .segmented__options"], "description": "Pointer hover inherited from the canonical choice control and contextual wrapper." },
+    { "name": "focusVisible", "selectors": [".filter-bar__input.checkbox__input", ".filter-bar.segmented .segmented__options"], "description": "Visible native Checkbox or radio focus without a second focus owner." },
+    { "name": "disabled", "selectors": [".filter-bar", ".filter-bar__choice.checkbox:has(.checkbox__input:disabled)"], "description": "Complete fieldset or individual target-authored option is unavailable." }
+  ],
+  "behavior": [
+    {
+      "name": "canonicalChoiceComposition",
+      "selectors": [".filter-bar.segmented", ".filter-bar__choice.checkbox", ".filter-bar__input.checkbox__input"],
+      "attributes": ["<fieldset>", "<legend>", "type=radio", "type=checkbox", "name", "value", "checked", "disabled"],
+      "events": ["input", "change"],
+      "description": "Single mode composes canonical Segmented Control radios; Multiple mode composes canonical Checkboxes. There are no destination links, aria-current state, hidden duplicate inputs or custom selection roles."
+    },
+    {
+      "name": "controlledSelection",
+      "selectors": [".filter-bar", ".filter-bar__input", ".segmented__input"],
+      "events": ["selectedValuesChange"],
+      "description": "One ordered selectedValues projection is authoritative. Single mode normalizes it to at most one valid value; Multiple mode preserves valid values in option order. Empty is valid in both modes."
+    },
+    {
+      "name": "immediateCommitRequest",
+      "selectors": [".filter-bar__input", ".segmented__input"],
+      "events": ["change", "commitRequest"],
+      "description": "Every accepted native choice change immediately requests the complete next selected-value collection. The component has no Apply, Cancel or draft selection."
+    },
+    {
+      "name": "targetQueryLifecycle",
+      "selectors": [".filter-bar"],
+      "events": ["commitRequest", "popstate", "target result"],
+      "description": "Capable Web and Shopify targets choose the query key, serialization and push-versus-replace policy; synchronize URL, Back/Forward and results; and own cancellation, pending, error, empty, announcements, focus, analytics and pagination reset."
+    },
+    {
+      "name": "failClosed",
+      "selectors": [".filter-bar"],
+      "description": "Blank label or name, fewer than two valid unique options, or otherwise invalid authored content omits the complete component instead of emitting an unnamed or ineffective group."
+    }
+  ],
+  "properties": [
+    { "name": "mode", "type": "enum", "required": false, "defaultValue": "single", "valuesFrom": "variants", "description": "Exclusive single or multiple selection model; it changes the canonical child control semantics, not only appearance.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".filter-bar", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Non-empty localized visible label naming the complete filter choice group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".filter-bar__legend" }, { "kind": "content", "selector": ".segmented__legend" }] } },
+    { "name": "name", "type": "string", "required": true, "description": "Target-selected native field name repeated across every choice; Web targets may also use it as their chosen query key.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".filter-bar__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".segmented__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "options", "type": "slot", "required": true, "description": "Ordered target-owned option records with stable unique value, complete localized label and optional availability; at least two valid records are required.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".filter-bar", "classNames": [".filter-bar", ".filter-bar__options", ".filter-bar__choice", ".filter-bar__input", ".filter-bar__label", ".segmented", ".segmented__options", ".segmented__item", ".segmented__input", ".segmented__label", ".checkbox", ".checkbox__input", ".checkbox__label"] }] } },
+    { "name": "selectedValues", "type": "string-list", "required": true, "description": "One controlled ordered collection of selected stable option values. It may be empty; Single mode accepts at most one valid value.", "targetMappings": { "web": [{ "kind": "collection", "selector": ".filter-bar" }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the complete native fieldset and every contained choice unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".filter-bar", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["fieldset"] }] } },
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id references for persistent target-authored guidance about the filter and associated results.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".filter-bar", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["fieldset"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-border-default", "--color-surface-statement", "--color-text-primary"],
+      "radius": ["--radius-full"],
+      "spacing": ["--tg-space-stack-xs", "--tg-space-stack-sm", "--space-layout-touch-target", "--space-input-label-size"],
+      "typography": ["--font-family-body", "--typo-body-sm-line-height", "--tg-font-weight-medium"]
+    }
+  },
+  "accessibility": [
+    "Use one native fieldset with a visible legend. Do not render nav, links, aria-current, menu, tablist or toolbar semantics for filtering.",
+    "Single mode composes same-name native radios through Segmented Control; Multiple mode composes independent named native Checkboxes.",
+    "Preserve native Tab, Arrow and Space behavior supplied by the canonical controls and keep every visible label complete.",
+    "Selected state remains checked state and is not conveyed only by color; focus, selection and boundaries remain visible in forced colors.",
+    "The target that updates results owns a concise result announcement, pending/error/empty distinction, focus policy and Back/Forward synchronization; Filter Bar does not create a competing live region.",
+    "Omit the complete component when its label, native name or minimum valid option collection is unavailable."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "native-choice-composition", "notes": "Canonical radio/Checkbox markup, controlled checked projection, native change requests and compact intrinsic CSS are implemented. The consuming Web target chooses query serialization, History API policy and results lifecycle." },
+    "shopify": { "status": "planned", "kind": "liquid-choice-section-rendering", "notes": "Compose canonical controls from target filter records and synchronize the chosen query parameter plus section results; no neutral query key or Shopify filter schema is frozen." },
+    "react": { "status": "planned", "kind": "controlled-component", "notes": "Accept options and selectedValues arrays and emit the complete next array without a mirrored uncontrolled store." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Represent Single and Multiple compositions plus wrapping and selected/disabled/focus states without encoding URL behavior." },
+    "swiftui": { "status": "planned", "kind": "controlled-view", "notes": "Map Single to native exclusive selection and Multiple to independent toggles while preserving one selected-value collection." },
+    "compose": { "status": "planned", "kind": "controlled-composable", "notes": "Map Single to exclusive selection and Multiple to checkboxes; host navigation owns query state." }
+  }
+}

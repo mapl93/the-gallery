@@ -5,6 +5,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import EmptyStateArtwork from './EmptyStateArtwork';
 import { getStudioLucideIcon } from './lucideCatalogue';
 
 interface EmptyStateStudioProps {
@@ -95,20 +96,16 @@ export default function EmptyStateStudio({ contract, definition }: EmptyStateStu
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <div className="empty-state docs-studio__preview-empty-state">
-              {values.icon === true && Icon && (
-                <div className="empty-state__icon" aria-hidden="true">
-                  <Icon />
-                </div>
-              )}
-              <h2 className="empty-state__title">{String(values.title || '')}</h2>
-              {String(values.message || '') && (
-                <p className="empty-state__message">{String(values.message)}</p>
-              )}
-              {values.action === true && (
-                <button className="btn" type="button">Explore components</button>
-              )}
-            </div>
+            <EmptyStateArtwork
+              className="docs-studio__preview-empty-state"
+              title={String(values.title || '')}
+              titleElement="h2"
+              message={String(values.message || '')}
+              icon={values.icon === true && Icon ? <Icon /> : undefined}
+              action={values.action === true ? (
+                <a className="btn" href="/components">Explore components</a>
+              ) : undefined}
+            />
           </div>
         </section>
       </div>

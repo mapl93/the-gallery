@@ -59,6 +59,31 @@ function cssVariableDefinitions(css) {
   return new Set([...css.matchAll(/^\s*(--[a-zA-Z0-9_-]+)\s*:/gm)].map((match) => match[1]));
 }
 
+function componentCompositionCss(slug, context, ancestry = new Set()) {
+  if (context.compositionCss.has(slug)) {
+    return context.compositionCss.get(slug);
+  }
+
+  if (ancestry.has(slug)) {
+    return '';
+  }
+
+  const component = context.registry.components?.[slug];
+  if (!component) {
+    return '';
+  }
+
+  const nextAncestry = new Set(ancestry).add(slug);
+  const sourcePath = path.join(rootDir, component.file ?? '');
+  const sourceCss = fs.existsSync(sourcePath) ? read(sourcePath) : '';
+  const dependencyCss = (component.dependencies ?? [])
+    .map((dependency) => componentCompositionCss(dependency, context, nextAncestry))
+    .filter(Boolean);
+  const css = [sourceCss, ...dependencyCss].join('\n');
+  context.compositionCss.set(slug, css);
+  return css;
+}
+
 function flattenPublicTokens(contract) {
   return Object.values(contract.tokens?.public ?? {}).flat();
 }
@@ -139,8 +164,8 @@ function validatePropertyList(errors, contract, css) {
     errors.push(`${contract.slug}.properties names must be unique non-empty strings`);
   }
 
-  const propertyTypes = new Set(['string', 'boolean', 'number', 'enum', 'slot']);
-  const mappingKinds = new Set(['content', 'optionClass', 'class', 'attribute', 'slot']);
+  const propertyTypes = new Set(['string', 'string-list', 'boolean', 'number', 'enum', 'slot']);
+  const mappingKinds = new Set(['content', 'optionClass', 'class', 'attribute', 'slot', 'collection']);
 
   for (const property of contract.properties) {
     const propertyName = property?.name ?? 'unknown';
@@ -267,6 +292,10 @@ function validatePropertyList(errors, contract, css) {
 
         if (mapping.kind === 'content' && property.type !== 'string') {
           errors.push(`${mappingLabel} content mappings require a string property`);
+        }
+
+        if (mapping.kind === 'collection' && property.type !== 'string-list') {
+          errors.push(`${mappingLabel} collection mappings require a string-list property`);
         }
 
         if (mapping.kind === 'optionClass') {
@@ -439,9 +468,10 @@ function validateContract(contractPath, context) {
     return errors;
   }
 
-  const css = read(cssPath);
+  const sourceCss = read(cssPath);
+  const css = componentCompositionCss(contract.slug, context);
   const docs = fs.existsSync(docsPath) ? read(docsPath) : '';
-  const cssRefs = cssVariableRefs(css);
+  const cssRefs = cssVariableRefs(sourceCss);
   const webDefinitions = context.webDefinitions;
 
   validateOptionList(errors, contract, 'variants');
@@ -562,7 +592,8 @@ function main() {
 
   const context = {
     registry: readJson(registryPath),
-    webDefinitions: fs.existsSync(webTokensPath) ? cssVariableDefinitions(read(webTokensPath)) : new Set()
+    webDefinitions: fs.existsSync(webTokensPath) ? cssVariableDefinitions(read(webTokensPath)) : new Set(),
+    compositionCss: new Map()
   };
 
   for (const fileName of contractFiles) {

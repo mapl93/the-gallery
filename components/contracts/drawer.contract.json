@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "drawer",
   "name": "Drawer",
   "registryId": "B3",
   "category": "layout",
   "status": "pilot",
-  "summary": "Side-panel overlay with backdrop, right and left placement variants, close control, body/footer regions, open state, and accessibility behavior requirements.",
-  "dependencies": [],
+  "summary": "Modal side-panel composition with physical right and left placement, required named content and canonical dismissal, scroll partition, and target-owned focus, inertness, and lifecycle.",
+  "dependencies": ["button", "close-button"],
   "source": {
     "registry": "registry.json#/components/drawer",
     "css": {
@@ -35,15 +35,22 @@
       "name": "header",
       "selector": ".drawer__header",
       "className": ".drawer__header",
-      "required": false,
-      "description": "Optional top region for title and close affordance."
+      "required": true,
+      "description": "Top region for the required visible title and canonical dismiss action."
+    },
+    {
+      "name": "title",
+      "selector": ".drawer__title",
+      "className": ".drawer__title",
+      "required": true,
+      "description": "Required visible title used by aria-labelledby."
     },
     {
       "name": "close",
       "selector": ".drawer__close",
       "className": ".drawer__close",
-      "required": false,
-      "description": "Optional close control styled for hover and focus-visible states."
+      "required": true,
+      "description": "Required named dismiss action composed with canonical Close Button."
     },
     {
       "name": "body",
@@ -109,21 +116,17 @@
       "description": "Visible left-side drawer state."
     },
     {
-      "name": "closeHover",
-      "selectors": [".drawer__close:hover"],
-      "description": "Pointer hover state on the close control."
-    },
-    {
-      "name": "closeFocusVisible",
-      "selectors": [".drawer__close:focus-visible"],
-      "description": "Keyboard focus indicator on the close control."
+      "name": "scrollingBody",
+      "selectors": [".drawer__body"],
+      "description": "Long primary content scrolls independently between fixed header and footer."
     }
   ],
   "behavior": [
     {
       "name": "visibility",
       "selectors": [".drawer-overlay.is-open", ".drawer.is-open"],
-      "description": "The overlay and drawer are hidden by default and become visible when is-open is applied to both elements."
+      "attributes": ["aria-hidden"],
+      "description": "The target keeps closed content unavailable and applies is-open plus aria-hidden=false when presenting the drawer."
     },
     {
       "name": "placement",
@@ -138,15 +141,55 @@
     {
       "name": "focusManagement",
       "events": ["open", "close", "Tab", "Shift+Tab"],
-      "description": "Opening the drawer moves focus inside it, traps tab navigation while open, and restores focus to the trigger on close."
+      "description": "Opening from an invoker moves focus inside, contains Tab and Shift+Tab while modal, and restores focus logically on close."
     },
     {
       "name": "dismissal",
-      "events": ["Escape", "backdrop click", "close action"],
-      "description": "The drawer must provide a visible close mechanism and should close on Escape."
+      "events": ["Escape", "backdrop request", "close action"],
+      "description": "The drawer provides a visible named dismiss action and closes on Escape; backdrop dismissal remains target policy."
+    },
+    {
+      "name": "targetLifecycle",
+      "events": ["open", "cancel", "close"],
+      "description": "The target owns trigger relationships, inert background, page scroll locking, mutual exclusion, exit completion, and cleanup."
     }
   ],
   "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Visible localized title that supplies the dialog accessible name.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".drawer__title" }] }
+    },
+    {
+      "name": "content",
+      "type": "slot",
+      "required": true,
+      "description": "Primary content composed inside the scrollable body.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".drawer__body", "classNames": [".drawer__body"] }] }
+    },
+    {
+      "name": "dismissAction",
+      "type": "slot",
+      "required": true,
+      "description": "Visible native dismiss action composed with canonical Close Button.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".drawer__close", "classNames": [".drawer__close"] }] }
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": true,
+      "description": "Contextual accessible name for the dismiss action.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".drawer__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+    },
+    {
+      "name": "footer",
+      "type": "slot",
+      "required": false,
+      "description": "Optional persistent summary or canonical Button actions below the scrolling body.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".drawer__footer", "classNames": [".drawer__footer"] }] }
+    },
     {
       "name": "placement",
       "type": "enum",
@@ -168,6 +211,7 @@
       "targetMappings": {
         "web": [
           { "kind": "class", "selector": ".drawer-overlay", "classNames": [".is-open"] },
+          { "kind": "attribute", "selector": ".drawer-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } },
           { "kind": "class", "selector": ".drawer", "classNames": [".is-open"] }
         ]
       }
@@ -177,14 +221,8 @@
     "public": {
       "color": [
         "--color-surface-primary",
-        "--color-surface-secondary",
         "--color-border-subtle",
-        "--color-text-primary",
-        "--color-text-secondary",
-        "--color-border-focus"
-      ],
-      "radius": [
-        "--radius-sm"
+        "--color-text-primary"
       ],
       "shadow": [
         "--shadow-2xl"
@@ -197,12 +235,15 @@
         "--z-modal"
       ],
       "transition": [
-        "--transition-base",
-        "--transition-fast"
+        "--transition-base"
       ],
       "easing": [
-        "--easing-default",
         "--easing-out"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-h4-size",
+        "--typo-h4-line-height"
       ],
       "spacing": [
         "--space-layout-element-gap"
@@ -210,18 +251,19 @@
     }
   },
   "accessibility": [
-    "Use role=\"dialog\" and aria-modal=\"true\" when the drawer blocks page interaction.",
-    "Provide a programmatic name with aria-labelledby or aria-label.",
-    "Trap keyboard focus inside the drawer while it is open.",
-    "Return focus to the trigger element when the drawer closes.",
-    "Close on Escape and provide a visible close control.",
-    "Use the left placement only when it matches the target reading direction or product pattern."
+    "Treat the v1 Drawer as modal: use role=\"dialog\" and aria-modal=\"true\" only while page interaction is actually blocked.",
+    "Use the required visible title through aria-labelledby.",
+    "Move focus inside, contain Tab and Shift+Tab, and restore focus logically on close.",
+    "Close on Escape and provide a visible named canonical dismiss action.",
+    "Keep header and footer available while the body scrolls; do not obscure focused content.",
+    "Use the physical left placement only when it matches the target product pattern; do not infer logical RTL remapping.",
+    "Honor reduced motion and preserve system boundaries in forced-colors mode."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; behavior must be provided by the consuming target."
+      "kind": "css-target-behavior",
+      "notes": "Canonical CSS implements physical side placement and scroll partition. The Web target maps modality through native dialog or equivalent focus/inert/dismiss behavior; the docs target demonstrates the lifecycle."
     },
     "shopify": {
       "status": "implemented",

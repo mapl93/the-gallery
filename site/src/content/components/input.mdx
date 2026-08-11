@@ -1,6 +1,6 @@
 ## Overview
 
-Text input with a visible label, optional message, validation variants, and independent passive icon slots.
+Native single-line text input with form semantics, a visible label, optional message, validation variants, and independent passive icon slots.
 
 <Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="input-name">Name</label><div class="input__control"><input class="input__field" id="input-name" type="text" placeholder="Enter your name" /></div></div></div>'} label="Input" />
 
@@ -9,6 +9,7 @@ Text input with a visible label, optional message, validation variants, and inde
 Input has one default size and four validation variants. The absence of a modifier class selects the default variant.
 Leading and trailing icons are optional, independent, and passive; they may be used together without changing the native field semantics.
 Hover preserves the active Error, Success, or Warning color family instead of returning the border to Default.
+Semantic borders and status icons use a private contrast-strengthening mix of their public validation token with primary text; the public token remains the customizable source value.
 
 | Property | Value | Web mapping |
 | --- | --- | --- |
@@ -24,7 +25,7 @@ Hover preserves the active Error, Success, or Warning color family instead of re
 
 ### Error
 
-<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--error"><label class="input__label" for="input-error">With error</label><div class="input__control"><input class="input__field" id="input-error" type="text" value="Invalid" aria-invalid="true" aria-describedby="input-error-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><span class="input__message" id="input-error-message" role="alert">This field is required</span></div></div>'} label="Error with trailing status icon" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--error"><label class="input__label" for="input-error">With error</label><div class="input__control"><input class="input__field" id="input-error" type="text" value="Invalid" aria-invalid="true" aria-describedby="input-error-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><span class="input__message" id="input-error-message">This field is required</span></div></div>'} label="Error with trailing status icon" />
 
 ### Success
 
@@ -33,6 +34,12 @@ Hover preserves the active Error, Success, or Warning color family instead of re
 ### Warning
 
 <Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--warning"><label class="input__label" for="input-warning">Warning</label><div class="input__control"><input class="input__field" id="input-warning" type="text" value="Almost complete" aria-describedby="input-warning-message" /><svg class="input__icon input__icon--trailing" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21.73 18 13.73 4a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></svg></div><span class="input__message" id="input-warning-message">Add a unit number if applicable.</span></div></div>'} label="Warning with trailing status icon" />
+
+### Native form behavior
+
+`name`, `required`, `readOnly`, `autocomplete`, `minLength`, and `maxLength` map directly to the native input. In static HTML, the `value` attribute establishes the initial value and the browser owns subsequent editing and reset behavior. Framework adapters may instead bind the live `value` property and native `input`/`change` events; they must not create a second hidden value owner.
+
+The visible label or associated instructions must say when a value is required. `required` supplies constraint-validation semantics but does not replace that visible instruction.
 
 ## Usage Guidelines
 
@@ -57,6 +64,10 @@ Hover preserves the active Error, Success, or Warning color family instead of re
 - Add `aria-invalid="true"` when the error variant represents an invalid value.
 - Do not add `aria-invalid` to Success or Warning; keep their associated message descriptive.
 - Use native `disabled` for unavailable fields.
+- Use `readOnly` when a value must remain focusable, selectable, and submittable but cannot be edited.
+- Keep `name`, `required`, `autocomplete`, `minlength`, and `maxlength` on the native input.
+- Communicate required status in visible label or instruction text instead of relying on the native attribute alone.
+- Use `role="alert"` only when an error message is inserted dynamically; a message already present at page load only needs `aria-describedby`.
 - Do not rely on icon or color alone to communicate validation status.
 - Keep `leadingIcon` and `trailingIcon` passive and hidden from assistive technology when decorative.
 - Use a specialized component such as Password Input when an icon performs an action.
@@ -66,6 +77,12 @@ Hover preserves the active Error, Success, or Warning color family instead of re
 <PropTable>
   <tr><td>`label`</td><td>string</td><td>required</td><td>Visible label associated with the field</td></tr>
   <tr><td>`value`</td><td>string</td><td>empty</td><td>Current native field value</td></tr>
+  <tr><td>`name`</td><td>string</td><td>empty</td><td>Native form field name</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required-value constraint</td></tr>
+  <tr><td>`readOnly`</td><td>boolean</td><td>`false`</td><td>Prevents editing while preserving focus and submission</td></tr>
+  <tr><td>`autocomplete`</td><td>string</td><td>empty</td><td>Native autofill token or token sequence</td></tr>
+  <tr><td>`minLength`</td><td>number</td><td>unset</td><td>Optional non-negative native minimum character length</td></tr>
+  <tr><td>`maxLength`</td><td>number</td><td>unset</td><td>Optional non-negative native maximum character length</td></tr>
   <tr><td>`placeholder`</td><td>string</td><td>empty</td><td>Supporting hint; never the accessible name</td></tr>
   <tr><td>`message`</td><td>string</td><td>empty</td><td>Supporting or validation message</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>

@@ -1,0 +1,194 @@
+{% liquid
+  assign section_title = section.settings.title | strip
+  assign heading_id = 'Lookbook-' | append: section.id | append: '-Title'
+
+  assign valid_item_count = 0
+  for block in section.blocks
+    assign image_alt = block.settings.image_alt | strip
+    if image_alt == blank and block.settings.image != blank
+      assign image_alt = block.settings.image.alt | strip
+    endif
+
+    assign has_image_semantics = false
+    if block.settings.image_decorative or image_alt != blank
+      assign has_image_semantics = true
+    endif
+
+    if block.type == 'image' and block.settings.image != blank and has_image_semantics
+      assign valid_item_count = valid_item_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if valid_item_count > 0 %}
+  {% if section_title != blank %}
+    <section class="lookbook" aria-labelledby="{{ heading_id }}">
+  {% else %}
+    <div class="lookbook">
+  {% endif %}
+    {% if section_title != blank %}
+      <div class="lookbook__header">
+        <h2 class="lookbook__title" id="{{ heading_id }}">{{ section_title | escape }}</h2>
+      </div>
+    {% endif %}
+
+    <ol class="lookbook__grid">
+      {% for block in section.blocks %}
+        {% liquid
+          assign image_alt = block.settings.image_alt | strip
+          if image_alt == blank and block.settings.image != blank
+            assign image_alt = block.settings.image.alt | strip
+          endif
+          if block.settings.image_decorative
+            assign image_alt = ''
+          endif
+
+          assign has_image_semantics = false
+          if block.settings.image_decorative or image_alt != blank
+            assign has_image_semantics = true
+          endif
+
+          assign layout_class = ''
+          assign image_sizes = '(min-width: 1024px) 25vw, (min-width: 512px) 50vw, 100vw'
+          if block.settings.layout == 'wide'
+            assign layout_class = ' lookbook__cell--wide'
+            assign image_sizes = '(min-width: 1024px) 50vw, 100vw'
+          elsif block.settings.layout == 'tall'
+            assign layout_class = ' lookbook__cell--tall'
+          endif
+        %}
+
+        {% if block.type == 'image' and block.settings.image != blank and has_image_semantics %}
+          <li class="lookbook__cell{{ layout_class }}" {{ block.shopify_attributes }}>
+            <figure class="lookbook__figure">
+              {{ block.settings.image | image_url: width: 1800 | image_tag:
+                alt: image_alt,
+                loading: 'lazy',
+                widths: '320, 480, 640, 800, 1080, 1440, 1800',
+                sizes: image_sizes
+              }}
+              {% if block.settings.caption != blank %}
+                <figcaption class="lookbook__caption">{{ block.settings.caption | escape }}</figcaption>
+              {% endif %}
+              {% if block.settings.product != blank %}
+                <a
+                  class="lookbook__hotspot"
+                  href="{{ block.settings.product.url }}"
+                  style="inset-inline-start: {{ block.settings.hotspot_x }}%; inset-block-start: {{ block.settings.hotspot_y }}%; translate: -50% -50%;"
+                  aria-label="{{ 'sections.lookbook.blocks.image.view_product' | t: product: block.settings.product.title | escape }}"
+                >
+                  <span aria-hidden="true">+</span>
+                </a>
+              {% endif %}
+            </figure>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ol>
+  {% if section_title != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.lookbook.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.lookbook.settings.title"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.lookbook.blocks.image.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.lookbook.blocks.image.settings.image"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_decorative",
+          "label": "t:sections.lookbook.blocks.image.settings.image_decorative",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "t:sections.lookbook.blocks.image.settings.image_alt"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "t:sections.lookbook.blocks.image.settings.caption"
+        },
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "t:sections.lookbook.blocks.image.settings.layout",
+          "options": [
+            {
+              "value": "default",
+              "label": "t:sections.lookbook.options.default"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.lookbook.options.wide"
+            },
+            {
+              "value": "tall",
+              "label": "t:sections.lookbook.options.tall"
+            }
+          ],
+          "default": "default"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:sections.lookbook.blocks.image.settings.product"
+        },
+        {
+          "type": "range",
+          "id": "hotspot_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.lookbook.blocks.image.settings.hotspot_x",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "hotspot_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.lookbook.blocks.image.settings.hotspot_y",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "t:sections.lookbook.name",
+      "blocks": [
+        { "type": "image", "settings": { "layout": "wide" } },
+        { "type": "image", "settings": { "layout": "tall" } },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" },
+        { "type": "image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

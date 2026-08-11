@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "toast",
   "name": "Toast",
   "registryId": "B4",
   "category": "layout",
   "status": "pilot",
-  "summary": "Notification toast with feedback variants, optional icon, content, close control, visible state, live-region behavior, and timed or user dismissal.",
-  "dependencies": [],
+  "summary": "Passive notification item with independent visual and announcement priority, optional safe Button action and canonical dismissal, semantic hidden state, and target-owned viewport, queue, timing, and lifecycle.",
+  "dependencies": ["button", "close-button"],
   "source": {
     "registry": "registry.json#/components/toast",
     "css": {
@@ -22,7 +22,7 @@
       "selector": ".toast",
       "className": ".toast",
       "required": true,
-      "description": "Fixed notification container that owns surface, border, shadow, motion, and placement."
+      "description": "Notification item surface that owns border, shadow, content layout, and item motion but not global viewport placement."
     },
     {
       "name": "icon",
@@ -36,7 +36,7 @@
       "selector": ".toast__content",
       "className": ".toast__content",
       "required": true,
-      "description": "Content wrapper for title and message."
+      "description": "Content and announcement region for title and message, excluding interactive actions from the live string."
     },
     {
       "name": "title",
@@ -53,11 +53,18 @@
       "description": "Notification message text."
     },
     {
+      "name": "action",
+      "selector": ".toast__action",
+      "className": ".toast__action",
+      "required": false,
+      "description": "Optional canonical Button action that is safe to ignore."
+    },
+    {
       "name": "close",
       "selector": ".toast__close",
       "className": ".toast__close",
       "required": false,
-      "description": "Optional dismiss action."
+      "description": "Optional named dismiss action composed with canonical Close Button."
     }
   ],
   "variants": [
@@ -97,40 +104,43 @@
   "states": [
     {
       "name": "hidden",
-      "selectors": [".toast"],
-      "description": "Resting hidden state."
+      "selectors": [".toast:not(.is-visible)", ".toast[aria-hidden=\"true\"]"],
+      "description": "Resting hidden state unavailable to pointer and assistive technology."
     },
     {
       "name": "visible",
       "selectors": [".toast.is-visible"],
       "description": "Visible state controlled by is-visible."
-    },
-    {
-      "name": "closeHover",
-      "selectors": [".toast__close:hover"],
-      "description": "Pointer hover state on the close control."
-    },
-    {
-      "name": "closeFocusVisible",
-      "selectors": [".toast__close:focus-visible"],
-      "description": "Keyboard focus indicator on the close control."
     }
   ],
   "behavior": [
     {
       "name": "visibility",
       "selectors": [".toast.is-visible"],
-      "description": "The toast is hidden by default and becomes visible when is-visible is applied."
+      "attributes": ["aria-hidden"],
+      "description": "The item is visibility- and accessibility-hidden by default and becomes available when is-visible and aria-hidden=false are applied."
     },
     {
       "name": "announcement",
-      "attributes": ["role=\"status\"", "role=\"alert\"", "aria-live"],
-      "description": "Use polite live regions for routine notifications and assertive alerts only for urgent failures."
+      "selectors": [".toast__content"],
+      "attributes": ["role=\"status\"", "role=\"alert\"", "aria-live", "aria-atomic=\"true\""],
+      "description": "The content region uses polite status or assertive alert semantics only when dynamically inserted; actions remain outside the announced string."
     },
     {
       "name": "dismissal",
-      "events": ["close action", "timeout", "Escape"],
-      "description": "Toasts may dismiss after a timeout or by explicit user action; focused toasts should not disappear without warning."
+      "events": ["close action", "target timeout", "target Escape"],
+      "description": "Explicit dismissal belongs to the item; timeout, Escape, pause/resume, queue, and removal belong to the target viewport service."
+    },
+    {
+      "name": "safeAction",
+      "selectors": [".toast__action"],
+      "events": ["click", "Space", "Enter"],
+      "description": "An optional canonical Button action is safe to ignore and has a persistent alternative when the target may time out the toast."
+    },
+    {
+      "name": "passiveFocus",
+      "events": ["show"],
+      "description": "Presenting a toast never moves keyboard focus from the user's current task."
     }
   ],
   "properties": [
@@ -164,6 +174,13 @@
       "targetMappings": { "web": [{ "kind": "slot", "selector": ".toast__icon", "classNames": [".toast__icon"] }] }
     },
     {
+      "name": "action",
+      "type": "slot",
+      "required": false,
+      "description": "Optional named canonical Button action that remains safe to ignore.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".toast__action", "classNames": [".toast__action"] }] }
+    },
+    {
       "name": "dismissAction",
       "type": "slot",
       "required": false,
@@ -186,8 +203,9 @@
       "description": "Live-region priority used when the toast is inserted dynamically.",
       "targetMappings": {
         "web": [
-          { "kind": "attribute", "selector": ".toast", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } },
-          { "kind": "attribute", "selector": ".toast", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } }
+          { "kind": "attribute", "selector": ".toast__content", "attribute": "role", "values": { "none": null, "polite": "status", "assertive": "alert" } },
+          { "kind": "attribute", "selector": ".toast__content", "attribute": "aria-live", "values": { "none": null, "polite": "polite", "assertive": "assertive" } },
+          { "kind": "attribute", "selector": ".toast__content", "attribute": "aria-atomic", "values": { "none": null, "polite": "true", "assertive": "true" } }
         ]
       }
     },
@@ -197,16 +215,14 @@
       "required": false,
       "defaultValue": false,
       "description": "Controls visible toast presentation; target timing and queue management remain external.",
-      "targetMappings": { "web": [{ "kind": "class", "selector": ".toast", "classNames": [".is-visible"] }] }
+      "targetMappings": { "web": [{ "kind": "class", "selector": ".toast", "classNames": [".is-visible"] }, { "kind": "attribute", "selector": ".toast", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] }
     }
   ],
   "tokens": {
     "public": {
       "color": [
         "--color-surface-primary",
-        "--color-surface-secondary",
         "--color-border-default",
-        "--color-border-focus",
         "--color-text-primary",
         "--color-text-secondary",
         "--color-feedback-info-default",
@@ -214,41 +230,36 @@
         "--color-feedback-error-default",
         "--color-feedback-warning-default"
       ],
-      "radius": [
-        "--radius-md",
-        "--radius-sm"
-      ],
+      "radius": ["--radius-md"],
       "shadow": [
         "--shadow-lg"
       ],
-      "z-index": [
-        "--z-toast"
-      ],
-      "transition": [
-        "--transition-base",
-        "--transition-fast"
-      ],
-      "easing": [
-        "--easing-default",
-        "--easing-out"
-      ],
+      "transition": ["--transition-base"],
+      "easing": ["--easing-out"],
       "typography": [
-        "--typo-body-size"
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
       ]
     }
   },
   "accessibility": [
-    "Use role=\"status\" or aria-live=\"polite\" for non-urgent notifications.",
-    "Use role=\"alert\" only for urgent failures that require immediate attention.",
-    "Provide a clear dismiss action when the toast persists or contains an action.",
-    "Do not move keyboard focus to passive toasts.",
-    "Avoid auto-dismissing a toast while it or an action inside it has focus."
+    "Put status/alert semantics on the content region so interactive actions are excluded from the announced string.",
+    "Use polite status for routine notifications and assertive alert only for genuinely urgent changes; visual Error does not imply assertive.",
+    "Provide a clear named canonical dismiss action when the toast persists or contains an action.",
+    "Never move keyboard focus when presenting a passive toast.",
+    "Keep optional actions safe to ignore and provide a persistent alternative when a target may time out the item.",
+    "Target viewport services pause automatic dismissal on hover, focus, and window blur and avoid concurrent assertive announcements.",
+    "Keep hidden items unavailable to pointer and assistive technology.",
+    "Honor reduced motion and preserve text, boundaries, and focus in forced-colors mode."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; visibility and timing behavior must be provided by the consuming target."
+      "kind": "css-target-behavior",
+      "notes": "Canonical CSS implements one notification item and semantic hidden state. Target services own insertion, live timing, viewport placement, queueing, pause/resume, duration, and removal."
     },
     "shopify": {
       "status": "planned",

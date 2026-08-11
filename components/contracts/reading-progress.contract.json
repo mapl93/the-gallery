@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "reading-progress",
   "name": "Reading Progress Bar",
   "registryId": "L4",
   "category": "blog",
   "status": "pilot",
-  "summary": "Fixed top bar showing scroll progress through article.",
+  "summary": "Decorative article-position indicator with exclusive controlled and explicitly associated automatic measurement paths, host-owned placement, bounded visual output, and no task-completion semantics.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/reading-progress",
@@ -14,38 +14,50 @@
     "docs": "site/src/content/components/reading-progress.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".reading-progress", "className": ".reading-progress", "required": true, "description": "Fixed reading-progress track." },
-    { "name": "bar", "selector": ".reading-progress__bar", "className": ".reading-progress__bar", "required": true, "description": "Target-controlled visual progress indicator." }
+    { "name": "root", "selector": ".reading-progress", "className": ".reading-progress", "required": true, "description": "Passive decorative track that is hidden from assistive technology and remains in the host's layout context." },
+    { "name": "bar", "selector": ".reading-progress__bar", "className": ".reading-progress__bar", "required": true, "description": "Decorative fill projected from logical inline start through a private transform scale." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default fixed top-edge progress presentation." }
+    { "name": "controlled", "className": null, "default": true, "description": "Target supplies one finite bounded article-position value and owns every measurement lifecycle." },
+    { "name": "automatic", "className": null, "default": false, "description": "Capable adapter measures one explicitly associated article against the viewport or an explicitly associated scroll root." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Canonical thin progress track." }
+    { "name": "default", "className": null, "default": true, "description": "One thin intrinsic track; placement and surrounding offsets belong to the host." }
   ],
   "states": [
-    { "name": "default", "selectors": [".reading-progress"], "description": "Default reading-progress presentation before a target applies measured progress." }
+    { "name": "controlled", "selectors": [".reading-progress[data-reading-state=\"controlled\"]"], "description": "Visible bounded target-supplied position." },
+    { "name": "automatic", "selectors": [".reading-progress[data-reading-state=\"automatic\"]"], "description": "Visible bounded position derived from the explicitly associated article range." },
+    { "name": "unavailable", "selectors": [".reading-progress[data-reading-state=\"unavailable\"][hidden]"], "description": "Automatic article range is not scrollable or is no longer connected, so the decorative indicator is omitted." },
+    { "name": "invalid", "selectors": [".reading-progress[data-reading-state=\"invalid\"][hidden]"], "description": "Required controlled value or automatic associations are invalid, so the component fails closed." }
   ],
   "behavior": [
-    { "name": "targetProgress", "selectors": [".reading-progress__bar"], "description": "The target supplies measured progress and updates the bar; neutral calculation and accessibility semantics remain unresolved." }
+    { "name": "decorativeSemantics", "selectors": [".reading-progress"], "attributes": ["aria-hidden=\"true\"", "pointer-events:none", "no role", "no tabindex", "no aria-live"], "description": "Article position is supplemental visual information, not task completion, an operable scrollbar, a meter, or a live status." },
+    { "name": "exclusiveSource", "selectors": [".reading-progress[data-reading-mode=\"controlled\"]", ".reading-progress[data-reading-mode=\"automatic\"]"], "attributes": ["data-reading-value", "data-reading-target", "data-reading-scroll-root"], "description": "Controlled consumes only value; Automatic requires one explicit article id and optionally one explicit scroll-root id. The two source paths are never mixed." },
+    { "name": "automaticMeasurement", "selectors": [".reading-progress[data-reading-mode=\"automatic\"]"], "events": ["scroll", "resize", "ResizeObserver"], "description": "Capable Web adapters normalize article start-to-end position, coalesce visual writes to requestAnimationFrame, recompute after relevant geometry changes, attach listeners only while an automatic root exists, and perform no polling." },
+    { "name": "hostPlacement", "selectors": [".reading-progress"], "description": "The owning page or layout chooses fixed, sticky, safe-area, Header-offset, stacking or in-flow placement; L4 exposes no viewport-placement property." },
+    { "name": "passiveOutput", "selectors": [".reading-progress", ".reading-progress__bar"], "attributes": ["data-reading-state", "data-value", "private --_reading-progress-scale"], "description": "Bounded output updates only visual state, emits no event and never claims content was read, understood or completed." }
   ],
   "properties": [
-    { "name": "indicator", "type": "slot", "required": true, "description": "Target-owned progress indicator with any target-required state or semantics.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".reading-progress__bar", "classNames": [".reading-progress__bar"] }] } }
+    { "name": "mode", "type": "enum", "required": false, "valuesFrom": "variants", "defaultValue": "controlled", "description": "Exclusive source path: target-supplied Controlled value or explicitly associated Automatic article measurement.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".reading-progress", "attribute": "data-reading-mode", "values": { "controlled": "controlled", "automatic": "automatic" } }] } },
+    { "name": "value", "type": "number", "required": false, "defaultValue": 44, "minimum": 0, "maximum": 100, "step": 1, "unsetBehavior": "Required in Controlled mode and ignored in Automatic mode; invalid controlled input omits the component.", "description": "Finite bounded article-position percentage supplied by the target in Controlled mode; it does not represent task completion.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".reading-progress", "attribute": "data-reading-value", "valueFrom": "property" }] } },
+    { "name": "targetId", "type": "string", "required": false, "unsetBehavior": "Required in Automatic mode and omitted in Controlled mode.", "description": "Stable identifier of the explicitly associated article range used by capable Web adapters; other targets map the same source relationship natively.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".reading-progress", "attribute": "data-reading-target", "valueFrom": "property" }] } },
+    { "name": "scrollRootId", "type": "string", "required": false, "unsetBehavior": "Automatic mode uses the document viewport when no explicit scroll root is supplied; Controlled mode omits it.", "description": "Optional explicit scroll-container identifier for an automatic embedded reading surface; the referenced container must contain the article target.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".reading-progress", "attribute": "data-reading-scroll-root", "valueFrom": "property" }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-accent"],
-      "z-index": ["--z-sticky"]
+      "color": ["--color-text-accent"]
     }
   },
   "accessibility": [
-    "Do not add live-region announcements for continuous scroll updates without an accepted behavior decision.",
-    "If a target exposes progressbar semantics, it must provide a useful accessible name and synchronized bounded values.",
-    "The visual indicator must not intercept pointer interaction with page content."
+    "Keep the root aria-hidden, non-focusable, non-live and pointer-transparent; do not add progressbar, scrollbar, meter or status semantics.",
+    "Preserve native article headings, landmarks, browser scrolling and optional Table of Contents as the accessible navigation model.",
+    "Do not claim that article position means content was read, understood or completed.",
+    "Project visual progress from logical inline start, including RTL, and retain a forced-color fill without making the cue the only source of information.",
+    "Omit automatic indicators for invalid, disconnected, short or non-scrollable ranges rather than exposing stale or false position."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Visual CSS is implemented; measurement and semantics are target-owned pending a source decision." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
+    "web": { "status": "implemented", "kind": "semantic-html-css-js", "notes": "Decorative controlled projection and explicit automatic article/scroll-root measurement with coalesced shared runtime and complete cleanup." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Requires a selected article/template owner, explicit source association and Theme Editor lifecycle before Automatic is target-ready; Controlled remains available to a target service." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

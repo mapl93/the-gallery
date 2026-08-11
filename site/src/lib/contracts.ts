@@ -38,7 +38,7 @@ export interface ContractBehavior {
 }
 
 export interface ContractTargetMapping {
-  kind: 'content' | 'optionClass' | 'class' | 'attribute' | 'slot';
+  kind: 'content' | 'optionClass' | 'class' | 'attribute' | 'slot' | 'collection';
   selector?: string;
   source?: 'variants' | 'sizes';
   classNames?: string[];
@@ -51,7 +51,7 @@ export interface ContractTargetMapping {
 
 export interface ContractProperty {
   name: string;
-  type: 'string' | 'boolean' | 'number' | 'enum' | 'slot';
+  type: 'string' | 'string-list' | 'boolean' | 'number' | 'enum' | 'slot';
   required: boolean;
   defaultValue?: string | boolean | number;
   minimum?: number;
@@ -94,6 +94,8 @@ export interface ComponentContract {
   adapters: Record<string, ContractAdapter>;
 }
 
+// Keep the eager module map bound to the current repository contract inventory;
+// Vite must re-evaluate this module when a pre-v1 contract is replaced in place.
 const contractModules = import.meta.glob('../../../components/contracts/*.contract.json', {
   eager: true,
   import: 'default',

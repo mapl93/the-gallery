@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "bottom-nav",
   "name": "Bottom Navigation Bar",
   "registryId": "C8",
   "category": "global",
   "status": "pilot",
-  "summary": "Fixed mobile bottom navigation with icons, labels, current state, and badge support.",
+  "summary": "Fixed safe-area-aware mobile navigation landmark containing one native list of persistent destination links, visible labels, optional decorative icons and counts, non-color current-page treatment, normal Link behavior, and target-owned route state.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/bottom-nav",
@@ -14,11 +14,13 @@
     "docs": "site/src/content/components/bottom-nav.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".bottom-nav", "className": ".bottom-nav", "required": true, "description": "Fixed mobile navigation bar." },
-    { "name": "item", "selector": ".bottom-nav__item", "className": ".bottom-nav__item", "required": true, "description": "Navigation item link." },
-    { "name": "icon", "selector": ".bottom-nav__icon", "className": ".bottom-nav__icon", "required": false, "description": "Navigation icon." },
-    { "name": "label", "selector": ".bottom-nav__label", "className": ".bottom-nav__label", "required": true, "description": "Navigation item label." },
-    { "name": "badge", "selector": ".bottom-nav__badge", "className": ".bottom-nav__badge", "required": false, "description": "Item badge such as cart count." }
+    { "name": "root", "selector": ".bottom-nav", "className": ".bottom-nav", "required": true, "description": "Labelled fixed mobile navigation landmark with safe-area padding." },
+    { "name": "list", "selector": ".bottom-nav__list", "className": ".bottom-nav__list", "required": true, "description": "Single flat native destination list." },
+    { "name": "entry", "selector": ".bottom-nav__entry", "className": ".bottom-nav__entry", "required": true, "description": "Native list item containing one destination." },
+    { "name": "item", "selector": ".bottom-nav__item", "className": ".bottom-nav__item", "required": true, "description": "Native destination link and complete pointer target." },
+    { "name": "icon", "selector": ".bottom-nav__icon", "className": ".bottom-nav__icon", "required": false, "description": "Decorative destination icon hidden from duplicate name calculation." },
+    { "name": "label", "selector": ".bottom-nav__label", "className": ".bottom-nav__label", "required": true, "description": "Visible localized destination label." },
+    { "name": "badge", "selector": ".bottom-nav__badge", "className": ".bottom-nav__badge", "required": false, "description": "Compact visual count whose equivalent meaning is included in the containing link name." }
   ],
   "variants": [
     { "name": "default", "className": null, "default": true, "description": "Default mobile bottom navigation." }
@@ -28,38 +30,45 @@
   ],
   "states": [
     { "name": "default", "selectors": [".bottom-nav"], "description": "Default bottom navigation state." },
-    { "name": "mobileVisible", "selectors": [".bottom-nav { display: flex; }"], "description": "Mobile breakpoint visible state." },
+    { "name": "mobileVisible", "selectors": [".bottom-nav { display: flex; }"], "description": "Neutral Web mobile visibility default; final breakpoint policy remains page-shell owned." },
     { "name": "itemHover", "selectors": [".bottom-nav__item:hover"], "description": "Navigation item hover state." },
     { "name": "currentPage", "selectors": [".bottom-nav__item[aria-current=\"page\"]"], "description": "Current bottom-navigation destination." },
+    { "name": "itemFocus", "selectors": [".bottom-nav__item:focus-visible"], "description": "Visible keyboard focus on a destination." },
     { "name": "badge", "selectors": [".bottom-nav__badge"], "description": "Badge visible state." }
   ],
   "behavior": [
-    { "name": "mobileNavigation", "selectors": [".bottom-nav__item"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "Items should navigate and expose current-page state." },
-    { "name": "badgeCount", "selectors": [".bottom-nav__badge"], "description": "Badges should update from target state such as cart item count." },
-    { "name": "safeArea", "selectors": [".bottom-nav"], "description": "Adapters should preserve safe-area spacing on mobile devices." }
+    { "name": "mobileNavigation", "selectors": [".bottom-nav__list", ".bottom-nav__item"], "attributes": ["href", "aria-current"], "events": ["Tab", "Shift+Tab", "Enter", "click"], "description": "A flat native list contains ordinary destination links; no tablist/menu/toolbar roles, roving focus, panels, or arrow-key handling are added." },
+    { "name": "routeOwnership", "selectors": [".bottom-nav__item[aria-current=\"page\"]"], "description": "The target router is the sole current owner and marks zero pending or exactly one resolved current page." },
+    { "name": "badgeCount", "selectors": [".bottom-nav__badge"], "description": "Target state formats the compact visual count, includes equivalent meaning in the link accessible name, hides the visual duplicate, and chooses whether changes require a separate announcement." },
+    { "name": "safeAreaAndOffset", "selectors": [".bottom-nav"], "description": "The surface preserves safe-area padding and 44px targets; the page shell owns bottom content offset and keyboard-viewport coordination." },
+    { "name": "motionAndContrast", "events": ["prefers-reduced-motion", "forced-colors"], "description": "Reduced motion removes authored transitions and forced colors preserves boundary, current, focus, icon, and count distinctions." }
   ],
   "properties": [
     { "name": "label", "type": "string", "required": true, "description": "Accessible name for the mobile navigation region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".bottom-nav", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
-    { "name": "items", "type": "slot", "required": true, "description": "Target-owned navigation destinations with visible labels, optional icons, current-page markup, and optional badges.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".bottom-nav", "classNames": [".bottom-nav"] }] } }
+    { "name": "items", "type": "slot", "required": true, "description": "Target-owned native destination list with visible labels, optional decorative icons, current-page markup, and optional count metadata included in link names.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".bottom-nav__list", "classNames": [".bottom-nav__list"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-text-secondary", "--color-text-primary", "--color-feedback-error-default"],
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-border-subtle", "--color-border-focus", "--color-text-secondary", "--color-text-primary", "--color-feedback-error-default"],
       "radius": ["--radius-full"],
       "spacing": ["--space-layout-touch-target"],
+      "typography": ["--typo-caption-size", "--typo-caption-line-height"],
+      "z-index": ["--z-sticky"],
       "transition": ["--transition-fast"],
       "easing": ["--easing-default"]
     }
   },
   "accessibility": [
-    "Expose the bar as a labelled navigation region.",
-    "Provide text labels even when icons are visible.",
-    "Use aria-current for the active destination.",
-    "Keep badge values readable and announced when they change dynamically."
+    "Expose the bar as a labelled nav containing one native list of native destination links.",
+    "Provide visible localized text labels and hide decorative icons from duplicate accessible-name calculation.",
+    "Use aria-current=page for zero unresolved or exactly one resolved current destination and reinforce it without color alone.",
+    "Include optional count meaning in the containing link accessible name, hide the visual duplicate, and announce dynamic changes only according to target policy.",
+    "Preserve normal Link keyboard behavior, 44px targets, visible focus, safe areas, reduced motion, forced colors, and logical RTL placement.",
+    "Do not add tablist, menu, toolbar, roving-focus, panel, or arrow-key semantics."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map mobile navigation links, current route, and cart badge count." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical CSS provides list/link layout, safe-area/touch geometry, current/focus/count/special-media states, and no neutral runtime; the target owns routes, counts, visibility policy, and page offset." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Liquid should map a merchant menu and current route while target services synchronize cart/customer counts, page-shell offset, and visibility." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

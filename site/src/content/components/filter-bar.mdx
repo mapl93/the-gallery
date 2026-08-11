@@ -1,0 +1,93 @@
+## Overview
+
+Filter Bar is a compact horizontal choice group that filters associated content
+in place. It is not navigation: it renders no `nav`, destination link,
+`aria-current`, menu or tab semantics.
+
+Use Single mode when at most one value may be selected and Multiple mode when
+independent values may be combined. The component owns choice composition and
+emits the complete next selection immediately; the consuming target owns the
+query parameter and result lifecycle.
+
+## Presentation
+
+<Preview html={'<fieldset class="segmented filter-bar filter-bar--single tg-preview-frame" aria-describedby="filter-bar-help"><legend class="segmented__legend">Filter stories</legend><div class="segmented__options"><label class="segmented__item"><input class="segmented__input" type="radio" name="topic" value="studio-notes" checked /><span class="segmented__label">Studio notes</span></label><label class="segmented__item"><input class="segmented__input" type="radio" name="topic" value="materials" /><span class="segmented__label">Materials</span></label><label class="segmented__item"><input class="segmented__input" type="radio" name="topic" value="process" /><span class="segmented__label">Process</span></label><label class="segmented__item"><input class="segmented__input" type="radio" name="topic" value="exhibitions" /><span class="segmented__label">Exhibitions</span></label></div></fieldset>'} label="Filter Bar" />
+
+Single mode composes the canonical radio-backed [Segmented Control](/components/segmented-control).
+Multiple mode composes independent canonical [Checkboxes](/components/checkbox)
+inside the same visible fieldset/legend boundary. Both modes use one controlled
+`selectedValues` string list; there is no hidden duplicate state owner.
+Its root composes `.filter-bar--multiple` while the Single fallback above
+composes `.filter-bar--single`.
+
+## Usage Guidelines
+
+<DoDont>
+  <Do>Use a short, ordered set of stable choices to filter the content immediately below the bar.</Do>
+  <Dont>Do not use Filter Bar for page destinations, a full faceted sidebar, tabs, sort controls or deferred Apply/Cancel workflows.</Dont>
+</DoDont>
+
+- Supply at least two valid options with stable unique values and complete
+  localized labels. Blank or duplicate records are ignored; fewer than two
+  valid records omit the component.
+- Keep Single and Multiple explicit. Single normalizes `selectedValues` to at
+  most one valid value; Multiple preserves valid selections in option order.
+- Empty selection is valid. The associated result owner decides what it means;
+  Filter Bar does not invent an “All” option or empty-result copy.
+- Every accepted choice change emits the complete next selection immediately.
+  There is no draft, Apply or Cancel state.
+- Counts, icons, taxonomy sources, query keys and serialization formats are not
+  component defaults.
+
+## Accessibility
+
+- The root is a native `fieldset` with a visible `legend`.
+- Single uses same-name radios, native Tab entry, arrow-key movement and Space
+  activation. Multiple uses independently focusable native Checkboxes and Space
+  activation.
+- Checkedness is the authoritative selected state. Selection, focus and group
+  boundaries remain perceivable in forced colors and do not rely only on color.
+- The option bar wraps from its own container. Labels remain complete under
+  localization, RTL, zoom and text-spacing overrides.
+- The result owner, not Filter Bar, announces updated result counts and owns
+  pending, error and empty states plus focus after a query commit.
+
+## API Reference
+
+<PropTable>
+  <tr><td>`mode`</td><td>`single | multiple`</td><td>optional</td><td>Canonical radio-backed or Checkbox composition; Single is default</td></tr>
+  <tr><td>`label`</td><td>`string`</td><td>required</td><td>Visible localized group legend</td></tr>
+  <tr><td>`name`</td><td>`string`</td><td>required</td><td>Native field name selected by the consuming target</td></tr>
+  <tr><td>`options`</td><td>`FilterBarOption[]`</td><td>required</td><td>Ordered stable values, complete labels and optional availability</td></tr>
+  <tr><td>`selectedValues`</td><td>`string[]`</td><td>required</td><td>Controlled authoritative selection; empty is valid</td></tr>
+  <tr><td>`disabled`</td><td>`boolean`</td><td>optional</td><td>Disables the complete native fieldset</td></tr>
+  <tr><td>`describedBy`</td><td>`string`</td><td>optional</td><td>Target-authored persistent guidance references</td></tr>
+  <tr><td>`onSelectedValuesChange`</td><td>`(values) => void`</td><td>adapter</td><td>Complete next controlled selection</td></tr>
+  <tr><td>`onCommitRequest`</td><td>`(values) => void`</td><td>adapter</td><td>Immediate query/result request</td></tr>
+</PropTable>
+
+Anatomy: `.filter-bar`, the Single canonical `.segmented*` parts, and the
+Multiple `.filter-bar__legend`, `.filter-bar__options`,
+`.filter-bar__choice.checkbox`, `.filter-bar__input.checkbox__input` and
+`.filter-bar__label.checkbox__label` composition.
+
+Capable Web and Shopify targets reflect committed selection in a target-chosen
+query parameter, restore it on reload and Back/Forward, and coordinate results,
+cancellation, pending/error/empty presentation, announcements, focus,
+pagination reset and analytics. The neutral contract deliberately does not
+choose the parameter name, router, serialization, request strategy or
+push-versus-replace history policy.
+
+Runtime Exhibit and Studio resolve the same registered `FilterBarArtwork`,
+canonical child renderers, fixture options, controlled values, DOM and target
+query simulation. The static markup above is the matching Single fallback.
+
+References: [APG Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/),
+[APG Checkbox](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/),
+[WHATWG URL](https://url.spec.whatwg.org/#urlsearchparams),
+[WHATWG History](https://html.spec.whatwg.org/multipage/nav-history-apis.html#the-history-interface),
+[Radix Radio Group](https://www.radix-ui.com/primitives/docs/components/radio-group),
+and [Shopify storefront filtering](https://shopify.dev/docs/storefronts/themes/navigation-search/filtering).
+
+The contract remains `pilot`. Final visual approval, a first production query
+consumer and explicit human stability review remain required.

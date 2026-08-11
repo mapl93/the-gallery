@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "photo-reviews",
   "name": "Photo Reviews Gallery",
   "registryId": "V6",
   "category": "reviews",
   "status": "pilot",
-  "summary": "Responsive gallery of target-supplied review images that remains passive unless a target provides native actions.",
+  "summary": "Passive native collection of target-supplied review images with a separate optional native-action projection and no provider or enlarged-media runtime.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/photo-reviews",
@@ -14,65 +14,115 @@
     "docs": "site/src/content/components/photo-reviews.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".photo-reviews", "className": ".photo-reviews", "required": true, "description": "Responsive image-gallery region." },
-    { "name": "item", "selector": ".photo-reviews__item", "className": ".photo-reviews__item", "required": true, "description": "Repeated square media item, passive by default or rendered as a native action by the target." },
-    { "name": "image", "selector": ".photo-reviews__image", "className": ".photo-reviews__image", "required": true, "description": "Review image that fills its contained square item." },
-    { "name": "imageFallback", "selector": ".photo-reviews__item img", "required": false, "description": "Compatibility selector for direct image children that do not yet use the explicit image class." },
-    { "name": "overlay", "selector": ".photo-reviews__item::after", "required": false, "generated": true, "description": "Generated fine-pointer feedback overlay for target-supplied native actions." }
+    { "name": "root", "selector": ".photo-reviews", "className": ".photo-reviews", "required": true, "description": "Native unordered review-photo list whose source order remains authoritative." },
+    { "name": "item", "selector": ".photo-reviews__item", "className": ".photo-reviews__item", "required": true, "description": "Repeated native list item and square media surface." },
+    { "name": "action", "selector": ".photo-reviews__action", "className": ".photo-reviews__action", "required": false, "description": "Optional native link or button inside an item when the target supplies a truthful destination or action." },
+    { "name": "image", "selector": ".photo-reviews__image", "className": ".photo-reviews__image", "required": true, "description": "Target-supplied review image with contextual alternative text and delivery attributes." },
+    { "name": "overlay", "selector": ".photo-reviews__action::after", "required": false, "generated": true, "description": "Decorative fine-pointer feedback allocated only by an optional native action." }
   ],
   "properties": [
     {
       "name": "label",
       "type": "string",
       "required": false,
-      "description": "Optional accessible region name when surrounding content does not already identify the gallery.",
-      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".photo-reviews", "attribute": "aria-label", "valueFrom": "property" }] }
+      "description": "Optional localized accessible collection name when surrounding content does not already identify the gallery.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".photo-reviews", "attribute": "aria-label", "valueFrom": "property", "elements": ["ul"] }] }
     },
     {
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned image items, alt text, and any native link or button semantics.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".photo-reviews__item", "classNames": [".photo-reviews__item"] }] }
+      "description": "Ordered target-owned native list items containing image source/alternative data and any optional native action composition.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".photo-reviews", "classNames": [".photo-reviews__item", ".photo-reviews__action", ".photo-reviews__image"] }] }
     }
   ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default responsive square-image grid." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Auto-filling grid contained by available inline width." }],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Passive native review-photo collection with optional target action composition." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic square auto-fill grid contained by the component content box." }
+  ],
   "states": [
-    { "name": "default", "selectors": [".photo-reviews"], "description": "Responsive gallery with passive items by default." },
-    { "name": "actionHover", "selectors": [".photo-reviews__item:is(a, button):hover img"], "description": "Fine-pointer feedback only when the target renders a native action." },
-    { "name": "actionFocusVisible", "selectors": [".photo-reviews__item:is(a, button):focus-visible"], "description": "Visible keyboard focus for a target-supplied native action." }
+    { "name": "passive", "selectors": [".photo-reviews"], "description": "Default native collection with no enabled interactive surface, transition or component runtime." },
+    { "name": "actionHover", "selectors": [".photo-reviews__action:where(:hover:not(:disabled)) .photo-reviews__image", ".photo-reviews__action:hover:not(:disabled)::after"], "description": "Fine-pointer visual feedback for an enabled target-supplied native action." },
+    { "name": "actionFocusVisible", "selectors": [".photo-reviews__action:focus-visible"], "description": "Visible keyboard focus on a target-supplied native action." },
+    { "name": "actionDisabled", "selectors": [".photo-reviews__action:disabled"], "description": "Unavailable native button action; links do not project disabled state." }
   ],
   "behavior": [
     {
+      "name": "nativeCollection",
+      "selectors": [".photo-reviews", ".photo-reviews__item"],
+      "description": "Neutral Web uses native ul/li structure. CSS wrapping never changes the target-authored source and reading order."
+    },
+    {
       "name": "passiveByDefault",
-      "selectors": [".photo-reviews__item"],
-      "description": "Items are passive media unless a target explicitly renders native link or button semantics. The neutral gallery does not own a lightbox."
+      "selectors": [".photo-reviews__item", ".photo-reviews__image"],
+      "description": "Items are passive informative media unless a target explicitly composes a real link or button."
     },
     {
       "name": "imageAlternative",
-      "selectors": [".photo-reviews__image", ".photo-reviews__item img"],
+      "selectors": [".photo-reviews__image"],
       "attributes": ["alt"],
-      "description": "Targets provide meaningful alt text for informative review images and empty alt text only for genuinely decorative duplicates."
+      "description": "Targets provide concise contextual alt text for informative photos and empty alt text only for genuinely decorative or redundant images."
+    },
+    {
+      "name": "imageDeliveryBoundary",
+      "selectors": [".photo-reviews__image"],
+      "attributes": ["src", "srcset", "sizes", "loading", "decoding"],
+      "description": "Source selection, responsive formats, loading, decoding, fallback, failure status and moderation remain target responsibilities."
+    },
+    {
+      "name": "actionProjection",
+      "selectors": [".photo-reviews__action"],
+      "attributes": ["href", "type", "aria-label", "aria-labelledby", "disabled"],
+      "description": "A target may place a native link or button inside a list item. The action needs a truthful destination/action name and owns activation state."
+    },
+    {
+      "name": "functionalImageName",
+      "selectors": [".photo-reviews__action", ".photo-reviews__image"],
+      "attributes": ["alt", "aria-label", "aria-labelledby"],
+      "description": "When an image becomes functional, the native action name describes its purpose or destination rather than relying only on a visual description."
+    },
+    {
+      "name": "overlayBoundary",
+      "selectors": [".photo-reviews__action::after"],
+      "description": "The generated overlay is decorative action feedback only and conveys no review or availability information."
+    },
+    {
+      "name": "enlargedMediaBoundary",
+      "selectors": [".photo-reviews__action"],
+      "description": "Photo Reviews does not select or partially implement Lightbox, Modal, Popover, download, focus management, navigation, dismissal, history or preloading."
+    },
+    {
+      "name": "emptyCollection",
+      "selectors": [".photo-reviews"],
+      "description": "An empty native list is valid. A surrounding target owns any explanatory Empty State."
+    },
+    {
+      "name": "runtimeBoundary",
+      "selectors": [".photo-reviews"],
+      "description": "Neutral Web adds no listener, observer, timer, request, formatter, layout read or JavaScript asset."
     }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-secondary", "--color-text-primary", "--color-border-focus"],
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-text-primary", "--color-border-focus"],
       "radius": ["--radius-sm"],
-      "motion": ["--motion-transition-media", "--motion-transition-micro"]
+      "motion": ["--motion-transition-media", "--motion-transition-micro"],
+      "opacity": ["--opacity-disabled"]
     }
   },
   "accessibility": [
-    "Provide meaningful alt text for informative review images and empty alt text only for decorative duplicates.",
-    "Use native links or buttons when a target makes an image actionable; do not make a div click-only.",
-    "Preserve visible focus and an accessible name for every target-supplied action.",
-    "Do not communicate review information only through hover or generated overlays.",
-    "Any modal or lightbox focus management and dismissal belongs to the component selected by the target."
+    "Use native ul/li collection structure and keep the target-authored source order.",
+    "Give informative review photos concise contextual alt text; use alt empty only when a duplicate is genuinely decorative in that context.",
+    "Use a native link or button inside the list item when a target makes a photo actionable; do not replace the list item or make a div click-only.",
+    "Give every action a name that describes its function or destination and preserve native Enter, Space where applicable, focus-visible and disabled behavior.",
+    "Do not communicate action, review, loading or failure information only through crop, hover, zoom or the generated overlay.",
+    "Compose the complete canonical Lightbox or Modal when enlarged media is selected; focus, navigation, close, dismissal and restoration do not belong to Photo Reviews."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Responsive containment, native-action focus, fine-pointer hover, forced-colors, and reduced motion are implemented." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must select image data and any action/lightbox composition explicitly." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Native list/items, strict image anatomy, intrinsic containment and optional native-action hover/focus/disabled/reduced-motion/forced-colors hooks are implemented with zero component runtime." },
+    "shopify": { "status": "planned", "kind": "theme-app-block-css", "notes": "A review-provider theme app block must supply moderated images, Shopify CDN transforms, localized alternatives and any action/overlay composition while consuming generated CSS." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

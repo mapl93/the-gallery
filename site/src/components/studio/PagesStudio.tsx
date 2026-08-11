@@ -9,12 +9,10 @@ import {
 import {
   Check,
   Clipboard,
-  Camera,
   Home,
   PackageSearch,
   QrCode,
   Search,
-  Users,
 } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
@@ -24,6 +22,7 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { editorialMedia } from './editorialMedia';
+import StepsArtwork, { type StepsArtworkItem } from './StepsArtwork';
 
 interface PagesStudioProps {
   contract: ComponentContract;
@@ -31,6 +30,12 @@ interface PagesStudioProps {
 }
 
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
+
+const checkoutStepsFixture: StepsArtworkItem[] = [
+  { id: 'information', title: 'Information', status: 'completed' },
+  { id: 'shipping', title: 'Shipping', status: 'current' },
+  { id: 'payment', title: 'Payment', status: 'upcoming' },
+];
 
 const fixtureValues: Record<string, StudioPropertyValues> = {
   'coming-soon': {
@@ -43,8 +48,6 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     formHeading: 'Be first to enter the gallery',
     formDescription: 'Receive one note when the collection opens.',
     form: true,
-    passwordTriggerLabel: 'Private access',
-    passwordEntry: false,
     footer: true,
   },
   'page-404': {
@@ -58,20 +61,22 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
   },
   'gift-card': {
     visual: true,
-    brand: 'The Gallery',
-    amount: '$150.00',
-    heading: 'A gift for their collection',
-    message: 'Use this card for any available work in the gallery.',
-    code: 'GALLERY-7K4P-92M',
-    copyLabel: 'Copy gift card code',
+    issuer: 'The Gallery',
     balance: '$150.00 available',
+    heading: 'A gift for their collection',
+    instructions: 'Use this code for any available work in the gallery.',
+    codeLabel: 'Gift card code',
+    code: 'GALLERY-7K4P-92M',
+    copyLabel: 'Copy code',
+    details: true,
     actions: true,
     qr: true,
-    form: true,
+    form: false,
   },
   'policy-page': {
     title: 'Shipping policy',
     updatedDate: 'Updated July 12, 2026',
+    updatedDateTime: '2026-07-12',
     tocTitle: 'On this page',
     tocItems: true,
     body: true,
@@ -118,7 +123,9 @@ function LocalField({
   id,
   className = '',
   label,
+  name,
   placeholder,
+  required = false,
   value,
   message,
   onChange,
@@ -126,7 +133,9 @@ function LocalField({
   id: string;
   className?: string;
   label: string;
+  name: string;
   placeholder?: string;
+  required?: boolean;
   value: string;
   message?: string;
   onChange: (value: string) => void;
@@ -139,10 +148,12 @@ function LocalField({
         <input
           className="input__field"
           id={id}
+          name={name}
           type="text"
           value={value}
           placeholder={placeholder}
           aria-describedby={message ? messageId : undefined}
+          required={required}
           onChange={(event) => onChange(event.target.value)}
         />
       </div>
@@ -202,16 +213,16 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
 
   function submitComingSoon(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setComingSoonFeedback(email
-      ? `Thanks. ${email} is on the local preview list.`
-      : 'Enter an email address to preview the confirmation.');
+    setComingSoonFeedback(
+      `Preview only: ${email} passed native validation. No request was sent.`,
+    );
   }
 
   function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSearchFeedback(searchQuery
-      ? `Local preview search: ${searchQuery}`
-      : 'Enter a search term to preview recovery feedback.');
+      ? `Preview only: "${searchQuery}" was captured locally. No request was sent.`
+      : 'Enter a search term to preview local recovery feedback.');
   }
 
   function submitGiftForm(event: FormEvent<HTMLFormElement>) {
@@ -222,33 +233,48 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
   }
 
   async function copyCode() {
-    const code = String(values.code || '');
+    const code = String(values.code || '').trim();
     let copied = false;
     try {
       await navigator.clipboard.writeText(code);
       copied = true;
     } catch {
-      const fallback = document.createElement('textarea');
-      fallback.value = code;
-      fallback.setAttribute('readonly', '');
-      fallback.style.position = 'fixed';
-      fallback.style.opacity = '0';
-      document.body.appendChild(fallback);
-      fallback.select();
-      copied = document.execCommand('copy');
-      fallback.remove();
+      const codeElement = document.getElementById(`gift-card-code-${generatedId}`);
+      const selection = window.getSelection();
+      if (codeElement && selection) {
+        const range = document.createRange();
+        range.selectNodeContents(codeElement);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
     }
-    setCopyFeedback(copied ? 'Code copied.' : 'Code selected. Copy it from the visible field.');
+    setCopyFeedback(copied
+      ? 'Gift card code copied.'
+      : 'Gift card code selected. Copy it with your device command.');
   }
 
   function renderComingSoon() {
+    const heading = String(values.heading || '').trim();
+    if (!heading) return null;
+
+    const formHeading = String(values.formHeading || '').trim();
+    const formDescription = String(values.formDescription || '').trim();
+    const hasFormRegion = Boolean(formHeading || formDescription || values.form === true);
+    const headingId = `coming-soon-title-${generatedId}`;
+    const formHeadingId = `coming-soon-form-${generatedId}`;
+    const emailId = `coming-soon-email-${generatedId}`;
+    const emailMessageId = `${emailId}-message`;
+
     return (
-      <main className="coming-soon docs-studio__pages-coming-soon">
+      <section
+        className="coming-soon docs-studio__pages-coming-soon"
+        aria-labelledby={headingId}
+      >
         {values.backgroundMedia === true && (
           <img
             className="coming-soon__bg docs-studio__pages-media docs-studio__pages-media--coming-soon"
             src={editorialMedia.galleryInterior}
-            alt="Sunlit gallery interior with painting, sculptural works, and a wooden bench"
+            alt=""
           />
         )}
         {values.brand === true && (
@@ -257,9 +283,9 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
           </div>
         )}
         <div className="coming-soon__inner">
-          <section className="coming-soon__left" aria-labelledby={`coming-soon-title-${generatedId}`}>
-            <h2 className="coming-soon__heading" id={`coming-soon-title-${generatedId}`}>
-              {String(values.heading || '')}
+          <div className="coming-soon__left">
+            <h2 className="coming-soon__heading" id={headingId}>
+              {heading}
             </h2>
             {String(values.subtitle || '') && (
               <p className="coming-soon__subtitle">{String(values.subtitle)}</p>
@@ -271,236 +297,388 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
             )}
             {values.socialLinks === true && (
               <nav className="coming-soon__social" aria-label="Gallery social links">
-                <a className="coming-soon__social-link" href="#instagram" onClick={(event) => event.preventDefault()} aria-label="Instagram">
-                  <Camera aria-hidden="true" />
+                <a className="link" href="https://www.instagram.com/" target="_blank" rel="noopener">
+                  Instagram
                 </a>
-                <a className="coming-soon__social-link" href="#facebook" onClick={(event) => event.preventDefault()} aria-label="Facebook">
-                  <Users aria-hidden="true" />
+                <a className="link" href="https://www.facebook.com/" target="_blank" rel="noopener">
+                  Facebook
                 </a>
               </nav>
             )}
-          </section>
-          <section className="coming-soon__right" aria-labelledby={`coming-soon-form-${generatedId}`}>
-            {String(values.formHeading || '') && (
-              <h3 className="coming-soon__form-header" id={`coming-soon-form-${generatedId}`}>
-                {String(values.formHeading)}
-              </h3>
-            )}
-            {String(values.formDescription || '') && (
-              <p className="coming-soon__form-subtext">{String(values.formDescription)}</p>
-            )}
-            {values.form === true && (
-              <div className="coming-soon__newsletter">
-                <form className="coming-soon__form" onSubmit={submitComingSoon} noValidate>
+          </div>
+          {hasFormRegion && (
+            <div className="coming-soon__right">
+              {formHeading && (
+                <h3 className="coming-soon__form-header" id={formHeadingId}>
+                  {formHeading}
+                </h3>
+              )}
+              {formDescription && (
+                <p className="coming-soon__form-subtext">{formDescription}</p>
+              )}
+              {values.form === true && (
+                <form
+                  className="coming-soon__form"
+                  aria-labelledby={formHeading ? formHeadingId : undefined}
+                  onSubmit={submitComingSoon}
+                >
                   <div className="input docs-studio__pages-coming-soon-field">
-                    <label className="input__label" htmlFor={`coming-soon-email-${generatedId}`}>Email address</label>
+                    <label className="input__label" htmlFor={emailId}>Email address</label>
                     <div className="input__control">
                       <input
-                        className="input__field coming-soon__input"
-                        id={`coming-soon-email-${generatedId}`}
+                        className="input__field"
+                        id={emailId}
+                        name="email"
                         type="email"
                         value={email}
                         placeholder="name@example.com"
-                        aria-describedby={`coming-soon-email-message-${generatedId}`}
-                        onChange={(event) => setEmail(event.target.value)}
+                        autoComplete="email"
+                        aria-describedby={emailMessageId}
+                        required
+                        onChange={(event) => {
+                          setEmail(event.target.value);
+                          setComingSoonFeedback('');
+                        }}
                       />
                     </div>
-                    <p className="input__message" id={`coming-soon-email-message-${generatedId}`}>
-                      We will only email when the collection opens.
+                    <p
+                      className="input__message"
+                      id={emailMessageId}
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {comingSoonFeedback || 'We will only email when the collection opens.'}
                     </p>
                   </div>
-                  <button className="btn coming-soon__submit" type="submit">Notify me</button>
+                  <button className="btn" type="submit">Notify me</button>
                 </form>
-                {comingSoonFeedback && (
-                  <p className="coming-soon__success docs-studio__pages-feedback" role="status">
-                    {comingSoonFeedback}
-                  </p>
-                )}
-              </div>
-            )}
-            {String(values.passwordTriggerLabel || '') && (
-              <button
-                className="coming-soon__password-link"
-                type="button"
-                onClick={() => setComingSoonFeedback('Private access remains target-owned in this preview.')}
-              >
-                {String(values.passwordTriggerLabel)}
-              </button>
-            )}
-            {values.passwordEntry === true && (
-              <div className="docs-studio__pages-password-slot" aria-label="Private access content">
-                <span>Private viewing</span>
-                <span>Target-provided access content</span>
-              </div>
-            )}
-          </section>
+              )}
+            </div>
+          )}
         </div>
         {values.footer === true && <footer className="coming-soon__footer">The Gallery, Buenos Aires</footer>}
-      </main>
+      </section>
     );
   }
 
   function renderPage404() {
+    const heading = String(values.heading || '').trim();
+    const message = String(values.message || '').trim();
+    const hasRecovery = values.search === true
+      || values.recoveryLinks === true
+      || values.suggestions === true;
+    if (!heading || !message || !hasRecovery) return null;
+
+    const headingId = `page-404-title-${generatedId}`;
+    const searchId = `page-404-search-${generatedId}`;
+    const searchMessageId = `${searchId}-message`;
+    const suggestionsId = `page-404-suggestions-${generatedId}`;
+
     return (
-      <main className="page-404 docs-studio__pages-404" aria-labelledby={`page-404-title-${generatedId}`}>
-        {values.illustration === true && (
-          <div className="page-404__illustration docs-studio__pages-404-illustration" aria-hidden="true">
-            <PackageSearch />
-          </div>
-        )}
-        {String(values.code || '') && <div className="page-404__code">{String(values.code)}</div>}
-        <h2 className="page-404__heading" id={`page-404-title-${generatedId}`}>{String(values.heading || '')}</h2>
-        <p className="page-404__text">{String(values.message || '')}</p>
+      <section className="page-404" aria-labelledby={headingId}>
+        <div className="empty-state page-404__core">
+          {values.illustration === true && (
+            <div className="empty-state__icon page-404__illustration" aria-hidden="true">
+              <PackageSearch />
+            </div>
+          )}
+          {String(values.code || '').trim() && (
+            <p className="page-404__code" aria-hidden="true">{String(values.code).trim()}</p>
+          )}
+          <h2 className="empty-state__title page-404__heading" id={headingId}>{heading}</h2>
+          <p className="empty-state__message page-404__text">{message}</p>
+          {values.recoveryLinks === true && (
+            <a className="btn page-404__primary-action" href="/">
+              <Home className="btn__icon btn__icon--leading" aria-hidden="true" />
+              Return to the gallery
+            </a>
+          )}
+        </div>
         {values.search === true && (
-          <form className="page-404__search" role="search" onSubmit={submitSearch}>
-            <label className="docs-studio__pages-sr-only" htmlFor={`page-search-${generatedId}`}>Search the gallery</label>
-            <input
-              className="page-404__search-input"
-              id={`page-search-${generatedId}`}
-              type="search"
-              value={searchQuery}
-              placeholder="Search artists or works"
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
-            <button className="page-404__search-btn" type="submit">
-              <Search aria-hidden="true" />
-              <span className="docs-studio__pages-sr-only">Search</span>
-            </button>
+          <form
+            className="page-404__search"
+            role="search"
+            aria-label="Search the gallery"
+            onSubmit={submitSearch}
+          >
+            <div className="input page-404__search-field">
+              <label className="input__label" htmlFor={searchId}>Search the gallery</label>
+              <div className="page-404__search-row">
+                <div className="input__control">
+                  <input
+                    className="input__field"
+                    id={searchId}
+                    name="q"
+                    type="search"
+                    value={searchQuery}
+                    placeholder="Artists, works, or collections"
+                    aria-describedby={searchMessageId}
+                    required
+                    onChange={(event) => {
+                      setSearchQuery(event.target.value);
+                      setSearchFeedback('');
+                    }}
+                  />
+                </div>
+                <button className="btn page-404__search-action" type="submit">
+                  <Search className="btn__icon btn__icon--leading" aria-hidden="true" />
+                  Search
+                </button>
+              </div>
+              <p
+                className="input__message"
+                id={searchMessageId}
+                role={searchFeedback ? 'status' : undefined}
+                aria-live={searchFeedback ? 'polite' : undefined}
+              >
+                {searchFeedback || 'Enter a title or artist. Search handling remains target-owned.'}
+              </p>
+            </div>
           </form>
         )}
-        {searchFeedback && <p className="docs-studio__pages-inline-status" role="status">{searchFeedback}</p>}
         {values.recoveryLinks === true && (
-          <nav className="page-404__links" aria-label="Recovery links">
-            <a className="page-404__link" href="#home" onClick={(event) => event.preventDefault()}><Home aria-hidden="true" /> Home</a>
-            <a className="page-404__link" href="#collection" onClick={(event) => event.preventDefault()}>Current collection</a>
+          <nav className="page-404__links" aria-label="More recovery links">
+            <a className="link page-404__link" href="/components">Browse components</a>
+            <a className="link page-404__link" href="/architecture">Read the architecture</a>
           </nav>
         )}
         {values.suggestions === true && (
-          <section className="page-404__suggestions" aria-labelledby={`suggestions-${generatedId}`}>
-            <h3 className="page-404__suggestions-heading" id={`suggestions-${generatedId}`}>Still on view</h3>
-            <div className="docs-studio__pages-suggestions">
-              <a href="#vessels" onClick={(event) => event.preventDefault()}>Sculptural vessels</a>
-              <a href="#tableware" onClick={(event) => event.preventDefault()}>Tableware studies</a>
-              <a href="#artists" onClick={(event) => event.preventDefault()}>Featured artists</a>
-            </div>
+          <section className="page-404__suggestions" aria-labelledby={suggestionsId}>
+            <h3 className="page-404__suggestions-heading" id={suggestionsId}>Continue exploring</h3>
+            <ul className="page-404__suggestion-list">
+              <li className="page-404__suggestion-item">
+                <a className="link page-404__suggestion-link" href="/components/product-card">Product Card</a>
+              </li>
+              <li className="page-404__suggestion-item">
+                <a className="link page-404__suggestion-link" href="/components/gallery-grid">Gallery Grid</a>
+              </li>
+              <li className="page-404__suggestion-item">
+                <a className="link page-404__suggestion-link" href="/components/artist-profile">Artist Profile</a>
+              </li>
+            </ul>
           </section>
         )}
-      </main>
+      </section>
     );
   }
 
   function renderGiftCard() {
+    const issuer = String(values.issuer || '').trim();
+    const balance = String(values.balance || '').trim();
+    const heading = String(values.heading || '').trim();
+    const instructions = String(values.instructions || '').trim();
+    const codeLabel = String(values.codeLabel || '').trim();
+    const code = String(values.code || '').trim();
+    if (!issuer || !balance || !heading || !instructions || !codeLabel || !code) return null;
+
+    const headingId = `gift-card-title-${generatedId}`;
+    const codeLabelId = `gift-card-code-label-${generatedId}`;
+    const codeId = `gift-card-code-${generatedId}`;
+    const copyStatusId = `gift-card-copy-status-${generatedId}`;
+    const formStatusId = `gift-card-form-status-${generatedId}`;
+
     return (
-      <main className="gift-card docs-studio__pages-gift-card" aria-labelledby={`gift-card-title-${generatedId}`}>
-        {values.visual === true && (
-          <div className="gift-card__visual">
-            <img
-              className="docs-studio__pages-media docs-studio__pages-media--gift-card"
-              src={editorialMedia.texturedVase}
-              alt="Close view of a tall, ribbed ceramic vase"
-            />
-            <div className="gift-card__visual-overlay">
-              {String(values.brand || '') && <span className="gift-card__brand">{String(values.brand)}</span>}
-              <span className="gift-card__amount">{String(values.amount || '')}</span>
+      <section className="gift-card" aria-labelledby={headingId}>
+        <div className="gift-card__layout">
+          <div className="gift-card__card">
+            {values.visual === true && (
+              <img
+                className="gift-card__media docs-studio__pages-media--gift-card"
+                src={editorialMedia.texturedVase}
+                alt=""
+              />
+            )}
+            <div className="gift-card__card-content">
+              <p className="gift-card__issuer">{issuer}</p>
+              <p className="gift-card__balance">{balance}</p>
             </div>
           </div>
-        )}
-        <h2 className="gift-card__heading" id={`gift-card-title-${generatedId}`}>{String(values.heading || '')}</h2>
-        {String(values.message || '') && <p className="gift-card__message">{String(values.message)}</p>}
-        <div className="gift-card__code-wrapper">
-          <span className="gift-card__code">{String(values.code || '')}</span>
-          {String(values.copyLabel || '') && (
-            <button className="gift-card__copy-btn" type="button" aria-label={String(values.copyLabel)} onClick={copyCode}>
-              {copyFeedback === 'Code copied.' ? <Check aria-hidden="true" /> : <Clipboard aria-hidden="true" />}
-            </button>
-          )}
+
+          <div className="gift-card__content">
+            <div>
+              <h2 className="gift-card__heading" id={headingId}>{heading}</h2>
+              <p className="gift-card__instructions">{instructions}</p>
+            </div>
+
+            <div className="gift-card__code-group" aria-labelledby={codeLabelId}>
+              <p className="gift-card__code-label" id={codeLabelId}>{codeLabel}</p>
+              <div className="gift-card__code-row">
+                <code className="gift-card__code" id={codeId}>{code}</code>
+                {String(values.copyLabel || '').trim() && (
+                  <button
+                    className="btn btn--secondary gift-card__copy-action"
+                    type="button"
+                    aria-describedby={copyStatusId}
+                    onClick={copyCode}
+                  >
+                    {copyFeedback === 'Gift card code copied.'
+                      ? <Check className="btn__icon btn__icon--leading" aria-hidden="true" />
+                      : <Clipboard className="btn__icon btn__icon--leading" aria-hidden="true" />}
+                    <span className="gift-card__copy-label">{String(values.copyLabel).trim()}</span>
+                  </button>
+                )}
+              </div>
+              {String(values.copyLabel || '').trim() && (
+                <p
+                  className="gift-card__copy-status"
+                  id={copyStatusId}
+                  role="status"
+                  aria-live="polite"
+                >
+                  {copyFeedback}
+                </p>
+              )}
+            </div>
+
+            {values.details === true && (
+              <dl className="gift-card__details">
+                <div className="gift-card__detail">
+                  <dt>Status</dt>
+                  <dd>Active</dd>
+                </div>
+                <div className="gift-card__detail">
+                  <dt>Expiration</dt>
+                  <dd>No expiration</dd>
+                </div>
+              </dl>
+            )}
+
+            {values.actions === true && (
+              <div className="gift-card__actions" aria-label="Gift card destinations">
+                <a className="btn gift-card__action" href="/components">Browse the gallery</a>
+              </div>
+            )}
+
+            {values.qr === true && (
+              <figure className="gift-card__qr">
+                <div className="gift-card__qr-graphic" aria-hidden="true">
+                  <QrCode />
+                </div>
+                <figcaption className="gift-card__qr-caption">
+                  QR media is supplied by the issuing target; the visible code remains available.
+                </figcaption>
+              </figure>
+            )}
+
+            {values.form === true && (
+              <form
+                className="gift-card__form"
+                aria-label="Target-owned gift card form preview"
+                onSubmit={submitGiftForm}
+              >
+                <LocalField
+                  id={`gift-code-${generatedId}`}
+                  className="gift-card__field"
+                  label="Service code"
+                  name="gift_card_code"
+                  placeholder="Enter a code"
+                  required
+                  value={giftCode}
+                  message="This local preview does not contact a gift card service."
+                  onChange={(nextValue) => {
+                    setGiftCode(nextValue);
+                    setGiftFeedback('');
+                  }}
+                />
+                <button className="btn btn--secondary" type="submit">Submit preview</button>
+                <p
+                  className="gift-card__form-status"
+                  id={formStatusId}
+                  role="status"
+                  aria-live="polite"
+                >
+                  {giftFeedback}
+                </p>
+              </form>
+            )}
+          </div>
         </div>
-        {copyFeedback && <p className="docs-studio__pages-inline-status" role="status">{copyFeedback}</p>}
-        {String(values.balance || '') && <p className="gift-card__balance"><strong>Balance:</strong> {String(values.balance)}</p>}
-        {values.actions === true && (
-          <div className="gift-card__actions">
-            <a className="gift-card__action gift-card__action--primary" href="#browse" onClick={(event) => event.preventDefault()}>Browse works</a>
-            <button className="gift-card__action gift-card__action--secondary" type="button" onClick={() => window.print()}>Print</button>
-          </div>
-        )}
-        {values.qr === true && (
-          <div className="gift-card__qr docs-studio__pages-qr" role="img" aria-label="QR code for the sample gift card">
-            <QrCode aria-hidden="true" />
-          </div>
-        )}
-        {values.form === true && (
-          <form className="gift-card__form" onSubmit={submitGiftForm} noValidate>
-            <LocalField
-              id={`gift-code-${generatedId}`}
-              className="gift-card__field"
-              label="Gift card code"
-              placeholder="Enter a code"
-              value={giftCode}
-              message="This local preview does not check a live balance."
-              onChange={setGiftCode}
-            />
-            <button className="btn" type="submit">Check preview</button>
-            {giftFeedback && <p className="docs-studio__pages-inline-status" role="status">{giftFeedback}</p>}
-          </form>
-        )}
-      </main>
+      </section>
     );
   }
 
   function renderPolicyPage() {
+    const title = String(values.title || '').trim();
+    const updatedDate = String(values.updatedDate || '').trim();
+    const updatedDateTime = String(values.updatedDateTime || '').trim();
+    const tocTitle = String(values.tocTitle || '').trim();
+    const hasBody = values.body === true;
+    const hasToc = values.tocItems === true && Boolean(tocTitle);
+
+    if (!title || !hasBody) return null;
+
     return (
-      <article className="policy-page docs-studio__pages-policy" aria-labelledby={`policy-title-${generatedId}`}>
+      <article className="policy-page" aria-labelledby={`policy-title-${generatedId}`}>
         <header className="policy-page__header">
-          <h2 className="policy-page__title" id={`policy-title-${generatedId}`}>{String(values.title || '')}</h2>
-          {String(values.updatedDate || '') && <p className="policy-page__date">{String(values.updatedDate)}</p>}
+          <h2 className="policy-page__title" id={`policy-title-${generatedId}`}>{title}</h2>
+          {updatedDate && updatedDateTime && (
+            <time className="policy-page__date" dateTime={updatedDateTime}>{updatedDate}</time>
+          )}
+          {updatedDate && !updatedDateTime && <p className="policy-page__date">{updatedDate}</p>}
         </header>
-        {values.tocItems === true && (
+        {hasToc && (
           <nav className="policy-page__toc" aria-labelledby={`policy-toc-${generatedId}`}>
-            {String(values.tocTitle || '') && (
-              <h3 className="policy-page__toc-title" id={`policy-toc-${generatedId}`}>{String(values.tocTitle)}</h3>
-            )}
+            <h3 className="policy-page__toc-title" id={`policy-toc-${generatedId}`}>{tocTitle}</h3>
             <ol className="policy-page__toc-list">
-              <li><a className="policy-page__toc-link" href={`#shipping-${generatedId}`}>Dispatch and handling</a></li>
-              <li><a className="policy-page__toc-link" href={`#delivery-${generatedId}`}>Delivery</a></li>
-              <li><a className="policy-page__toc-link" href={`#returns-${generatedId}`}>Returns</a></li>
+              <li><a className="link policy-page__toc-link" href={`#shipping-${generatedId}`}>Dispatch and handling</a></li>
+              <li><a className="link policy-page__toc-link" href={`#delivery-${generatedId}`}>Delivery</a></li>
+              <li><a className="link policy-page__toc-link" href={`#returns-${generatedId}`}>Returns</a></li>
             </ol>
           </nav>
         )}
-        {values.body === true && (
-          <div className="policy-page__body">
-            <p>Each work is inspected and packed by the studio before it begins its journey.</p>
-            <h2 id={`shipping-${generatedId}`}>Dispatch and handling</h2>
+        <div className="policy-page__body">
+          <p>Each work is inspected and packed by the studio before it begins its journey.</p>
+          <section
+            className="policy-page__section"
+            id={`shipping-${generatedId}`}
+            aria-labelledby={`shipping-title-${generatedId}`}
+          >
+            <h3 className="policy-page__section-title" id={`shipping-title-${generatedId}`}>Dispatch and handling</h3>
             <p>Available works usually leave the gallery within three business days. Made-to-order work follows the timeline shown with the piece.</p>
-            <h2 id={`delivery-${generatedId}`}>Delivery</h2>
+            <ul>
+              <li>In-stock work is packed after a final condition check.</li>
+              <li>Made-to-order timing remains attached to the individual work.</li>
+            </ul>
+          </section>
+          <section
+            className="policy-page__section"
+            id={`delivery-${generatedId}`}
+            aria-labelledby={`delivery-title-${generatedId}`}
+          >
+            <h3 className="policy-page__section-title" id={`delivery-title-${generatedId}`}>Delivery</h3>
             <p>Delivery timing depends on destination and carrier service. Tracking details are supplied by the target storefront after dispatch.</p>
-            <h2 id={`returns-${generatedId}`}>Returns</h2>
-            <p>Contact the gallery before returning a work so its condition and return route can be documented.</p>
-          </div>
-        )}
+            <blockquote>
+              Transit estimates begin after dispatch and do not replace the carrier's current service information.
+            </blockquote>
+          </section>
+          <section
+            className="policy-page__section"
+            id={`returns-${generatedId}`}
+            aria-labelledby={`returns-title-${generatedId}`}
+          >
+            <h3 className="policy-page__section-title" id={`returns-title-${generatedId}`}>Returns</h3>
+            <p>
+              <a className="link" href="/components/contact-section">Contact the gallery</a>{' '}
+              before returning a work so its condition and return route can be documented.
+            </p>
+          </section>
+        </div>
       </article>
     );
   }
 
   function renderCheckoutProgress() {
+    const accessibleLabel = String(values.accessibleLabel || '').trim();
+    if (!accessibleLabel || values.steps !== true) return null;
+
     return (
-      <ol className="checkout-progress docs-studio__pages-checkout" aria-label={String(values.accessibleLabel || '')}>
-        {values.steps === true && (
-          <>
-            <li className="checkout-progress__step" data-status="complete">
-              <span className="checkout-progress__indicator"><Check aria-label="Complete" /></span>
-              <span className="checkout-progress__label">Information</span>
-            </li>
-            <li className="checkout-progress__step" data-status="current" aria-current="step">
-              <span className="checkout-progress__indicator">2</span>
-              <span className="checkout-progress__label">Shipping</span>
-            </li>
-            <li className="checkout-progress__step">
-              <span className="checkout-progress__indicator">3</span>
-              <span className="checkout-progress__label">Payment</span>
-            </li>
-          </>
-        )}
-      </ol>
+      <div className="checkout-progress">
+        <StepsArtwork
+          className="checkout-progress__list"
+          label={accessibleLabel}
+          items={checkoutStepsFixture}
+        />
+      </div>
     );
   }
 

@@ -1,31 +1,207 @@
-<section class="product-slider" aria-label="Related products">
-  <div class="product-slider__header">
-    <h2 class="product-slider__title">{{ section.settings.title | default: 'You may also like' }}</h2>
-    <div class="product-slider__nav">
-      <button class="btn btn--outline btn--icon-only btn--sm"
-              aria-label="Previous" data-slider-prev>
-        {% render 'icon', name: 'chevron-left' %}
-      </button>
-      <button class="btn btn--outline btn--icon-only btn--sm"
-              aria-label="Next" data-slider-next>
-        {% render 'icon', name: 'chevron-right' %}
-      </button>
-    </div>
-  </div>
+{%- liquid
+  assign default_title = 'products.slider.heading' | t
+  assign slider_title = section.settings.title | default: default_title
+  assign slider_title_id = 'ProductSliderTitle-' | append: section.id
+  assign slider_track_id = 'ProductSliderTrack-' | append: section.id
+-%}
 
-  <div class="product-slider__track" data-slider-track>
-    {% for product in recommendations.products limit: 8 %}
-      {% render 'product-card', product: product %}
-    {% endfor %}
-  </div>
-</section>
+<tg-product-slider
+  data-section-id="{{ section.id }}"
+  {% if product != blank %}data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&amp;product_id={{ product.id }}&amp;limit={{ section.settings.products_to_show }}&amp;intent=related"{% endif %}
+>
+  {%- if recommendations.performed? and recommendations.products_count > 0 -%}
+    <section class="carousel product-slider" aria-labelledby="{{ slider_title_id }}" data-product-slider>
+      <div class="product-slider__header">
+        <h2 class="product-slider__title" id="{{ slider_title_id }}">{{ slider_title | escape }}</h2>
+        <div class="product-slider__nav" role="group" aria-labelledby="{{ slider_title_id }}">
+          <button
+            class="icon-btn icon-btn--round carousel__nav-btn product-slider__nav-button product-slider__nav-button--previous"
+            type="button"
+            aria-label="{{ 'products.slider.previous' | t | escape }}"
+            aria-controls="{{ slider_track_id }}"
+            data-product-slider-previous
+            disabled
+          >
+            {% render 'icon', name: 'chevron-left' %}
+          </button>
+          <button
+            class="icon-btn icon-btn--round carousel__nav-btn product-slider__nav-button product-slider__nav-button--next"
+            type="button"
+            aria-label="{{ 'products.slider.next' | t | escape }}"
+            aria-controls="{{ slider_track_id }}"
+            data-product-slider-next
+          >
+            {% render 'icon', name: 'chevron-right' %}
+          </button>
+        </div>
+      </div>
+
+      <ul
+        class="carousel__track product-slider__track"
+        id="{{ slider_track_id }}"
+        tabindex="0"
+        aria-labelledby="{{ slider_title_id }}"
+        data-product-slider-track
+      >
+        {%- for recommendation in recommendations.products limit: section.settings.products_to_show -%}
+          <li class="carousel__slide product-slider__item" data-product-slider-item>
+            {% render 'product-card', product: recommendation, media_ratio: section.settings.media_ratio %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </section>
+  {%- endif -%}
+</tg-product-slider>
+
+{% javascript %}
+  class GalleryProductSlider extends HTMLElement {
+    connectedCallback() {
+      this.frame = null;
+      this.abortController = null;
+      this.resizeObserver = null;
+      const slider = this.querySelector('[data-product-slider]');
+      if (slider) {
+        this.setupSlider(slider);
+        return;
+      }
+      if (this.dataset.url) this.loadRecommendations();
+    }
+
+    disconnectedCallback() {
+      this.abortController?.abort();
+      this.resizeObserver?.disconnect();
+      if (this.frame !== null) cancelAnimationFrame(this.frame);
+      this.track?.removeEventListener('scroll', this.handleScroll);
+      this.previous?.removeEventListener('click', this.handlePrevious);
+      this.next?.removeEventListener('click', this.handleNext);
+    }
+
+    async loadRecommendations() {
+      this.abortController = new AbortController();
+      try {
+        const response = await fetch(this.dataset.url, {
+          headers: { Accept: 'text/html' },
+          signal: this.abortController.signal,
+        });
+        if (!response.ok) throw new Error();
+        const html = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const incoming = html.querySelector('tg-product-slider');
+        if (!incoming?.querySelector('[data-product-slider]')) {
+          this.hidden = true;
+          return;
+        }
+        this.innerHTML = incoming.innerHTML;
+        this.setupSlider(this.querySelector('[data-product-slider]'));
+      } catch (error) {
+        if (error.name !== 'AbortError') this.hidden = true;
+      }
+    }
+
+    setupSlider(slider) {
+      if (!slider) return;
+      this.track = slider.querySelector('[data-product-slider-track]');
+      this.items = [...slider.querySelectorAll('[data-product-slider-item]')];
+      this.previous = slider.querySelector('[data-product-slider-previous]');
+      this.next = slider.querySelector('[data-product-slider-next]');
+      if (!this.track || this.items.length === 0 || !this.previous || !this.next) return;
+
+      this.currentIndex = 0;
+      this.handleScroll = () => this.scheduleSync();
+      this.handlePrevious = () => this.move(-1);
+      this.handleNext = () => this.move(1);
+      this.track.addEventListener('scroll', this.handleScroll, { passive: true });
+      this.previous.addEventListener('click', this.handlePrevious);
+      this.next.addEventListener('click', this.handleNext);
+      this.resizeObserver = new ResizeObserver(() => this.scheduleSync());
+      this.resizeObserver.observe(this.track);
+      this.sync();
+    }
+
+    scheduleSync() {
+      if (this.frame !== null) return;
+      this.frame = requestAnimationFrame(() => {
+        this.frame = null;
+        this.sync();
+      });
+    }
+
+    sync() {
+      const rtl = getComputedStyle(this.track).direction === 'rtl';
+      const trackRect = this.track.getBoundingClientRect();
+      const trackEdge = rtl ? trackRect.right : trackRect.left;
+      this.currentIndex = this.items.reduce((closest, item, index) => {
+        const rect = item.getBoundingClientRect();
+        const distance = Math.abs((rtl ? rect.right : rect.left) - trackEdge);
+        return distance < closest.distance ? { index, distance } : closest;
+      }, { index: 0, distance: Number.POSITIVE_INFINITY }).index;
+
+      const firstRect = this.items[0].getBoundingClientRect();
+      const lastRect = this.items[this.items.length - 1].getBoundingClientRect();
+      const previousWasFocused = document.activeElement === this.previous;
+      const nextWasFocused = document.activeElement === this.next;
+      this.previous.disabled = rtl
+        ? firstRect.right <= trackRect.right + 1
+        : firstRect.left >= trackRect.left - 1;
+      this.next.disabled = rtl
+        ? lastRect.left >= trackRect.left - 1
+        : lastRect.right <= trackRect.right + 1;
+      if ((previousWasFocused && this.previous.disabled) || (nextWasFocused && this.next.disabled)) {
+        this.track.focus({ preventScroll: true });
+      }
+    }
+
+    move(direction) {
+      const control = direction < 0 ? this.previous : this.next;
+      if (control.disabled) return;
+      const index = Math.max(0, Math.min(this.items.length - 1, this.currentIndex + direction));
+      this.items[index].scrollIntoView({ block: 'nearest', inline: 'start' });
+    }
+  }
+
+  if (!customElements.get('tg-product-slider')) {
+    customElements.define('tg-product-slider', GalleryProductSlider);
+  }
+{% endjavascript %}
 
 {% schema %}
 {
-  "name": "Related Products",
+  "name": "t:sections.related_products.name",
   "settings": [
-    { "type": "text", "id": "title", "label": "Heading", "default": "You may also like" }
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.related_products.settings.heading"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "t:sections.related_products.settings.media_ratio",
+      "options": [
+        {
+          "value": "square",
+          "label": "t:sections.related_products.options.square"
+        },
+        {
+          "value": "portrait",
+          "label": "t:sections.related_products.options.portrait"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "t:sections.related_products.settings.products_to_show",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 6
+    }
   ],
-  "presets": [{ "name": "Related Products" }]
+  "presets": [
+    {
+      "name": "t:sections.related_products.name"
+    }
+  ]
 }
 {% endschema %}

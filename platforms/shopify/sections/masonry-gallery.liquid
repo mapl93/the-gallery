@@ -1,0 +1,100 @@
+{% liquid
+  assign gallery_label = section.settings.accessibility_label
+  if gallery_label == blank
+    assign gallery_label = 'masonry_gallery.default_label' | t
+  endif
+
+  assign artwork_count = 0
+  for block in section.blocks
+    if block.type == 'artwork' and block.settings.image != blank
+      assign artwork_count = artwork_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if artwork_count > 0 %}
+  <ul class="masonry-gallery" aria-label="{{ gallery_label | escape }}">
+    {% for block in section.blocks %}
+      {% if block.type == 'artwork' and block.settings.image != blank %}
+        {% liquid
+          assign image_alt = block.settings.image.alt
+          if block.settings.image_decorative
+            assign image_alt = ''
+          endif
+        %}
+        <li class="masonry-gallery__item" {{ block.shopify_attributes }}>
+          <figure class="gallery-piece">
+            {{ block.settings.image | image_url: width: 1800 | image_tag:
+              alt: image_alt,
+              widths: '320, 480, 640, 800, 1080, 1440, 1800',
+              sizes: '(min-width: 1024px) 33vw, (min-width: 520px) 50vw, 100vw'
+            }}
+
+            {% if block.settings.title != blank or block.settings.price != blank %}
+              <figcaption class="gallery-piece__overlay">
+                {% if block.settings.title != blank %}
+                  <span class="gallery-piece__title">{{ block.settings.title | escape }}</span>
+                {% endif %}
+                {% if block.settings.price != blank %}
+                  <span class="gallery-piece__price">{{ block.settings.price | escape }}</span>
+                {% endif %}
+              </figcaption>
+            {% endif %}
+          </figure>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.masonry_gallery.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "accessibility_label",
+      "label": "t:sections.masonry_gallery.settings.accessibility_label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "artwork",
+      "name": "t:sections.masonry_gallery.blocks.artwork.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.masonry_gallery.blocks.artwork.settings.image"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_decorative",
+          "label": "t:sections.masonry_gallery.blocks.artwork.settings.image_decorative",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:sections.masonry_gallery.blocks.artwork.settings.title"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "t:sections.masonry_gallery.blocks.artwork.settings.price"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.masonry_gallery.name",
+      "blocks": [
+        { "type": "artwork" },
+        { "type": "artwork" },
+        { "type": "artwork" }
+      ]
+    }
+  ]
+}
+{% endschema %}

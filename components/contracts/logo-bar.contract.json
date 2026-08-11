@@ -1,188 +1,86 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "logo-bar",
   "name": "Logo Bar / Trust Bar",
   "registryId": "S12",
   "category": "sections",
   "status": "pilot",
-  "summary": "Passive logo or trust-mark collection with static and source-backed marquee presentation.",
-  "dependencies": [],
+  "summary": "Native ordered mark collection with a static default and an optional canonical Marquee presentation for bounded logical motion and persistent playback control.",
+  "dependencies": ["marquee"],
   "source": {
     "registry": "registry.json#/components/logo-bar",
-    "css": {
-      "file": "components/css/sections.css",
-      "selector": ".logo-bar"
-    },
+    "css": { "file": "components/css/sections.css", "selector": ".logo-bar" },
     "docs": "site/src/content/components/logo-bar.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".logo-bar",
-      "className": ".logo-bar",
-      "required": true,
-      "description": "Logo bar section root."
-    },
-    {
-      "name": "label",
-      "selector": ".logo-bar__label",
-      "className": ".logo-bar__label",
-      "required": false,
-      "description": "Optional visible collection label."
-    },
-    {
-      "name": "logos",
-      "selector": ".logo-bar__logos",
-      "className": ".logo-bar__logos",
-      "required": true,
-      "description": "Ordered target-owned logo or trust-mark composition."
-    }
+    { "name": "root", "selector": ".logo-bar", "className": ".logo-bar", "required": true, "description": "Generic root, or labelled section when a visible contextual label exists; omitted when no valid marks exist." },
+    { "name": "label", "selector": ".logo-bar__label", "className": ".logo-bar__label", "required": false, "description": "Optional visible contextual label. Its final heading rank is selected by the surrounding target document." },
+    { "name": "viewport", "selector": ".logo-bar__viewport", "className": ".logo-bar__viewport", "required": true, "description": "Canonical Marquee viewport; it clips only after a valid marquee enhancement." },
+    { "name": "track", "selector": ".logo-bar__track", "className": ".logo-bar__track", "required": true, "description": "Canonical Marquee presentation track." },
+    { "name": "sourceList", "selector": ".logo-bar__list", "className": ".logo-bar__list", "required": true, "description": "The one authoritative native list of target-owned marks in meaningful source order; it also carries the canonical Marquee source-group class." },
+    { "name": "item", "selector": ".logo-bar__item", "className": ".logo-bar__item", "required": true, "description": "Native list item containing one informative, decorative or functional target-owned mark composition." },
+    { "name": "mark", "selector": ".logo-bar__mark", "className": ".logo-bar__mark", "required": true, "description": "Target-supplied raster image, SVG or equivalent mark with explicit alternative-text intent." },
+    { "name": "destination", "selector": ".logo-bar__link", "className": ".logo-bar__link", "required": false, "description": "Native anchor used only when a real destination exists and the mark names that purpose." },
+    { "name": "visualCopy", "selector": ".marquee__group--copy", "className": ".marquee__group--copy", "required": false, "generated": true, "description": "At most one canonical Marquee visual copy, aria-hidden, inert, non-interactive and absent from the semantic data source." },
+    { "name": "control", "selector": ".marquee__control", "className": ".marquee__control", "required": false, "description": "Canonical compact Button, additionally identified by the Logo Bar part class in adapters, revealed only for a valid marquee enhancement and labelled with the next Pause or Resume action." }
   ],
   "variants": [
-    {
-      "name": "static",
-      "className": null,
-      "default": true,
-      "description": "Default wrapping logo collection."
-    },
-    {
-      "name": "marquee",
-      "className": ".logo-bar--marquee",
-      "default": false,
-      "description": "Existing continuously translated presentation hook."
-    }
+    { "name": "static", "className": ".logo-bar--static", "default": true, "description": "Default intrinsic wrapping collection with no visual copy, playback control or component runtime work." },
+    { "name": "marquee", "className": ".logo-bar--marquee", "default": false, "description": "Explicitly composes canonical Marquee Auto behavior while preserving the same authoritative mark list." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default size."
-    }
+    { "name": "default", "className": null, "default": true, "description": "One container-responsive presentation; mark box, gap and wrapping geometry remain private." }
   ],
   "states": [
-    {
-      "name": "default",
-      "selectors": [
-        ".logo-bar"
-      ],
-      "description": "Passive resting logo collection."
-    },
-    {
-      "name": "logoHover",
-      "selectors": [
-        ".logo-bar__logos img:hover",
-        ".logo-bar__logos svg:hover"
-      ],
-      "description": "Pointer-only visual emphasis for a passive raster mark. Vector marks use the same treatment without creating activation semantics."
-    },
-    {
-      "name": "linkedLogoFocusVisible",
-      "selectors": [
-        ".logo-bar__logos a:focus-visible"
-      ],
-      "description": "Visible keyboard focus when a target wraps a mark in a native link."
-    }
+    { "name": "static", "selectors": [".logo-bar--static", ".marquee[data-marquee-state=\"static\"]"], "description": "The authoritative mark list wraps intrinsically and no playback control exists." },
+    { "name": "pending", "selectors": [".marquee--auto:not([data-marquee-enhanced=\"true\"])"], "description": "No-JavaScript and pre-enhancement marquee markup stays readable and static." },
+    { "name": "playing", "selectors": [".marquee[data-marquee-state=\"playing\"]"], "description": "Canonical Marquee CSS motion runs at the measured duration for the selected semantic pace." },
+    { "name": "temporarilyPaused", "selectors": [".marquee[data-marquee-state=\"paused\"][data-hover-paused=\"true\"]"], "description": "Pointer presence temporarily suspends marquee motion without changing the durable user preference." },
+    { "name": "userPaused", "selectors": [".marquee[data-user-paused=\"true\"]"], "description": "Focus entry or Pause activation creates a durable pause until explicit Resume." },
+    { "name": "linkedMarkFocusVisible", "selectors": [".logo-bar__link:focus-visible"], "description": "The authoritative native mark link has a visible keyboard focus indicator." },
+    { "name": "reducedMotion", "selectors": [".marquee[data-reduced-motion=\"true\"]"], "description": "The source list is static, the visual copy is hidden and the playback control is omitted." }
   ],
   "behavior": [
-    {
-      "name": "passiveMarks",
-      "selectors": [
-        ".logo-bar__logos"
-      ],
-      "description": "Marks are passive by default. A target may wrap a mark in a native link only when a real destination exists and must then provide link semantics and focus treatment."
-    },
-    {
-      "name": "marqueeBoundary",
-      "selectors": [
-        ".logo-bar--marquee .logo-bar__logos"
-      ],
-      "description": "The class is source-backed presentation evidence only; content duplication, travel distance, timing, pause controls, and announcements remain unresolved and target-owned. Reduced motion renders a wrapped static collection."
-    }
+    { "name": "nativeMarkCollection", "selectors": [".logo-bar__list", ".logo-bar__item"], "description": "Targets supply one ordered native list. Informative marks name the represented entity, decorative marks are hidden, and linked marks use a native anchor only for a real destination." },
+    { "name": "canonicalMarqueeComposition", "selectors": [".logo-bar.marquee", ".logo-bar__track", ".marquee__control"], "events": ["marqueeplaybackchange"], "description": "Marquee presentation delegates duplication, measurement, logical direction, semantic pace, playback, focus, visibility and reduced-motion behavior to canonical S18 without a second state owner." },
+    { "name": "progressiveFallback", "selectors": [".marquee[data-marquee]"], "description": "Empty collections omit the root. Static, reduced-motion, missing-JavaScript, failed-enhancement and one-item output stays readable with no usable motion control." },
+    { "name": "boundedLinkedCopies", "selectors": [".logo-bar__link", ".marquee__group--copy"], "description": "Generated linked marks are aria-hidden, inert, pointer-inactive and removed from focus navigation; only the authoritative link remains interactive." },
+    { "name": "stateOwnership", "selectors": [".logo-bar"], "events": ["marqueeplaybackchange"], "description": "Neutral Web marquee playback is uncontrolled for the live component lifetime. Framework targets may project controlled state around the same owner, not add a second state machine." }
   ],
   "properties": [
-    {
-      "name": "variant",
-      "type": "enum",
-      "required": false,
-      "defaultValue": "static",
-      "valuesFrom": "variants",
-      "description": "Static or existing marquee presentation.",
-      "targetMappings": {
-        "web": [{ "kind": "optionClass", "selector": ".logo-bar", "source": "variants" }]
-      }
-    },
-    {
-      "name": "label",
-      "type": "string",
-      "required": false,
-      "description": "Optional visible label for the mark collection.",
-      "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".logo-bar__label" }]
-      }
-    },
-    {
-      "name": "logos",
-      "type": "slot",
-      "required": true,
-      "description": "Ordered target-owned logo or trust-mark content.",
-      "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".logo-bar__logos", "classNames": [".logo-bar__logos"] }]
-      }
-    }
+    { "name": "presentation", "type": "enum", "required": false, "defaultValue": "static", "valuesFrom": "variants", "description": "Static wrapping collection or explicit canonical Marquee presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".logo-bar", "source": "variants" }, { "kind": "attribute", "selector": ".logo-bar", "attribute": "data-presentation", "values": { "static": "static", "marquee": "auto" } }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Optional visible contextual label; blank omits both the label and section landmark.", "targetMappings": { "web": [{ "kind": "content", "selector": ".logo-bar__label" }] } },
+    { "name": "marks", "type": "slot", "required": true, "description": "One ordered native list of target-owned informative, decorative or functional mark compositions; the root is omitted when empty.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".logo-bar__list", "classNames": [".logo-bar__list", ".logo-bar__item", ".logo-bar__mark", ".logo-bar__link"] }] } },
+    { "name": "direction", "type": "enum", "required": false, "defaultValue": "forward", "values": ["forward", "reverse"], "description": "Marquee-only logical direction independent of physical left/right.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".logo-bar", "attribute": "data-direction", "values": { "forward": "forward", "reverse": "reverse" } }] } },
+    { "name": "pace", "type": "enum", "required": false, "defaultValue": "default", "values": ["slow", "default", "fast"], "description": "Marquee-only semantic distance-normalized velocity preset; raw duration remains private.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".logo-bar", "attribute": "data-pace", "values": { "slow": "slow", "default": "default", "fast": "fast" } }] } },
+    { "name": "pauseLabel", "type": "string", "required": true, "description": "Localized visible next-action label required for the canonical Button when marquee motion can be paused.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".marquee__control", "attribute": "data-pause-label", "valueFrom": "property", "elements": ["button"] }, { "kind": "content", "selector": ".marquee__control" }] } },
+    { "name": "resumeLabel", "type": "string", "required": true, "description": "Localized visible next-action label used while marquee motion is durably paused.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".marquee__control", "attribute": "data-resume-label", "valueFrom": "property", "elements": ["button"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-border-focus",
-        "--color-border-subtle",
-        "--color-text-secondary"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
-      "spacing": [
-        "--space-layout-container"
-      ],
-      "transition": [
-        "--transition-fast"
-      ],
-      "typography": [
-        "--typo-body-size"
-      ]
+      "color": ["--color-border-focus", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "easing": ["--easing-default"],
+      "radius": ["--radius-sm"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap"],
+      "transition": ["--transition-fast"],
+      "typography": ["--font-family-body", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Each informative mark has an appropriate accessible name; decorative duplicate marks are hidden from assistive technology.",
-    "Passive marks do not receive link semantics. Linked marks use native anchors with visible focus and descriptive destination names.",
-    "Marquee presentation pauses for focus and hover, and reduced motion renders a static wrapping collection without duplicate announcements."
+    "Preserve one authoritative native list in meaningful target-authored order; classify every mark as informative, decorative or functional and never infer truthful alternative text from a filename.",
+    "Use native anchors only for real destinations, give each functional mark a useful accessible name, preserve visible focus and keep every generated linked copy inert and unfocusable.",
+    "Do not use Logo Bar as the only location for critical policy, price, availability, status, deadline, instruction or error information.",
+    "For marquee presentation, expose one localized canonical Button for persistent Pause and Resume, pause durably on focus entry, pause temporarily on hover and suspend while the document is hidden.",
+    "Render a readable static list and omit the playback control for static, reduced motion, missing JavaScript, failed enhancement, invalid content or one item.",
+    "Preserve logical source order, RTL direction, forced colors, localization, narrow containers and 200 percent text zoom without horizontal page overflow or clipped focus."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "native-component"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "native-component"
-    }
+    "web": { "status": "implemented", "kind": "css-js-composition", "notes": "Canonical Logo Bar CSS composes canonical Marquee markup, runtime and Button control without a second motion owner." },
+    "shopify": { "status": "planned", "kind": "section-blocks-css-js", "notes": "Map ordered image/link blocks, explicit alternative text and static/marquee settings to the same source semantics; editor-preview runtime remains target certification work." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-component" },
+    "compose": { "status": "planned", "kind": "native-component" }
   }
 }

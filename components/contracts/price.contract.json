@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.4.0",
   "slug": "price",
   "name": "Price",
   "registryId": "A9",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Commerce price primitive with current price, compare-at price, unit price, and sale visual treatment.",
+  "summary": "Passive target-formatted commerce price with current, compare-at, and unit-price parts.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/price",
@@ -22,28 +22,42 @@
       "selector": ".price",
       "className": ".price",
       "required": true,
-      "description": "Inline price wrapper."
+      "description": "Passive inline price wrapper without widget, group, or live-region semantics."
     },
     {
       "name": "current",
       "selector": ".price__current",
       "className": ".price__current",
       "required": true,
-      "description": "Current payable price."
+      "description": "Current payable price part."
     },
     {
       "name": "compare",
       "selector": ".price__compare",
       "className": ".price__compare",
       "required": false,
-      "description": "Original or compare-at price shown when discounted."
+      "description": "Native s element for a no-longer-current compare-at price."
     },
     {
       "name": "unit",
       "selector": ".price__unit",
       "className": ".price__unit",
       "required": false,
-      "description": "Optional unit or recurring price qualifier."
+      "description": "Optional complete target-formatted unit-price expression."
+    },
+    {
+      "name": "label",
+      "selector": ".price__label",
+      "className": ".price__label",
+      "required": false,
+      "description": "Localized visually hidden text that identifies a current, compare-at, or unit-price part."
+    },
+    {
+      "name": "value",
+      "selector": ".price__value",
+      "className": ".price__value",
+      "required": true,
+      "description": "Bidirectionally isolated target-formatted value text."
     }
   ],
   "variants": [
@@ -51,13 +65,13 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default price display."
+      "description": "Current price with optional unit-price content."
     },
     {
       "name": "on-sale",
       "className": ".price--on-sale",
       "default": false,
-      "description": "Discounted price with compare-at value."
+      "description": "Current sale price plus a target-validated compare-at price."
     }
   ],
   "sizes": [
@@ -65,28 +79,42 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default price size."
+      "description": "One container-responsive price hierarchy."
     }
   ],
   "states": [
     {
       "name": "default",
       "selectors": [".price"],
-      "description": "Passive display state. Sale treatment is a variant, not a duplicated state."
+      "description": "Passive readable content. Dynamic updates and announcements belong to the owning target region."
     }
   ],
   "behavior": [
     {
-      "name": "moneyFormatting",
+      "name": "targetFormatting",
       "selectors": [".price__current", ".price__compare", ".price__unit"],
-      "attributes": ["aria-label"],
-      "description": "Targets provide already-formatted locale, currency, compare-at, and unit-price strings while preserving the price anatomy."
+      "description": "Targets supply complete locale-, currency-, rounding-, range-, and measurement-aware strings; Price performs no parsing or arithmetic."
+    },
+    {
+      "name": "saleComposition",
+      "selectors": [".price--on-sale", ".price__current", ".price__compare", ".price__label"],
+      "description": "On-sale composition requires current and compare-at values plus localized part labels; the target validates the commercial relationship."
+    },
+    {
+      "name": "bidirectionalIsolation",
+      "selectors": [".price__value"],
+      "description": "Each formatted value uses native bdi isolation while localized labels follow the surrounding language direction."
+    },
+    {
+      "name": "targetOwnedUpdates",
+      "selectors": [".price"],
+      "description": "Price is not a live region. A product, cart, or checkout adapter owns price-change status timing, deduplication, and focus context."
     },
     {
       "name": "openTypeFeatures",
       "selectors": [".price"],
       "attributes": ["data-price-alternate-digits", "data-price-slashed-zero", "data-price-tabular-numbers", "data-price-contextual-alternates", "data-price-fractions"],
-      "description": "Price exposes independent OpenType feature switches. Unsupported features are ignored by the active font without changing content semantics."
+      "description": "Five independent accepted OpenType switches fail progressively when the active font does not support a requested feature."
     }
   ],
   "properties": [
@@ -94,44 +122,59 @@
       "name": "currentPrice",
       "type": "string",
       "required": true,
-      "description": "Already-formatted current payable price supplied by the target.",
+      "description": "Complete target-formatted current payable price, range, or truthful price text.",
       "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".price__current"
-          }
-        ]
+        "web": [{ "kind": "content", "selector": ".price__current" }]
+      }
+    },
+    {
+      "name": "currentPriceLabel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit the current label when adjacent context already makes a non-sale price unambiguous; provide it for on-sale composition.",
+      "description": "Localized Price or Sale price text exposed as DOM content.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".price__label" }]
       }
     },
     {
       "name": "compareAtPrice",
       "type": "string",
       "required": false,
-      "unsetBehavior": "Omit the compare-at element when no formatted value is supplied.",
-      "description": "Optional already-formatted original or compare-at price used with the on-sale variant.",
+      "unsetBehavior": "Omit the compare-at element; on-sale is incomplete without it.",
+      "description": "Complete target-formatted previous price used only with on-sale.",
       "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".price__compare"
-          }
-        ]
+        "web": [{ "kind": "content", "selector": ".price__compare" }]
+      }
+    },
+    {
+      "name": "compareAtPriceLabel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit with compare-at content; a rendered compare-at price requires a localized label in usage guidance.",
+      "description": "Localized Regular price or equivalent text exposed inside the compare-at element.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".price__label" }]
       }
     },
     {
       "name": "unitPrice",
       "type": "string",
       "required": false,
-      "unsetBehavior": "Omit the unit-price element when no formatted value is supplied.",
-      "description": "Optional already-formatted unit or recurring price qualifier.",
+      "unsetBehavior": "Omit the unit-price element.",
+      "description": "Complete target-formatted price and measurement expression.",
       "targetMappings": {
-        "web": [
-          {
-            "kind": "content",
-            "selector": ".price__unit"
-          }
-        ]
+        "web": [{ "kind": "content", "selector": ".price__unit" }]
+      }
+    },
+    {
+      "name": "unitPriceLabel",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Omit with unit-price content; a localized label is recommended whenever unit content renders.",
+      "description": "Localized Unit price text exposed as DOM content.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".price__label" }]
       }
     },
     {
@@ -139,32 +182,9 @@
       "type": "enum",
       "required": false,
       "valuesFrom": "variants",
-      "description": "Price presentation selected from the canonical variant list; default is the classless contract variant.",
+      "description": "Default or target-validated on-sale presentation.",
       "targetMappings": {
-        "web": [
-          {
-            "kind": "optionClass",
-            "selector": ".price",
-            "source": "variants"
-          }
-        ]
-      }
-    },
-    {
-      "name": "accessibleLabel",
-      "type": "string",
-      "required": false,
-      "unsetBehavior": "Use the visible price text as the accessible content when no aggregate label is supplied.",
-      "description": "Optional localized aggregate label that explains sale and compare-at meaning without relying on strikethrough.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "attribute",
-            "selector": ".price",
-            "attribute": "aria-label",
-            "valueFrom": "property"
-          }
-        ]
+        "web": [{ "kind": "optionClass", "selector": ".price", "source": "variants" }]
       }
     },
     {
@@ -172,7 +192,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Enables the active font's ss01 stylistic set; in Inter this provides alternate open digits.",
+      "description": "Enables the active font's ss01 stylistic set; exact glyphs remain font-owned.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-alternate-digits", "values": { "true": "true", "false": "false" } }]
       }
@@ -182,7 +202,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": true,
-      "description": "Enables the standard zero OpenType feature for a slashed zero when supported.",
+      "description": "Enables the standard slashed-zero feature when supported.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-slashed-zero", "values": { "true": "true", "false": "false" } }]
       }
@@ -192,7 +212,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": true,
-      "description": "Enables tabular numeric widths to keep changing and aligned prices stable.",
+      "description": "Enables stable tabular numeric widths when supported.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-tabular-numbers", "values": { "true": "true", "false": "false" } }]
       }
@@ -212,7 +232,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Enables automatic fractions for price content that intentionally contains fraction notation.",
+      "description": "Enables automatic fractions only for intentionally authored fraction notation.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".price", "attribute": "data-price-fractions", "values": { "true": "true", "false": "false" } }]
       }
@@ -220,50 +240,39 @@
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-text-primary",
-        "--color-text-disabled",
-        "--color-text-secondary"
-      ],
+      "color": ["--color-text-primary", "--color-text-secondary"],
       "typography": [
         "--typo-h4-size",
+        "--typo-h4-line-height",
         "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height",
         "--font-family-body"
       ]
     }
   },
   "accessibility": [
-    "Expose the payable price in text, not only visually.",
-    "Make discounted pricing understandable to assistive technology with clear text or aria-labels.",
-    "Do not rely on strikethrough alone to explain compare-at pricing.",
-    "Preserve locale and currency formatting for the target market."
+    "Expose the payable price as visible text and preserve complete target locale and currency formatting.",
+    "Use native s plus localized Regular price and Sale price text so compare-at meaning does not depend on line-through or color alone.",
+    "Isolate each formatted value bidirectionally without changing the surrounding localized label direction.",
+    "Do not give a static Price widget, group, focus, keyboard, or live-region semantics.",
+    "Let the owning target region announce dynamic price changes only when its interaction and status policy requires it."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/primitives.css; targets provide formatted string content."
+      "kind": "css-html",
+      "notes": "Canonical CSS and semantic HTML parts consume complete target-formatted strings without neutral runtime."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid formats prices with Shopify money filters and renders the canonical root variant and element classes."
+      "notes": "Dedicated Liquid maps product money filters, localized labels, native compare-at semantics, and Shopify's unit-price measurement filter."
     },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "style"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "composable"
-    }
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

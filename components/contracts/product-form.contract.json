@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "product-form",
   "name": "Product Form",
   "registryId": "D5",
   "category": "product",
   "status": "pilot",
-  "summary": "Add-to-cart form layout that composes variant selection, quantity selection, and primary product actions.",
+  "summary": "Native product-purchase form that composes canonical option, quantity, and primary-action controls while targets own merchandise resolution and the purchase lifecycle.",
   "dependencies": ["button", "quantity-selector", "variant-selector"],
   "source": {
     "registry": "registry.json#/components/product-form",
@@ -14,43 +14,67 @@
     "docs": "site/src/content/components/product-form.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".product-form", "className": ".product-form", "required": true, "description": "Product purchase form." },
-    { "name": "actions", "selector": ".product-form__actions", "className": ".product-form__actions", "required": true, "description": "Action row for add-to-cart and secondary actions." },
-    { "name": "submit", "selector": ".product-form__submit", "className": ".product-form__submit", "required": true, "description": "Primary submit button." },
-    { "name": "variantSelector", "selector": ".variant-selector", "className": ".variant-selector", "required": false, "description": "Variant selector dependency." }
+    { "name": "root", "selector": ".product-form", "className": ".product-form", "required": true, "description": "Native product-purchase form and form-associated control boundary on Web." },
+    { "name": "variantSelector", "selector": ".product-form > .variant-selector", "className": ".variant-selector", "required": false, "description": "Optional canonical Variant Selector dependency." },
+    { "name": "quantitySelector", "selector": ".product-form > .qty", "className": ".qty", "required": false, "description": "Optional canonical Quantity Selector dependency." },
+    { "name": "message", "selector": ".product-form__message", "className": ".product-form__message", "required": false, "description": "Optional target-owned feedback placement; the target owns its text, tone, role, announcement, focus, and lifecycle." },
+    { "name": "actions", "selector": ".product-form__actions", "className": ".product-form__actions", "required": true, "description": "Intrinsic action row containing the purchase submitter." },
+    { "name": "submit", "selector": ".product-form__submit", "className": ".product-form__submit", "required": true, "description": "Canonical primary Button used as the explicit native submitter." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default product form layout." }
+    { "name": "default", "className": null, "default": true, "description": "One target-neutral product form composition." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default product form size." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic size that wraps from its container capacity." }
   ],
   "states": [
-    { "name": "default", "selectors": [".product-form"], "description": "Default add-to-cart form state." }
+    { "name": "default", "selectors": [".product-form"], "description": "Submit-only or target-selected default composition." },
+    { "name": "withVariant", "selectors": [".product-form > .variant-selector"], "description": "Canonical Variant Selector is present." },
+    { "name": "withQuantity", "selectors": [".product-form > .qty"], "description": "Canonical Quantity Selector is present." },
+    { "name": "withSelection", "selectors": [".product-form > .variant-selector", ".product-form > .qty"], "description": "Both reviewed selection dependencies are present." },
+    { "name": "unavailable", "selectors": [".product-form__submit:disabled"], "description": "The resolved selection cannot currently be purchased and the native submitter is disabled without a target pending lifecycle." },
+    { "name": "pending", "selectors": [".product-form__submit[aria-busy=\"true\"]"], "description": "Target purchase work is pending; canonical Button busy treatment blocks repeat activation and preserves the label." },
+    { "name": "withFeedback", "selectors": [".product-form__message"], "description": "Target-owned purchase feedback is present in the form flow." }
   ],
   "behavior": [
-    { "name": "addToCart", "selectors": [".product-form", ".product-form__submit"], "attributes": ["method", "action", "type=\"submit\""], "events": ["submit"], "description": "Form submission should validate variant, quantity, and selling-plan state before adding to cart." },
-    { "name": "dependencyComposition", "selectors": [".variant-selector"], "description": "The form composes variant and quantity dependencies without replacing their semantics." }
+    { "name": "nativePurchaseForm", "selectors": [".product-form"], "attributes": ["<form>", "action", "method"], "events": ["submit", "formdata", "reset", "invalid", "constraint validation"], "description": "The real form and its complete FormData remain functional without JavaScript. Named controls, activated submitter, successful-entry construction, constraint validation and reset stay native." },
+    { "name": "dependencyComposition", "selectors": [".product-form > .variant-selector", ".product-form > .qty", ".product-form__submit"], "description": "Product Form consumes canonical Variant Selector, Quantity Selector and Button markup without replacing their value, keyboard, validation or visual ownership." },
+    { "name": "resolvedPurchaseData", "selectors": [".product-form"], "attributes": ["target-owned named controls", "resolved merchandise identifier"], "events": ["input", "change", "submit", "formdata", "reset"], "description": "The shared product coordinator maps current options to one purchasable identifier and synchronizes availability and quantity rules before enabling or submitting; Product Form consumes that state and owns no mirrored object or variant database." },
+    { "name": "submitAction", "selectors": [".product-form__submit"], "attributes": ["type=\"submit\"", "name", "value", "disabled", "aria-busy"], "events": ["activated submitter", "submit"], "description": "One canonical Button is the explicit submitter. Unavailable uses disabled; asynchronous pending maps to Button busy and disabled semantics without replacing its label." },
+    { "name": "feedbackBoundary", "selectors": [".product-form__message"], "attributes": ["optional role, aria-live and aria-describedby chosen by target timing"], "description": "The form provides optional feedback placement only. The target owns localized content, tone, insertion, announcement, focus, recovery and removal." },
+    { "name": "targetPurchaseLifecycle", "selectors": [".product-form"], "events": ["native submission", "optional same-form Ajax interception", "success", "error", "retry"], "description": "Native submission is the required baseline. A capable target may intercept that same valid form and FormData; it owns pending, endpoint, cart mutation, Cart Drawer/count updates, error, retry, focus, announcements, analytics and rollback without creating a parallel submission path." },
+    { "name": "v1ScopeBoundary", "selectors": [".product-form"], "description": "Accelerated checkout and a generic supplementary-field slot are excluded from neutral v1. Selling plans, personalization, uploads, gifts and preorder flows require separately accepted canonical compositions." },
+    { "name": "intrinsicLayout", "selectors": [".product-form", ".product-form__actions"], "description": "The form and action row wrap from available inline size without viewport breakpoints, reordered DOM, or altered tab order." }
   ],
   "properties": [
-    { "name": "variantSelector", "type": "slot", "required": false, "description": "Optional Variant Selector dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".variant-selector", "classNames": [".variant-selector"] }] } },
-    { "name": "submitLabel", "type": "string", "required": true, "description": "Visible primary submit action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-form__submit" }] } },
-    { "name": "submitDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the primary submit action unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-form__submit", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+    { "name": "variantSelector", "type": "slot", "required": false, "description": "Optional canonical Variant Selector composition; omit it when the product has no meaningful options.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-form > .variant-selector", "classNames": [".variant-selector"] }] } },
+    { "name": "quantitySelector", "type": "slot", "required": false, "description": "Optional canonical Quantity Selector composition; target product policy decides when quantity is fixed or omitted.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-form > .qty", "classNames": [".qty"] }] } },
+    { "name": "submitLabel", "type": "string", "required": true, "description": "Non-empty localized visible label for the primary purchase submitter.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-form__submit" }] } },
+    { "name": "submitDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects an unavailable resolved selection to the native submitter; targets provide a visible explanation when it is not already evident.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-form__submit", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "pending", "type": "boolean", "required": false, "defaultValue": false, "description": "Projects target-owned asynchronous purchase work to canonical Button busy and disabled semantics.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-form__submit", "attribute": "aria-busy", "values": { "true": "true", "false": null }, "elements": ["button"] }, { "kind": "attribute", "selector": ".product-form__submit", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } },
+    { "name": "feedback", "type": "slot", "required": false, "description": "Optional target-owned localized purchase feedback; Product Form owns placement, not message semantics or lifecycle.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-form__message", "classNames": [".product-form__message"] }] } }
   ],
   "tokens": {
-    "public": {}
+    "public": {
+      "spacing": ["--space-layout-element-gap"]
+    }
   },
   "accessibility": [
-    "Use a real form for add-to-cart flows when the target platform supports it.",
-    "Keep variant and quantity controls labelled and reachable before the submit action.",
-    "Disable or explain unavailable submit states when a required variant is missing."
+    "Use a real native form and explicit submit button on neutral Web.",
+    "Give every submitted child control a stable name and preserve the activated submitter in FormData.",
+    "Keep the target-owned merchandise identifier synchronized with current options and disable submission when no purchasable match exists.",
+    "Preserve child constraint validation, visible labels, accessible names, keyboard behavior, default values and reset behavior.",
+    "Use canonical Button busy semantics for pending work, preserve its visible label, and block repeat activation.",
+    "Explain unavailable purchase actions in visible text when option labels or adjacent content do not already communicate the reason.",
+    "Let the target choose result insertion, live-region role, focus movement and recovery timing; avoid duplicate announcements across Product Info, Variant Selector and Product Form.",
+    "Keep visual order, reading order and tab order aligned across intrinsic wrapping and localization."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map to Shopify product form actions, variant ids, quantities, and selling plans." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css", "notes": "Native form composition and intrinsic layout need no neutral runtime; product data and purchase lifecycle remain target-owned." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js", "notes": "The Liquid product form is a complete native baseline. One target coordinator atomically refreshes merchandise id, quantity rules and submit availability; the merchant may show or omit Quantity. Optional Ajax may later intercept this same form but is not required for correctness." },
+    "react": { "status": "implemented", "kind": "component", "notes": "The shared Exhibit/Studio renderer proves a real form, named canonical children, native validation/FormData/reset, unavailable and pending projection. Framework product features own resolved merchandise and optional request/result state while each child keeps its controlled or uncontrolled contract." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Visible default, unavailable, pending and feedback compositions only; no commerce engine or data model." },
     "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

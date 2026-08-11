@@ -1,0 +1,100 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "filter-panel",
+  "name": "Filter Panel",
+  "registryId": "E3",
+  "category": "collection",
+  "status": "pilot",
+  "summary": "Adaptive multi-group filter form that uses one canonical control tree as an adjacent panel in wide containers and inside canonical Drawer in constrained containers, with immediate or manual target-owned query commitment.",
+  "dependencies": ["drawer", "button", "checkbox", "radio", "input", "tag"],
+  "source": {
+    "registry": "registry.json#/components/filter-panel",
+    "css": { "file": "components/css/collection.css", "selector": ".filter-panel" },
+    "docs": "site/src/content/components/filter-panel.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".filter-panel", "className": ".filter-panel", "required": true, "description": "Named adaptive filter boundary and inline-size query owner; it is not a navigation landmark or result form." },
+    { "name": "trigger", "selector": ".filter-panel__trigger", "className": ".filter-panel__trigger", "required": true, "description": "Canonical Button that opens the constrained Drawer surface and is omitted from the wide panel flow." },
+    { "name": "active", "selector": ".filter-panel__active", "className": ".filter-panel__active", "required": false, "description": "Native list of committed active values composed from canonical Tags." },
+    { "name": "activeItem", "selector": ".filter-panel__active-item", "className": ".filter-panel__active-item", "required": false, "description": "Native list item containing one canonical Tag and its optional target-owned removal request." },
+    { "name": "layout", "selector": ".filter-panel__layout", "className": ".filter-panel__layout", "required": true, "description": "Container-responsive parent that places one filter surface beside one target result slot when wide." },
+    { "name": "overlay", "selector": ".filter-panel__overlay", "className": ".filter-panel__overlay", "required": true, "description": "Canonical Drawer overlay used only while the constrained modal surface is open." },
+    { "name": "surface", "selector": ".filter-panel__surface", "className": ".filter-panel__surface", "required": true, "description": "One canonical Drawer root that becomes a non-modal adjacent panel in wide containers without duplicating the form or controls." },
+    { "name": "header", "selector": ".filter-panel__header", "className": ".filter-panel__header", "required": true, "description": "Visible panel title and constrained-surface canonical Close Button." },
+    { "name": "form", "selector": ".filter-panel__form", "className": ".filter-panel__form", "required": true, "description": "Single named native GET form shared by both adaptive presentations; results remain outside it." },
+    { "name": "body", "selector": ".filter-panel__body", "className": ".filter-panel__body", "required": true, "description": "Scrollable Drawer body and wide panel content region containing always-visible labelled groups." },
+    { "name": "group", "selector": ".filter-group", "className": ".filter-group", "required": false, "description": "Native fieldset for one always-visible target facet group." },
+    { "name": "groupTitle", "selector": ".filter-group__title", "className": ".filter-group__title", "required": false, "description": "First legend supplying the visible and accessible group label; it is not a disclosure trigger." },
+    { "name": "groupOptions", "selector": ".filter-group__options", "className": ".filter-group__options", "required": false, "description": "Canonical Checkbox or Radio choices with real target names, values, availability and checked state." },
+    { "name": "priceRange", "selector": ".filter-panel__price", "className": ".filter-panel__price", "required": false, "description": "Target-specific bounded minimum/maximum composition using canonical numeric Inputs when the facet source supplies a real price range." },
+    { "name": "footer", "selector": ".filter-panel__footer", "className": ".filter-panel__footer", "required": false, "description": "Manual-mode canonical Apply and Cancel actions; absent in Immediate mode." },
+    { "name": "results", "selector": ".filter-panel__results", "className": ".filter-panel__results", "required": true, "description": "Target-owned associated result composition kept outside the filter form." }
+  ],
+  "variants": [
+    { "name": "immediate", "className": ".filter-panel--immediate", "default": true, "description": "Every canonical choice change is a committed query-change request; the target owns URL/history and result coordination." },
+    { "name": "manual", "className": ".filter-panel--manual", "default": false, "description": "Choices edit target-owned draft values; Apply commits and Cancel restores the last committed projection without changing the URL." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "One density that responds to the owning container: adjacent panel when coherent, canonical Drawer when constrained." }
+  ],
+  "states": [
+    { "name": "widePanel", "selectors": [".filter-panel:not([data-surface=\"drawer\"])", ".filter-panel__surface"], "description": "One non-modal adjacent panel with the trigger and close action unavailable." },
+    { "name": "drawerClosed", "selectors": [".filter-panel[data-surface=\"drawer\"]", ".filter-panel__trigger"], "description": "Constrained surface is unavailable and the named trigger is present." },
+    { "name": "drawerOpen", "selectors": [".drawer-overlay.is-open", ".drawer.is-open"], "description": "Canonical modal Drawer with visible close action, contained focus and background exclusion owned by the adapter." },
+    { "name": "withActiveFilters", "selectors": [".filter-panel__active", ".filter-panel__active-item"], "description": "One or more committed values projected as canonical Tags in a native list." },
+    { "name": "manualDraft", "selectors": [".filter-panel--manual", ".filter-panel__footer"], "description": "Draft choice values and visible Apply/Cancel actions exist without mutating the committed query until Apply." }
+  ],
+  "behavior": [
+    { "name": "nativeQueryForm", "selectors": [".filter-panel__form"], "attributes": ["<form>", "non-empty accessible name", "action", "method=get"], "events": ["submit", "formdata", "reset", "input", "change"], "description": "Web exposes one named native GET form and successful values. Product cards and other consumer forms remain in the sibling results slot." },
+    { "name": "adaptiveSurface", "selectors": [".filter-panel", ".filter-panel__trigger", ".filter-panel__overlay", ".filter-panel__surface"], "events": ["container change", "open", "close", "Escape", "Tab", "Shift+Tab", "backdrop request"], "description": "One control tree is composed as a non-modal adjacent panel when its container is wide and as canonical modal Drawer when constrained. Adapters must not duplicate desktop/mobile forms or use viewport width as the sole switch." },
+    { "name": "commitPolicy", "selectors": [".filter-panel--immediate", ".filter-panel--manual", ".filter-panel__footer"], "events": ["choice change request", "apply request", "cancel request"], "description": "Immediate is the default committed-change request. Manual mode maintains one target-owned draft projection; Apply requests the committed query and Cancel restores committed values without URL mutation." },
+    { "name": "nativeGroups", "selectors": [".filter-group", ".filter-group__title", ".filter-group__options", ".filter-panel__price"], "attributes": ["<fieldset>", "<legend>", "name", "value", "checked", "disabled", "min", "max"], "events": ["Tab", "Space", "Radio arrow keys", "input", "change", "form reset"], "description": "V1 groups remain visible and use canonical named Checkbox or Radio controls; a source-backed price facet may compose bounded canonical numeric Inputs. No disclosure state or inert title Button is introduced." },
+    { "name": "selectionOwnership", "selectors": [".filter-group__options"], "events": ["input", "change", "form reset"], "description": "Native Web controls own current form values; controlled adapters project coherent committed and, only in Manual mode, draft collections without a hidden duplicate owner." },
+    { "name": "activeFilterRemoval", "selectors": [".filter-panel__active", ".filter-panel__active-item"], "events": ["click", "Space", "Enter", "target removal request"], "description": "A canonical Tag action requests removal of one committed value. The target reconciles query/results, chooses surviving focus and announces meaningful change." },
+    { "name": "resultCoordination", "selectors": [".filter-panel__results"], "events": ["query commit", "pending", "result replacement", "error", "empty", "history navigation"], "description": "The target owns query-parameter names and serialization, push-versus-replace history, Back/Forward synchronization, cancellation, pending/error/empty status, result replacement, focus, analytics and pagination reset." },
+    { "name": "progressiveBaseline", "selectors": [".filter-panel__form", ".filter-panel__surface"], "description": "Without enhancement, the native GET form remains inline and usable. Enhancement may activate Drawer presentation and immediate result updates without removing native form semantics." },
+    { "name": "dependencyComposition", "selectors": [".drawer", ".btn", ".tag", ".checkbox", ".radio", ".input"], "description": "Filter Panel consumes canonical Drawer, Button, Tag, Checkbox, Radio and Input behavior rather than copying their visual or interaction systems." }
+  ],
+  "properties": [
+    { "name": "commitMode", "type": "enum", "required": false, "defaultValue": "immediate", "valuesFrom": "variants", "description": "Immediate committed-change requests or explicit Manual draft Apply/Cancel lifecycle.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".filter-panel", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Visible localized panel title and accessible name for the single native filter form.", "targetMappings": { "web": [{ "kind": "content", "selector": ".filter-panel__title" }, { "kind": "attribute", "selector": ".filter-panel__form", "attribute": "aria-label", "valueFrom": "property", "elements": ["form"] }] } },
+    { "name": "formAction", "type": "string", "required": true, "description": "Real Web GET destination supplied by the owning target; neutral source does not define query keys or serialization.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".filter-panel__form", "attribute": "action", "valueFrom": "property", "elements": ["form"] }] } },
+    { "name": "triggerLabel", "type": "string", "required": true, "description": "Visible localized canonical Button label that opens the constrained Drawer.", "targetMappings": { "web": [{ "kind": "content", "selector": ".filter-panel__trigger" }] } },
+    { "name": "dismissLabel", "type": "string", "required": true, "description": "Contextual localized accessible name for the constrained Drawer Close Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".filter-panel__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "applyLabel", "type": "string", "required": false, "unsetBehavior": "Ignored in Immediate mode; Manual mode adapters must supply a non-empty localized label.", "description": "Visible canonical submit Button label for Manual mode.", "targetMappings": { "web": [{ "kind": "content", "selector": ".filter-panel__apply" }] } },
+    { "name": "cancelLabel", "type": "string", "required": false, "unsetBehavior": "Ignored in Immediate mode; Manual mode adapters must supply a non-empty localized label.", "description": "Visible canonical Button label restoring committed values in Manual mode.", "targetMappings": { "web": [{ "kind": "content", "selector": ".filter-panel__cancel" }] } },
+    { "name": "activeFiltersLabel", "type": "string", "required": false, "unsetBehavior": "Omit the active-filter list when no committed values are present.", "description": "Localized accessible name for the native list of committed active Tags.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".filter-panel__active", "attribute": "aria-label", "valueFrom": "property", "elements": ["ul"] }] } },
+    { "name": "activeFilters", "type": "slot", "required": false, "description": "Ordered committed-value list composed from canonical Tags; the target owns removal results and focus.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".filter-panel__active", "classNames": [".filter-panel__active", ".filter-panel__active-item", ".tag"] }] } },
+    { "name": "filterGroups", "type": "slot", "required": false, "description": "Zero or more always-visible native fieldsets composed from canonical named Checkbox, Radio or source-backed bounded numeric Input controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".filter-panel__body", "classNames": [".filter-group", ".filter-group__title", ".filter-group__options", ".filter-panel__price", ".checkbox", ".radio", ".input"] }] } },
+    { "name": "results", "type": "slot", "required": true, "description": "Associated target-owned result composition outside the filter form; Filter Panel owns only adaptive adjacency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".filter-panel__results", "classNames": [".filter-panel__results"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-border-subtle", "--color-text-primary"],
+      "spacing": ["--space-layout-grid-gap", "--space-layout-element-gap"],
+      "typography": ["--typo-body-size"]
+    }
+  },
+  "accessibility": [
+    "Render one non-empty visible panel title and use it to name the single native GET form and constrained Drawer.",
+    "Keep the same form and controls in both adaptive surfaces. Never render duplicate desktop/mobile control trees or preserve two checked-state owners.",
+    "In constrained mode compose canonical modal Drawer semantics, named trigger and dismiss action, Escape/backdrop policy, focus containment, background exclusion, scroll lock and trigger restoration.",
+    "In wide mode remove modal semantics, keep the panel in document flow and make constrained-only trigger and dismiss actions unavailable.",
+    "Keep result content outside the filter form so consumer forms remain valid and all stale result focus stops can be replaced atomically.",
+    "Group related controls with fieldset and a first legend. V1 group titles are never disclosure buttons.",
+    "Give every choice a stable target-defined name and value and preserve canonical Checkbox, Radio or bounded numeric Input keyboard, checked/value, disabled and form behavior.",
+    "Render committed active values as a named native list of canonical Tags and let the target own removal reconciliation, focus and status.",
+    "In Manual mode expose complete localized Apply and Cancel actions and restore committed values on Cancel without changing the URL.",
+    "Use one target-owned result status and preserve query parameters, Back/Forward history, focus, pagination reset, loading/error/empty truth and analytics outside neutral Filter Panel.",
+    "Preserve long/localized labels, unbroken content, RTL, text spacing, 200 percent zoom, forced-color focus and reduced motion through canonical dependencies."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "html-css-js", "notes": "One native GET form progressively composes as a container-driven adjacent panel or canonical Drawer; the adapter owns only surface lifecycle and emits native choice/submit requests while the target owns query/results." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-js", "notes": "Main Collection maps collection.filters names, values, counts and active-removal URLs into the same GET form and adaptive surface; native navigation preserves linkable query state while enhanced section refresh remains target-owned." },
+    "react": { "status": "implemented", "kind": "controlled-component", "notes": "The first-party docs target renders one form tree with controlled committed/draft projections and canonical Drawer lifecycle." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Map one Filter Panel component with Panel/Drawer presentation and Immediate/Manual commit properties after human visual review." },
+    "swiftui": { "status": "planned", "kind": "native-component", "notes": "Map one selection model into an adjacent inspector or modal sheet according to container/navigation context." },
+    "compose": { "status": "planned", "kind": "composable", "notes": "Map one selection model into an adjacent panel or modal sheet according to container/navigation context." }
+  }
+}

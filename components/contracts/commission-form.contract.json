@@ -1,11 +1,87 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "commission-form", "name": "Commission Form", "registryId": "R8", "category": "ceramics", "status": "pilot", "summary": "Custom commission request form with reference image upload.", "dependencies": ["input", "textarea", "file-upload", "button"],
-  "source": { "registry": "registry.json#/components/commission-form", "css": { "file": "components/css/ceramics.css", "selector": ".commission-form" }, "docs": "site/src/content/components/commission-form.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".commission-form", "className": ".commission-form", "required": true, "description": "Commission-request composition container; targets choose the native form boundary." }, { "name": "header", "selector": ".commission-form__header", "className": ".commission-form__header", "required": false, "description": "Optional introduction." }, { "name": "title", "selector": ".commission-form__title", "className": ".commission-form__title", "required": false, "description": "Form heading." }, { "name": "text", "selector": ".commission-form__text", "className": ".commission-form__text", "required": false, "description": "Optional form guidance." }, { "name": "fields", "selector": ".commission-form__fields", "className": ".commission-form__fields", "required": true, "description": "Input and Textarea composition region." }, { "name": "referenceUpload", "selector": ".commission-form__upload-zone", "className": ".commission-form__upload-zone", "required": false, "description": "Optional File Upload composition region; it does not recreate file-input state." }, { "name": "uploadLabel", "selector": ".commission-form__upload-label", "className": ".commission-form__upload-label", "required": false, "description": "Legacy supporting upload copy outside the canonical File Upload state model." }, { "name": "actions", "selector": ".commission-form__actions", "className": ".commission-form__actions", "required": false, "description": "Button composition region." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default commission form composition." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained responsive form layout." }], "states": [{ "name": "default", "selectors": [".commission-form"], "description": "Commission Form does not duplicate dependency states." }],
-  "behavior": [{ "name": "fieldComposition", "selectors": [".commission-form__fields"], "description": "Composed Input and Textarea dependencies own labels, values, disabled behavior, focus, and Default, Error, Success, and Warning validation families." }, { "name": "uploadComposition", "selectors": [".commission-form__upload-zone"], "description": "The composed File Upload dependency owns native file selection, accepted-type guidance, disabled behavior, focus, and validation presentation." }, { "name": "actionComposition", "selectors": [".commission-form__actions"], "description": "Composed Button dependencies own action emphasis, focus, disabled, and busy behavior." }, { "name": "workflowOwnership", "selectors": [".commission-form"], "description": "Targets own field inventory, consent, submission, persistence, status responses, notifications, and the overall commission workflow." }],
-  "properties": [{ "name": "title", "type": "string", "required": false, "description": "Optional form heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".commission-form__title" }] } }, { "name": "intro", "type": "string", "required": false, "description": "Optional target-provided guidance.", "targetMappings": { "web": [{ "kind": "content", "selector": ".commission-form__text" }] } }, { "name": "fields", "type": "slot", "required": true, "description": "Target-owned canonical Input and Textarea composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".commission-form__fields", "classNames": [".commission-form__fields"] }] } }, { "name": "referenceUpload", "type": "slot", "required": false, "description": "Optional canonical File Upload composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".commission-form__upload-zone", "classNames": [".commission-form__upload-zone"] }] } }, { "name": "actions", "type": "slot", "required": false, "description": "Target-owned canonical Button actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".commission-form__actions", "classNames": [".commission-form__actions"] }] } }],
-  "tokens": { "public": { "color": ["--color-text-disabled", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-h3-size"], "spacing": ["--space-layout-container", "--space-layout-element-gap", "--space-layout-section-gap"] } },
-  "accessibility": ["Use a native form when the target provides submission and associate every composed field with a visible label.", "Composed Input, Textarea, and File Upload preserve Default, Error, Success, and Warning feedback, including aria-describedby and aria-invalid rules.", "Do not duplicate dependency validation messages or state classes on Commission Form.", "Composed Button actions preserve disabled and busy semantics.", "Announce target-owned submission outcomes without moving focus unexpectedly."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Layout composition is implemented in components/css/ceramics.css; workflow is target-owned." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "commission-form",
+  "name": "Commission Form",
+  "registryId": "R8",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Commission-intake composition over canonical fields, optional reference upload, and actions without prescribing the record or submission workflow.",
+  "dependencies": ["input", "textarea", "file-upload", "button"],
+  "source": {
+    "registry": "registry.json#/components/commission-form",
+    "css": { "file": "components/css/ceramics.css", "selector": ".commission-form" },
+    "docs": "site/src/content/components/commission-form.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".commission-form", "className": ".commission-form", "required": true, "description": "Commission-intake composition root emitted only with required field content; a standalone Web target uses a native form while an embedded target avoids nested forms." },
+    { "name": "header", "selector": ".commission-form__header", "className": ".commission-form__header", "required": false, "description": "Optional introduction region omitted when both title and guidance are empty." },
+    { "name": "title", "selector": ".commission-form__title", "className": ".commission-form__title", "required": false, "description": "Optional visible contextual heading that may name a standalone form." },
+    { "name": "text", "selector": ".commission-form__text", "className": ".commission-form__text", "required": false, "description": "Optional concise target-authored guidance presented before affected controls." },
+    { "name": "fields", "selector": ".commission-form__fields", "className": ".commission-form__fields", "required": true, "description": "Required non-empty logical composition of canonical named controls." },
+    { "name": "referenceUpload", "selector": ".commission-form__upload-zone", "className": ".commission-form__upload-zone", "required": false, "description": "Optional layout region containing one canonical File Upload; R8 does not recreate FileList or upload state." },
+    { "name": "actions", "selector": ".commission-form__actions", "className": ".commission-form__actions", "required": false, "description": "Optional canonical Button composition with explicit truthful native action types." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "One neutral commission-intake composition; fields and workflow own their own variants." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Bounded form measure and action layout respond to actual available inline size." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".commission-form", ".commission-form__fields"], "description": "R8 has no parallel validation or submission state; composed dependencies and the target workflow retain state ownership." }
+  ],
+  "behavior": [
+    { "name": "strictRequiredComposition", "selectors": [".commission-form", ".commission-form__fields"], "description": "A missing or empty required fields slot omits the complete R8 root; optional title, intro, reference upload, and actions never create an empty form shell." },
+    { "name": "formBoundary", "selectors": [".commission-form"], "attributes": ["standalone Web: <form>", "named native controls", "explicit button types", "do not nest forms"], "events": ["submit", "reset", "formdata", "constraint validation"], "description": "A standalone Web target preserves native form ownership. A target embedding R8 in another form uses a neutral container and retains the outer form as the sole owner." },
+    { "name": "fieldComposition", "selectors": [".commission-form__fields"], "description": "Canonical Input and Textarea own visible labels, value, type, name, autocomplete, required/disabled behavior, descriptions, focus, and Default, Error, Success, and Warning validation." },
+    { "name": "uploadComposition", "selectors": [".commission-form__upload-zone"], "description": "Canonical File Upload owns one native FileList, visible instruction/hint/status, accept guidance, selection, reset, disabled, focus, drag-presence enhancement, and validation presentation. R8 owns no transport or file policy." },
+    { "name": "actionComposition", "selectors": [".commission-form__actions"], "description": "Canonical Buttons preserve submit, reset, cancel, disabled, and busy semantics selected by the target; R8 adds no action state." },
+    { "name": "workflowOwnership", "selectors": [".commission-form"], "description": "Targets own field inventory, consent/privacy, domain validation, encoding/endpoint, persistence, pending/error/success timing, result announcement/focus, notifications, abuse protection, and every later commission stage." },
+    { "name": "responsiveComposition", "selectors": [".commission-form", ".commission-form__actions"], "description": "Measure, wrapping, and action stacking respond to R8's actual inline size without changing reading, source, or tab order." }
+  ],
+  "properties": [
+    { "name": "title", "type": "string", "required": false, "description": "Optional visible contextual form heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".commission-form__title" }] } },
+    { "name": "intro", "type": "string", "required": false, "description": "Optional concise target-provided guidance shown before the controls.", "targetMappings": { "web": [{ "kind": "content", "selector": ".commission-form__text" }] } },
+    { "name": "fields", "type": "slot", "required": true, "description": "Required non-empty target-owned canonical Input, Textarea, or other approved control composition in logical order.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".commission-form__fields", "classNames": [".commission-form__fields"] }] } },
+    { "name": "referenceUpload", "type": "slot", "required": false, "description": "Optional canonical File Upload composition; accepted files, validation, transport, storage, and deletion remain target owned.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".commission-form__upload-zone", "classNames": [".commission-form__upload-zone"] }] } },
+    { "name": "actions", "type": "slot", "required": false, "description": "Optional target-owned canonical Button actions with explicit native types.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".commission-form__actions", "classNames": [".commission-form__actions"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-text-primary", "--color-text-secondary"],
+      "typography": [
+        "--font-family-body",
+        "--font-family-heading",
+        "--tg-font-weight-regular",
+        "--tg-font-weight-semibold",
+        "--typo-body-line-height",
+        "--typo-body-size",
+        "--typo-h3-line-height",
+        "--typo-h3-size"
+      ],
+      "spacing": ["--space-layout-element-gap", "--space-layout-grid-gap"]
+    }
+  },
+  "accessibility": [
+    "Use a native standalone form on Web or a non-form host when embedded; never nest form elements.",
+    "Associate every composed control with a visible label and present required status, formats, limits, and instructions before they are needed.",
+    "Give submitted controls stable unique names and preserve the activated submitter, native FormData, constraint validation, and reset behavior unless the target owns a complete accessible replacement.",
+    "Keep source, visual, reading, and keyboard order aligned; responsive action stacking must not reorder controls or actions.",
+    "Compose canonical Input and Textarea validation and descriptions; do not duplicate aria-invalid, messages, state classes, or focus behavior on R8.",
+    "Compose one canonical File Upload as the only FileList owner. Treat accept as a picker hint, visibly disclose target policy, and validate files in the receiving service.",
+    "Use explicit submit, reset, and non-submit Button types. Pending/disabled policy and duplicate-submission prevention remain target owned.",
+    "Provide concise target-owned success/error feedback. Longer multi-error forms should expose a useful summary and target-approved announcement/focus behavior without erasing valid entries.",
+    "Preserve full text, native zoom, user spacing, RTL, forced colors, reduced motion, and dependency focus/keyboard behavior."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "html-css-composition", "notes": "Standalone native form or non-nested host composition with canonical fields/upload/actions, intrinsic logical layout, and no R8 neutral runtime." },
+    "shopify": { "status": "planned", "kind": "liquid-contact-or-app-composition", "notes": "Requires approved commission fields, consent, contact or app endpoint, Liquid form mapping, result behavior, and a verified file-upload service if references are required." },
+    "webflow": { "status": "planned", "kind": "native-form-integration", "notes": "The target chooses its form and file service while retaining canonical names, labels, validation, and response semantics." },
+    "react": { "status": "planned", "kind": "thin-composition" },
+    "angular": { "status": "planned", "kind": "thin-composition" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-form" },
+    "compose": { "status": "planned", "kind": "native-form" }
+  }
 }

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildRuntimeSources, runtimeModulesForComponents } from './lib/runtime-modules.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = path.join(repoRoot, 'registry.json');
@@ -8,10 +9,16 @@ const contractsDir = path.join(repoRoot, 'components', 'contracts');
 const manifestPath = path.join(repoRoot, 'platforms', 'web', 'adapter.manifest.json');
 const summaryPath = path.join(repoRoot, 'platforms', 'web', 'adapter.summary.json');
 const componentsCssPath = path.join(repoRoot, 'platforms', 'web', 'components.css');
+const cssModuleDirectory = path.join(repoRoot, 'platforms', 'web', 'components');
 const entryCssPath = path.join(repoRoot, 'platforms', 'web', 'index.css');
 const tokensCssPath = path.join(repoRoot, 'platforms', 'web', 'tokens.css');
 const themeJsPath = path.join(repoRoot, 'platforms', 'web', 'theme.js');
 const sourceThemeJsPath = path.join(repoRoot, 'components', 'js', 'theme.js');
+const runtimeDirectory = path.join(repoRoot, 'platforms', 'web', 'runtime');
+const runtimeLoaderPath = path.join(repoRoot, 'platforms', 'web', 'runtime-loader.js');
+const runtimeCorePath = path.join(runtimeDirectory, 'core.js');
+const firingScheduleJsPath = path.join(repoRoot, 'platforms', 'web', 'firing-schedule.js');
+const sourceFiringScheduleJsPath = path.join(repoRoot, 'components', 'js', 'firing-schedule.js');
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');
@@ -63,12 +70,19 @@ function validateOutputFiles(errors, manifest) {
     tokens: tokensCssPath,
     components: componentsCssPath,
     javascript: themeJsPath,
+    runtimeLoader: runtimeLoaderPath,
+    runtimeCore: runtimeCorePath,
+    firingSchedule: firingScheduleJsPath,
     manifest: manifestPath,
     summary: summaryPath
   })) {
     pathExists(errors, filePath);
     assert(errors, manifest.outputs?.[key] === relative(filePath), `manifest.outputs.${key} must be ${relative(filePath)}`);
   }
+  pathExists(errors, cssModuleDirectory);
+  pathExists(errors, runtimeDirectory);
+  assert(errors, manifest.outputs?.cssModuleDirectory === relative(cssModuleDirectory), `manifest.outputs.cssModuleDirectory must be ${relative(cssModuleDirectory)}`);
+  assert(errors, manifest.outputs?.runtimeDirectory === relative(runtimeDirectory), `manifest.outputs.runtimeDirectory must be ${relative(runtimeDirectory)}`);
 }
 
 function validateSummary(errors, manifest) {
@@ -81,7 +95,7 @@ function validateSummary(errors, manifest) {
   const summary = readJson(summaryPath);
 
   assert(errors, summary.$schema === 'https://the-gallery.dev/schema/web-adapter-summary.json', 'summary.$schema is not the expected web adapter summary schema URL');
-  assert(errors, summary.summaryVersion === '0.1.0', 'summary.summaryVersion must be 0.1.0');
+  assert(errors, summary.summaryVersion === '0.2.0', 'summary.summaryVersion must be 0.2.0');
   assert(errors, summary.target?.id === manifest.target?.id, 'summary.target.id must match manifest');
   assert(errors, JSON.stringify(summary.outputs) === JSON.stringify(manifest.outputs), 'summary.outputs must match manifest.outputs');
   assert(errors, JSON.stringify(summary.loadOrder) === JSON.stringify(manifest.loadOrder), 'summary.loadOrder must match manifest.loadOrder');
@@ -124,9 +138,50 @@ function validateConcatenatedCss(errors, manifest) {
     }
 
     const sourceCss = read(sourcePath).trimEnd();
+    const modulePath = path.join(repoRoot, item.output ?? '');
+    pathExists(errors, modulePath);
+    if (fs.existsSync(modulePath)) {
+      assert(errors, read(modulePath) === read(sourcePath), `${item.output} must match ${item.source}`);
+    }
     assert(errors, outputCss.includes(`/* Source: ${item.source} */`), `platforms/web/components.css is missing source marker for ${item.source}`);
     assert(errors, outputCss.includes(sourceCss), `platforms/web/components.css does not include ${item.source}`);
   }
+}
+
+function validateModularRuntime(errors, manifest) {
+  const expected = buildRuntimeSources(repoRoot);
+  pathExists(errors, runtimeLoaderPath);
+  pathExists(errors, runtimeCorePath);
+  if (fs.existsSync(runtimeLoaderPath)) {
+    assert(errors, read(runtimeLoaderPath) === expected.loader, 'platforms/web/runtime-loader.js must match generated selective loader');
+  }
+  if (fs.existsSync(runtimeCorePath)) {
+    assert(errors, read(runtimeCorePath) === expected.core, 'platforms/web/runtime/core.js must match generated runtime core');
+  }
+
+  const expectedPaths = [];
+  for (const [fileName, source] of expected.modules) {
+    const filePath = path.join(runtimeDirectory, fileName);
+    expectedPaths.push(relative(filePath));
+    pathExists(errors, filePath);
+    if (fs.existsSync(filePath)) {
+      assert(errors, read(filePath) === source, `${relative(filePath)} must match generated source block`);
+    }
+  }
+  assert(errors, JSON.stringify(manifest.outputs?.runtimeModules) === JSON.stringify(expectedPaths), 'manifest.outputs.runtimeModules must list every generated runtime module');
+  return expected.config;
+}
+
+function resolveComponentDependencies(registry, slug, resolved = new Set(), order = []) {
+  if (resolved.has(slug)) return order;
+  const component = registry.components[slug];
+  if (!component) return order;
+  for (const dependency of component.dependencies ?? []) {
+    resolveComponentDependencies(registry, dependency, resolved, order);
+  }
+  resolved.add(slug);
+  order.push(slug);
+  return order;
 }
 
 function validateJavascript(errors) {
@@ -135,9 +190,15 @@ function validateJavascript(errors) {
   }
 
   assert(errors, read(themeJsPath) === read(sourceThemeJsPath), 'platforms/web/theme.js must match components/js/theme.js');
+
+  pathExists(errors, firingScheduleJsPath);
+  pathExists(errors, sourceFiringScheduleJsPath);
+  if (fs.existsSync(firingScheduleJsPath) && fs.existsSync(sourceFiringScheduleJsPath)) {
+    assert(errors, read(firingScheduleJsPath) === read(sourceFiringScheduleJsPath), 'platforms/web/firing-schedule.js must match components/js/firing-schedule.js');
+  }
 }
 
-function validateComponents(errors, registry, contracts, manifest) {
+function validateComponents(errors, registry, contracts, manifest, runtimeConfig) {
   const registrySlugs = Object.keys(registry.components).sort();
   const manifestComponents = manifest.components ?? [];
   const manifestSlugs = manifestComponents.map((component) => component.slug).sort();
@@ -169,6 +230,20 @@ function validateComponents(errors, registry, contracts, manifest) {
     assert(errors, manifestComponent.source?.css === registryComponent.file, `${slug} manifest source.css must match registry`);
     assert(errors, manifestComponent.source?.contract === `components/contracts/${slug}.contract.json`, `${slug} manifest source.contract must point to contract`);
     assert(errors, manifestComponent.source?.docs === contract.source.docs, `${slug} manifest source.docs must match contract`);
+
+    const dependencyClosure = resolveComponentDependencies(registry, slug);
+    const expectedCss = [...new Set([
+      ...Object.values(registry.base).map((entry) => entry.file),
+      ...dependencyClosure.map((componentSlug) => registry.components[componentSlug].file),
+    ])].map((source) => `platforms/web/components/${path.basename(source)}`);
+    const runtimeIds = runtimeModulesForComponents(runtimeConfig, dependencyClosure);
+    const expectedRuntime = runtimeIds.length === 0
+      ? []
+      : ['platforms/web/runtime/core.js', ...runtimeIds.map((id) => `platforms/web/runtime/${id}.js`)];
+    assert(errors, manifestComponent.install?.tokens === 'platforms/web/tokens.css', `${slug} install.tokens must point to the web token target`);
+    assert(errors, JSON.stringify(manifestComponent.install?.dependencyClosure) === JSON.stringify(dependencyClosure), `${slug} install.dependencyClosure must be topological and complete`);
+    assert(errors, JSON.stringify(manifestComponent.install?.css) === JSON.stringify(expectedCss), `${slug} install.css must contain the dependency-closed CSS slice`);
+    assert(errors, JSON.stringify(manifestComponent.install?.runtime) === JSON.stringify(expectedRuntime), `${slug} install.runtime must contain only required enhancer modules`);
 
     const sourceCssPath = path.join(repoRoot, registryComponent.file);
     pathExists(errors, sourceCssPath);
@@ -203,7 +278,7 @@ function main() {
   const manifest = readJson(manifestPath);
 
   assert(errors, manifest.$schema === 'https://the-gallery.dev/schema/web-adapter-manifest.json', 'manifest.$schema is not the expected web adapter schema URL');
-  assert(errors, manifest.manifestVersion === '0.1.0', 'manifest.manifestVersion must be 0.1.0');
+  assert(errors, manifest.manifestVersion === '0.2.0', 'manifest.manifestVersion must be 0.2.0');
   assert(errors, manifest.target?.id === 'web', 'manifest.target.id must be web');
   assert(errors, manifest.target?.kind === 'css', 'manifest.target.kind must be css');
   assert(errors, manifest.generatedBy === 'scripts/build-web-adapter.js', 'manifest.generatedBy must be scripts/build-web-adapter.js');
@@ -212,7 +287,8 @@ function main() {
   validateLoadOrder(errors);
   validateConcatenatedCss(errors, manifest);
   validateJavascript(errors);
-  validateComponents(errors, registry, contracts, manifest);
+  const runtimeConfig = validateModularRuntime(errors, manifest);
+  validateComponents(errors, registry, contracts, manifest, runtimeConfig);
   validateSummary(errors, manifest);
 
   if (errors.length > 0) {

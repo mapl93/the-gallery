@@ -1,9 +1,9 @@
 ## Overview
 
-Notification toast. 4 feedback variants.
+A passive notification item with four feedback variants. Toast owns one item; target services own viewport placement, queues, timing, pause/resume, and removal.
 
 <Preview
-  html='<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger aria-expanded="true">Show toast</button><div class="toast toast--success is-visible tg-preview-floating-notice" role="status"><svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><div class="toast__content"><p class="toast__title">Saved</p><p class="toast__message">Your changes have been saved.</p></div><button class="toast__close" type="button" data-preview-close aria-label="Dismiss notification"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div>'
+  html='<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn" type="button" data-preview-trigger>Show toast</button><div class="toast toast--success is-visible tg-preview-floating-notice" aria-hidden="false"><svg class="toast__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><div class="toast__content" role="status" aria-live="polite" aria-atomic="true"><p class="toast__title">Saved</p><p class="toast__message">Your changes have been saved.</p></div><button class="btn btn--link btn--sm toast__action" type="button" data-preview-close>Undo</button><button class="close-btn toast__close" type="button" data-preview-close aria-label="Dismiss notification"><svg class="close-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div>'
   label="Toast"
   layout="overlay"
   interaction={{ selector: '.toast', toggle: 'is-visible', triggerLabel: 'Show Toast', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }}
@@ -15,19 +15,19 @@ Toast supports `info`, `success`, `warning`, and `error` feedback families. Vari
 
 ### Info
 
-<Preview html={"<div class=\"toast toast--info is-visible tg-preview-static\" role=\"status\"><div class=\"toast__content\"><p class=\"toast__message\">Info toast.</p></div></div>"} label="Info" />
+<Preview html={"<div class=\"toast toast--info is-visible tg-preview-static\" aria-hidden=\"false\"><div class=\"toast__content\"><p class=\"toast__message\">Info toast.</p></div></div>"} label="Info" />
 
 ### Success
 
-<Preview html={"<div class=\"toast toast--success is-visible tg-preview-static\" role=\"status\"><div class=\"toast__content\"><p class=\"toast__message\">Success toast.</p></div></div>"} label="Success" />
+<Preview html={"<div class=\"toast toast--success is-visible tg-preview-static\" aria-hidden=\"false\"><div class=\"toast__content\"><p class=\"toast__message\">Success toast.</p></div></div>"} label="Success" />
 
 ### Error
 
-<Preview html={"<div class=\"toast toast--error is-visible tg-preview-static\" role=\"alert\"><div class=\"toast__content\"><p class=\"toast__message\">Error toast.</p></div></div>"} label="Error" />
+<Preview html={"<div class=\"toast toast--error is-visible tg-preview-static\" aria-hidden=\"false\"><div class=\"toast__content\"><p class=\"toast__message\">Error toast.</p></div></div>"} label="Error" />
 
 ### Warning
 
-<Preview html={"<div class=\"toast toast--warning is-visible tg-preview-static\" role=\"status\"><div class=\"toast__content\"><p class=\"toast__message\">Warning toast.</p></div></div>"} label="Warning" />
+<Preview html={"<div class=\"toast toast--warning is-visible tg-preview-static\" aria-hidden=\"false\"><div class=\"toast__content\"><p class=\"toast__message\">Warning toast.</p></div></div>"} label="Warning" />
 
 ## Usage Guidelines
 
@@ -42,7 +42,8 @@ Toast supports `info`, `success`, `warning`, and `error` feedback families. Vari
   Toasts should announce important changes without stealing focus from the user's current task.
 </Callout>
 
-- Use `role="alert"` or `aria-live="assertive"` for important notifications.
+- Put live-region semantics on `.toast__content`, not on the root that also contains actions.
+- Use `role="alert"` or `aria-live="assertive"` only for genuinely urgent changes; an Error visual does not imply assertive priority.
 - Use `role="status"` or `aria-live="polite"` for routine confirmations.
 - Do not auto-dismiss a toast while focus is inside it.
 
@@ -53,6 +54,7 @@ Toast supports `info`, `success`, `warning`, and `error` feedback families. Vari
   <tr><td>`message`</td><td>string</td><td>required</td><td>Visible notification message</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`info`</td><td>`info`, `success`, `warning`, or `error`</td></tr>
   <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Decorative feedback icon</td></tr>
+  <tr><td>`action`</td><td>slot</td><td>optional</td><td>Canonical Button action that is safe to ignore</td></tr>
   <tr><td>`dismissAction`</td><td>slot</td><td>optional</td><td>Named dismiss button</td></tr>
   <tr><td>`dismissLabel`</td><td>string</td><td>optional</td><td>Accessible dismiss name</td></tr>
   <tr><td>`announcement`</td><td>enum</td><td>`none`</td><td>`none`, `polite`, or `assertive`</td></tr>
@@ -66,6 +68,7 @@ Toast supports `info`, `success`, `warning`, and `error` feedback families. Vari
   <tr><td>`.toast__content`</td><td>class</td><td>—</td><td>Title and message wrapper</td></tr>
   <tr><td>`.toast__title`</td><td>class</td><td>—</td><td>Optional title</td></tr>
   <tr><td>`.toast__message`</td><td>class</td><td>—</td><td>Message text</td></tr>
+  <tr><td>`.toast__action`</td><td>class</td><td>—</td><td>Layout hook on an optional canonical Button</td></tr>
   <tr><td>`.toast__close`</td><td>class</td><td>—</td><td>Dismiss control</td></tr>
   <tr><td>`.is-visible`</td><td>state class</td><td>—</td><td>Shows the toast</td></tr>
 </PropTable>

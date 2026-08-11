@@ -1,42 +1,47 @@
-## Overview
+## Deprecated identity
 
-Hero Section presents a page-level message with a required heading and optional media, contrast overlay, eyebrow, supporting copy, Button-composed actions, or target-owned slides.
+Hero Section (`S1`) is deprecated as an independent public component. The
+owner-selected `G1-A` direction keeps one public [Hero](/components/hero) and
+moves all useful S1 anatomy and layout profiles into that canonical identity.
 
-## Presentation
+This migration record renders the same Hero renderer and fixture as G1. It owns
+no independent CSS, behavior, Studio implementation, or Shopify adapter and
+must not be used for new consumer code.
 
-<Preview html={'<section class="hero-section tg-preview-stage" aria-labelledby="hero-section-title"><div class="hero-section__media"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Hand-thrown ceramic vessels arranged in a sunlit studio" /></div><div class="hero-section__overlay" aria-hidden="true"></div><div class="hero-section__content"><p class="hero-section__eyebrow">New collection</p><h2 class="hero-section__title" id="hero-section-title">Artisan ceramics</h2><p class="hero-section__subtitle">Handcrafted pieces for considered daily rituals.</p><div class="hero-section__actions"><a class="btn" href="#">View collection</a><a class="btn btn--secondary" href="#">Read the story</a></div></div></section>'} label="Hero Section" />
+<Preview html={'<section class="hero tg-preview-stage" aria-labelledby="hero-section-migration-title" data-hero data-media-behavior="none" data-autoplay="false" data-loop="true" data-navigation="both"><div class="hero__inner"><div class="hero__media"><div class="tg-preview-media tg-preview-media--wide hero__media-item" aria-hidden="true"></div><div class="hero__overlay" aria-hidden="true"></div></div><div class="hero__content"><p class="hero__label">New collection</p><h2 class="hero__title" id="hero-section-migration-title">Objects shaped for daily rituals</h2><p class="hero__description">This audit fallback uses the canonical Hero classes; Exhibit and Studio use the registered shared renderer.</p><div class="hero__actions"><a class="btn" href="/components/hero">Open canonical Hero</a></div></div></div></section>'} label="Deprecated Hero Section migration to canonical Hero" />
 
-`full` is the default media-backed presentation and has no modifier class. `split` maps to `.hero-section--split`, `text-only` to `.hero-section--text-only`, `parallax` to `.hero-section--parallax`, `slideshow` to `.hero-section--slideshow`, and `fullscreen` to `.hero-section--fullscreen`. Parallax and slideshow are presentation hooks only: scroll behavior, navigation, timing, announcements, and playback remain target-owned.
+## Canonical mapping
 
-## Usage Guidelines
+- `.hero-section` → `.hero`
+- `.hero-section__inner` → `.hero__inner`
+- `.hero-section__media` → `.hero__media`
+- `.hero-section__slide` → `.hero__slide`
+- `.hero-section__overlay` → `.hero__overlay`
+- `.hero-section__content` → `.hero__content`
+- `.hero-section__eyebrow` → `.hero__label`
+- `.hero-section__title` → `.hero__title`
+- `.hero-section__subtitle` → `.hero__description`
+- `.hero-section__actions` → `.hero__actions`
 
-<DoDont>
-  <Do>Use one clear heading and a restrained action hierarchy that supports the page purpose.</Do>
-  <Dont>Do not imply slideshow navigation or parallax behavior unless the target provides the complete interaction.</Dont>
-</DoDont>
+The canonical Hero additionally owns `.hero__track`, `.hero__controls`,
+`.hero__previous`, `.hero__next`, `.hero__indicators`,
+`.hero__indicator`, `.hero__rotation-control`, `.hero__progress`,
+`.hero__progress-value`, and `.hero__status`.
 
-Keep media, overlay, and foreground contrast coordinated. Treat slide records as ordered target content rather than a source for invented carousel settings.
+Layout modifiers migrate to `.hero--split`, `.hero--text-only`, and
+`.hero--fullscreen`. Current slide uses
+`.hero__slide[aria-current="true"]`; playback uses
+`.hero[data-autoplay-state="playing"]` or
+`.hero[data-autoplay-state="paused"]`; reduced motion is reflected through
+`.hero[data-reduced-motion="true"]`. Loop, autoplay, navigation, parallax, and
+slideshow use the canonical `data-loop`, `data-autoplay`,
+`data-navigation`, and `data-media-behavior` mappings.
 
-## Accessibility
+## Migration API
 
-- Choose a heading level that fits the surrounding page hierarchy.
-- Give informative media useful alternative text and use an empty alternative for decorative media.
-- Keep links as links and commands as native buttons through the composed Button contract.
-- When a target enables slideshow or parallax behavior, it must define focus order, announcements, pause controls, reduced-motion behavior, and current-slide state.
-
-## References
-
-**Dependency:** [Button](/components/button).
-
-**Anatomy:** `.hero-section`, `.hero-section__media`, `.hero-section__overlay`, `.hero-section__content`, `.hero-section__eyebrow`, `.hero-section__title`, `.hero-section__subtitle`, `.hero-section__actions`, and `.hero-section__slide`.
-
-<PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`full`</td><td>`full`, `split`, `text-only`, `parallax`, `slideshow`, or `fullscreen`</td></tr>
-  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-owned image, video, or slideshow media</td></tr>
-  <tr><td>`overlay`</td><td>slot</td><td>optional</td><td>Optional contrast layer</td></tr>
-  <tr><td>`eyebrow`</td><td>string</td><td>optional</td><td>Short context above the heading</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Primary hero heading</td></tr>
-  <tr><td>`subtitle`</td><td>string</td><td>optional</td><td>Supporting hero copy</td></tr>
-  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Button-composed actions</td></tr>
-  <tr><td>`slides`</td><td>slot</td><td>optional</td><td>Ordered target-owned slide content</td></tr>
-</PropTable>
+The temporary contract mirrors canonical `layout`, `height`,
+`mediaBehavior`, `label`, `title`, `description`, `media`, `overlay`,
+`actions`, `slides`, `autoplay`, `loop`, `navigation`,
+`autoplayInterval`, `previousLabel`, `nextLabel`, `pauseLabel`,
+`playLabel`, and `statusTemplate` only so existing S1 references can be
+reviewed and migrated. Its contract status is `deprecated`, never `stable`.

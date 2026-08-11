@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "header",
   "name": "Header",
   "registryId": "C1",
   "category": "global",
   "status": "pilot",
-  "summary": "Sticky site header with logo, primary navigation, action buttons, and cart-count support.",
+  "summary": "Sticky site masthead with required brand destination, optional primary navigation, canonical Button or Link actions, cart-count badge, and container-responsive mobile-trigger composition.",
   "dependencies": ["button"],
   "source": {
     "registry": "registry.json#/components/header",
@@ -19,6 +19,7 @@
     { "name": "nav", "selector": ".header__nav", "className": ".header__nav", "required": false, "description": "Primary navigation wrapper." },
     { "name": "navLink", "selector": ".header__nav-link", "className": ".header__nav-link", "required": false, "description": "Primary navigation link." },
     { "name": "actions", "selector": ".header__actions", "className": ".header__actions", "required": false, "description": "Header action group." },
+    { "name": "action", "selector": ".header__action", "className": ".header__action", "required": false, "description": "Positioning hook applied to a composed canonical Button or native Link action." },
     { "name": "cartCount", "selector": ".header__cart-count", "className": ".header__cart-count", "required": false, "description": "Cart item-count badge." },
     { "name": "hamburger", "selector": ".header__hamburger", "className": ".header__hamburger", "required": false, "description": "Mobile menu trigger." }
   ],
@@ -30,30 +31,36 @@
   ],
   "states": [
     { "name": "default", "selectors": [".header"], "description": "Default header state." },
-    { "name": "navHover", "selectors": [".header__nav-link:hover"], "description": "Navigation-link hover state." },
-    { "name": "currentPage", "selectors": [".header__nav-link[aria-current=\"page\"]"], "description": "Current navigation destination state." },
-    { "name": "desktopNav", "selectors": [".header__nav", ".header__hamburger"], "description": "Desktop breakpoint reveals navigation and hides hamburger trigger." }
+    { "name": "navHover", "selectors": [".header__nav-link:hover"], "description": "Navigation-link hover keeps primary text contrast and exposes the accent underline." },
+    { "name": "focusVisible", "selectors": [".header__logo:focus-visible", ".header__nav-link:focus-visible"], "description": "Keyboard focus on brand and navigation links remains distinct." },
+    { "name": "currentPage", "selectors": [".header__nav-link[aria-current=\"page\"]"], "description": "Current destination keeps primary text contrast and exposes the accent underline." },
+    { "name": "compactNav", "selectors": [".header__nav", ".header__hamburger"], "description": "Below the existing 48rem Header-container threshold, primary navigation is hidden and the optional mobile trigger remains available." },
+    { "name": "expandedNav", "selectors": [".header__nav", ".header__hamburger"], "description": "At or above the existing 48rem Header-container threshold, primary navigation is available and the mobile trigger is hidden." }
   ],
   "behavior": [
+    { "name": "mastheadSemantics", "selectors": [".header"], "attributes": ["<header>"], "description": "A top-level Header element supplies the page banner landmark natively; nested previews do not add a banner role." },
     { "name": "primaryNavigation", "selectors": [".header__nav", ".header__nav-link"], "attributes": ["aria-label", "aria-current"], "description": "Primary navigation should expose a labelled navigation region and current-page state." },
-    { "name": "mobileMenuTrigger", "selectors": [".header__hamburger"], "attributes": ["aria-expanded", "aria-controls"], "events": ["click"], "description": "Mobile trigger should open the mobile navigation or drawer adapter." },
-    { "name": "cartCount", "selectors": [".header__cart-count"], "description": "Cart count should update when commerce state changes and remain readable at small sizes." }
+    { "name": "containerResponse", "selectors": [".header__nav", ".header__hamburger"], "description": "The existing 48rem composition threshold is evaluated against Header inline size; unsupported container-query targets retain the compact mobile-trigger fallback." },
+    { "name": "canonicalActions", "selectors": [".header__actions", ".header__action"], "description": "Actions compose canonical Button or native Link implementations; Header owns only grouping and badge positioning." },
+    { "name": "mobileMenuTrigger", "selectors": [".header__hamburger"], "attributes": ["aria-expanded", "aria-controls"], "events": ["click"], "description": "When connected, the mobile trigger must control a Mobile Menu or Drawer adapter and synchronize expanded state." },
+    { "name": "cartCount", "selectors": [".header__cart-count"], "description": "The visible badge is subordinate to the cart action accessible name; target cart state owns updates and live-region policy." },
+    { "name": "targetServices", "description": "Search, account, cart, mobile navigation, mega-menu coordination, action priority, route dismissal, focus, scroll offset, and global state remain target-owned." }
   ],
   "properties": [
     { "name": "logo", "type": "slot", "required": true, "description": "Brand name or brand image rendered by the logo link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__logo", "classNames": [".header__logo"] }] } },
     { "name": "logoHref", "type": "string", "required": true, "description": "Brand-home destination for the logo link.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__logo", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
-    { "name": "logoLabel", "type": "string", "required": false, "description": "Accessible name for the logo link when visible brand content is insufficient.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__logo", "attribute": "aria-label", "valueFrom": "property", "elements": ["a"] }] } },
+    { "name": "logoLabel", "type": "string", "required": false, "description": "Accessible name only when visible brand text or image alternative does not already identify the home link.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__logo", "attribute": "aria-label", "valueFrom": "property", "elements": ["a"] }] } },
     { "name": "navigationLabel", "type": "string", "required": false, "description": "Accessible name for the optional primary navigation region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".header__nav", "attribute": "aria-label", "valueFrom": "property", "elements": ["nav"] }] } },
     { "name": "navigation", "type": "slot", "required": false, "description": "Target-owned primary navigation links and current-page markup.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__nav", "classNames": [".header__nav"] }] } },
-    { "name": "actions", "type": "slot", "required": false, "description": "Button and link dependencies for search, cart, mobile navigation, or other target-owned global actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__actions", "classNames": [".header__actions"] }] } },
-    { "name": "cartCount", "type": "string", "required": false, "description": "Target-formatted cart count displayed by a composed cart action.", "targetMappings": { "web": [{ "kind": "content", "selector": ".header__cart-count" }] } },
+    { "name": "actions", "type": "slot", "required": false, "description": "Canonical Button and native Link dependencies for target-owned global actions; each may add the Header positioning hook.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__actions", "classNames": [".header__actions", ".header__action"] }] } },
+    { "name": "cartCount", "type": "string", "required": false, "description": "Target-formatted visible cart count mirrored in the composed cart action's accessible name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".header__cart-count" }] } },
     { "name": "mobileMenuTrigger", "type": "slot", "required": false, "description": "Optional Button dependency that a target may connect to Mobile Menu or Drawer behavior.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".header__hamburger", "classNames": [".header__hamburger"] }] } }
   ],
   "tokens": {
     "public": {
       "color": ["--color-surface-primary", "--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-secondary", "--color-text-accent", "--color-button-primary-bg-default", "--color-button-primary-text-default"],
       "spacing": ["--space-layout-touch-target", "--space-layout-container", "--space-layout-element-gap"],
-      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size"],
+      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size", "--typo-body-line-height"],
       "z-index": ["--z-sticky"],
       "radius": ["--radius-full"],
       "transition": ["--transition-fast"],
@@ -61,14 +68,17 @@
     }
   },
   "accessibility": [
+    "Use a top-level header element for the page banner and do not add redundant role=\"banner\".",
     "Use a labelled nav region for the primary navigation.",
     "Expose current destination with aria-current when possible.",
-    "Keep cart-count changes understandable to assistive technology.",
-    "Mobile menu triggers need aria-expanded and aria-controls when they toggle a drawer."
+    "Compose actions from canonical Button or native Link implementations with visible focus and accessible names.",
+    "Include cart quantity in the cart action accessible name and apply live-region policy in target cart state.",
+    "Connected mobile menu triggers need synchronized aria-expanded and aria-controls.",
+    "Sticky page shells must keep focused and fragment-linked content visible below the occupied Header."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map navigation links, cart count, search trigger, and mobile menu trigger from theme data." },
+    "web": { "status": "implemented", "kind": "css-target-behavior", "notes": "Canonical CSS owns sticky/container-responsive composition; the page shell owns action and overlay services." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Liquid maps brand, menu, actions, and cart data, but shared search/cart/mobile runtime and action priority remain target work." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

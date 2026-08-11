@@ -1,61 +1,76 @@
 {%- comment -%}
   Snippet: cart-drawer
   Usage: {% render 'cart-drawer' %}
+
+  Canonical Drawer owns modal structure. This Shopify target maps cart records,
+  native quantity form ownership, removal requests, formatted totals, empty
+  content, and checkout. A target controller must still own open/close focus,
+  inertness, scroll lock, Ajax/section refresh, pending/error, and status policy.
 {%- endcomment -%}
 
-<div class="drawer-overlay" data-cart-overlay></div>
-<aside class="drawer" data-cart-drawer aria-label="Shopping cart">
+<div class="drawer-overlay" data-cart-overlay aria-hidden="true"></div>
+<aside
+  class="drawer"
+  id="CartDrawer"
+  data-cart-drawer
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="CartDrawerTitle"
+  aria-hidden="true"
+>
   <div class="drawer__header">
-    <h2 class="modal__title">Cart ({{ cart.item_count }})</h2>
-    <button class="btn btn--outline btn--icon-only"
-            aria-label="Close cart" data-cart-close>
-      {% render 'icon', name: 'x' %}
+    <h2 class="drawer__title" id="CartDrawerTitle">
+      {{ 'cart.title' | t }} ({{ cart.item_count }})
+    </h2>
+    <button class="close-btn drawer__close" type="button"
+            aria-label="{{ 'cart.close' | t | escape }}" data-cart-close>
+      <span class="close-btn__icon">{% render 'icon', name: 'x' %}</span>
     </button>
   </div>
 
-  <div class="drawer__body">
+  <form class="drawer__body" action="{{ routes.cart_url }}" method="post">
     {% if cart.item_count == 0 %}
-      {% render 'empty-state', icon: 'shopping-bag',
-         title: 'Your cart is empty',
-         message: 'Discover our handcrafted pieces.',
-         cta_text: 'Shop Now', cta_url: '/collections/all' %}
+      {% render 'empty-state', heading_tag: 'h3', icon: 'shopping-bag',
+         title: 'cart.empty' | t,
+         message: 'cart.empty_message' | t,
+         cta_text: 'cart.continue_shopping' | t,
+         cta_url: routes.all_products_collection_url %}
     {% else %}
-      {% for item in cart.items %}
-        <div class="cart-item" data-cart-item="{{ item.key }}">
-          <a href="{{ item.url }}">
-            {{ item.image | image_url: width: 160 | image_tag:
-               class: 'cart-item__image', alt: item.title, loading: 'lazy' }}
-          </a>
-          <div class="cart-item__details">
-            <a class="cart-item__title" href="{{ item.url }}">{{ item.product.title }}</a>
-            {% unless item.variant.title == 'Default Title' %}
-              <p class="cart-item__variant">{{ item.variant.title }}</p>
-            {% endunless %}
-            <div class="cart-item__actions">
-              {% render 'quantity-selector', item: item %}
-              <span class="price__current">{{ item.final_line_price | money }}</span>
-            </div>
-            <button class="cart-item__remove" data-remove="{{ item.key }}">
-              Remove
-            </button>
-          </div>
-        </div>
-      {% endfor %}
+      <ul class="cart-lines">
+        {% for item in cart.items %}
+          {%- if settings.gift_wrap_enabled and settings.gift_wrap_product != blank and item.product_id == settings.gift_wrap_product.id -%}
+            {% render 'cart-line-item', item: item, show_quantity: false %}
+          {%- else -%}
+            {% render 'cart-line-item', item: item %}
+          {%- endif -%}
+        {% endfor %}
+      </ul>
+      {%- if settings.gift_wrap_enabled and settings.gift_wrap_product != blank -%}
+        {% render 'gift-wrap',
+           gift_wrap_product: settings.gift_wrap_product,
+           gift_wrap_id: 'CartDrawerGiftWrap' %}
+      {%- endif -%}
+      <button type="submit" name="update" class="btn btn--outline btn--full">
+        {{ 'cart.update' | t }}
+      </button>
     {% endif %}
-  </div>
+  </form>
 
   {% if cart.item_count > 0 %}
-  <div class="drawer__footer">
-    <div class="cart-summary">
-      <div class="cart-summary__row cart-summary__total">
-        <span>Total</span>
-        <span>{{ cart.total_price | money }}</span>
-      </div>
+    <div class="drawer__footer">
+      <dl class="cart-drawer__summary">
+        <div class="cart-drawer__summary-row cart-drawer__summary-total">
+          <dt>{{ 'cart.total' | t }}</dt>
+          <dd><bdi>{{ cart.total_price | money }}</bdi></dd>
+        </div>
+      </dl>
+      <p>{{ 'cart.shipping_note' | t }}</p>
+      <a href="{{ routes.cart_url }}" class="btn btn--outline btn--full">
+        {{ 'cart.title' | t }}
+      </a>
+      <a href="/checkout" class="btn btn--primary btn--full">
+        {{ 'cart.checkout' | t }}
+      </a>
     </div>
-    <p style="font-size: calc(var(--typo-body-size) * 0.75); color: var(--color-text-secondary); margin: 8px 0;">
-      Shipping calculated at checkout
-    </p>
-    <a href="/checkout" class="btn btn--primary btn--full">Checkout</a>
-  </div>
   {% endif %}
 </aside>

@@ -1,39 +1,117 @@
-<section class="collection-story {% if section.settings.reverse %}collection-story--reversed{% endif %}">
-  <div class="collection-story__media">
-    {% if section.settings.image %}
-      {{ section.settings.image | image_url: width: 960 | image_tag:
-         alt: section.settings.title, loading: 'lazy',
-         widths: '480,720,960', sizes: '(min-width: 768px) 50vw, 100vw' }}
+{% liquid
+  assign story_title = section.settings.title
+  if story_title == blank
+    assign story_title = 'collection_story.default_title' | t
+  endif
+
+  assign action_label = section.settings.cta_text
+  if action_label == blank
+    assign action_label = 'collection_story.default_action' | t
+  endif
+
+  assign heading_id = 'CollectionStory-' | append: section.id | append: '-Title'
+  assign image_alt = section.settings.image.alt
+  if section.settings.image_decorative
+    assign image_alt = ''
+  endif
+%}
+
+<section
+  class="collection-story{% if section.settings.reverse %} collection-story--reversed{% endif %}"
+  aria-labelledby="{{ heading_id }}"
+>
+  <div class="collection-story__layout{% if section.settings.image != blank %} collection-story__layout--with-media{% endif %}">
+    {% if section.settings.image != blank %}
+      <div class="collection-story__media">
+        {{ section.settings.image | image_url: width: 1440 | image_tag:
+          alt: image_alt,
+          loading: 'lazy',
+          widths: '360, 540, 720, 960, 1200, 1440',
+          sizes: '(min-width: 768px) 50vw, 100vw'
+        }}
+      </div>
     {% endif %}
-  </div>
-  <div class="collection-story__content">
-    <span class="collection-story__label">{{ section.settings.label | default: 'The Story' }}</span>
-    <h2 class="collection-story__title">{{ section.settings.title }}</h2>
-    <div class="collection-story__text">{{ section.settings.text }}</div>
-    {% if section.settings.quote %}
-      <blockquote class="collection-story__inspiration">{{ section.settings.quote }}</blockquote>
-    {% endif %}
-    {% if section.settings.cta_url %}
-      <a href="{{ section.settings.cta_url }}" class="btn btn--outline">
-        {{ section.settings.cta_text | default: 'Explore Collection' }}
-      </a>
-    {% endif %}
+
+    <div class="collection-story__content">
+      {% if section.settings.label != blank %}
+        <p class="collection-story__label">{{ section.settings.label | escape }}</p>
+      {% endif %}
+
+      <h2 class="collection-story__title" id="{{ heading_id }}">{{ story_title | escape }}</h2>
+
+      {% if section.settings.text != blank %}
+        <div class="collection-story__text">{{ section.settings.text }}</div>
+      {% endif %}
+
+      {% if section.settings.quote != blank %}
+        <blockquote class="collection-story__inspiration">{{ section.settings.quote | escape }}</blockquote>
+      {% endif %}
+
+      {% if section.settings.cta_url != blank %}
+        <div class="collection-story__actions">
+          <a class="btn btn--outline" href="{{ section.settings.cta_url }}">{{ action_label | escape }}</a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "Collection Story",
+  "name": "t:sections.collection_story.name",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "label", "label": "Label", "default": "The Story" },
-    { "type": "text", "id": "title", "label": "Heading" },
-    { "type": "richtext", "id": "text", "label": "Body text" },
-    { "type": "textarea", "id": "quote", "label": "Inspiration quote" },
-    { "type": "url", "id": "cta_url", "label": "CTA link" },
-    { "type": "text", "id": "cta_text", "label": "CTA text" },
-    { "type": "checkbox", "id": "reverse", "label": "Reverse layout", "default": false }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.collection_story.settings.image"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_decorative",
+      "label": "t:sections.collection_story.settings.image_decorative",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:sections.collection_story.settings.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.collection_story.settings.title"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:sections.collection_story.settings.body"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:sections.collection_story.settings.quote"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "t:sections.collection_story.settings.action_url"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:sections.collection_story.settings.action_label"
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse",
+      "label": "t:sections.collection_story.settings.reverse",
+      "default": false
+    }
   ],
-  "presets": [{ "name": "Collection Story" }]
+  "presets": [
+    {
+      "name": "t:sections.collection_story.name"
+    }
+  ]
 }
 {% endschema %}

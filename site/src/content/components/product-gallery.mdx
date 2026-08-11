@@ -1,39 +1,63 @@
 ## Overview
 
-Product image gallery with thumbnails, zoom, and dots.
+Controlled rich-media product collection for images, hosted video, external video, and models. One stable media id is current; selection stays manual and image detail delegates to canonical Lightbox.
 
-<Preview html={"<div class=\"product-gallery tg-preview-frame--md\"><div class=\"product-gallery__main\"><div class=\"tg-preview-media tg-preview-media--square\" role=\"img\" aria-label=\"Product image\"></div></div><div class=\"product-gallery__thumbs\"><button class=\"product-gallery__thumb\" aria-selected=\"true\"><div class=\"tg-preview-media tg-preview-media--thumb\" role=\"img\" aria-label=\"Thumb 1\"></div></button><button class=\"product-gallery__thumb\"><div class=\"tg-preview-media tg-preview-media--thumb\" role=\"img\" aria-label=\"Thumb 2\"></div></button><button class=\"product-gallery__thumb\"><div class=\"tg-preview-media tg-preview-media--thumb\" role=\"img\" aria-label=\"Thumb 3\"></div></button></div></div>"} label="Product Gallery" />
+<Preview html={"<div class=\"product-gallery tg-preview-frame--md\" data-image-detail=\"lightbox\" data-loop=\"false\"><div class=\"product-gallery__layout\"><div class=\"product-gallery__main\" data-gallery-viewport><div class=\"product-gallery__media product-gallery__media--image\" data-gallery-media-id=\"front\" data-gallery-media-type=\"image\"><button class=\"product-gallery__image-action\" type=\"button\" aria-label=\"Open image detail: Front view\"><img src=\"/media/editorial/textured-vase.jpg\" alt=\"Celadon glazed stoneware vessel, front view\"></button></div><div class=\"product-gallery__media product-gallery__media--video\" data-gallery-media-id=\"video\" data-gallery-media-type=\"video\" hidden><div class=\"product-gallery__poster\"><img src=\"/media/editorial/ceramic-tableware.jpg\" alt=\"Poster for product video\"><button class=\"product-gallery__activate btn\" type=\"button\">Play video</button></div><div class=\"product-gallery__interactive\" hidden></div></div><button class=\"product-gallery__nav product-gallery__nav--prev icon-btn icon-btn--round\" type=\"button\" aria-label=\"Previous media\" disabled>←</button><button class=\"product-gallery__nav product-gallery__nav--next icon-btn icon-btn--round\" type=\"button\" aria-label=\"Next media\">→</button></div><div class=\"product-gallery__thumbs\" role=\"group\" aria-label=\"Product media views\"><button class=\"product-gallery__thumb\" type=\"button\" aria-label=\"Show product media: Front view\" aria-current=\"true\"><img src=\"/media/editorial/textured-vase.jpg\" alt=\"\"></button><button class=\"product-gallery__thumb\" type=\"button\" aria-label=\"Show product media: Product video\"><img src=\"/media/editorial/ceramic-tableware.jpg\" alt=\"\"><span class=\"badge product-gallery__media-badge\" aria-hidden=\"true\">Video</span></button></div><div class=\"product-gallery__dots\" role=\"group\" aria-label=\"Product media pages\"><button class=\"product-gallery__dot\" type=\"button\" aria-label=\"Show product media: Front view\" aria-current=\"true\"></button><button class=\"product-gallery__dot\" type=\"button\" aria-label=\"Show product media: Product video\"></button></div><p class=\"product-gallery__status visually-hidden\" role=\"status\" aria-live=\"polite\"></p></div></div>"} label="Product Gallery" />
 
 ## Presentation
 
-The selected main media, thumbnail selection, mobile dots, and desktop zoom are independent states. Media collections and index coordination remain consumer data.
+The neutral item collection discriminates `image`, `video`, `external-video`, and `model`. Each record owns a stable id, localized label, preview, type-native data, and item-specific accessible text. AR is an adapter capability/action on eligible models, not another media type.
+
+The product coordinator owns the collection, `currentId`, change handling, and variant synchronization. Framework targets may also offer `initialCurrentId`, but controlled and uncontrolled modes use the same state and never run a second DOM enhancer.
+
+Selection only changes the current id. Video keeps a poster and explicit Play action; models keep a preview and explicit View in 3D action; eligible AR remains separate. Changing current media pauses and releases previous playback, provider iframe, or viewer content.
+
+`imageDetail="lightbox"` is the full-product default. Activating a featured image opens canonical Lightbox over the image subset and synchronizes the same current id. `none` leaves images passive for already-modal surfaces such as Quick View. There is no second inline hover-zoom engine.
+
+`loop` defaults to `false`. Finite navigation disables real collection bounds; loop wraps logical state without cloned records or duplicate controls. The collection never advances automatically.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Optimize product images for web — use WebP format and responsive srcset.</Do>
-  <Dont>Don't overload product components with too many badges or CTAs — keep it clean.</Dont>
+  <Do>Provide complete discriminated records, stable ids, item-specific text, responsive image delivery, posters, explicit native activation, and one coordinator-owned current id.</Do>
+  <Dont>Do not start playback on selection, fabricate an AR media type, load provider/model content before activation, or combine controlled state with the DOM enhancer.</Dont>
 </DoDont>
+
+Use canonical Button, Badge, Icon Button, and Lightbox dependencies. Thumbnail and compact groups remain ordinary named Button groups with `aria-current`; Product Gallery does not claim Tabs or Listbox semantics.
+
+Shopify maps `product.media` to image, `video_tag`, `external_video_tag`, and `model_viewer_tag`. Interactive markup remains deferred in inert templates until explicit activation; eligible models may expose Shopify XR separately.
 
 ## Accessibility
 
-<Callout type="tip">
-  Product components are designed to work together. The product page combines gallery, info, form, and related products.
-</Callout>
+- Keep hidden media, every selector group's `aria-current`, previous/next bounds, and the polite status synchronized to one stable id.
+- Keep previous/next Buttons available because media controls can interfere with swipe; swipe is supplementary.
+- Use item-specific `alt` for informative images and posters, `alt=""` for decorative previews inside named Buttons, and visible type Badges for non-image thumbnails.
+- Do not autoplay the collection. Require explicit Play, View in 3D, and AR actions and retain native media controls.
+- Lightbox owns modal naming, focus containment, Escape/backdrop/Close dismissal, restored focus, logical RTL navigation, direct swipe, and bounded zoom/pan.
+- Respect reduced motion and forced colors; keep the 44px semantic compact target and visible focus treatment.
 
-- All images must have descriptive `alt` text.
-- Thumbnail and dot controls should expose the selected media with `aria-selected` or an equivalent target-native state.
-- Do not make zoom the only way to inspect product detail.
+### Dependencies
+
+This component uses:
+
+- [Button](/components/button)
+- [Badge](/components/badge)
+- [Icon Button](/components/icon-button)
+- [Lightbox](/components/lightbox)
 
 ## References
 
 <PropTable>
-  <tr><td>`.product-gallery`</td><td>class</td><td>—</td><td>Base product gallery styles</td></tr>
-  <tr><td>`.product-gallery__main`</td><td>class</td><td>—</td><td>Main selected media frame</td></tr>
-  <tr><td>`.product-gallery__thumbs`</td><td>class</td><td>—</td><td>Thumbnail rail</td></tr>
-  <tr><td>`.product-gallery__thumb`</td><td>class</td><td>—</td><td>Thumbnail trigger</td></tr>
-  <tr><td>`.product-gallery__thumb[aria-selected="true"]`</td><td>state</td><td>—</td><td>Selected thumbnail</td></tr>
-  <tr><td>`.product-gallery__dots`</td><td>class</td><td>—</td><td>Mobile dot navigation</td></tr>
-  <tr><td>`.product-gallery__dot`</td><td>class</td><td>—</td><td>Mobile dot trigger</td></tr>
-  <tr><td>`.product-gallery__dot[aria-selected="true"]`</td><td>state</td><td>—</td><td>Selected dot</td></tr>
+  <tr><td>`imageDetail`</td><td>`lightbox | none`</td><td>`lightbox`</td><td>Canonical image detail or passive featured image</td></tr>
+  <tr><td>`loop`</td><td>boolean</td><td>`false`</td><td>Wrap logical collection navigation without cloning</td></tr>
+  <tr><td>`currentId`</td><td>adapter state</td><td>required</td><td>One stable coordinator-owned current media id</td></tr>
+  <tr><td>`initialCurrentId`</td><td>adapter state</td><td>optional</td><td>Uncontrolled initialization over the same state machine</td></tr>
+  <tr><td>`.product-gallery__media`</td><td>part</td><td>required</td><td>Discriminated rich-media record projection</td></tr>
+  <tr><td>`.product-gallery__poster`</td><td>part</td><td>rich media</td><td>Inactive preview before explicit activation</td></tr>
+  <tr><td>`.product-gallery__interactive`</td><td>slot</td><td>rich media</td><td>Target-native video/provider/model lifecycle</td></tr>
+  <tr><td>`.product-gallery__media-badge`</td><td>Badge</td><td>non-image</td><td>Visible thumbnail media type</td></tr>
+  <tr><td>`tg:product-gallery-select`</td><td>Web event</td><td>optional</td><td>Target request to select a stable id</td></tr>
+  <tr><td>`tg:product-gallery-change`</td><td>Web event</td><td>emitted</td><td>Reports synchronized current-id change</td></tr>
 </PropTable>
+
+Primary references: [WAI-ARIA APG Carousel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/), [Open UI carousel research](https://open-ui.org/components/carousel.research/), [HTML media](https://html.spec.whatwg.org/multipage/media.html), [Shopify product media support](https://shopify.dev/docs/storefronts/themes/product-merchandising/media/support-media), and [Shopify media UX](https://shopify.dev/docs/storefronts/themes/product-merchandising/media/media-ux).

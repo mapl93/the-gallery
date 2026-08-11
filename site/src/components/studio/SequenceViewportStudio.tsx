@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -7,6 +7,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import StepsArtwork, { type StepsArtworkItem } from './StepsArtwork';
 
 interface SequenceViewportStudioProps {
   contract: ComponentContract;
@@ -14,7 +15,11 @@ interface SequenceViewportStudioProps {
 }
 
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
-const stepsFixture = ['Details', 'Shipping', 'Review'];
+const stepsFixture: StepsArtworkItem[] = [
+  { id: 'details', title: 'Details', description: 'Artwork and contact', status: 'completed' },
+  { id: 'shipping', title: 'Shipping', description: 'Delivery method', status: 'current' },
+  { id: 'review', title: 'Review', description: 'Confirm order', status: 'upcoming' },
+];
 const slidesFixture = ['Celadon study', 'Ash glaze study', 'Porcelain study'];
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
@@ -48,10 +53,6 @@ function initialFixtureValues(contract: ComponentContract): StudioPropertyValues
   return values;
 }
 
-function variantClass(contract: ComponentContract, value: StudioPropertyValue): string | null {
-  return contract.variants.find((variant) => variant.name === value)?.className?.replace(/^\./, '') ?? null;
-}
-
 export default function SequenceViewportStudio({ contract, definition }: SequenceViewportStudioProps) {
   const initialValues = useMemo(() => initialFixtureValues(contract), [contract]);
   const studioTokens = useMemo(() => [...new Set(definition.groups.flatMap((group) => (
@@ -62,6 +63,9 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [slideIndex, setSlideIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<Array<HTMLElement | null>>([]);
+  const carouselFrameRef = useRef<number | null>(null);
+  const carouselTrackId = useId();
 
   useEffect(() => {
     const read = () => {
@@ -81,6 +85,10 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
     setSlideIndex(values.current === true ? 0 : 1);
   }, [contract.slug, values.current]);
 
+  useEffect(() => () => {
+    if (carouselFrameRef.current !== null) cancelAnimationFrame(carouselFrameRef.current);
+  }, []);
+
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
 
   function reset() {
@@ -91,19 +99,13 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
 
   function renderSteps() {
     const orientation: 'horizontal' | 'vertical' = values.orientation === 'vertical' ? 'vertical' : 'horizontal';
-    const classes = ['steps', variantClass(contract, orientation), 'docs-studio__preview-steps'].filter(Boolean).join(' ');
     return (
-      <ol className={classes} aria-label="Order progress" aria-orientation={orientation}>
-        {stepsFixture.map((label, index) => {
-          const stateClass = index === 0 ? 'steps__item--completed' : index === 1 ? 'steps__item--active' : '';
-          return (
-            <li className={`steps__item ${stateClass}`.trim()} aria-current={index === 1 ? 'step' : undefined} key={label}>
-              <span className="steps__indicator">{index === 0 ? <Check aria-hidden="true" /> : index + 1}</span>
-              <span className="steps__title">{label}</span>
-            </li>
-          );
-        })}
-      </ol>
+      <StepsArtwork
+        className="docs-studio__preview-steps"
+        label="Order progress"
+        orientation={orientation}
+        items={stepsFixture}
+      />
     );
   }
 
@@ -111,35 +113,59 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
     const normalized = Math.max(0, Math.min(slidesFixture.length - 1, next));
     setSlideIndex(normalized);
     setValues((current) => ({ ...current, current: normalized === 0, disabled: normalized === 0 }));
-    const track = trackRef.current;
-    if (track) track.scrollTo({ left: normalized * track.clientWidth, behavior: 'smooth' });
+    slideRefs.current[normalized]?.scrollIntoView({
+      block: 'nearest',
+      inline: 'start',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    });
   }
 
-  function carouselKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'ArrowLeft') selectSlide(slideIndex - 1);
-    else if (event.key === 'ArrowRight') selectSlide(slideIndex + 1);
-    else return;
-    event.preventDefault();
+  function syncCarouselFromScroll() {
+    if (carouselFrameRef.current !== null) return;
+    carouselFrameRef.current = requestAnimationFrame(() => {
+      carouselFrameRef.current = null;
+      const track = trackRef.current;
+      if (!track) return;
+      const rtl = getComputedStyle(track).direction === 'rtl';
+      const trackEdge = rtl ? track.getBoundingClientRect().right : track.getBoundingClientRect().left;
+      const next = slideRefs.current.reduce((closest, slide, index) => {
+        if (!slide) return closest;
+        const rect = slide.getBoundingClientRect();
+        const distance = Math.abs((rtl ? rect.right : rect.left) - trackEdge);
+        return distance < closest.distance ? { index, distance } : closest;
+      }, { index: 0, distance: Number.POSITIVE_INFINITY }).index;
+      if (next !== slideIndex) {
+        setSlideIndex(next);
+        setValues((current) => ({ ...current, current: next === 0, disabled: next === 0 }));
+      }
+    });
   }
 
   function renderCarousel() {
     return (
-      <div className="carousel docs-studio__preview-carousel" aria-label="Artwork studies" onKeyDown={carouselKeyDown}>
-        <div className="carousel__track" ref={trackRef} tabIndex={0}>
+      <div className="carousel docs-studio__preview-carousel" role="region" aria-roledescription="carousel" aria-label="Artwork studies">
+        <div className="carousel__track" id={carouselTrackId} ref={trackRef} tabIndex={0} aria-label="Artwork slides" onScroll={syncCarouselFromScroll}>
           {slidesFixture.map((label, index) => (
-            <article className={`carousel__slide docs-studio__carousel-slide docs-studio__carousel-slide--${index + 1}`} aria-label={`${index + 1} of ${slidesFixture.length}: ${label}`} key={label}>
+            <article
+              className={`carousel__slide docs-studio__carousel-slide docs-studio__carousel-slide--${index + 1}`}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${index + 1} of ${slidesFixture.length}: ${label}`}
+              key={label}
+              ref={(element) => { slideRefs.current[index] = element; }}
+            >
               <span>{label}</span>
             </article>
           ))}
         </div>
         <div className="carousel__nav carousel__nav--prev">
-          <button className="carousel__nav-btn" type="button" aria-label="Previous slide" disabled={values.disabled === true || slideIndex === 0} onClick={() => selectSlide(slideIndex - 1)}>
-            <ArrowLeft aria-hidden="true" />
+          <button className="icon-btn icon-btn--round carousel__nav-btn" type="button" aria-label="Previous slide" aria-controls={carouselTrackId} disabled={values.disabled === true || slideIndex === 0} onClick={() => selectSlide(slideIndex - 1)}>
+            <ArrowLeft className="icon-btn__icon" aria-hidden="true" />
           </button>
         </div>
         <div className="carousel__nav carousel__nav--next">
-          <button className="carousel__nav-btn" type="button" aria-label="Next slide" disabled={slideIndex === slidesFixture.length - 1} onClick={() => selectSlide(slideIndex + 1)}>
-            <ArrowRight aria-hidden="true" />
+          <button className="icon-btn icon-btn--round carousel__nav-btn" type="button" aria-label="Next slide" aria-controls={carouselTrackId} disabled={slideIndex === slidesFixture.length - 1} onClick={() => selectSlide(slideIndex + 1)}>
+            <ArrowRight className="icon-btn__icon" aria-hidden="true" />
           </button>
         </div>
         <div className="carousel__dots" aria-label="Choose slide">
@@ -148,19 +174,24 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
               className={`carousel__dot${slideIndex === index ? ' carousel__dot--active' : ''}`}
               type="button"
               aria-label={`Go to ${label}`}
+              aria-controls={carouselTrackId}
               aria-current={slideIndex === index ? 'true' : undefined}
               key={label}
               onClick={() => selectSlide(index)}
             />
           ))}
         </div>
+        <p className="carousel__status visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+          {`${slideIndex + 1} of ${slidesFixture.length}: ${slidesFixture[slideIndex]}`}
+        </p>
       </div>
     );
   }
 
   function renderScrollArea() {
+    const label = String(values.label || '').trim();
     return (
-      <div className="scroll-area docs-studio__preview-scroll-area" tabIndex={0} aria-label={String(values.label || '')}>
+      <div className="scroll-area docs-studio__preview-scroll-area" role={label ? 'region' : undefined} tabIndex={label ? 0 : undefined} aria-label={label || undefined}>
         <h3>Artwork notes</h3>
         {Array.from({ length: 7 }, (_, index) => (
           <p key={index}>Study {index + 1}. Glaze density, firing atmosphere, and surface response.</p>
@@ -178,21 +209,29 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
         secondary: '--color-text-secondary',
         text: '--color-text-primary',
         radius: '--radius-full',
+        'body-small': '--typo-body-sm-size',
+        caption: '--typo-caption-size',
+        spacing: '--space-layout-element-gap',
       }
     : contract.slug === 'carousel'
       ? {
           surface: '--color-surface-primary',
           hover: '--color-surface-secondary',
           border: '--color-border-subtle',
+          focus: '--color-border-focus',
           text: '--color-text-primary',
           spacing: '--space-layout-element-gap',
+          'touch-target': '--space-layout-touch-target',
           radius: '--radius-full',
           shadow: '--shadow-md',
           'disabled-opacity': '--opacity-disabled',
+          transition: '--transition-fast',
+          easing: '--easing-default',
         }
       : {
           thumb: '--color-border-subtle',
           'thumb-hover': '--color-border-default',
+          focus: '--color-border-focus',
           radius: '--radius-full',
         };
 

@@ -1,39 +1,123 @@
 ## Overview
 
-Table of Contents presents a target-owned hierarchy of links to headings in the current article. It supports an in-flow default and an optional sticky presentation.
+Table of Contents is a passive, always-named same-document navigation landmark
+for one long structured document. The target supplies ordered nested heading
+records; L5 turns them into native ordered lists and canonical Links without
+parsing rich HTML, inventing heading identifiers, or maintaining a second
+reading-state service.
+
+The complete component is omitted when its accessible label is blank or its
+records are empty, malformed, or contain duplicate identifiers. It is not site
+navigation, a menu, a tree, article pagination, related content, or a replacement
+for the document's own headings.
 
 ## Presentation
 
-<Preview html={'<nav class="toc tg-preview-frame--sm" aria-label="On this page"><h2 class="toc__title">On this page</h2><ul class="toc__list"><li class="toc__item"><a class="toc__link" href="#article-introduction">Introduction</a></li><li class="toc__item"><a class="toc__link" href="#article-process">The making process</a></li><li class="toc__item toc__item--h3"><a class="toc__link" href="#article-materials">Choosing materials</a></li><li class="toc__item toc__item--h4"><a class="toc__link" href="#article-clay-body">Clay body</a></li></ul></nav>'} label="Table of Contents" />
+<Preview
+  html={`
+    <nav class="toc toc--sticky tg-preview-frame--sm" aria-label="In this article">
+      <p class="toc__title">In this article</p>
+      <ol class="toc__list">
+        <li class="toc__item"><a class="link link--nav toc__link" href="#article-arrival">Arrival at the studio</a></li>
+        <li class="toc__item">
+          <a class="link link--nav toc__link" href="#article-repetition" aria-current="location">Learning through repetition</a>
+          <ol class="toc__list">
+            <li class="toc__item"><a class="link link--nav toc__link" href="#article-pressure">Noticing pressure points</a></li>
+          </ol>
+        </li>
+        <li class="toc__item"><a class="link link--nav toc__link" href="#article-records">Keeping useful records</a></li>
+      </ol>
+    </nav>
+  `}
+  label="Table of Contents"
+/>
 
-The in-flow presentation has no modifier class. `sticky` maps to `.toc--sticky`. Third- and fourth-level items use `.toc__item--h3` and `.toc__item--h4`; a target-synchronized active link may use `.toc__link--active`.
+The target-owned `items` records require a stable unique `id`, a complete
+localized `label`, and optional nested `children`. The renderer preserves that
+order and hierarchy as `.toc__list`, `.toc__item`, and canonical
+`.link.link--nav.toc__link` anchors. Each `href` points to the encoded fragment
+for the supplied id; the target must ensure that exactly one matching heading
+exists in the same document.
+
+`placement` accepts `sticky | flow` and defaults to `sticky`. Both modes use
+identical content, DOM, semantics, and source order. Neutral Web makes sticky a
+bounded preference only in sufficiently wide and tall viewports; narrow,
+zoomed, short, or target-incompatible contexts stay in flow. The page adapter
+still owns the real fixed-header offset, safe areas, collision boundary,
+available height, long-list reachability, and focus-not-obscured proof.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Match every fragment destination to a unique heading identifier in the article content.</Do>
-  <Dont>Do not mark a link active unless the target keeps that state synchronized with the reading position.</Dont>
+  <Do>Supply a concise hierarchy of stable major sections whose labels, order, nesting, and fragments match the document headings.</Do>
+  <Dont>Do not pass arbitrary merchant HTML, a Shopify menu, visual indentation, or an independently generated set of ids as the heading source.</Dont>
 </DoDont>
 
-Heading extraction and active-section synchronization remain target-owned. Whether this component shares a neutral reading-state enhancement with Reading Progress or receives state independently from each target remains unresolved.
+<DoDont>
+  <Do>Pass one controlled `currentSectionId` only when target reading state knows the current visible section.</Do>
+  <Dont>Do not use `aria-selected`, `aria-current="page"`, an active-only class, a live region, or a second scroll observer.</Dont>
+</DoDont>
+
+`currentSectionId` is optional controlled state. A matching record projects
+`aria-current="location"` to exactly one Link; blank or unmatched values produce
+no current marker. L5 has no uncontrolled mode. A capable target may derive the
+value from the same bounded reading-state service used by Reading Progress, but
+L5 itself adds no parser, observer, listener, scroll polling, generated ids,
+smooth scrolling, focus relocation, history mutation, announcement, or runtime.
+
+The optional visible `title` remains neutral text in the shared renderer because
+its heading rank belongs to the surrounding document. A target that owns the
+contextual rank and stable title id may render it as a heading and name the
+navigation through `aria-labelledby`.
+
+Shopify exposes L5 only when an article source already provides structured
+heading records and matching ids, or when verified preprocessing emits both
+atomically. Native `article.content` is not parsed or rewritten by neutral L5.
 
 ## Accessibility
 
-- Use a `nav` landmark with a useful accessible name when the page contains more than one navigation region.
-- Keep list indentation aligned with the article heading hierarchy.
-- Ensure every fragment link resolves to one unique heading `id`.
-- Use active styling or `aria-current` only when its semantics match synchronized target state.
-- Preserve visible keyboard focus and touch-sized links.
+- Use a native `nav`, ordered and nested lists, list items, and canonical
+  anchors with real `href` fragments. Do not add menu, tree, disclosure,
+  arrow-key, or roving-tabindex behavior.
+- Give the landmark a useful localized name that distinguishes it from site,
+  footer, category, or other page navigation.
+- Keep labels, hierarchy, order, and fragments synchronized with headings and
+  reject duplicate or invalid record ids rather than emitting ambiguous links.
+- Use at most one `aria-current="location"` from a matching controlled id. Its
+  logical-start border and stronger weight preserve a non-color cue.
+- Preserve canonical Link focus, wrapping, forced colors, and reduced motion.
+  Long localized labels stay complete and nested indentation follows RTL.
+- Sticky and flow keep the same Tab order. A sticky target must bound tall
+  content, keep every focused Link visible, preserve page escape, account for
+  fixed chrome and safe areas, and degrade to flow when those conditions cannot
+  be proven.
 
 ## References
 
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default` or `sticky`</td></tr>
-  <tr><td>`label`</td><td>string</td><td>optional</td><td>Accessible name for the navigation landmark</td></tr>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible table-of-contents title</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned heading links and active-state markers</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Non-empty localized landmark name; omission removes the root</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible localized title; contextual heading rank remains target-owned</td></tr>
+  <tr><td>`items`</td><td>slot / records</td><td>required</td><td>Ordered nested records with unique id, label, and optional children</td></tr>
+  <tr><td>`currentSectionId`</td><td>string</td><td>optional</td><td>Controlled stable id; a match receives `aria-current="location"`</td></tr>
+  <tr><td>`placement`</td><td>`sticky | flow`</td><td>`sticky`</td><td>Safely degrading sticky preference or explicit normal flow</td></tr>
 </PropTable>
 
-Anatomy: `.toc`, `.toc__title`, `.toc__list`, `.toc__item`, `.toc__item--h3`, `.toc__item--h4`, and `.toc__link`.
+Anatomy: `.toc`, optional `.toc__title`, required `.toc__list`, `.toc__item`,
+and `.toc__link`. Nested `.toc__list` instances represent subsection hierarchy.
 
-Dependencies: none. The contract remains `pilot`; neutral heading extraction and reading-state synchronization are explicitly unresolved.
+Dependency: canonical [Link](/components/link). The contract remains `pilot`;
+automated evidence prepares it for explicit human review but never promotes it
+to `stable` automatically.
+
+- [HTML `nav`](https://html.spec.whatwg.org/dev/sections.html#the-nav-element)
+- [WAI G64: Providing a Table of Contents](https://www.w3.org/WAI/WCAG22/Techniques/general/G64)
+- [WAI Content Structure](https://www.w3.org/WAI/tutorials/page-structure/content/)
+- [WAI-ARIA `aria-current`](https://www.w3.org/TR/wai-aria-1.2/#aria-current)
+- [APG Link pattern](https://www.w3.org/WAI/ARIA/apg/patterns/link/)
+- [WCAG Focus Not Obscured](https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html)
+- [WCAG Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow.html)
+- [USWDS In-page Navigation](https://designsystem.digital.gov/components/in-page-navigation/)
+- [Open UI components](https://open-ui.org/components/)
+- [Radix Navigation Menu](https://www.radix-ui.com/primitives/docs/components/navigation-menu)
+- [Polaris Navigation](https://polaris-react.shopify.com/components/navigation/navigation)
+- [Shopify Storefront Article](https://shopify.dev/docs/api/storefront/latest/objects/Article)

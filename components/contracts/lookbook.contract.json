@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "lookbook",
   "name": "Lookbook",
   "registryId": "S6",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive editorial image composition with optional captions and target-owned hotspot behavior.",
+  "summary": "Passive container-responsive editorial sequence of ordered target-owned media figures with persistent captions and target-owned native hotspots.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/lookbook",
@@ -22,63 +22,70 @@
       "selector": ".lookbook",
       "className": ".lookbook",
       "required": true,
-      "description": "Lookbook section root."
+      "description": "Titled thematic section or untitled generic root for one complete finite editorial sequence."
     },
     {
       "name": "header",
       "selector": ".lookbook__header",
       "className": ".lookbook__header",
       "required": false,
-      "description": "Optional heading region."
+      "description": "Optional contextual-heading region."
     },
     {
       "name": "title",
       "selector": ".lookbook__title",
       "className": ".lookbook__title",
       "required": false,
-      "description": "Optional lookbook heading."
+      "description": "Optional visible contextual heading that names the thematic root."
     },
     {
-      "name": "grid",
+      "name": "items",
       "selector": ".lookbook__grid",
       "className": ".lookbook__grid",
       "required": true,
-      "description": "Ordered editorial cell composition."
+      "description": "Required native ordered list and responsive layout region for target-owned cells."
     },
     {
       "name": "cell",
       "selector": ".lookbook__cell",
       "className": ".lookbook__cell",
       "required": false,
-      "description": "Repeated target-owned media cell."
+      "description": "Repeated passive native list item containing one complete target-owned media composition."
     },
     {
       "name": "wideCell",
       "selector": ".lookbook__cell--wide",
       "className": ".lookbook__cell--wide",
       "required": false,
-      "description": "Item-level modifier that spans two grid columns."
+      "description": "Item-level layout modifier that spans two available columns without changing source order."
     },
     {
       "name": "tallCell",
       "selector": ".lookbook__cell--tall",
       "className": ".lookbook__cell--tall",
       "required": false,
-      "description": "Item-level modifier that spans two grid rows."
+      "description": "Item-level layout modifier that spans two implicit rows without changing source order."
+    },
+    {
+      "name": "figure",
+      "selector": ".lookbook__figure",
+      "className": ".lookbook__figure",
+      "required": false,
+      "description": "Target-owned native figure grouping one media item with its optional persistent caption."
     },
     {
       "name": "caption",
       "selector": ".lookbook__caption",
       "className": ".lookbook__caption",
       "required": false,
-      "description": "Optional caption disclosed on hover, focus within, and non-hover input."
+      "description": "Optional persistent native figcaption for one media figure."
     },
     {
       "name": "hotspot",
       "selector": ".lookbook__hotspot",
       "className": ".lookbook__hotspot",
       "required": false,
-      "description": "Optional target-owned native control positioned over a cell."
+      "description": "Optional target-owned native link or button positioned over a figure only when a real result exists."
     }
   ],
   "variants": [
@@ -86,7 +93,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "Single editorial sequence; wide and tall are item-level layout modifiers rather than parent variants."
     }
   ],
   "sizes": [
@@ -94,7 +101,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Intrinsic size whose private tracks and row geometry respond to component space."
     }
   ],
   "states": [
@@ -103,46 +110,78 @@
       "selectors": [
         ".lookbook"
       ],
-      "description": "Resting lookbook presentation; wide and tall are item layout modifiers rather than states."
+      "description": "Passive resting editorial sequence with captions persistently visible."
     },
     {
-      "name": "itemHover",
+      "name": "targetInteractiveFocus",
       "selectors": [
-        ".lookbook__cell:hover img"
+        ".lookbook__hotspot:focus-visible",
+        ".lookbook__cell :where(a, button):focus-visible"
       ],
-      "description": "Pointer emphasis and caption disclosure for one cell."
-    },
-    {
-      "name": "itemFocusWithin",
-      "selectors": [
-        ".lookbook__cell:focus-visible",
-        ".lookbook__cell:focus-within img",
-        ".lookbook__cell:focus-within .lookbook__caption"
-      ],
-      "description": "Equivalent emphasis and caption disclosure when target-owned interactive content receives focus."
-    },
-    {
-      "name": "hotspotFocusVisible",
-      "selectors": [
-        ".lookbook__hotspot:focus-visible"
-      ],
-      "description": "Visible keyboard focus when a target renders a hotspot as a native control."
+      "description": "Visible keyboard focus only when target-owned native interaction receives focus."
     }
   ],
   "behavior": [
     {
-      "name": "itemOwnership",
+      "name": "rootSemantics",
       "selectors": [
+        ".lookbook",
+        ".lookbook__title"
+      ],
+      "description": "A non-empty title produces a thematic section named by its visible heading; an untitled composition uses a generic root."
+    },
+    {
+      "name": "sourceOrder",
+      "selectors": [
+        ".lookbook__grid",
         ".lookbook__cell"
       ],
-      "description": "Targets supply ordered cell content and decide whether a cell is passive or contains native navigation."
+      "description": "Native ordered-list order remains authoritative; sparse Grid placement and wide/tall spans never reorder content."
+    },
+    {
+      "name": "cellLayout",
+      "selectors": [
+        ".lookbook__cell",
+        ".lookbook__cell--wide",
+        ".lookbook__cell--tall"
+      ],
+      "description": "The target assigns each cell's default, wide or tall modifier while neutral CSS owns only private responsive geometry."
+    },
+    {
+      "name": "itemOwnership",
+      "selectors": [
+        ".lookbook__figure",
+        ".lookbook__caption"
+      ],
+      "description": "Targets supply complete figure/media/caption content and own sources, dimensions, alternatives, loading, localization and editor data."
+    },
+    {
+      "name": "captionAvailability",
+      "selectors": [
+        ".lookbook__caption"
+      ],
+      "description": "When supplied, a caption remains visually present without hover, focus or pointer capability."
     },
     {
       "name": "hotspotOwnership",
       "selectors": [
         ".lookbook__hotspot"
       ],
-      "description": "When a hotspot is present, the target supplies a native control, accessible name, destination or disclosure behavior, and any commerce data; canonical CSS owns presentation only."
+      "description": "Only a target-owned native link or button may add a hotspot; it owns accessible name, destination or disclosure lifecycle, coordinates, commerce data and analytics."
+    },
+    {
+      "name": "omission",
+      "selectors": [
+        ".lookbook"
+      ],
+      "description": "Missing required items omits the root; an empty optional title omits only the header and selects generic root semantics."
+    },
+    {
+      "name": "runtimeBoundary",
+      "selectors": [
+        ".lookbook"
+      ],
+      "description": "Neutral Web uses no component JavaScript, observer, listener, request, timer, layout measurement, focus manager or authored motion."
     }
   ],
   "properties": [
@@ -150,7 +189,7 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible lookbook heading.",
+      "description": "Optional non-empty visible contextual heading; when present it names the thematic root.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".lookbook__title" }]
       }
@@ -159,7 +198,7 @@
       "name": "items",
       "type": "slot",
       "required": true,
-      "description": "Ordered target-owned cells, including any item-level span, caption, or hotspot composition.",
+      "description": "One or more source-ordered target-owned native list-item compositions including layout modifier, complete media semantics, optional caption and any legitimate native hotspot.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".lookbook__grid", "classNames": [".lookbook__grid"] }]
       }
@@ -173,12 +212,14 @@
         "--color-text-inverse",
         "--color-text-primary"
       ],
-      "easing": [
-        "--easing-default"
-      ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
-        "--typo-body-size",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-h2-weight",
+        "--typo-caption-line-height",
+        "--typo-caption-size",
+        "--typo-h2-line-height",
         "--typo-h2-size"
       ],
       "radius": [
@@ -189,30 +230,32 @@
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap",
         "--space-layout-touch-target"
-      ],
-      "transition": [
-        "--transition-default",
-        "--transition-fast"
       ]
     }
   },
   "accessibility": [
-    "Provide useful alternatives for informative imagery and preserve source order when cells use wide or tall visual spans.",
-    "Captions remain available on focus within and non-hover input rather than relying on pointer hover alone.",
-    "A hotspot is a native touch-sized control only when a target supplies a real action, accessible name, keyboard behavior, and destination or disclosure semantics.",
-    "Reduced motion removes pulse and image/caption transitions."
+    "When title is present, render a thematic section associated with the visible contextual heading through aria-labelledby; use a generic root when title is absent.",
+    "Render the finite curated sequence as native ol/li content and preserve target-authored source order across default, wide and tall layout modifiers without dense placement.",
+    "Use native figure/figcaption for captioned fixture media, keep captions persistently visible, and give informative target media contextual alternatives while hiding decorative or redundant media appropriately.",
+    "Do not focus, hover-emphasize, click, select or announce passive cells; only target-owned native links or buttons may add activation and visible native focus.",
+    "A product link owns its destination and name; a disclosure hotspot composes canonical Popover or a complete target-native equivalent with open state, focus, dismissal and relationship semantics.",
+    "Lookbook adds no authored motion or runtime and does not use span, crop, position, color or visual order as the only meaning cue.",
+    "Leave native heading rank, media delivery/loading, hotspot coordinates, commerce/provider data, analytics and editor lifecycle with the owning target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by conditional titled-section semantics, native ordered-list/figure fixture composition, strict required-slot omission, persistent captions, component-responsive sparse Grid CSS and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps optional title and reorderable complete media blocks; an optional product resource becomes a native product-link hotspot with block-owned coordinates and no section runtime."
     },
     "react": {
       "status": "planned",

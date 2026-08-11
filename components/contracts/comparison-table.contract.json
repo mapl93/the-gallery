@@ -1,13 +1,19 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "comparison-table",
   "name": "Comparison Table",
   "registryId": "S13",
   "category": "sections",
   "status": "pilot",
-  "summary": "Horizontally contained native comparison table with target-owned rows, columns, labels, and emphasis.",
-  "dependencies": [],
+  "summary": "Contextual comparison section that composes canonical Data Table and optionally exposes controlled alternative selection through canonical Radio or Checkbox controls.",
+  "dependencies": [
+    "data-table",
+    "radio",
+    "checkbox",
+    "link",
+    "button"
+  ],
   "source": {
     "registry": "registry.json#/components/comparison-table",
     "css": {
@@ -22,53 +28,83 @@
       "selector": ".comparison-table",
       "className": ".comparison-table",
       "required": true,
-      "description": "Scrollable comparison section root."
+      "description": "Titled thematic section or untitled generic root for one finite target-owned comparison composition."
+    },
+    {
+      "name": "inner",
+      "selector": ".comparison-table__inner",
+      "className": ".comparison-table__inner",
+      "required": true,
+      "description": "Container-safe inner wrapper that owns maximum measure and section rhythm."
     },
     {
       "name": "title",
       "selector": ".comparison-table__title",
       "className": ".comparison-table__title",
       "required": false,
-      "description": "Optional visible section heading."
+      "description": "Optional visible contextual heading that names the thematic root."
+    },
+    {
+      "name": "scrollWrapper",
+      "selector": ".comparison-table__scroll",
+      "className": ".comparison-table__scroll",
+      "required": true,
+      "description": "Required canonical Data Table overflow wrapper and horizontal keyboard-scroll owner."
     },
     {
       "name": "table",
-      "selector": ".comparison-table table",
+      "selector": ".comparison-table__table",
+      "className": ".comparison-table__table",
       "required": true,
-      "description": "Native target-owned comparison table."
+      "description": "One complete target-owned native canonical Data Table composition."
     },
     {
-      "name": "headerCell",
-      "selector": ".comparison-table th",
+      "name": "caption",
+      "selector": ".table caption",
       "required": true,
-      "description": "Native row or column header cell."
+      "description": "Native visible or visually hidden matrix name and selection context owned by the target table composition."
     },
     {
-      "name": "dataCell",
-      "selector": ".comparison-table td",
+      "name": "alternative",
+      "selector": ".comparison-table__alternative",
+      "className": ".comparison-table__alternative",
       "required": true,
-      "description": "Native comparison data cell."
+      "description": "Column-header composition containing one complete alternative label and optional selection control or explicit claim."
+    },
+    {
+      "name": "choice",
+      "selector": ".comparison-table__choice",
+      "className": ".comparison-table__choice",
+      "required": false,
+      "description": "Canonical Radio in single mode or Checkbox in multiple mode; omitted in passive mode."
     },
     {
       "name": "highlight",
       "selector": ".comparison-table__highlight",
       "className": ".comparison-table__highlight",
       "required": false,
-      "description": "Optional cell-level emphasis modifier."
+      "description": "Optional visual emphasis applied to related cells without selection or recommendation semantics."
     },
     {
-      "name": "check",
-      "selector": ".comparison-table__check",
-      "className": ".comparison-table__check",
+      "name": "claim",
+      "selector": ".comparison-table__claim",
+      "className": ".comparison-table__claim",
       "required": false,
-      "description": "Optional positive visual indicator whose text alternative is target-owned."
+      "description": "Optional explicit target-owned claim text; highlight alone never creates this meaning."
     },
     {
-      "name": "cross",
-      "selector": ".comparison-table__cross",
-      "className": ".comparison-table__cross",
+      "name": "status",
+      "selector": ".comparison-table__status",
+      "className": ".comparison-table__status",
       "required": false,
-      "description": "Optional negative or unavailable visual indicator whose text alternative is target-owned."
+      "description": "Optional inclusion or exclusion presentation whose shape is decorative and whose meaning remains complete text."
+    },
+    {
+      "name": "action",
+      "selector": ".comparison-table__action",
+      "className": ".comparison-table__action",
+      "required": false,
+      "description": "Optional explicit canonical Link or Button CTA for one alternative; activation is independent from selection."
     }
   ],
   "variants": [
@@ -76,7 +112,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "Single intrinsic comparison-table presentation."
     }
   ],
   "sizes": [
@@ -84,39 +120,165 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Canonical Data Table owns cell density; S13 owns only private section geometry."
     }
   ],
   "states": [
     {
-      "name": "default",
+      "name": "passive",
       "selectors": [
-        ".comparison-table"
+        ".comparison-table__alternative-name"
       ],
-      "description": "Resting scrollable table presentation; highlighted cells and indicators are content options rather than states."
+      "description": "Default comparison profile with no selection controls; optional target-composed CTA controls may still exist."
+    },
+    {
+      "name": "selectableSingle",
+      "selectors": [
+        ".radio__input"
+      ],
+      "description": "Controlled mutually exclusive alternative selection using one native canonical Radio group."
+    },
+    {
+      "name": "selectableMultiple",
+      "selectors": [
+        ".checkbox__input"
+      ],
+      "description": "Controlled independent alternative selection using canonical Checkboxes."
+    },
+    {
+      "name": "selected",
+      "selectors": [
+        ".radio__input:checked",
+        ".checkbox__input:checked"
+      ],
+      "description": "Native checked state projected exclusively from target-owned controlled selection."
     },
     {
       "name": "overflowFocusVisible",
       "selectors": [
-        ".comparison-table:focus-visible"
+        ".table-wrapper:focus-visible"
       ],
-      "description": "Visible keyboard focus when the target makes an overflowing table region focusable."
+      "description": "Canonical visible focus on the horizontal table scroll owner; child controls retain their own canonical focus."
     }
   ],
   "behavior": [
     {
-      "name": "tableSemantics",
+      "name": "rootSemantics",
       "selectors": [
-        ".comparison-table"
+        ".comparison-table",
+        ".comparison-table__title"
       ],
-      "description": "Targets provide native table structure, a caption or equivalent accessible name, correctly scoped headers, and meaningful text for visual indicators."
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A non-empty title produces a thematic section named by its visible heading; an untitled composition uses a generic root."
     },
     {
-      "name": "overflowAccess",
+      "name": "canonicalTableComposition",
+      "selectors": [
+        ".comparison-table__scroll",
+        ".comparison-table__table",
+        ".table caption"
+      ],
+      "attributes": [
+        "<table>",
+        "<caption>",
+        "<thead>",
+        "<tbody>",
+        "<th>",
+        "<td>",
+        "scope"
+      ],
+      "description": "S13 composes canonical Data Table overflow and native table anatomy; targets own the finite caption, header relationships, alternatives, criteria, values, and optional footer actions."
+    },
+    {
+      "name": "responsiveOverflow",
+      "selectors": [
+        ".comparison-table__inner",
+        ".comparison-table__scroll",
+        ".comparison-table__table"
+      ],
+      "attributes": [
+        "tabindex=\"0\"",
+        "accessible name"
+      ],
+      "events": [
+        "ArrowLeft",
+        "ArrowRight"
+      ],
+      "description": "The title remains outside the scroll owner while canonical Data Table preserves readable columns and native keyboard scrolling at narrow component widths."
+    },
+    {
+      "name": "nativeControlledSelection",
+      "selectors": [
+        ".radio__input",
+        ".checkbox__input"
+      ],
+      "attributes": [
+        "type=\"radio\"",
+        "same non-empty radio name",
+        "type=\"checkbox\"",
+        "value",
+        "checked",
+        "aria-describedby"
+      ],
+      "events": [
+        "input",
+        "change",
+        "Space",
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "selection change"
+      ],
+      "description": "Selectable mode composes canonical native controls. Single mode emits one named Radio group and one selected id; multiple mode emits independent Checkboxes and selected ids. The target owns controlled state and must replace it from the emitted next id or id list."
+    },
+    {
+      "name": "passiveCells",
+      "selectors": [
+        ".comparison-table__table"
+      ],
+      "description": "Ordinary table cells remain passive and unfocusable. S13 never adds grid semantics, cell selection, roving tabindex, or directional cell navigation; only explicitly composed native controls enter focus order."
+    },
+    {
+      "name": "explicitClaimsAndActions",
+      "selectors": [
+        ".comparison-table__highlight",
+        ".comparison-table__claim",
+        ".comparison-table__action",
+        ".link",
+        ".btn"
+      ],
+      "events": [
+        "link activation",
+        "button activation"
+      ],
+      "description": "Highlight is visual only. Commercial claims require explicit target-owned text, and optional canonical Link or Button actions retain their own destination/action lifecycle without silently selecting an alternative."
+    },
+    {
+      "name": "passiveStatusMeaning",
+      "selectors": [
+        ".comparison-table__status",
+        ".comparison-table__check",
+        ".comparison-table__cross"
+      ],
+      "description": "Optional shapes are decorative and every status cell retains visible or visually hidden target-owned text."
+    },
+    {
+      "name": "targetDataOwnership",
+      "selectors": [
+        ".comparison-table__table"
+      ],
+      "description": "Targets own finite bounds, records, formatting, localization, units, pricing and recommendation claims, freshness, complex header associations, loading, empty, error, update, action, analytics, persistence, and commercial policy. Neutral Web imposes no two-offering cap."
+    },
+    {
+      "name": "omission",
       "selectors": [
         ".comparison-table"
       ],
-      "description": "When horizontal overflow occurs, targets keep the region keyboard reachable and programmatically named without replacing native table semantics."
+      "description": "Missing or invalid required table composition omits the root; an empty optional title omits only the heading and selects generic root semantics."
     }
   ],
   "properties": [
@@ -124,63 +286,183 @@
       "name": "title",
       "type": "string",
       "required": false,
-      "description": "Optional visible comparison heading.",
+      "description": "Optional non-empty visible contextual heading; when present it names the native section.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".comparison-table__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".comparison-table__title"
+          }
+        ]
       }
     },
     {
       "name": "table",
       "type": "slot",
       "required": true,
-      "description": "Target-owned native table, including caption, headers, body rows, and any highlighted cells.",
+      "description": "One target-owned canonical Data Table composition containing a finite caption, alternatives, criteria, values, optional explicit claims, and optional canonical Link or Button actions.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".comparison-table", "classNames": [".comparison-table"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".comparison-table__scroll",
+            "classNames": [
+              ".comparison-table__scroll",
+              ".table-wrapper",
+              ".comparison-table__table",
+              ".table",
+              ".comparison-table__alternative",
+              ".comparison-table__choice",
+              ".comparison-table__highlight",
+              ".comparison-table__claim",
+              ".comparison-table__status",
+              ".comparison-table__check",
+              ".comparison-table__cross",
+              ".comparison-table__action",
+              ".radio",
+              ".checkbox",
+              ".link",
+              ".btn"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "interaction",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "passive",
+      "values": [
+        "passive",
+        "selectable"
+      ],
+      "description": "Controls only whether alternatives expose selection controls. Passive mode may still contain independently composed explicit CTA controls.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".comparison-table",
+            "attribute": "data-interaction",
+            "values": {
+              "passive": "passive",
+              "selectable": "selectable"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "selectionMode",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "single",
+      "values": [
+        "single",
+        "multiple"
+      ],
+      "description": "Selects canonical Radio or Checkbox composition when interaction is selectable; ignored in passive mode.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".comparison-table",
+            "attribute": "data-selection-mode",
+            "values": {
+              "single": "single",
+              "multiple": "multiple"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "selectedId",
+      "type": "string",
+      "required": false,
+      "unsetBehavior": "Single selectable mode may render with no checked alternative until the target supplies one; passive and multiple modes ignore this value.",
+      "description": "Target-owned controlled alternative id for single selection. The target correlates this id to one canonical Radio value.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".radio__input:checked",
+            "attribute": "value",
+            "valueFrom": "property",
+            "elements": [
+              "input"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "selectedIds",
+      "type": "string-list",
+      "required": false,
+      "unsetBehavior": "Multiple selectable mode renders every alternative unchecked when the target supplies an empty list; passive and single modes ignore this value.",
+      "description": "Target-owned controlled alternative ids for multiple selection. The target correlates each id to one canonical Checkbox value.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "collection",
+            "selector": ".checkbox__input"
+          }
+        ]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
-        "--color-border-default",
-        "--color-border-focus",
-        "--color-border-subtle",
         "--color-button-primary-bg-default",
         "--color-feedback-success-default",
-        "--color-text-disabled",
         "--color-text-primary",
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
-        "--typo-body-size",
-        "--typo-h2-size"
+        "--tg-typography-body-default-weight",
+        "--tg-typography-h2-weight",
+        "--typo-caption-line-height",
+        "--typo-caption-size",
+        "--typo-h2-size",
+        "--typo-h2-line-height"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
       ]
     }
   },
   "accessibility": [
-    "Use native table, caption, thead, tbody, th, and td semantics with correct row or column scope.",
-    "Check and cross visuals require meaningful text or visually hidden alternatives and must not rely on color alone.",
-    "When the table overflows, keep the scroll region keyboard reachable, visibly focused, and programmatically named.",
-    "Cell emphasis does not change the underlying header relationships or reading order."
+    "When title is present, render a thematic section associated with the visible heading through aria-labelledby; use a generic root when title is absent.",
+    "Compose canonical Data Table with native caption, thead, tbody, optional tfoot, th, and td elements; use scope for simple headers and explicit id/headers associations for complex matrices.",
+    "Keep the horizontal table wrapper keyboard reachable, visibly focused, and programmatically named; title and ordinary section content remain outside horizontal scrolling.",
+    "Use canonical native Radios with one shared name for single selection and canonical native Checkboxes for multiple selection; every control needs a visible alternative label and contextual description.",
+    "Keep ordinary cells passive and unfocusable; do not add grid roles, cell selection, roving tabindex, or directional cell navigation.",
+    "Do not conflate highlight, checked state, recommendation text, or CTA activation. Claims must be explicit text and actions must have independent accessible names and real target behavior.",
+    "Pair every check, cross, availability mark, quantity, price, and abbreviation with meaningful target-owned text; never rely on icon, shape, position, or color alone.",
+    "Preserve native source and reading order across responsive presentation; do not hide essential columns or transform the matrix into cards without a target-specific accessible composition.",
+    "Targets must declare and validate finite matrix bounds, state ownership, persistence, analytics, records, formatting, claims, actions, updates, and editor behavior."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-native-control-composition",
+      "notes": "Implemented through conditional section semantics, canonical Data Table, optional controlled canonical Radio or Checkbox selection, explicit independent CTA composition, table-only overflow, and zero S13 neutral runtime."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "metaobject-backed-section",
+      "notes": "Owner decision 66 selects a variable but finite metaobject-backed matrix. The adapter remains planned until its exact numeric bounds, definitions, Theme Store/custom-theme profile, editor validation, selection persistence, action lifecycle, and performance evidence are implemented."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "controlled-component"
     },
     "figma": {
       "status": "planned",

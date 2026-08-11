@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "image-text",
   "name": "Image with Text",
   "registryId": "S3",
   "category": "sections",
   "status": "pilot",
-  "summary": "Responsive media-and-narrative section with source-backed layout variants and Button-composed actions.",
+  "summary": "Named passive media-and-narrative section with required target-owned content, five container-responsive presentations, and an optional Button-composed action.",
   "dependencies": [
     "button"
   ],
@@ -24,49 +24,49 @@
       "selector": ".image-text",
       "className": ".image-text",
       "required": true,
-      "description": "Media-and-text section root."
+      "description": "Thematic section named by its required visible title and omitted when media, title, or body is incomplete."
     },
     {
       "name": "media",
       "selector": ".image-text__media",
       "className": ".image-text__media",
       "required": true,
-      "description": "Target-owned image or media region."
+      "description": "Required target-owned native media region with explicit informative or decorative semantics."
     },
     {
       "name": "content",
       "selector": ".image-text__content",
       "className": ".image-text__content",
       "required": true,
-      "description": "Narrative content region."
+      "description": "Required narrative grouping that owns section placement and measure without becoming a landmark."
     },
     {
       "name": "eyebrow",
       "selector": ".image-text__eyebrow",
       "className": ".image-text__eyebrow",
       "required": false,
-      "description": "Optional short contextual label."
+      "description": "Optional short contextual label that never replaces the required title."
     },
     {
       "name": "title",
       "selector": ".image-text__title",
       "className": ".image-text__title",
       "required": true,
-      "description": "Section heading."
+      "description": "Non-empty visible contextual heading whose id names the thematic section."
     },
     {
       "name": "body",
       "selector": ".image-text__body",
       "className": ".image-text__body",
       "required": true,
-      "description": "Target-owned narrative rich content."
+      "description": "Required non-empty target-owned narrative rich content."
     },
     {
       "name": "cta",
       "selector": ".image-text__cta",
       "className": ".image-text__cta",
       "required": false,
-      "description": "Optional Button-composed action."
+      "description": "Optional complete Button-composed link or command whose semantics and lifecycle remain target-owned."
     }
   ],
   "variants": [
@@ -74,31 +74,31 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default side-by-side media and content presentation."
+      "description": "Media-first composition that stacks in narrow component containers and becomes a balanced split when space permits."
     },
     {
       "name": "reversed",
       "className": ".image-text--reversed",
       "default": false,
-      "description": "Places media after content visually without requiring DOM reordering."
+      "description": "Preserves media-first DOM order while placing content first visually only in sufficiently wide split mode."
     },
     {
       "name": "stacked",
       "className": ".image-text--stacked",
       "default": false,
-      "description": "Single-column presentation at all viewport widths."
+      "description": "Single-column presentation at every component-container width with bounded media."
     },
     {
       "name": "overlay",
       "className": ".image-text--overlay",
       "default": false,
-      "description": "Content overlays the media with a contrast layer."
+      "description": "Content overlays bounded media with an invariant scrim and explicit inverse semantic foregrounds."
     },
     {
       "name": "offset",
       "className": ".image-text--offset",
       "default": false,
-      "description": "Contained presentation with spacing and rounded media."
+      "description": "Contained split-or-stack presentation with canonical section inset, grid gap, and rounded media."
     }
   ],
   "sizes": [
@@ -106,7 +106,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Single intrinsic size whose crop, measure, threshold, padding curve, overlay block size, and scrim geometry remain private composition."
     }
   ],
   "states": [
@@ -115,23 +115,57 @@
       "selectors": [
         ".image-text"
       ],
-      "description": "Resting section presentation; layout modifiers are variants rather than states."
+      "description": "Complete passive section with required media, visible title, and non-empty body; layout modifiers are variants rather than states."
     }
   ],
   "behavior": [
+    {
+      "name": "namedSection",
+      "selectors": [
+        ".image-text",
+        ".image-text__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "The required visible contextual heading names the thematic section without adding a widget role or an unnecessary nested landmark."
+    },
+    {
+      "name": "requiredComposition",
+      "selectors": [
+        ".image-text",
+        ".image-text__media",
+        ".image-text__title",
+        ".image-text__body"
+      ],
+      "description": "Media, non-empty title, and non-empty body are a coupled required composition; targets omit the section rather than emit incomplete or unnamed markup."
+    },
     {
       "name": "mediaSemantics",
       "selectors": [
         ".image-text__media"
       ],
-      "description": "Targets decide whether media is informative or decorative and provide appropriate alternative text or hidden semantics."
+      "attributes": [
+        "alt",
+        "width",
+        "height"
+      ],
+      "description": "Targets own native source, intrinsic dimensions, responsive sources, loading, focal point, and the informative alternative or decorative empty alternative."
     },
     {
       "name": "actionComposition",
       "selectors": [
         ".image-text__cta"
       ],
-      "description": "The optional action composes Button and preserves Button-owned activation, focus, disabled, and busy behavior."
+      "attributes": [
+        "href"
+      ],
+      "events": [
+        "native navigation",
+        "native command activation"
+      ],
+      "description": "A complete optional action composes Button and preserves target/Button-owned activation, focus, disabled, busy, result, destination, and analytics behavior."
     },
     {
       "name": "meaningfulSourceOrder",
@@ -139,7 +173,26 @@
         ".image-text__media",
         ".image-text__content"
       ],
-      "description": "Adapters preserve a meaningful media and narrative source order even when a variant changes visual placement."
+      "description": "Adapters preserve media then narrative in DOM/source order; Reversed changes only wide visual placement and returns to media-first when stacked."
+    },
+    {
+      "name": "responsiveComposition",
+      "selectors": [
+        ".image-text",
+        ".image-text__media",
+        ".image-text__content"
+      ],
+      "events": [
+        "container resize"
+      ],
+      "description": "CSS responds to the named component container with logical geometry; no viewport breakpoint, site-only implementation, layout read, observer, or neutral controller is required."
+    },
+    {
+      "name": "targetOwnership",
+      "selectors": [
+        ".image-text"
+      ],
+      "description": "Targets own image selection and art direction, heading rank, rich-text sanitization, action routing/result, analytics, loading, editor preview, and content completeness."
     }
   ],
   "properties": [
@@ -149,7 +202,7 @@
       "required": false,
       "defaultValue": "default",
       "valuesFrom": "variants",
-      "description": "Source-backed media-and-content layout presentation.",
+      "description": "Default, visually Reversed, always Stacked, Overlay, or contained Offset presentation; responsive geometry remains private.",
       "targetMappings": {
         "web": [{ "kind": "optionClass", "selector": ".image-text", "source": "variants" }]
       }
@@ -158,7 +211,8 @@
       "name": "media",
       "type": "slot",
       "required": true,
-      "description": "Target-owned media content.",
+      "unsetBehavior": "Omit the entire section when target-owned native media is unavailable.",
+      "description": "Required target-owned native media with explicit alternative, intrinsic dimensions, responsive sources, loading, and focal-point policy.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".image-text__media", "classNames": [".image-text__media"] }]
       }
@@ -167,7 +221,8 @@
       "name": "eyebrow",
       "type": "string",
       "required": false,
-      "description": "Optional short context above the heading.",
+      "unsetBehavior": "Omit the eyebrow without leaving empty rhythm.",
+      "description": "Optional short context above the required heading; it never names the section by itself.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".image-text__eyebrow" }]
       }
@@ -176,7 +231,8 @@
       "name": "title",
       "type": "string",
       "required": true,
-      "description": "Visible section heading.",
+      "unsetBehavior": "Omit the entire section when the trimmed visible heading is empty.",
+      "description": "Required non-empty visible contextual heading; targets choose the appropriate native heading rank.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".image-text__title" }]
       }
@@ -185,7 +241,8 @@
       "name": "body",
       "type": "slot",
       "required": true,
-      "description": "Target-owned narrative rich content.",
+      "unsetBehavior": "Omit the entire section when narrative rich content is empty.",
+      "description": "Required non-empty target-owned narrative rich content; targets own sanitization and native markup.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".image-text__body", "classNames": [".image-text__body"] }]
       }
@@ -194,7 +251,8 @@
       "name": "action",
       "type": "slot",
       "required": false,
-      "description": "Optional Button-composed call to action.",
+      "unsetBehavior": "Omit the action unless the target can supply a complete valid Button composition.",
+      "description": "Optional complete Button-composed navigation or command; target owns destination/result, analytics, disabled, and busy lifecycle.",
       "targetMappings": {
         "web": [{ "kind": "slot", "selector": ".image-text__cta", "classNames": [".image-text__cta"] }]
       }
@@ -203,39 +261,59 @@
   "tokens": {
     "public": {
       "color": [
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-surface-statement",
         "--color-text-inverse",
         "--color-text-primary",
         "--color-text-secondary"
       ],
       "typography": [
+        "--font-family-body",
         "--font-family-heading",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-default-weight",
+        "--tg-typography-h2-weight",
         "--typo-body-size",
-        "--typo-h2-size"
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height",
+        "--typo-h2-size",
+        "--typo-h2-line-height"
       ],
       "radius": [
         "--radius-lg"
       ],
       "spacing": [
         "--space-layout-container",
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap",
         "--space-layout-section-gap"
+      ],
+      "opacity": [
+        "--opacity-overlay"
       ]
     }
   },
   "accessibility": [
-    "Use a contextual heading level and preserve meaningful media and narrative source order when layouts reverse or stack.",
-    "Give informative media useful alternative text and hide decorative media from assistive technology.",
-    "Ensure overlay presentation maintains text contrast over every supplied media frame.",
-    "The optional action preserves Button-owned focus, touch, activation, disabled, and busy behavior."
+    "Require non-empty media, title, and body; associate the thematic section with the visible contextual heading through aria-labelledby.",
+    "Give informative media a useful alternative and intrinsic dimensions; use an empty alt for decorative imagery without duplicating adjacent narrative.",
+    "Preserve media then narrative in DOM/source order for every variant; Reversed changes only wide visual placement.",
+    "Ensure Overlay applies an invariant scrim, explicit inverse child colors, and a readable forced-colors fallback for every supplied media frame.",
+    "Render the optional action only as a complete canonical Button composition with truthful native navigation or command semantics and visible focus.",
+    "Add no section focus model, Arrow-key behavior, live region, autoplay, timeout, authored motion, or neutral runtime.",
+    "Omit incomplete content and leave heading rank, rich-text sanitization, media loading/art direction, action results, analytics, and update announcements with the owning target."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "html-css-composition",
+      "notes": "Implemented by a named native section, required target media/title/body, optional Button composition, five container-responsive CSS presentations, and no neutral runtime."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section",
+      "notes": "Merchant-editable section maps responsive image data, decorative classification, required heading/rich text, optional eyebrow/complete button pair, and five presentation choices."
     },
     "react": {
       "status": "planned",

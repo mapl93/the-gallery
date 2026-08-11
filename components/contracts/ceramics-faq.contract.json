@@ -1,12 +1,81 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "ceramics-faq", "name": "Ceramics Care FAQ", "registryId": "R14", "category": "ceramics", "status": "pilot", "summary": "Category-filtered FAQ accordion for ceramics care and handling.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/ceramics-faq", "css": { "file": "components/css/ceramics.css", "selector": ".ceramics-faq" }, "docs": "site/src/content/components/ceramics-faq.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".ceramics-faq", "className": ".ceramics-faq", "required": true, "description": "Ceramics care FAQ section." }, { "name": "header", "selector": ".ceramics-faq__header", "className": ".ceramics-faq__header", "required": false, "description": "Optional FAQ introduction." }, { "name": "heading", "selector": ".ceramics-faq__heading", "className": ".ceramics-faq__heading", "required": false, "description": "FAQ heading." }, { "name": "subheading", "selector": ".ceramics-faq__subheading", "className": ".ceramics-faq__subheading", "required": false, "description": "Optional FAQ introduction." }, { "name": "categories", "selector": ".ceramics-faq__categories", "className": ".ceramics-faq__categories", "required": false, "description": "Optional target-owned category controls." }, { "name": "categoryControl", "selector": ".ceramics-faq__category-btn", "className": ".ceramics-faq__category-btn", "required": false, "description": "Single category control." }, { "name": "list", "selector": ".ceramics-faq__list", "className": ".ceramics-faq__list", "required": true, "description": "FAQ item region." }, { "name": "item", "selector": ".faq-item", "className": ".faq-item", "required": true, "description": "Single question and answer." }, { "name": "question", "selector": ".faq-item__question", "className": ".faq-item__question", "required": true, "description": "Existing disclosure-style question control." }, { "name": "answer", "selector": ".faq-item__answer", "className": ".faq-item__answer", "required": true, "description": "Answer content." }, { "name": "contact", "selector": ".ceramics-faq__contact", "className": ".ceramics-faq__contact", "required": false, "description": "Optional follow-up region." }, { "name": "contactText", "selector": ".ceramics-faq__contact-text", "className": ".ceramics-faq__contact-text", "required": false, "description": "Optional follow-up copy." }, { "name": "contactLink", "selector": ".ceramics-faq__contact-link", "className": ".ceramics-faq__contact-link", "required": false, "description": "Optional target-owned follow-up destination." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default FAQ presentation." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained responsive FAQ layout." }],
-  "states": [{ "name": "default", "selectors": [".ceramics-faq"], "description": "Default FAQ presentation." }, { "name": "activeCategory", "selectors": [".ceramics-faq__category-btn[aria-pressed=\"true\"]", ".ceramics-faq__category-btn.is-active"], "description": "Existing visual hook for a target-owned category state." }, { "name": "expandedItem", "selectors": [".faq-item[aria-expanded=\"true\"]"], "description": "Existing visual hook for a disclosed answer." }],
-  "behavior": [{ "name": "faqContent", "selectors": [".ceramics-faq__list", ".faq-item"], "description": "Targets own questions, answers, categories, ordering, and follow-up destinations." }, { "name": "categoryOwnership", "selectors": [".ceramics-faq__categories", ".ceramics-faq__category-btn"], "attributes": ["aria-pressed"], "description": "Visual hooks do not decide category selection mode, filtering, URL state, result synchronization, or announcements." }, { "name": "disclosureOwnership", "selectors": [".faq-item__question", ".faq-item__answer"], "attributes": ["aria-expanded", "aria-controls"], "description": "Targets own disclosure behavior and must synchronize control state, panel visibility, and relationships." }],
-  "properties": [{ "name": "heading", "type": "string", "required": false, "description": "Optional FAQ heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-faq__heading" }] } }, { "name": "subheading", "type": "string", "required": false, "description": "Optional FAQ introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-faq__subheading" }] } }, { "name": "categories", "type": "slot", "required": false, "description": "Optional target-owned category controls; no filtering model is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-faq__categories", "classNames": [".ceramics-faq__categories"] }] } }, { "name": "items", "type": "slot", "required": true, "description": "Target-owned FAQ questions and answers.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-faq__list", "classNames": [".ceramics-faq__list"] }] } }, { "name": "contact", "type": "slot", "required": false, "description": "Optional target-owned follow-up content and destination.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-faq__contact", "classNames": [".ceramics-faq__contact"] }] } }],
-  "tokens": { "public": { "color": ["--color-border-default", "--color-border-focus", "--color-border-subtle", "--color-surface-secondary", "--color-surface-statement", "--color-text-accent", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size", "--typo-body-sm-size", "--typo-h2-size"], "radius": ["--radius-full", "--radius-md"], "spacing": ["--layout-gutter", "--space-layout-touch-target"], "transition": ["--transition-fast"], "easing": ["--easing-default"] } },
-  "accessibility": ["Each disclosure control must expose aria-expanded and reference its answer panel.", "Keep questions and answers adjacent in source order.", "If categories filter content, expose the current category and announce result changes appropriately.", "Provide descriptive link text for follow-up destinations.", "Do not rely on category color alone to communicate selection."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "CSS visual hooks are implemented; category filtering and disclosure behavior remain target-owned." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "ceramics-faq",
+  "name": "Ceramics Care FAQ",
+  "registryId": "R14",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Contextual ceramics questions and answers that compose canonical Accordion disclosures and an optional canonical Link follow-up, without implying unresolved category filtering or navigation behavior.",
+  "dependencies": ["accordion", "link"],
+  "source": {
+    "registry": "registry.json#/components/ceramics-faq",
+    "css": { "file": "components/css/ceramics.css", "selector": ".ceramics-faq" },
+    "docs": "site/src/content/components/ceramics-faq.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".ceramics-faq", "className": ".ceramics-faq", "required": true, "description": "Contained FAQ presentation; it is labelled by the optional visible heading when one is supplied." },
+    { "name": "header", "selector": ".ceramics-faq__header", "className": ".ceramics-faq__header", "required": false, "description": "Optional contextual introduction, omitted when both heading and subheading are empty." },
+    { "name": "heading", "selector": ".ceramics-faq__heading", "className": ".ceramics-faq__heading", "required": false, "description": "Optional visible contextual section heading." },
+    { "name": "subheading", "selector": ".ceramics-faq__subheading", "className": ".ceramics-faq__subheading", "required": false, "description": "Optional concise introduction to the question set." },
+    { "name": "list", "selector": ".ceramics-faq__list", "className": ".ceramics-faq__list", "required": true, "description": "Canonical Accordion root containing at least one question and answer." },
+    { "name": "item", "selector": ".ceramics-faq__item", "className": ".ceramics-faq__item", "required": true, "description": "One contextual canonical Accordion item with target-owned question and answer content." },
+    { "name": "contact", "selector": ".ceramics-faq__contact", "className": ".ceramics-faq__contact", "required": false, "description": "Optional follow-up region after the question set." },
+    { "name": "contactText", "selector": ".ceramics-faq__contact-text", "className": ".ceramics-faq__contact-text", "required": false, "description": "Optional follow-up explanation." },
+    { "name": "contactLink", "selector": ".ceramics-faq__contact-link", "className": ".ceramics-faq__contact-link", "required": false, "description": "Optional canonical Link to a real target-owned care or support destination." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "Contained contextual FAQ without category controls." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Fluid contained FAQ with no viewport-specific size API." }
+  ],
+  "states": [
+    { "name": "default", "selectors": [".ceramics-faq"], "description": "Default FAQ with the target-selected initial Accordion state." },
+    { "name": "collapsedQuestion", "selectors": [".accordion__trigger[aria-expanded=\"false\"]", ".accordion__panel[hidden]"], "description": "Collapsed canonical Accordion question with its answer removed from rendering and focus order." },
+    { "name": "expandedQuestion", "selectors": [".accordion__trigger[aria-expanded=\"true\"]", ".accordion__panel:not([hidden])"], "description": "Expanded canonical Accordion question exposing its answer." },
+    { "name": "disabledQuestion", "selectors": [".accordion__trigger:disabled"], "description": "Unavailable target-owned question disclosure." }
+  ],
+  "behavior": [
+    { "name": "faqContent", "selectors": [".ceramics-faq__list", ".ceramics-faq__item"], "description": "Targets own records, ordering, stable ids, heading rank, answer accuracy, rich-content trust, localization, initial expansion, and destinations; the contract does not define a CMS or policy schema." },
+    { "name": "canonicalAccordionComposition", "selectors": [".ceramics-faq__list", ".accordion", ".accordion__item", ".accordion__trigger", ".accordion__panel"], "attributes": ["aria-expanded", "aria-controls", "hidden"], "description": "Every question consumes canonical Accordion anatomy and behavior rather than recreating disclosure markup, state, focus, visibility, or motion." },
+    { "name": "groupPolicy", "selectors": [".ceramics-faq__list"], "description": "A target may allow single, multiple, collapsible, or exact-exclusive expansion and may choose initial state; the FAQ wrapper does not add a second controlled or uncontrolled API over Accordion." },
+    { "name": "headingOmission", "selectors": [".ceramics-faq", ".ceramics-faq__heading"], "attributes": ["aria-labelledby"], "description": "When heading is omitted, the root also omits the dangling aria-labelledby relationship; an empty introduction wrapper is not emitted." },
+    { "name": "canonicalFollowupLink", "selectors": [".ceramics-faq__contact-link", ".link"], "attributes": ["href"], "description": "Optional follow-up navigation composes canonical Link with a real target-owned destination; placeholder or prevented links are not part of the contract." },
+    { "name": "categoryControlsExcluded", "description": "Category controls, taxonomy, filtering, navigation, URL state, focus policy, empty results, counts, and announcements remain outside the v1 API until one complete product mode is selected." },
+    { "name": "contentResilience", "selectors": [".ceramics-faq", ".accordion__trigger", ".accordion__content", ".ceramics-faq__contact-link"], "description": "Long, localized, unbroken, and bidirectional content wraps in source order without clipping or viewport-specific behavior." },
+    { "name": "essentialInformation", "description": "Essential safety, legal, eligibility, and universally required care information must remain visible outside optional FAQ disclosures." }
+  ],
+  "properties": [
+    { "name": "heading", "type": "string", "required": false, "description": "Optional visible contextual FAQ heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-faq__heading" }] } },
+    { "name": "subheading", "type": "string", "required": false, "description": "Optional concise introduction.", "targetMappings": { "web": [{ "kind": "content", "selector": ".ceramics-faq__subheading" }] } },
+    { "name": "items", "type": "slot", "required": true, "description": "Target-supplied questions and answers composed through canonical Accordion items.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-faq__list", "classNames": [".ceramics-faq__list", ".ceramics-faq__item"] }] } },
+    { "name": "contact", "type": "slot", "required": false, "description": "Optional target-supplied follow-up copy and canonical Link destination.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".ceramics-faq__contact", "classNames": [".ceramics-faq__contact", ".ceramics-faq__contact-text", ".ceramics-faq__contact-link"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-secondary", "--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--layout-gutter", "--space-layout-element-gap", "--space-layout-section-gap"],
+      "radius": ["--radius-md"],
+      "typography": ["--font-family-body", "--font-family-heading", "--tg-typography-body-default-weight", "--tg-typography-h2-weight", "--typo-body-line-height", "--typo-body-size", "--typo-h2-line-height", "--typo-h2-size"]
+    }
+  },
+  "accessibility": [
+    "Fit the optional FAQ heading and canonical Accordion trigger headings into the surrounding document hierarchy.",
+    "Keep each trigger id, aria-expanded, aria-controls, panel id, optional region label, and native hidden state synchronized through Accordion.",
+    "Preserve native Button click, Enter, Space, focus retention, and normal Tab order; do not add arrow-key behavior to independent disclosure triggers.",
+    "Use labelled panel regions only while the number of simultaneously visible panels remains small enough to avoid landmark proliferation.",
+    "Use canonical Links with descriptive text and real destinations for follow-up navigation.",
+    "Keep long and localized questions and answers readable at 200 percent zoom, in narrow containers, and in right-to-left direction.",
+    "Do not introduce category controls until navigation or filtering, URL, focus, result, empty, and announcement behavior is defined.",
+    "Do not hide essential safety, legal, eligibility, or universally required care information only inside optional disclosures."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css-composition", "notes": "Ceramics CSS owns contextual introduction and follow-up presentation while canonical Accordion owns disclosure behavior and canonical Link owns navigation." },
+    "shopify": { "status": "planned", "kind": "liquid-accordion-or-details", "notes": "Liquid maps merchant records to canonical Accordion markup or a semantics-preserving details/summary equivalent; the target owns ids, expansion policy, records, and destinations." },
+    "react": { "status": "planned", "kind": "composition" },
+    "figma": { "status": "planned", "kind": "component-composition" },
+    "swiftui": { "status": "planned", "kind": "native-composition" },
+    "compose": { "status": "planned", "kind": "native-composition" }
+  }
 }

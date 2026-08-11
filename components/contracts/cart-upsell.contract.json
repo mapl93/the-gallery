@@ -1,66 +1,87 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "cart-upsell",
   "name": "Cart Upsell",
   "registryId": "K6",
   "category": "cart",
   "status": "pilot",
-  "summary": "Cart upsell block with title, recommended items, product image, title, price, and add action.",
-  "dependencies": ["button"],
+  "summary": "Named target-controlled recommendation list with optional canonical Link, Price, and Button composition per item.",
+  "dependencies": ["button", "link", "price"],
   "source": {
     "registry": "registry.json#/components/cart-upsell",
     "css": { "file": "components/css/cart.css", "selector": ".cart-upsell" },
     "docs": "site/src/content/components/cart-upsell.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".cart-upsell", "className": ".cart-upsell", "required": true, "description": "Upsell container." },
-    { "name": "title", "selector": ".cart-upsell__title", "className": ".cart-upsell__title", "required": true, "description": "Upsell section title." },
-    { "name": "items", "selector": ".cart-upsell__items", "className": ".cart-upsell__items", "required": true, "description": "Recommended item list." },
-    { "name": "item", "selector": ".cart-upsell__item", "className": ".cart-upsell__item", "required": true, "description": "Single recommendation." },
-    { "name": "itemImage", "selector": ".cart-upsell__item-image", "className": ".cart-upsell__item-image", "required": false, "description": "Recommendation image." },
-    { "name": "itemInfo", "selector": ".cart-upsell__item-info", "className": ".cart-upsell__item-info", "required": true, "description": "Recommendation info wrapper." },
-    { "name": "itemTitle", "selector": ".cart-upsell__item-title", "className": ".cart-upsell__item-title", "required": true, "description": "Recommendation title." },
-    { "name": "itemPrice", "selector": ".cart-upsell__item-price", "className": ".cart-upsell__item-price", "required": false, "description": "Recommendation price." },
-    { "name": "action", "selector": ".cart-upsell__action", "className": ".cart-upsell__action", "required": true, "description": "Add recommendation action." }
+    { "name": "root", "selector": ".cart-upsell", "className": ".cart-upsell", "required": true, "description": "Named section rendered only for a non-empty title and recommendation list." },
+    { "name": "title", "selector": ".cart-upsell__title", "className": ".cart-upsell__title", "required": true, "description": "Visible heading that names the recommendation region through aria-labelledby." },
+    { "name": "items", "selector": ".cart-upsell__items", "className": ".cart-upsell__items", "required": true, "description": "Native unordered list of target-authored recommendations." },
+    { "name": "item", "selector": ".cart-upsell__item", "className": ".cart-upsell__item", "required": true, "description": "Native list item for one target recommendation." },
+    { "name": "itemImage", "selector": ".cart-upsell__item-image", "className": ".cart-upsell__item-image", "required": false, "description": "Optional target media; decorative when adjacent identity repeats its meaning." },
+    { "name": "itemInfo", "selector": ".cart-upsell__item-info", "className": ".cart-upsell__item-info", "required": true, "description": "Layout wrapper for product identity and optional canonical Price." },
+    { "name": "itemTitle", "selector": ".cart-upsell__item-title", "className": ".cart-upsell__item-title", "required": true, "description": "Non-empty product identity rendered as text or canonical Link when a truthful destination exists." },
+    { "name": "price", "selector": ".cart-upsell__price", "className": ".cart-upsell__price", "required": false, "description": "Optional canonical Price composition with complete target-formatted content." },
+    { "name": "action", "selector": ".cart-upsell__action", "className": ".cart-upsell__action", "required": false, "description": "Optional canonical Button for a target-supported per-item request." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default cart upsell block." }
+    { "name": "default", "className": null, "default": true, "description": "One neutral recommendation-region composition." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default compact upsell list." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic compact layout with container-responsive item reflow." }
   ],
   "states": [
-    { "name": "default", "selectors": [".cart-upsell"], "description": "Default upsell state." }
+    { "name": "default", "selectors": [".cart-upsell"], "description": "Controlled projection of a non-empty target recommendation collection." }
   ],
   "behavior": [
-    { "name": "addUpsell", "selectors": [".cart-upsell__item"], "events": ["click"], "description": "Add actions should add the recommended item to cart and update totals." },
-    { "name": "recommendations", "selectors": [".cart-upsell__items"], "description": "Targets own recommendation source, item availability, and variant selection rules." }
+    { "name": "namedRegion", "selectors": [".cart-upsell", ".cart-upsell__title"], "attributes": ["aria-labelledby", "id"], "description": "The non-empty visible heading supplies the section's accessible name through a unique target-generated ID." },
+    { "name": "nativeCollection", "selectors": [".cart-upsell__items", ".cart-upsell__item"], "description": "Recommendations use ul and li without custom list, selection, widget, or keyboard semantics." },
+    { "name": "itemComposition", "selectors": [".cart-upsell__item", ".cart-upsell__item-title", ".cart-upsell__price", ".cart-upsell__action"], "description": "Each item independently composes target identity, optional canonical Link, optional canonical Price, and optional canonical Button." },
+    { "name": "contextualActions", "selectors": [".cart-upsell__action"], "description": "Repeated item actions require contextual accessible names and per-item availability/pending truth owned by the target." },
+    { "name": "recommendations", "selectors": [".cart-upsell__items"], "description": "Targets own source, intent, ranking, tracking destination, item availability, variant selection, formatting, and refresh lifecycle." },
+    { "name": "targetOwnedResults", "selectors": [".cart-upsell"], "description": "K6 is not a live region and owns no optimistic state; the parent target confirms outcomes, updates cart truth, announces results, and applies its focus policy." },
+    { "name": "emptyOmission", "selectors": [".cart-upsell"], "description": "Blank title or zero valid recommendations omits the complete component instead of exposing an empty named region." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Recommendation-section title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-upsell__title" }] } },
-    { "name": "items", "type": "slot", "required": true, "description": "Target-owned recommendation items.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-upsell__items", "classNames": [".cart-upsell__items"] }] } },
-    { "name": "addLabel", "type": "string", "required": true, "description": "Add recommendation action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-upsell__action" }] } },
-    { "name": "addDisabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables recommendation actions when unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-upsell__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Non-empty localized heading that names the recommendation region.",
+      "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-upsell__title" }] }
+    },
+    {
+      "name": "items",
+      "type": "slot",
+      "required": true,
+      "description": "Non-empty target-authored recommendation list composition; per-item Link, Price, Button, availability, and pending state remain inside the slot.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-upsell__items", "classNames": [".cart-upsell__items"] }] }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "color": ["--color-surface-primary", "--color-border-subtle", "--color-text-primary"],
       "radius": ["--radius-md", "--radius-sm"],
-      "typography": ["--typo-body-size"]
+      "spacing": ["--space-layout-element-gap"],
+      "typography": ["--tg-font-weight-semibold", "--font-family-heading", "--font-family-body", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Use clear add-action labels that include the product name.",
-    "Expose price and availability as text.",
-    "Do not force upsell focus before the main checkout path."
+    "Render a section labelled by its non-empty visible heading only when at least one valid recommendation exists.",
+    "Use native ul and li semantics; do not add a listbox, selection model, roving focus, carousel, or custom keyboard behavior.",
+    "Render product navigation through canonical Link and add requests through canonical Button; each repeated action needs a product-specific accessible name.",
+    "Use canonical Price for complete target-formatted and bidirectionally isolated price meaning.",
+    "Use empty alternative text for media that repeats adjacent product identity; provide concise target text only when media adds information.",
+    "Keep K6 out of live regions. Announce confirmed cart results and errors in one parent target status surface without unexpected focus movement.",
+    "Omit direct add when target variant or availability rules cannot support it truthfully; a navigation-only recommendation is valid.",
+    "Preserve canonical Link, Button, Price, forced-colors, focus-visible, disabled, busy, and reduced-motion behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map recommendations, related items, or manual upsells." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "semantic-html-css", "notes": "Neutral layout and semantics implemented in components/css/cart.css; target supplies items and behavior." },
+    "shopify": { "status": "planned", "kind": "liquid-section-css-js", "notes": "Recommendation source, cart placement, product-recommendation request context, variant/add policy, merchant settings, refresh, tracking, status, and editor proof remain open target decisions." },
+    "react": { "status": "planned", "kind": "controlled-composition" },
+    "figma": { "status": "planned", "kind": "component-with-repeatable-item-slot" },
+    "swiftui": { "status": "planned", "kind": "native-section-list-composition" },
+    "compose": { "status": "planned", "kind": "native-section-list-composition" }
   }
 }

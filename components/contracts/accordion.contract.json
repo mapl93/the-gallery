@@ -1,217 +1,79 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "accordion",
   "name": "Accordion",
   "registryId": "B6",
   "category": "layout",
   "status": "pilot",
-  "summary": "Collapsible disclosure group with trigger, icon, animated panel, expanded state, and ARIA disclosure behavior.",
+  "summary": "Vertical disclosure group with contextual headings, native triggers, truly hidden collapsed panels, optional indicators, per-item disabled state, and target-coordinated expansion.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/accordion",
-    "css": {
-      "file": "components/css/layout.css",
-      "selector": ".accordion"
-    },
+    "css": { "file": "components/css/layout.css", "selector": ".accordion" },
     "docs": "site/src/content/components/accordion.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".accordion",
-      "className": ".accordion",
-      "required": true,
-      "description": "Wrapper around one or more collapsible items."
-    },
-    {
-      "name": "item",
-      "selector": ".accordion__item",
-      "className": ".accordion__item",
-      "required": true,
-      "description": "Individual accordion item."
-    },
-    {
-      "name": "trigger",
-      "selector": ".accordion__trigger",
-      "className": ".accordion__trigger",
-      "required": true,
-      "description": "Button that toggles its associated panel."
-    },
-    {
-      "name": "icon",
-      "selector": ".accordion__icon",
-      "className": ".accordion__icon",
-      "required": false,
-      "description": "Optional expansion indicator."
-    },
-    {
-      "name": "panel",
-      "selector": ".accordion__panel",
-      "className": ".accordion__panel",
-      "required": true,
-      "description": "Animated collapsible panel."
-    },
-    {
-      "name": "panelInner",
-      "selector": ".accordion__panel-inner",
-      "className": ".accordion__panel-inner",
-      "required": false,
-      "description": "Optional inner wrapper used to hide overflowing panel content during animation."
-    },
-    {
-      "name": "content",
-      "selector": ".accordion__content",
-      "className": ".accordion__content",
-      "required": true,
-      "description": "Content region inside the panel."
-    }
+    { "name": "root", "selector": ".accordion", "className": ".accordion", "required": true, "description": "Vertical wrapper around one or more disclosure items." },
+    { "name": "item", "selector": ".accordion__item", "className": ".accordion__item", "required": true, "description": "Repeatable disclosure item." },
+    { "name": "heading", "selector": ".accordion__heading", "className": ".accordion__heading", "required": true, "description": "Contextual native or ARIA heading whose only child is the trigger." },
+    { "name": "trigger", "selector": ".accordion__trigger", "className": ".accordion__trigger", "required": true, "description": "Native Button that toggles one associated panel." },
+    { "name": "icon", "selector": ".accordion__icon", "className": ".accordion__icon", "required": false, "description": "Optional decorative expansion indicator supplied by the consumer or target." },
+    { "name": "panel", "selector": ".accordion__panel", "className": ".accordion__panel", "required": true, "description": "Panel container linked to its trigger and hidden when collapsed; region semantics are contextual." },
+    { "name": "panelInner", "selector": ".accordion__panel-inner", "className": ".accordion__panel-inner", "required": false, "description": "Optional compatibility wrapper that does not own visibility or accessibility semantics." },
+    { "name": "content", "selector": ".accordion__content", "className": ".accordion__content", "required": true, "description": "Consumer-owned flow content inside the panel." }
   ],
   "variants": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default accordion group."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Default vertical bordered Accordion group." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Default accordion spacing."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Default Accordion trigger and content spacing." }
   ],
   "states": [
-    {
-      "name": "collapsed",
-      "selectors": [".accordion__panel"],
-      "description": "Resting collapsed panel state."
-    },
-    {
-      "name": "expanded",
-      "selectors": [".accordion__trigger[aria-expanded=\"true\"] + .accordion__panel"],
-      "description": "Expanded panel state controlled by aria-expanded on the trigger."
-    },
-    {
-      "name": "iconExpanded",
-      "selectors": [".accordion__trigger[aria-expanded=\"true\"] .accordion__icon"],
-      "description": "Expanded icon rotation state."
-    },
-    {
-      "name": "hover",
-      "selectors": [".accordion__trigger:hover"],
-      "description": "Pointer hover state on the trigger."
-    },
-    {
-      "name": "focusVisible",
-      "selectors": [".accordion__trigger:focus-visible"],
-      "description": "Keyboard focus indicator on the trigger."
-    }
+    { "name": "collapsed", "selectors": [".accordion__trigger[aria-expanded=\"false\"]", ".accordion__panel[hidden]"], "description": "Collapsed trigger state with its panel removed from rendering and focus order." },
+    { "name": "expanded", "selectors": [".accordion__trigger[aria-expanded=\"true\"]", ".accordion__panel:not([hidden])"], "description": "Expanded trigger exposes its associated visible panel." },
+    { "name": "iconExpanded", "selectors": [".accordion__trigger[aria-expanded=\"true\"] .accordion__icon"], "description": "Optional indicator rotates to communicate expanded state." },
+    { "name": "hover", "selectors": [".accordion__trigger:hover:not(:disabled)"], "description": "Pointer hover state on an enabled trigger." },
+    { "name": "focusVisible", "selectors": [".accordion__trigger:focus-visible"], "description": "Keyboard focus indicator on the trigger." },
+    { "name": "disabled", "selectors": [".accordion__trigger:disabled"], "description": "Unavailable item trigger cannot change expansion state." }
   ],
   "behavior": [
-    {
-      "name": "disclosureSemantics",
-      "attributes": ["aria-expanded", "aria-controls", "id"],
-      "description": "Each trigger must expose expanded state and reference the panel it controls."
-    },
-    {
-      "name": "toggle",
-      "selectors": [".accordion__trigger[aria-expanded=\"true\"] + .accordion__panel"],
-      "events": ["click", "Enter", "Space"],
-      "description": "Activating a trigger toggles aria-expanded and the associated panel."
-    },
-    {
-      "name": "mode",
-      "events": ["single item open", "multiple items open"],
-      "description": "Adapters may choose single-open or multi-open behavior, but must keep aria-expanded synchronized."
-    }
+    { "name": "headingSemantics", "description": "Each native Button trigger is the only child of a heading whose level fits the containing page hierarchy." },
+    { "name": "disclosureSemantics", "attributes": ["id", "aria-expanded", "aria-controls", "hidden", "aria-labelledby"], "description": "Trigger and panel ids, expanded state, optional region label, and native hidden state remain synchronized." },
+    { "name": "toggle", "events": ["click", "Enter", "Space", "expandedChange"], "description": "Activating an enabled native trigger requests the opposite per-item expanded state." },
+    { "name": "panelVisibility", "selectors": [".accordion__panel[hidden]"], "attributes": ["hidden"], "description": "Collapsed panels are not rendered, announced, or included in sequential focus; visual-only zero-height collapse is insufficient." },
+    { "name": "groupPolicy", "events": ["single item open", "multiple items open", "at least one item open"], "description": "Consumers or target adapters coordinate single, multiple, or exact-exclusive groups without changing per-item semantics." },
+    { "name": "optionalRegion", "attributes": ["role=\"region\"", "aria-labelledby"], "description": "Use a labelled region only when the panel is structurally significant; avoid landmark proliferation in large groups." },
+    { "name": "disabledItem", "attributes": ["disabled"], "description": "A disabled item remains perceivable but cannot be toggled by pointer or keyboard." }
   ],
   "properties": [
-    {
-      "name": "expanded",
-      "type": "boolean",
-      "required": false,
-      "defaultValue": false,
-      "description": "Controls the expanded state of an individual accordion item; groups may coordinate this state as single-open or multi-open.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "attribute",
-            "selector": ".accordion__trigger",
-            "attribute": "aria-expanded",
-            "values": {
-              "true": "true",
-              "false": "false"
-            }
-          }
-        ]
-      }
-    }
+    { "name": "items", "type": "slot", "required": true, "description": "One or more repeated heading, trigger, panel, and content item compositions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".accordion", "classNames": [".accordion__item", ".accordion__heading", ".accordion__trigger", ".accordion__panel", ".accordion__content"] }] } },
+    { "name": "expanded", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls the expanded state of an individual item; target groups may coordinate multiple item states.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".accordion__trigger", "attribute": "aria-expanded", "values": { "true": "true", "false": "false" } }, { "kind": "attribute", "selector": ".accordion__panel", "attribute": "hidden", "values": { "true": null, "false": "" } }] } },
+    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes an individual item trigger unavailable without hiding its heading.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".accordion__trigger", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": [
-        "--color-border-subtle",
-        "--color-surface-primary",
-        "--color-surface-secondary",
-        "--color-text-primary",
-        "--color-text-secondary",
-        "--color-border-focus"
-      ],
-      "radius": [
-        "--radius-md"
-      ],
-      "transition": [
-        "--transition-fast",
-        "--transition-base"
-      ],
-      "easing": [
-        "--easing-default"
-      ],
-      "typography": [
-        "--typo-body-size",
-        "--typo-body-line-height",
-        "--font-family-body"
-      ],
-      "spacing": [
-        "--space-layout-element-gap"
-      ]
+      "color": ["--color-border-subtle", "--color-surface-primary", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-text-disabled", "--color-border-focus"],
+      "radius": ["--radius-md"],
+      "transition": ["--transition-fast", "--transition-base"],
+      "easing": ["--easing-default"],
+      "typography": ["--typo-body-size", "--typo-body-line-height", "--font-family-body"],
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"]
     }
   },
   "accessibility": [
-    "Use a native button for each accordion trigger.",
-    "Set aria-expanded on each trigger and keep it synchronized with panel visibility.",
-    "Connect triggers and panels with aria-controls and matching ids.",
-    "Support Enter and Space activation on triggers.",
-    "Preserve heading hierarchy around accordion triggers when accordions structure page content."
+    "Wrap each native Button trigger in a contextual heading and keep the trigger as its only child.",
+    "Synchronize aria-expanded, aria-controls, stable ids, and native hidden panel state.",
+    "Support native click, Enter, and Space activation while preserving normal Tab order.",
+    "Use role=\"region\" only when it adds useful structure and will not create landmark proliferation.",
+    "Ensure collapsed panels and their interactive descendants are absent from rendering and sequential focus."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/layout.css; toggle behavior must be provided by the consuming target."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "style"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "composable"
-    }
+    "web": { "status": "implemented", "kind": "css-target-behavior", "notes": "Canonical CSS styles APG disclosure markup; a target may alternatively map to native details/summary while preserving the visual classes and state contract." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js-or-details", "notes": "Liquid can emit APG Button markup or native details; theme behavior owns optional group coordination." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

@@ -1,0 +1,94 @@
+{
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.1.0",
+  "slug": "store-locator",
+  "name": "Store Locator",
+  "registryId": "D9a",
+  "category": "product",
+  "status": "pilot",
+  "summary": "General branch discovery through manual search, optional explicit geolocation and synchronized map, complete list results, details, contact, and target-owned directions without commerce selection.",
+  "dependencies": ["input", "button", "link"],
+  "source": {
+    "registry": "registry.json#/components/store-locator",
+    "css": { "file": "components/css/product.css", "selector": ".store-locator" },
+    "docs": "site/src/content/components/store-locator.mdx"
+  },
+  "anatomy": [
+    { "name": "root", "selector": ".store-locator", "className": ".store-locator", "required": true, "description": "General location-discovery surface with no product or transaction requirement." },
+    { "name": "header", "selector": ".location-search__header", "className": ".location-search__header", "required": true, "description": "Visible heading and optional discovery explanation." },
+    { "name": "heading", "selector": ".location-search__heading", "className": ".location-search__heading", "required": true, "description": "Visible section heading and accessible root name." },
+    { "name": "description", "selector": ".location-search__description", "className": ".location-search__description", "required": false, "description": "Optional search-scope explanation." },
+    { "name": "searchForm", "selector": ".location-search__form", "className": ".location-search__form", "required": true, "description": "Native search form composing canonical Input and Button." },
+    { "name": "query", "selector": ".location-search__query", "className": ".location-search__query", "required": true, "description": "Canonical visibly labelled manual location-search Input." },
+    { "name": "searchAction", "selector": ".location-search__submit", "className": ".location-search__submit", "required": true, "description": "Canonical submit Button that requests target-owned search results." },
+    { "name": "useLocationAction", "selector": ".location-search__geolocate", "className": ".location-search__geolocate", "required": false, "description": "Optional explicit action that alone may initiate target geolocation permission." },
+    { "name": "status", "selector": ".location-search__status", "className": ".location-search__status", "required": false, "description": "One concise result, loading, empty, error, retry, or action status." },
+    { "name": "resultsRegion", "selector": ".store-locator__results", "className": ".store-locator__results", "required": true, "description": "Named region containing the complete target-ordered branch list." },
+    { "name": "resultsHeading", "selector": ".store-locator__results-heading", "className": ".store-locator__results-heading", "required": true, "description": "Visible heading naming the result list." },
+    { "name": "results", "selector": ".location-search__results", "className": ".location-search__results", "required": true, "description": "Native list of complete target-supplied branch summaries." },
+    { "name": "result", "selector": ".store-locator__result", "className": ".store-locator__result", "required": true, "description": "Native list item containing one named branch article." },
+    { "name": "branch", "selector": ".store-locator__result > article", "required": true, "description": "Article containing stable branch identity, address, and optional hours, services, contact, and directions." },
+    { "name": "contactAction", "selector": ".store-locator__actions", "className": ".store-locator__actions", "required": false, "description": "Optional canonical Link group for contact or explicit target-owned directions." },
+    { "name": "map", "selector": ".location-search__map", "className": ".location-search__map", "required": false, "description": "Optional target-owned synchronized map that never replaces list discovery." }
+  ],
+  "variants": [
+    { "name": "default", "className": null, "default": true, "description": "One searchable list-first branch discovery surface." }
+  ],
+  "sizes": [
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic size with a private component-container stacking threshold." }
+  ],
+  "states": [
+    { "name": "ready", "selectors": [".location-search__results", ".store-locator__results"], "description": "Complete target branch results are available." },
+    { "name": "loading", "selectors": [".location-search[data-status=\"loading\"] .location-search__status", ".location-search__status"], "description": "Target search is pending and stale results are suppressed." },
+    { "name": "empty", "selectors": [".location-search__status"], "description": "Completed search has no matching branches and manual search remains available." },
+    { "name": "error", "selectors": [".location-search[data-status=\"error\"] .location-search__status", ".location-search__status"], "description": "Target search failed with truthful retry guidance and no stale results." },
+    { "name": "withMap", "selectors": [".location-search__map", ".store-locator__results"], "description": "Optional synchronized map is present while the list remains complete." }
+  ],
+  "behavior": [
+    { "name": "manualSearch", "selectors": [".location-search__form", ".location-search__query", ".location-search__submit"], "attributes": ["role=\"search\"", "type=\"search\"", "visible label", "native submit"], "events": ["input", "change", "submit", "reset"], "description": "Manual search remains available regardless of geolocation or map support. The target owns geocoding, requests, ordering, cancellation, retry, stale suppression, results, history, privacy, and analytics." },
+    { "name": "explicitGeolocation", "selectors": [".location-search__geolocate"], "events": ["click", "Space", "Enter", "location request"], "description": "Geolocation may be requested only after the explicit localized action; mounting or ordinary search interaction never prompts permission." },
+    { "name": "discoveryOnly", "selectors": [".store-locator__results", ".store-locator__actions"], "events": ["contact navigation", "directions navigation"], "description": "Store Locator discovers and inspects branches. It never chooses a transaction pickup location and never stores a temporary or account-level preferred branch." },
+    { "name": "directionsBoundary", "selectors": [".store-locator__actions"], "attributes": ["real target-owned href", "descriptive visible link text"], "events": ["link activation", "target navigation"], "description": "Directions is an explicit canonical Link with target-owned destination, navigation, external-app policy, analytics, and failure handling." },
+    { "name": "resultLifecycle", "selectors": [".store-locator", ".location-search__status", ".store-locator__results"], "attributes": ["data-status", "aria-busy", "role=\"status\"", "role=\"alert\" for error"], "events": ["loading", "ready", "empty", "error", "retry"], "description": "The target location service owns provider truth, statuses, stale suppression, focus, and one concise announcement." },
+    { "name": "optionalMap", "selectors": [".location-search__map", ".store-locator__results"], "description": "A capable target may add a synchronized map with its provider attribution and failure UI. Map absence or failure leaves every result, detail, contact, and direction link available in the list." },
+    { "name": "dependencyComposition", "selectors": [".location-search__query", ".location-search__submit", ".location-search__geolocate", ".store-locator__actions"], "description": "D9a consumes canonical Input, Button, and Link markup, focus, form, disabled, and navigation behavior without recreating their implementations." }
+  ],
+  "properties": [
+    { "name": "heading", "type": "string", "required": true, "unsetBehavior": "Omit the complete component when the visible heading is empty.", "description": "Visible section heading and accessible root name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__heading" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional discovery-scope explanation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__description" }] } },
+    { "name": "queryLabel", "type": "string", "required": true, "description": "Visible localized manual-search label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".input__label" }] } },
+    { "name": "query", "type": "string", "required": false, "defaultValue": "", "description": "Current manual search value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".input__field", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "queryPlaceholder", "type": "string", "required": false, "description": "Optional non-label search hint.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".input__field", "attribute": "placeholder", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "searchLabel", "type": "string", "required": true, "description": "Visible localized canonical search Button label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__submit" }] } },
+    { "name": "useLocationLabel", "type": "string", "required": false, "unsetBehavior": "Omit the geolocation action without affecting manual search.", "description": "Optional explicit localized geolocation action label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__geolocate" }] } },
+    { "name": "resultsLabel", "type": "string", "required": true, "description": "Visible heading naming the branch result region.", "targetMappings": { "web": [{ "kind": "content", "selector": ".store-locator__results-heading" }] } },
+    { "name": "locations", "type": "slot", "required": true, "description": "Target-ordered native list of branch articles with stable identity and address plus optional hours, services, contact, and directions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".location-search__results", "classNames": [".location-search__results", ".store-locator__result", ".location-search__result-name", ".location-search__address", ".store-locator__actions"] }] } },
+    { "name": "status", "type": "enum", "required": false, "defaultValue": "ready", "values": ["ready", "loading", "empty", "error"], "description": "Coherent target-owned search lifecycle projection.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".store-locator", "attribute": "data-status", "values": { "ready": "ready", "loading": "loading", "empty": "empty", "error": "error" } }] } },
+    { "name": "statusMessage", "type": "string", "required": false, "description": "Concise truthful target-authored result, loading, empty, error, retry, or action message.", "targetMappings": { "web": [{ "kind": "content", "selector": ".location-search__status" }] } },
+    { "name": "map", "type": "slot", "required": false, "description": "Optional target-owned synchronized map with attribution and failure handling; never the sole result or action route.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".location-search__map", "classNames": [".location-search__map"] }] } }
+  ],
+  "tokens": {
+    "public": {
+      "color": ["--color-surface-primary", "--color-surface-secondary", "--color-border-subtle", "--color-border-default", "--color-text-primary", "--color-text-secondary", "--color-feedback-error-default", "--color-feedback-error-bg"],
+      "spacing": ["--space-layout-element-gap"],
+      "typography": ["--font-family-heading", "--typo-h4-size", "--typo-h4-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--tg-font-weight-semibold"],
+      "radius": ["--radius-md"]
+    }
+  },
+  "accessibility": [
+    "Use a visible heading to name the section and one visibly labelled canonical search Input; placeholder text never replaces either name.",
+    "Keep manual search available without geolocation or a map. Request device location only after the explicit localized Button action and provide target-owned privacy disclosure.",
+    "Render results as a native list of named branch articles with text-complete identity and address. Hours, services, contact, and directions omit cleanly when absent.",
+    "Use real descriptive canonical Links for phone and directions. Store Locator contains no transaction selection Radio, preferred-store control, or hidden account mutation.",
+    "Expose one coherent busy/result status and alert only new errors. Suppress stale result sets before publishing replacements.",
+    "The complete list remains usable under map failure, forced colors, zoom, text spacing, RTL, reduced motion, and narrow containers."
+  ],
+  "adapters": {
+    "web": { "status": "implemented", "kind": "css-target-behavior", "notes": "Canonical Input/Button/Link composition, search states, native branch list, optional map slot, and container response are implemented; provider/geolocation/directions remain target-owned." },
+    "shopify": { "status": "planned", "kind": "section-liquid-css-js", "notes": "Requires a target-native general-location data source, search/geocoding, localization, optional map provider, directions policy, schema/editor behavior, and live-store proof; product store availability is not a general locator source." },
+    "react": { "status": "implemented", "kind": "composed-component", "notes": "Docs target demonstrates controlled query/result status and shared location-search renderer without making React canonical." },
+    "figma": { "status": "planned", "kind": "component-composition" },
+    "swiftui": { "status": "planned", "kind": "native-search-list" },
+    "compose": { "status": "planned", "kind": "native-search-list" }
+  }
+}

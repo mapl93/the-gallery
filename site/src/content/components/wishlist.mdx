@@ -1,50 +1,141 @@
 ## Overview
 
-Wishlist is a saved-products surface with a required title, optional target-formatted count, and a required slot of Product Card compositions.
+Wishlist is a heading-labelled, target-controlled exact-variant saved-item
+collection. It arranges canonical Product Cards in a native list and may
+replace a resolved empty collection with canonical Empty State. The accepted
+hybrid profile combines anonymous local-device and authenticated account
+records, but persistence, reconciliation, loading, mutation, focus recovery,
+and announcements remain target-owned.
 
 <Preview
-  html={'<section class="wishlist tg-preview-frame tg-preview-frame--lg"><header class="wishlist__header"><h1 class="wishlist__title">My Wishlist</h1><span class="wishlist__count">2 items</span></header><div class="wishlist__grid"><article class="product-card"><a class="product-card__media" href="#"><img class="product-card__image tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /></a><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h2 class="product-card__title"><a href="#">Artisan Ceramic Vase</a></h2><div class="product-card__footer"><span class="price"><span class="price__current">$120.00</span></span><button class="wishlist-btn" type="button" aria-label="Remove Artisan Ceramic Vase from wishlist" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div></div></article><article class="product-card"><a class="product-card__media" href="#"><img class="product-card__image tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Hand-thrown stoneware bowl" /></a><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h2 class="product-card__title"><a href="#">Stoneware Bowl</a></h2><div class="product-card__footer"><span class="price"><span class="price__current">$85.00</span></span><button class="wishlist-btn" type="button" aria-label="Remove Stoneware Bowl from wishlist" aria-pressed="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg></button></div></div></article></div></section>'}
-  label="Wishlist"
+  html={'<section class="wishlist tg-preview-frame tg-preview-frame--lg" aria-labelledby="wishlist-preview-title"><header class="wishlist__header"><h2 class="wishlist__title" id="wishlist-preview-title" dir="auto">Saved works</h2><span class="wishlist__count" dir="auto">2 items</span></header><ul class="wishlist__grid"><li class="wishlist__item" data-saved-product-id="celadon-study-no-4" data-saved-variant-id="celadon-study-no-4-large-seafoam"><article class="card product-card"><div class="product-card__media"><img class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Celadon Study No. 4, Large Seafoam, ceramic vessel" /></div><div class="product-card__body"><span class="product-card__vendor" dir="auto">Lucia Ferrer</span><h3 class="product-card__title"><a href="#" dir="auto">Celadon Study No. 4</a></h3><span class="product-card__subtitle" dir="auto">Large · Seafoam</span></div><div class="product-card__footer"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$120.00</bdi></span></span><button class="btn btn--outline btn--sm" type="button" aria-label="Remove Celadon Study No. 4, Large Seafoam, from saved works">Remove</button></div></article></li><li class="wishlist__item" data-saved-product-id="celadon-study-no-4" data-saved-variant-id="celadon-study-no-4-small-porcelain"><article class="card product-card"><div class="product-card__media"><img class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Celadon Study No. 4, Small Porcelain white, ceramic vessel" /></div><div class="product-card__body"><span class="product-card__vendor" dir="auto">Lucia Ferrer</span><h3 class="product-card__title"><a href="#" dir="auto">Celadon Study No. 4</a></h3><span class="product-card__subtitle" dir="auto">Small · Porcelain white</span></div><div class="product-card__footer"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$112.00</bdi></span></span><button class="btn btn--outline btn--sm" type="button" aria-label="Remove Celadon Study No. 4, Small Porcelain white, from saved works">Remove</button></div></article></li></ul></section>'}
+  label="Wishlist populated collection"
 />
 
 ## Presentation
 
-`products` is one required slot containing repeated Product Card compositions. Product identity, imagery, price, destinations, order, and per-product saved state are fixture or target data rather than top-level Wishlist properties.
+The root is a native `section` labelled by its required visible title. `count`
+is optional complete target-formatted text and is deliberately not a live
+region. The populated collection is `ul.wishlist__grid`; each
+`li.wishlist__item` contains one complete `article.card.product-card`.
 
-The artwork includes the current `.wishlist-btn` hook inside each product fixture. The Wishlist contract does not expose that button as an independent property, so its ownership is not expanded here. `count` is optional and remains target-formatted.
+`products` remains one target-controlled slot rather than a flattened array of
+Wishlist product props. It is optional so a resolved-empty target can omit the
+list and supply `emptyState`; once the lifecycle is resolved, one of those two
+compositions is required. Product identity, media, links, vendor, price,
+availability, ordering, and contextual commands stay inside Product Card or
+the target data composition.
+
+Every saved record represents one exact variant or merchandise selection. The
+target uses stable variant identity for merge/deduplication while retaining the
+parent product identity for navigation. Multiple variants of the same product
+may coexist, so Product Card must visibly name each option selection and the
+contextual Remove command must include both product and selection in its
+accessible name. Image, swatch, or color alone is insufficient.
+
+The runtime fixture places a canonical small outline Button in Product Card's
+footer. On a saved-items page, `Remove` is a command and has no `aria-pressed`.
+A persistent Save toggle that remains visible in saved and unsaved states is a
+different potential component and is not silently defined by U8.
+
+Sold-out or no-longer-available exact variants remain in the collection with
+truthful text, parent-product navigation, and explicit Remove. The target never
+silently deletes them or converts them into product-level favorites.
+
+### Hybrid persistence and sign-in merge
+
+Anonymous local records and authenticated account records are united
+idempotently after sign-in using exact variant identity. Neither source
+destructively replaces the other. The authenticated service returns the
+authoritative merged result, and the target clears local records only after
+confirmed success. Failure preserves local truth for retry. Neutral Wishlist
+stores nothing and exposes no provider, account, or storage API.
+
+### Resolved empty composition
+
+`emptyState` is optional and is used only after the target has resolved that the
+saved collection is empty. The target chooses contextual heading rank, copy,
+action, focus, and announcement behavior. Loading and errors must not be
+presented as an empty collection.
+
+<Preview
+  html={'<section class="wishlist tg-preview-frame" aria-labelledby="wishlist-empty-title"><header class="wishlist__header"><h2 class="wishlist__title" id="wishlist-empty-title">Saved works</h2><span class="wishlist__count">0 items</span></header><div class="empty-state"><div class="empty-state__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" fill="none" stroke="currentColor" stroke-width="1.5" /></svg></div><h3 class="empty-state__title">No saved works yet</h3><p class="empty-state__message">Explore the collection and save works to return to later.</p><a class="btn btn--outline" href="/components/product-card">Explore works</a></div></section>'}
+  label="Wishlist resolved empty composition"
+/>
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep saved state, visible products, and count synchronized from one target-owned source.</Do>
-  <Dont>Do not treat Product Card fixture data as Wishlist-level API.</Dont>
+  <Do>Project exact-variant records and count from one authoritative target result.</Do>
+  <Dont>Do not store saved IDs, query products, or duplicate Product Card inside Wishlist.</Dont>
 </DoDont>
 
-- Let Product Card own product identity, media, price, and navigation.
-- Preserve the customer's saved order when the target supports it.
-- Reconcile optimistic add or remove actions with target persistence and failure feedback.
-- Provide an intentional empty state when the products slot contains no saved items.
+- Use one native list item per complete canonical Product Card.
+- Preserve Product Card's media ratio, title link, Price, Button, focus, and
+  reduced-motion behavior; Wishlist only arranges the collection.
+- Use a Button for removal or mutation and a Link for navigation.
+- Update list/count/empty truth only after confirmed mutation success. Preserve
+  the record and explain failure when confirmation does not arrive.
+- Decide a logical focus destination when a successful removal deletes the
+  focused card: a surviving adjacent action, collection title, or empty-state
+  action may be appropriate depending on the resulting context.
+- Union local and account records idempotently by exact variant identity after
+  sign-in; clear local records only after confirmed account success.
+- Treat guest storage, customer accounts, cross-device sync, consent, retention,
+  limits, privacy, and authorization as target policy.
 
 ## Accessibility
 
-- Give every saved-state toggle a product-specific accessible name.
-- Keep `aria-pressed` synchronized with the actual saved state.
-- Make count changes understandable after add or remove actions, using target-owned live feedback when needed.
-- Preserve Product Card image alternatives, links, and heading hierarchy.
-- Protect customer-specific saved items according to the target account or local-storage model.
+- Give the visible title a unique ID and reference it through
+  `section[aria-labelledby]`. Do not add application, grid, selection, or
+  listbox roles.
+- Keep the product collection as `ul > li`; Product Card keeps its own `article`
+  and heading/link semantics.
+- Give every removal command a product-and-saved-option-specific accessible
+  name. A command Button has no `aria-pressed`.
+- If a future persistent Save toggle is accepted, keep its label stable while
+  `aria-pressed` communicates state and expose controlled/uncontrolled ownership
+  at that component.
+- Keep count passive. Target-owned Status or Alert output announces pending,
+  success, failure, undo, resulting count, and empty transitions when needed.
+- Do not leave focus on a removed node, move focus merely to announce a status,
+  or display Empty State while loading/error truth is unresolved.
+- Keep every exact option selection visible in text and retain unavailable
+  records with a truthful localized status and explicit user choices.
+- Protect customer-specific saved data according to the selected account,
+  guest-storage, privacy, consent, authorization, and retention model.
 
 ## References
 
+### Standards and mature systems
+
+- [HTML section](https://html.spec.whatwg.org/dev/sections.html#the-section-element)
+- [HTML unordered list](https://html.spec.whatwg.org/dev/grouping-content.html#the-ul-element)
+- [WAI content structure](https://www.w3.org/WAI/tutorials/page-structure/content/)
+- [WAI region labels](https://www.w3.org/WAI/tutorials/page-structure/labels/)
+- [WAI-ARIA APG Button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+- [WCAG Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+- [Radix Toggle](https://www.radix-ui.com/primitives/docs/components/toggle)
+- [Shopify customer-account Wishlist tutorial](https://shopify.dev/docs/apps/build/customer-accounts/full-page-extensions/build-new-pages)
+- [Shopify customer-account full-page target](https://shopify.dev/docs/api/customer-account-ui-extensions/latest/targets/full-page)
+- [Shopify customer-account metafields](https://shopify.dev/docs/apps/build/customer-accounts/metafields-in-customer-accounts)
+
+Open UI has no Wishlist or saved-items element/pattern. The Gallery therefore
+uses native section/list/Button semantics and target-owned persistence rather
+than inventing a custom widget model.
+
 ### Dependencies
 
-- [Product Card](/components/product-card)
-
-The two cards in the artwork are fixture content inside `products`; their repeated data is not promoted to Wishlist properties.
+- [Product Card](/components/product-card) — complete saved-product article,
+  product navigation, media, Price/footer, and optional contextual Button
+- [Empty State](/components/empty-state) — optional resolved-absence composition;
+  contextual heading and lifecycle remain target-owned
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Wishlist page title</td></tr>
-  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted saved-item count</td></tr>
-  <tr><td>`products`</td><td>slot</td><td>required</td><td>Saved Product Card compositions and per-product saved state</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible contextual heading that labels the section</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Complete localized target-formatted saved-item count; passive text</td></tr>
+  <tr><td>`products`</td><td>slot</td><td>optional</td><td>Target-controlled exact-variant records rendered as complete canonical Product Cards with visible option and availability truth; omit only for a resolved `emptyState`</td></tr>
+  <tr><td>`emptyState`</td><td>slot</td><td>optional</td><td>Canonical Empty State shown only after the collection is resolved empty</td></tr>
 </PropTable>

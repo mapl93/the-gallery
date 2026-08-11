@@ -3,15 +3,35 @@
   Usage: {% render 'search-overlay' %}
 {%- endcomment -%}
 
-<div class="search-overlay" data-search-overlay>
-  <div class="search-box" role="search">
-    <form action="{{ routes.search_url }}" method="get">
-      <input class="search-box__input" type="search" name="q"
-             placeholder="Search for bowls, vases, glazes…"
-             aria-label="Search" autocomplete="off" data-search-input>
-    </form>
-    <div class="search-results" data-search-results aria-live="polite">
-      {%- comment -%} Predictive search results injected via JS {%- endcomment -%}
+<div class="search-overlay"
+     id="search-overlay"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true"
+     aria-labelledby="search-overlay-title"
+     data-search-overlay>
+  <form class="search-box" role="search" action="{{ routes.search_url }}" method="get">
+    <div class="search-box__header">
+      <h2 class="search-box__title" id="search-overlay-title">{{ 'accessibility.search' | t }}</h2>
+      <button class="close-btn search-box__close"
+              type="button"
+              aria-label="{{ 'accessibility.close' | t }} {{ 'accessibility.search' | t | downcase }}"
+              data-search-close>
+        {% render 'icon', name: 'x' %}
+      </button>
     </div>
-  </div>
+    <label class="visually-hidden search-box__label" for="search-overlay-query">
+      {{ 'accessibility.search' | t }}
+    </label>
+    <input class="search-box__input"
+           id="search-overlay-query"
+           type="search"
+           name="q"
+           placeholder="{{ 'accessibility.search' | t }}"
+           autocomplete="off"
+           data-search-input>
+    <div class="search-results" data-search-results>
+      {%- comment -%} Target runtime injects truthful result, loading, empty, error, and status content. {%- endcomment -%}
+    </div>
+  </form>
 </div>

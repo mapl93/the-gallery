@@ -1,17 +1,17 @@
 ## Overview
 
-Universal composition for a visible label, form control, helper text, and validation feedback.
+Control-agnostic composition for a visible label, one canonical control, helper text, and one current feedback message.
 
 ## Presentation
 
-Field Wrapper presents `default`, `error`, `success`, and `warning` feedback families without changing the semantics of its composed control.
+Field Wrapper presents `default`, `error`, `success`, and `warning` feedback families without taking ownership of its composed control's value, validity, events, or reset.
 
-<Preview html={"<div class=\"field field--success tg-preview-frame--sm\"><label class=\"field__label field__label--required\" for=\"field-email\">Email address</label><div class=\"input input--success\"><input id=\"field-email\" class=\"input__field\" type=\"email\" value=\"studio@example.com\" aria-describedby=\"field-email-help field-email-feedback\" required /></div><span id=\"field-email-help\" class=\"field__description\">Used only for order updates.</span><span id=\"field-email-feedback\" class=\"field__success\">Email address verified.</span></div>"} label="Field Wrapper" />
+<Preview html={'<div class="field field--success"><label class="field__label field__label--required" for="field-email">Email address</label><div class="input field__control input--success"><input class="input__field" id="field-email" name="email" type="email" value="studio@example.com" required aria-describedby="field-email-help field-email-feedback" /></div><span class="field__description" id="field-email-help">Used only for order updates.</span><span class="field__feedback field__success" id="field-email-feedback">Email address verified.</span></div>'} label="Field Wrapper" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use one Field Wrapper for each visible label, control, and related messages.</Do>
+  <Do>Compose one canonical control and reference only the helper/current feedback that exists.</Do>
   <Dont>Don't use the generated required marker without synchronizing native required state.</Dont>
 </DoDont>
 
@@ -20,14 +20,17 @@ Field Wrapper presents `default`, `error`, `success`, and `warning` feedback fam
 - Associate labels with controls using matching `for` and `id` values.
 - Reference helper and feedback messages with `aria-describedby`.
 - Use `aria-invalid="true"` only for error feedback.
-- Keep message order predictable after the control.
+- Keep order predictable: label, canonical control, helper, current feedback.
+- Let the composed control own value, disabled, validity, events, reset, and controlled/uncontrolled behavior.
 
 ## References
 
 <PropTable>
   <tr><td>`label`</td><td>string</td><td>required</td><td>Visible field label</td></tr>
+  <tr><td>`control`</td><td>slot</td><td>required</td><td>One canonical form-control root</td></tr>
   <tr><td>`description`</td><td>string</td><td>optional</td><td>Helper text after the control</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>Feedback family</td></tr>
+  <tr><td>`feedback`</td><td>string</td><td>optional</td><td>One current feedback message</td></tr>
   <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Visual required indicator</td></tr>
   <tr><td>`.field`</td><td>class</td><td>—</td><td>Vertical field composition</td></tr>
   <tr><td>`.field--error`</td><td>modifier</td><td>—</td><td>Error feedback family</td></tr>
@@ -35,7 +38,9 @@ Field Wrapper presents `default`, `error`, `success`, and `warning` feedback fam
   <tr><td>`.field--warning`</td><td>modifier</td><td>—</td><td>Warning feedback family</td></tr>
   <tr><td>`.field__label`</td><td>class</td><td>—</td><td>Visible label</td></tr>
   <tr><td>`.field__label--required`</td><td>modifier</td><td>—</td><td>Generated required marker</td></tr>
+  <tr><td>`.field__control`</td><td>class</td><td>—</td><td>Canonical control composition class</td></tr>
   <tr><td>`.field__description`</td><td>class</td><td>—</td><td>Helper text</td></tr>
+  <tr><td>`.field__feedback`</td><td>class</td><td>—</td><td>Current feedback base</td></tr>
   <tr><td>`.field__error`</td><td>class</td><td>—</td><td>Error message</td></tr>
   <tr><td>`.field__success`</td><td>class</td><td>—</td><td>Success message</td></tr>
   <tr><td>`.field__warning`</td><td>class</td><td>—</td><td>Warning message</td></tr>

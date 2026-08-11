@@ -1,37 +1,38 @@
 ## Overview
 
-FAQ Section provides an optional heading and supporting context around an ordered Accordion composition. Accordion retains ownership of expansion, keyboard, panel, and focus behavior.
+FAQ Section provides an optional introduction around one required ordered Accordion composition. It owns section context and container-aware placement only; Accordion retains ownership of item anatomy, expansion, disabled state, keyboard activation, focus, trigger/panel relationships, and group policy.
 
 ## Presentation
 
-<Preview html={'<section class="faq-section" aria-labelledby="faq-section-title"><header class="faq-section__header"><h2 class="faq-section__title" id="faq-section-title">Frequently asked questions</h2><p class="faq-section__subtitle">Care, shipping, and studio policies</p></header><div class="accordion"><div class="accordion__item"><button class="accordion__trigger" id="faq-care-trigger" type="button" aria-expanded="true" aria-controls="faq-care-panel"><span>How should I care for stoneware?</span><svg class="accordion__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg></button><div class="accordion__panel" id="faq-care-panel" role="region" aria-labelledby="faq-care-trigger"><div class="accordion__panel-inner"><div class="accordion__content"><p>Wash with mild soap and avoid sudden temperature changes.</p></div></div></div></div><div class="accordion__item"><button class="accordion__trigger" id="faq-shipping-trigger" type="button" aria-expanded="false" aria-controls="faq-shipping-panel"><span>Do you ship internationally?</span><svg class="accordion__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg></button><div class="accordion__panel" id="faq-shipping-panel" role="region" aria-labelledby="faq-shipping-trigger"><div class="accordion__panel-inner"><div class="accordion__content"><p>Available destinations and rates are calculated by the target storefront.</p></div></div></div></div></div></section>'} label="FAQ Section" />
+<Preview html={'<section class="faq-section" aria-labelledby="faq-section-title"><header class="faq-section__header"><h2 class="faq-section__title" id="faq-section-title">Questions from collectors</h2><p class="faq-section__subtitle">Details about the work, delivery, and care.</p></header><div class="accordion faq-section__list"><div class="accordion__item faq-section__item"><h3 class="accordion__heading"><button class="accordion__trigger" id="faq-handmade-trigger" type="button" aria-expanded="true" aria-controls="faq-handmade-panel"><span>Is every work handmade?</span><svg class="accordion__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg></button></h3><div class="accordion__panel" id="faq-handmade-panel"><div class="accordion__panel-inner"><div class="accordion__content"><p>Yes. Small variations are evidence of the making process and part of each work.</p></div></div></div></div><div class="accordion__item faq-section__item"><h3 class="accordion__heading"><button class="accordion__trigger" id="faq-viewing-trigger" type="button" aria-expanded="false" aria-controls="faq-viewing-panel"><span>Can I request a private viewing?</span><svg class="accordion__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg></button></h3><div class="accordion__panel" id="faq-viewing-panel" hidden><div class="accordion__panel-inner"><div class="accordion__content"><p>The gallery can arrange a remote or in-person viewing for available works.</p></div></div></div></div><div class="accordion__item faq-section__item"><h3 class="accordion__heading"><button class="accordion__trigger" id="faq-care-trigger" type="button" aria-expanded="false" aria-controls="faq-care-panel"><span>How should I care for the ceramics?</span><svg class="accordion__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" /></svg></button></h3><div class="accordion__panel" id="faq-care-panel" hidden><div class="accordion__panel-inner"><div class="accordion__content"><p>Use a soft cloth and avoid sudden temperature changes unless the work states otherwise.</p></div></div></div></div></div></section>'} label="FAQ Section" />
 
-The parent controls section placement and introductory content. The required `items` slot contains a complete Accordion composition rather than copying Accordion properties onto FAQ Section.
+The parent controls placement and optional introductory content. The required `items` slot contains one complete canonical Accordion rather than copying Accordion properties onto FAQ Section. When no title is supplied, use a generic `div.faq-section` instead of an unnamed native `section`; omit the entire component when no valid items are available.
 
 ## Usage Guidelines
 
 <DoDont>
   <Do>Group concise questions around one subject and compose the canonical Accordion anatomy.</Do>
-  <Dont>Do not hide information users must read before they can complete a critical task.</Dont>
+  <Dont>Do not hide information every user must read before completing a critical task or nest another Accordion inside an answer.</Dont>
 </DoDont>
 
-Keep answer content direct and use links when an answer needs to point to a complete policy or guide.
+Keep answers direct. Link to a complete policy or guide when the answer becomes long, and choose FAQ only when disclosure meaningfully improves scanning.
 
 ## Accessibility
 
-- Use a logical section heading and native buttons for Accordion triggers.
-- Keep `aria-expanded`, `aria-controls`, panel IDs, and labelled regions synchronized through the Accordion implementation.
-- Preserve Enter and Space activation and visible keyboard focus.
-- Do not duplicate Accordion state or behavior at the FAQ Section root.
+- Use a contextual visible heading and associate a native thematic section with that title. Use a generic root when the title is absent.
+- Preserve canonical Accordion headings, native Button triggers, `aria-expanded`, `aria-controls`, stable ids, native hidden panels, Enter/Space activation, visible focus, and disabled behavior.
+- Do not add `role="region"` to every short answer. A target may opt in only when a panel is structurally significant and landmark count remains useful.
+- Keep essential information visible outside collapsed answers and preserve meaningful question/answer source order without scripting.
+- Group expansion policy is target-owned. Single, multiple, exact-exclusive, collapsible, and required-open modes are not FAQ Section properties.
 
 ## References
 
-**Dependency:** [Accordion](/components/accordion).
+**Dependencies:** [Accordion](/components/accordion), [WAI-ARIA APG Accordion](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/), and [HTML `details`/`summary`](https://html.spec.whatwg.org/dev/interactive-elements.html).
 
-**Anatomy:** `.faq-section`, `.faq-section__header`, `.faq-section__title`, and `.faq-section__subtitle`, followed by the composed Accordion.
+**Anatomy:** `.faq-section`, optional `.faq-section__header`, `.faq-section__title`, and `.faq-section__subtitle`, followed by required `.accordion.faq-section__list` and repeated `.accordion__item.faq-section__item` compositions.
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible FAQ section heading</td></tr>
-  <tr><td>`subtitle`</td><td>string</td><td>optional</td><td>Supporting FAQ context</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered Accordion composition</td></tr>
+  <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible contextual heading; creates and names the native section</td></tr>
+  <tr><td>`subtitle`</td><td>string</td><td>optional</td><td>Supporting FAQ context; never substitutes for the section title</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Non-empty ordered canonical Accordion composition</td></tr>
 </PropTable>

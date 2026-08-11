@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "data-table",
   "name": "Table",
   "registryId": "A25",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Native data table primitive with responsive overflow and independently composable striped, row-hover, and sortable-header capabilities.",
+  "summary": "Native data table primitive with optional caption, keyboard-accessible responsive overflow, and independently composable striped, row-hover, and sortable-header capabilities.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/data-table",
@@ -14,8 +14,9 @@
     "docs": "site/src/content/components/data-table.mdx"
   },
   "anatomy": [
-    { "name": "wrapper", "selector": ".table-wrapper", "className": ".table-wrapper", "required": false, "description": "Horizontal scroll wrapper." },
+    { "name": "wrapper", "selector": ".table-wrapper", "className": ".table-wrapper", "required": false, "description": "Keyboard-focusable horizontal scroll wrapper with a contextual accessible name." },
     { "name": "root", "selector": ".table", "className": ".table", "required": true, "description": "Native table element." },
+    { "name": "caption", "selector": ".table caption", "required": false, "description": "Optional native caption that names or summarizes the dataset; it may be visually hidden when equivalent visible context already labels the table." },
     { "name": "sortButton", "selector": ".table__sort-btn", "className": ".table__sort-btn", "required": false, "description": "Sortable header button." },
     { "name": "sortIcon", "selector": ".table__sort-icon", "className": ".table__sort-icon", "required": false, "description": "Sort direction icon." }
   ],
@@ -32,14 +33,25 @@
     { "name": "default", "selectors": [".table"], "description": "Default table state." },
     { "name": "striped", "selectors": [".table--striped tbody tr:nth-child(even)"], "description": "Striped row state." },
     { "name": "rowHover", "selectors": [".table--hover tbody tr:hover"], "description": "Row hover state." },
-    { "name": "sorted", "selectors": ["th[aria-sort]:not([aria-sort=\"none\"]) .table__sort-icon"], "description": "Canonical visual hook for a sorted header icon." }
+    { "name": "sorted", "selectors": ["th[aria-sort]:not([aria-sort=\"none\"]) .table__sort-icon"], "description": "Canonical visual hook for a sorted header icon." },
+    { "name": "scrollFocus", "selectors": [".table-wrapper:focus-visible"], "description": "Visible keyboard focus on the horizontal scroll owner." },
+    { "name": "sortFocus", "selectors": [".table__sort-btn:focus-visible"], "description": "Visible keyboard focus on the native sort trigger." }
   ],
   "behavior": [
-    { "name": "tableSemantics", "selectors": [".table"], "attributes": ["<table>", "<thead>", "<tbody>", "<th>", "<td>", "scope"], "description": "Targets preserve native table structure and associate header cells with their data cells." },
-    { "name": "sorting", "selectors": [".table__sort-btn", "th[aria-sort]:not([aria-sort=\"none\"]) .table__sort-icon"], "attributes": ["aria-sort on <th>", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "Sortable headers use native buttons and keep aria-sort on the owning header synchronized. Targets own comparison, locale rules, data ordering, and remote requests." },
-    { "name": "responsiveOverflow", "selectors": [".table-wrapper"], "description": "The optional wrapper preserves table width and provides horizontal scrolling when columns exceed the available inline space." }
+    { "name": "tableSemantics", "selectors": [".table", ".table caption"], "attributes": ["<table>", "<caption>", "<thead>", "<tbody>", "<th>", "<td>", "scope"], "description": "Targets preserve native table structure, optionally name the dataset with caption, and associate header cells with their data cells." },
+    { "name": "sorting", "selectors": [".table__sort-btn", "th[aria-sort]:not([aria-sort=\"none\"]) .table__sort-icon"], "attributes": ["aria-sort on one owning <th>", "type=\"button\""], "events": ["click", "Space", "Enter"], "description": "Sortable headers use native buttons and keep one aria-sort value synchronized with visible order. The initial unsorted state may use none; ascending or descending identifies the active order. Targets own comparison, locale rules, data ordering, and remote requests." },
+    { "name": "responsiveOverflow", "selectors": [".table-wrapper", ".table-wrapper:focus-visible"], "attributes": ["tabindex=\"0\"", "accessible name"], "events": ["ArrowLeft", "ArrowRight", "Shift+mousewheel"], "description": "The optional wrapper preserves readable column width and provides a named keyboard-focusable horizontal scroll owner when columns exceed the available inline space." }
   ],
   "properties": [
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "Optional dataset name or concise summary rendered in the native caption; targets may visually hide it when equivalent visible context already labels the table.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".table caption", "elements": ["caption"] }]
+      }
+    },
     {
       "name": "striped",
       "type": "boolean",
@@ -73,11 +85,11 @@
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-text-primary", "--color-surface-secondary"],
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-surface-secondary"],
       "radius": ["--radius-md"],
       "transition": ["--transition-fast"],
       "easing": ["--easing-default"],
-      "typography": ["--typo-body-size"]
+      "typography": ["--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
@@ -85,6 +97,8 @@
     "Use scope for simple tables and explicit header associations when the table structure is complex.",
     "Place aria-sort on the sorted th and synchronize it with the visible order when sorting is available.",
     "Keep sortable header triggers native buttons so pointer and keyboard activation share one behavior.",
+    "Provide a caption or equivalent contextual label so users can identify the dataset.",
+    "When the overflow wrapper can scroll, make it keyboard focusable, give it a contextual accessible name, and preserve a visible focus indicator.",
     "Do not use tables for layout-only content."
   ],
   "adapters": {

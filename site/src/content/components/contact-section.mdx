@@ -1,38 +1,42 @@
 ## Overview
 
-Contact Form arranges optional contact information beside a required native form composed from Input, Textarea, and Button. It does not duplicate field validation or submission behavior.
+Contact Form arranges optional contact information beside one required named native form composed from Input, Textarea, and Button. It does not duplicate field values, validation, or submission behavior.
 
 ## Presentation
 
-<Preview html={'<section class="contact-section" aria-labelledby="contact-section-title"><div class="contact-section__grid"><div class="contact-section__info"><h2 class="contact-section__title" id="contact-section-title">Contact the studio</h2><p class="contact-section__text">Ask about available work, commissions, or studio visits.</p><div class="contact-section__detail"><span>Buenos Aires, Argentina</span></div><div class="contact-section__detail"><span>hello@thegallery.example</span></div></div><form class="contact-section__form"><div class="input"><label class="input__label" for="contact-name">Name</label><div class="input__control"><input class="input__field" id="contact-name" name="name" type="text" autocomplete="name" /></div></div><div class="input"><label class="input__label" for="contact-message">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="contact-message" name="message" data-min-lines="4"></textarea></div></div><button class="btn" type="submit">Send message</button></form></div></section>'} label="Contact Form" />
+<Preview html={'<section class="contact-section" aria-labelledby="contact-section-title"><div class="contact-section__grid"><div class="contact-section__info"><header class="contact-section__header"><h2 class="contact-section__title" id="contact-section-title">Contact the studio</h2><p class="contact-section__text">Ask about available work, commissions, or studio visits.</p></header><address class="contact-section__details"><ul><li class="contact-section__detail"><a href="mailto:hello@thegallery.example">hello@thegallery.example</a></li><li class="contact-section__detail"><span>Private viewings by appointment</span></li></ul></address></div><form class="contact-section__form" aria-label="Send an inquiry to the gallery" method="post"><div class="input"><label class="input__label" for="contact-email">Email (required)</label><div class="input__control"><input class="input__field" id="contact-email" name="email" type="email" autocomplete="email" required /></div></div><div class="input"><label class="input__label" for="contact-message">Message (required)</label><div class="input__control"><textarea class="input__field textarea__field" id="contact-message" name="message" required data-min-lines="4"></textarea></div></div><button class="btn" type="submit">Send inquiry</button></form></div></section>'} label="Contact Form" />
 
-The parent owns only layout, introductory copy, details, and the form slot. Input and Textarea retain their labels, values, messages, validation families, disabled state, focus, hover, and native attributes; Button retains action state.
+The parent owns only conditional section semantics, layout, introductory copy, details, a required form label, and the form slot. Input and Textarea retain their labels, names, values, constraints, messages, validation families, disabled/read-only state, focus, hover, and controlled/uncontrolled strategy; Button retains action state. The target owns the endpoint and complete response lifecycle.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Compose complete field anatomy and keep the form focused on one clear contact purpose.</Do>
-  <Dont>Do not recreate field variants, messages, or submit state as Contact Form properties.</Dont>
+  <Do>Compose complete named field anatomy, keep the form short, and report only confirmed submission outcomes.</Do>
+  <Dont>Do not recreate field variants, aggregate values, provider policy, or submit state as Contact Form properties.</Dont>
 </DoDont>
 
 Select is not a registered dependency of Contact Form. A target that supplies Select must preserve the Select contract rather than borrowing Input behavior.
 
+Use `address` only for contact information relevant to the owning document or article. Keep unrelated hours, status, or promotional metadata in ordinary content. Actionable email and telephone values use native links.
+
 ## Accessibility
 
-- Associate every field with a visible label and connect supporting messages with `aria-describedby`.
+- Give the native form a non-empty localized accessible name. Associate every field with a visible label, give submitted controls stable names, and connect only field-specific supporting messages with `aria-describedby`.
 - Use `aria-invalid="true"` only for Error fields; preserve equivalent Default, Success, and Warning anatomy.
-- Keep native form submission semantics and communicate busy, success, and error outcomes in the target implementation.
+- Keep native form submission and constraint validation. Communicate required fields visibly and announce only outcomes confirmed by the target service.
 - Use native links for actionable contact details and preserve visible focus on all controls.
+- For multiple validation failures, targets should provide a concise linked error summary and preserve entered non-sensitive values.
 
 ## References
 
 **Dependencies:** [Input](/components/input), [Textarea](/components/textarea), and [Button](/components/button).
 
-**Anatomy:** `.contact-section`, `.contact-section__grid`, `.contact-section__info`, `.contact-section__title`, `.contact-section__text`, `.contact-section__detail`, and `.contact-section__form`.
+**Anatomy:** `.contact-section`, `.contact-section__grid`, optional `.contact-section__info`, `.contact-section__header`, `.contact-section__title`, `.contact-section__text`, `.contact-section__details`, and `.contact-section__detail`, required `.contact-section__form`, and optional `.contact-section__status`.
 
 <PropTable>
   <tr><td>`title`</td><td>string</td><td>optional</td><td>Visible contact heading</td></tr>
   <tr><td>`description`</td><td>string</td><td>optional</td><td>Supporting contact copy</td></tr>
+  <tr><td>`formLabel`</td><td>string</td><td>required</td><td>Localized accessible name for the native form landmark</td></tr>
   <tr><td>`details`</td><td>slot</td><td>optional</td><td>Target-owned contact details and native link semantics</td></tr>
   <tr><td>`form`</td><td>slot</td><td>required</td><td>Native form composed from field and Button contracts</td></tr>
 </PropTable>

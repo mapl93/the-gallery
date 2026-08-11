@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "mobile-menu",
   "name": "Mobile Menu",
   "registryId": "C4",
   "category": "global",
   "status": "pilot",
-  "summary": "Mobile navigation list intended to be composed inside a Drawer.",
+  "summary": "Direct-link site navigation list composed inside canonical Drawer without duplicating overlay state or menu-widget semantics.",
   "dependencies": ["drawer"],
   "source": {
     "registry": "registry.json#/components/mobile-menu",
@@ -14,43 +14,52 @@
     "docs": "site/src/content/components/mobile-menu.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".mobile-nav", "className": ".mobile-nav", "required": true, "description": "Mobile navigation list." },
-    { "name": "item", "selector": ".mobile-nav__item", "className": ".mobile-nav__item", "required": false, "description": "Navigation list item." },
-    { "name": "link", "selector": ".mobile-nav__link", "className": ".mobile-nav__link", "required": true, "description": "Mobile navigation link." }
+    { "name": "root", "selector": ".mobile-nav", "className": ".mobile-nav", "required": true, "description": "Native navigation list rendered inside a labelled navigation region and canonical Drawer body." },
+    { "name": "item", "selector": ".mobile-nav__item", "className": ".mobile-nav__item", "required": true, "description": "One or more native list items." },
+    { "name": "link", "selector": ".mobile-nav__link", "className": ".mobile-nav__link", "required": true, "description": "Native destination link with touch-safe sizing, containment, and optional aria-current." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default mobile navigation list." }
+    { "name": "default", "className": null, "default": true, "description": "Default direct-link navigation list." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default touch-friendly mobile row size." }
+    { "name": "default", "className": null, "default": true, "description": "Default touch-friendly row size." }
   ],
   "states": [
-    { "name": "default", "selectors": [".mobile-nav"], "description": "Default mobile navigation list." },
-    { "name": "separatedItems", "selectors": [".mobile-nav__item + .mobile-nav__item"], "description": "Separated stacked navigation rows." },
-    { "name": "currentPage", "selectors": [".mobile-nav__link[aria-current=\"page\"]"], "description": "Current mobile navigation destination." }
+    { "name": "default", "selectors": [".mobile-nav"], "description": "Default stacked navigation list." },
+    { "name": "separatedItems", "selectors": [".mobile-nav__item + .mobile-nav__item"], "description": "Adjacent rows use a semantic subtle divider." },
+    { "name": "currentPage", "selectors": [".mobile-nav__link[aria-current=\"page\"]"], "description": "Current destination retains primary text contrast with an accent underline." },
+    { "name": "linkHover", "selectors": [".mobile-nav__link:hover"], "description": "Fine-pointer hover adds a secondary surface without changing link meaning." },
+    { "name": "linkFocusVisible", "selectors": [".mobile-nav__link:focus-visible"], "description": "Keyboard focus remains visible within the Drawer body." }
   ],
   "behavior": [
-    { "name": "drawerComposition", "selectors": [".mobile-nav"], "description": "Mobile Menu should inherit Drawer focus management and dismissal when rendered inside an overlay." },
-    { "name": "mobileNavigation", "selectors": [".mobile-nav__link"], "attributes": ["href", "aria-current"], "events": ["click"], "description": "Navigation links should navigate or close the drawer after activation depending on target behavior." }
+    { "name": "drawerComposition", "selectors": [".mobile-nav"], "description": "Mobile Menu supplies navigation content only and inherits the canonical Drawer's title, dismiss action, open state, focus containment, Escape handling, inertness, and focus restoration." },
+    { "name": "siteNavigation", "selectors": [".mobile-nav__link"], "attributes": ["href", "aria-current"], "events": ["click", "Enter"], "description": "Use direct native links for site destinations; do not apply menu, menuitem, menubar, or roving-focus semantics." },
+    { "name": "targetNavigationOwnership", "selectors": [".mobile-nav"], "events": ["navigation completion"], "description": "The target owns route resolution and whether successful navigation closes its containing Drawer." },
+    { "name": "directLevelBoundary", "selectors": [".mobile-nav__item"], "description": "The v1 contract certifies one direct link level; nested disclosure navigation remains an unresolved target/product decision." }
   ],
   "properties": [
-    { "name": "items", "type": "slot", "required": true, "description": "Target-owned mobile navigation items, destinations, labels, and current-page markup.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mobile-nav", "classNames": [".mobile-nav"] }] } }
+    { "name": "items", "type": "slot", "required": true, "description": "One or more target-owned direct destinations, labels, order, and current-page markup.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".mobile-nav", "classNames": [".mobile-nav", ".mobile-nav__item", ".mobile-nav__link"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-border-focus", "--color-text-primary", "--color-text-accent"],
-      "typography": ["--typo-body-size"],
-      "spacing": ["--space-layout-touch-target"]
+      "color": ["--color-border-subtle", "--color-border-focus", "--color-surface-secondary", "--color-text-primary", "--color-text-accent"],
+      "typography": ["--typo-body-size", "--typo-body-line-height"],
+      "spacing": ["--space-layout-touch-target", "--space-layout-element-gap"],
+      "radius": ["--radius-sm"],
+      "transition": ["--transition-fast"],
+      "easing": ["--easing-default"]
     }
   },
   "accessibility": [
-    "Render the list inside a labelled navigation region.",
-    "Preserve Drawer focus management when the menu is shown as an overlay.",
-    "Expose current page state with aria-current where possible."
+    "Render the native list inside a labelled nav region and canonical modal Drawer.",
+    "Use native destination links rather than ARIA menu roles or application-style arrow-key interaction.",
+    "Expose the current destination with aria-current=\"page\" when applicable.",
+    "Preserve Drawer focus containment, Escape dismissal, focus restoration, and background inertness.",
+    "Keep localized labels wrap-safe, touch-sized, keyboard visible, reduced-motion safe, and forced-colors legible."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map mobile menu links and nested menu behavior from Shopify navigation data." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical direct-link list presentation and states are implemented; overlay lifecycle is inherited from Drawer and demonstrated by the shared docs renderer." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Current Liquid maps first-level Shopify navigation, while the missing Drawer lifecycle and any nested-menu policy remain target work." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

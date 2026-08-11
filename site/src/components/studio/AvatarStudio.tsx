@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import AvatarArtwork from './AvatarArtwork';
 
 interface AvatarStudioProps {
   contract: ComponentContract;
@@ -51,13 +52,6 @@ function resolveTokens(control: StudioControl, contract: ComponentContract): str
   return category.filter((token) => pattern.test(token));
 }
 
-function optionClass(
-  options: ComponentContract['sizes'],
-  value: StudioPropertyValue
-): string | null {
-  return options.find((option) => option.name === value)?.className?.replace(/^\./, '') ?? null;
-}
-
 export default function AvatarStudio({ contract, definition }: AvatarStudioProps) {
   const initialValues = useMemo(() => initialValuesFor(contract), [contract]);
   const studioTokens = useMemo(() => [...new Set(definition.groups.flatMap((group) => (
@@ -91,11 +85,6 @@ export default function AvatarStudio({ contract, definition }: AvatarStudioProps
   }, [studioTokens]);
 
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
-  const classes = [
-    'avatar',
-    optionClass(contract.sizes, values.size),
-  ].filter(Boolean).join(' ');
-
   function reset() {
     setValues({ ...initialValues });
     setTokenOverrides({});
@@ -133,9 +122,11 @@ export default function AvatarStudio({ contract, definition }: AvatarStudioProps
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <span className={classes} role="img" aria-label={avatarFixture.name}>
-              {avatarFixture.initials}
-            </span>
+            <AvatarArtwork
+              name={avatarFixture.name}
+              content={avatarFixture.initials}
+              size={String(values.size || 'default') as 'sm' | 'default' | 'lg' | 'xl'}
+            />
           </div>
         </section>
       </div>

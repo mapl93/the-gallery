@@ -1,19 +1,32 @@
 {%- comment -%}
   Snippet: empty-state
-  Usage: {% render 'empty-state', icon: 'shopping-bag', title: 'Your cart is empty', message: 'Discover our pieces.', cta_text: 'Shop Now', cta_url: '/collections/all' %}
+  Usage: {% render 'empty-state', heading_tag: 'h2', icon: 'shopping-bag', title: 'Your cart is empty', message: 'Discover our pieces.', cta_text: 'Shop Now', cta_url: '/collections/all' %}
+  Optional composition hooks: root_class, title_id, title_class, message_class,
+  action_class. heading_tag is required target composition input and accepts
+  h1 through h6; it is not a visual component property.
 {%- endcomment -%}
 
-<div class="empty-state">
+{%- liquid
+  assign resolved_heading_tag = heading_tag | downcase
+  assign allowed_heading_tags = 'h1,h2,h3,h4,h5,h6' | split: ','
+  unless allowed_heading_tags contains resolved_heading_tag
+    assign resolved_heading_tag = ''
+  endunless
+-%}
+
+{% if title != blank and resolved_heading_tag != blank %}
+<div class="empty-state{% if root_class %} {{ root_class }}{% endif %}">
   {% if icon %}
     <div class="empty-state__icon" aria-hidden="true">
       {% render 'icon', name: icon %}
     </div>
   {% endif %}
-  <h3 class="empty-state__title">{{ title }}</h3>
+  <{{ resolved_heading_tag }} class="empty-state__title{% if title_class %} {{ title_class }}{% endif %}"{% if title_id %} id="{{ title_id }}"{% endif %}>{{ title }}</{{ resolved_heading_tag }}>
   {% if message %}
-    <p class="empty-state__message">{{ message }}</p>
+    <p class="empty-state__message{% if message_class %} {{ message_class }}{% endif %}">{{ message }}</p>
   {% endif %}
   {% if cta_text and cta_url %}
-    <a href="{{ cta_url }}" class="btn btn--outline">{{ cta_text }}</a>
+    <a href="{{ cta_url }}" class="btn btn--outline{% if action_class %} {{ action_class }}{% endif %}">{{ cta_text }}</a>
   {% endif %}
 </div>
+{% endif %}

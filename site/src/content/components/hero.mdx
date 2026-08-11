@@ -1,40 +1,88 @@
 ## Overview
 
-Hero Banner presents a prominent page introduction with optional media, a contrast overlay, supporting copy, and Button-composed actions.
+Hero is the single public editorial Hero for The Gallery. It merges the former
+Hero Banner and Hero Section into one container-responsive component with
+independent layout, height, and media-behavior axes.
 
 ## Presentation
 
-<Preview html={'<section class="hero tg-preview-stage" aria-labelledby="hero-preview-title"><div class="hero__media"><div class="tg-preview-media tg-preview-media--wide" aria-hidden="true"></div></div><div class="hero__overlay" aria-hidden="true"></div><div class="hero__content"><span class="hero__label">New collection</span><h1 class="hero__title" id="hero-preview-title">Artisan ceramics</h1><p class="hero__description">Handcrafted pieces designed for daily rituals.</p><div class="hero__actions"><a class="btn" href="#hero-preview-collection">Shop the collection</a><a class="btn btn--secondary" href="#hero-preview-story">Read the story</a></div></div></section>'} label="Hero Banner" />
+`layout` supports `full`, `split`, and `text-only`.
+`height` supports `default` and `fullscreen`.
+`mediaBehavior` supports `none`, `parallax`, and `slideshow`.
+Text-only derives media, overlay, controls, progress, and motion as absent.
 
-The root owns containment, vertical alignment, and responsive minimum height. Media and overlay are optional layers; content remains foregrounded, and actions compose Button without changing its native link or button semantics.
+<Preview html={'<section class="hero tg-preview-stage" aria-labelledby="hero-preview-title" data-hero data-media-behavior="none" data-autoplay="false" data-loop="true" data-navigation="both"><div class="hero__inner"><div class="hero__media"><div class="tg-preview-media tg-preview-media--wide hero__media-item" aria-hidden="true"></div><div class="hero__overlay" aria-hidden="true"></div></div><div class="hero__content"><p class="hero__label">New collection</p><h2 class="hero__title" id="hero-preview-title">Objects shaped for daily rituals</h2><p class="hero__description">A quiet study in hand-thrown stoneware, tactile glazes, and useful forms.</p><div class="hero__actions"><a class="btn" href="/components/gallery-grid">View collection</a><a class="btn btn--secondary" href="/components/brand-story">Read the story</a></div></div></div></section>'} label="Hero" />
 
-## Usage Guidelines
+The modifier classes are `.hero--split`, `.hero--text-only`, and
+`.hero--fullscreen`. Parallax and slideshow are selected with
+`data-media-behavior`, not additional layout variants, so they can combine
+coherently with full, split, or fullscreen presentation.
 
-<DoDont>
-  <Do>Use one clear heading and a focused action group that matches the page's primary purpose.</Do>
-  <Dont>Do not rely on the media layer to communicate information that is absent from the visible copy.</Dont>
-</DoDont>
+## Slideshow
 
-Choose whether media is informative or decorative in the consuming target. Add the overlay only when it is needed to maintain readable contrast.
+Slideshow composes canonical Carousel and Icon Button anatomy:
+
+- `.hero__track.carousel__track` is the native focusable scroll viewport.
+- Every `.hero__slide.carousel__slide` is one real named slide group; loop
+  changes logical indices and never clones slides.
+- `.hero__previous` and `.hero__next` are canonical Icon Buttons.
+- `.hero__indicators` contains `.hero__indicator.carousel__dot` controls.
+- `.hero__rotation-control` is rendered whenever autoplay is enabled.
+- `.hero__status.carousel__status` announces only discrete position changes.
+- `.hero__progress` and `.hero__progress-value` form one aria-hidden visual
+  timing bar.
+
+Autoplay defaults off. When enabled, it pauses during hover, focus-within, and
+document-hidden periods. Manual previous, next, indicator, or direct-scroll
+selection pauses it without an implicit restart; only the visible Play control
+resumes. Reduced motion suppresses autoplay, timing feedback, smooth scrolling,
+and parallax.
+
+## Parallax
+
+Parallax uses progressive CSS scroll-driven animation on
+`.hero[data-media-behavior="parallax"] .hero__media-item`. Supporting browsers
+translate only the classified single-media item. Other browsers retain a static
+image, and reduced motion removes both animation and transform.
+
+## Composition
+
+A non-empty `.hero__title` is required. `.hero__overlay` is always nested
+inside existing `.hero__media`. `.hero__content`, `.hero__label`,
+`.hero__description`, and `.hero__actions` remain stable across layouts.
+Actions compose canonical Button; slideshow controls compose canonical Icon
+Button and Carousel.
+
+## Public API
+
+| Property | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `layout` | `full | split | text-only` | `full` | Container-responsive content/media layout |
+| `height` | `default | fullscreen` | `default` | Independent intrinsic or viewport height |
+| `mediaBehavior` | `none | parallax | slideshow` | `none` | Mutually exclusive media behavior |
+| `label` | string | empty | Optional context |
+| `title` | string | required | Required visible heading |
+| `description` | string | empty | Optional supporting copy |
+| `media` | slot | empty | Classified single media |
+| `overlay` | slot | empty | Media-contained visual scrim |
+| `actions` | slot | empty | Canonical Button actions |
+| `slides` | slot | empty | Ordered real slideshow media groups |
+| `autoplay` | boolean | `false` | Optional timed rotation |
+| `loop` | boolean | `true` | Circular logical selection without clones |
+| `navigation` | `both | arrows | indicators` | `both` | Visible selection controls |
+| `autoplayInterval` | number | `6000` | 3000–12000ms interval used only by autoplay |
+| `previousLabel`, `nextLabel` | string | required | Localized navigation labels |
+| `pauseLabel`, `playLabel` | string | required | Localized rotation-control labels |
+| `statusTemplate` | string | required | Localized `{current}` / `{total}` position template |
 
 ## Accessibility
 
-- Use a heading level appropriate to the surrounding page hierarchy.
-- Give informative images alternative text and equivalent visible meaning; hide decorative media from assistive technology.
-- Verify text contrast against every selected image or video frame.
-- Preserve native link or button semantics for each composed Button action.
-
-## References
-
-| Anatomy | Selector | Requirement |
-| --- | --- | --- |
-| Root | `.hero` | Required hero section and containment surface |
-| Media | `.hero__media` | Optional image or video layer |
-| Overlay | `.hero__overlay` | Optional contrast layer |
-| Content | `.hero__content` | Required foreground content wrapper |
-| Label | `.hero__label` | Optional context label |
-| Title | `.hero__title` | Required primary heading |
-| Description | `.hero__description` | Optional supporting copy |
-| Actions | `.hero__actions` | Optional Button-composed action group |
-
-Dependency: [Button](/components/button).
+- Choose the heading rank from the surrounding page; omit the entire Hero when
+  its title is empty.
+- Classify every image/video and supply alternative text, controls, captions,
+  transcripts, consent, crop, and loading policy at the target.
+- Verify contrast for every authored slide; the overlay is visual only.
+- Do not intercept horizontal arrows on the Hero root. Keyboard operation stays
+  on the focused native buttons and scroll viewport.
+- Keep the continuously changing timing bar aria-hidden.
+- Provide localized labels and a status template.

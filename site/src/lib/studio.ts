@@ -1,5 +1,6 @@
 export type StudioControlKind =
   | 'text'
+  | 'collection'
   | 'number'
   | 'select'
   | 'segmented'
@@ -60,6 +61,8 @@ export interface StudioDefinition {
   groups: StudioGroup[];
 }
 
+// Eager discovery keeps Exhibit and Studio on the same current definition even
+// when a pre-v1 metadata file is replaced during refinement.
 const studioModules = import.meta.glob('../content/studio/*.studio.json', {
   eager: true,
   import: 'default',

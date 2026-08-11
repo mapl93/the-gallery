@@ -1,51 +1,118 @@
-<section class="artist-profile">
-  <div class="artist-profile__portrait">
-    {% if section.settings.portrait %}
-      {{ section.settings.portrait | image_url: width: 800 | image_tag:
-         alt: section.settings.name, loading: 'lazy',
-         widths: '400,600,800', sizes: '(min-width: 768px) 50vw, 100vw' }}
+{% liquid
+  assign artist_name = section.settings.name
+  if artist_name == blank
+    assign artist_name = 'artist_profile.default_name' | t
+  endif
+
+  assign portrait_alt = section.settings.portrait.alt | default: artist_name
+  if section.settings.portrait_decorative
+    assign portrait_alt = ''
+  endif
+
+  assign action_label = section.settings.cta_text
+  if action_label == blank
+    assign action_label = 'artist_profile.default_action' | t
+  endif
+
+  assign heading_id = 'ArtistProfile-' | append: section.id | append: '-Name'
+%}
+
+<section class="artist-profile" aria-labelledby="{{ heading_id }}">
+  <div class="artist-profile__layout{% if section.settings.portrait != blank %} artist-profile__layout--split{% endif %}">
+    {% if section.settings.portrait != blank %}
+      <div class="artist-profile__portrait">
+        {{ section.settings.portrait | image_url: width: 1200 | image_tag:
+          alt: portrait_alt,
+          loading: 'lazy',
+          widths: '360, 540, 720, 960, 1200',
+          sizes: '(min-width: 768px) 50vw, 100vw'
+        }}
+      </div>
     {% endif %}
-  </div>
 
-  <div class="artist-profile__content">
-    <span class="artist-profile__label">The Maker</span>
-    <h2 class="artist-profile__name">{{ section.settings.name }}</h2>
+    <div class="artist-profile__content">
+      {% if section.settings.label != blank %}
+        <p class="artist-profile__label">{{ section.settings.label | escape }}</p>
+      {% endif %}
 
-    {% if section.settings.location %}
-      <p class="artist-profile__location">
-        {% render 'icon', name: 'map-pin', size: 16 %}
-        {{ section.settings.location }}
-      </p>
-    {% endif %}
+      <h2 class="artist-profile__name" id="{{ heading_id }}">{{ artist_name | escape }}</h2>
 
-    <div class="artist-profile__bio">{{ section.settings.bio }}</div>
+      {% if section.settings.location != blank %}
+        <p class="artist-profile__location">{{ section.settings.location | escape }}</p>
+      {% endif %}
 
-    {% if section.settings.philosophy %}
-      <blockquote class="artist-profile__philosophy">
-        {{ section.settings.philosophy }}
-      </blockquote>
-    {% endif %}
+      {% if section.settings.bio != blank %}
+        <div class="artist-profile__bio">{{ section.settings.bio }}</div>
+      {% endif %}
 
-    {% if section.settings.cta_url %}
-      <a href="{{ section.settings.cta_url }}" class="btn btn--outline">
-        {{ section.settings.cta_text | default: 'View their work' }}
-      </a>
-    {% endif %}
+      {% if section.settings.philosophy != blank %}
+        <blockquote class="artist-profile__philosophy">{{ section.settings.philosophy | escape }}</blockquote>
+      {% endif %}
+
+      {% if section.settings.cta_url != blank %}
+        <div class="artist-profile__actions">
+          <a class="btn btn--outline" href="{{ section.settings.cta_url }}">{{ action_label | escape }}</a>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </section>
 
 {% schema %}
 {
-  "name": "Artist Profile",
+  "name": "t:sections.artist_profile.name",
   "settings": [
-    { "type": "image_picker", "id": "portrait", "label": "Portrait" },
-    { "type": "text", "id": "name", "label": "Name" },
-    { "type": "text", "id": "location", "label": "Location" },
-    { "type": "richtext", "id": "bio", "label": "Biography" },
-    { "type": "textarea", "id": "philosophy", "label": "Philosophy quote" },
-    { "type": "url", "id": "cta_url", "label": "CTA link" },
-    { "type": "text", "id": "cta_text", "label": "CTA text" }
+    {
+      "type": "image_picker",
+      "id": "portrait",
+      "label": "t:sections.artist_profile.settings.portrait"
+    },
+    {
+      "type": "checkbox",
+      "id": "portrait_decorative",
+      "label": "t:sections.artist_profile.settings.portrait_decorative",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:sections.artist_profile.settings.label"
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "t:sections.artist_profile.settings.name"
+    },
+    {
+      "type": "text",
+      "id": "location",
+      "label": "t:sections.artist_profile.settings.location"
+    },
+    {
+      "type": "richtext",
+      "id": "bio",
+      "label": "t:sections.artist_profile.settings.biography"
+    },
+    {
+      "type": "textarea",
+      "id": "philosophy",
+      "label": "t:sections.artist_profile.settings.philosophy"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "t:sections.artist_profile.settings.action_url"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "t:sections.artist_profile.settings.action_label"
+    }
   ],
-  "presets": [{ "name": "Artist Profile" }]
+  "presets": [
+    {
+      "name": "t:sections.artist_profile.name"
+    }
+  ]
 }
 {% endschema %}

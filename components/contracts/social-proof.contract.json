@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "social-proof",
   "name": "Social Proof Notifications",
   "registryId": "G10",
   "category": "marketing",
   "status": "pilot",
-  "summary": "Passive, dismissible social-proof notification presentation with truthful target-supplied content and optional media.",
-  "dependencies": [],
+  "summary": "Passive commercial-activity profile of canonical Toast with strict target-supplied truth, optional media/time, canonical dismissal, semantic hidden state, no default live announcement, and target-owned provider lifecycle.",
+  "dependencies": ["toast"],
   "source": {
     "registry": "registry.json#/components/social-proof",
     "css": {
@@ -19,38 +19,45 @@
   "anatomy": [
     {
       "name": "root",
-      "selector": ".social-proof",
+      "selector": ".social-proof.toast",
       "className": ".social-proof",
       "required": true,
-      "description": "Viewport-contained notification surface."
+      "description": "Flow-sized Social Proof profile composed on the canonical Toast root."
     },
     {
       "name": "image",
       "selector": ".social-proof__image",
       "className": ".social-proof__image",
       "required": false,
-      "description": "Optional target-supplied image or image wrapper."
+      "description": "Optional relevant target-supplied image or image wrapper in the Toast visual column."
+    },
+    {
+      "name": "content",
+      "selector": ".social-proof__content.toast__content",
+      "className": ".social-proof__content",
+      "required": true,
+      "description": "Canonical Toast content region with no live role by default."
     },
     {
       "name": "text",
-      "selector": ".social-proof__text",
+      "selector": ".social-proof__text.toast__message",
       "className": ".social-proof__text",
       "required": true,
-      "description": "Visible social-proof statement."
+      "description": "Visible, trimmed, self-contained and target-verified commercial activity statement."
     },
     {
       "name": "time",
       "selector": ".social-proof__time",
       "className": ".social-proof__time",
       "required": false,
-      "description": "Optional target-supplied relative or absolute time text."
+      "description": "Optional trimmed target-formatted time text whose source, freshness and expiry remain external."
     },
     {
       "name": "close",
-      "selector": ".social-proof__close",
+      "selector": ".social-proof__close.toast__close.close-btn",
       "className": ".social-proof__close",
       "required": false,
-      "description": "Optional named native dismiss button."
+      "description": "Optional named dismiss action composed through canonical Toast and Close Button."
     }
   ],
   "variants": [
@@ -58,7 +65,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Single notification presentation."
+      "description": "Passive informational Toast profile."
     }
   ],
   "sizes": [
@@ -66,57 +73,69 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Viewport-contained notification width."
+      "description": "Canonical Toast item measure with intrinsic content response."
     }
   ],
   "states": [
     {
       "name": "hidden",
       "selectors": [
-        ".social-proof"
+        ".social-proof:not(.is-visible)",
+        ".social-proof[aria-hidden=\"true\"]"
       ],
-      "description": "Notification is translated outside the viewport by default."
+      "description": "Canonical Toast hidden state is unavailable to pointer and assistive technology; targets may unmount instead."
     },
     {
       "name": "visible",
       "selectors": [
-        ".social-proof[data-visible]"
+        ".social-proof.is-visible[aria-hidden=\"false\"]"
       ],
-      "description": "Visible notification state."
-    },
-    {
-      "name": "closeHover",
-      "selectors": [
-        ".social-proof__close:hover"
-      ],
-      "description": "Pointer hover on the optional dismiss action."
-    },
-    {
-      "name": "closeFocusVisible",
-      "selectors": [
-        ".social-proof__close:focus-visible"
-      ],
-      "description": "Visible keyboard focus on the optional dismiss action."
+      "description": "Controlled visible state composed through canonical Toast."
     }
   ],
   "behavior": [
     {
+      "name": "canonicalToastComposition",
+      "selectors": [
+        ".social-proof.toast",
+        ".social-proof__content.toast__content",
+        ".social-proof__text.toast__message",
+        ".social-proof__close.toast__close.close-btn"
+      ],
+      "description": "G10 consumes canonical Toast surface, content, visibility, motion and dismissal composition instead of duplicating notification infrastructure."
+    },
+    {
+      "name": "validComposition",
+      "selectors": [
+        ".social-proof__text"
+      ],
+      "description": "A non-empty trimmed message is required. Blank or missing message content omits the complete root; no commercial fallback is generated."
+    },
+    {
       "name": "visibility",
       "selectors": [
-        ".social-proof[data-visible]"
+        ".social-proof.is-visible"
       ],
       "attributes": [
-        "data-visible"
+        "aria-hidden"
       ],
-      "description": "The notification is hidden by canonical CSS until data-visible is present."
+      "description": "Visible state projects through canonical Toast is-visible and aria-hidden semantics; target timing and queueing remain external."
+    },
+    {
+      "name": "passiveAnnouncement",
+      "selectors": [
+        ".social-proof__content"
+      ],
+      "description": "Static and default Social Proof has no status, alert, aria-live or focus movement. Repeated commercial activity never becomes an assertive announcement."
     },
     {
       "name": "truthfulTargetData",
       "selectors": [
         ".social-proof__text",
-        ".social-proof__time"
+        ".social-proof__time",
+        ".social-proof__image"
       ],
-      "description": "The target supplies and verifies purchaser, product, location, and time content; the source contract does not manufacture social-proof data or timing."
+      "description": "The target verifies event truth, source, freshness, expiry, privacy and publication before rendering; the base does not manufacture or validate commercial claims."
     },
     {
       "name": "dismissal",
@@ -124,9 +143,9 @@
         ".social-proof__close"
       ],
       "events": [
-        "click"
+        "close action"
       ],
-      "description": "The optional native button requests dismissal; the target owns visibility state, persistence, queueing, and any later reappearance."
+      "description": "The optional canonical Close Button requests dismissal. Target Toast services own persistence, queueing, rate, timing, pause, Escape, removal and reappearance."
     }
   ],
   "properties": [
@@ -134,7 +153,7 @@
       "name": "message",
       "type": "string",
       "required": true,
-      "description": "Visible, self-contained social-proof statement from verified target data.",
+      "description": "Trimmed, visible, self-contained social-proof statement from current verified target data; blank content omits the component.",
       "targetMappings": {
         "web": [
           {
@@ -148,7 +167,7 @@
       "name": "time",
       "type": "string",
       "required": false,
-      "description": "Optional target-supplied time text.",
+      "description": "Optional trimmed target-formatted time text; blank content omits the part and the target owns freshness/expiry.",
       "targetMappings": {
         "web": [
           {
@@ -162,7 +181,7 @@
       "name": "image",
       "type": "slot",
       "required": false,
-      "description": "Optional product or contextual image supplied by the target.",
+      "description": "Optional relevant product or contextual image supplied and delivered by the target.",
       "targetMappings": {
         "web": [
           {
@@ -179,7 +198,7 @@
       "name": "imageAlt",
       "type": "string",
       "required": false,
-      "description": "Alternative text when the optional image adds meaning beyond the message.",
+      "description": "Alternative text when the optional relevant image adds meaning beyond the complete message; use empty text when redundant.",
       "targetMappings": {
         "web": [
           {
@@ -198,7 +217,7 @@
       "name": "dismissAction",
       "type": "slot",
       "required": false,
-      "description": "Optional native button that requests dismissal.",
+      "description": "Optional canonical Toast/Close Button composition that requests dismissal and is omitted when its label is blank.",
       "targetMappings": {
         "web": [
           {
@@ -215,7 +234,7 @@
       "name": "dismissLabel",
       "type": "string",
       "required": false,
-      "description": "Accessible name for the optional dismiss button.",
+      "description": "Non-empty localized accessible name required whenever dismissAction is supplied; blank content omits the action.",
       "targetMappings": {
         "web": [
           {
@@ -235,16 +254,23 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Controls presentation only; timing and queue behavior remain target-owned.",
+      "description": "Controls item presentation through canonical Toast; target viewport timing, queueing and persistence remain external.",
       "targetMappings": {
         "web": [
           {
+            "kind": "class",
+            "selector": ".social-proof",
+            "classNames": [
+              ".is-visible"
+            ]
+          },
+          {
             "kind": "attribute",
             "selector": ".social-proof",
-            "attribute": "data-visible",
+            "attribute": "aria-hidden",
             "values": {
-              "true": "",
-              "false": null
+              "true": "false",
+              "false": "true"
             }
           }
         ]
@@ -254,68 +280,60 @@
   "tokens": {
     "public": {
       "color": [
-        "--color-border-focus",
-        "--color-surface-primary",
         "--color-text-primary",
         "--color-text-secondary"
       ],
-      "easing": [
-        "--easing-default"
-      ],
       "radius": [
-        "--radius-lg",
         "--radius-md"
       ],
-      "shadow": [
-        "--shadow-lg"
-      ],
       "spacing": [
-        "--space-layout-container",
+        "--space-layout-element-gap",
         "--space-layout-touch-target"
       ],
-      "transition": [
-        "--transition-default"
-      ],
       "typography": [
-        "--typo-body-size"
-      ],
-      "z-index": [
-        "--z-toast"
+        "--font-family-body",
+        "--tg-typography-body-caption-weight",
+        "--typo-caption-line-height",
+        "--typo-caption-size"
       ]
     }
   },
   "accessibility": [
-    "Keep the complete notification meaning in text and treat an optional image as decorative when it adds no information.",
-    "Use a polite status announcement only when dynamic insertion needs to be conveyed; do not move keyboard focus to passive social proof.",
-    "Provide a named, keyboard-operable dismiss button when the notification persists.",
-    "Do not auto-dismiss while the notification or an action within it has focus.",
-    "Respect reduced-motion preferences for entrance and exit transitions."
+    "Keep the complete commercial claim in visible text and omit the full root when the required message is blank.",
+    "Static and default Social Proof has no live role and never moves keyboard focus; marketing content is never assertive.",
+    "Compose visibility through canonical Toast semantic hidden state or unmount so hidden actions are unavailable to pointer and assistive technology.",
+    "Treat the optional image as decorative with empty alt when the message already supplies its meaning; use informative alt only when it adds relevant content.",
+    "Render the optional canonical Close Button only with a non-empty localized accessible name.",
+    "Target Toast services own pause, stop, hide, frequency, queue, duration, focus/window pause, Escape and removal policies for automatically changing feeds.",
+    "Do not use color, image or relative time as the only evidence or meaning of the claim.",
+    "Honor canonical Toast reduced-motion and forced-color behavior."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Presentation is implemented; source data, timing, queueing, and persistence remain target-owned."
+      "kind": "css-composition",
+      "notes": "G10 profiles canonical Toast; target-verified data, viewport, queue, timing, privacy, persistence and provider behavior remain external."
     },
     "shopify": {
       "status": "planned",
-      "kind": "liquid-css-js"
+      "kind": "app-or-provider-composition",
+      "notes": "ADR 0253 omits G10 from Shopify v1 until a verified provider or authoritative source and its event qualification, freshness/expiry, privacy, placement, queue/timing, persistence, withdrawal, and focus policy are selected and certified."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "toast-profile"
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component-profile"
     },
     "swiftui": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-profile"
     },
     "compose": {
       "status": "planned",
-      "kind": "native-component"
+      "kind": "native-profile"
     }
   }
 }

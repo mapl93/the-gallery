@@ -1,50 +1,54 @@
 ## Overview
 
-Collection Story pairs optional media with a required editorial title and narrative, plus optional label, inspiration quotation, and target-owned actions.
+Collection Story is a named, container-responsive editorial section that pairs optional media with a required title and narrative, plus an optional label, genuine quotation, and target-owned actions.
 
 <Preview
-  html={'<section class="collection-story tg-preview-frame tg-preview-frame--lg"><div class="collection-story__media"><img class="tg-preview-media tg-preview-media--landscape" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Stoneware vessels arranged beside weathered Patagonian rock" /></div><div class="collection-story__content"><span class="collection-story__label">Spring 2026</span><h2 class="collection-story__title">Earth and Water</h2><div class="collection-story__text"><p>Inspired by Patagonian landscapes, the collection balances raw clay textures with translucent mineral glazes.</p></div><blockquote class="collection-story__inspiration">The horizon became a line between weight and reflection.</blockquote><div class="collection-story__actions"><a href="#collection-story-works">Explore the collection</a></div></div></section>'}
+  html={'<section class="collection-story tg-preview-frame tg-preview-frame--lg" aria-labelledby="collection-story-preview-title"><div class="collection-story__layout collection-story__layout--with-media"><div class="collection-story__media"><img class="tg-preview-media tg-preview-media--landscape" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Stoneware vessels arranged beside weathered Patagonian rock" /></div><div class="collection-story__content"><p class="collection-story__label">Spring 2026</p><h2 class="collection-story__title" id="collection-story-preview-title">Earth and Water</h2><div class="collection-story__text"><p>Inspired by Patagonian landscapes, the collection balances raw clay textures with translucent mineral glazes.</p></div><blockquote class="collection-story__inspiration">The horizon became a line between weight and reflection.</blockquote><div class="collection-story__actions"><a class="btn" href="#collection-story-works">Explore the collection</a></div></div></div></section>'}
   label="Collection Story"
 />
 
 ## Presentation
 
-The default layout stacks into one column and becomes two columns at wider viewports. `title` and `body` are required; `media`, `label`, `inspiration`, and `actions` are optional target-owned content.
+The default layout stacks into one column and becomes two columns only when media is present and the component content box is at least `42rem` wide. `title` and `body` are required; `media`, `label`, `inspiration`, and `actions` are optional target-owned content. Omitting media leaves one centered narrative column at every size.
 
-`reversed` defaults to `false`. When enabled, `.collection-story--reversed` places media after narrative content at wider viewports without changing source order. Reversal is a layout property, not a state or registry variant.
+`reversed` defaults to `false`. When enabled, `.collection-story--reversed` places media after narrative content in the intrinsic two-column composition without changing source order. Reversal is a layout property, not a state or registry variant. The component has no local state or JavaScript runtime.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep the source in meaningful media-then-narrative order even when using the reversed layout.</Do>
-  <Dont>Do not treat reversal as a content change or interaction state.</Dont>
+  <Do>Keep the media-then-narrative source order and omit optional parts instead of leaving empty wrappers.</Do>
+  <Dont>Do not make the whole section interactive or treat reversal as a content or interaction state.</Dont>
 </DoDont>
 
 - Use one focused collection narrative rather than a list of product facts.
-- Keep the inspiration quotation subordinate to the main body.
-- Compose actions whose destinations are owned by the target.
+- Use `blockquote` only when the inspiration is genuinely quoted from another source; keep any attribution outside it.
+- Compose actions whose destinations are owned by the target, using canonical Button or native control semantics without adding an extra navigation landmark.
+- Let targets own image alternative text, decorative intent, focal point, crop, loading, rich-text safety, localization, and routing.
 
 ## Accessibility
 
-- Use a heading level appropriate to the surrounding page for the collection title.
-- Give meaningful collection media useful alternative text and mark decorative media accordingly.
-- Use quotation markup for the inspiration text when it is a quotation.
+- Associate the section with the visible collection heading through a target-unique `aria-labelledby`/`id` pair.
+- Use a heading level appropriate to the surrounding page for the collection title; the visual class does not require `h2`.
+- Give informative media concise useful alternative text, use `alt=""` for decorative or redundant media, and omit the media region when absent.
+- Use quotation markup only for a real quotation and keep attribution outside the quoted content.
 - Preserve source reading order when `reversed` changes only wide-viewport placement.
+- Keep composed links/buttons native and keyboard accessible with canonical visible focus.
+- Allow localized, unbroken and zoomed content to reflow without page-level horizontal overflow.
 
 ## References
 
 **Dependencies:** None.
 
-**Anatomy:** required `.collection-story` root, `.collection-story__content`, `.collection-story__title`, and `.collection-story__text`; optional `.collection-story__media` and image, `.collection-story__label`, `.collection-story__inspiration`, and `.collection-story__actions`.
+**Anatomy:** named `.collection-story` section root; required `.collection-story__layout`, `.collection-story__content`, contextual `.collection-story__title` heading, and `.collection-story__text`; optional `.collection-story__media` and target media, `.collection-story__label`, native `.collection-story__inspiration` quotation, and ordinary `.collection-story__actions` group. `.collection-story__layout--with-media` explicitly enables the intrinsic split and is omitted when media is absent.
 
 **API Reference**
 
 <PropTable>
-  <tr><td>`reversed`</td><td>boolean</td><td>`false`</td><td>Reverses wide-viewport visual placement without changing source order</td></tr>
-  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-owned collection media</td></tr>
-  <tr><td>`label`</td><td>string</td><td>optional</td><td>Editorial label</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Collection story title</td></tr>
+  <tr><td>`reversed`</td><td>boolean</td><td>`false`</td><td>Reverses intrinsic wide visual placement without changing source order</td></tr>
+  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-owned passive collection media and native alternative text</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Editorial label before the title</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible collection-story heading</td></tr>
   <tr><td>`body`</td><td>slot</td><td>required</td><td>Target-owned narrative rich content</td></tr>
-  <tr><td>`inspiration`</td><td>string</td><td>optional</td><td>Inspiration quotation</td></tr>
-  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Target-owned calls to action</td></tr>
+  <tr><td>`inspiration`</td><td>string</td><td>optional</td><td>Genuine inspiration quotation</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Target-owned native or canonical action composition</td></tr>
 </PropTable>

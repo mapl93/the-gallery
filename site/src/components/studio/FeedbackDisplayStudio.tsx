@@ -7,6 +7,9 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { getStudioLucideIcon } from './lucideCatalogue';
+import AlertArtwork, { type AlertArtworkVariant } from './AlertArtwork';
+import ProgressArtwork from './ProgressArtwork';
+import StatArtwork from './StatArtwork';
 
 interface FeedbackDisplayStudioProps {
   contract: ComponentContract;
@@ -46,7 +49,8 @@ function initialValuesFor(contract: ComponentContract): StudioPropertyValues {
       accessibleLabel: 'Upload progress',
       label: 'Uploading',
       value: 65,
-      valueText: '65%',
+      displayValue: '65%',
+      valueText: '65 percent complete',
     });
   } else if (contract.slug === 'spinner') {
     values.label = 'Loading collection';
@@ -75,6 +79,33 @@ function optionClass(options: ComponentContract['variants'], value: StudioProper
 
 function numeric(value: StudioPropertyValue, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function mergeValues(
+  slug: string,
+  current: StudioPropertyValues,
+  next: StudioPropertyValues,
+): StudioPropertyValues {
+  const merged = { ...current, ...next };
+  if (slug !== 'progress') return merged;
+
+  if (next.variant === 'circle') {
+    merged.indeterminate = false;
+  } else if (next.indeterminate === true) {
+    merged.variant = 'bar';
+  }
+
+  const min = numeric(merged.min, 0);
+  const max = numeric(merged.max, 100);
+  if (max <= min) {
+    if ('max' in next && !('min' in next)) {
+      merged.min = max - 1;
+    } else {
+      merged.max = min + 1;
+    }
+  }
+
+  return merged;
 }
 
 function activeTokens(slug: string, values: StudioPropertyValues): Record<string, string | null> {
@@ -133,69 +164,47 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
     if (contract.slug === 'alert') {
       if (dismissed) return <p className="docs-studio__preview-removal" role="status">Alert dismissed</p>;
       const announcement = String(values.announcement || 'none');
+      const variant = String(values.variant || 'info') as AlertArtworkVariant;
       return (
-        <div
-          className={['alert', 'docs-studio__preview-alert', optionClass(contract.variants, values.variant)].filter(Boolean).join(' ')}
-          role={announcement === 'assertive' ? 'alert' : announcement === 'polite' ? 'status' : undefined}
-          aria-live={announcement === 'none' ? undefined : announcement as 'polite' | 'assertive'}
-        >
-          {values.icon === true && Icon && <Icon className="alert__icon" aria-hidden="true" />}
-          <div className="alert__content">
-            {String(values.title || '') && <p className="alert__title">{String(values.title)}</p>}
-            <p className="alert__message">{String(values.message || '')}</p>
-          </div>
-          {values.dismissAction === true && (
+        <AlertArtwork
+          className="docs-studio__preview-alert"
+          title={String(values.title || '')}
+          message={String(values.message || '')}
+          variant={variant}
+          announcement={announcement as 'none' | 'polite' | 'assertive'}
+          icon={values.icon === true && Icon
+            ? <Icon className="alert__icon" aria-hidden="true" />
+            : undefined}
+          dismissAction={values.dismissAction === true ? (
             <button
               className="close-btn alert__dismiss"
               type="button"
-              aria-label={String(values.dismissLabel || 'Dismiss alert')}
+              aria-label={String(values.dismissLabel ?? '')}
               onClick={() => setDismissed(true)}
             >
               {DismissIcon && <DismissIcon className="close-btn__icon" aria-hidden="true" />}
             </button>
-          )}
-        </div>
+          ) : undefined}
+        />
       );
     }
 
     if (contract.slug === 'progress') {
-      const min = numeric(values.min, 0);
-      const max = Math.max(numeric(values.max, 100), min + Number.EPSILON);
-      const current = Math.min(max, Math.max(min, numeric(values.value, min)));
-      const percent = ((current - min) / (max - min)) * 100;
-      const indeterminate = values.indeterminate === true;
-      const circle = values.variant === 'circle' && !indeterminate;
-      const common = {
-        role: 'progressbar',
-        'aria-label': String(values.accessibleLabel || 'Progress'),
-        'aria-valuemin': min,
-        'aria-valuemax': max,
-        'aria-valuenow': indeterminate ? undefined : current,
-        'aria-valuetext': String(values.valueText || '') || undefined,
-      } as const;
-
-      if (circle) {
-        return (
-          <div className="progress-circle docs-studio__preview-progress-circle" {...common}>
-            <svg viewBox="0 0 36 36" aria-hidden="true">
-              <circle className="progress-circle__bg" cx="18" cy="18" r="15.9" />
-              <circle className="progress-circle__fill" cx="18" cy="18" r="15.9" strokeDasharray={`${percent} ${100 - percent}`} />
-            </svg>
-            {String(values.valueText || '') && <span className="progress-circle__text">{String(values.valueText)}</span>}
-          </div>
-        );
-      }
-
       return (
-        <div className={['progress', 'docs-studio__preview-progress', indeterminate ? 'progress--indeterminate' : null].filter(Boolean).join(' ')} aria-busy={indeterminate || undefined} {...common}>
-          {(String(values.label || '') || String(values.valueText || '')) && (
-            <div className="progress__label">
-              <span className="progress__label-text">{String(values.label || '')}</span>
-              {!indeterminate && <span className="progress__value">{String(values.valueText || '')}</span>}
-            </div>
-          )}
-          <div className="progress__track"><div className="progress__bar" style={indeterminate ? undefined : { width: `${percent}%` }} /></div>
-        </div>
+        <ProgressArtwork
+          className={values.variant === 'circle'
+            ? 'docs-studio__preview-progress-circle'
+            : 'docs-studio__preview-progress'}
+          accessibleLabel={String(values.accessibleLabel ?? '')}
+          label={String(values.label ?? '')}
+          variant={values.variant === 'circle' ? 'circle' : 'bar'}
+          value={typeof values.value === 'number' && Number.isFinite(values.value) ? values.value : undefined}
+          min={numeric(values.min, 0)}
+          max={numeric(values.max, 100)}
+          displayValue={String(values.displayValue ?? '')}
+          valueText={String(values.valueText ?? '')}
+          indeterminate={values.indeterminate === true}
+        />
       );
     }
 
@@ -209,21 +218,20 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
       ) : spinner;
     }
 
-    const direction = String(values.changeDirection || 'neutral');
-    const change = String(values.change || '');
+    const direction = String(values.changeDirection || 'neutral') as 'neutral' | 'up' | 'down';
     return (
-      <div
-        className="stat docs-studio__preview-stat"
-        data-stat-alternate-digits={String(values.alternateDigits === true)}
-        data-stat-slashed-zero={String(values.slashedZero !== false)}
-        data-stat-tabular-numbers={String(values.tabularNumbers !== false)}
-        data-stat-contextual-alternates={String(values.contextualAlternates !== false)}
-        data-stat-fractions={String(values.fractions === true)}
-      >
-        <span className="stat__value">{String(values.value || '')}</span>
-        <span className="stat__label">{String(values.label || '')}</span>
-        {change && <span className="stat__change" data-direction={direction === 'neutral' ? undefined : direction}>{change}</span>}
-      </div>
+      <StatArtwork
+        value={String(values.value || '')}
+        label={String(values.label || '')}
+        change={String(values.change || '')}
+        changeDirection={direction}
+        alternateDigits={values.alternateDigits === true}
+        slashedZero={values.slashedZero !== false}
+        tabularNumbers={values.tabularNumbers !== false}
+        contextualAlternates={values.contextualAlternates !== false}
+        fractions={values.fractions === true}
+        className="docs-studio__preview-stat"
+      />
     );
   }
 
@@ -239,7 +247,7 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
           stateValue={contract.states[0]?.name ?? 'default'}
           tokenValues={tokenValues}
           activeTokens={activeTokens(contract.slug, values)}
-          onPropertiesChange={(next) => { setValues((current) => ({ ...current, ...next })); setDismissed(false); }}
+          onPropertiesChange={(next) => { setValues((current) => mergeValues(contract.slug, current, next)); setDismissed(false); }}
           onSlotIconChange={(slot, iconName) => setSlotIconValues((current) => ({ ...current, [slot]: iconName }))}
           onStateChange={() => undefined}
           onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))}

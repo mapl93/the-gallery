@@ -1,68 +1,491 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "cart-page",
   "name": "Cart Page",
   "registryId": "K1",
   "category": "cart",
   "status": "pilot",
-  "summary": "Full cart page layout that composes cart line items and a cart summary.",
-  "dependencies": ["cart-line-item", "cart-summary"],
+  "summary": "Named populated-cart composition with a required title, canonical Cart Line Item collection, canonical Cart Summary, configurable flow or safely degrading sticky summary placement, optional target-formatted count, and optional complete continue-shopping link.",
+  "dependencies": [
+    "cart-line-item",
+    "cart-summary"
+  ],
   "source": {
     "registry": "registry.json#/components/cart-page",
-    "css": { "file": "components/css/cart.css", "selector": ".cart-page" },
+    "css": {
+      "file": "components/css/cart.css",
+      "selector": ".cart-page"
+    },
     "docs": "site/src/content/components/cart-page.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".cart-page", "className": ".cart-page", "required": true, "description": "Cart page grid container." },
-    { "name": "header", "selector": ".cart-page__header", "className": ".cart-page__header", "required": true, "description": "Cart page header." },
-    { "name": "title", "selector": ".cart-page__title", "className": ".cart-page__title", "required": true, "description": "Cart page title." },
-    { "name": "count", "selector": ".cart-page__count", "className": ".cart-page__count", "required": false, "description": "Cart item count." },
-    { "name": "continue", "selector": ".cart-page__continue", "className": ".cart-page__continue", "required": false, "description": "Continue shopping link." },
-    { "name": "items", "selector": ".cart-page__items", "className": ".cart-page__items", "required": true, "description": "Cart Line Item composition region." },
-    { "name": "summary", "selector": ".cart-page__summary", "className": ".cart-page__summary", "required": true, "description": "Cart Summary composition region." }
+    {
+      "name": "root",
+      "selector": ".cart-page",
+      "className": ".cart-page",
+      "required": true,
+      "description": "Required native section named by its visible cart title and sized as the component container."
+    },
+    {
+      "name": "header",
+      "selector": ".cart-page__header",
+      "className": ".cart-page__header",
+      "required": true,
+      "description": "Required native header containing the title and any complete optional cart context."
+    },
+    {
+      "name": "title",
+      "selector": ".cart-page__title",
+      "className": ".cart-page__title",
+      "required": true,
+      "description": "Required non-empty visible heading that names the section; the target selects a rank appropriate to the surrounding document."
+    },
+    {
+      "name": "count",
+      "selector": ".cart-page__count",
+      "className": ".cart-page__count",
+      "required": false,
+      "description": "Optional target-formatted snapshot of the same confirmed cart state represented by the line collection and summary."
+    },
+    {
+      "name": "continue",
+      "selector": ".cart-page__continue",
+      "className": ".cart-page__continue",
+      "required": false,
+      "description": "Optional native continue-shopping link rendered only when both a non-empty label and a real target-owned destination exist."
+    },
+    {
+      "name": "layout",
+      "selector": ".cart-page__layout",
+      "className": ".cart-page__layout",
+      "required": true,
+      "description": "Required private layout wrapper that changes tracks from the root container width without adding document semantics."
+    },
+    {
+      "name": "itemsRegion",
+      "selector": ".cart-page__items",
+      "className": ".cart-page__items",
+      "required": true,
+      "description": "Required neutral wrapper around one non-empty ordered canonical Cart Line Item collection."
+    },
+    {
+      "name": "lineCollection",
+      "selector": ".cart-lines",
+      "className": ".cart-lines",
+      "required": true,
+      "description": "Required canonical native list containing one or more Cart Line Item dependencies in target order."
+    },
+    {
+      "name": "summaryRegion",
+      "selector": ".cart-page__summary",
+      "className": ".cart-page__summary",
+      "required": true,
+      "description": "Required neutral wrapper around one complete canonical Cart Summary."
+    },
+    {
+      "name": "summary",
+      "selector": ".cart-summary",
+      "className": ".cart-summary",
+      "required": true,
+      "description": "Required canonical named Cart Summary dependency; it owns rows, note, checkout action, optional express composition, and their semantics."
+    }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default cart page layout." }
+    {
+      "name": "sticky",
+      "className": null,
+      "default": true,
+      "description": "Default sticky summary presentation when the target and available component/viewport space satisfy the documented safety requirements; otherwise it degrades to flow."
+    },
+    {
+      "name": "flow",
+      "className": ".cart-page--summary-flow",
+      "default": false,
+      "description": "Explicit normal-flow summary presentation using the same source order, canonical Cart Summary, and target-confirmed snapshot."
+    }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive one-column to two-column cart layout." }
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One intrinsic layout that changes from a single flow to line-items-plus-summary tracks at the component's own inline threshold."
+    }
   ],
   "states": [
-    { "name": "default", "selectors": [".cart-page"], "description": "Default cart page state." },
-    { "name": "continueHover", "selectors": [".cart-page__continue:hover"], "description": "Continue shopping hover state." },
-    { "name": "continueFocus", "selectors": [".cart-page__continue:focus-visible"], "description": "Visible continue-shopping focus state." }
+    {
+      "name": "default",
+      "selectors": [
+        ".cart-page",
+        ".cart-page__layout",
+        ".cart-lines",
+        ".cart-summary"
+      ],
+      "description": "Valid named populated cart with a required line collection and summary representing one coherent target snapshot."
+    },
+    {
+      "name": "countOmitted",
+      "selectors": [
+        ".cart-page",
+        ".cart-page__header"
+      ],
+      "description": "The optional count is absent without leaving an empty element, live region, or layout placeholder."
+    },
+    {
+      "name": "continueOmitted",
+      "selectors": [
+        ".cart-page",
+        ".cart-page__header"
+      ],
+      "description": "The optional continue-shopping link is absent when intentionally omitted or when either label or destination is incomplete."
+    },
+    {
+      "name": "invalidRequiredComposition",
+      "selectors": [
+        ".cart-page"
+      ],
+      "description": "A blank title, absent line-item collection, or absent summary omits the complete renderer instead of exposing an unnamed or structurally incomplete cart shell."
+    },
+    {
+      "name": "narrowContainer",
+      "selectors": [
+        ".cart-page__layout"
+      ],
+      "description": "Line collection and summary remain in one logical source-order flow when the component container is below its private threshold."
+    },
+    {
+      "name": "wideContainer",
+      "selectors": [
+        ".cart-page__layout"
+      ],
+      "description": "Line collection and summary use flexible main and bounded summary tracks when the component container reaches its private threshold."
+    },
+    {
+      "name": "stickySummary",
+      "selectors": [
+        ".cart-page:not(.cart-page--summary-flow) .cart-page__summary"
+      ],
+      "description": "The default summary becomes sticky only in a sufficiently wide component and sufficiently tall viewport, with bounded internal overflow and a target-owned safe offset."
+    },
+    {
+      "name": "flowSummary",
+      "selectors": [
+        ".cart-page--summary-flow .cart-page__summary"
+      ],
+      "description": "An explicit flow selection, narrow component, short viewport, or incapable target keeps the summary in logical document flow."
+    },
+    {
+      "name": "continueHover",
+      "selectors": [
+        ".cart-page__continue:hover"
+      ],
+      "description": "Native link hover remains a visual enhancement and does not replace the underline or accessible link semantics."
+    },
+    {
+      "name": "continueFocus",
+      "selectors": [
+        ".cart-page__continue:focus-visible"
+      ],
+      "description": "Keyboard focus exposes the canonical solid two-pixel focus outline with a three-pixel offset."
+    },
+    {
+      "name": "dependencyUpdate",
+      "selectors": [
+        ".cart-lines",
+        ".cart-summary",
+        ".cart-page__count"
+      ],
+      "description": "After a target-confirmed cart mutation, the target replaces the line collection, summary, and optional count from the same state; Cart Page itself stores or computes none of them."
+    }
   ],
   "behavior": [
-    { "name": "cartComposition", "selectors": [".cart-page"], "description": "Cart page should compose Cart Line Item and Cart Summary without redefining their behavior." },
-    { "name": "liveTotals", "selectors": [".cart-page__count"], "description": "Item count and totals should update when cart line quantity or removal changes." }
+    {
+      "name": "namedSection",
+      "selectors": [
+        ".cart-page",
+        ".cart-page__title"
+      ],
+      "attributes": [
+        "<section>",
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "A target-unique heading id names the native section from its required visible title; the target chooses heading rank and the renderer never leaves a dangling reference."
+    },
+    {
+      "name": "canonicalComposition",
+      "selectors": [
+        ".cart-page__items",
+        ".cart-lines",
+        ".cart-page__summary",
+        ".cart-summary"
+      ],
+      "description": "Cart Page consumes canonical Cart Line Item and Cart Summary markup, controls, state projections, focus treatment, and target mappings without duplicating dependency anatomy or behavior."
+    },
+    {
+      "name": "completeContinueLink",
+      "selectors": [
+        ".cart-page__continue"
+      ],
+      "attributes": [
+        "<a>",
+        "href"
+      ],
+      "events": [
+        "click",
+        "Enter"
+      ],
+      "description": "Continue shopping is an ordinary native link rendered only with a non-empty label and real target-owned href, preserving context menu, modified activation, history, and keyboard behavior."
+    },
+    {
+      "name": "coherentSnapshot",
+      "selectors": [
+        ".cart-page__count",
+        ".cart-lines",
+        ".cart-summary"
+      ],
+      "description": "Optional count, line items, prices, discounts, totals, availability, and checkout readiness must describe one target-confirmed snapshot; the neutral component does not derive, reconcile, or optimistically mutate commerce facts."
+    },
+    {
+      "name": "targetLifecycle",
+      "selectors": [
+        ".cart-page",
+        ".cart-lines",
+        ".cart-summary"
+      ],
+      "events": [
+        "load",
+        "change quantity",
+        "remove line",
+        "update cart",
+        "checkout",
+        "success",
+        "error"
+      ],
+      "description": "The target owns cart storage, identity, localization, inventory, pricing, discounts, taxes, shipping, mutation transport, pending/error/rollback/retry, empty transition, focus, announcements, analytics, checkout, and every server-authoritative refresh."
+    },
+    {
+      "name": "statusOwnership",
+      "selectors": [
+        ".cart-page__count",
+        ".cart-lines",
+        ".cart-summary"
+      ],
+      "description": "Static content is not automatically live. When a confirmed mutation changes content without navigation or focus context, one target coordinator announces a complete contextual result once rather than making count and totals competing live regions."
+    },
+    {
+      "name": "containerResponse",
+      "selectors": [
+        ".cart-page",
+        ".cart-page__layout"
+      ],
+      "description": "The root establishes an inline-size container and only its private layout descendant changes tracks; response never depends on viewport width or Studio/target overrides."
+    },
+    {
+      "name": "safeSummaryPlacement",
+      "selectors": [
+        ".cart-page__summary",
+        ".cart-page--summary-flow"
+      ],
+      "description": "summaryPlacement changes presentation only. Sticky uses the same canonical summary and source order, applies only when component width and viewport height are sufficient, is bounded to available viewport height, scrolls internally when necessary, and stops within the cart layout. The target owns the real header/safe-area offset, collision context, focused-control visibility evidence, and truthful fallback to flow."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".cart-page",
+        ".cart-page__title",
+        ".cart-page__count",
+        ".cart-page__continue",
+        ".cart-page__layout"
+      ],
+      "description": "Logical sizing and resilient wrapping contain short, long, empty optional, localized, bidirectional, unbroken, zoomed, and user-spaced content without changing source order."
+    },
+    {
+      "name": "zeroRuntime",
+      "selectors": [
+        ".cart-page"
+      ],
+      "description": "Cart Page adds no neutral listener, store, request, timer, observer, layout read, focus manager, animation, or asset; only canonical dependencies and the target runtime may act."
+    }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Cart page title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-page__title" }] } },
-    { "name": "count", "type": "string", "required": false, "description": "Target-formatted cart item count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-page__count" }] } },
-    { "name": "continueLabel", "type": "string", "required": false, "description": "Continue-shopping link label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".cart-page__continue" }] } },
-    { "name": "continueHref", "type": "string", "required": false, "description": "Continue-shopping destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".cart-page__continue", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
-    { "name": "lineItems", "type": "slot", "required": true, "description": "Ordered Cart Line Item dependencies.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-page__items", "classNames": [".cart-page__items"] }] } },
-    { "name": "summary", "type": "slot", "required": true, "description": "Cart Summary dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".cart-page__summary", "classNames": [".cart-page__summary"] }] } }
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Required non-empty visible cart title and section-name source; the target supplies a unique heading id and selects a rank that fits the document outline.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".cart-page__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "count",
+      "type": "string",
+      "required": false,
+      "description": "Optional localized, target-formatted count snapshot coherent with the rendered lines and summary; it is not a live region or calculation input by default.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".cart-page__count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "continueLabel",
+      "type": "string",
+      "required": false,
+      "description": "Optional non-empty visible continue-shopping link text; it composes only when continueHref is also valid.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".cart-page__continue"
+          }
+        ]
+      }
+    },
+    {
+      "name": "continueHref",
+      "type": "string",
+      "required": false,
+      "description": "Optional real target-owned continue-shopping destination; it composes only when continueLabel is also non-empty.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".cart-page__continue",
+            "attribute": "href",
+            "valueFrom": "property",
+            "elements": [
+              "a"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "lineItems",
+      "type": "slot",
+      "required": true,
+      "description": "Required non-empty ordered native list of canonical Cart Line Item dependencies supplied from target cart state.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-page__items",
+            "classNames": [
+              ".cart-lines",
+              ".cart-line"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "summary",
+      "type": "slot",
+      "required": true,
+      "description": "Required complete canonical Cart Summary dependency supplied from the same target cart state as lineItems and count.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".cart-page__summary",
+            "classNames": [
+              ".cart-summary"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "summaryPlacement",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "sticky",
+      "valuesFrom": "variants",
+      "description": "Semantic presentation choice for the same canonical Cart Summary: sticky by default when the target can satisfy the safety contract, or explicit normal flow. It never changes cart data, source order, or lifecycle ownership.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".cart-page",
+            "source": "variants"
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-primary", "--color-text-secondary", "--color-text-accent", "--color-border-focus"],
-      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
-      "typography": ["--font-family-heading", "--typo-h2-size", "--typo-body-size"]
+      "color": [
+        "--color-text-primary",
+        "--color-text-secondary",
+        "--color-text-accent",
+        "--color-border-focus"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-layout-grid-gap"
+      ],
+      "typography": [
+        "--tg-typography-h2-weight",
+        "--typo-h2-size",
+        "--typo-h2-line-height",
+        "--font-family-heading",
+        "--tg-typography-body-default-weight",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--font-family-body"
+      ]
     }
   },
   "accessibility": [
-    "Use a page-level heading for the cart title.",
-    "Keep line-item changes and item count changes understandable to assistive technology.",
-    "Preserve logical reading order between cart items and the summary."
+    "Omit the complete renderer when title is blank, the lineItems composition is absent, or summary is absent; never expose an unnamed or structurally incomplete cart section.",
+    "Name the native section from its required visible heading through a target-unique id, and choose heading rank from the surrounding document outline.",
+    "Preserve the canonical native list, product links, contextual quantity and removal names, native summary name-value rows, primary checkout Button, logical source order, and visible dependency focus styles.",
+    "Render continue shopping only as a native link with both a descriptive visible label and real target-owned destination; preserve Tab, Enter, modified activation, context menu, and history.",
+    "Treat count as optional static snapshot content by default. After a confirmed no-navigation mutation, announce one complete contextual outcome from a target-owned status region rather than marking count, lines, and totals independently live.",
+    "Keep pending controls, mutation errors, rollback/retry, empty transition, post-removal focus, checkout handoff, and synchronization with global cart surfaces under one target coordinator.",
+    "Do not add section or complementary roles to the neutral items and summary layout wrappers; canonical children already provide their own list, region, control, and name-value semantics.",
+    "Support narrow component containers, mobile through XL frames, 200 percent zoom, user text spacing, RTL, long localized content, forced colors, dark mode, reduced motion, and keyboard-only operation without viewport-dependent source reordering.",
+    "For sticky placement, keep every focused summary control visible, bound tall summary content to available viewport height, preserve page escape at the summary boundaries, stop stickiness within the cart layout, account for sticky headers and safe areas, and fall back to flow whenever the target cannot prove those conditions."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map cart items and cart totals from Shopify cart data." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css-html-composition",
+      "notes": "Canonical source provides the named populated-cart section, complete optional context, intrinsic layout, flow and safely degrading sticky summary presentations, semantics, focus, forced colors, omission rules, and zero runtime; the host supplies any real sticky-header offset plus commerce state and lifecycle."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-cart-form",
+      "notes": "Main Cart maps Shopify cart items, localized count, canonical summary, configurable flow/sticky placement, native update form, checkout, note and real continue destination into the composition. The target maps its Header offset and responsive fallback; server-authoritative mutations, empty transition, editor behavior, accelerated checkout and live-store proof remain required."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "controlled-composition"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component",
+      "notes": "Model the populated composition and canonical dependency instances after visual approval; generic registered nodes are traceability metadata rather than Cart Page artwork."
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-cart-composition"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-cart-composition"
+    }
   }
 }

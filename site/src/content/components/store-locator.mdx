@@ -1,0 +1,48 @@
+## Overview
+
+Store Locator is the general branch-discovery companion to Pickup Location Selector. It searches target-supplied galleries, studios, or stores without requiring product context and presents branch identity, address, hours, services, contact details, and an explicit target-owned directions Link. It never chooses a transaction pickup location or stores a preferred branch.
+
+<Preview html={'<section class="location-search store-locator tg-preview-frame--lg" aria-labelledby="locator-preview-heading" data-status="ready"><header class="location-search__header"><h2 class="location-search__heading" id="locator-preview-heading">Find a gallery or studio</h2><p class="location-search__description">Explore branches, opening hours, services, and contact details.</p></header><form class="location-search__form" role="search"><div class="input location-search__query"><label class="input__label" for="locator-preview-query">City, region, or postal code</label><div class="input__control"><input class="input__field" id="locator-preview-query" type="search" name="location-query" placeholder="Try Recoleta" autocomplete="postal-code"/></div></div><button class="btn location-search__submit" type="submit">Search</button></form><button class="btn btn--link btn--sm location-search__geolocate" type="button">Use my location</button><p class="location-search__status" role="status">2 locations found.</p><section class="store-locator__results" aria-labelledby="locator-preview-results"><h3 class="store-locator__results-heading" id="locator-preview-results">Nearby locations</h3><ul class="location-search__results"><li class="location-search__result store-locator__result"><article aria-labelledby="locator-preview-palermo"><h4 class="location-search__result-name" id="locator-preview-palermo">Palermo Gallery</h4><address class="location-search__address">Costa Rica 4827, Buenos Aires</address><p class="location-search__meta">Open today, 11:00–19:00</p><p class="location-search__meta">Pickup · Exhibitions · Accessibility</p><div class="store-locator__actions"><a class="link" href="tel:+541155550100">Call gallery</a><a class="link" href="/directions/palermo-gallery">Get directions</a></div></article></li></ul></section></section>'} label="Store Locator" />
+
+## Presentation
+
+Store Locator reuses the same canonical manual-search controls, result lifecycle, spacing, record surface, container response, and optional map boundary as Pickup Location Selector. Its result list is informational rather than a Radio group: each native list item contains a named branch article and optional canonical contact or directions Links.
+
+The complete list is always the primary interaction surface. A synchronized map can supplement spatial context but cannot hide branch details, contact, or directions actions behind pins.
+
+## Usage Guidelines
+
+<DoDont>
+  <Do>Use Store Locator to discover and inspect branches without requiring a product or transaction.</Do>
+  <Dont>Do not use it to choose checkout pickup, persist a preferred store, or trigger location permission automatically.</Dont>
+</DoDont>
+
+- Keep manual address, city, region, or postal-code search available in every target.
+- Use real descriptive target-owned destinations for phone and directions. The target owns navigation, external-app policy, analytics, and failures.
+- Omit absent hours, services, or contact fields cleanly; retain stable name and address for each valid branch.
+- Use Pickup Location Selector when selection must emit pickup intent for the current product, variant, and market.
+
+## Accessibility
+
+- Name the surface, search field, search action, and results region visibly.
+- Render branches as a native list of named articles with semantic `address` content and ordinary canonical Links.
+- Use one coherent status channel for loading/result/empty changes and an alert only for a new error.
+- Preserve manual search when geolocation is unsupported, denied, times out, or errors. Permission follows only the explicit localized action.
+- Keep all results, details, contact, and directions usable without a map and under keyboard, zoom, RTL, text-spacing, forced-color, and reduced-motion modes.
+- Do not add Radios, selected states, preferred-store mutation, or transaction semantics to this discovery surface.
+
+## References
+
+The direction uses native [HTML form, list, article, address, and link semantics](https://html.spec.whatwg.org/), the [W3C Geolocation permission model](https://www.w3.org/TR/geolocation/), Open UI typed-search research, and Polaris location-picker/listbox evidence while retaining native list content because result cards contain multiple readable details and actions.
+
+<PropTable>
+  <tr><td>`heading`</td><td>string</td><td>required</td><td>Visible section heading and accessible root name</td></tr>
+  <tr><td>`queryLabel`, `query`, `queryPlaceholder`</td><td>string</td><td>label required</td><td>Canonical manual-search Input contract</td></tr>
+  <tr><td>`searchLabel`, `useLocationLabel`</td><td>string</td><td>search required</td><td>Canonical search and optional explicit geolocation Buttons</td></tr>
+  <tr><td>`resultsLabel`</td><td>string</td><td>required</td><td>Visible branch-results heading</td></tr>
+  <tr><td>`locations`</td><td>slot</td><td>required when ready</td><td>Target-ordered native branch articles with stable identity and address</td></tr>
+  <tr><td>`status`, `statusMessage`</td><td>enum/string</td><td>`ready`/optional</td><td>Ready, loading, empty, or error lifecycle and concise truthful copy</td></tr>
+  <tr><td>`map`</td><td>slot</td><td>optional</td><td>Target-owned synchronized progressive map</td></tr>
+</PropTable>
+
+Stateful adapters expose controlled `query/onQueryChange` and `status`; static Web can use native form submission. Provider data, geocoding, geolocation, map tiles and attribution, search ordering, directions, privacy, and analytics remain target responsibilities.

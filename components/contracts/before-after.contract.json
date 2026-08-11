@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "before-after",
   "name": "Before / After Image Slider",
   "registryId": "S17",
   "category": "sections",
   "status": "pilot",
-  "summary": "Layered before-and-after comparison presentation whose control mechanics and position state remain target-owned.",
-  "dependencies": [],
+  "summary": "Interactive matched-media comparison that composes the canonical native Slider as its sole value, focus, form, pointer, touch, and keyboard owner.",
+  "dependencies": ["slider"],
   "source": {
     "registry": "registry.json#/components/before-after",
     "css": {
@@ -22,63 +22,91 @@
       "selector": ".before-after",
       "className": ".before-after",
       "required": true,
-      "description": "Layered image-comparison root."
+      "description": "Native figure and Slider root for one matched-media comparison."
     },
     {
-      "name": "image",
+      "name": "stage",
+      "selector": ".before-after__stage",
+      "className": ".before-after__stage",
+      "required": true,
+      "description": "Positioning stage that also composes the canonical Slider track."
+    },
+    {
+      "name": "mediaFrame",
+      "selector": ".before-after__media-frame",
+      "className": ".before-after__media-frame",
+      "required": true,
+      "description": "Shared clipped frame for both matched media layers."
+    },
+    {
+      "name": "beforeMedia",
       "selector": ".before-after__image",
       "className": ".before-after__image",
       "required": true,
-      "description": "Base comparison image."
+      "description": "Base comparison media layer."
     },
     {
       "name": "overlay",
       "selector": ".before-after__overlay",
       "className": ".before-after__overlay",
       "required": true,
-      "description": "Clipped comparison-image layer."
+      "description": "Logical-progress clip that reveals the second matched media layer."
     },
     {
-      "name": "handle",
-      "selector": ".before-after__handle",
-      "className": ".before-after__handle",
-      "required": false,
-      "description": "Optional target-owned comparison control or visual divider."
+      "name": "afterMedia",
+      "selector": ".before-after__image",
+      "className": ".before-after__image",
+      "required": true,
+      "description": "Second comparison media layer revealed by the native range value."
     },
     {
-      "name": "handleKnob",
-      "selector": ".before-after__handle::before",
-      "required": false,
-      "generated": true,
-      "description": "Generated visual knob for the optional divider."
+      "name": "input",
+      "selector": ".before-after__input",
+      "className": ".before-after__input",
+      "required": true,
+      "description": "Canonical native range owner with fixed 0–100 bounds and step 1."
     },
     {
-      "name": "handleGlyph",
-      "selector": ".before-after__handle::after",
-      "required": false,
-      "generated": true,
-      "description": "Generated bidirectional visual cue; it is not an accessible name."
+      "name": "controlLabel",
+      "selector": ".before-after__control-label",
+      "className": ".before-after__control-label",
+      "required": true,
+      "description": "Localized accessible name for the native range input."
+    },
+    {
+      "name": "divider",
+      "selector": ".before-after__divider",
+      "className": ".before-after__divider",
+      "required": true,
+      "description": "Decorative divider synchronized to the canonical Slider progress variable."
     },
     {
       "name": "label",
       "selector": ".before-after__label",
       "className": ".before-after__label",
       "required": false,
-      "description": "Shared comparison-label presentation."
+      "description": "Shared visible state-label presentation."
     },
     {
       "name": "beforeLabel",
       "selector": ".before-after__label--before",
       "className": ".before-after__label--before",
       "required": false,
-      "description": "Visible label for the base image."
+      "description": "Optional visible label for the base state."
     },
     {
       "name": "afterLabel",
       "selector": ".before-after__label--after",
       "className": ".before-after__label--after",
       "required": false,
-      "description": "Visible label for the clipped image."
+      "description": "Optional visible label for the revealed state."
+    },
+    {
+      "name": "description",
+      "selector": ".before-after__description",
+      "className": ".before-after__description",
+      "required": false,
+      "description": "Optional figure caption referenced by the native range input."
     }
   ],
   "variants": [
@@ -86,7 +114,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default variant."
+      "description": "One horizontal logical-direction comparison."
     }
   ],
   "sizes": [
@@ -94,66 +122,130 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default size."
+      "description": "Intrinsic responsive media stage with a canonical touch-sized Slider thumb."
     }
   ],
   "states": [
     {
       "name": "default",
-      "selectors": [
-        ".before-after"
-      ],
-      "description": "Static midpoint presentation supplied by canonical CSS."
+      "selectors": [".before-after"],
+      "description": "Authored value is reflected in the reveal, divider, and native input."
     },
     {
-      "name": "controlFocusVisible",
+      "name": "enhanced",
+      "selectors": [".before-after[data-slider-enhanced=\"true\"]"],
+      "description": "Canonical Slider synchronization is active and the native input is operable."
+    },
+    {
+      "name": "focusVisible",
       "selectors": [
-        ".before-after__handle:focus-visible::before"
+        ".slider__input:focus-visible::-webkit-slider-thumb",
+        ".slider__input:focus-visible::-moz-range-thumb"
       ],
-      "description": "Visible keyboard focus when a target renders the divider as a focusable control."
+      "description": "Canonical Slider focus indication on the sole native control."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".before-after__input:disabled"],
+      "description": "Unavailable native control while the comparison remains perceivable."
+    },
+    {
+      "name": "noEnhancement",
+      "selectors": [".before-after:not([data-slider-enhanced=\"true\"])"],
+      "description": "Static authored reveal with the unsynchronized native input hidden."
+    },
+    {
+      "name": "rightToLeft",
+      "selectors": [".before-after:dir(rtl)"],
+      "description": "Reveal origin and divider alignment follow logical inline direction."
     }
   ],
   "behavior": [
     {
-      "name": "comparisonMechanicsBoundary",
-      "selectors": [
-        ".before-after"
-      ],
-      "description": "Canonical CSS supplies a static 50 percent clip and divider. This contract does not choose pointer dragging, keyboard semantics, range values, gesture handling, or state synchronization; those require a separate accepted behavior decision."
+      "name": "requiredComposition",
+      "selectors": [".before-after"],
+      "description": "A non-empty localized label plus both matched media slots are required; omit the complete root when any is absent."
+    },
+    {
+      "name": "canonicalSliderOwnership",
+      "selectors": [".before-after.slider", ".before-after__input.slider__input"],
+      "attributes": ["type=\"range\"", "min=\"0\"", "max=\"100\"", "step=\"1\"", "value", "disabled", "name"],
+      "events": ["input", "change", "reset"],
+      "description": "One canonical native Slider input is the sole value, focus, form, reset, pointer, touch, keyboard, and event owner."
+    },
+    {
+      "name": "progressSynchronization",
+      "selectors": [".before-after__overlay", ".before-after__divider"],
+      "events": ["input", "change", "reset"],
+      "description": "Canonical Slider synchronization writes one private progress variable consumed by the logical clip and decorative divider."
+    },
+    {
+      "name": "controlledUncontrolled",
+      "events": ["input", "change", "reset"],
+      "description": "Static HTML uses the native value as an uncontrolled default; framework targets control that same native owner and consume native events without mirrored state."
+    },
+    {
+      "name": "progressiveEnhancement",
+      "selectors": [".before-after:not([data-slider-enhanced=\"true\"])"],
+      "description": "Without shared runtime, the authored reveal remains visible and the native input stays hidden so control and artwork cannot diverge."
+    },
+    {
+      "name": "logicalDirection",
+      "selectors": [".before-after", ".before-after:dir(rtl)"],
+      "description": "The reveal advances from logical inline start and preserves native range keyboard behavior in the active writing direction."
     },
     {
       "name": "mediaSemantics",
-      "selectors": [
-        ".before-after__image",
-        ".before-after__overlay img"
-      ],
-      "description": "Targets provide useful alternative text or a shared accessible comparison description without duplicating confusing image announcements."
+      "selectors": [".before-after__image", ".before-after__description"],
+      "description": "Targets supply matched framing and useful distinct alternatives or an equivalent shared description without redundant announcements."
+    },
+    {
+      "name": "boundedRuntime",
+      "description": "The component adds no animation, polling, network work, per-frame JavaScript, pointer-capture engine, or layout-read loop."
     }
   ],
   "properties": [
     {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Required localized accessible name describing what percentage the control reveals.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".before-after__control-label" }]
+      }
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible comparison description referenced by the input.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".before-after__description" }]
+      }
+    },
+    {
       "name": "beforeMedia",
       "type": "slot",
       "required": true,
-      "description": "Target-owned base comparison image.",
+      "description": "Required target-owned base media with matched framing.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".before-after__image", "classNames": [".before-after__image"] }]
+        "web": [{ "kind": "slot", "selector": ".before-after__media-frame", "classNames": [".before-after__image"] }]
       }
     },
     {
       "name": "afterMedia",
       "type": "slot",
       "required": true,
-      "description": "Target-owned image rendered in the clipped overlay layer.",
+      "description": "Required target-owned revealed media of the same subject and framing.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".before-after__overlay", "classNames": [".before-after__overlay"] }]
+        "web": [{ "kind": "slot", "selector": ".before-after__overlay", "classNames": [".before-after__image"] }]
       }
     },
     {
       "name": "beforeLabel",
       "type": "string",
       "required": false,
-      "description": "Optional visible label for the base image.",
+      "description": "Optional visible label for the base state.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".before-after__label--before" }]
       }
@@ -162,54 +254,82 @@
       "name": "afterLabel",
       "type": "string",
       "required": false,
-      "description": "Optional visible label for the clipped image.",
+      "description": "Optional visible label for the revealed state.",
       "targetMappings": {
         "web": [{ "kind": "content", "selector": ".before-after__label--after" }]
       }
     },
     {
-      "name": "control",
-      "type": "slot",
+      "name": "value",
+      "type": "number",
       "required": false,
-      "description": "Optional target-owned control or divider content; no drag or range behavior is implied.",
+      "defaultValue": 50,
+      "minimum": 0,
+      "maximum": 100,
+      "step": 1,
+      "description": "Current reveal percentage, clamped to the fixed 0–100 comparison scale.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".before-after__handle", "classNames": [".before-after__handle"] }]
+        "web": [{ "kind": "attribute", "selector": ".before-after__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native comparison control unavailable without hiding its content.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".before-after__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Optional native form-field name for the reveal percentage.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".before-after__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }]
       }
     }
   ],
   "tokens": {
     "public": {
       "color": [
-        "--color-border-focus",
-        "--color-text-primary"
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-text-inverse",
+        "--color-text-primary",
+        "--color-text-secondary"
       ],
-      "radius": [
-        "--radius-full",
-        "--radius-md",
-        "--radius-sm"
-      ],
-      "shadow": [
-        "--shadow-md"
-      ],
+      "radius": ["--radius-md", "--radius-sm"],
+      "shadow": ["--shadow-sm"],
+      "opacity": ["--opacity-disabled"],
       "typography": [
+        "--font-family-body",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-body-small-weight",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-caption-line-height",
         "--typo-caption-size"
       ],
-      "spacing": [
-        "--space-layout-touch-target"
-      ]
+      "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"]
     }
   },
   "accessibility": [
-    "Provide a concise shared comparison description or distinct useful alternatives without announcing redundant image content.",
-    "Visible before and after labels identify the compared states and do not rely on position alone.",
-    "Do not expose the visual divider as an interactive slider until keyboard operation, value bounds, current value, pointer behavior, focus, and announcements are defined.",
-    "If a target supplies a focusable control, it uses a touch-sized target and visible focus indicator."
+    "Use one native input type=\"range\" as the only focusable comparison control.",
+    "Provide a required localized label that explains the revealed percentage; a generic Before and After name is insufficient.",
+    "Preserve native minimum 0, maximum 100, step 1, current value, pointer, touch, keyboard, form, and reset semantics.",
+    "Supply matched media with useful distinct alternatives or an equivalent concise shared comparison description.",
+    "Keep visible before and after state labels optional and supplementary; do not rely on image position or color alone.",
+    "Keep the divider decorative and expose visible keyboard focus only through the canonical native Slider thumb.",
+    "No component motion is introduced, so reduced-motion mode preserves the same operation."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented in components/css/sections.css."
+      "kind": "css-js-composition",
+      "notes": "Composes canonical Slider markup and shared synchronization from components/js/theme.js; S17 adds only comparison presentation."
     },
     "shopify": {
       "status": "planned",

@@ -1,35 +1,35 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "review-card",
   "name": "Review Card",
   "registryId": "V4",
   "category": "reviews",
   "status": "pilot",
-  "summary": "Individual review content with supplied author metadata, Star Rating composition, and optional photos, action, and reply regions.",
-  "dependencies": ["star-rating"],
+  "summary": "Self-contained review article with target-supplied metadata, required canonical Rating composition, optional labelled photos, a native helpfulness request, and an associated reply.",
+  "dependencies": ["rating"],
   "source": {
     "registry": "registry.json#/components/review-card",
     "css": { "file": "components/css/reviews.css", "selector": ".review-card" },
     "docs": "site/src/content/components/review-card.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".review-card", "className": ".review-card", "required": true, "description": "Semantic article containing one supplied review record." },
+    { "name": "root", "selector": ".review-card", "className": ".review-card", "required": true, "description": "Semantic article containing one supplied review record; an optional title may label it." },
     { "name": "header", "selector": ".review-card__header", "className": ".review-card__header", "required": true, "description": "Flexible author and review-metadata header." },
-    { "name": "avatar", "selector": ".review-card__avatar", "className": ".review-card__avatar", "required": false, "description": "Optional target-owned reviewer image or identity media." },
+    { "name": "avatar", "selector": ".review-card__avatar", "className": ".review-card__avatar", "required": false, "description": "Optional target-owned reviewer media; its alternative text reflects whether adjacent author text already conveys the same identity." },
     { "name": "meta", "selector": ".review-card__meta", "className": ".review-card__meta", "required": true, "description": "Author and date text group." },
     { "name": "author", "selector": ".review-card__author", "className": ".review-card__author", "required": true, "description": "Visible target-supplied reviewer name or attribution." },
-    { "name": "date", "selector": ".review-card__date", "className": ".review-card__date", "required": false, "description": "Optional visible target-formatted review date, preferably rendered with a semantic time element." },
+    { "name": "date", "selector": ".review-card__date", "className": ".review-card__date", "required": false, "description": "Optional visible target-formatted review date rendered with a semantic time element and an independent machine value when supplied." },
     { "name": "verified", "selector": ".review-card__verified", "className": ".review-card__verified", "required": false, "description": "Optional target-owned verification statement with readable text." },
-    { "name": "rating", "selector": ".review-card > .star-rating", "className": ".star-rating", "required": true, "description": "Composed read-only Star Rating for the supplied review value." },
-    { "name": "title", "selector": ".review-card__title", "className": ".review-card__title", "required": false, "description": "Optional review heading within the surrounding document hierarchy." },
+    { "name": "rating", "selector": ".review-card > .rating", "className": ".rating", "required": true, "description": "Composed canonical read-only Rating for the supplied review value." },
+    { "name": "title", "selector": ".review-card__title", "className": ".review-card__title", "required": false, "description": "Optional review heading that may label the article; its native rank remains target-owned within the surrounding hierarchy." },
     { "name": "body", "selector": ".review-card__body", "className": ".review-card__body", "required": true, "description": "Review body text." },
-    { "name": "photos", "selector": ".review-card__photos", "className": ".review-card__photos", "required": false, "description": "Optional horizontally contained collection of target-owned review photos." },
-    { "name": "photo", "selector": ".review-card__photo", "className": ".review-card__photo", "required": false, "description": "Repeated passive image or native link/button when the target supplies an action." },
+    { "name": "photos", "selector": ".review-card__photos", "className": ".review-card__photos", "required": false, "description": "Optional localized native list containing target-owned review photos with horizontal containment." },
+    { "name": "photo", "selector": ".review-card__photo", "className": ".review-card__photo", "required": false, "description": "Repeated native list item containing a passive image or a native link/button when the target supplies an action." },
     { "name": "actions", "selector": ".review-card__actions", "className": ".review-card__actions", "required": false, "description": "Optional action and related status region." },
     { "name": "helpfulButton", "selector": ".review-card__helpful-btn", "className": ".review-card__helpful-btn", "required": false, "description": "Optional native toggle button that requests a helpfulness preference change." },
-    { "name": "helpfulCount", "selector": ".review-card__helpful-count", "className": ".review-card__helpful-count", "required": false, "description": "Optional target-formatted helpfulness count." },
-    { "name": "reply", "selector": ".review-card__reply", "className": ".review-card__reply", "required": false, "description": "Optional target-owned reply semantically associated with this review." },
+    { "name": "helpfulCount", "selector": ".review-card__helpful-count", "className": ".review-card__helpful-count", "required": false, "description": "Optional target-formatted helpfulness count associated as the button description when both exist; it is not a live region." },
+    { "name": "reply", "selector": ".review-card__reply", "className": ".review-card__reply", "required": false, "description": "Optional target-owned reply grouped directly with this review without creating a complementary landmark." },
     { "name": "replyLabel", "selector": ".review-card__reply-label", "className": ".review-card__reply-label", "required": false, "description": "Visible reply-author or reply-type label." },
     { "name": "replyBody", "selector": ".review-card__reply-body", "className": ".review-card__reply-body", "required": false, "description": "Reply body text." }
   ],
@@ -49,6 +49,13 @@
       "targetMappings": { "web": [{ "kind": "content", "selector": ".review-card__date" }] }
     },
     {
+      "name": "dateTime",
+      "type": "string",
+      "required": false,
+      "description": "Optional machine-readable value for the visible review date; the component never parses it from localized display text.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-card__date", "attribute": "datetime", "valueFrom": "property", "elements": ["time"] }] }
+    },
+    {
       "name": "avatar",
       "type": "slot",
       "required": false,
@@ -66,8 +73,8 @@
       "name": "rating",
       "type": "slot",
       "required": true,
-      "description": "Required Star Rating composition for the target-supplied review value.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-card > .star-rating", "classNames": [".star-rating"] }] }
+      "description": "Required canonical Rating composition for the target-supplied review value.",
+      "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-card > .rating", "classNames": [".rating"] }] }
     },
     {
       "name": "title",
@@ -91,6 +98,13 @@
       "targetMappings": { "web": [{ "kind": "slot", "selector": ".review-card__photos", "classNames": [".review-card__photos"] }] }
     },
     {
+      "name": "photosLabel",
+      "type": "string",
+      "required": true,
+      "description": "Localized accessible name emitted on the native photo list when that optional composition exists; the schema cannot express the conditional requirement.",
+      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".review-card__photos", "attribute": "aria-label", "valueFrom": "property", "elements": ["ul"] }] }
+    },
+    {
       "name": "helpfulLabel",
       "type": "string",
       "required": false,
@@ -102,7 +116,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Current local pressed state of the optional helpfulness toggle; persistence is target-owned.",
+      "description": "Current projected pressed state of the optional helpfulness toggle; the state owner handles request reconciliation and persistence.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".review-card__helpful-btn", "attribute": "aria-pressed", "values": { "true": "true", "false": "false" }, "elements": ["button"] }]
       }
@@ -137,25 +151,48 @@
   "states": [
     { "name": "default", "selectors": [".review-card"], "description": "Passive review content state." },
     { "name": "photoHover", "selectors": [".review-card__photo:is(a, button):hover"], "description": "Fine-pointer feedback for a target-supplied native photo action." },
-    { "name": "actionHover", "selectors": [".review-card__helpful-btn:hover:not(:disabled)"], "description": "Available helpfulness-button hover state." },
+    { "name": "actionHover", "selectors": [".review-card__helpful-btn:hover:not(:disabled):not([aria-pressed=\"true\"])"], "description": "Available unpressed helpfulness-button hover state without masking selection." },
     { "name": "actionFocusVisible", "selectors": [".review-card__helpful-btn:focus-visible"], "description": "Visible keyboard focus on the optional helpfulness button." },
     { "name": "actionPressed", "selectors": [".review-card__helpful-btn[aria-pressed=\"true\"]"], "description": "Current helpfulness toggle state." },
     { "name": "actionDisabled", "selectors": [".review-card__helpful-btn:disabled"], "description": "Unavailable helpfulness action." }
   ],
   "behavior": [
-    { "name": "ratingComposition", "selectors": [".review-card > .star-rating"], "description": "Review Card composes Star Rating for read-only rating presentation and does not reuse Star Input." },
+    {
+      "name": "articleLabeling",
+      "selectors": [".review-card", ".review-card__title"],
+      "attributes": ["aria-labelledby"],
+      "description": "When a title exists, the target may use its unique id to label the article. Without a title, Review Card does not invent an author-derived accessible name or fixed heading rank."
+    },
+    {
+      "name": "dateSemantics",
+      "selectors": [".review-card__date"],
+      "attributes": ["datetime"],
+      "description": "Visible localized date text and optional machine-readable datetime are supplied independently; the component performs no parsing or formatting."
+    },
+    { "name": "ratingComposition", "selectors": [".review-card > .rating"], "description": "Review Card composes canonical Rating for read-only rating presentation and does not reuse Star Input." },
     {
       "name": "helpfulnessRequest",
       "selectors": [".review-card__helpful-btn"],
       "attributes": ["type=\"button\"", "aria-pressed", "disabled"],
       "events": ["click"],
-      "description": "The optional native button emits an activation request and exposes local pressed state; authentication, persistence, optimistic updates, and count synchronization remain target-owned."
+      "description": "The optional native button emits an activation request and exposes projected pressed state. Static Web authoring supplies state, Studio may demonstrate local state, and framework/provider targets may control it; authentication, persistence, optimistic updates, rollback, and count synchronization remain target-owned."
+    },
+    {
+      "name": "helpfulCountDescription",
+      "selectors": [".review-card__helpful-btn", ".review-card__helpful-count"],
+      "attributes": ["aria-describedby"],
+      "description": "When both exist, the target associates the supplied count as the button description. The count is ordinary text, not a component-owned live status or confirmed update."
     },
     {
       "name": "photoActivationBoundary",
       "selectors": [".review-card__photo"],
       "attributes": ["alt"],
-      "description": "Photos are passive by default. A target may use native link or button markup, but Review Card does not select or implement lightbox behavior."
+      "description": "The localized photo collection is a native list. Photos are passive by default; a target may use native link or button markup, but Review Card does not select or implement lightbox behavior."
+    },
+    {
+      "name": "replyAssociation",
+      "selectors": [".review-card__reply"],
+      "description": "The reply remains ordinary content inside the review article. It does not create an aside, region, live status, disclosure, thread, or moderation workflow."
     }
   ],
   "tokens": {
@@ -163,21 +200,23 @@
       "color": ["--color-border-subtle", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary", "--color-feedback-success-default", "--color-border-default", "--color-border-focus", "--color-button-primary-bg-default"],
       "radius": ["--radius-full", "--radius-sm", "--radius-md"],
       "spacing": ["--space-layout-element-gap", "--space-layout-touch-target"],
-      "typography": ["--typo-caption-size", "--typo-body-size", "--typo-body-sm-size"],
+      "typography": ["--tg-typography-h3-weight", "--tg-typography-body-default-weight", "--tg-typography-body-small-weight", "--tg-typography-body-caption-weight", "--tg-font-weight-medium", "--tg-font-weight-semibold", "--typo-h3-size", "--typo-h3-line-height", "--typo-caption-size", "--typo-caption-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--font-family-heading", "--font-family-body"],
       "motion": ["--motion-transition-micro", "--motion-opacity-subtle"],
       "opacity": ["--opacity-disabled"]
     }
   },
   "accessibility": [
-    "Render one review as a semantic article with author, date, rating, title, and body in logical source order.",
+    "Render one review as a semantic article with author, date, rating, title, and body in logical source order; use an optional contextual title to label it without fixing one heading rank in the neutral contract.",
+    "Supply machine-readable datetime independently from the localized visible date instead of parsing display text.",
     "Verification status needs readable text and must reflect target data rather than visual inference.",
-    "Give review images meaningful alt text, or empty alt text when they are genuinely decorative.",
+    "Render optional photos as a localized native list and give images meaningful alt text, or empty alt text when they are genuinely decorative or redundant.",
     "Use native buttons or links for target-supplied photo actions and preserve visible focus.",
-    "Expose helpfulness selection with aria-pressed on a native button; do not announce unsynchronized counts as confirmed updates."
+    "Expose helpfulness selection with aria-pressed on a native button, keep its visible label stable, and associate the supplied count as a description when both exist.",
+    "Do not announce unsynchronized counts as confirmed updates or create a complementary landmark for the directly associated reply."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Responsive content, optional native action states, touch targets, focus, forced colors, and reduced motion are implemented in components/css/reviews.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "A future adapter must choose review data and action providers without changing the neutral content contract." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Native article, time, list and button semantics plus responsive content, optional action states, touch targets, focus, forced colors, and reduced motion are implemented without neutral component JavaScript." },
+    "shopify": { "status": "planned", "kind": "theme-app-block-css", "notes": "Official Shopify guidance assigns product reviews to dynamic-source app blocks. A future provider adapter supplies truthful data, localization, actions and persistence while consuming generated Gallery CSS." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

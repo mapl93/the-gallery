@@ -1,12 +1,12 @@
 ## Overview
 
-Page navigation for bounded collection results.
+Named page navigation for a bounded collection of results.
 
-<Preview html={"<nav class=\"pagination\" aria-label=\"Collection pages\" data-current-page=\"2\"><a class=\"pagination__link\" href=\"#previous\" aria-label=\"Previous page\">Previous</a><a class=\"pagination__link\" href=\"#page-1\">1</a><span class=\"pagination__current\" aria-current=\"page\">2</span><a class=\"pagination__link\" href=\"#page-3\">3</a><span class=\"pagination__ellipsis\" aria-hidden=\"true\">...</span><a class=\"pagination__link\" href=\"#page-10\">10</a><a class=\"pagination__link\" href=\"#next\" aria-label=\"Next page\">Next</a></nav>"} label="Pagination" />
+<Preview html={"<nav class=\"pagination\" aria-label=\"Collection pages\" data-current-page=\"5\"><ul class=\"pagination__list\"><li class=\"pagination__item\"><a class=\"link link--subtle pagination__link\" href=\"#page-4\" aria-label=\"Previous page\">Previous</a></li><li class=\"pagination__item\"><a class=\"link link--subtle pagination__link\" href=\"#page-1\" aria-label=\"Page 1\">1</a></li><li class=\"pagination__item\" aria-hidden=\"true\"><span class=\"pagination__ellipsis\" aria-hidden=\"true\">…</span></li><li class=\"pagination__item\"><a class=\"link link--subtle pagination__link\" href=\"#page-4\" aria-label=\"Page 4\">4</a></li><li class=\"pagination__item\"><span class=\"pagination__current\" aria-current=\"page\">5</span></li><li class=\"pagination__item\"><a class=\"link link--subtle pagination__link\" href=\"#page-6\" aria-label=\"Page 6\">6</a></li><li class=\"pagination__item\" aria-hidden=\"true\"><span class=\"pagination__ellipsis\" aria-hidden=\"true\">…</span></li><li class=\"pagination__item\"><a class=\"link link--subtle pagination__link\" href=\"#page-10\" aria-label=\"Page 10\">10</a></li><li class=\"pagination__item\"><a class=\"link link--subtle pagination__link\" href=\"#page-6\" aria-label=\"Next page\">Next</a></li></ul></nav>"} label="Pagination" />
 
 ## Presentation
 
-The current page uses the neutral primary-action family. Adjacent pages remain quiet until hover or focus, and ellipsis content is informational rather than interactive.
+The current page uses the neutral primary-action family. Available destinations remain quiet until hover or focus, ellipses are informational, and the finite list wraps when its container is narrow.
 
 ## Usage Guidelines
 
@@ -16,23 +16,29 @@ The current page uses the neutral primary-action family. Adjacent pages remain q
 </DoDont>
 
 - Disable previous or next navigation only at a real boundary.
+- Omit the unavailable directional destination at that boundary.
 - Preserve collection filters and view mode when changing pages.
 - Use target-native URLs so navigation still works without JavaScript.
+- Let the target calculate the finite page window; CSS must not hide destinations.
 
 ## Accessibility
 
-- Use a `<nav>` with a specific accessible label.
-- Mark the current page with `aria-current="page"`.
+- Use a specifically named `<nav>` containing a native `ul`/`li` list.
+- Use native anchors with `href` for every available destination.
+- Mark exactly one non-interactive current page with `aria-current="page"`.
 - Give icon-only previous and next links accessible names.
-- Use `aria-disabled="true"` only when an unavailable link remains in the DOM.
+- Omit previous on the first page and next on the last page instead of leaving dead focus stops.
+- Hide passive ellipses from assistive technology and never render them as links.
 
 ## References
 
 <PropTable>
   <tr><td>`label`</td><td>string</td><td>required</td><td>Pagination navigation name</td></tr>
-  <tr><td>`currentPage`</td><td>number</td><td>required</td><td>Current page used to generate items</td></tr>
-  <tr><td>`pageItems`</td><td>slot</td><td>required</td><td>Previous, page, ellipsis, and next items</td></tr>
-  <tr><td>`.pagination__link`</td><td>class</td><td>optional</td><td>Page or directional link</td></tr>
-  <tr><td>`.pagination__current`</td><td>class</td><td>required</td><td>Current page indicator</td></tr>
-  <tr><td>`.pagination__ellipsis`</td><td>class</td><td>optional</td><td>Skipped page range</td></tr>
+  <tr><td>`currentPage`</td><td>number</td><td>required</td><td>Positive projection matching the one current item</td></tr>
+  <tr><td>`pageItems`</td><td>slot</td><td>required</td><td>Finite target-supplied list of previous, page, current, ellipsis, and next items</td></tr>
+  <tr><td>`.pagination__list`</td><td>`ul`</td><td>required</td><td>Native destination list</td></tr>
+  <tr><td>`.pagination__item`</td><td>`li`</td><td>required</td><td>One destination, current page, or ellipsis</td></tr>
+  <tr><td>`.pagination__link`</td><td>`a.link[href]`</td><td>optional</td><td>Canonical available destination Link</td></tr>
+  <tr><td>`.pagination__current`</td><td>`span`</td><td>required</td><td>One non-interactive current-page indicator</td></tr>
+  <tr><td>`.pagination__ellipsis`</td><td>`span`</td><td>optional</td><td>Hidden passive skipped-range mark</td></tr>
 </PropTable>

@@ -14,7 +14,7 @@ The collection set includes:
 
 - Collection Hero
 - Collection Grid
-- Collection Filters
+- Filter Panel (originally Collection Filters; identity migrated by ADR 0250)
 - Pagination
 - Grid / List View Toggle
 - Collection Promo Tile
@@ -29,7 +29,7 @@ The new contracts are:
 ```text
 components/contracts/collection-hero.contract.json
 components/contracts/collection-grid.contract.json
-components/contracts/filters.contract.json
+components/contracts/filter-panel.contract.json
 components/contracts/pagination.contract.json
 components/contracts/view-toggle.contract.json
 components/contracts/collection-promo.contract.json

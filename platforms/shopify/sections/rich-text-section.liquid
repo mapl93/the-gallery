@@ -1,0 +1,49 @@
+{% liquid
+  assign section_title = section.settings.title | strip
+  assign section_body = section.settings.body
+  assign section_body_text = section_body | strip_html | strip
+  assign heading_id = 'RichTextSection-' | append: section.id | append: '-Title'
+%}
+
+{% if section_body_text != blank %}
+  {% if section_title != blank %}
+    <section class="rich-text-section" aria-labelledby="{{ heading_id }}">
+  {% else %}
+    <div class="rich-text-section">
+  {% endif %}
+    {% if section_title != blank %}
+      <h2 class="rich-text-section__title" id="{{ heading_id }}">{{ section_title | escape }}</h2>
+    {% endif %}
+
+    <div class="rich-text-section__body">
+      {{ section_body }}
+    </div>
+  {% if section_title != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.rich_text_section.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.rich_text_section.settings.title"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "t:sections.rich_text_section.settings.body"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.rich_text_section.name"
+    }
+  ]
+}
+{% endschema %}

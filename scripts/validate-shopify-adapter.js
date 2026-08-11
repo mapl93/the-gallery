@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildRuntimeSources, runtimeModulesForComponents } from './lib/runtime-modules.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = path.join(repoRoot, 'registry.json');
@@ -10,6 +11,8 @@ const assetsDir = path.join(shopifyDir, 'assets');
 const manifestPath = path.join(shopifyDir, 'adapter.manifest.json');
 const summaryPath = path.join(shopifyDir, 'adapter.summary.json');
 const sourceThemeJsPath = path.join(repoRoot, 'components', 'js', 'theme.js');
+const runtimeLoaderPath = path.join(assetsDir, 'runtime-loader.js');
+const runtimeCorePath = path.join(assetsDir, 'tg-runtime-core.js');
 const maturityModel = 'shopify-maturity-v1';
 const maturityLevels = ['css-ready', 'template-detected', 'schema-ready', 'editor-ready', 'implemented', 'planned'];
 const maturityStrategies = [
@@ -144,6 +147,47 @@ function validateCopiedAssets(errors) {
   }
 }
 
+function validateModularRuntime(errors, manifest) {
+  const expected = buildRuntimeSources(repoRoot, {
+    moduleFile: (id) => `tg-runtime-${id}.js`,
+    coreImport: './tg-runtime-core.js',
+    loaderExpression: '`./tg-runtime-${definition.id}.js`',
+  });
+  pathExists(errors, runtimeLoaderPath);
+  pathExists(errors, runtimeCorePath);
+  assert(errors, manifest.outputs?.runtimeLoader === relative(runtimeLoaderPath), `manifest.outputs.runtimeLoader must be ${relative(runtimeLoaderPath)}`);
+  assert(errors, manifest.outputs?.runtimeCore === relative(runtimeCorePath), `manifest.outputs.runtimeCore must be ${relative(runtimeCorePath)}`);
+  if (fs.existsSync(runtimeLoaderPath)) {
+    assert(errors, read(runtimeLoaderPath) === expected.loader, 'platforms/shopify/assets/runtime-loader.js must match generated selective loader');
+  }
+  if (fs.existsSync(runtimeCorePath)) {
+    assert(errors, read(runtimeCorePath) === expected.core, 'platforms/shopify/assets/tg-runtime-core.js must match generated runtime core');
+  }
+  const expectedPaths = [];
+  for (const [fileName, source] of expected.modules) {
+    const filePath = path.join(assetsDir, fileName);
+    expectedPaths.push(relative(filePath));
+    pathExists(errors, filePath);
+    if (fs.existsSync(filePath)) {
+      assert(errors, read(filePath) === source, `${relative(filePath)} must match generated source block`);
+    }
+  }
+  assert(errors, JSON.stringify(manifest.outputs?.runtimeModules) === JSON.stringify(expectedPaths), 'manifest.outputs.runtimeModules must list every generated Shopify runtime module');
+  return expected.config;
+}
+
+function resolveComponentDependencies(registry, slug, resolved = new Set(), order = []) {
+  if (resolved.has(slug)) return order;
+  const component = registry.components[slug];
+  if (!component) return order;
+  for (const dependency of component.dependencies ?? []) {
+    resolveComponentDependencies(registry, dependency, resolved, order);
+  }
+  resolved.add(slug);
+  order.push(slug);
+  return order;
+}
+
 function readContracts(errors) {
   const contracts = new Map();
   pathExists(errors, contractsDir);
@@ -160,9 +204,9 @@ function readContracts(errors) {
   return contracts;
 }
 
-function validateManifest(errors, warnings, registry, contracts, manifest) {
+function validateManifest(errors, warnings, registry, contracts, manifest, runtimeConfig) {
   assert(errors, manifest.$schema === 'https://the-gallery.dev/schema/shopify-adapter-manifest.json', 'manifest.$schema is not the expected Shopify adapter schema URL');
-  assert(errors, manifest.manifestVersion === '0.1.0', 'manifest.manifestVersion must be 0.1.0');
+  assert(errors, manifest.manifestVersion === '0.2.0', 'manifest.manifestVersion must be 0.2.0');
   assert(errors, manifest.target?.id === 'shopify', 'manifest.target.id must be shopify');
   assert(errors, manifest.generatedBy === 'scripts/build-shopify-adapter.js', 'manifest.generatedBy must be scripts/build-shopify-adapter.js');
   assert(errors, manifest.outputs?.manifest === 'platforms/shopify/adapter.manifest.json', 'manifest.outputs.manifest must point to platforms/shopify/adapter.manifest.json');
@@ -203,6 +247,25 @@ function validateManifest(errors, warnings, registry, contracts, manifest) {
     assert(errors, component.source?.contract === `components/contracts/${component.slug}.contract.json`, `${component.slug} manifest source.contract must point to contract`);
     assert(errors, component.source?.docs === contract.source.docs, `${component.slug} manifest source.docs must match contract`);
     assert(errors, component.contractAdapter?.status === contract.adapters?.shopify?.status, `${component.slug} manifest Shopify status must match contract`);
+
+    const dependencyClosure = resolveComponentDependencies(registry, component.slug);
+    const expectedCss = [
+      'platforms/shopify/assets/tokens.css',
+      'platforms/shopify/assets/base.css',
+      ...dependencyClosure.map((slug) => {
+        const source = registry.components[slug].file;
+        if (baseCssSources.map((fileName) => `components/css/${fileName}`).includes(source)) return 'platforms/shopify/assets/base.css';
+        const asset = componentCssAssets.find((item) => `components/css/${item.source}` === source);
+        return asset ? `platforms/shopify/assets/${asset.output}` : null;
+      }),
+    ].filter(Boolean);
+    const runtimeIds = runtimeModulesForComponents(runtimeConfig, dependencyClosure);
+    const expectedRuntime = runtimeIds.length === 0
+      ? []
+      : ['platforms/shopify/assets/tg-runtime-core.js', ...runtimeIds.map((id) => `platforms/shopify/assets/tg-runtime-${id}.js`)];
+    assert(errors, JSON.stringify(component.install?.dependencyClosure) === JSON.stringify(dependencyClosure), `${component.slug} install.dependencyClosure must be topological and complete`);
+    assert(errors, JSON.stringify(component.install?.css) === JSON.stringify([...new Set(expectedCss)]), `${component.slug} install.css must contain the dependency-closed Shopify CSS slice`);
+    assert(errors, JSON.stringify(component.install?.runtime) === JSON.stringify(expectedRuntime), `${component.slug} install.runtime must contain only required Shopify runtime modules`);
 
     const cssOutput = component.source?.cssOutput;
     assert(errors, typeof cssOutput === 'string' && cssOutput.length > 0, `${component.slug} must map to a Shopify CSS output`);
@@ -282,7 +345,7 @@ function validateSummary(errors, manifest) {
 
   const summary = readJson(summaryPath);
   assert(errors, summary.$schema === 'https://the-gallery.dev/schema/shopify-adapter-summary.json', 'summary.$schema is not the expected Shopify adapter summary schema URL');
-  assert(errors, summary.summaryVersion === '0.1.0', 'summary.summaryVersion must be 0.1.0');
+  assert(errors, summary.summaryVersion === '0.2.0', 'summary.summaryVersion must be 0.2.0');
   assert(errors, JSON.stringify(summary.stats) === JSON.stringify(manifest.stats), 'summary.stats must match manifest.stats');
   assert(errors, JSON.stringify(summary.maturityModel) === JSON.stringify(manifest.maturityModel), 'summary.maturityModel must match manifest.maturityModel');
   assert(errors, summary.warningCount === manifest.warningCount, 'summary.warningCount must match manifest.warningCount');
@@ -311,11 +374,21 @@ function main() {
   const registry = readJson(registryPath);
   const manifest = readJson(manifestPath);
 
+  const runtimeConfig = validateModularRuntime(errors, manifest);
+
+  for (const layoutName of ['theme.liquid', 'password.liquid']) {
+    const layoutPath = path.join(shopifyDir, 'layout', layoutName);
+    if (!fs.existsSync(layoutPath)) continue;
+    const liquid = read(layoutPath);
+    assert(errors, liquid.includes(`<script type="module" src="{{ 'runtime-loader.js' | asset_url }}"></script>`), `${relative(layoutPath)} must load runtime-loader.js as a module`);
+    assert(errors, !liquid.includes(`{{ 'theme.js' | asset_url }}`), `${relative(layoutPath)} must not load the compatibility theme.js aggregate`);
+  }
+
   validateLayoutLoadOrder(errors, manifest, 'theme', path.join(shopifyDir, 'layout', 'theme.liquid'));
   validateLayoutLoadOrder(errors, manifest, 'password', path.join(shopifyDir, 'layout', 'password.liquid'));
   validateBaseCss(errors);
   validateCopiedAssets(errors);
-  validateManifest(errors, warnings, registry, contracts, manifest);
+  validateManifest(errors, warnings, registry, contracts, manifest, runtimeConfig);
   validateSummary(errors, manifest);
 
   if (warnings.length > 0) {

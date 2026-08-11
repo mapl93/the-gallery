@@ -22,10 +22,12 @@ import { createInterface } from 'node:readline';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_ROOT = resolve(__dirname, '..');
 const REGISTRY_PATH = resolve(PACKAGE_ROOT, 'registry.json');
+const WEB_MANIFEST_PATH = resolve(PACKAGE_ROOT, 'platforms/web/adapter.manifest.json');
 const CWD = process.cwd();
 
 // ── Helpers ──────────────────────────────────────────────────
 const registry = JSON.parse(readFileSync(REGISTRY_PATH, 'utf-8'));
+const webManifest = JSON.parse(readFileSync(WEB_MANIFEST_PATH, 'utf-8'));
 
 const CONFIG_FILE = 'tg.config.json';
 
@@ -90,26 +92,32 @@ function resolveDeps(componentId, resolved = new Set(), order = []) {
 
 /** Get the CSS file(s) needed for a list of components. Returns unique file paths in order. */
 function getRequiredFiles(componentIds) {
-  const files = new Set();
-  const ordered = [];
-
-  // Always include base files
-  ordered.push(resolve(PACKAGE_ROOT, registry.base.reset.file));
-  files.add(registry.base.reset.file);
-
-  ordered.push(resolve(PACKAGE_ROOT, registry.base.utilities.file));
-  files.add(registry.base.utilities.file);
-
-  // Collect component files in dependency order
+  const outputs = [];
+  const seen = new Set();
   for (const id of componentIds) {
-    const entry = registry.components[id];
-    if (entry && !files.has(entry.file)) {
-      files.add(entry.file);
-      ordered.push(resolve(PACKAGE_ROOT, entry.file));
+    const component = webManifest.components.find((entry) => entry.slug === id);
+    for (const file of component?.install?.css ?? []) {
+      if (seen.has(file)) continue;
+      seen.add(file);
+      outputs.push(resolve(PACKAGE_ROOT, file));
     }
   }
+  return outputs;
+}
 
-  return ordered;
+/** Get the dependency-closed progressive-enhancement modules for installed components. */
+function getRequiredRuntimeFiles(componentIds) {
+  const outputs = [];
+  const seen = new Set();
+  for (const id of componentIds) {
+    const component = webManifest.components.find((entry) => entry.slug === id);
+    for (const file of component?.install?.runtime ?? []) {
+      if (seen.has(file)) continue;
+      seen.add(file);
+      outputs.push(resolve(PACKAGE_ROOT, file));
+    }
+  }
+  return outputs;
 }
 
 /** Get all token categories used by a set of components. */
@@ -140,6 +148,7 @@ async function cmdInit() {
     $schema: 'https://the-gallery.dev/schema/config.json',
     cssDir: cssDir || './styles/the-gallery',
     tokensDir: tokensDir || './styles/tokens',
+    jsDir: './scripts/the-gallery',
     components: [],
   };
 
@@ -224,11 +233,13 @@ async function cmdAdd(args) {
   }
 
   const files = getRequiredFiles(resolvedAll);
+  const runtimeFiles = getRequiredRuntimeFiles(resolvedAll);
   const tokenCategories = getRequiredTokens(resolvedAll);
 
   // Create target directories
   const cssDir = resolve(CWD, config.cssDir);
   const tokensDir = resolve(CWD, config.tokensDir);
+  const jsDir = resolve(CWD, config.jsDir || './scripts/the-gallery');
   mkdirSync(cssDir, { recursive: true });
   mkdirSync(tokensDir, { recursive: true });
 
@@ -241,6 +252,23 @@ async function cmdAdd(args) {
     copied++;
   }
   success(`Copied ${copied} CSS file(s) → ${relative(CWD, cssDir)}/`);
+
+  if (runtimeFiles.length > 0) {
+    mkdirSync(jsDir, { recursive: true });
+    for (const srcPath of runtimeFiles) {
+      cpSync(srcPath, resolve(jsDir, basename(srcPath)));
+    }
+    const moduleFiles = runtimeFiles
+      .map((file) => basename(file))
+      .filter((file) => file !== 'core.js');
+    const entry = [
+      '/** The Gallery dependency-closed runtime entry. */',
+      ...moduleFiles.map((file) => `import './${file}';`),
+      '',
+    ].join('\n');
+    writeFileSync(resolve(jsDir, 'runtime.js'), entry);
+    success(`Copied ${runtimeFiles.length} runtime module(s) → ${relative(CWD, jsDir)}/`);
+  }
 
   // Copy token source files
   let tokensCopied = 0;
@@ -265,7 +293,12 @@ async function cmdAdd(args) {
   log(`${COLORS.bold}Next steps:${COLORS.reset}`);
   log(`  1. Create a ${COLORS.cyan}tokens.css${COLORS.reset} with your brand values (or use Style Dictionary)`);
   log(`  2. Import tokens.css + component CSS in your project`);
-  log(`  3. Use the HTML/class patterns from the docs`);
+  if (runtimeFiles.length > 0) {
+    log(`  3. Load ${COLORS.cyan}${relative(CWD, resolve(jsDir, 'runtime.js'))}${COLORS.reset} with a module script`);
+    log(`  4. Use the HTML/class patterns from the docs`);
+  } else {
+    log(`  3. Use the HTML/class patterns from the docs`);
+  }
   log('');
   log(`${COLORS.dim}Tokens needed: ${tokenCategories.join(', ')}${COLORS.reset}`);
   log('');

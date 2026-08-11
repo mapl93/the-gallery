@@ -1,41 +1,73 @@
 ## Overview
 
-Multi-value text input that produces removable tag chips.
+Tags Input is a labelled free-form multi-value field. It composes the canonical
+Field Wrapper for label and feedback, canonical Tags for committed values, and
+one native text input for draft editing. The target owns the controlled value
+collection, validation, persistence, localization, and form serialization.
 
 ## Presentation
 
-Tags Input supports `default`, `error`, `success`, and `warning` validation families around the complete entry surface.
+The field supports `default`, `error`, `success`, and `warning` validation
+families. Committed values wrap inside the field boundary while the draft keeps
+a useful editing width and moves to a new row when the container narrows.
 
-<Preview html={"<div class=\"tags-input tg-preview-frame--sm\"><span class=\"tags-input__tag\">Ceramic <button class=\"tags-input__remove\" type=\"button\" aria-label=\"Remove Ceramic\">&times;</button></span><span class=\"tags-input__tag\">Handmade <button class=\"tags-input__remove\" type=\"button\" aria-label=\"Remove Handmade\">&times;</button></span><input id=\"tags-entry\" class=\"tags-input__field\" type=\"text\" aria-label=\"Add tag\" placeholder=\"Add tag\" /></div>"} label="Tags Input" />
+<Preview html={'<div class="field tags-input tg-preview-frame--sm"><label class="field__label" for="tags-entry">Materials</label><div class="field__control tags-input__control"><ul class="tags-input__values" aria-label="Selected materials"><li class="tags-input__item"><span class="tag"><span class="tag__label">Stoneware</span><button class="tag__remove" type="button" aria-label="Remove Stoneware material"></button></span></li><li class="tags-input__item"><span class="tag"><span class="tag__label">Celadon</span><button class="tag__remove" type="button" aria-label="Remove Celadon material"></button></span></li></ul><input id="tags-entry" class="tags-input__field" type="text" aria-describedby="tags-help" placeholder="Add material" /></div><span class="field__description" id="tags-help">Press Enter to add one material.</span><span class="tags-input__status" role="status" aria-atomic="true"></span></div>'} label="Tags Input" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Always pair form inputs with visible labels for accessibility.</Do>
-  <Dont>Don't rely on placeholder text as the only label — it disappears on input.</Dont>
+  <Do>Use Tags Input for short free-form values when the owning target can validate and persist the complete collection.</Do>
+  <Dont>Don't use it as a multi-select or autocomplete without composing a complete Combobox popup and keyboard contract.</Dont>
 </DoDont>
+
+- Enter requests one trimmed non-empty value after text composition ends.
+- Keep draft text distinct from committed values in controlled adapters.
+- Use explicit named Tag remove buttons. The v1 field does not delete values on
+  empty Backspace or turn commas, blur, or pasted text into implicit commits.
+- Keep duplicate equivalence, allowed characters, limits, server identity,
+  ordering, asynchronous validation, and persistence in the owning target.
+- Read-only preserves readable/focusable content without remove actions.
+  Disabled also disables the native field and every rendered remove action.
 
 ## Accessibility
 
 <Callout type="tip">
-  Tags Input depends on the Tag primitive for chip semantics, but tag creation and removal behavior is target-owned.
+  The free-form v1 field has no suggestion popup, so it remains a labelled native
+  text input and does not expose Combobox, Listbox, `aria-autocomplete`,
+  `aria-expanded`, or active-option semantics.
 </Callout>
 
-- Provide a visible label or equivalent accessible name for the entry field.
-- Name each remove button with the tag value it removes.
-- Announce duplicate or invalid tag errors.
-- Keep the text field focused after adding or removing tags when practical.
+- Provide a visible explicit label; placeholder text is supplementary only.
+- Associate persistent guidance and current feedback through
+  `aria-describedby`. Error sets `aria-invalid="true"`; Success and Warning do
+  not.
+- Communicate a required collection with `aria-required` and target validation.
+  Do not put native `required` on an empty draft when committed values already
+  satisfy the collection.
+- Give every available Tag remove button a localized name that includes its
+  value. Canonical Tag preserves native Tab, Enter, Space, disabled, focus, and
+  24px pointer-target behavior.
+- Pre-mount an empty polite atomic status and update it only with concise add,
+  remove, duplicate, capacity, or rejection results. Do not echo keystrokes.
+- After a successful add or removal, return focus to the native draft field
+  unless a documented target flow has a more logical surviving destination.
+- Preserve native punctuation, paste, Backspace, Delete, and IME composition
+  behavior unless a target adapter explicitly documents another policy.
 
 ## References
 
-This component composes [Tag](/components/tag).
+This component composes [Field Wrapper](/components/field-wrapper) and
+[Tag](/components/tag). A future constrained suggestion mode must compose
+[Combobox](/components/combobox) rather than adding dormant popup ARIA.
 
 <PropTable>
-  <tr><td>`.tags-input`</td><td>class</td><td>—</td><td>Input-like wrapper for tags and text entry</td></tr>
+  <tr><td>`.field.tags-input`</td><td>composition</td><td>—</td><td>Visible label, control, guidance, feedback, and status root</td></tr>
   <tr><td>`.tags-input--error`</td><td>modifier</td><td>—</td><td>Error validation family</td></tr>
   <tr><td>`.tags-input--success`</td><td>modifier</td><td>—</td><td>Success validation family</td></tr>
   <tr><td>`.tags-input--warning`</td><td>modifier</td><td>—</td><td>Warning validation family</td></tr>
-  <tr><td>`.tags-input__tag`</td><td>element</td><td>—</td><td>Selected value chip</td></tr>
-  <tr><td>`.tags-input__remove`</td><td>element</td><td>—</td><td>Remove button inside a selected tag</td></tr>
-  <tr><td>`.tags-input__field`</td><td>element</td><td>—</td><td>Text input used to add tags</td></tr>
+  <tr><td>`.tags-input__control`</td><td>element</td><td>—</td><td>Input-like visual surface without a widget role</td></tr>
+  <tr><td>`.tags-input__values`</td><td>element</td><td>—</td><td>Native list of committed values</td></tr>
+  <tr><td>`.tags-input__item &gt; .tag`</td><td>composition</td><td>—</td><td>One canonical committed Tag</td></tr>
+  <tr><td>`.tags-input__field`</td><td>native input</td><td>—</td><td>Draft text and editing focus owner</td></tr>
+  <tr><td>`.tags-input__status`</td><td>status</td><td>empty</td><td>Target-localized collection result</td></tr>
 </PropTable>

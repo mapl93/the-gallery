@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "article-hero",
   "name": "Article Hero",
   "registryId": "L2",
   "category": "blog",
   "status": "pilot",
-  "summary": "Article header with full-width image, split, or text-only variants.",
+  "summary": "Passive native article header with a required contextual title, optional target media and metadata, and three intrinsic editorial variants.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/article-hero",
@@ -14,55 +14,66 @@
     "docs": "site/src/content/components/article-hero.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".article-hero", "className": ".article-hero", "required": true, "description": "Article hero container." },
-    { "name": "backgroundMedia", "selector": ".article-hero__bg", "className": ".article-hero__bg", "required": false, "description": "Full-image variant background media." },
-    { "name": "overlay", "selector": ".article-hero__overlay", "className": ".article-hero__overlay", "required": false, "description": "Optional contrast overlay for the full-image variant." },
-    { "name": "splitMedia", "selector": ".article-hero__media", "className": ".article-hero__media", "required": false, "description": "Media region for the split variant." },
-    { "name": "content", "selector": ".article-hero__content", "className": ".article-hero__content", "required": true, "description": "Article heading and metadata wrapper." },
-    { "name": "category", "selector": ".article-hero__category", "className": ".article-hero__category", "required": false, "description": "Optional article category label." },
-    { "name": "title", "selector": ".article-hero__title", "className": ".article-hero__title", "required": true, "description": "Article title heading." },
-    { "name": "metadata", "selector": ".article-hero__meta", "className": ".article-hero__meta", "required": false, "description": "Optional target-formatted article metadata." }
+    { "name": "root", "selector": ".article-hero", "className": ".article-hero", "required": true, "description": "Native passive header that introduces the surrounding article without creating a new section or landmark." },
+    { "name": "layout", "selector": ".article-hero__layout", "className": ".article-hero__layout", "required": true, "description": "Private media/content layout that responds to the root inline-size container." },
+    { "name": "backgroundMedia", "selector": ".article-hero__bg", "className": ".article-hero__bg", "required": false, "description": "Optional target-owned media region for the full-image variant." },
+    { "name": "overlay", "selector": ".article-hero__overlay", "className": ".article-hero__overlay", "required": false, "description": "Visual-only private contrast layer rendered only with full background media." },
+    { "name": "splitMedia", "selector": ".article-hero__media", "className": ".article-hero__media", "required": false, "description": "Optional target-owned media region for the split variant." },
+    { "name": "content", "selector": ".article-hero__content", "className": ".article-hero__content", "required": true, "description": "Article category, contextual heading, and target metadata flow." },
+    { "name": "category", "selector": ".article-hero__category", "className": ".article-hero__category", "required": false, "description": "Optional compact article-context label; destination policy remains target-owned." },
+    { "name": "title", "selector": ".article-hero__title", "className": ".article-hero__title", "required": true, "description": "Complete contextual heading whose rank is selected by the target composition." },
+    { "name": "metadata", "selector": ".article-hero__meta", "className": ".article-hero__meta", "required": false, "description": "Optional target-formatted publication, author, duration, or taxonomy metadata." },
+    { "name": "metadataSeparator", "selector": ".article-hero__meta-separator", "className": ".article-hero__meta-separator", "required": false, "description": "Optional visual-only separator between target metadata values." }
   ],
   "variants": [
-    { "name": "full", "className": ".article-hero--image", "default": true, "description": "Full-width image hero with overlaid content." },
-    { "name": "split", "className": ".article-hero--split", "default": false, "description": "Responsive split media and content hero." },
-    { "name": "text-only", "className": ".article-hero--text", "default": false, "description": "Centered text-only hero without required media." }
+    { "name": "full", "className": ".article-hero--image", "default": true, "description": "Full-width media presentation with a private contrast overlay and complete overlaid content." },
+    { "name": "split", "className": ".article-hero--split", "default": false, "description": "Media/content composition that splits only when its own container has sufficient inline space." },
+    { "name": "text-only", "className": ".article-hero--text", "default": false, "description": "Centered bounded article introduction that never requires media." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive hero sizing controlled by canonical layout tokens." }
+    { "name": "default", "className": null, "default": true, "description": "Fluid intrinsic size controlled by the parent and Article Hero container." }
   ],
   "states": [
-    { "name": "default", "selectors": [".article-hero"], "description": "Default article hero state." }
+    { "name": "default", "selectors": [".article-hero"], "description": "Passive complete article introduction with a required contextual heading." },
+    { "name": "withoutSelectedMedia", "selectors": [".article-hero--without-media"], "description": "Full or split mode lacks its selected media and fails closed to readable normal text without an empty track or inverse-on-transparent content." }
   ],
   "behavior": [
-    { "name": "targetMetadata", "selectors": [".article-hero__meta"], "description": "Publication date, author, and reading metadata are formatted and supplied by the target." },
-    { "name": "mediaSemantics", "selectors": [".article-hero__bg img", ".article-hero--split .article-hero__media img"], "attributes": ["alt"], "description": "Target markup determines whether hero media is informative or decorative and supplies appropriate alternative text." }
+    { "name": "nativeArticleHeader", "selectors": [".article-hero", ".article-hero__title"], "attributes": ["<header>", "<h1>-<h6>"], "description": "Use a native header and one contextual heading selected by the surrounding document; do not add a Hero widget role, landmark, or keyboard model." },
+    { "name": "contextualMedia", "selectors": [".article-hero__bg img", ".article-hero__media img"], "attributes": ["alt"], "description": "The target supplies informative alternative text or an explicit empty value according to the image's role in context." },
+    { "name": "visualOnlyOverlay", "selectors": [".article-hero__overlay"], "attributes": ["aria-hidden=true"], "description": "The full-image contrast layer is private presentation, rendered only with media and hidden from assistive technology." },
+    { "name": "targetMetadata", "selectors": [".article-hero__meta"], "description": "Dates, durations, authors, taxonomy, locale, ordering, and optional child destinations are supplied by the target; machine-readable time values are retained where applicable." },
+    { "name": "readableMediaFallback", "selectors": [".article-hero--without-media"], "description": "A missing selected media slot never produces inverse text on transparency, a forced empty column, hidden title content, or a substituted image. Unsupported variant input normalizes to full before this safe state is derived." },
+    { "name": "intrinsicVariantLayout", "selectors": [".article-hero", ".article-hero__layout", ".article-hero--split"], "description": "Variant layout responds to the Article Hero named inline-size container without viewport assumptions, reordered DOM, or Studio overrides." },
+    { "name": "contentCompleteness", "selectors": [".article-hero__category", ".article-hero__title", ".article-hero__meta"], "description": "Complete title and optional context wrap naturally without source clamps, generated ellipsis, or runtime measurement." },
+    { "name": "passiveRuntime", "selectors": [".article-hero"], "description": "Neutral Article Hero owns no JavaScript, request, observer, timer, storage, focus behavior, animation loop, analytics, or structured-data emission." }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Full-image, split, or text-only hero presentation.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".article-hero", "source": "variants" }] } },
-    { "name": "backgroundMedia", "type": "slot", "required": false, "description": "Target-owned media for the full-image presentation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__bg", "classNames": [".article-hero__bg"] }] } },
-    { "name": "splitMedia", "type": "slot", "required": false, "description": "Target-owned media for the split presentation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__media", "classNames": [".article-hero__media"] }] } },
-    { "name": "category", "type": "string", "required": false, "description": "Optional article category label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-hero__category" }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Visible article title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-hero__title" }] } },
-    { "name": "metadata", "type": "slot", "required": false, "description": "Target-owned publication, author, and reading metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__meta", "classNames": [".article-hero__meta"] }] } }
+    { "name": "variant", "type": "enum", "required": false, "defaultValue": "full", "valuesFrom": "variants", "description": "One of the three accepted Article Hero presentation profiles.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".article-hero", "source": "variants" }] } },
+    { "name": "backgroundMedia", "type": "slot", "required": false, "unsetBehavior": "Full mode adds the private without-media state and renders a readable normal-text header; other variants ignore this slot.", "description": "Target-owned picture, image, or media composition for full mode.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__bg", "classNames": [".article-hero__bg"] }] } },
+    { "name": "splitMedia", "type": "slot", "required": false, "unsetBehavior": "Split mode adds the private without-media state and renders one readable content column; other variants ignore this slot.", "description": "Target-owned picture, image, or media composition for split mode.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__media", "classNames": [".article-hero__media"] }] } },
+    { "name": "category", "type": "string", "required": false, "unsetBehavior": "Omit the category paragraph when no compact article-context label is supplied.", "description": "Optional article-context label; links and taxonomy records remain target-owned.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-hero__category" }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Complete visible article title rendered in one target-selected contextual heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-hero__title" }] } },
+    { "name": "metadata", "type": "slot", "required": false, "unsetBehavior": "Omit the metadata wrapper when no target-formatted values are supplied.", "description": "Target-owned publication date, duration, author, or taxonomy composition; use machine-readable time elements where applicable.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-hero__meta", "classNames": [".article-hero__meta"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-accent", "--color-text-inverse", "--color-text-primary", "--color-text-secondary"],
-      "typography": ["--font-family-heading", "--typo-body-size", "--typo-display-line-height", "--typo-display-size"],
-      "spacing": ["--space-layout-container", "--space-layout-section-gap"]
+      "color": ["--color-text-accent", "--color-text-primary", "--color-text-secondary", "--tg-color-gray-0"],
+      "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--tg-typography-display-weight", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-display-line-height", "--typo-display-size", "--typo-display-tracking"],
+      "spacing": ["--space-layout-container", "--space-layout-section-gap", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-xs"]
     }
   },
   "accessibility": [
-    "Use a page-appropriate heading level for the article title, normally the page h1.",
-    "Ensure overlaid text remains legible over full-image media in every theme and viewport.",
-    "Provide useful alternative text for informative media and an empty alt value for decorative media."
+    "Use a native header within the target article/page and exactly one complete contextual heading whose rank follows the surrounding document; do not add a Hero widget role, tabindex, live region, or custom keyboard model.",
+    "Provide contextual informative alt text for meaningful media or an explicit empty alt value when decorative; full versus split placement does not determine image meaning.",
+    "Keep full-image category, title, and metadata contrast compliant over every responsive crop and theme; use split or text-only when media cannot support readable overlaid text.",
+    "Use machine-readable time datetime values for supplied dates and durations, hide visual-only separators from assistive technology, and preserve normal DOM reading order.",
+    "Preserve complete wrapping title and metadata content through narrow containers, effective 200 percent text, RTL/localization, forced colors, and reduced-motion settings without horizontal overflow or motion dependency."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article title, image, blog, author, and publication metadata." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Native header/contextual heading markup, target slots, private readable no-media state, and CSS-only named-container variants; no neutral runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The article-hero snippet maps Shopify article title, image, author, and published timestamp with explicit variant, heading, label, visibility, alt-policy, sizes, and loading inputs; it adds no inferred duration, taxonomy, JavaScript, or structured data." },
+    "react": { "status": "planned", "kind": "component", "notes": "Preserve passive native semantics and target-owned heading rank, media, metadata, locale, and routing composition." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Needs corrected L2-specific three-variant, no-media, long-content, and overlay artwork; registered nodes currently reference generic Button shells." },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }
   }

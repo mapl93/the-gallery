@@ -1,38 +1,42 @@
 ## Overview
 
-Sticky Add-to-Cart Bar keeps essential product identity, price, and purchase action available when target logic decides the primary Product Form is no longer visible.
+Sticky Add-to-Cart Bar keeps current product identity, target-formatted Price, and one purchase submitter available when target logic decides the main Product Form is no longer the useful action surface. It submits that existing form rather than creating another form or cart path.
 
 <Preview
-  html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="true">Show sticky bar</button><div class="sticky-atc sticky-atc--visible tg-preview-bottom-layer"><div class="sticky-atc__inner"><div class="sticky-atc__image tg-preview-media tg-preview-media--thumb" role="img" aria-label="Ceramic vase"></div><div class="sticky-atc__info"><span class="sticky-atc__title">Ceramic Vase</span><span class="sticky-atc__price">$120.00</span></div><button class="btn sticky-atc__action" type="button" data-preview-close>Add to Cart</button></div></div></div>'}
+  html={'<div class="tg-preview-stage tg-preview-stage--overlay"><button class="btn btn--outline" type="button" data-preview-trigger aria-expanded="false">Toggle sticky bar</button><form class="product-form" id="sticky-product-form-preview" action="#cart" method="post" hidden><input type="hidden" name="merchandise" value="celadon-study-4" /><input type="hidden" name="quantity" value="1" /><div class="product-form__actions"><button class="btn btn--lg product-form__submit" type="submit" name="intent" value="add">Add to cart</button></div></form><div class="sticky-atc tg-preview-bottom-layer" data-preview-visibility aria-hidden="true" inert><div class="sticky-atc__inner"><div class="sticky-atc__info"><img class="sticky-atc__image" src="/media/editorial/textured-vase.jpg" alt="Celadon glazed stoneware vessel" /><span class="sticky-atc__title" dir="auto">Celadon Study No. 4</span><div class="sticky-atc__price"><span class="price"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$120.00</bdi></span></span></div></div><button class="btn sticky-atc__action" type="submit" form="sticky-product-form-preview" name="intent" value="add">Add to cart</button></div></div></div>'}
   label="Sticky Add-to-Cart Bar"
-  layout="overlay"
-  interaction={{ selector: '.sticky-atc', toggle: 'sticky-atc--visible', triggerLabel: 'Show Sticky Bar', triggerSelector: '[data-preview-trigger]', closeSelector: '[data-preview-close]', startVisible: true }}
+  interaction={{ selector: '.sticky-atc', toggle: 'sticky-atc--visible', triggerLabel: 'Toggle Sticky Bar', triggerSelector: '[data-preview-trigger]' }}
 />
 
 ## Presentation
 
-Sticky Add-to-Cart uses the ADR 0069 viewport-edge family. The bar is visible as the primary artwork, is contained at the preview's bottom edge, and does not inherit geometry from its hidden trigger.
+The source order stays product information, then purchase action. The inner composition responds to K9's own container: at constrained widths the action occupies a separate full-width row while title and Price remain available. Maximum width, threshold, image treatment, gaps, surface chrome, and movement are private implementation details pending human visual review.
 
-`visible` defaults to `false` and composes `.sticky-atc--visible`. `title` and `actionLabel` are required; media, alternative text, and target-formatted price are optional. `actionDisabled` defaults to `false`.
+`title`, `actionLabel`, and `productFormId` are required non-empty values. `image` and its target-authored `imageAlt` are optional. `price` is an optional canonical Price slot, not a raw money string. `visible`, `actionDisabled`, and `pending` project state from the target coordinator without creating K9-owned commerce state.
+
+The root has no landmark, toolbar, dialog, or live-region role. On Web, a hidden K9 is both `inert` and `aria-hidden="true"`; translation alone is not sufficient. The target owns when the bar mounts, appears, hides, or completes an exit transition.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Show the bar only when the primary purchase controls are no longer conveniently available.</Do>
-  <Dont>Do not let the sticky surface cover checkout, consent, or system controls.</Dont>
+  <Do>Associate the sticky canonical Button with the same native Product Form and synchronized product coordinator as the main action.</Do>
+  <Dont>Do not create a second form, local cart request, inferred “Added” state, or duplicate purchase announcement.</Dont>
 </DoDont>
 
-- Use the same selected variant, quantity, and selling-plan state as Product Form.
-- Keep the displayed price synchronized with target commerce state.
-- Avoid showing two competing add-to-cart actions at the same viewport position.
+- Keep selected merchandise, options, quantity, selling plan, Price, media, URL, inventory, availability, pending/result state, cart updates, and feedback synchronized through one target product coordinator.
+- Expose K9 only after the main Product Form action is no longer usefully visible and coherent product eligibility exists. Each target documents its own observation signal, thresholds, and hysteresis; K9 does not implement them.
+- Reserve dynamic block-end scroll space and coordinate safe areas, virtual keyboards, Bottom Nav, Cookie Consent, Cart Drawer, chat, and other fixed surfaces.
+- Use `actionDisabled` for an unavailable resolved selection and provide a visible explanation in the surrounding product context. Use `pending` only while target purchase work is in progress.
+- Do not expose fixed height, breakpoint, image size, shadow, border, gap, action width, observer threshold, z-index offset, or transition distance as public K9 properties.
 
 ## Accessibility
 
-- Keep the purchase action available through the primary Product Form when the bar is hidden.
-- Provide `imageAlt` when the optional image conveys information; hide redundant media from assistive technology otherwise.
-- Preserve a concise product title and a clearly named action.
-- Do not duplicate live announcements when the primary form and sticky bar reflect the same state.
-- Respect reduced-motion preferences when targets animate visibility.
+- On Web, use a real `button[type="submit"][form]` so the sticky action preserves Product Form constraint validation, activated-submitter semantics, named successful entries, and FormData.
+- Keep hidden descendants inert and accessibility-hidden. Do not repair a visually translated subtree with only one descendant `tabIndex`.
+- Preserve a visible localized product title and action label, canonical Price bidirectional isolation, and correct optional image alternative text. Empty image alt is appropriate only when the adjacent title communicates the same identity.
+- Pending uses canonical Button `aria-busy="true"` plus disabled semantics, preserves the visible label, and prevents repeat submission.
+- Keep target result status, focus, errors, retry, and announcement timing in one purchase/cart lifecycle; K9 itself is not a status region.
+- Ensure the fixed surface never completely obscures keyboard focus or checkout-critical controls. Test effective 200 percent zoom, reflow, reduced motion, forced colors, logical direction, safe areas, and short viewports.
 
 ## References
 
@@ -40,15 +44,18 @@ Sticky Add-to-Cart uses the ADR 0069 viewport-edge family. The bar is visible as
 
 - [Button](/components/button)
 - [Price](/components/price)
+- [Product Form](/components/product-form)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`visible`</td><td>boolean</td><td>`false`</td><td>Controls target-owned sticky visibility</td></tr>
-  <tr><td>`image`</td><td>slot</td><td>optional</td><td>Product thumbnail</td></tr>
-  <tr><td>`imageAlt`</td><td>string</td><td>optional</td><td>Product thumbnail alternative text</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Product title</td></tr>
-  <tr><td>`price`</td><td>string</td><td>optional</td><td>Target-formatted product price</td></tr>
-  <tr><td>`actionLabel`</td><td>string</td><td>required</td><td>Add-to-cart action label</td></tr>
-  <tr><td>`actionDisabled`</td><td>boolean</td><td>`false`</td><td>Disables add to cart when the current selection is unavailable</td></tr>
+  <tr><td>`visible`</td><td>`boolean`</td><td>`false`</td><td>Target-owned semantic visibility; trigger policy stays outside K9</td></tr>
+  <tr><td>`image`</td><td>`slot`</td><td>optional</td><td>Target-owned product thumbnail</td></tr>
+  <tr><td>`imageAlt`</td><td>`string`</td><td>optional</td><td>Thumbnail alternative text; empty only when adjacent title is equivalent</td></tr>
+  <tr><td>`title`</td><td>`string`</td><td>required</td><td>Non-empty localized product title</td></tr>
+  <tr><td>`price`</td><td>`slot`</td><td>optional</td><td>One canonical target-formatted Price</td></tr>
+  <tr><td>`actionLabel`</td><td>`string`</td><td>required</td><td>Non-empty localized canonical Button label</td></tr>
+  <tr><td>`productFormId`</td><td>`string`</td><td>required</td><td>Stable Product Form reference; native `form` owner on Web</td></tr>
+  <tr><td>`actionDisabled`</td><td>`boolean`</td><td>`false`</td><td>Unavailable resolved selection projected from the target</td></tr>
+  <tr><td>`pending`</td><td>`boolean`</td><td>`false`</td><td>Target work projected to Button busy and disabled semantics</td></tr>
 </PropTable>

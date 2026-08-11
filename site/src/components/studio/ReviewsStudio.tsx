@@ -2,6 +2,7 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type ChangeEvent,
@@ -9,8 +10,6 @@ import {
 } from 'react';
 import {
   BadgeCheck,
-  ChevronLeft,
-  ChevronRight,
   Star,
   ThumbsUp,
   Upload,
@@ -23,6 +22,8 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { editorialImage, editorialMedia } from './editorialMedia';
+import PaginationArtwork from './PaginationArtwork';
+import RatingArtwork from './RatingArtwork';
 
 interface ReviewsStudioProps {
   contract: ComponentContract;
@@ -34,21 +35,19 @@ const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 const fixtureValues: Record<string, StudioPropertyValues> = {
   'review-summary': {
     ratingValue: 4.5,
+    ratingDisplayValue: 4.5,
     scoreLabel: '4.5',
-    ratingLabel: '4.5 out of 5 stars from 127 reviews',
+    ratingLabel: '4.5 out of 5 stars',
     reviewCount: 127,
     reviewCountLabel: '127 reviews',
     distribution: true,
-  },
-  'star-rating': {
-    ratingValue: 4.5,
-    label: '4.5 out of 5 stars',
-    size: 'lg',
+    distributionLabel: 'Rating distribution',
   },
   'star-input': {
     label: 'Your rating',
     name: 'studio-rating',
     value: 4,
+    variant: 'default',
     required: false,
     disabled: false,
     describedBy: 'studio-rating-help',
@@ -56,12 +55,14 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
   'review-card': {
     author: 'Mara Vidal',
     date: 'July 8, 2026',
+    dateTime: '2026-07-08',
     avatar: true,
     verifiedStatus: true,
     rating: true,
     title: 'Quietly beautiful in daily use',
     body: 'The proportions feel considered, and the glaze changes gently as the light moves across it.',
     photos: true,
+    photosLabel: 'Review photos',
     helpfulLabel: 'Helpful',
     helpfulPressed: false,
     helpfulDisabled: false,
@@ -93,7 +94,8 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
   },
   'review-pagination': {
     label: 'Review pages',
-    controls: true,
+    currentPage: 5,
+    pageItems: true,
   },
 };
 
@@ -153,62 +155,46 @@ function ratingNumber(value: StudioPropertyValue, fallback = 0): number {
   return typeof value === 'number' ? Math.max(0, Math.min(5, value)) : fallback;
 }
 
-function StarDisplay({ value, label, large = false }: { value: number; label: string; large?: boolean }) {
-  return (
-    <span
-      className={`star-rating${large ? ' star-rating--lg' : ''}`}
-      data-rating={value}
-      role="img"
-      aria-label={label}
-    >
-      {[1, 2, 3, 4, 5].map((position) => {
-        const fill = value >= position ? 'true' : value >= position - 0.5 ? 'half' : undefined;
-        return (
-          <Star
-            className="star-rating__star"
-            data-filled={fill}
-            fill="currentColor"
-            aria-hidden="true"
-            key={position}
-          />
-        );
-      })}
-    </span>
-  );
-}
-
 interface StarInputProps {
   idPrefix: string;
   label: string;
   name: string;
   value: number | null;
+  variant?: 'default' | 'error' | 'success' | 'warning';
   required?: boolean;
   disabled?: boolean;
   describedBy?: string;
   onChange: (value: number) => void;
 }
 
-function StarInput({ idPrefix, label, name, value, required, disabled, describedBy, onChange }: StarInputProps) {
+function StarInput({ idPrefix, label, name, value, variant = 'default', required, disabled, describedBy, onChange }: StarInputProps) {
   return (
-    <fieldset className="star-input" data-value={value ?? undefined} aria-describedby={describedBy || undefined}>
+    <fieldset
+      className={`star-input${variant === 'default' ? '' : ` star-input--${variant}`}`}
+      data-value={value ?? undefined}
+      disabled={disabled}
+      aria-invalid={variant === 'error' ? true : undefined}
+      aria-describedby={describedBy || undefined}
+    >
       <legend className="star-input__legend">{label}</legend>
-      {[1, 2, 3, 4, 5].map((rating) => (
-        <label className="star-input__label" key={rating}>
-          <input
-            className="star-input__radio"
-            id={`${idPrefix}-${rating}`}
-            type="radio"
-            name={name}
-            value={rating}
-            checked={value === rating}
-            required={required}
-            disabled={disabled}
-            aria-label={`${rating} ${rating === 1 ? 'star' : 'stars'}`}
-            onChange={() => onChange(rating)}
-          />
-          <Star className="star-input__indicator" fill="currentColor" aria-hidden="true" />
-        </label>
-      ))}
+      <span className="star-input__choices">
+        {[1, 2, 3, 4, 5].map((rating) => (
+          <label className="star-input__label" key={rating}>
+            <input
+              className="star-input__radio"
+              id={`${idPrefix}-${rating}`}
+              type="radio"
+              name={name}
+              value={rating}
+              checked={value === rating}
+              required={required}
+              onChange={() => onChange(rating)}
+            />
+            <span className="star-input__label-text">{rating} {rating === 1 ? 'star' : 'stars'}</span>
+            <Star className="star-input__indicator" aria-hidden="true" />
+          </label>
+        ))}
+      </span>
     </fieldset>
   );
 }
@@ -228,14 +214,13 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState('');
-  const [selectedHighlights, setSelectedHighlights] = useState<string[]>(['Quality']);
   const [formRating, setFormRating] = useState<number | null>(4);
   const [reviewTitle, setReviewTitle] = useState('A thoughtful piece');
   const [reviewBody, setReviewBody] = useState('The form and glaze work beautifully together.');
   const [reviewTopic, setReviewTopic] = useState('product');
-  const [fileLabel, setFileLabel] = useState('No photo selected');
+  const [fileLabel, setFileLabel] = useState('No photo selected.');
   const [sortValue, setSortValue] = useState('recent');
-  const [currentPage, setCurrentPage] = useState(2);
+  const reviewFormRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const read = () => {
@@ -254,17 +239,16 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
 
   function reset() {
+    reviewFormRef.current?.reset();
     setValues({ ...initialValues });
     setTokenOverrides({});
     setFeedback('');
-    setSelectedHighlights(['Quality']);
     setFormRating(4);
     setReviewTitle('A thoughtful piece');
     setReviewBody('The form and glaze work beautifully together.');
     setReviewTopic('product');
-    setFileLabel('No photo selected');
+    setFileLabel('No photo selected.');
     setSortValue('recent');
-    setCurrentPage(2);
   }
 
   function updateValues(next: StudioPropertyValues) {
@@ -275,46 +259,47 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
   function renderSummary() {
     const rating = ratingNumber(values.ratingValue, 4.5);
     return (
-      <section
+      <figure
         className="review-summary"
         data-rating={rating}
         data-review-count={typeof values.reviewCount === 'number' ? values.reviewCount : undefined}
-        aria-label={String(values.ratingLabel || '') || undefined}
       >
-        <div className="review-summary__average">
-          <span className="review-summary__score">{String(values.scoreLabel)}</span>
-          <StarDisplay value={rating} label={String(values.ratingLabel)} />
+        <figcaption className="review-summary__average">
+          <span className="review-summary__score" aria-hidden="true">{String(values.scoreLabel)}</span>
+          <RatingArtwork
+            ratingValue={typeof values.ratingDisplayValue === 'number' ? values.ratingDisplayValue : Number.NaN}
+            accessibleLabel={String(values.ratingLabel)}
+          />
           <span className="review-summary__count">{String(values.reviewCountLabel)}</span>
-        </div>
+        </figcaption>
         {values.distribution === true && (
-          <div className="review-summary__bars" aria-label="Rating distribution">
+          <ul className="review-summary__bars" aria-label={String(values.distributionLabel || '')}>
             {distributionRows.map((row) => (
-              <div className="review-summary__bar-row" key={row.label}>
+              <li className="review-summary__bar-row" key={row.label}>
                 <span className="review-summary__bar-label">{row.label}</span>
                 <span className="review-summary__bar-track" aria-hidden="true">
-                  <span className="review-summary__bar-fill" style={{ width: row.width }} />
+                  <span className="review-summary__bar-fill" style={{ inlineSize: row.width }} />
                 </span>
                 <span className="review-summary__bar-count">{row.count}</span>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
-      </section>
-    );
-  }
-
-  function renderStarRating() {
-    return (
-      <StarDisplay
-        value={ratingNumber(values.ratingValue, 4.5)}
-        label={String(values.label || '')}
-        large={values.size === 'lg'}
-      />
+      </figure>
     );
   }
 
   function renderStarInput() {
     const describedBy = String(values.describedBy || '');
+    const variant = ['error', 'success', 'warning'].includes(String(values.variant))
+      ? values.variant as 'error' | 'success' | 'warning'
+      : 'default';
+    const feedback = {
+      default: 'Choose one rating from one through five.',
+      error: 'Choose a rating before continuing.',
+      success: 'Rating selected.',
+      warning: 'Review the selected rating before continuing.',
+    }[variant];
     return (
       <div className="docs-studio__reviews-star-input">
         <StarInput
@@ -322,129 +307,141 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
           label={String(values.label)}
           name={String(values.name) || `${id}-rating`}
           value={typeof values.value === 'number' ? values.value : null}
+          variant={variant}
           required={values.required === true}
           disabled={values.disabled === true}
           describedBy={describedBy}
           onChange={(value) => updateValues({ value })}
         />
-        {describedBy && <p className="docs-studio__reviews-note" id={describedBy}>Choose one rating from one through five.</p>}
+        {describedBy && <p className="docs-studio__reviews-note" id={describedBy}>{feedback}</p>}
       </div>
     );
   }
 
   function renderReviewCard() {
     const pressed = values.helpfulPressed === true;
+    const title = String(values.title || '');
+    const date = String(values.date || '');
+    const helpfulLabel = String(values.helpfulLabel || '');
+    const helpfulCount = String(values.helpfulCount || '');
+    const titleId = `${id}-review-title`;
+    const helpfulCountId = `${id}-review-helpful-count`;
     return (
-      <article className="review-card">
+      <article className="review-card" aria-labelledby={title ? titleId : undefined}>
         <header className="review-card__header">
           {values.avatar === true && (
             <img
               className="review-card__avatar docs-studio__reviews-avatar"
               src={editorialMedia.artistInStudio}
-              alt={`${String(values.author)} working in a ceramics studio`}
+              alt=""
             />
           )}
           <div className="review-card__meta">
             <span className="review-card__author">{String(values.author)}</span>
-            {String(values.date || '') && <time className="review-card__date">{String(values.date)}</time>}
+            {date && <time className="review-card__date" dateTime={String(values.dateTime || '') || undefined}>{date}</time>}
           </div>
           {values.verifiedStatus === true && <span className="review-card__verified"><BadgeCheck aria-hidden="true" />Verified purchase</span>}
         </header>
-        {values.rating === true && <StarDisplay value={4.5} label="4.5 out of 5 stars" />}
-        {String(values.title || '') && <h2 className="review-card__title">{String(values.title)}</h2>}
+        {values.rating === true && (
+          <RatingArtwork ratingValue={4.5} accessibleLabel="4.5 out of 5 stars" />
+        )}
+        {title && <h3 className="review-card__title" id={titleId}>{title}</h3>}
         <p className="review-card__body">{String(values.body)}</p>
         {values.photos === true && (
-          <div className="review-card__photos" aria-label="Review photos">
+          <ul className="review-card__photos" aria-label={String(values.photosLabel)}>
             {photoAlts.slice(0, 3).map((alt, index) => (
-              <span className="review-card__photo" key={alt}>
+              <li className="review-card__photo" key={alt}>
                 <img className={`docs-studio__reviews-media docs-studio__reviews-media--${index + 1}`} src={editorialImage(index)} alt={alt} />
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
-        {(String(values.helpfulLabel || '') || String(values.helpfulCount || '')) && (
+        {(helpfulLabel || helpfulCount) && (
           <div className="review-card__actions">
-            {String(values.helpfulLabel || '') && (
+            {helpfulLabel && (
               <button
                 className="review-card__helpful-btn"
                 type="button"
                 aria-pressed={pressed}
+                aria-describedby={helpfulCount ? helpfulCountId : undefined}
                 disabled={values.helpfulDisabled === true}
                 onClick={() => updateValues({ helpfulPressed: !pressed })}
               >
-                <ThumbsUp aria-hidden="true" />{String(values.helpfulLabel)}
+                <ThumbsUp aria-hidden="true" />{helpfulLabel}
               </button>
             )}
-            {String(values.helpfulCount || '') && <span className="review-card__helpful-count">{String(values.helpfulCount)}</span>}
+            {helpfulCount && <span className="review-card__helpful-count" id={helpfulCountId}>{helpfulCount}</span>}
           </div>
         )}
         {values.reply === true && (
-          <aside className="review-card__reply">
+          <div className="review-card__reply">
             <div className="review-card__reply-label">Gallery reply</div>
             <p className="review-card__reply-body">Thank you for sharing how the piece lives in your space.</p>
-          </aside>
+          </div>
         )}
       </article>
     );
   }
 
   function renderHighlights() {
-    const toggle = (label: string) => {
-      setSelectedHighlights((current) => current.includes(label)
-        ? current.filter((item) => item !== label)
-        : [...current, label]);
-      setFeedback('Theme selection changed only in this Studio fixture; no reviews were filtered.');
-    };
     return (
-      <section className="review-highlights" aria-label={String(values.label || '') || undefined}>
+      <ul className="review-highlights" role="list" aria-label={String(values.label || '') || undefined}>
         {values.items === true && highlightItems.map(([label, count]) => (
-          <button
-            className="review-highlights__tag"
-            type="button"
-            aria-pressed={selectedHighlights.includes(label)}
-            onClick={() => toggle(label)}
-            key={label}
-          >
-            {label}<span className="review-highlights__count">{count}</span>
-          </button>
+          <li key={label}>
+            <span className="review-highlights__tag">
+              {label}
+              <span className="review-highlights__count" aria-hidden="true">{count}</span>
+              <span className="visually-hidden">{count} reviews</span>
+            </span>
+          </li>
         ))}
-      </section>
+      </ul>
     );
   }
 
   function renderPhotoReviews() {
     return (
-      <div className="photo-reviews" role="list" aria-label={String(values.label || '') || undefined}>
+      <ul className="photo-reviews" role="list" aria-label={String(values.label || '') || undefined}>
         {values.items === true && photoAlts.map((alt, index) => (
-          <div className="photo-reviews__item" role="listitem" key={alt}>
+          <li className="photo-reviews__item" key={alt}>
             <img
               className={`photo-reviews__image docs-studio__reviews-media docs-studio__reviews-media--${index + 1}`}
               src={editorialImage(index)}
               alt={alt}
+              loading="lazy"
+              decoding="async"
             />
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     );
   }
 
   function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
-    setFileLabel(event.target.files?.[0]?.name || 'No photo selected');
+    setFileLabel(event.target.files?.[0]?.name || 'No photo selected.');
   }
 
   function renderReviewForm() {
     const submit = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setFeedback('Review validated in this Studio fixture. Nothing was uploaded or submitted.');
+      setFeedback('The local documentation fixture received the submit request. Nothing was uploaded or persisted.');
+    };
+    const resetReviewFields = () => {
+      setFormRating(4);
+      setReviewTitle('A thoughtful piece');
+      setReviewBody('The form and glaze work beautifully together.');
+      setReviewTopic('product');
+      setFileLabel('No photo selected.');
+      setFeedback('');
     };
     return (
-      <form className="review-form" aria-label={String(values.label || '') || undefined} onSubmit={submit}>
+      <form ref={reviewFormRef} className="review-form" aria-label={String(values.label || '') || undefined} onSubmit={submit} onReset={resetReviewFields}>
         <div className="review-form__fields">
           {values.rating === true && (
             <div className="review-form__group">
               <StarInput
                 idPrefix={`${id}-form-rating`}
-                label="Your rating"
+                label="Your rating (required)"
                 name={`${id}-form-rating`}
                 value={formRating}
                 required
@@ -458,9 +455,9 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
             <div className="input">
               <label className="input__label" htmlFor={`${id}-review-title`}>Review title</label>
               <div className="input__control">
-                <input className="input__field" id={`${id}-review-title`} name="review-title" value={reviewTitle} onChange={(event) => setReviewTitle(event.target.value)} />
+                <input className="input__field" id={`${id}-review-title`} name="review-title" type="text" value={reviewTitle} aria-describedby={`${id}-review-title-message`} onChange={(event) => setReviewTitle(event.target.value)} />
               </div>
-              <span className="input__message">Summarize your experience.</span>
+              <span className="input__message" id={`${id}-review-title-message`}>Summarize your experience.</span>
             </div>
           )}
           {values.reviewBody === true && (
@@ -484,23 +481,22 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
           {values.classification === true && (
             <div className="select select--success">
               <label className="select__label" htmlFor={`${id}-review-topic`}>Review topic</label>
-              <select className="select__field" id={`${id}-review-topic`} name="review-topic" value={reviewTopic} onChange={(event) => setReviewTopic(event.target.value)}>
+              <select className="select__field" id={`${id}-review-topic`} name="review-topic" value={reviewTopic} aria-describedby={`${id}-review-topic-message`} onChange={(event) => setReviewTopic(event.target.value)}>
                 <option value="product">Product</option>
                 <option value="delivery">Delivery</option>
                 <option value="service">Service</option>
               </select>
-              <span className="select__message">Topic selected.</span>
+              <span className="select__message" id={`${id}-review-topic-message`}>Topic selected.</span>
             </div>
           )}
           {values.photoUpload === true && (
-            <div className="file-upload">
-              <input className="file-upload__input" id={`${id}-review-photo`} name="review-photo" type="file" accept="image/*" aria-describedby={`${id}-review-photo-hint`} onChange={handlePhotoChange} />
-              <label htmlFor={`${id}-review-photo`}>
-                <Upload className="file-upload__icon" aria-hidden="true" />
-                <span className="file-upload__text">Add a review photo</span>
-                <span className="file-upload__hint" id={`${id}-review-photo-hint`}>Local preview only. {fileLabel}</span>
-              </label>
-            </div>
+            <label className={`file-upload${fileLabel === 'No photo selected.' ? '' : ' file-upload--selected'}`}>
+              <input className="file-upload__input" id={`${id}-review-photo`} name="review-photo" type="file" accept="image/*" aria-labelledby={`${id}-review-photo-label`} aria-describedby={`${id}-review-photo-hint`} onChange={handlePhotoChange} />
+              <Upload className="file-upload__icon" aria-hidden="true" />
+              <span className="file-upload__text" id={`${id}-review-photo-label`}>Add a review photo</span>
+              <span className="file-upload__hint" id={`${id}-review-photo-hint`}>This documentation fixture accepts image files; production policy is target-owned.</span>
+              <span className="file-upload__status" role="status" data-empty-label="No photo selected.">{fileLabel}</span>
+            </label>
           )}
         </div>
         {values.submitAction === true && <div className="review-form__actions"><button className="btn" type="submit">Submit review</button></div>}
@@ -510,8 +506,10 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
   }
 
   function renderToolbar() {
+    if (values.control !== true && values.writeAction !== true) return null;
+
     return (
-      <div className="review-toolbar" role="toolbar" aria-label={String(values.label || '') || undefined}>
+      <div className="review-toolbar" role="group" aria-label={String(values.label || '') || undefined}>
         {values.control === true && (
           <div className="review-toolbar__sort">
             <div className="select">
@@ -542,35 +540,22 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
   }
 
   function renderPagination() {
-    const selectPage = (page: number) => {
-      setCurrentPage(page);
-      setFeedback(`Page ${page} selected only in this Studio fixture; no reviews were fetched.`);
-    };
     return (
-      <nav className="review-pagination" aria-label={String(values.label)}>
-        {values.controls === true && (
-          <ul className="review-pagination__list">
-            <li className="review-pagination__item">
-              <button className="review-pagination__btn" type="button" aria-label="Previous review page" disabled={currentPage === 1} onClick={() => selectPage(currentPage - 1)}><ChevronLeft aria-hidden="true" /></button>
-            </li>
-            {[1, 2, 3, 4].map((page) => (
-              <li className="review-pagination__item" key={page}>
-                <button className="review-pagination__btn" type="button" aria-label={`Review page ${page}`} aria-current={currentPage === page ? 'page' : undefined} onClick={() => selectPage(page)}>{page}</button>
-              </li>
-            ))}
-            <li className="review-pagination__item"><span className="review-pagination__ellipsis" aria-hidden="true">...</span></li>
-            <li className="review-pagination__item">
-              <button className="review-pagination__btn" type="button" aria-label="Next review page" disabled={currentPage === 4} onClick={() => selectPage(currentPage + 1)}><ChevronRight aria-hidden="true" /></button>
-            </li>
-          </ul>
-        )}
-      </nav>
+      <PaginationArtwork
+        className="review-pagination"
+        label={String(values.label)}
+        currentPage={Number(values.currentPage) || 1}
+        pageItems={values.pageItems === true}
+        onPageChange={(page) => {
+          setValues((current) => ({ ...current, currentPage: page }));
+          setFeedback(`Page ${page} selected only in this documentation fixture; no reviews were fetched.`);
+        }}
+      />
     );
   }
 
   function renderPreview() {
     if (contract.slug === 'review-summary') return renderSummary();
-    if (contract.slug === 'star-rating') return renderStarRating();
     if (contract.slug === 'star-input') return renderStarInput();
     if (contract.slug === 'review-card') return renderReviewCard();
     if (contract.slug === 'review-highlights') return renderHighlights();

@@ -1,11 +1,313 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "firing-info", "name": "Kiln / Firing Info", "registryId": "R6", "category": "ceramics", "status": "pilot", "summary": "Firing details card: temperature, cone, atmosphere, duration.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/firing-info", "css": { "file": "components/css/ceramics.css", "selector": ".firing-info" }, "docs": "site/src/content/components/firing-info.mdx" },
-  "anatomy": [{ "name": "root", "selector": ".firing-info", "className": ".firing-info", "required": true, "description": "Firing information surface." }, { "name": "title", "selector": ".firing-info__title", "className": ".firing-info__title", "required": false, "description": "Optional firing-information heading." }, { "name": "list", "selector": ".firing-info__list", "className": ".firing-info__list", "required": true, "description": "Firing detail list." }, { "name": "item", "selector": ".firing-info__item", "className": ".firing-info__item", "required": true, "description": "Single firing term and value." }, { "name": "term", "selector": ".firing-info__item dt", "required": true, "description": "Firing detail term." }, { "name": "value", "selector": ".firing-info__item dd", "required": true, "description": "Target-formatted firing detail value." }],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default firing-information surface." }], "sizes": [{ "name": "default", "className": null, "default": true, "description": "Responsive term-value layout." }], "states": [{ "name": "default", "selectors": [".firing-info"], "description": "Passive technical information." }],
-  "behavior": [{ "name": "technicalData", "selectors": [".firing-info__list", ".firing-info__item"], "attributes": ["<dl>", "<dt>", "<dd>"], "description": "Targets supply and format firing facts while preserving term-description semantics." }],
-  "properties": [{ "name": "title", "type": "string", "required": false, "description": "Optional firing-information heading.", "targetMappings": { "web": [{ "kind": "content", "selector": ".firing-info__title" }] } }, { "name": "details", "type": "slot", "required": true, "description": "Target-owned firing terms and values; no ceramics data schema is implied.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".firing-info__list", "classNames": [".firing-info__list"] }] } }],
-  "tokens": { "public": { "color": ["--color-surface-secondary", "--color-text-primary", "--color-text-secondary"], "typography": ["--font-family-heading", "--typo-body-size"], "radius": ["--radius-lg"] } },
-  "accessibility": ["Use description-list semantics for firing terms and values.", "Include units and qualifiers in readable text.", "Do not communicate firing conditions through visual styling alone."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.3.0",
+  "slug": "firing-info",
+  "name": "Firing Schedule",
+  "registryId": "R6",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Controlled firing-program visualization with one real-time planned model, required ramp chart and canonical Data Table, optional observed series, and no kiln-control behavior.",
+  "dependencies": ["data-table"],
+  "source": {
+    "registry": "registry.json#/components/firing-info",
+    "css": {
+      "file": "components/css/ceramics.css",
+      "selector": ".firing-schedule"
+    },
+    "docs": "site/src/content/components/firing-info.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".firing-schedule",
+      "className": ".firing-schedule",
+      "required": true,
+      "description": "Conditional named section or generic root emitted only for one valid planned program; the legacy firing-info root class is pre-v1 migration-only."
+    },
+    {
+      "name": "header",
+      "selector": ".firing-schedule__header",
+      "className": ".firing-schedule__header",
+      "required": false,
+      "description": "Optional wrapper for a non-empty contextual title."
+    },
+    {
+      "name": "title",
+      "selector": ".firing-schedule__title",
+      "className": ".firing-schedule__title",
+      "required": false,
+      "description": "Visible contextual heading whose native rank is selected by the target."
+    },
+    {
+      "name": "summary",
+      "selector": ".firing-schedule__summary",
+      "className": ".firing-schedule__summary",
+      "required": true,
+      "description": "Visible starting-temperature, planned-duration and observed-lifecycle summary derived from the active normalized data."
+    },
+    {
+      "name": "chart",
+      "selector": ".firing-schedule__chart",
+      "className": ".firing-schedule__chart",
+      "required": true,
+      "description": "Required informative temperature-over-real-time figure derived from the same planned program used by the table."
+    },
+    {
+      "name": "chartScroll",
+      "selector": ".firing-schedule__chart-scroll",
+      "className": ".firing-schedule__chart-scroll",
+      "required": true,
+      "description": "Named keyboard-focusable horizontal scroll owner preserving legible axes at narrow widths."
+    },
+    {
+      "name": "plot",
+      "selector": ".firing-schedule__plot",
+      "className": ".firing-schedule__plot",
+      "required": true,
+      "description": "Informative SVG with localized accessible name and concise visible-series summary; raw samples never become focusable chart points."
+    },
+    {
+      "name": "legend",
+      "selector": ".firing-schedule__legend",
+      "className": ".firing-schedule__legend",
+      "required": true,
+      "description": "Visible native list identifying every displayed series through text and line treatment in addition to color."
+    },
+    {
+      "name": "table",
+      "selector": ".firing-schedule__table",
+      "className": ".firing-schedule__table",
+      "required": true,
+      "description": "Required canonical Data Table scroll owner containing one row per planned segment."
+    },
+    {
+      "name": "dataTable",
+      "selector": ".firing-schedule__data-table",
+      "className": ".firing-schedule__data-table",
+      "required": true,
+      "description": "Canonical native table with planned program columns and optional correlated actual-summary columns."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One chart-and-table presentation; planned, actual and both are controlled data views rather than independent visual variants."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Intrinsic scroll containment with no public viewport breakpoint or chart dimensions."
+    }
+  ],
+  "states": [
+    {
+      "name": "planned",
+      "selectors": [".firing-schedule[data-view=\"planned\"]"],
+      "description": "Shows the required derived planned curve and planned segment columns."
+    },
+    {
+      "name": "actual",
+      "selectors": [".firing-schedule[data-view=\"actual\"]"],
+      "description": "Shows the controlled observed curve while the required table continues to identify each planned segment and may add correlated observed summaries."
+    },
+    {
+      "name": "both",
+      "selectors": [".firing-schedule[data-view=\"both\"]"],
+      "description": "Compares planned and observed curves with distinct labels and line treatments."
+    },
+    {
+      "name": "collecting",
+      "selectors": [".firing-schedule[data-actual-status=\"collecting\"]"],
+      "description": "Truthfully labels a partial target-controlled observed series without announcing every sample."
+    },
+    {
+      "name": "complete",
+      "selectors": [".firing-schedule[data-actual-status=\"complete\"]"],
+      "description": "Labels the supplied observed series as complete."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "singlePlannedSource",
+      "selectors": [".firing-schedule__plot", ".firing-schedule__data-table"],
+      "description": "Neutral source validates one starting Celsius temperature and ordered stable segment records, then derives accumulated real time, planned chart points and table durations from that one program."
+    },
+    {
+      "name": "fullRateEstimate",
+      "selectors": [".firing-schedule__data-table"],
+      "description": "A full-rate segment requires a positive target-reviewed estimated ramp duration and is visibly labelled estimated; otherwise the complete schedule is invalid and omitted."
+    },
+    {
+      "name": "controlledView",
+      "selectors": [".firing-schedule"],
+      "attributes": ["data-view=planned|actual|both"],
+      "description": "The target controls the visible series. Both is the inferred default when valid observed data exists, otherwise planned; actual is unavailable without observed samples."
+    },
+    {
+      "name": "normalizedUnitConversion",
+      "selectors": [".firing-schedule", ".firing-schedule__plot", ".firing-schedule__data-table"],
+      "attributes": ["data-display-unit=celsius|fahrenheit"],
+      "description": "One normalized Celsius/seconds source drives every table, axis, legend and summary value. Fahrenheit display converts from that source and never consumes a duplicate dataset."
+    },
+    {
+      "name": "controlledObservedSeries",
+      "selectors": [".firing-schedule[data-actual-status]", ".firing-schedule__series--actual"],
+      "attributes": ["data-actual-status=collecting|complete"],
+      "description": "Targets replace timestamped observed samples at a bounded cadence. Neutral source never connects to a controller or sensor and never announces each sample."
+    },
+    {
+      "name": "accessibleVisualization",
+      "selectors": [".firing-schedule__plot", ".firing-schedule__legend", ".firing-schedule__data-table"],
+      "attributes": ["role=img", "<title>", "<desc>", "<figcaption>", "<table>", "<caption>", "scope"],
+      "description": "The informative SVG has a complete localized name and summary, the legend distinguishes series beyond color, and the canonical Data Table is the primary detailed representation. Raw samples add no sequential focus stops."
+    },
+    {
+      "name": "canonicalDataTable",
+      "selectors": [".firing-schedule__table", ".firing-schedule__data-table"],
+      "description": "One canonical Data Table row maps to each planned segment. Actual duration, reached temperature and deviation are optional summaries correlated by stable segmentId; raw samples never become table rows."
+    },
+    {
+      "name": "informativeSafetyBoundary",
+      "selectors": [".firing-schedule"],
+      "description": "R6 visualizes target-reviewed information only. It never programs, starts, controls, validates or certifies a kiln, material, firing schedule or safety procedure."
+    }
+  ],
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible contextual heading; a non-empty value selects named native-section semantics while heading rank remains target-owned.",
+      "targetMappings": {
+        "web": [{ "kind": "content", "selector": ".firing-schedule__title" }]
+      }
+    },
+    {
+      "name": "startingTemperatureCelsius",
+      "type": "number",
+      "required": true,
+      "description": "Finite normalized program start in degrees Celsius; display conversion never mutates this source value.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-starting-temperature-celsius", "valueFrom": "property" }]
+      }
+    },
+    {
+      "name": "segments",
+      "type": "slot",
+      "required": true,
+      "description": "Required non-empty ordered records with stable segmentId, positive rate or full-rate estimate, target Celsius temperature and non-negative hold seconds.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".firing-schedule", "classNames": [".firing-schedule__plot", ".firing-schedule__table", ".firing-schedule__data-table"] }]
+      }
+    },
+    {
+      "name": "actualSamples",
+      "type": "slot",
+      "required": false,
+      "description": "Optional strictly increasing elapsed-second/Celsius observations used only to draw the controlled actual curve; samples are not focusable and do not become table rows.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".firing-schedule__plot", "classNames": [".firing-schedule__series--actual", ".firing-schedule__actual-point"] }]
+      }
+    },
+    {
+      "name": "actualSummaries",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-reviewed duration, reached-temperature and deviation records correlated to planned rows by stable segmentId.",
+      "targetMappings": {
+        "web": [{ "kind": "slot", "selector": ".firing-schedule__data-table", "classNames": [".firing-schedule__data-table"] }]
+      }
+    },
+    {
+      "name": "view",
+      "type": "enum",
+      "required": false,
+      "values": ["planned", "actual", "both"],
+      "unsetBehavior": "Defaults to both when valid actual samples exist and otherwise planned; actual falls back to planned when no observed series is available.",
+      "description": "Controlled visible-series projection without duplicating the normalized source data.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-view", "values": { "planned": "planned", "actual": "actual", "both": "both" } }]
+      }
+    },
+    {
+      "name": "displayUnit",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "celsius",
+      "values": ["celsius", "fahrenheit"],
+      "description": "Formats table, axes, legend and summaries from normalized Celsius values without a duplicate target dataset.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-display-unit", "values": { "celsius": "celsius", "fahrenheit": "fahrenheit" } }]
+      }
+    },
+    {
+      "name": "actualStatus",
+      "type": "enum",
+      "required": false,
+      "defaultValue": "complete",
+      "values": ["collecting", "complete"],
+      "description": "Truthful lifecycle label for a supplied observed series; ignored when no valid actual samples exist.",
+      "targetMappings": {
+        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-actual-status", "values": { "collecting": "collecting", "complete": "complete" } }]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-focus",
+        "--color-border-subtle",
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-text-accent",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--font-family-heading",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-body-small-weight",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-caption-line-height",
+        "--typo-caption-size",
+        "--typo-h4-line-height",
+        "--typo-h4-size"
+      ],
+      "radius": ["--radius-lg", "--radius-md"],
+      "spacing": ["--space-layout-element-gap"]
+    }
+  },
+  "accessibility": [
+    "Keep the required chart and canonical Data Table synchronized to the same validated planned program and active display unit.",
+    "Give the informative SVG a localized accessible name and concise summary of visible series, time, range, lifecycle and relevant deviation; retain a visible figcaption.",
+    "Use native table, caption, header scope and one row per planned segment; keep raw observed samples out of the table and sequential keyboard focus.",
+    "Distinguish planned and actual series with explicit legend text and dashed versus solid line treatment in addition to color.",
+    "Keep chart and table horizontal scroll owners named, keyboard-focusable and visibly focused without causing document overflow.",
+    "Do not announce every observed sample or add chart-point tooltips containing otherwise unavailable information.",
+    "Do not imply that the component programs, starts, controls, validates or certifies a kiln, firing schedule, material or safety procedure."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css-native-table-svg-model",
+      "notes": "Canonical CSS, Data Table composition and framework-independent components/js/firing-schedule.js model support one real-time planned source plus controlled observed data; targets render localized markup."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-data",
+      "notes": "Requires approved normalized schedule/observation records, validation, provenance, safety/editor rules and a first consumer before Liquid/schema."
+    },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "native-chart-table" },
+    "compose": { "status": "planned", "kind": "composable-chart-table" }
+  }
 }

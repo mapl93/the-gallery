@@ -1,67 +1,404 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "certificate",
   "name": "Certificate of Authenticity",
   "registryId": "F3",
   "category": "storytelling",
   "status": "pilot",
-  "summary": "Certificate card with piece details, signature, and QR code.",
+  "summary": "Named passive certificate record with semantic details and optional target-owned signature and verification composition.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/certificate",
-    "css": { "file": "components/css/storytelling.css", "selector": ".coa" },
+    "css": {
+      "file": "components/css/storytelling.css",
+      "selector": ".coa"
+    },
     "docs": "site/src/content/components/certificate.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".coa", "className": ".coa", "required": true, "description": "Certificate of authenticity card." },
-    { "name": "header", "selector": ".coa__header", "className": ".coa__header", "required": false, "description": "Optional certificate label." },
-    { "name": "title", "selector": ".coa__title", "className": ".coa__title", "required": true, "description": "Authenticated piece title." },
-    { "name": "artist", "selector": ".coa__artist", "className": ".coa__artist", "required": false, "description": "Optional artist attribution." },
-    { "name": "divider", "selector": ".coa__divider", "className": ".coa__divider", "required": false, "description": "Decorative divider." },
-    { "name": "details", "selector": ".coa__details", "className": ".coa__details", "required": false, "description": "Repeated certificate metadata region." },
-    { "name": "detail", "selector": ".coa__details > *", "className": null, "required": false, "description": "Repeated label-value metadata pair." },
-    { "name": "detailLabel", "selector": ".coa__detail-label", "className": ".coa__detail-label", "required": false, "description": "Metadata label." },
-    { "name": "detailValue", "selector": ".coa__detail-value", "className": ".coa__detail-value", "required": false, "description": "Metadata value." },
-    { "name": "signature", "selector": ".coa__signature", "className": ".coa__signature", "required": false, "description": "Optional signature or artist mark." },
-    { "name": "qr", "selector": ".coa__qr", "className": ".coa__qr", "required": false, "description": "Optional target-owned verification region." },
-    { "name": "qrImage", "selector": ".coa__qr img", "className": null, "required": false, "description": "Verification image supplied by the target." },
-    { "name": "verify", "selector": ".coa__verify", "className": ".coa__verify", "required": false, "description": "Verification guidance text." }
+    {
+      "name": "root",
+      "selector": ".coa",
+      "className": ".coa",
+      "required": true,
+      "description": "Self-contained native certificate article named by its visible contextual title."
+    },
+    {
+      "name": "header",
+      "selector": ".coa__header",
+      "className": ".coa__header",
+      "required": false,
+      "description": "Optional target-authored record-kind label."
+    },
+    {
+      "name": "title",
+      "selector": ".coa__title",
+      "className": ".coa__title",
+      "required": true,
+      "description": "Required visible contextual heading that names the certificate article."
+    },
+    {
+      "name": "artist",
+      "selector": ".coa__artist",
+      "className": ".coa__artist",
+      "required": false,
+      "description": "Optional target-authored artist, maker or other attribution without a component-generated prefix."
+    },
+    {
+      "name": "divider",
+      "selector": ".coa__divider",
+      "className": ".coa__divider",
+      "required": false,
+      "description": "Optional decorative divider that never conveys record structure alone."
+    },
+    {
+      "name": "details",
+      "selector": ".coa__details",
+      "className": ".coa__details",
+      "required": false,
+      "description": "Optional native description list of target-owned certificate metadata."
+    },
+    {
+      "name": "detail",
+      "selector": ".coa__detail",
+      "className": ".coa__detail",
+      "required": false,
+      "description": "Repeated direct description-list group containing one target-owned name-value pair."
+    },
+    {
+      "name": "detailLabel",
+      "selector": ".coa__detail-label",
+      "className": ".coa__detail-label",
+      "required": false,
+      "description": "Native description term for one localized metadata name."
+    },
+    {
+      "name": "detailValue",
+      "selector": ".coa__detail-value",
+      "className": ".coa__detail-value",
+      "required": false,
+      "description": "Native description value for one target-owned metadata value."
+    },
+    {
+      "name": "signature",
+      "selector": ".coa__signature",
+      "className": ".coa__signature",
+      "required": false,
+      "description": "Optional target-owned signature or artist-mark composition; ordinary attribution is not silently relabelled as a signature."
+    },
+    {
+      "name": "verification",
+      "selector": ".coa__verification",
+      "className": ".coa__verification",
+      "required": false,
+      "description": "Optional native descriptive link rendered only when the target supplies a real certificate-record destination."
+    },
+    {
+      "name": "verificationMedia",
+      "selector": ".coa__qr",
+      "className": ".coa__qr",
+      "required": false,
+      "description": "Optional target-supplied QR or other verification media inside the descriptive link."
+    },
+    {
+      "name": "verificationText",
+      "selector": ".coa__verify",
+      "className": ".coa__verify",
+      "required": false,
+      "description": "Visible text that identifies the target-owned certificate-record destination independently of verification media."
+    }
   ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Default certificate card." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained certificate card with a single-column metadata fallback on narrow viewports." }],
-  "states": [{ "name": "default", "selectors": [".coa"], "description": "Default certificate state." }],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Default passive archival certificate record."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Contained certificate whose metadata changes intrinsically between one and two columns."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".coa"
+      ],
+      "description": "Required title with any accepted optional target-owned record composition."
+    },
+    {
+      "name": "verificationFocus",
+      "selectors": [
+        ".coa__verification:focus-visible"
+      ],
+      "description": "Visible keyboard focus on a supplied native certificate-record link."
+    }
+  ],
   "behavior": [
-    { "name": "targetData", "selectors": [".coa__details", ".coa__qr"], "description": "Targets own certificate records, verification destinations, and authenticity guarantees; the component preserves their visual and reading structure." }
+    {
+      "name": "articleLabelling",
+      "selectors": [
+        ".coa",
+        ".coa__title"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "Targets render a self-contained native article associated with a target-unique id on its same visible contextual heading; heading rank remains document-owned."
+    },
+    {
+      "name": "semanticDetails",
+      "selectors": [
+        ".coa__details",
+        ".coa__detail",
+        ".coa__detail-label",
+        ".coa__detail-value"
+      ],
+      "description": "Targets use native dl, direct grouped dt/dd pairs, preserve meaningful authored order and omit groups without values."
+    },
+    {
+      "name": "optionalComposition",
+      "selectors": [
+        ".coa__header",
+        ".coa__artist",
+        ".coa__divider",
+        ".coa__details",
+        ".coa__signature",
+        ".coa__verification",
+        ".coa__qr"
+      ],
+      "description": "Every non-title region is independently optional and is omitted completely rather than rendered as an empty wrapper or invented fallback."
+    },
+    {
+      "name": "targetVerification",
+      "selectors": [
+        ".coa__verification",
+        ".coa__verify"
+      ],
+      "attributes": [
+        "href"
+      ],
+      "description": "Verification is an ordinary descriptive link rendered only from a real target-owned destination. The component does not generate QR services, status, proof, issuer trust or authenticity guarantees."
+    },
+    {
+      "name": "verificationMediaAlternative",
+      "selectors": [
+        ".coa__qr"
+      ],
+      "attributes": [
+        "aria-hidden",
+        "alt"
+      ],
+      "description": "Optional media never carries the only link purpose. Redundant media is hidden from the accessible name when adjacent visible text fully identifies the destination."
+    },
+    {
+      "name": "intrinsicDetails",
+      "selectors": [
+        ".coa",
+        ".coa__details"
+      ],
+      "description": "The card is contained by its host and the details grid responds to the Certificate's own inline size rather than the page viewport."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".coa__title",
+        ".coa__artist",
+        ".coa__detail-label",
+        ".coa__detail-value",
+        ".coa__signature",
+        ".coa__verify"
+      ],
+      "description": "Short, long, empty, localized, unbroken, right-to-left and zoomed target content remains contained and readable when optional regions or verification media are missing."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".coa"
+      ],
+      "description": "Certificate owns no controlled or uncontrolled state, listener, observer, custom key handling, live region, animation, asset, generated QR or network request."
+    }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": false, "description": "Optional certificate label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".coa__header" }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Authenticated piece title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".coa__title" }] } },
-    { "name": "artist", "type": "string", "required": false, "description": "Optional artist attribution.", "targetMappings": { "web": [{ "kind": "content", "selector": ".coa__artist" }] } },
-    { "name": "details", "type": "slot", "required": false, "description": "Target-owned certificate metadata pairs.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".coa__details", "classNames": [".coa__details", ".coa__detail-label", ".coa__detail-value"] }] } },
-    { "name": "signature", "type": "slot", "required": false, "description": "Optional signature or artist-mark composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".coa__signature", "classNames": [".coa__signature"] }] } },
-    { "name": "verification", "type": "slot", "required": false, "description": "Target-owned verification image, destination, and guidance.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".coa__qr", "classNames": [".coa__qr", ".coa__verify"] }] } }
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "Optional visible target-authored record-kind label.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".coa__header"
+          }
+        ]
+      }
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "Required visible record title used to name the self-contained article; contextual heading level and unique id remain target-owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".coa__title"
+          }
+        ]
+      }
+    },
+    {
+      "name": "artist",
+      "type": "string",
+      "required": false,
+      "description": "Optional target-authored artist, maker or other attribution without a component-generated prefix.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".coa__artist"
+          }
+        ]
+      }
+    },
+    {
+      "name": "details",
+      "type": "slot",
+      "required": false,
+      "description": "Optional ordered target-owned name-value composition using native description-list groups.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".coa__details",
+            "classNames": [
+              ".coa__details",
+              ".coa__detail",
+              ".coa__detail-label",
+              ".coa__detail-value"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "signature",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned real signature or artist-mark composition.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".coa__signature",
+            "classNames": [
+              ".coa__signature"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "verification",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned native link composition with a real destination, descriptive text and optional redundant media.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".coa__verification",
+            "classNames": [
+              ".coa__verification",
+              ".coa__qr",
+              ".coa__verify"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-decorative", "--color-surface-archival", "--color-text-accent", "--color-text-primary", "--color-text-secondary"],
-      "typography": ["--font-family-accent", "--font-family-heading", "--typo-body-size", "--typo-h3-size", "--typo-h4-size"],
-      "radius": ["--radius-lg"],
-      "spacing": ["--space-layout-element-gap"]
+      "color": [
+        "--color-border-decorative",
+        "--color-border-focus",
+        "--color-surface-archival",
+        "--color-text-accent",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-accent",
+        "--font-family-body",
+        "--font-family-heading",
+        "--tg-font-weight-medium",
+        "--tg-font-weight-semibold",
+        "--tg-typography-body-caption-weight",
+        "--tg-typography-body-small-weight",
+        "--tg-typography-h3-weight",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-caption-line-height",
+        "--typo-caption-size",
+        "--typo-h3-line-height",
+        "--typo-h3-size",
+        "--typo-h4-line-height",
+        "--typo-h4-size"
+      ],
+      "radius": [
+        "--radius-lg"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ]
     }
   },
   "accessibility": [
-    "Use semantic name-value markup such as a description list for certificate details.",
-    "Expose verification as a descriptive link when it has a destination; a QR image must not be the only verification path.",
-    "Give a verification image alternative text that describes its action rather than its appearance.",
-    "Treat the divider as decorative."
+    "Render a self-contained native article associated with the same visible contextual heading through a target-unique aria-labelledby/id pair.",
+    "Use native dl with direct grouped dt/dd pairs for target-owned metadata, preserve meaningful authored order and omit groups without values.",
+    "Expose verification only as an ordinary descriptive link with a real target-owned destination and visible purpose; a QR or image must never be the only path.",
+    "Hide redundant verification media from the link's accessible name when adjacent visible text already identifies the destination.",
+    "Give a supplied verification link visible keyboard focus and preserve native link activation, context menu and copy behavior.",
+    "Treat the divider as decorative and retain record meaning without it, media, CSS, JavaScript or external services.",
+    "Allow localized, unbroken, right-to-left and 200-percent-zoom content to reflow without horizontal page overflow.",
+    "Do not generate verification destinations, QR requests, authenticity status, issuer trust, proof semantics, controlled state, live regions or custom key handling."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/storytelling.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js" },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": {
+      "status": "implemented",
+      "kind": "css",
+      "notes": "Implemented in components/css/storytelling.css with native article, description-list and link semantics plus intrinsic metadata layout and no runtime."
+    },
+    "shopify": {
+      "status": "implemented",
+      "kind": "snippet-adapter",
+      "notes": "Liquid snippet maps current product/metafield facts into localized semantic details and accepts optional explicit target-owned signature and verification inputs without generating a QR or authenticity claim."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-component"
+    }
   }
 }

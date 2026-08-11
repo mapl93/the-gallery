@@ -4,6 +4,8 @@ Status: Accepted
 
 Date: 2026-07-12
 
+Partially superseded for E3 adaptive behavior and identity by ADR 0250.
+
 ## Context
 
 The Collection family had canonical CSS and pilot contracts, but lacked reviewed

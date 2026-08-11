@@ -48,6 +48,9 @@ If these files conflict, treat the concrete source files and scripts as current 
 - Do not edit copied/generated target files as the canonical source. Prefer `components/css/`, `components/js/`, `tokens/`, `registry.json`, and `site/src/content/components/`.
 - Do not churn `site/dist` unless the task explicitly requires rebuilding and committing built docs output.
 - Preserve local/user changes. This repo may have a dirty worktree; never revert unrelated changes.
+- Treat local test resources as owned lifecycles. Never leave a docs server,
+  Playwright session, browser process, trace, or extra tab running after the
+  evidence phase that created it.
 - Keep component CSS target-agnostic unless working inside a target adapter such as `platforms/shopify/`.
 - Components should use BEM-style classes, `--_` private custom-property contracts, semantic tokens, accessible markup patterns, and progressive enhancement.
 - When the user writes in Spanish, respond in Spanish unless they ask otherwise.
@@ -61,6 +64,7 @@ If these files conflict, treat the concrete source files and scripts as current 
 - Base component CSS: `components/css/*.css`.
 - Component contracts: `components/contracts/*.contract.json`.
 - Shared component JS: `components/js/theme.js`.
+- Canonical runtime module boundaries: `components/js/runtime-modules.json`.
 - Component manifest: `registry.json`.
 - CLI: `cli/index.js`.
 - Docs app: `site/`.
@@ -69,7 +73,7 @@ If these files conflict, treat the concrete source files and scripts as current 
 - Shopify target: `platforms/shopify/`.
 - Shopify adapter output: `platforms/shopify/assets/base.css`, copied CSS assets, `platforms/shopify/assets/theme.js`, `platforms/shopify/adapter.manifest.json`, and `platforms/shopify/adapter.summary.json`.
 - Neutral web token target: `platforms/web/tokens.css`.
-- Neutral web component adapter output: `platforms/web/index.css`, `platforms/web/components.css`, `platforms/web/theme.js`, `platforms/web/adapter.manifest.json`, and `platforms/web/adapter.summary.json`.
+- Neutral web component adapter output: `platforms/web/index.css`, `platforms/web/components.css`, `platforms/web/components/`, `platforms/web/runtime-loader.js`, `platforms/web/runtime/`, compatibility `platforms/web/theme.js`, `platforms/web/adapter.manifest.json`, and `platforms/web/adapter.summary.json`.
 - Webflow target CSS output/copies: `platforms/webflow/`.
 - Framer token output: `platforms/framer/tokens.js`.
 
@@ -90,7 +94,10 @@ Run from the repo root unless noted:
 
 ```sh
 npm run validate:docs
+npm run validate:refinement-decisions
 npm run audit:components
+npm run audit:refinement
+npm run audit:refinement:performance
 npm run validate:tokens:source
 npm run build:tokens:source
 npm run validate:tokens:source-build
@@ -103,6 +110,7 @@ npm run build:adapter:web
 npm run validate:adapter:web
 npm run build:adapter:shopify
 npm run validate:adapter:shopify
+npm run validate:cli
 npm run validate:contracts
 npm run validate:studio
 npm run build:tokens
@@ -110,11 +118,58 @@ npm run build:components
 npm run build
 npm run tg -- list
 npm run tg -- add button
-npm --prefix site run dev
+npm run dev:site
+npm run dev:site:evidence
+npm run evidence:status
+npm run evidence:cleanup
+npm run evidence:assert-clean
 npm --prefix site run build
 ```
 
 Use validation commands that match the files you changed. Do not run commands that rewrite generated outputs unless the task calls for those outputs.
+
+## Local Test Resource Hygiene
+
+Browser evidence must use a bounded lifecycle. The default resource budget is
+one Gallery docs server, one Playwright CLI session/browser, and one tab. Do not
+run independent Exhibit, Studio, viewport, before, and after browsers in
+parallel.
+
+Before browser work:
+
+1. Do not start the docs site during research, source editing, or non-browser
+   validation. Start it only for a short baseline or final evidence phase.
+2. Probe `http://127.0.0.1:4173` before starting Vite. Reuse a responsive Gallery
+   server instead of opening another port.
+3. When no server exists, start exactly one with
+   `npm run dev:site:evidence` in a managed execution session. The command fixes
+   host `127.0.0.1`, port `4173`, and `strictPort`, records only the process it
+   owns, and reuses a responsive server instead of opening another one. Keep its
+   execution-session identifier as a first shutdown path; never use `&`,
+   `nohup`, an implicit fallback port, or one server per viewport.
+4. Reuse the stable Playwright session name `gallery-refinement`. Use one tab and
+   navigate it between Exhibit, Studio, states, and viewports. Default to
+   headless mode; use headed mode only when a visible interactive inspection is
+   materially necessary.
+
+After each baseline or final evidence phase, including interrupted or failed
+runs:
+
+1. Run `npm run evidence:cleanup`. It closes only `gallery-refinement` and the
+   server process recorded as owned by this repo; it preserves a pre-existing
+   user-owned server and normal Chrome.
+2. If the managed execution session is still present, send it `Ctrl-C` and run
+   cleanup again. Stopping the managed server also closes the stable Playwright
+   session as a failure-safe. Never stop a pre-existing user-owned server.
+3. Run `npm run evidence:assert-clean`. A batch may not finish while this gate
+   reports an owned browser or server.
+4. Keep the browser and server closed while writing code, documentation, reports,
+   or running non-browser validators.
+
+Before/after evidence may require two short browser phases. Close the baseline
+phase before implementation, then open one fresh `gallery-refinement` session
+for final evidence and close it immediately afterward. The screenshots remain;
+the processes must not.
 
 ## Adding Or Changing Components
 

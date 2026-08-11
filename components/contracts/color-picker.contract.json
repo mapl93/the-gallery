@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "color-picker",
   "name": "Color Picker / Swatch",
   "registryId": "H5",
   "category": "forms",
   "status": "pilot",
-  "summary": "Radio-backed color swatch group with selectable swatches, optional checkmark, focus-visible state, hover/selected border state, and swatch sizes.",
+  "summary": "Fieldset-and-legend color choice group whose named native radios own selection, form value, constraint validation, and reset while visual swatches retain visible names and a non-color selected boundary.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/color-picker",
@@ -22,7 +22,21 @@
       "selector": ".color-picker",
       "className": ".color-picker",
       "required": true,
-      "description": "Swatch group wrapper."
+      "description": "Native fieldset that groups one color question."
+    },
+    {
+      "name": "legend",
+      "selector": ".color-picker__legend",
+      "className": ".color-picker__legend",
+      "required": true,
+      "description": "Visible group question and accessible fieldset name."
+    },
+    {
+      "name": "options",
+      "selector": ".color-picker__options",
+      "className": ".color-picker__options",
+      "required": true,
+      "description": "Wrapping layout container for the native radio options."
     },
     {
       "name": "swatch",
@@ -56,8 +70,8 @@
       "name": "label",
       "selector": ".color-swatch__label",
       "className": ".color-swatch__label",
-      "required": false,
-      "description": "Visible or adjacent color name."
+      "required": true,
+      "description": "Visible color name and accessible label text for the wrapping native radio."
     }
   ],
   "variants": [
@@ -99,7 +113,7 @@
     },
     {
       "name": "hover",
-      "selectors": [".color-swatch:hover"],
+      "selectors": [".color-swatch:has(.color-swatch__input:not(:disabled)):hover .color-swatch__fill"],
       "description": "Pointer hover state on a swatch."
     },
     {
@@ -116,39 +130,63 @@
       "name": "focusVisible",
       "selectors": [".color-swatch__input:focus-visible + .color-swatch__fill"],
       "description": "Keyboard focus indicator."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".color-swatch:has(.color-swatch__input:disabled)", ".color-swatch__input:disabled"],
+      "description": "Unavailable native option and its visible label."
+    },
+    {
+      "name": "requiredInvalid",
+      "selectors": [".color-picker:has(.color-swatch__input:user-invalid)"],
+      "description": "Named required radio group after native constraint validation reports no selection."
     }
   ],
   "behavior": [
     {
       "name": "nativeChoice",
-      "attributes": ["type=\"radio\"", "name", "checked", "disabled"],
-      "description": "Color swatches should preserve native radio group behavior for single selection."
+      "attributes": ["type=\"radio\"", "name", "value", "checked", "required", "disabled"],
+      "events": ["click", "Space", "arrow keys", "input", "change", "form submit", "form reset", "constraint validation"],
+      "description": "Named native radios own mutually exclusive selection, submitted value, keyboard operation, reset, and required-group validation."
     },
     {
       "name": "selectionState",
       "selectors": [".color-swatch__input:checked + .color-swatch__fill", ".color-swatch__input:checked ~ .color-swatch__check"],
-      "description": "Visual selection state must stay synchronized with the native radio checked state."
+      "description": "Visual selection follows the native checked state; the double boundary remains perceivable without relying on the authored fill color or optional check."
     },
     {
       "name": "colorName",
-      "attributes": ["aria-label", "aria-labelledby"],
-      "description": "Each swatch needs an accessible color name; color alone is not enough."
+      "selectors": [".color-swatch", ".color-swatch__label"],
+      "attributes": ["wrapping label association"],
+      "description": "Each swatch has a visible name supplied by the wrapping label; color alone is never the option name."
+    },
+    {
+      "name": "selectionOwnership",
+      "selectors": [".color-swatch__input"],
+      "attributes": ["checked establishes initial checkedness in static HTML", "one controlled group value in framework adapters"],
+      "events": ["input", "change", "form reset"],
+      "description": "Static Web delegates live selection to the native group. Controlled adapters bind one group value instead of independent booleans that can yield multiple selections."
     }
   ],
   "properties": [
+    { "name": "groupLabel", "type": "string", "required": true, "description": "Visible question naming the complete color group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".color-picker__legend" }] } },
     { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Canonical swatch size.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".color-swatch", "source": "sizes" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the color choice group.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".color-picker", "source": "variants" }] } },
-    { "name": "label", "type": "string", "required": true, "description": "Accessible color name for an individual swatch.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "aria-label", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Visible accessible color name for an individual swatch.", "targetMappings": { "web": [{ "kind": "content", "selector": ".color-swatch__label" }] } },
     { "name": "name", "type": "string", "required": true, "description": "Native radio group name shared by swatches.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Native selected state for an individual swatch.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": true, "description": "Value submitted for this color when its native radio is selected.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Establishes initial checkedness in static HTML; controlled adapters bind one live group value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Requires one choice in the named native radio group.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes an individual swatch unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for group feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-swatch__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for helper or validation feedback associated with the fieldset.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".color-picker", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["fieldset"] }] } }
   ],
   "tokens": {
     "public": {
       "color": [
         "--color-border-subtle",
         "--color-border-strong",
+        "--color-surface-primary",
+        "--color-text-primary",
         "--color-text-inverse",
         "--color-text-secondary",
         "--color-input-default-focused-outer-border",
@@ -172,21 +210,29 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
-      ]
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
+      ],
+      "opacity": ["--opacity-disabled"]
     }
   },
   "accessibility": [
-    "Use native radio inputs for mutually exclusive color choices.",
-    "Provide an accessible color name for every swatch.",
-    "Do not communicate selected state only by color.",
-    "Keep focus-visible state visible around the selected swatch fill."
+    "Wrap the named native radio group in a fieldset with one visible legend.",
+    "Provide a visible accessible color name for every swatch.",
+    "Keep each option activation target at least 44 by 44 CSS pixels even when its visible fill is smaller.",
+    "Do not communicate selection only through the authored fill color or optional check; preserve the independent selected boundary.",
+    "Use aria-invalid only for Error and associate helper or validation feedback through the fieldset aria-describedby reference.",
+    "Keep focus-visible distinct from selected state and preserve native Space and arrow-key behavior.",
+    "Framework adapters should control one group value or use native checkedness, never independent booleans that permit multiple checked colors."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css with hidden native radio inputs."
+      "notes": "Implemented by fieldset, legend, wrapping labels, named native radios, and class composition in components/css/forms.css; no JavaScript is required."
     },
     "shopify": {
       "status": "implemented",

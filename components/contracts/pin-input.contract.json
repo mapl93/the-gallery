@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.4.0",
   "slug": "pin-input",
   "name": "Pin Input / OTP",
   "registryId": "H7",
   "category": "forms",
   "status": "pilot",
-  "summary": "One-time code input contract with individual character cells, filled and focus states, native input attributes, paste handling, and completion behavior.",
-  "dependencies": [],
+  "summary": "Labelled numeric one-time-code field composed from independently clickable and focusable native character inputs with ordered repeated-name submission and bounded progressive enhancement.",
+  "dependencies": ["field-wrapper"],
   "source": {
     "registry": "registry.json#/components/pin-input",
     "css": {
@@ -22,14 +22,42 @@
       "selector": ".pin-input",
       "className": ".pin-input",
       "required": true,
-      "description": "Wrapper that lays out individual one-time-code cells."
+      "description": "Field Wrapper-composed group that owns the complete code label, validation family, and segment relationship without becoming a second value owner."
+    },
+    {
+      "name": "label",
+      "selector": ".pin-input__legend",
+      "className": ".pin-input__legend",
+      "required": true,
+      "description": "Visible Field Wrapper label that names the complete code group."
+    },
+    {
+      "name": "fields",
+      "selector": ".pin-input__fields",
+      "className": ".pin-input__fields",
+      "required": true,
+      "description": "Ordered Field Wrapper control region containing only the real native segment inputs."
     },
     {
       "name": "field",
       "selector": ".pin-input__field",
       "className": ".pin-input__field",
       "required": true,
-      "description": "Single character native input cell."
+      "description": "Real single-character native input; every segment remains independently clickable, focusable, named, validatable, resettable, and submitted."
+    },
+    {
+      "name": "description",
+      "selector": ".field__description",
+      "className": ".field__description",
+      "required": false,
+      "description": "Optional persistent guidance composed from Field Wrapper and associated with the group and segments."
+    },
+    {
+      "name": "feedback",
+      "selector": ".field__feedback",
+      "className": ".field__feedback",
+      "required": false,
+      "description": "Optional current Error, Success, or Warning feedback composed from Field Wrapper for the complete code."
     }
   ],
   "variants": [
@@ -66,38 +94,78 @@
       "name": "filled",
       "selectors": [".pin-input__field--filled"],
       "description": "Cell state after a character has been entered."
+    },
+    {
+      "name": "complete",
+      "selectors": [".pin-input[data-complete=\"true\"]"],
+      "description": "Derived state when every real segment contains one accepted character; it does not submit, verify, blur, or announce itself."
+    },
+    {
+      "name": "disabled",
+      "selectors": [".pin-input__field:disabled"],
+      "description": "Every segment is natively disabled and removed from focus and form submission."
+    },
+    {
+      "name": "readOnly",
+      "selectors": [".pin-input__field:read-only:not(:disabled)"],
+      "description": "Every segment remains independently focusable and selectable but cannot be edited."
     }
   ],
   "behavior": [
     {
       "name": "nativeTextCells",
       "selectors": [".pin-input__field"],
-      "attributes": ["type=\"text\"", "maxlength=\"1\"", "inputmode", "autocomplete=\"one-time-code\"", "disabled", "aria-invalid"],
-      "description": "Each cell should preserve native text input semantics while constraining entry to one visible character."
+      "attributes": ["type=\"text\"", "maxlength=\"1\"", "inputmode=\"numeric\"", "pattern=\"[0-9]*\"", "autocomplete=\"one-time-code\" on the first segment", "required", "readonly", "disabled", "aria-invalid"],
+      "description": "Each cell preserves native text-input semantics and one numeric character. v1 does not infer alphanumeric, masking, or secret-credential behavior."
+    },
+    {
+      "name": "groupAssociation",
+      "selectors": [".pin-input", ".pin-input__legend", ".pin-input__field"],
+      "attributes": ["role=\"group\"", "aria-labelledby", "localized per-segment aria-label", "aria-describedby"],
+      "description": "One visible label names the complete group while every independently focusable segment has a localized position name such as character 2 of 6."
+    },
+    {
+      "name": "orderedSubmission",
+      "selectors": [".pin-input__field"],
+      "attributes": ["same non-empty name on every segment"],
+      "events": ["FormData.getAll(name)", "form submit", "form reset"],
+      "description": "The ordered segment inputs are the only form owners. Static Web submits repeated values under one target-supplied name; targets join the ordered values when a single code string is required. No hidden or mirrored full-code input is allowed."
     },
     {
       "name": "focusManagement",
       "selectors": [".pin-input__field"],
       "events": ["input", "Backspace", "ArrowLeft", "ArrowRight"],
-      "description": "Targets should move focus between cells without blocking normal editing or assistive technology behavior."
+      "description": "Accepted typing advances to the next logical segment; Backspace on an empty segment moves to the previous logical segment; horizontal arrows move by visual/logical direction in LTR and RTL. Every segment remains directly clickable and reachable in ordinary Tab order."
     },
     {
       "name": "pasteCode",
       "selectors": [".pin-input__field"],
       "events": ["paste"],
-      "description": "Pasted codes should be distributed across cells and validated by the target implementation."
+      "description": "The progressive Web adapter filters numeric text and distributes paste or multi-character autofill across the same real inputs, then emits a bubbling native input event from the final changed segment."
     },
     {
       "name": "completionState",
       "selectors": [".pin-input__field--filled"],
-      "description": "Filled visual state must stay synchronized with each cell value."
+      "description": "Filled classes and root data-complete are derived from the real segment values. Completion never auto-submits, verifies, blurs, redirects, or creates a live announcement."
+    },
+    {
+      "name": "ownershipStrategy",
+      "selectors": [".pin-input__field"],
+      "events": ["input", "change", "form reset"],
+      "description": "Static Web leaves every native segment uncontrolled after its initial value. Stateful adapters may control one ordered segment collection or an uncontrolled initial collection, but must bind the same real inputs and never add a mirrored full-code owner."
     }
   ],
   "properties": [
+    { "name": "label", "type": "string", "required": true, "description": "Visible label for the complete code group.", "targetMappings": { "web": [{ "kind": "content", "selector": ".pin-input__legend" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation for the complete code entry.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".pin-input", "source": "variants" }] } },
+    { "name": "name", "type": "string", "required": true, "description": "Non-empty form name repeated on every ordered segment; Web consumers reconstruct the code with FormData.getAll(name).join('').", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes every segment natively required and keeps the visible Field Wrapper marker synchronized.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "class", "selector": ".pin-input__legend", "classNames": [".field__label--required"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes every code cell unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "readOnly", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes every segment read-only while preserving independent focus and selection.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "readonly", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "invalid", "type": "boolean", "required": false, "defaultValue": false, "description": "Exposes native invalid state for the code cells when Error is active.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "aria-invalid", "values": { "true": "true", "false": null }, "elements": ["input"] }] } },
-    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for code guidance or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+    { "name": "describedBy", "type": "string", "required": false, "description": "Id references for complete-code guidance or current feedback, applied to the group and every segment.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".pin-input", "attribute": "aria-describedby", "valueFrom": "property" }, { "kind": "attribute", "selector": ".pin-input__field", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional persistent complete-code guidance composed through Field Wrapper.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__description" }] } },
+    { "name": "feedback", "type": "string", "required": false, "description": "Optional current complete-code feedback; the selected variant determines Error, Success, or Warning semantics.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__feedback" }] } }
   ],
   "tokens": {
     "public": {
@@ -109,6 +177,9 @@
         "--color-input-default-focused-outer-border",
         "--color-border-strong",
         "--color-input-default-hover-inner-border",
+        "--color-input-default-disabled-bg",
+        "--color-input-default-disabled-inner-border",
+        "--color-input-default-disabled-value",
         "--color-input-error-unfocused-inner-border",
         "--color-input-error-focused-inner-border",
         "--color-input-error-focused-outer-border",
@@ -128,6 +199,9 @@
       "easing": [
         "--easing-default"
       ],
+      "opacity": [
+        "--opacity-disabled"
+      ],
       "typography": [
         "--typo-h4-size",
         "--font-family-body"
@@ -137,15 +211,17 @@
   "accessibility": [
     "Provide a visible group label for the full one-time-code input.",
     "Use autocomplete=\"one-time-code\" when the field captures verification codes.",
-    "Keep each cell reachable with keyboard navigation.",
-    "Announce validation errors for the group, not only for an individual cell.",
-    "Support paste as an accessible shortcut for full-code entry."
+    "Keep every real cell in ordinary Tab order, directly clickable, and independently focusable; logical arrow movement supplements rather than replaces Tab navigation.",
+    "Give every segment a localized positional name and associate complete-code guidance and validation with the group and segments.",
+    "Mark every segment aria-invalid only for Error; Success and Warning remain valid feedback families.",
+    "Support paste and progressive one-time-code autofill distribution without a hidden full-code input.",
+    "Do not announce ordinary keystrokes or derived completion; verification results and any live message remain target-owned."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; focus movement, paste distribution, and value validation must be provided by the consuming target."
+      "notes": "Canonical CSS and shared theme.js enhance the real segment inputs with numeric filtering, logical focus movement, paste/autofill distribution, filled state, completion reflection, and reset synchronization; verification remains target-owned."
     },
     "shopify": {
       "status": "planned",

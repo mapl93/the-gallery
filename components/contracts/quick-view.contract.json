@@ -1,70 +1,89 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "quick-view",
   "name": "Quick View",
   "registryId": "K8",
   "category": "cart",
   "status": "pilot",
-  "summary": "Product quick-view content composed inside a Modal with gallery, product info, and product form behavior.",
-  "dependencies": ["modal", "product-gallery", "product-form"],
+  "summary": "Canonical Modal profile over one complete target-coordinated product snapshot, composing full rich-media Product Gallery in no-detail mode, target-formatted Price, optional native Product Form, and an optional coherent full-details Link.",
+  "dependencies": ["modal", "product-gallery", "price", "product-form", "link"],
   "source": {
     "registry": "registry.json#/components/quick-view",
     "css": { "file": "components/css/cart.css", "selector": ".quick-view" },
     "docs": "site/src/content/components/quick-view.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".quick-view", "className": ".quick-view", "required": true, "description": "Quick-view content grid." },
-    { "name": "gallery", "selector": ".quick-view__gallery", "className": ".quick-view__gallery", "required": true, "description": "Quick-view image or gallery area." },
-    { "name": "info", "selector": ".quick-view__info", "className": ".quick-view__info", "required": true, "description": "Quick-view product info wrapper." },
-    { "name": "title", "selector": ".quick-view__title", "className": ".quick-view__title", "required": true, "description": "Product title." },
-    { "name": "vendor", "selector": ".quick-view__vendor", "className": ".quick-view__vendor", "required": false, "description": "Vendor text." },
-    { "name": "description", "selector": ".quick-view__description", "className": ".quick-view__description", "required": false, "description": "Truncated product description." },
-    { "name": "form", "selector": ".quick-view__form", "className": ".quick-view__form", "required": false, "description": "Product Form dependency region." },
-    { "name": "fullLink", "selector": ".quick-view__full-link", "className": ".quick-view__full-link", "required": false, "description": "Full product-detail link." }
+    { "name": "overlay", "selector": ".quick-view-overlay", "className": ".quick-view-overlay", "required": true, "description": "Canonical Modal overlay while the target presents Quick View." },
+    { "name": "root", "selector": ".quick-view", "className": ".quick-view", "required": true, "description": "Canonical Modal dialog root with the Quick View domain profile." },
+    { "name": "header", "selector": ".quick-view .modal__header", "className": ".modal__header", "required": true, "description": "Canonical Modal header containing the product title and visible close action." },
+    { "name": "title", "selector": ".quick-view .modal__title", "className": ".modal__title", "required": true, "description": "Required visible product title that also supplies the dialog accessible name." },
+    { "name": "close", "selector": ".quick-view .modal__close", "className": ".modal__close", "required": true, "description": "Required named Modal dismiss action composed with canonical Close Button." },
+    { "name": "body", "selector": ".quick-view .modal__body", "className": ".modal__body", "required": true, "description": "Scrollable canonical Modal body containing the product composition." },
+    { "name": "layout", "selector": ".quick-view__layout", "className": ".quick-view__layout", "required": true, "description": "Private container-responsive Gallery and information layout." },
+    { "name": "gallery", "selector": ".quick-view__gallery", "className": ".quick-view__gallery", "required": true, "description": "Required wrapper containing one canonical Product Gallery with the complete coordinated rich-media collection and imageDetail none." },
+    { "name": "info", "selector": ".quick-view__info", "className": ".quick-view__info", "required": true, "description": "Product decision information and continuation region." },
+    { "name": "vendor", "selector": ".quick-view__vendor", "className": ".quick-view__vendor", "required": false, "description": "Optional vendor or maker plaintext." },
+    { "name": "price", "selector": ".quick-view__price", "className": ".quick-view__price", "required": true, "description": "Required wrapper containing one canonical target-formatted Price." },
+    { "name": "description", "selector": ".quick-view__description", "className": ".quick-view__description", "required": false, "description": "Optional concise target-authored product excerpt." },
+    { "name": "form", "selector": ".quick-view__form", "className": ".quick-view__form", "required": false, "description": "Optional canonical native Product Form composition." },
+    { "name": "fullLink", "selector": ".quick-view__full-link", "className": ".quick-view__full-link", "required": false, "description": "Optional canonical Link to the complete product detail destination." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default quick-view modal content." }
+    { "name": "default", "className": null, "default": true, "description": "One focused product quick-view Modal profile." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Responsive one-column to two-column quick-view layout." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic container-responsive modal profile; geometry remains private." }
   ],
   "states": [
-    { "name": "default", "selectors": [".quick-view"], "description": "Default quick-view content state." },
-    { "name": "fullLinkFocus", "selectors": [".quick-view__full-link:focus-visible"], "description": "Visible full-details link focus state." }
+    { "name": "closed", "selectors": [".quick-view-overlay"], "description": "Target-hidden or unmounted Quick View; its descendants are unavailable." },
+    { "name": "open", "selectors": [".quick-view"], "description": "Visible modal state with complete target modality and focus lifecycle." },
+    { "name": "withProductForm", "selectors": [".quick-view__form"], "description": "Purchase continuation supplied by canonical Product Form." },
+    { "name": "withFullLink", "selectors": [".quick-view__full-link"], "description": "Navigation continuation supplied by a coherent canonical Link with its inherited focus state." },
+    { "name": "richMedia", "selectors": [".product-gallery__media"], "description": "Within the required Gallery slot, the complete snapshot may include images, hosted video, external video, and models through canonical Product Gallery." }
   ],
   "behavior": [
-    { "name": "modalComposition", "selectors": [".quick-view"], "description": "Quick View should inherit Modal focus management, dismissal, and labelled dialog behavior." },
-    { "name": "productComposition", "selectors": [".quick-view__gallery", ".quick-view__info"], "description": "Quick View composes product gallery and product form behavior for a reduced product purchase flow." },
-    { "name": "fullDetails", "selectors": [".quick-view__full-link"], "attributes": ["href"], "events": ["click"], "description": "Full details link should navigate to the product page." }
+    { "name": "modalComposition", "selectors": [".quick-view-overlay", ".quick-view", ".quick-view .modal__header", ".quick-view .modal__title", ".quick-view .modal__close", ".quick-view .modal__body"], "attributes": ["role=\"dialog\"", "aria-modal=\"true\"", "aria-labelledby"], "description": "Quick View consumes the complete canonical Modal anatomy; the non-empty product title supplies its visible accessible name and a named close action remains present." },
+    { "name": "visibility", "selectors": [".quick-view-overlay"], "attributes": ["aria-hidden"], "description": "Targets expose the open surface and keep closed content unavailable rather than leaving a hidden interactive subtree." },
+    { "name": "focusAndDismissal", "selectors": [".quick-view", ".quick-view .modal__close"], "events": ["open", "Tab", "Shift+Tab", "Escape", "backdrop request", "close", "restore focus"], "description": "The Modal dependency and target move focus appropriately, contain it while modal, support Escape and the visible close action, apply target backdrop policy, and restore focus logically." },
+    { "name": "galleryComposition", "selectors": [".quick-view__gallery", ".product-gallery", ".product-gallery__media"], "attributes": ["data-image-detail=\"none\"", "data-gallery-media-type"], "description": "The required Gallery slot contains one canonical Product Gallery with the complete coordinated image/video/external-video/model collection and imageDetail none; K8 does not duplicate media selection, alternatives, activation, release, swipe, or current-state behavior." },
+    { "name": "noNestedImageDetail", "selectors": [".quick-view__gallery", ".product-gallery", ".product-gallery__media"], "attributes": ["data-image-detail=\"none\""], "description": "Images remain passive inside the already-modal Quick View. K8 creates no nested, transferred, or emulated Lightbox; the complete-product destination uses Product Gallery's independent lightbox default." },
+    { "name": "priceComposition", "selectors": [".quick-view__price", ".price"], "description": "The required Price slot contains one canonical Price supplied with complete target-formatted content; K8 performs no money parsing or formatting." },
+    { "name": "productFormComposition", "selectors": [".quick-view__form", ".product-form"], "events": ["submit", "formdata", "reset"], "description": "When present, the Product Form slot is the real canonical native form and owns its child controls and action states; K8 does not duplicate purchase markup." },
+    { "name": "continuationCoherence", "selectors": [".quick-view__form", ".quick-view__full-link"], "attributes": ["href"], "events": ["submit", "click"], "description": "A valid Quick View provides Product Form, a complete Link label/destination pair, or both. One-sided Link values and synthetic fallback URLs are invalid." },
+    { "name": "targetCoordination", "selectors": [".quick-view__gallery", ".quick-view__price", ".quick-view__form", ".quick-view__full-link"], "description": "One target product coordinator opens K8 only from a complete coherent snapshot and synchronizes identity, rich media/current id, selected options, merchandise id, availability, Price, quantity rules, URL, inventory, pending/result/error state, cart refresh and one localized status. Incomplete, loading, or stale snapshots omit K8." },
+    { "name": "intrinsicLayout", "selectors": [".quick-view", ".quick-view__layout", ".quick-view__gallery", ".quick-view__info"], "description": "The stable source order responds to the Quick View container, wraps localized and unbroken content, and avoids viewport-dependent internal composition." }
   ],
   "properties": [
-    { "name": "gallery", "type": "slot", "required": true, "description": "Product Gallery dependency or reduced media fixture.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__gallery", "classNames": [".quick-view__gallery"] }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Product title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__title" }] } },
-    { "name": "vendor", "type": "string", "required": false, "description": "Vendor or maker text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__vendor" }] } },
-    { "name": "description", "type": "string", "required": false, "description": "Truncated product description.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__description" }] } },
-    { "name": "productForm", "type": "slot", "required": false, "description": "Reduced Product Form dependency.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__form", "classNames": [".quick-view__form"] }] } },
-    { "name": "fullLinkLabel", "type": "string", "required": false, "description": "Full product details link label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__full-link" }] } },
-    { "name": "href", "type": "string", "required": false, "description": "Full product details destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".quick-view__full-link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Non-empty visible localized product title and dialog accessible name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view .modal__title" }] } },
+    { "name": "dismissLabel", "type": "string", "required": true, "description": "Contextual localized accessible name for the visible close action.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".quick-view .modal__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "open", "type": "boolean", "required": false, "defaultValue": false, "description": "Controls whether the target presents Quick View; complete modality and lifecycle remain target-owned.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".quick-view-overlay", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] } },
+    { "name": "gallery", "type": "slot", "required": true, "description": "Required slot containing one canonical Product Gallery supplied with the complete coordinated rich-media collection and imageDetail none.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__gallery", "classNames": [".quick-view__gallery"] }] } },
+    { "name": "vendor", "type": "string", "required": false, "description": "Optional vendor or maker plaintext.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__vendor" }] } },
+    { "name": "price", "type": "slot", "required": true, "description": "Required slot containing one canonical target-formatted Price.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__price", "classNames": [".quick-view__price"] }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional concise target-authored product excerpt; K8 does not visually clamp a longer hidden value.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__description" }] } },
+    { "name": "productForm", "type": "slot", "required": false, "description": "Optional canonical native Product Form composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".quick-view__form", "classNames": [".quick-view__form"] }] } },
+    { "name": "fullLinkLabel", "type": "string", "required": false, "unsetBehavior": "Omit the complete Link unless href is also non-empty.", "description": "Optional descriptive complete-product Link label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".quick-view__full-link" }] } },
+    { "name": "href", "type": "string", "required": false, "unsetBehavior": "Omit the complete Link unless fullLinkLabel is also non-empty; never invent a fallback destination.", "description": "Optional target-owned complete-product navigation destination.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".quick-view__full-link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } }
   ],
-  "tokens": {
-    "public": {
-      "color": ["--color-text-primary", "--color-text-secondary", "--color-text-accent", "--color-border-focus"],
-      "radius": ["--radius-md"],
-      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size", "--typo-body-line-height"]
-    }
-  },
+  "tokens": { "public": {} },
   "accessibility": [
-    "Preserve Modal focus management and return focus to the trigger on close.",
-    "Keep product title, price, variants, and add-to-cart actions readable in the modal context.",
-    "Provide a full product-detail link when quick view truncates content."
+    "Compose the complete Modal dependency and assert aria-modal=true only when outside content is genuinely inert and focus is contained.",
+    "Use the required visible non-empty product title through aria-labelledby and always provide a visible close action with a contextual accessible name.",
+    "Choose content-aware initial focus, contain Tab and Shift+Tab, close on Escape, and restore focus to the invoker or another logical workflow target.",
+    "Preserve Product Gallery alternative text, named selection controls, swipe, explicit rich-media activation/release, native target fallbacks and current-media status without creating a second gallery keyboard model.",
+    "Keep imageDetail none inside the already-modal Quick View so featured images are passive and no nested or transferred Lightbox/dialog can open.",
+    "Render one canonical target-formatted Price and keep price/availability changes out of independent duplicate live regions.",
+    "Render optional Product Form as a real native form with canonical child controls; target confirmation, error, retry, focus and announcement timing remain target-owned.",
+    "Render the full-details destination as a native canonical Link only when both descriptive label and real href exist.",
+    "Honor reduced motion, preserve forced-color boundaries, logical direction and effective 200 percent reflow without horizontal overflow."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/cart.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map product data and variant form behavior into modal content." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "css-target-lifecycle", "notes": "Canonical composition and container layout are implemented in source CSS. Web targets map complete modality through native dialog or an equivalent proven lifecycle without neutral Quick View runtime." },
+    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "The product-context snippet maps complete product.media through canonical Product Gallery with image_detail none plus canonical Price/Form/Link. Invocation, complete-snapshot loading, variant synchronization, purchase lifecycle, focus/status and live-theme proof remain target work." },
+    "react": { "status": "planned", "kind": "component", "notes": "Framework adapter may expose controlled/uncontrolled open state while one parent product coordinator owns the complete snapshot, Gallery current id, Price, Product Form, URL and result synchronization." },
+    "figma": { "status": "planned", "kind": "component", "notes": "Visual Modal profile with canonical child instances only; lifecycle and product data remain annotations." },
     "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

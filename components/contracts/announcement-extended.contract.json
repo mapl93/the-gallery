@@ -1,240 +1,85 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "announcement-extended",
-  "name": "Announcement Bar (Extended)",
+  "name": "Announcement Extended (deprecated)",
   "registryId": "G11",
   "category": "marketing",
-  "status": "pilot",
-  "summary": "Announcement Bar presentation extensions for countdown content, rotating slides, and an optional dismiss action without deciding capability composition or rotation behavior.",
-  "dependencies": [
-    "announcement-bar"
-  ],
+  "status": "deprecated",
+  "summary": "Deprecated G11 identity retained only as a pre-v1 migration record to canonical C2 Announcement Bar; it owns no independent CSS, renderer, fixture, behavior or target adapter.",
+  "dependencies": ["announcement-bar", "link", "close-button", "countdown", "carousel", "icon-button"],
   "source": {
     "registry": "registry.json#/components/announcement-extended",
-    "css": {
-      "file": "components/css/marketing.css",
-      "selector": ".announcement-bar--countdown"
-    },
+    "css": { "file": "components/css/global.css", "selector": ".announcement" },
     "docs": "site/src/content/components/announcement-extended.mdx"
   },
   "anatomy": [
-    {
-      "name": "countdownRoot",
-      "selector": ".announcement-bar--countdown",
-      "className": ".announcement-bar--countdown",
-      "required": true,
-      "description": "Registry selector and flex layout for announcement content with countdown values."
-    },
-    {
-      "name": "rotatingRoot",
-      "selector": ".announcement-bar--rotating",
-      "className": ".announcement-bar--rotating",
-      "required": false,
-      "description": "Optional clipped rotating-message viewport."
-    },
-    {
-      "name": "slides",
-      "selector": ".announcement-bar__slides",
-      "className": ".announcement-bar__slides",
-      "required": false,
-      "description": "Optional animated slide stack."
-    },
-    {
-      "name": "slide",
-      "selector": ".announcement-bar__slide",
-      "className": ".announcement-bar__slide",
-      "required": false,
-      "description": "Repeated announcement message row."
-    },
-    {
-      "name": "dismissibleRoot",
-      "selector": ".announcement-bar--dismissible",
-      "className": ".announcement-bar--dismissible",
-      "required": false,
-      "description": "Optional positioning context for a dismiss action."
-    },
-    {
-      "name": "dismiss",
-      "selector": ".announcement-bar__dismiss",
-      "className": ".announcement-bar__dismiss",
-      "required": false,
-      "description": "Optional named native dismiss button."
-    }
+    { "name": "root", "selector": ".announcement", "className": ".announcement", "required": true, "description": "Canonical controlled C2 Announcement Bar surface." },
+    { "name": "body", "selector": ".announcement__body", "className": ".announcement__body", "required": true, "description": "Canonical intrinsic content row." },
+    { "name": "message", "selector": ".announcement__message", "className": ".announcement__message", "required": false, "description": "Canonical static-mode message." },
+    { "name": "countdown", "selector": ".announcement__countdown", "className": ".announcement__countdown", "required": false, "description": "Canonical Countdown-mode composition." },
+    { "name": "rotation", "selector": ".announcement__rotation", "className": ".announcement__rotation", "required": false, "description": "Canonical Carousel rotation composition." },
+    { "name": "track", "selector": ".announcement__track", "className": ".announcement__track", "required": false, "description": "Canonical rotating message track." },
+    { "name": "slide", "selector": ".announcement__slide", "className": ".announcement__slide", "required": false, "description": "Canonical real message slide." },
+    { "name": "controls", "selector": ".announcement__controls", "className": ".announcement__controls", "required": false, "description": "Canonical rotating controls." },
+    { "name": "dismiss", "selector": ".announcement__dismiss", "className": ".announcement__dismiss", "required": false, "description": "Canonical Close Button dismissal request." }
   ],
   "variants": [
-    {
-      "name": "countdown",
-      "className": ".announcement-bar--countdown",
-      "default": true,
-      "description": "Countdown-content layout extension."
-    },
-    {
-      "name": "rotating",
-      "className": ".announcement-bar--rotating",
-      "default": false,
-      "description": "Rotating-message presentation extension."
-    },
-    {
-      "name": "dismissible",
-      "className": ".announcement-bar--dismissible",
-      "default": false,
-      "description": "Dismiss-action presentation extension."
-    }
+    { "name": "static", "className": null, "default": true, "description": "Canonical static mode." },
+    { "name": "countdown", "className": ".announcement--countdown", "default": false, "description": "Canonical Countdown mode." },
+    { "name": "rotating", "className": ".announcement--rotating", "default": false, "description": "Canonical rotating mode." }
   ],
   "sizes": [
-    {
-      "name": "default",
-      "className": null,
-      "default": true,
-      "description": "Size remains owned by the Announcement Bar dependency."
-    }
+    { "name": "default", "className": null, "default": true, "description": "Canonical compact intrinsic size." }
   ],
   "states": [
-    {
-      "name": "default",
-      "selectors": [
-        ".announcement-bar--countdown"
-      ],
-      "description": "Announcement Bar extension at rest."
-    },
-    {
-      "name": "dismissHover",
-      "selectors": [
-        ".announcement-bar__dismiss:hover"
-      ],
-      "description": "Pointer hover on the optional dismiss button."
-    },
-    {
-      "name": "dismissFocusVisible",
-      "selectors": [
-        ".announcement-bar__dismiss:focus-visible"
-      ],
-      "description": "Visible keyboard focus on the optional dismiss button."
-    }
+    { "name": "default", "selectors": [".announcement"], "description": "Canonical visible surface." },
+    { "name": "dismissible", "selectors": [".announcement--dismissible", ".announcement__dismiss"], "description": "Canonical orthogonal dismissal capability." },
+    { "name": "currentMessage", "selectors": [".announcement__slide[aria-current=\"true\"]"], "description": "Canonical current rotating message." },
+    { "name": "autoplayPaused", "selectors": [".announcement[data-autoplay-state=\"paused\"]"], "description": "Canonical paused rotation state." },
+    { "name": "userPaused", "selectors": [".announcement[data-user-paused=\"true\"]"], "description": "Canonical durable user-pause state." },
+    { "name": "closed", "selectors": [".announcement[hidden]"], "description": "Canonical controlled closed state." }
   ],
   "behavior": [
-    {
-      "name": "baseComposition",
-      "selectors": [
-        ".announcement-bar--countdown"
-      ],
-      "description": "Every extension composes the Announcement Bar dependency and preserves its message and link obligations."
-    },
-    {
-      "name": "rotationPresentation",
-      "selectors": [
-        ".announcement-bar--rotating",
-        ".announcement-bar__slides",
-        ".announcement-bar__slide"
-      ],
-      "description": "Canonical CSS demonstrates a fixed visual loop only; the source contract does not define message count, cadence, pausing, controls, synchronization, or whether rotation combines with other extensions."
-    },
-    {
-      "name": "dismissal",
-      "selectors": [
-        ".announcement-bar__dismiss"
-      ],
-      "events": [
-        "click"
-      ],
-      "description": "The optional native button requests dismissal; the target owns persistence, focus destination, and whether the announcement may return."
-    }
+    { "name": "deprecatedForward", "selectors": [".announcement"], "description": "Every former G11 use migrates to canonical C2 Announcement Bar; G11 adds no class, mode, property, event or runtime." },
+    { "name": "canonicalOwnership", "events": ["announcementdismissrequest", "announcementchange", "announcementplaybackchange"], "description": "Canonical C2 owns exclusive modes, dependency composition and controlled event semantics." }
   ],
   "properties": [
-    {
-      "name": "slides",
-      "type": "slot",
-      "required": false,
-      "description": "Optional repeated announcement messages for the existing rotating presentation; this does not define rotation behavior.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".announcement-bar__slides",
-            "classNames": [
-              ".announcement-bar__slides"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "dismissAction",
-      "type": "slot",
-      "required": false,
-      "description": "Optional native button that requests announcement dismissal.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "slot",
-            "selector": ".announcement-bar__dismiss",
-            "classNames": [
-              ".announcement-bar__dismiss"
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "name": "dismissLabel",
-      "type": "string",
-      "required": false,
-      "description": "Accessible name for the optional dismiss button.",
-      "targetMappings": {
-        "web": [
-          {
-            "kind": "attribute",
-            "selector": ".announcement-bar__dismiss",
-            "attribute": "aria-label",
-            "valueFrom": "property",
-            "elements": [
-              "button"
-            ]
-          }
-        ]
-      }
-    }
+    { "name": "mode", "type": "enum", "required": false, "defaultValue": "static", "valuesFrom": "variants", "description": "Canonical C2 content mode.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".announcement", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Canonical accessible region name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "aria-label", "valueFrom": "property", "elements": ["section"] }] } },
+    { "name": "message", "type": "slot", "required": false, "description": "Canonical static message.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement__message", "classNames": [".announcement__message"] }] } },
+    { "name": "countdown", "type": "slot", "required": false, "description": "Canonical inline Countdown.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement__countdown", "classNames": [".announcement__countdown"] }] } },
+    { "name": "messages", "type": "slot", "required": false, "description": "Canonical ordered rotating messages.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement__track", "classNames": [".announcement__track", ".announcement__slide"] }] } },
+    { "name": "visible", "type": "boolean", "required": false, "defaultValue": true, "description": "Canonical controlled presence.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "hidden", "values": { "true": null, "false": "" } }] } },
+    { "name": "dismissible", "type": "boolean", "required": false, "defaultValue": false, "description": "Canonical optional dismissal capability.", "targetMappings": { "web": [{ "kind": "class", "selector": ".announcement", "classNames": [".announcement--dismissible"] }] } },
+    { "name": "dismissLabel", "type": "string", "required": true, "description": "Canonical localized dismiss name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__dismiss", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "autoplay", "type": "boolean", "required": false, "defaultValue": false, "description": "Canonical rotating autoplay switch.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "data-autoplay", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "autoplayInterval", "type": "number", "required": false, "defaultValue": 6000, "minimum": 3000, "maximum": 12000, "step": 1000, "description": "Canonical rotating interval.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "data-autoplay-interval", "valueFrom": "property" }] } },
+    { "name": "previousLabel", "type": "string", "required": true, "description": "Canonical previous-message name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__previous", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "nextLabel", "type": "string", "required": true, "description": "Canonical next-message name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__next", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "pauseLabel", "type": "string", "required": true, "description": "Canonical pause name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__rotation-control", "attribute": "data-pause-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "playLabel", "type": "string", "required": true, "description": "Canonical play name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__rotation-control", "attribute": "data-play-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "counterTemplate", "type": "string", "required": true, "description": "Canonical visible position template.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__counter", "attribute": "data-counter-template", "valueFrom": "property" }] } },
+    { "name": "statusTemplate", "type": "string", "required": true, "description": "Canonical assistive position template.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__status", "attribute": "data-status-template", "valueFrom": "property" }] } }
   ],
   "tokens": {
     "public": {
-      "spacing": [
-        "--space-layout-touch-target"
-      ]
+      "color": ["--color-surface-statement", "--color-text-primary", "--color-border-focus"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap"],
+      "typography": ["--font-family-body", "--tg-font-weight-medium", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Preserve the Announcement Bar dependency's readable message and native-link semantics.",
-    "Provide a named native dismiss button when dismissal is offered.",
-    "Do not rotate critical legal, checkout, or safety information.",
-    "Pause or replace automatic rotation when an accepted rotation model is introduced, and disable the current CSS animation for reduced motion.",
-    "Do not infer that countdown, rotation, and dismissal are mutually exclusive or freely composable until that product boundary is accepted."
+    "Migrate to canonical C2 Announcement Bar before v1.",
+    "Do not preserve the former CSS-only animation, clipped height, duplicated dismiss button, or G11-specific class contract.",
+    "Use canonical Countdown, Carousel, Icon Button, Close Button and Link semantics through C2."
   ],
   "adapters": {
-    "web": {
-      "status": "implemented",
-      "kind": "css",
-      "notes": "Presentation CSS exists; capability composition and rotation behavior remain unresolved."
-    },
-    "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
-    },
-    "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "swiftui": {
-      "status": "planned",
-      "kind": "native-component"
-    },
-    "compose": {
-      "status": "planned",
-      "kind": "native-component"
-    }
+    "web": { "status": "implemented", "kind": "deprecated-forward", "notes": "Temporary migration records render canonical C2 source; G11 owns no independent Web output." },
+    "shopify": { "status": "unsupported", "kind": "deprecated", "notes": "Use canonical C2 Announcement Bar; G11 owns no Shopify adapter." },
+    "react": { "status": "planned", "kind": "component" },
+    "figma": { "status": "planned", "kind": "component" },
+    "swiftui": { "status": "planned", "kind": "style" },
+    "compose": { "status": "planned", "kind": "composable" }
   }
 }

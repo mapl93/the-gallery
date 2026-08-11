@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import CheckboxArtwork from './CheckboxArtwork';
 
 interface CheckboxStudioProps {
   contract: ComponentContract;
@@ -98,7 +99,8 @@ function activeColorTokens(
 
 function simulatedControlStyle(
   activeTokens: Record<string, string | null>,
-  state: string
+  state: string,
+  variant: string
 ): CSSProperties {
   const focused = state === 'focusVisible'
     || state === 'errorFocusVisible'
@@ -109,7 +111,9 @@ function simulatedControlStyle(
 
   return {
     borderColor: activeTokens['control-color']
-      ? `var(${activeTokens['control-color']})`
+      ? variant === 'error' || variant === 'success' || variant === 'warning'
+        ? `color-mix(in srgb, var(${activeTokens['control-color']}) 70%, var(--color-text-primary))`
+        : `var(${activeTokens['control-color']})`
       : undefined,
     outline: focused && activeTokens['focus-ring']
       ? `4px solid var(${activeTokens['focus-ring']})`
@@ -172,7 +176,7 @@ export default function CheckboxStudio({ contract, definition }: CheckboxStudioP
     () => activeColorTokens(variant, previewState, checked || indeterminate),
     [variant, previewState, checked, indeterminate]
   );
-  const controlStyle = simulatedControlStyle(activeTokens, previewState);
+  const controlStyle = simulatedControlStyle(activeTokens, previewState, variant);
   const classes = [
     'checkbox',
     'docs-studio__preview-checkbox',
@@ -233,29 +237,26 @@ export default function CheckboxStudio({ contract, definition }: CheckboxStudioP
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <label className={classes}>
-              <input
-                ref={inputRef}
-                className="checkbox__input"
-                type="checkbox"
-                name={name || undefined}
-                value={value}
-                checked={checked}
-                disabled={disabled}
-                required={required}
-                aria-invalid={variant === 'error' || undefined}
-                aria-describedby={describedBy}
-                data-indeterminate={indeterminate ? 'true' : undefined}
-                data-studio-state={previewState}
-                style={controlStyle}
-                onChange={(event) => setValues((current) => ({
-                  ...current,
-                  checked: event.target.checked,
-                  indeterminate: false,
-                }))}
-              />
-              <span className="checkbox__label">{label}</span>
-            </label>
+            <CheckboxArtwork
+              className={classes.replace(/^checkbox\s*/, '')}
+              label={label}
+              name={name}
+              value={value}
+              checked={checked}
+              disabled={disabled}
+              required={required}
+              invalid={variant === 'error'}
+              describedBy={describedBy}
+              indeterminate={indeterminate}
+              dataState={previewState}
+              inputStyle={controlStyle}
+              inputRef={inputRef}
+              onChange={(event) => setValues((current) => ({
+                ...current,
+                checked: event.target.checked,
+                indeterminate: false,
+              }))}
+            />
           </div>
         </section>
       </div>

@@ -7,14 +7,6 @@ import {
   type FormEvent,
   type MouseEvent,
 } from 'react';
-import {
-  Copy,
-  Link2,
-  Mail,
-  MessageCircle,
-  Reply,
-  ThumbsUp,
-} from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -22,6 +14,39 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import ArticleBodyArtwork, { ArticleBodyFixture } from './ArticleBodyArtwork';
+import ArticleCardArtwork from './ArticleCardArtwork';
+import ArticleHeroArtwork from './ArticleHeroArtwork';
+import AuthorCardArtwork, {
+  AuthorCardAvatarFixture,
+  AuthorCardLinksFixture,
+  authorCardFixture,
+} from './AuthorCardArtwork';
+import BlogSidebarArtwork, {
+  BlogSidebarFixture,
+  blogSidebarFixture,
+} from './BlogSidebarArtwork';
+import FilterBarArtwork, { filterBarFixtureOptions } from './FilterBarArtwork';
+import CommentSectionArtwork, {
+  CommentComposerFixture,
+  CommentOrderFixture,
+  CommentPaginationFixture,
+  CommentThreadFixture,
+  commentsFixture,
+  updateCommentReactionFixture,
+  type CommentArtworkRecord,
+} from './CommentSectionArtwork';
+import RelatedArticlesArtwork, {
+  buildRelatedArticlesFixture,
+} from './RelatedArticlesArtwork';
+import ShareActionsArtwork, {
+  buildShareActionsFixture,
+  type ShareActionArtworkItem,
+} from './ShareActionsArtwork';
+import { ReadingProgressFixture } from './ReadingProgressArtwork';
+import TableOfContentsArtwork, {
+  tableOfContentsFixtureItems,
+} from './TableOfContentsArtwork';
 import { editorialImage } from './editorialMedia';
 
 interface BlogStudioProps {
@@ -34,6 +59,7 @@ const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 const fixtureValues: Record<string, StudioPropertyValues> = {
   'article-card': {
     variant: 'standard',
+    surface: 'default',
     title: 'Inside the quiet rhythm of a working studio',
     href: '#studio-rhythm',
     media: true,
@@ -41,6 +67,7 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     category: 'Studio notes',
     metadata: true,
     excerpt: 'A morning shaped by clay, repetition, and the small decisions that give each vessel its character.',
+    excerptLines: 'none',
     author: true,
   },
   'article-hero': {
@@ -52,36 +79,56 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     metadata: true,
   },
   'article-body': { content: true, dropCap: false },
-  'reading-progress': { indicator: true },
+  'reading-progress': {
+    mode: 'controlled',
+    value: 44,
+    targetId: 'reading-progress-article',
+    scrollRootId: 'reading-progress-scroll-root',
+  },
   'table-of-contents': {
-    variant: 'default',
-    label: 'Article contents',
+    placement: 'sticky',
+    label: 'In this article',
     title: 'In this article',
     items: true,
+    currentSectionId: 'article-repetition',
   },
   'author-card': {
     variant: 'full',
     avatar: true,
-    name: 'Marina Paz',
-    role: 'Ceramic artist and writer',
-    bio: 'Marina writes about material practice, studio rituals, and the lives objects gather through use.',
+    name: authorCardFixture.name,
+    role: authorCardFixture.role,
+    bio: authorCardFixture.bio,
     links: true,
   },
-  'category-nav': { label: 'Blog categories', items: true },
-  'blog-sidebar': { sections: true },
-  'share-buttons': { variant: 'inline', actions: true },
+  'filter-bar': {
+    mode: 'single',
+    label: 'Filter stories',
+    name: 'topic',
+    options: true,
+    selectedValues: ['studio-notes'],
+    disabled: false,
+    describedBy: '',
+  },
+  'blog-sidebar': { label: blogSidebarFixture.label, sections: true },
+  'share-buttons': {
+    variant: 'inline',
+    label: 'Share this studio note',
+    actions: true,
+  },
   'related-articles': { title: 'Continue reading', articles: true },
-  comments: { title: 'Conversation', count: '2 comments', thread: true, composer: true },
+  comments: {
+    title: 'Conversation',
+    count: '24 comments',
+    orderControl: true,
+    thread: true,
+    pagination: true,
+    composer: true,
+  },
 };
-
-const relatedArticleFixtures = [
-  { title: 'A field guide to ash glazes', category: 'Materials' },
-  { title: 'The tools that earn a permanent place', category: 'Studio notes' },
-  { title: 'Firing a small batch with intention', category: 'Process' },
-];
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
   if ('defaultValue' in property) return property.defaultValue ?? null;
+  if (property.type === 'string-list') return [];
   if (property.type === 'boolean' || property.type === 'slot') return false;
   if (property.type === 'number') return null;
   if (property.type === 'enum') {
@@ -140,6 +187,40 @@ export default function BlogStudio({ contract, definition }: BlogStudioProps) {
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState('');
   const [commentDraft, setCommentDraft] = useState('');
+  const [commentRecords, setCommentRecords] = useState<readonly CommentArtworkRecord[]>(commentsFixture);
+  const [commentPage, setCommentPage] = useState(1);
+  const [commentOrder, setCommentOrder] = useState('oldest');
+
+  useEffect(() => {
+    if (contract.slug !== 'filter-bar') return undefined;
+
+    const synchronizeFromUrl = () => {
+      const key = String(values.name || 'topic').trim();
+      if (!key) return;
+      const url = new URL(window.location.href);
+      const validValues = new Set(filterBarFixtureOptions.map((option) => option.value));
+      const urlSelection = url.searchParams.getAll(key).filter((value) => validValues.has(value));
+      const fallbackSelection = Array.isArray(initialValues.selectedValues)
+        ? initialValues.selectedValues
+        : [];
+      const nextSelection = (url.searchParams.has(key) ? urlSelection : fallbackSelection)
+        .slice(0, values.mode === 'multiple' ? undefined : 1);
+
+      setValues((current) => {
+        const currentSelection = Array.isArray(current.selectedValues)
+          ? current.selectedValues
+          : [];
+        return currentSelection.length === nextSelection.length
+          && currentSelection.every((value, index) => value === nextSelection[index])
+          ? current
+          : { ...current, selectedValues: nextSelection };
+      });
+    };
+
+    synchronizeFromUrl();
+    window.addEventListener('popstate', synchronizeFromUrl);
+    return () => window.removeEventListener('popstate', synchronizeFromUrl);
+  }, [contract.slug, initialValues, values.mode, values.name]);
 
   useEffect(() => {
     const read = () => {
@@ -162,6 +243,32 @@ export default function BlogStudio({ contract, definition }: BlogStudioProps) {
     setTokenOverrides({});
     setFeedback('');
     setCommentDraft('');
+    setCommentRecords(commentsFixture);
+    setCommentPage(1);
+    setCommentOrder('oldest');
+    if (contract.slug === 'filter-bar') {
+      const key = String(values.name || 'topic').trim();
+      const url = new URL(window.location.href);
+      if (key) url.searchParams.delete(key);
+      window.history.replaceState(window.history.state, '', url);
+    }
+  }
+
+  function updateFilterQuery(selectedValues: readonly string[], method: 'push' | 'replace' = 'push') {
+    const key = String(values.name || '').trim();
+    if (!key) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete(key);
+    if (selectedValues.length === 0) {
+      url.searchParams.set(key, '');
+    } else {
+      selectedValues.forEach((value) => url.searchParams.append(key, value));
+    }
+    window.history[method === 'push' ? 'pushState' : 'replaceState'](
+      window.history.state,
+      '',
+      url,
+    );
   }
 
   function inspect(event: MouseEvent<HTMLElement>, label: string) {
@@ -171,249 +278,274 @@ export default function BlogStudio({ contract, definition }: BlogStudioProps) {
 
   function renderArticleCard() {
     const className = variantClass(contract, values.variant);
-    const href = String(values.href || '#article');
-    const category = String(values.category || '');
-    const categoryNode = category ? <span className="badge article-card__category">{category}</span> : null;
+    const variant = String(values.variant || 'standard');
+    const href = String(values.href ?? '');
     return (
-      <article className={['article-card', className, 'docs-studio__article-card'].filter(Boolean).join(' ')}>
-        {values.media === true && (
-          <a className="article-card__media" href={href} onClick={(event) => inspect(event, 'Article media link')}>
-            <BlogMedia alt={String(values.imageAlt || '')} />
-            {categoryNode}
-          </a>
-        )}
-        <div className="article-card__body">
-          {values.media !== true && categoryNode}
-          {values.metadata === true && <div className="article-card__meta"><time dateTime="2026-07-12">July 12, 2026</time><span className="article-card__meta-separator">/</span><span>6 min read</span></div>}
-          <h2 className="article-card__title"><a href={href} onClick={(event) => inspect(event, 'Article title link')}>{String(values.title)}</a></h2>
-          {String(values.excerpt || '') && <p className="article-card__excerpt">{String(values.excerpt)}</p>}
-          {values.author === true && <div className="article-card__author"><span className="article-card__author-name">By Marina Paz</span></div>}
-        </div>
-      </article>
+      <ArticleCardArtwork
+        title={String(values.title || '')}
+        href={href}
+        variant={variant}
+        surface={String(values.surface || 'default')}
+        className={className ?? ''}
+        media={values.media === true ? <BlogMedia alt={String(values.imageAlt || '')} /> : null}
+        category={String(values.category || '')}
+        metadata={values.metadata === true ? (
+          <>
+            <time dateTime="2026-07-12">July 12, 2026</time>
+            <span className="article-card__meta-separator" aria-hidden="true">/</span>
+            <time dateTime="PT6M">6 min read</time>
+          </>
+        ) : null}
+        excerpt={String(values.excerpt || '')}
+        excerptLines={String(values.excerptLines || 'none')}
+        author={values.author === true ? <span className="article-card__author-name" dir="auto">By Marina Paz</span> : null}
+        onNavigate={(event) => inspect(event, 'Article title link')}
+      />
     );
   }
 
   function renderArticleHero() {
     const className = variantClass(contract, values.variant);
-    const isFull = values.variant === 'full';
-    const isSplit = values.variant === 'split';
     return (
-      <header className={[
-        'article-hero',
-        className,
-        'docs-studio__article-hero',
-        isFull && values.backgroundMedia !== true ? 'docs-studio__article-hero--without-media' : null,
-      ].filter(Boolean).join(' ')}>
-        {isFull && values.backgroundMedia === true && <div className="article-hero__bg"><BlogMedia alt="Kiln shelves holding newly fired stoneware" /></div>}
-        {isFull && values.backgroundMedia === true && <div className="article-hero__overlay" />}
-        {isSplit && values.splitMedia === true && <div className="article-hero__media"><BlogMedia index={2} alt="A ceramic artist checking a glazed vessel" /></div>}
-        <div className="article-hero__content">
-          {String(values.category || '') && <div className="article-hero__category">{String(values.category)}</div>}
-          <h2 className="article-hero__title">{String(values.title)}</h2>
-          {values.metadata === true && <div className="article-hero__meta"><span>By Marina Paz</span><time dateTime="2026-07-12">July 12, 2026</time><span>7 min read</span></div>}
-        </div>
-      </header>
+      <ArticleHeroArtwork
+        title={String(values.title || '')}
+        variant={String(values.variant || 'full')}
+        className={className ?? ''}
+        backgroundMedia={values.backgroundMedia === true ? <BlogMedia alt="Kiln shelves holding newly fired stoneware" /> : null}
+        splitMedia={values.splitMedia === true ? <BlogMedia index={2} alt="A ceramic artist checking a glazed vessel" /> : null}
+        category={String(values.category || '')}
+        metadata={values.metadata === true ? (
+          <>
+            <span dir="auto">By Marina Paz</span>
+            <span className="article-hero__meta-separator" aria-hidden="true">/</span>
+            <time dateTime="2026-07-12">July 12, 2026</time>
+            <span className="article-hero__meta-separator" aria-hidden="true">/</span>
+            <time dateTime="PT7M">7 min read</time>
+          </>
+        ) : null}
+      />
     );
   }
 
   function renderArticleBody() {
     return (
-      <article className={`prose docs-studio__article-body${values.dropCap === true ? ' prose--drop-cap' : ''}`}>
-        {values.content === true && (
-          <>
-            <p>Before the studio wakes, the clay is already responding to weather, moisture, and the memory of yesterday's hands.</p>
-            <h2>Learning through repetition</h2>
-            <p>Making the same form again is never truly repetition. Each pass reveals a different pressure point and a more economical gesture.</p>
-            <blockquote>Attention is part of the material.<cite>Marina Paz, studio notes</cite></blockquote>
-            <h3>Keeping useful records</h3>
-            <p>Small observations become a practical archive: firing curves, glaze thickness, and the character of a rim after one more pull.</p>
-          </>
-        )}
-      </article>
+      <ArticleBodyArtwork
+        content={values.content === true ? <ArticleBodyFixture /> : null}
+        dropCap={values.dropCap === true}
+      />
     );
   }
 
   function renderReadingProgress() {
     return (
-      <div className="reading-progress docs-studio__reading-progress">
-        {values.indicator === true && <div className="reading-progress__bar docs-studio__reading-progress-bar" />}
-      </div>
+      <ReadingProgressFixture
+        mode={values.mode === 'automatic' ? 'automatic' : 'controlled'}
+        value={Number(values.value ?? 0)}
+        targetId={String(values.targetId || '')}
+        scrollRootId={String(values.scrollRootId || '')}
+      />
     );
   }
 
   function renderTableOfContents() {
-    const className = variantClass(contract, values.variant);
-    const items = [
-      ['Arrival at the studio', ''],
-      ['Learning through repetition', 'toc__item--h3'],
-      ['Keeping useful records', 'toc__item--h3'],
-    ];
     return (
-      <nav className={['toc', className, 'docs-studio__toc'].filter(Boolean).join(' ')} aria-label={String(values.label || '') || undefined}>
-        {String(values.title || '') && <h2 className="toc__title">{String(values.title)}</h2>}
-        {values.items === true && (
-          <ol className="toc__list">
-            {items.map(([label, itemClass], index) => (
-              <li className={['toc__item', itemClass].filter(Boolean).join(' ')} key={label}>
-                <a className={`toc__link${index === 0 ? ' toc__link--active' : ''}`} href={`#section-${index + 1}`} onClick={(event) => inspect(event, 'Heading link')}>{label}</a>
-              </li>
-            ))}
-          </ol>
-        )}
-      </nav>
+      <TableOfContentsArtwork
+        label={String(values.label || '')}
+        title={String(values.title || '')}
+        items={values.items === true ? tableOfContentsFixtureItems : []}
+        currentSectionId={String(values.currentSectionId || '')}
+        placement={String(values.placement || 'sticky')}
+        className="docs-studio__toc"
+        onNavigate={(event) => inspect(event, 'Heading link')}
+      />
     );
   }
 
   function renderAuthorCard() {
-    const className = variantClass(contract, values.variant);
+    const authorVariant = String(values.variant || 'full');
     return (
-      <section className={['author-card', className, 'docs-studio__author-card'].filter(Boolean).join(' ')}>
-        {values.avatar === true && <span className="avatar avatar--lg author-card__avatar docs-studio__blog-avatar" aria-hidden="true">MP</span>}
-        <div className="author-card__info">
-          <h2 className="author-card__name">{String(values.name)}</h2>
-          {String(values.role || '') && <div className="author-card__role">{String(values.role)}</div>}
-          {String(values.bio || '') && <p className="author-card__bio">{String(values.bio)}</p>}
-          {values.links === true && (
-            <div className="author-card__links">
-              <a className="btn btn--outline btn--sm" href="mailto:studio@example.com" onClick={(event) => inspect(event, 'Author email link')}><Mail className="btn__icon btn__icon--leading" aria-hidden="true" />Email</a>
-              <a className="btn btn--link btn--sm" href="#author-profile" onClick={(event) => inspect(event, 'Author profile link')}><Link2 className="btn__icon btn__icon--leading" aria-hidden="true" />Profile</a>
-            </div>
-          )}
-        </div>
-      </section>
+      <AuthorCardArtwork
+        name={String(values.name || '')}
+        avatar={values.avatar === true ? (
+          <AuthorCardAvatarFixture compact={authorVariant === 'compact'} />
+        ) : null}
+        role={String(values.role || '')}
+        bio={String(values.bio || '')}
+        links={values.links === true ? (
+          <AuthorCardLinksFixture onNavigate={(event, label) => inspect(event, label)} />
+        ) : null}
+        variant={authorVariant}
+        className="docs-studio__author-card"
+      />
     );
   }
 
-  function renderCategoryNav() {
-    const categories = [
-      ['All stories', '28'],
-      ['Studio notes', '9'],
-      ['Materials', '7'],
-      ['Process', '12'],
-    ];
+  function renderFilterBar() {
+    const selectedValues = Array.isArray(values.selectedValues)
+      ? values.selectedValues
+      : [];
     return (
-      <nav className="category-nav docs-studio__category-nav" aria-label={String(values.label)}>
-        {values.items === true && categories.map(([label, count], index) => (
-          <a
-            className={`category-nav__item${index === 0 ? ' category-nav__item--active' : ''}`}
-            href={`#category-${index + 1}`}
-            aria-current={index === 0 ? 'page' : undefined}
-            onClick={(event) => inspect(event, 'Category item')}
-            key={label}
-          >
-            {label}<span className="category-nav__count">{count}</span>
-          </a>
-        ))}
-      </nav>
+      <FilterBarArtwork
+        mode={values.mode === 'multiple' ? 'multiple' : 'single'}
+        label={String(values.label || '')}
+        name={String(values.name || '')}
+        options={values.options === true ? filterBarFixtureOptions : []}
+        selectedValues={selectedValues}
+        disabled={values.disabled === true}
+        describedBy={String(values.describedBy || '') || undefined}
+        className="docs-studio__filter-bar"
+        onSelectedValuesChange={(nextSelection) => {
+          setValues((current) => ({ ...current, selectedValues: nextSelection }));
+        }}
+        onCommitRequest={(nextSelection) => {
+          updateFilterQuery(nextSelection);
+          setFeedback(nextSelection.length > 0
+            ? `Filter request: ${nextSelection.join(', ')}. The target URL now reflects the controlled selection.`
+            : 'Filter request: no selected values. The target URL now reflects the empty selection.');
+        }}
+      />
     );
   }
 
   function renderBlogSidebar() {
     return (
-      <aside className="blog-sidebar docs-studio__blog-sidebar">
-        {values.sections === true && (
-          <>
-            <section className="blog-sidebar__section">
-              <h2 className="blog-sidebar__title">Recent notes</h2>
-              <ul className="blog-sidebar__list">
-                {['The case for slower tools', 'Testing a new ash glaze', 'What survives the firing'].map((label, index) => (
-                  <li className="blog-sidebar__list-item" key={label}><a className="blog-sidebar__link" href={`#recent-${index + 1}`} onClick={(event) => inspect(event, 'Sidebar article link')}>{label}</a></li>
-                ))}
-              </ul>
-            </section>
-            <section className="blog-sidebar__section">
-              <h2 className="blog-sidebar__title">Explore tags</h2>
-              <div className="tag-cloud">
-                {['Stoneware', 'Glaze', 'Kiln', 'Tools'].map((label) => (
-                  <a className="tag tag-cloud__item" href={`#tag-${label.toLowerCase()}`} onClick={(event) => inspect(event, 'Tag link')} key={label}><span className="tag__label">{label}</span></a>
-                ))}
-              </div>
-            </section>
-          </>
-        )}
-      </aside>
+      <BlogSidebarArtwork
+        label={String(values.label || '')}
+        sections={values.sections === true ? (
+          <BlogSidebarFixture onNavigate={(event, label) => inspect(event, label)} />
+        ) : null}
+        className="docs-studio__blog-sidebar"
+      />
     );
   }
 
-  function renderShareButtons() {
-    const className = variantClass(contract, values.variant);
-    const actions = [
-      { label: 'Copy link', icon: Copy },
-      { label: 'Email', icon: Mail },
-      { label: 'Share', icon: Link2 },
-    ];
+  function renderShareActions() {
+    const sharePayload = {
+      title: 'Inside the quiet rhythm of a working studio',
+      text: 'A studio note from The Gallery.',
+      url: 'https://example.com/studio-note',
+    };
+    const actions = buildShareActionsFixture().filter((action) => {
+      if (action.id === 'native') {
+        return typeof navigator.share === 'function'
+          && (typeof navigator.canShare !== 'function' || navigator.canShare(sharePayload));
+      }
+      if (action.id === 'copy') {
+        return typeof navigator.clipboard?.writeText === 'function';
+      }
+      return true;
+    });
+
+    async function requestShareAction(
+      event: MouseEvent<HTMLButtonElement>,
+      action: ShareActionArtworkItem,
+    ) {
+      event.preventDefault();
+      if (action.id === 'copy') {
+        try {
+          await navigator.clipboard.writeText(sharePayload.url);
+          setFeedback('Link copied after the target clipboard operation succeeded.');
+        } catch {
+          setFeedback('Copy failed. The target must provide an accessible fallback.');
+        }
+        return;
+      }
+
+      if (action.id === 'native') {
+        try {
+          await navigator.share(sharePayload);
+          setFeedback('The target share operation completed.');
+        } catch (error) {
+          setFeedback(error instanceof DOMException && error.name === 'AbortError'
+            ? 'Sharing was cancelled without changing the component.'
+            : 'Sharing failed. The target must provide recovery or another explicit action.');
+        }
+        return;
+      }
+
+      setFeedback(`${action.label} request emitted to the target.`);
+    }
+
     return (
       <div className="docs-studio__share-fixture">
-        <div className={['share-buttons', className].filter(Boolean).join(' ')}>
-          {values.actions === true && actions.map(({ label, icon: Icon }) => (
-            <button className="btn btn--outline btn--sm" type="button" onClick={(event) => inspect(event, `${label} action`)} key={label}><Icon className="btn__icon btn__icon--leading" aria-hidden="true" />{label}</button>
-          ))}
-        </div>
+        <ShareActionsArtwork
+          label={String(values.label || '')}
+          actions={values.actions === true ? actions : []}
+          variant={String(values.variant || 'inline')}
+          onActionRequest={(event, action) => void requestShareAction(event, action)}
+          onNavigate={(event, action) => inspect(event, `${action.label} destination`)}
+        />
       </div>
-    );
-  }
-
-  function renderRelatedCard(title: string, category: string, index: number) {
-    return (
-      <article className="article-card docs-studio__related-card" key={title}>
-        <a className="article-card__media" href={`#related-${index + 1}`} onClick={(event) => inspect(event, 'Related article link')}><BlogMedia index={index + 1} alt={`${title} article illustration`} /><span className="badge article-card__category">{category}</span></a>
-        <div className="article-card__body"><h3 className="article-card__title"><a href={`#related-${index + 1}`} onClick={(event) => inspect(event, 'Related article link')}>{title}</a></h3></div>
-      </article>
     );
   }
 
   function renderRelatedArticles() {
     return (
-      <section className="related-articles docs-studio__related-articles">
-        {String(values.title || '') && <h2 className="related-articles__title">{String(values.title)}</h2>}
-        {values.articles === true && <div className="related-articles__grid docs-studio__related-grid">{relatedArticleFixtures.map((article, index) => renderRelatedCard(article.title, article.category, index))}</div>}
-      </section>
-    );
-  }
-
-  function renderComment(author: string, initials: string, text: string, nested = false) {
-    return (
-      <article className="comment" key={author}>
-        <span className="avatar comment__avatar docs-studio__blog-avatar" aria-hidden="true">{initials}</span>
-        <div className="comment__body">
-          <header className="comment__header"><span className="comment__author">{author}</span><time className="comment__date" dateTime="2026-07-12">Today</time></header>
-          <p className="comment__text">{text}</p>
-          <div className="comment__actions">
-            <button className="comment__action-btn" type="button" onClick={(event) => inspect(event, `${nested ? 'Nested ' : ''}reply action`)}><Reply aria-hidden="true" />Reply</button>
-            <button className="comment__action-btn" type="button" onClick={(event) => inspect(event, 'Appreciation action')}><ThumbsUp aria-hidden="true" />Appreciate</button>
-          </div>
-        </div>
-      </article>
+      <RelatedArticlesArtwork
+        id={`${id}-related-articles`}
+        title={String(values.title || '')}
+        articles={values.articles === true
+          ? buildRelatedArticlesFixture({ onNavigate: (event, label) => inspect(event, label) })
+          : []}
+        className="docs-studio__related-articles"
+      />
     );
   }
 
   function renderComments() {
-    function submit(event: FormEvent) {
+    function submit(event: FormEvent<HTMLFormElement>) {
       event.preventDefault();
       setFeedback(commentDraft.trim()
         ? 'Comment text is available for inspection; posting and persistence remain target-owned.'
         : 'Enter a comment to inspect the composer.');
     }
     return (
-      <section className="comments docs-studio__comments">
-        <h2 className="comments__title">{String(values.title)} {String(values.count || '') && <span className="comments__count">{String(values.count)}</span>}</h2>
-        {values.thread === true && (
-          <div className="docs-studio__comment-thread">
-            {renderComment('Ana Ruiz', 'AR', 'The notes about repetition feel true in every material practice.')}
-            <div className="comment__replies">{renderComment('Marina Paz', 'MP', 'Exactly. Repetition creates enough quiet to notice what changed.', true)}</div>
-          </div>
-        )}
-        {values.composer === true && (
-          <form className="comment-form" onSubmit={submit}>
-            <h3 className="comment-form__title">Join the conversation</h3>
-            <div className="input docs-studio__comment-field">
-              <label className="input__label" htmlFor={`${id}-comment`}>Comment</label>
-              <div className="input__control"><textarea className="input__field textarea__field" id={`${id}-comment`} rows={4} value={commentDraft} onChange={(event) => setCommentDraft(event.target.value)} /></div>
-            </div>
-            <button className="btn" type="submit"><MessageCircle className="btn__icon btn__icon--leading" aria-hidden="true" />Preview comment</button>
-          </form>
-        )}
-      </section>
+      <CommentSectionArtwork
+        id={`${id}-comments`}
+        title={String(values.title || '')}
+        count={String(values.count || '')}
+        orderControl={values.orderControl === true ? (
+          <CommentOrderFixture
+            id={`${id}-comment-order`}
+            value={commentOrder}
+            onChange={(event) => {
+              setCommentOrder(event.target.value);
+              setCommentPage(1);
+              setFeedback(`Comment order ${event.target.value} requested; the fixture target projected one authoritative record set.`);
+            }}
+          />
+        ) : null}
+        thread={values.thread === true ? (
+          <CommentThreadFixture
+            id={`${id}-comments`}
+            records={commentOrder === 'newest' ? [...commentRecords].reverse() : commentRecords}
+            onReactionRequest={(event, commentKey, reactionId) => {
+              event.preventDefault();
+              setCommentRecords((current) => updateCommentReactionFixture(current, commentKey, reactionId));
+              setFeedback(`Reaction ${reactionId} requested; the fixture target returned the complete authoritative reaction array.`);
+            }}
+            onReply={(event, label) => inspect(event, label)}
+          />
+        ) : null}
+        pagination={values.pagination === true ? (
+          <CommentPaginationFixture
+            currentPage={commentPage}
+            onPageChange={(page) => {
+              setCommentPage(page);
+              setFeedback(`Comment page ${page} requested; records, URL, focus and announcements remain target-owned.`);
+            }}
+          />
+        ) : null}
+        composer={values.composer === true ? (
+          <CommentComposerFixture
+            id={`${id}-comment-composer`}
+            value={commentDraft}
+            onChange={(event) => setCommentDraft(event.target.value)}
+            onSubmit={submit}
+          />
+        ) : null}
+        className="docs-studio__comments"
+      />
     );
   }
 
@@ -424,9 +556,9 @@ export default function BlogStudio({ contract, definition }: BlogStudioProps) {
     if (contract.slug === 'reading-progress') return renderReadingProgress();
     if (contract.slug === 'table-of-contents') return renderTableOfContents();
     if (contract.slug === 'author-card') return renderAuthorCard();
-    if (contract.slug === 'category-nav') return renderCategoryNav();
+    if (contract.slug === 'filter-bar') return renderFilterBar();
     if (contract.slug === 'blog-sidebar') return renderBlogSidebar();
-    if (contract.slug === 'share-buttons') return renderShareButtons();
+    if (contract.slug === 'share-buttons') return renderShareActions();
     if (contract.slug === 'related-articles') return renderRelatedArticles();
     return renderComments();
   }
@@ -444,7 +576,15 @@ export default function BlogStudio({ contract, definition }: BlogStudioProps) {
           tokenValues={tokenValues}
           activeTokens={activeTokens}
           onPropertiesChange={(next) => {
-            setValues((current) => ({ ...current, ...next }));
+            const nextSelection = next.mode === 'single' && Array.isArray(values.selectedValues)
+              ? values.selectedValues.slice(0, 1)
+              : null;
+            setValues((current) => ({
+              ...current,
+              ...next,
+              ...(nextSelection ? { selectedValues: nextSelection } : {}),
+            }));
+            if (nextSelection) updateFilterQuery(nextSelection, 'replace');
             setFeedback('');
           }}
           onSlotIconChange={() => undefined}
@@ -455,7 +595,7 @@ export default function BlogStudio({ contract, definition }: BlogStudioProps) {
         <section className="docs-studio__stage docs-studio__stage--blog" aria-label={`${contract.name} preview`} style={tokenOverrides as CSSProperties}>
           <div className={`docs-studio__stage-inner docs-studio__blog-stage-inner docs-studio__blog-stage-inner--${contract.slug}`}>
             {renderPreview()}
-            <p className="docs-studio__blog-feedback" role="status" aria-live="polite">{feedback}</p>
+            {feedback && <p className="docs-studio__blog-feedback" role="status">{feedback}</p>}
           </div>
         </section>
       </div>

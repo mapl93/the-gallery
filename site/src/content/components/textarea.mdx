@@ -1,6 +1,6 @@
 ## Overview
 
-Multi-line value-entry field that composes Input validation, feedback, typography, spacing, focus, hover, and disabled behavior while exposing configurable resize direction.
+Native multi-line value-entry field that composes Input form semantics, validation, feedback, typography, spacing, focus, hover, and disabled behavior while exposing configurable resize direction and line bounds.
 
 <Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input"><label class="input__label" for="textarea-message">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-message" name="message" placeholder="Write a message..."></textarea></div></div></div>'} label="Textarea" />
 
@@ -9,6 +9,7 @@ Multi-line value-entry field that composes Input validation, feedback, typograph
 Textarea has one default size and the four shared field variants. The root uses the canonical Input modifier classes; `.textarea__field` adds native resize direction and configurable line bounds. Vertical and four minimum lines are the defaults, while the optional `data-resize`, `data-min-lines`, and `data-max-lines` attributes configure the remaining behavior.
 
 Hover and focus preserve the active Error, Success, or Warning color family.
+The shared Input layer also provides logical geometry, strengthened semantic boundaries, reduced-motion handling, and forced-colors focus behavior.
 
 | Property | Value | Web mapping |
 | --- | --- | --- |
@@ -37,7 +38,7 @@ Hover and focus preserve the active Error, Success, or Warning color family.
 
 ### Error
 
-<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--error"><label class="input__label" for="textarea-error">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-error" aria-invalid="true" aria-describedby="textarea-error-message">Too short</textarea></div><span class="input__message" id="textarea-error-message" role="alert">Add enough detail for us to understand the request.</span></div></div>'} label="Textarea error" />
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--error"><label class="input__label" for="textarea-error">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-error" aria-invalid="true" aria-describedby="textarea-error-message">Too short</textarea></div><span class="input__message" id="textarea-error-message">Add enough detail for us to understand the request.</span></div></div>'} label="Textarea error" />
 
 ### Success
 
@@ -46,6 +47,12 @@ Hover and focus preserve the active Error, Success, or Warning color family.
 ### Warning
 
 <Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="input input--warning"><label class="input__label" for="textarea-warning">Message</label><div class="input__control"><textarea class="input__field textarea__field" id="textarea-warning" aria-describedby="textarea-warning-message">Please call me about this order.</textarea></div><span class="input__message" id="textarea-warning-message">Avoid including sensitive information.</span></div></div>'} label="Textarea warning" />
+
+### Native form behavior
+
+`name`, `required`, `readOnly`, `autocomplete`, `minLength`, and `maxLength` map directly to the native textarea. In static HTML, element text content establishes the initial value and the browser owns subsequent editing and reset behavior. Framework adapters may bind the live `value` property and native `input`/`change` events without adding a second value owner.
+
+Character constraints are independent from visible-line bounds: `minLength`/`maxLength` constrain content, while `minLines`/`maxLines` constrain resize geometry.
 
 ## Usage Guidelines
 
@@ -72,6 +79,8 @@ Use Vertical for normal form flows, Horizontal when height must remain fixed, an
 - Use `aria-invalid="true"` only for Error; Success and Warning do not expose invalid state.
 - Use `role="alert"` only when an Error message is introduced dynamically and requires immediate announcement.
 - Use native `disabled` for unavailable fields.
+- Use `readOnly` when content must remain focusable, selectable, and submittable but cannot be edited.
+- Keep `name`, `required`, `autocomplete`, `minlength`, and `maxlength` on the native textarea and communicate required status visibly.
 - Preserve the native resize handle and choose a direction that does not hide adjacent content or validation feedback.
 - Use positive whole line counts and keep `maxLines` greater than or equal to `minLines`.
 - Keep the visible message descriptive so validation does not rely on color alone.
@@ -81,6 +90,12 @@ Use Vertical for normal form flows, Horizontal when height must remain fixed, an
 <PropTable>
   <tr><td>`label`</td><td>string</td><td>required</td><td>Visible label associated with the textarea</td></tr>
   <tr><td>`value`</td><td>string</td><td>empty</td><td>Current native textarea content</td></tr>
+  <tr><td>`name`</td><td>string</td><td>empty</td><td>Native form field name</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native required-value constraint</td></tr>
+  <tr><td>`readOnly`</td><td>boolean</td><td>`false`</td><td>Prevents editing while preserving focus and submission</td></tr>
+  <tr><td>`autocomplete`</td><td>string</td><td>empty</td><td>Native autofill token or token sequence</td></tr>
+  <tr><td>`minLength`</td><td>number</td><td>unset</td><td>Optional non-negative native minimum character length</td></tr>
+  <tr><td>`maxLength`</td><td>number</td><td>unset</td><td>Optional non-negative native maximum character length</td></tr>
   <tr><td>`placeholder`</td><td>string</td><td>empty</td><td>Supporting hint; never the accessible name</td></tr>
   <tr><td>`message`</td><td>string</td><td>empty</td><td>Supporting or validation feedback</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>

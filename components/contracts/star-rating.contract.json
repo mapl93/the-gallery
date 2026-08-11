@@ -1,127 +1,60 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "star-rating",
-  "name": "Star Rating (Display)",
+  "name": "Star Rating (Display) (deprecated)",
   "registryId": "V2",
   "category": "reviews",
-  "status": "pilot",
-  "summary": "Read-only star visualization for a supplied rating value with default and large presentation options.",
-  "dependencies": [],
+  "status": "deprecated",
+  "summary": "Deprecated V2 migration record to canonical A11 Rating; it owns no selector alias, CSS, renderer, fixture, behavior, token, or target adapter.",
+  "dependencies": ["rating"],
   "source": {
     "registry": "registry.json#/components/star-rating",
-    "css": { "file": "components/css/reviews.css", "selector": ".star-rating" },
+    "css": { "file": "components/css/primitives.css", "selector": ".rating" },
     "docs": "site/src/content/components/star-rating.mdx"
   },
   "anatomy": [
-    {
-      "name": "root",
-      "selector": ".star-rating",
-      "className": ".star-rating",
-      "required": true,
-      "description": "Read-only inline rating group with an accessible text alternative."
-    },
-    {
-      "name": "star",
-      "selector": ".star-rating__star",
-      "className": ".star-rating__star",
-      "required": true,
-      "description": "Repeated decorative star glyph or icon marked empty, filled, or half-filled by the adapter."
-    }
-  ],
-  "properties": [
-    {
-      "name": "ratingValue",
-      "type": "number",
-      "required": true,
-      "minimum": 0,
-      "maximum": 5,
-      "step": 0.5,
-      "description": "Read-only rating value represented by the decorative stars; this component does not calculate aggregates.",
-      "targetMappings": {
-        "web": [
-          { "kind": "attribute", "selector": ".star-rating", "attribute": "data-rating", "valueFrom": "property" }
-        ]
-      }
-    },
-    {
-      "name": "label",
-      "type": "string",
-      "required": true,
-      "description": "Accessible text alternative containing the supplied value and rating scale.",
-      "targetMappings": {
-        "web": [
-          { "kind": "attribute", "selector": ".star-rating", "attribute": "aria-label", "valueFrom": "property" }
-        ]
-      }
-    },
-    {
-      "name": "size",
-      "type": "enum",
-      "required": false,
-      "valuesFrom": "variants",
-      "description": "Star presentation size selected from the registry-backed options; default is the contract default.",
-      "targetMappings": {
-        "web": [
-          { "kind": "optionClass", "selector": ".star-rating", "source": "variants" }
-        ]
-      }
-    }
+    { "name": "root", "selector": ".rating", "className": ".rating", "required": true, "description": "Canonical Rating root; deprecated V2 owns no independent root." },
+    { "name": "stars", "selector": ".rating__stars", "className": ".rating__stars", "required": true, "description": "Canonical named Rating star image." },
+    { "name": "star", "selector": ".rating__star", "className": ".rating__star", "required": true, "description": "Canonical decorative full, half, or empty Rating star." },
+    { "name": "count", "selector": ".rating__count", "className": ".rating__count", "required": false, "description": "Optional canonical localized review-count text." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default 16px star presentation." },
-    { "name": "lg", "className": ".star-rating--lg", "default": false, "description": "Large 24px star presentation." }
+    { "name": "default", "className": null, "default": true, "description": "Canonical Rating presentation; the former V2 identity adds no variant." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Registry default size list retained for compatibility; the registry models visual size through variants." }
+    { "name": "default", "className": null, "default": true, "description": "Canonical default Rating size." },
+    { "name": "lg", "className": ".rating--lg", "default": false, "description": "Canonical large Rating size migrated from V2." }
   ],
   "states": [
-    { "name": "default", "selectors": [".star-rating"], "description": "Read-only rating group." },
-    {
-      "name": "filled",
-      "selectors": [
-        ".star-rating__star[data-filled=\"true\"]",
-        ".star-rating__star.is-filled"
-      ],
-      "description": "Decorative full-star presentation state."
-    },
-    {
-      "name": "halfFilled",
-      "selectors": [
-        ".star-rating__star[data-filled=\"half\"]",
-        ".star-rating__star.is-half"
-      ],
-      "description": "Decorative half-star presentation state."
-    }
+    { "name": "default", "selectors": [".rating", ".rating__star"], "description": "Canonical passive Rating with target-supplied star states." },
+    { "name": "filled", "selectors": [".rating__star--filled"], "description": "Canonical full-star state." },
+    { "name": "half", "selectors": [".rating__star--half"], "description": "Canonical half-star state." }
   ],
   "behavior": [
-    {
-      "name": "readOnlyValue",
-      "selectors": [".star-rating"],
-      "attributes": ["data-rating", "aria-label"],
-      "description": "The adapter projects the supplied half-step value into decorative star states while preserving the complete value as accessible text."
-    },
-    {
-      "name": "decorativeStars",
-      "selectors": [".star-rating__star"],
-      "attributes": ["aria-hidden=\"true\"", "data-filled"],
-      "description": "Individual stars are hidden from assistive technology when the root already exposes the rating label."
-    }
+    { "name": "deprecatedForward", "selectors": [".rating"], "description": "V2 migration references render canonical Rating and must be replaced before v1; no star-rating selector or permanent compatibility alias exists." },
+    { "name": "passiveRating", "selectors": [".rating", ".rating__stars"], "attributes": ["data-rating", "role=\"img\"", "aria-label"], "description": "Canonical Rating owns the supplied half-step value, localized image name, decorative star sequence, optional count, and passive semantics." }
+  ],
+  "properties": [
+    { "name": "ratingValue", "type": "number", "required": true, "minimum": 0, "maximum": 5, "step": 0.5, "description": "Canonical target-supplied half-step Rating value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".rating", "attribute": "data-rating", "valueFrom": "property" }] } },
+    { "name": "accessibleLabel", "type": "string", "required": true, "description": "Canonical complete localized Rating value and scale.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".rating__stars", "attribute": "aria-label", "valueFrom": "property" }] } },
+    { "name": "reviewCount", "type": "string", "required": false, "unsetBehavior": "Omit canonical count when no complete localized text is supplied.", "description": "Optional canonical complete localized review count.", "targetMappings": { "web": [{ "kind": "content", "selector": ".rating__count" }] } },
+    { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Canonical default or large Rating size.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".rating", "source": "sizes" }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-button-primary-bg-default", "--color-border-subtle"]
+      "color": ["--color-text-accent", "--color-text-secondary"],
+      "typography": ["--font-family-body", "--typo-body-size", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Expose the full rating value and scale through readable text or the root accessible label.",
-    "Hide individual decorative star glyphs from assistive technology when the root supplies the complete label.",
-    "Do not use Star Rating for value entry; use Star Input for an interactive rating choice.",
-    "Do not rely on star color alone when the rating value must be understood."
+    "Migrate to canonical Rating and preserve its one named star image, decorative shape-distinct stars, independently readable optional count, and passive semantics.",
+    "Do not restore the star-rating selector, add a compatibility alias, or use the passive display for value entry.",
+    "Use Star Input for interactive rating selection."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Read-only visual states are implemented in components/css/reviews.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "A future adapter may map target-supplied values without owning aggregation." },
+    "web": { "status": "implemented", "kind": "deprecated-forward", "notes": "Temporary migration records render canonical A11 Rating; V2 owns no Web implementation." },
+    "shopify": { "status": "unsupported", "kind": "deprecated", "notes": "Use the existing canonical Rating Liquid projection; V2 owns no Shopify adapter." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

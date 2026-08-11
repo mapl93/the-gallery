@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "slider",
   "name": "Slider / Range",
   "registryId": "H2",
   "category": "forms",
   "status": "pilot",
-  "summary": "Native range input contract for single-value sliders and dual-handle range sliders with value display, thumb states, disabled state, and range-fill behavior.",
+  "summary": "Native horizontal range contract for one value or an ordered lower/upper pair, with synchronized visible values, active fill, native form ownership, validation presentation, and cross-engine thumb behavior.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/slider",
@@ -22,7 +22,7 @@
       "selector": ".slider",
       "className": ".slider",
       "required": true,
-      "description": "Single-value slider wrapper."
+      "description": "Horizontal slider wrapper that owns label, value summary, validation presentation, and synchronized fill progress."
     },
     {
       "name": "label",
@@ -36,7 +36,7 @@
       "selector": ".slider__value",
       "className": ".slider__value",
       "required": false,
-      "description": "Formatted current value display."
+      "description": "Visible current value or lower–upper value summary synchronized from the native input owner or owners."
     },
     {
       "name": "track",
@@ -71,7 +71,7 @@
       "selector": ".range-slider",
       "className": ".range-slider",
       "required": false,
-      "description": "Dual-handle range slider wrapper."
+      "description": "Dual-handle range wrapper with private logical start/end progress variables."
     },
     {
       "name": "rangeTrack",
@@ -92,7 +92,7 @@
       "selector": ".range-slider__input",
       "className": ".range-slider__input",
       "required": false,
-      "description": "Native range input used as one range handle."
+      "description": "Native lower or upper range input; data-range-lower and data-range-upper identify stable semantic owners."
     }
   ],
   "variants": [
@@ -134,6 +134,11 @@
       "description": "Unavailable slider state."
     },
     {
+      "name": "rangeFocusVisible",
+      "selectors": [".range-slider__input:focus-visible::-webkit-slider-thumb", ".range-slider__input:focus-visible::-moz-range-thumb"],
+      "description": "Four-pixel focus hierarchy on the active native range handle."
+    },
+    {
       "name": "range",
       "selectors": [".range-slider"],
       "description": "Dual-handle range structure."
@@ -142,31 +147,64 @@
       "name": "rangeFill",
       "selectors": [".range-slider__fill"],
       "description": "Selected range fill state."
+    },
+    {
+      "name": "error",
+      "selectors": [".slider[data-validation=\"error\"]", ".range-slider[data-validation=\"error\"]"],
+      "description": "Error validation family applied independently from geometry and value."
+    },
+    {
+      "name": "success",
+      "selectors": [".slider[data-validation=\"success\"]", ".range-slider[data-validation=\"success\"]"],
+      "description": "Success validation family applied independently from geometry and value."
+    },
+    {
+      "name": "warning",
+      "selectors": [".slider[data-validation=\"warning\"]", ".range-slider[data-validation=\"warning\"]"],
+      "description": "Warning validation family applied independently from geometry and value."
     }
   ],
   "behavior": [
     {
       "name": "nativeRange",
       "attributes": ["type=\"range\"", "min", "max", "step", "value", "disabled"],
-      "description": "Single-value sliders should preserve native range input behavior and value semantics."
+      "description": "Every handle preserves native range value, form, reset, pointer, touch, and keyboard behavior."
+    },
+    {
+      "name": "valueSynchronization",
+      "events": ["input", "change", "reset"],
+      "description": "Visible value text and active fill are derived from the current native value after initialization, input, change, attribute updates, and form reset."
     },
     {
       "name": "rangePair",
       "selectors": [".range-slider", ".range-slider__input", ".range-slider__fill"],
-      "attributes": ["aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-valuetext"],
-      "description": "Dual-handle range sliders must keep lower and upper values ordered and synchronize the fill between handles."
+      "attributes": ["data-range-lower", "data-range-upper", "min", "max", "step", "value"],
+      "description": "Dual-handle sliders keep explicit lower and upper native values ordered without swapping semantic owners and synchronize the logical fill between them."
+    },
+    {
+      "name": "trackPointer",
+      "events": ["pointerdown"],
+      "description": "Pointer activation on the shared range track moves the nearest available native handle and focuses that owner; no continuous layout work runs while idle."
     },
     {
       "name": "keyboardNavigation",
       "events": ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"],
       "description": "Keyboard users should be able to adjust slider values using native range keyboard behavior."
+    },
+    {
+      "name": "controlledUncontrolled",
+      "events": ["input", "change", "reset"],
+      "description": "Static HTML values are uncontrolled defaults; framework adapters control the same native values and consume native events instead of adding mirrored hidden state."
     }
   ],
   "properties": [
     { "name": "label", "type": "string", "required": true, "description": "Visible label for the slider.", "targetMappings": { "web": [{ "kind": "content", "selector": ".slider__label" }] } },
     { "name": "mode", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Single-value or dual-handle range structure.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".slider", "source": "variants" }] } },
     { "name": "variant", "type": "enum", "required": false, "values": ["default", "error", "success", "warning"], "description": "Validation presentation composed independently from slider mode.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider", "attribute": "data-validation", "values": { "default": null, "error": "error", "success": "success", "warning": "warning" } }, { "kind": "attribute", "selector": ".range-slider", "attribute": "data-validation", "values": { "default": null, "error": "error", "success": "success", "warning": "warning" } }] } },
-    { "name": "value", "type": "number", "required": false, "defaultValue": 50, "description": "Current native range value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "number", "required": false, "defaultValue": 50, "description": "Current single value or lower native value in range mode.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input[data-range-lower]", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "upperValue", "type": "number", "required": false, "defaultValue": 75, "description": "Upper native value used only in range mode; it cannot be lower than value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".range-slider__input[data-range-upper]", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "name", "type": "string", "required": false, "description": "Form field name for the single or lower native range owner.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input[data-range-lower]", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "upperName", "type": "string", "required": false, "description": "Form field name for the upper native owner in range mode.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".range-slider__input[data-range-upper]", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "min", "type": "number", "required": false, "defaultValue": 0, "description": "Minimum native range value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "min", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "min", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "max", "type": "number", "required": false, "defaultValue": 100, "description": "Maximum native range value.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "max", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "max", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "step", "type": "number", "required": false, "defaultValue": 1, "minimum": 0.01, "description": "Native value increment.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".slider__input", "attribute": "step", "valueFrom": "property", "elements": ["input"] }, { "kind": "attribute", "selector": ".range-slider__input", "attribute": "step", "valueFrom": "property", "elements": ["input"] }] } },
@@ -208,7 +246,9 @@
         "--easing-default"
       ],
       "typography": [
-        "--typo-body-size"
+        "--font-family-body",
+        "--typo-body-size",
+        "--typo-body-line-height"
       ]
     }
   },
@@ -222,8 +262,8 @@
   "adapters": {
     "web": {
       "status": "implemented",
-      "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css; value display and dual-handle range synchronization must be provided by the consuming target."
+      "kind": "css-js",
+      "notes": "Native range owners are styled in components/css/forms.css and progressively synchronized by components/js/theme.js for visible values, single/range fill, ordered handles, track pointer activation, mutations, and reset."
     },
     "shopify": {
       "status": "planned",

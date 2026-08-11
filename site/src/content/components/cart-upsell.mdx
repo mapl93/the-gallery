@@ -1,48 +1,54 @@
 ## Overview
 
-Cart Upsell presents target-owned product recommendations and an add action for each available item. The component owns the compact recommendation layout, while recommendation source and purchase rules remain outside it.
+Cart Upsell presents a small target-owned recommendation list near a cart. It owns the named compact region and item layout; recommendation source, ranking, availability, destinations, variant selection, price formatting, cart mutation, result status, analytics, and refresh remain target responsibilities.
 
 <Preview
-  html={'<aside class="cart-upsell tg-preview-frame--md"><h2 class="cart-upsell__title">You might also like</h2><div class="cart-upsell__items"><div class="cart-upsell__item"><div class="cart-upsell__item-image tg-preview-media tg-preview-media--thumb" role="img" aria-label="Vase stand"></div><div class="cart-upsell__item-info"><span class="cart-upsell__item-title">Vase Stand</span><span class="cart-upsell__item-price">$25.00</span></div><button class="btn btn--secondary btn--sm cart-upsell__action" type="button" aria-label="Add Vase Stand to cart">Add</button></div></div></aside>'}
+  html={'<section class="cart-upsell tg-preview-frame--md" aria-labelledby="cart-upsell-preview-title"><h2 class="cart-upsell__title" id="cart-upsell-preview-title">Complete the set</h2><ul class="cart-upsell__items"><li class="cart-upsell__item"><div class="cart-upsell__item-image tg-preview-media tg-preview-media--thumb" role="img" aria-label="Celadon incense holder"></div><div class="cart-upsell__item-info"><a class="link link--nav cart-upsell__item-title" href="#product">Celadon incense holder</a><span class="price cart-upsell__price" data-price-alternate-digits="false" data-price-slashed-zero="true" data-price-tabular-numbers="true" data-price-contextual-alternates="true" data-price-fractions="false"><span class="price__current"><span class="price__label">Price: </span><bdi class="price__value">$34.00</bdi></span></span></div><button class="btn btn--sm cart-upsell__action" type="button" aria-label="Add Celadon incense holder to cart">Add</button></li></ul></section>'}
   label="Cart Upsell"
 />
 
 ## Presentation
 
-The required `items` slot contains target-owned recommendation rows. Each row may compose media, title, formatted price, and the required add action label. `.cart-upsell__action` composes the Button dependency without redefining Button states.
+The required `items` slot contains a non-empty native list of target-authored recommendations. Each item has a non-empty identity and may independently compose media, canonical Link, canonical Price, and canonical Button. The whole component is omitted when the title is blank or no valid item exists.
 
-`addDisabled` defaults to `false` and disables recommendation actions when the selected item or variant is unavailable.
+Direct add is optional. Omit it when a product requires variant selection or the target cannot support a truthful one-click request. Per-item labels, accessible names, availability, and pending state belong inside the item composition; there is no collection-wide add label or disabled property.
+
+The layout wraps from its actual available width, so the same markup fits a cart page, drawer, or embedded surface without a viewport breakpoint. External spacing belongs to the parent.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Recommend a small set of relevant, currently purchasable items.</Do>
-  <Dont>Do not let recommendations compete with line-item editing or checkout.</Dont>
+  <Do>Recommend a small set of relevant, currently truthful product options.</Do>
+  <Dont>Do not claim “frequently bought together” or expose direct add unless the target can support that promise.</Dont>
 </DoDont>
 
-- Let the target own recommendation ranking, inventory, and variant-selection rules.
-- Update cart totals after a successful add action.
-- Keep recommendation prices target-formatted and synchronized with selected variants.
+- Preserve target recommendation URLs, including tracking parameters.
+- Keep recommendation controls secondary to line editing, totals, and checkout.
+- Let each item expose only capabilities that are valid for that product and target.
+- Hide the complete region when no recommendation is available; do not leave an empty heading or list.
+- Announce confirmed cart results in the parent target status surface rather than making K6 a live region.
 
 ## Accessibility
 
-- Use a heading that identifies the recommendation region.
-- Give each add action an accessible name that includes the recommendation title.
-- Use useful image alternative text, or hide redundant media when adjacent text names the product.
-- Communicate unavailable actions beyond disabled styling alone.
-- Announce successful cart additions and resulting count changes without moving focus unexpectedly.
+- Label the `section` from its visible heading with a unique `aria-labelledby` relationship.
+- Use `ul` and `li`; do not add listbox, selection, carousel, or custom arrow-key behavior.
+- Use canonical Link for navigation and canonical Button for actions.
+- Give repeated actions contextual accessible names that include the product identity.
+- Use canonical Price for complete target-formatted and bidirectionally isolated price text.
+- Use `alt=""` when adjacent product identity makes the image redundant; provide concise alternative text only when media adds information.
+- Keep unavailable and pending truth per item. The target owns confirmed success/error copy and focus behavior.
 
 ## References
 
 ### Dependencies
 
 - [Button](/components/button)
+- [Link](/components/link)
+- [Price](/components/price)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Recommendation-section title</td></tr>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Target-owned recommendation items</td></tr>
-  <tr><td>`addLabel`</td><td>string</td><td>required</td><td>Add-recommendation action label</td></tr>
-  <tr><td>`addDisabled`</td><td>boolean</td><td>`false`</td><td>Disables recommendation actions when unavailable</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty localized heading that names the recommendation region</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>Non-empty target-authored recommendation list with per-item canonical composition</td></tr>
 </PropTable>

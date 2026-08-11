@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "skeleton",
   "name": "Loading Skeleton",
   "registryId": "A12",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Loading placeholder primitive with shimmer animation and shape variants for text, title, image, button, and circle placeholders.",
+  "summary": "Decorative, finite-motion loading geometry with six shape presets and target-owned dimensions, busy lifecycle, status text, and content replacement.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/skeleton",
@@ -22,7 +22,7 @@
       "selector": ".skeleton",
       "className": ".skeleton",
       "required": true,
-      "description": "Placeholder surface with shimmer animation."
+      "description": "One ordinary decorative placeholder shape with no widget, progress, status, busy, focus, or interaction semantics."
     }
   ],
   "variants": [
@@ -30,37 +30,37 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default skeleton block."
+      "description": "Unopinionated block whose width and height are entirely consumer-owned."
     },
     {
       "name": "text",
       "className": ".skeleton--text",
       "default": false,
-      "description": "Single-line text placeholder."
+      "description": "One low-fidelity body-line preset; spacing between repeated lines remains consumer-owned."
     },
     {
       "name": "title",
       "className": ".skeleton--title",
       "default": false,
-      "description": "Heading placeholder."
+      "description": "One low-fidelity heading-line preset; surrounding layout remains consumer-owned."
     },
     {
       "name": "image",
       "className": ".skeleton--image",
       "default": false,
-      "description": "Square media placeholder."
+      "description": "Container-width square media preset."
     },
     {
       "name": "button",
       "className": ".skeleton--button",
       "default": false,
-      "description": "Button placeholder."
+      "description": "Compact action-shaped preset using canonical Button minimum height and container-bounded width."
     },
     {
       "name": "circle",
       "className": ".skeleton--circle",
       "default": false,
-      "description": "Circular placeholder."
+      "description": "Fully rounded identity/media shape whose diameter remains consumer-owned."
     }
   ],
   "sizes": [
@@ -68,19 +68,24 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default placeholder size defined by content or variant."
+      "description": "No public size API; consumer layout and target fixtures own final dimensions."
     }
   ],
   "states": [
     {
       "name": "loading",
       "selectors": [".skeleton"],
-      "description": "Loading placeholder state."
+      "description": "Decorative placeholder is present while its target-controlled content region is incomplete."
     },
     {
       "name": "shimmer",
       "selectors": ["@keyframes skeleton-shimmer"],
-      "description": "Indeterminate shimmer animation."
+      "description": "Optional base presentation runs at most three 1.5-second visual cycles before becoming static."
+    },
+    {
+      "name": "static",
+      "selectors": ["@media (prefers-reduced-motion: reduce)", "@media (forced-colors: active)"],
+      "description": "Reduced-motion and forced-color modes render an immediate static placeholder surface."
     }
   ],
   "behavior": [
@@ -88,17 +93,32 @@
       "name": "decorativePlaceholder",
       "selectors": [".skeleton"],
       "attributes": ["aria-hidden=\"true\""],
-      "description": "Skeleton shapes are decorative and should not duplicate the loading announcement."
+      "description": "Each visual shape is hidden from assistive technology and never becomes a status, progress indicator, accessible image, or focus target."
     },
     {
-      "name": "loadingAnnouncement",
-      "attributes": ["aria-busy=\"true\"", "role=\"status\""],
-      "description": "Loading announcement semantics belong to the containing region when users need feedback."
+      "name": "targetOwnedLifecycle",
+      "attributes": ["aria-busy=\"true\"", "aria-busy=\"false\"", "role=\"status\""],
+      "description": "The consumer's real content region owns busy true/false lifecycle, optional localized Status text, loading errors, and atomic replacement; these attributes never belong to Skeleton itself."
+    },
+    {
+      "name": "finiteMotion",
+      "selectors": [".skeleton", "@keyframes skeleton-shimmer"],
+      "description": "Canonical shimmer runs for no more than 4.5 seconds and creates no neutral JavaScript timer or pause control."
     },
     {
       "name": "reducedMotion",
-      "selectors": [".skeleton"],
-      "description": "Targets should consider reduced-motion policy for shimmer animation."
+      "selectors": ["@media (prefers-reduced-motion: reduce)"],
+      "description": "Reduced-motion preference removes animation and replaces the gradient with the solid semantic base surface."
+    },
+    {
+      "name": "forcedColors",
+      "selectors": ["@media (forced-colors: active)"],
+      "description": "Forced colors removes animation and uses a static GrayText system-color shape while preserving the user's palette."
+    },
+    {
+      "name": "compositionOwnedGeometry",
+      "selectors": [".skeleton", ".skeleton--text", ".skeleton--title", ".skeleton--image", ".skeleton--button", ".skeleton--circle"],
+      "description": "Shapes stay within their container; repeated spacing, Default dimensions, Circle diameter, composite layout, and exact final-content reservation remain consumer-owned."
     }
   ],
   "properties": [
@@ -106,8 +126,9 @@
       "name": "variant",
       "type": "enum",
       "required": false,
+      "defaultValue": "default",
       "valuesFrom": "variants",
-      "description": "Placeholder geometry selected from the canonical shape variants.",
+      "description": "Selects one canonical low-fidelity geometry preset without changing semantics, lifecycle, dimensions ownership, or announcement behavior.",
       "targetMappings": {
         "web": [
           {
@@ -136,36 +157,42 @@
     }
   },
   "accessibility": [
-    "Mark decorative skeleton shapes as aria-hidden when the containing region announces loading state.",
-    "Use aria-busy or role=\"status\" on the loading region when users need loading feedback.",
-    "Replace skeletons with real content as soon as the target data is available.",
-    "Respect reduced-motion preferences for shimmer animation in targets that support it."
+    "Hide every visual Skeleton shape from assistive technology; do not assign image, status, progress, busy, label, focus, or interaction semantics to it.",
+    "Set aria-busy on the consumer's real content region only while its content is incomplete, and return it to false or remove it after atomic replacement.",
+    "When loading needs explicit feedback, provide one actual localized Status text owner outside the decorative shapes rather than naming or announcing every placeholder.",
+    "Stop canonical shimmer before five seconds and render an immediate solid shape for reduced-motion and forced-color users.",
+    "Replace Skeleton with real content promptly and reserve matching geometry to reduce layout shift."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition and keyframes in components/css/primitives.css."
+      "notes": "Canonical decorative variants, bounded shimmer, static preference modes, and container-safe geometry are implemented in components/css/primitives.css; the consumer owns lifecycle and content."
     },
     "shopify": {
       "status": "implemented",
-      "kind": "liquid-css-class"
+      "kind": "liquid-css-class",
+      "notes": "Embedded class contract uses generated canonical CSS; consuming Liquid owns asynchronous data, dimensions, region semantics, replacement, and errors."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component",
+      "notes": "Framework target should keep conditional loading/content state and region announcements outside the decorative shape."
     },
     "figma": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component",
+      "notes": "Visual target maps six shapes; fixture dimensions are not semantic defaults."
     },
     "swiftui": {
       "status": "planned",
-      "kind": "style"
+      "kind": "style",
+      "notes": "Native adapter uses decorative/redacted geometry and platform motion/accessibility preferences while the target owns loading state."
     },
     "compose": {
       "status": "planned",
-      "kind": "composable"
+      "kind": "composable",
+      "notes": "Native adapter uses decorative placeholder geometry and platform motion/accessibility preferences while the target owns loading state."
     }
   }
 }

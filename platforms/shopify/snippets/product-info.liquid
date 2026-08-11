@@ -1,46 +1,104 @@
 {%- comment -%}
   Snippet: product-info
-  Usage: {% render 'product-info', product: product, collection: collection %}
+  Usage: {% render 'product-info', product: product, variant: current_variant %}
+
+  Passive contract boundary:
+  - owns product identity, canonical Price, rich description, and metadata
+  - the parent section owns Breadcrumb, Rating, Product Form, apps, variant
+    synchronization, URL/structured-data updates, and one announcement region
+  - a supplied variant projects exact Price, SKU, inventory, and availability;
+    without one, only truthful product-level data and Price range are rendered
 {%- endcomment -%}
 
-<div class="product-info">
-  {% render 'breadcrumb', product: product, collection: collection %}
+{%- liquid
+  assign subtitle = product.metafields.custom.subtitle.value
+  assign dimensions = product.metafields.custom.dimensions.value
+  assign material = product.metafields.custom.material.value
+  assign weight = product.metafields.custom.weight.value
+  assign glaze = product.metafields.custom.glaze_type.value
+  assign product_info_projection = 'product'
+  if variant
+    assign product_info_projection = 'variant'
+  endif
+-%}
 
-  {% if product.vendor %}
-    <span class="product-info__vendor">{{ product.vendor }}</span>
-  {% endif %}
+<section
+  class="product-info"
+  data-product-info
+  data-product-info-projection="{{ product_info_projection }}"
+>
+  <header class="product-info__identity">
+    {% if product.vendor != blank %}
+      <p class="product-info__vendor" dir="auto">{{ product.vendor | escape }}</p>
+    {% endif %}
 
-  <h1 class="product-info__title">{{ product.title }}</h1>
+    <h1 class="product-info__title" dir="auto">{{ product.title | escape }}</h1>
 
-  {% if product.metafields.custom.subtitle %}
-    <p class="product-info__subtitle">{{ product.metafields.custom.subtitle }}</p>
-  {% endif %}
+    {% if subtitle != blank %}
+      <p class="product-info__subtitle" dir="auto">{{ subtitle | escape }}</p>
+    {% endif %}
+  </header>
 
-  {% render 'price', product: product %}
-
-  {% if product.metafields.reviews.rating %}
-    {% render 'rating', rating: product.metafields.reviews.rating,
-       count: product.metafields.reviews.rating_count %}
-  {% endif %}
-
-  <div class="product-info__description">
-    {{ product.description }}
+  <div class="product-info__price">
+    {% render 'price', product: product, variant: variant %}
   </div>
 
-  <dl class="product-info__meta">
-    {% if product.metafields.custom.dimensions %}
-      <div><dt>Dimensions</dt><dd>{{ product.metafields.custom.dimensions }}</dd></div>
-    {% endif %}
-    {% if product.metafields.custom.material %}
-      <div><dt>Material</dt><dd>{{ product.metafields.custom.material }}</dd></div>
-    {% endif %}
-    {% if product.metafields.custom.weight %}
-      <div><dt>Weight</dt><dd>{{ product.metafields.custom.weight }}</dd></div>
-    {% endif %}
-    {% if product.metafields.custom.glaze_type %}
-      <div><dt>Glaze</dt><dd>{{ product.metafields.custom.glaze_type }}</dd></div>
-    {% endif %}
-  </dl>
+  {% if product.description != blank %}
+    <div class="product-info__description">
+      {{ product.description }}
+    </div>
+  {% endif %}
 
-  {% render 'product-form', product: product %}
-</div>
+  {% if dimensions != blank or material != blank or weight != blank or glaze != blank or variant %}
+    <dl class="product-info__meta">
+      {% if dimensions != blank %}
+        <div>
+          <dt>{{ 'products.meta.dimensions' | t }}</dt>
+          <dd dir="auto">{{ dimensions | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if material != blank %}
+        <div>
+          <dt>{{ 'products.meta.material' | t }}</dt>
+          <dd dir="auto">{{ material | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if weight != blank %}
+        <div>
+          <dt>{{ 'products.meta.weight' | t }}</dt>
+          <dd dir="auto">{{ weight | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if glaze != blank %}
+        <div>
+          <dt>{{ 'products.meta.glaze' | t }}</dt>
+          <dd dir="auto">{{ glaze | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if variant and variant.sku != blank %}
+        <div data-product-info-variant-field="sku">
+          <dt>{{ 'products.meta.sku' | t }}</dt>
+          <dd dir="auto">{{ variant.sku | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if variant and variant.inventory_management != blank %}
+        <div data-product-info-variant-field="inventory">
+          <dt>{{ 'products.meta.inventory' | t }}</dt>
+          <dd dir="auto">{{ variant.inventory_quantity }}</dd>
+        </div>
+      {% endif %}
+      {% if variant %}
+        <div data-product-info-variant-field="availability">
+          <dt>{{ 'products.meta.availability' | t }}</dt>
+          <dd dir="auto">
+            {% if variant.available %}
+              {{ 'products.availability.available' | t }}
+            {% else %}
+              {{ 'products.availability.unavailable' | t }}
+            {% endif %}
+          </dd>
+        </div>
+      {% endif %}
+    </dl>
+  {% endif %}
+</section>

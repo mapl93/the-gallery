@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "radio",
   "name": "Radio",
   "registryId": "A6",
@@ -58,6 +58,7 @@
     { "name": "focusVisible", "selectors": [".radio__input:focus-visible"], "description": "Keyboard focus on the native control." },
     { "name": "checked", "selectors": [".radio__input:checked"], "description": "Selected state controlled by the native checked property." },
     { "name": "disabled", "selectors": [".radio__input:disabled"], "description": "Unavailable native choice." },
+    { "name": "requiredInvalid", "selectors": [".radio__input"], "description": "Native required group with no selected value; invalidity is semantic and is not styled without the Error variant." },
     { "name": "errorFocusVisible", "selectors": [".radio--error .radio__input:focus-visible"], "description": "Focused Error variant with a lighter matching outer ring." },
     { "name": "successFocusVisible", "selectors": [".radio--success .radio__input:focus-visible"], "description": "Focused Success variant with a lighter matching outer ring." },
     { "name": "warningFocusVisible", "selectors": [".radio--warning .radio__input:focus-visible"], "description": "Focused Warning variant with a lighter matching outer ring." }
@@ -68,7 +69,7 @@
       "selectors": [".radio__input"],
       "attributes": ["type=\"radio\"", "checked"],
       "events": ["click", "Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
-      "description": "Native radio behavior provides activation and keyboard movement within a named group."
+      "description": "Native radio behavior provides activation and keyboard movement within a named group without component JavaScript."
     },
     {
       "name": "mutualExclusion",
@@ -81,7 +82,7 @@
       "selectors": [".radio__input"],
       "attributes": ["name", "value", "checked"],
       "events": ["form submission", "form reset"],
-      "description": "Only the checked radio contributes its configured value to native form data."
+      "description": "Only the checked radio contributes its configured value to native form data; reset restores default checkedness."
     },
     {
       "name": "nativeDisabled",
@@ -104,6 +105,13 @@
         "aria-describedby references feedback owned by Field Wrapper when present"
       ],
       "description": "Radio owns validation presentation and native invalid state while Field Wrapper owns associated feedback content."
+    },
+    {
+      "name": "selectionOwnership",
+      "selectors": [".radio__input"],
+      "attributes": ["checked establishes default checkedness in static HTML", "one controlled group value in framework adapters"],
+      "events": ["input", "change", "form reset"],
+      "description": "Static Web delegates live selection to the native named group; controlled adapters own one group value rather than independent item booleans."
     }
   ],
   "properties": [
@@ -142,7 +150,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Controls the native selected state.",
+      "description": "Establishes default checkedness in static HTML; framework adapters may bind the live checked property as part of one controlled group value.",
       "targetMappings": { "web": [{ "kind": "attribute", "selector": ".radio__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] }
     },
     {
@@ -189,7 +197,7 @@
         "--color-text-primary"
       ],
       "spacing": ["--space-input-icon-size", "--space-input-icon-gap"],
-      "typography": ["--typo-body-size"],
+      "typography": ["--typo-body-size", "--typo-body-line-height"],
       "radius": ["--radius-full"],
       "transition": ["--transition-fast"],
       "easing": ["--easing-default"],
@@ -201,10 +209,12 @@
     "Wrap related choices in Fieldset and provide a visible Legend that names the question.",
     "Keep each visible label associated by wrapping its native input or using matching for and id values.",
     "Use aria-invalid only for Error and associate helper or validation feedback with aria-describedby.",
-    "Success and Warning require non-color feedback in the surrounding Field Wrapper when validation meaning must be communicated."
+    "Success and Warning require non-color feedback in the surrounding Field Wrapper when validation meaning must be communicated.",
+    "Keep the visible option label stable and let native Space and arrow-key behavior update the named group.",
+    "Framework adapters should control one group value or use native defaultChecked, never independent booleans that can produce multiple checked items."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by native radio markup and class composition in components/css/primitives.css." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Implemented by native named-radio markup and class composition in components/css/primitives.css; browser selection and form behavior remain authoritative." },
     "shopify": { "status": "implemented", "kind": "liquid-css-class", "notes": "Shopify Liquid can render native named radio groups with the same class contract." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

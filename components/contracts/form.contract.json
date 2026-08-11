@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "form",
   "name": "Form",
   "registryId": "H15",
   "category": "forms",
   "status": "pilot",
-  "summary": "Form layout contract with sections, responsive rows, actions, error summary, native submission semantics, and dependencies on Field Wrapper and Button.",
+  "summary": "Native form composition with container-responsive rows, canonical Field Wrapper and Button children, optional actions and linked error summary, and target-owned submission policy.",
   "dependencies": ["field-wrapper", "button"],
   "source": {
     "registry": "registry.json#/components/form",
@@ -22,7 +22,7 @@
       "selector": ".form",
       "className": ".form",
       "required": true,
-      "description": "Native form or form-like layout wrapper."
+      "description": "Native form root and form-associated control boundary on Web."
     },
     {
       "name": "section",
@@ -50,14 +50,14 @@
       "selector": ".form__row--2col",
       "className": ".form__row--2col",
       "required": false,
-      "description": "Two-column row modifier at supported viewport widths."
+      "description": "Two-column row compatibility modifier activated by container capacity."
     },
     {
       "name": "threeColumnRow",
       "selector": ".form__row--3col",
       "className": ".form__row--3col",
       "required": false,
-      "description": "Three-column row modifier at supported viewport widths."
+      "description": "Three-column row compatibility modifier activated by container capacity."
     },
     {
       "name": "actions",
@@ -124,13 +124,13 @@
     },
     {
       "name": "twoColumn",
-      "selectors": [".form__row--2col"],
-      "description": "Responsive two-column row is present."
+      "selectors": [".form__row--2col", ".form__row[data-columns=\"two\"]"],
+      "description": "Two-column intent is present and activates only with sufficient form-container capacity."
     },
     {
       "name": "threeColumn",
-      "selectors": [".form__row--3col"],
-      "description": "Responsive three-column row is present."
+      "selectors": [".form__row--3col", ".form__row[data-columns=\"three\"]"],
+      "description": "Three-column intent is present and activates only with sufficient form-container capacity."
     },
     {
       "name": "withActions",
@@ -141,6 +141,11 @@
       "name": "withErrorSummary",
       "selectors": [".form__error-summary"],
       "description": "Top-level validation summary is present."
+    },
+    {
+      "name": "errorSummaryFocus",
+      "selectors": [".form__error-summary:focus-visible"],
+      "description": "Programmatically focusable summary has a visible focus treatment when the target moves focus after failed submission."
     }
   ],
   "behavior": [
@@ -148,8 +153,8 @@
       "name": "nativeSubmission",
       "selectors": [".form"],
       "attributes": ["<form>", "action", "method", "novalidate", "autocomplete"],
-      "events": ["submit", "reset"],
-      "description": "Targets should preserve native form submission semantics unless the target explicitly owns submission."
+      "events": ["submit", "reset", "formdata", "invalid", "constraint validation"],
+      "description": "Web uses a real form so named controls, activated submitter, validation, entry-list construction, submit, and reset remain native unless the target explicitly owns persistence."
     },
     {
       "name": "fieldComposition",
@@ -159,23 +164,31 @@
     {
       "name": "responsiveRows",
       "selectors": [".form__row--2col", ".form__row--3col"],
-      "description": "Responsive row modifiers should not change source order or keyboard order."
+      "description": "Container-responsive row modifiers change only grid columns and never source, reading, or keyboard order."
     },
     {
       "name": "actionSemantics",
       "selectors": [".form__actions"],
-      "attributes": ["type=\"submit\"", "type=\"button\"", "disabled", "aria-disabled"],
-      "description": "Action buttons should use explicit button types and respect pending or disabled states."
+      "attributes": ["type=\"submit\"", "type=\"reset\"", "type=\"button\"", "disabled", "aria-disabled"],
+      "description": "Canonical Button children use explicit action types; pending or disabled submission policy remains target-owned."
     },
     {
       "name": "errorSummary",
       "selectors": [".form__error-summary", ".form__error-summary-list", ".form__error-summary-list a"],
-      "attributes": ["role=\"alert\"", "aria-labelledby", "href"],
-      "description": "Error summaries should announce validation failures and link to invalid fields when possible."
+      "attributes": ["aria-labelledby", "tabindex=\"-1\"", "href", "optional role and aria-live chosen by target timing"],
+      "description": "A text summary links to invalid fields. The target owns insertion, announcement, and whether focus moves to the summary or first invalid control."
+    },
+    {
+      "name": "valueOwnership",
+      "selectors": [".form"],
+      "attributes": ["named native controls", "activated submitter", "FormData"],
+      "events": ["input and change on composed controls", "submit", "reset", "formdata"],
+      "description": "Form does not mirror a controlled value object; each canonical control remains the owner of its own native current and default value."
     }
   ],
   "properties": [
     { "name": "columns", "type": "enum", "required": false, "values": ["one", "two", "three"], "defaultValue": "one", "description": "Responsive field count for a composed form row.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form__row", "attribute": "data-columns", "values": { "one": "one", "two": "two", "three": "three" } }] } },
+    { "name": "content", "type": "slot", "required": true, "description": "Canonical named controls and optional sections/rows in logical source order.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form", "classNames": [".form__section", ".form__row", ".field"] }] } },
     { "name": "errorSummary", "type": "slot", "required": false, "description": "Optional top-level summary that links validation errors to their fields.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form__error-summary", "classNames": [".form__error-summary"] }] } },
     { "name": "actions", "type": "slot", "required": false, "description": "Optional explicit submit and secondary action row.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form__actions", "classNames": [".form__actions"] }] } },
     { "name": "noValidate", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables native browser validation when the target owns a complete accessible validation flow.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form", "attribute": "novalidate", "values": { "true": "", "false": null }, "elements": ["form"] }] } },
@@ -194,16 +207,21 @@
       "typography": [
         "--font-family-body",
         "--typo-h4-size",
-        "--typo-body-size"
+        "--typo-body-size",
+        "--typo-body-sm-size",
+        "--typo-body-sm-line-height"
       ]
     }
   },
   "accessibility": [
-    "Use native form elements for form submission when available.",
+    "Use a native form element for the neutral Web implementation.",
+    "Give submitted controls stable names and preserve the activated submitter in native form data.",
     "Keep field order, visual order, and tab order aligned.",
     "Use explicit button types for submit, reset, and non-submit actions.",
     "Provide a top-level error summary for longer forms with multiple invalid fields.",
-    "Link error summary items to their invalid fields when the target supports focusable anchors."
+    "Link error summary items to their invalid fields when the target supports focusable anchors.",
+    "Let the target validation lifecycle choose error-summary insertion, live announcement, and focus timing.",
+    "Preserve native default values and reset behavior for every composed control."
   ],
   "adapters": {
     "web": {

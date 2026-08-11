@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "footer",
   "name": "Footer",
   "registryId": "C3",
   "category": "global",
   "status": "pilot",
-  "summary": "Site footer with responsive link columns and bottom metadata bar.",
+  "summary": "Body-scoped content-info landmark with required target-owned navigation groups, optional brand context, and optional metadata.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/footer",
@@ -14,48 +14,60 @@
     "docs": "site/src/content/components/footer.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".footer", "className": ".footer", "required": true, "description": "Footer region." },
-    { "name": "grid", "selector": ".footer__grid", "className": ".footer__grid", "required": true, "description": "Responsive footer column grid." },
-    { "name": "heading", "selector": ".footer__heading", "className": ".footer__heading", "required": false, "description": "Footer column heading." },
-    { "name": "links", "selector": ".footer__links", "className": ".footer__links", "required": false, "description": "Footer link list." },
-    { "name": "bottom", "selector": ".footer__bottom", "className": ".footer__bottom", "required": false, "description": "Bottom metadata and legal row." }
+    { "name": "root", "selector": ".footer", "className": ".footer", "required": true, "description": "Native footer landmark scoped to the document body." },
+    { "name": "grid", "selector": ".footer__grid", "className": ".footer__grid", "required": true, "description": "Container-responsive composition for brand context and navigation groups." },
+    { "name": "brand", "selector": ".footer__brand", "className": ".footer__brand", "required": false, "description": "Optional target-owned brand context; it is not a second navigation landmark." },
+    { "name": "group", "selector": ".footer__group", "className": ".footer__group", "required": true, "description": "One or more labelled target-owned navigation groups." },
+    { "name": "heading", "selector": ".footer__heading", "className": ".footer__heading", "required": true, "description": "Visible group or brand heading used to label its region where applicable." },
+    { "name": "copy", "selector": ".footer__copy", "className": ".footer__copy", "required": false, "description": "Optional supporting brand copy." },
+    { "name": "links", "selector": ".footer__links", "className": ".footer__links", "required": true, "description": "Native list of navigation links for a group." },
+    { "name": "link", "selector": ".footer__link", "className": ".footer__link", "required": true, "description": "Native destination link with wrap-safe text and visible interaction states." },
+    { "name": "bottom", "selector": ".footer__bottom", "className": ".footer__bottom", "required": false, "description": "Optional metadata row below the navigation groups." },
+    { "name": "metadata", "selector": ".footer__meta", "className": ".footer__meta", "required": false, "description": "Readable copyright, locale, legal, or brand metadata item." },
+    { "name": "metadataLink", "selector": ".footer__meta-link", "className": ".footer__meta-link", "required": false, "description": "Optional native link inside the metadata row." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default footer layout." }
+    { "name": "default", "className": null, "default": true, "description": "Default footer composition." }
   ],
   "sizes": [
     { "name": "default", "className": null, "default": true, "description": "Default full-width footer spacing." }
   ],
   "states": [
-    { "name": "default", "selectors": [".footer"], "description": "Default footer state." },
-    { "name": "linkHover", "selectors": [".footer__links a:hover"], "description": "Footer link hover state." },
-    { "name": "desktopGrid", "selectors": [".footer__grid"], "description": "Desktop breakpoint expands link columns." }
+    { "name": "default", "selectors": [".footer"], "description": "Single-column narrow-container presentation." },
+    { "name": "linkHover", "selectors": [".footer__link:hover", ".footer__links a:hover"], "description": "Pointer hover keeps contrast-safe primary text and adds the accent underline." },
+    { "name": "linkFocusVisible", "selectors": [".footer__link:focus-visible", ".footer__links a:focus-visible"], "description": "Keyboard focus ring around a native footer link." },
+    { "name": "wideContainer", "selectors": [".footer__grid"], "description": "At a 48rem footer container, brand context and three navigation groups share the wider grid." }
   ],
   "behavior": [
-    { "name": "footerNavigation", "selectors": [".footer__links"], "attributes": ["aria-label"], "description": "Footer link groups should be organized as labelled navigation when they contain navigation links." },
-    { "name": "legalMetadata", "selectors": [".footer__bottom"], "description": "Bottom bar should expose legal, locale, or brand metadata as readable text." }
+    { "name": "contentInfoLandmark", "selectors": [".footer"], "attributes": ["footer"], "description": "Use one body-scoped native footer for the page content-info landmark; do not add a redundant role." },
+    { "name": "labelledNavigation", "selectors": [".footer__group", ".footer__heading", ".footer__links"], "attributes": ["aria-labelledby", "href"], "description": "Each link group is a nav labelled by its visible heading and contains native list-item links." },
+    { "name": "containerResponsive", "selectors": [".footer", ".footer__grid"], "description": "Layout responds to the footer container rather than the document viewport and keeps long localized content contained." },
+    { "name": "passiveMetadata", "selectors": [".footer__bottom", ".footer__meta"], "description": "Metadata stays ordinary readable content unless a target supplies a genuine destination link." }
   ],
   "properties": [
-    { "name": "linkGroups", "type": "slot", "required": true, "description": "Target-owned footer headings and labelled navigation lists.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".footer__grid", "classNames": [".footer__grid"] }] } },
-    { "name": "metadata", "type": "slot", "required": false, "description": "Optional legal, locale, copyright, or brand metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".footer__bottom", "classNames": [".footer__bottom"] }] } }
+    { "name": "linkGroups", "type": "slot", "required": true, "description": "One or more target-owned labelled navigation groups with native list-item links.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".footer__grid", "classNames": [".footer__group", ".footer__heading", ".footer__links", ".footer__link"] }] } },
+    { "name": "brand", "type": "slot", "required": false, "description": "Optional target-owned brand heading and supporting context; this does not imply newsletter or social features.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".footer__brand", "classNames": [".footer__brand", ".footer__heading", ".footer__copy"] }] } },
+    { "name": "metadata", "type": "slot", "required": false, "description": "Optional legal, locale, copyright, or brand metadata selected by the target.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".footer__bottom", "classNames": [".footer__bottom", ".footer__meta", ".footer__meta-link"] }] } }
   ],
   "tokens": {
     "public": {
       "color": ["--color-surface-secondary", "--color-text-secondary", "--color-text-primary", "--color-border-subtle", "--color-border-focus", "--color-text-accent"],
-      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--space-layout-grid-gap", "--space-layout-element-gap"],
-      "typography": ["--typo-body-size", "--font-family-heading"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--space-layout-grid-gap", "--space-layout-element-gap", "--space-layout-touch-target"],
+      "typography": ["--font-family-heading", "--typo-body-size", "--typo-body-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height", "--typo-caption-size", "--typo-caption-line-height"],
       "transition": ["--transition-fast"],
       "easing": ["--easing-default"]
     }
   },
   "accessibility": [
-    "Group footer links with headings or labelled navigation regions.",
-    "Keep legal and locale information readable at small type sizes.",
+    "Use one body-scoped native footer landmark and do not add redundant contentinfo roles.",
+    "Label each navigation group from its visible heading and retain native list and link semantics.",
+    "Keep link labels and metadata readable, wrap-safe, and operable at the canonical touch target.",
+    "Preserve contrast-safe hover, visible keyboard focus, reduced motion, and forced-colors boundaries.",
     "Do not make the footer the only route to critical support actions."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map footer menu blocks, brand copy, newsletter, and legal links from theme settings." },
+    "web": { "status": "implemented", "kind": "css", "notes": "Canonical native footer parts, labelled link groups, container query, interaction states, and robust text containment are implemented in components/css/global.css." },
+    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Current Liquid maps brand copy and menu blocks, but modern section-group placement remains an owner-level target decision; newsletter, locale, social, and legal composition are not inferred." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

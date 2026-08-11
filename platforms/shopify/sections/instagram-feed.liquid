@@ -1,0 +1,193 @@
+{% liquid
+  assign section_heading = section.settings.heading | strip
+  assign handle_label = section.settings.handle | strip
+  assign handle_destination = section.settings.handle_destination
+  assign action_label = section.settings.action_label | strip
+  assign action_destination = section.settings.action_destination
+  assign heading_id = 'InstagramFeed-' | append: section.id | append: '-Heading'
+  assign image_sizes = '(min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 512px) 33vw, 50vw'
+
+  assign has_handle = false
+  if handle_label != blank and handle_destination != blank
+    assign has_handle = true
+  endif
+
+  assign has_action = false
+  if action_label != blank and action_destination != blank
+    assign has_action = true
+  endif
+
+  assign valid_item_count = 0
+  for block in section.blocks
+    assign image_alt = block.settings.image_alt | strip
+    if image_alt == blank and block.settings.image != blank
+      assign image_alt = block.settings.image.alt | strip
+    endif
+
+    assign has_image_semantics = false
+    if block.settings.image_decorative or image_alt != blank
+      assign has_image_semantics = true
+    endif
+
+    if block.type == 'media' and block.settings.image != blank and has_image_semantics
+      assign valid_item_count = valid_item_count | plus: 1
+    endif
+  endfor
+%}
+
+{% if valid_item_count > 0 %}
+  {% if section_heading != blank %}
+    <section class="instagram-feed" aria-labelledby="{{ heading_id }}">
+  {% else %}
+    <div class="instagram-feed">
+  {% endif %}
+    {% if section_heading != blank or has_handle %}
+      <header class="instagram-feed__header">
+        {% if section_heading != blank %}
+          <h2 class="instagram-feed__heading" id="{{ heading_id }}">{{ section_heading | escape }}</h2>
+        {% endif %}
+
+        {% if has_handle %}
+          <a class="instagram-feed__handle" href="{{ handle_destination }}">{{ handle_label | escape }}</a>
+        {% endif %}
+      </header>
+    {% endif %}
+
+    <ul class="instagram-feed__grid">
+      {% for block in section.blocks %}
+        {% liquid
+          assign image_alt = block.settings.image_alt | strip
+          if image_alt == blank and block.settings.image != blank
+            assign image_alt = block.settings.image.alt | strip
+          endif
+          if block.settings.image_decorative
+            assign image_alt = ''
+          endif
+
+          assign has_image_semantics = false
+          if block.settings.image_decorative or image_alt != blank
+            assign has_image_semantics = true
+          endif
+
+          assign item_caption = block.settings.caption | strip
+          assign item_destination = block.settings.destination
+        %}
+
+        {% if block.type == 'media' and block.settings.image != blank and has_image_semantics %}
+          <li class="instagram-feed__item" {{ block.shopify_attributes }}>
+            {% if item_destination != blank %}
+              <a class="instagram-feed__link" href="{{ item_destination }}">
+            {% endif %}
+              <figure class="instagram-feed__figure">
+                {{ block.settings.image | image_url: width: 1800 | image_tag:
+                  alt: image_alt,
+                  class: 'instagram-feed__media',
+                  loading: 'lazy',
+                  widths: '240, 320, 480, 640, 800, 1080, 1440, 1800',
+                  sizes: image_sizes
+                }}
+
+                {% if item_caption != blank %}
+                  <figcaption class="instagram-feed__caption">{{ item_caption | escape }}</figcaption>
+                {% endif %}
+              </figure>
+            {% if item_destination != blank %}
+              </a>
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    {% if has_action %}
+      <div class="instagram-feed__cta">
+        <a class="btn btn--outline" href="{{ action_destination }}">{{ action_label | escape }}</a>
+      </div>
+    {% endif %}
+  {% if section_heading != blank %}
+    </section>
+  {% else %}
+    </div>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "t:sections.instagram_feed.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.instagram_feed.settings.heading"
+    },
+    {
+      "type": "text",
+      "id": "handle",
+      "label": "t:sections.instagram_feed.settings.handle"
+    },
+    {
+      "type": "url",
+      "id": "handle_destination",
+      "label": "t:sections.instagram_feed.settings.handle_destination"
+    },
+    {
+      "type": "text",
+      "id": "action_label",
+      "label": "t:sections.instagram_feed.settings.action_label"
+    },
+    {
+      "type": "url",
+      "id": "action_destination",
+      "label": "t:sections.instagram_feed.settings.action_destination"
+    }
+  ],
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "media",
+      "name": "t:sections.instagram_feed.blocks.media.name",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.instagram_feed.blocks.media.settings.image"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_decorative",
+          "label": "t:sections.instagram_feed.blocks.media.settings.image_decorative",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "image_alt",
+          "label": "t:sections.instagram_feed.blocks.media.settings.image_alt"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "t:sections.instagram_feed.blocks.media.settings.caption"
+        },
+        {
+          "type": "url",
+          "id": "destination",
+          "label": "t:sections.instagram_feed.blocks.media.settings.destination"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.instagram_feed.name",
+      "blocks": [
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" },
+        { "type": "media" }
+      ]
+    }
+  ]
+}
+{% endschema %}

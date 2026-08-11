@@ -43,12 +43,13 @@ Current component source layers:
 - Component contracts: `components/contracts/`.
 - CSS source: `components/css/`.
 - Shared JS source: `components/js/theme.js`.
+- Runtime module boundaries: `components/js/runtime-modules.json`.
 - Manifest: `registry.json`.
 - Documentation: `site/src/content/components/*.mdx`.
 
 Target-specific implementations belong under `platforms/<target>/`.
 
-The first explicit component adapter is the neutral web output in `platforms/web/`. It currently packages hand-authored CSS from `components/css/`, shared progressive-enhancement JS, and a generated adapter manifest that maps every registry component back to its contract and source files.
+The first explicit component adapter is the neutral web output in `platforms/web/`. It packages hand-authored CSS from `components/css/`, dependency-selective progressive-enhancement modules, compatibility aggregates, and a generated adapter manifest that maps every registry component to its contract, source files, and copy-and-own install slice.
 
 ## Documentation Site
 

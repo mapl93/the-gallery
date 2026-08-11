@@ -1,55 +1,98 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.4.0",
   "slug": "announcement-bar",
   "name": "Announcement Bar",
   "registryId": "C2",
   "category": "global",
   "status": "pilot",
-  "summary": "Top-of-page promotional bar with optional link content.",
-  "dependencies": [],
+  "summary": "Controlled compact announcement surface with exclusive static, canonical Countdown, or canonical Carousel rotation content and optional target-owned dismissal.",
+  "dependencies": ["link", "close-button", "countdown", "carousel", "icon-button"],
   "source": {
     "registry": "registry.json#/components/announcement-bar",
     "css": { "file": "components/css/global.css", "selector": ".announcement" },
     "docs": "site/src/content/components/announcement-bar.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".announcement", "className": ".announcement", "required": true, "description": "Announcement container." },
-    { "name": "link", "selector": ".announcement a", "required": false, "description": "Optional announcement link." }
+    { "name": "root", "selector": ".announcement", "className": ".announcement", "required": true, "description": "Controlled compact surface, omitted when visible is false." },
+    { "name": "body", "selector": ".announcement__body", "className": ".announcement__body", "required": true, "description": "Intrinsic content row that wraps without hiding, scaling, or clipping content." },
+    { "name": "message", "selector": ".announcement__message", "className": ".announcement__message", "required": false, "description": "Static-mode message with an optional canonical Link." },
+    { "name": "countdown", "selector": ".announcement__countdown", "className": ".announcement__countdown", "required": false, "description": "Countdown-mode slot containing canonical Countdown in its inline presentation." },
+    { "name": "rotation", "selector": ".announcement__rotation", "className": ".announcement__rotation", "required": false, "description": "Rotating-mode canonical Carousel composition." },
+    { "name": "track", "selector": ".announcement__track", "className": ".announcement__track", "required": false, "description": "Focusable horizontal scroll-snap viewport for real message slides." },
+    { "name": "slide", "selector": ".announcement__slide", "className": ".announcement__slide", "required": false, "description": "Ordered real message group; rotation never clones slides." },
+    { "name": "controls", "selector": ".announcement__controls", "className": ".announcement__controls", "required": false, "description": "Rotating-mode previous, counter, next and conditional pause/play controls." },
+    { "name": "previous", "selector": ".announcement__previous", "className": ".announcement__previous", "required": false, "description": "Canonical previous Icon Button." },
+    { "name": "counter", "selector": ".announcement__counter", "className": ".announcement__counter", "required": false, "description": "Visible localized current/total position such as 2/3." },
+    { "name": "next", "selector": ".announcement__next", "className": ".announcement__next", "required": false, "description": "Canonical next Icon Button." },
+    { "name": "rotationControl", "selector": ".announcement__rotation-control", "className": ".announcement__rotation-control", "required": false, "description": "Canonical pause/play Icon Button rendered only while autoplay is enabled." },
+    { "name": "status", "selector": ".announcement__status", "className": ".announcement__status", "required": false, "description": "Visually hidden localized position status updated after selection changes." },
+    { "name": "dismiss", "selector": ".announcement__dismiss", "className": ".announcement__dismiss", "required": false, "description": "Canonical Close Button that emits a dismiss request without owning removal or persistence." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default promotional announcement." }
+    { "name": "static", "className": null, "default": true, "description": "One stable message and optional canonical Link." },
+    { "name": "countdown", "className": ".announcement--countdown", "default": false, "description": "Canonical inline Countdown composition; rotating content is absent." },
+    { "name": "rotating", "className": ".announcement--rotating", "default": false, "description": "Canonical Carousel rotation composition; static and countdown content are absent." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default compact bar size." }
+    { "name": "default", "className": null, "default": true, "description": "Compact intrinsic size that may wrap into additional rows from its container." }
   ],
   "states": [
-    { "name": "default", "selectors": [".announcement"], "description": "Default announcement state." },
-    { "name": "linked", "selectors": [".announcement a"], "description": "Announcement with inline link." }
+    { "name": "default", "selectors": [".announcement"], "description": "Visible controlled surface with autoplay off by default." },
+    { "name": "dismissible", "selectors": [".announcement--dismissible", ".announcement__dismiss"], "description": "Orthogonal controlled Close Button is present in any content mode." },
+    { "name": "currentMessage", "selectors": [".announcement__slide[aria-current=\"true\"]"], "description": "Exactly one real rotating message is current." },
+    { "name": "autoplayPlaying", "selectors": [".announcement[data-autoplay-state=\"playing\"]"], "description": "Opt-in rotation is advancing while no pause condition applies." },
+    { "name": "autoplayPaused", "selectors": [".announcement[data-autoplay-state=\"paused\"]"], "description": "Rotation remains durably or temporarily paused." },
+    { "name": "userPaused", "selectors": [".announcement[data-user-paused=\"true\"]"], "description": "Focus or manual selection created a durable pause that requires explicit Play." },
+    { "name": "reducedMotion", "selectors": [".announcement[data-reduced-motion=\"true\"]"], "description": "Automatic rotation and smooth scrolling are suppressed." },
+    { "name": "closed", "selectors": [".announcement[hidden]"], "description": "Target-controlled closed state is omitted or natively hidden and non-interactive." }
   ],
   "behavior": [
-    { "name": "announcementMessage", "selectors": [".announcement"], "description": "Announcement text should be concise and remain visible above global header chrome." },
-    { "name": "announcementLink", "selectors": [".announcement a"], "attributes": ["href"], "events": ["click"], "description": "Linked announcement should navigate to a relevant campaign or destination." }
+    { "name": "exclusiveContentMode", "selectors": [".announcement", ".announcement--countdown", ".announcement--rotating"], "description": "Exactly one static, countdown, or rotating content model is rendered; countdown and rotation never coexist." },
+    { "name": "staticSemantics", "selectors": [".announcement__message"], "description": "Page-load promotional content has no alert, status, or live-region role by default and uses a native Link only for navigation." },
+    { "name": "countdownComposition", "selectors": [".announcement__countdown", ".countdown--inline"], "description": "Countdown mode delegates deadline, units, cadence, expiry and events to canonical Countdown and preserves every selected unit while wrapping intrinsically." },
+    { "name": "rotatingSelection", "selectors": [".announcement__track", ".announcement__slide", ".announcement__previous", ".announcement__next"], "events": ["click", "scroll", "announcementchange"], "description": "Previous, next and supplementary direct touch scrolling wrap through real slides, synchronize current state and visible current/total position, and never intercept root-wide arrow keys." },
+    { "name": "autoplayLifecycle", "selectors": [".announcement[data-autoplay=\"true\"]", ".announcement__rotation-control"], "events": ["click", "pointerenter", "pointerleave", "focusin", "visibilitychange", "announcementplaybackchange"], "description": "Autoplay is opt-in, defaults off, uses a six-second default, pauses for hover, focus and hidden-document conditions, is suppressed by reduced motion, and never restarts implicitly after user interaction." },
+    { "name": "dismissRequest", "selectors": [".announcement__dismiss"], "events": ["click", "announcementdismissrequest"], "description": "Canonical Close Button requests dismissal; the target controls visible state, eligibility, persistence, reappearance and focus after removal." },
+    { "name": "controlledOwnership", "selectors": [".announcement"], "events": ["announcementdismissrequest", "announcementchange", "announcementplaybackchange"], "description": "The neutral implementation projects target state and emits requests; targets own campaign scheduling, targeting, persistence, analytics and navigation." }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": false, "description": "Accessible name when the announcement is rendered as a labelled region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "aria-label", "valueFrom": "property", "elements": ["div", "section"] }] } },
-    { "name": "message", "type": "slot", "required": true, "description": "Announcement content with an optional native link supplied by the target.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement", "classNames": [".announcement"] }] } }
+    { "name": "mode", "type": "enum", "required": false, "defaultValue": "static", "valuesFrom": "variants", "description": "Exclusive static, countdown, or rotating content model.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".announcement", "source": "variants" }] } },
+    { "name": "label", "type": "string", "required": false, "description": "Accessible region name; required by composition when mode is rotating and optional when another mode is intentionally exposed as a region.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "aria-label", "valueFrom": "property", "elements": ["section"] }] } },
+    { "name": "message", "type": "slot", "required": false, "description": "Required static-mode message with an optional canonical Link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement__message", "classNames": [".announcement__message"] }] } },
+    { "name": "countdown", "type": "slot", "required": false, "description": "Required countdown-mode canonical Countdown configured with inline presentation.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement__countdown", "classNames": [".announcement__countdown"] }] } },
+    { "name": "messages", "type": "slot", "required": false, "description": "Required rotating-mode ordered collection of at least two concise message slides.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".announcement__track", "classNames": [".announcement__track", ".announcement__slide"] }] } },
+    { "name": "visible", "type": "boolean", "required": false, "defaultValue": true, "description": "Target-controlled presence; false omits or natively hides the whole surface.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "hidden", "values": { "true": null, "false": "" } }] } },
+    { "name": "dismissible", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows a canonical Close Button in any mode without adding persistence or reappearance policy.", "targetMappings": { "web": [{ "kind": "class", "selector": ".announcement", "classNames": [".announcement--dismissible"] }] } },
+    { "name": "dismissLabel", "type": "string", "required": true, "description": "Localized accessible name for the conditional Close Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__dismiss", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "autoplay", "type": "boolean", "required": false, "defaultValue": false, "description": "Opt-in timed rotation used only in rotating mode; a visible pause/play control is then required.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "data-autoplay", "values": { "true": "true", "false": "false" } }] } },
+    { "name": "autoplayInterval", "type": "number", "required": false, "defaultValue": 6000, "minimum": 3000, "maximum": 12000, "step": 1000, "description": "Rotation interval in milliseconds, read only when rotating autoplay is enabled.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement", "attribute": "data-autoplay-interval", "valueFrom": "property" }] } },
+    { "name": "previousLabel", "type": "string", "required": true, "description": "Localized accessible name for the previous-message Icon Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__previous", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "nextLabel", "type": "string", "required": true, "description": "Localized accessible name for the next-message Icon Button.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__next", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "pauseLabel", "type": "string", "required": true, "description": "Localized accessible name while the rotation control pauses autoplay.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__rotation-control", "attribute": "data-pause-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "playLabel", "type": "string", "required": true, "description": "Localized accessible name while the rotation control resumes autoplay.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__rotation-control", "attribute": "data-play-label", "valueFrom": "property", "elements": ["button"] }] } },
+    { "name": "counterTemplate", "type": "string", "required": true, "description": "Localized visible position template containing {current} and {total}, for example {current}/{total}.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__counter", "attribute": "data-counter-template", "valueFrom": "property" }] } },
+    { "name": "statusTemplate", "type": "string", "required": true, "description": "Localized assistive position template containing {current} and {total}.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".announcement__status", "attribute": "data-status-template", "valueFrom": "property" }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-statement", "--color-text-primary"],
-      "spacing": ["--space-layout-container"],
-      "typography": ["--typo-body-size"]
+      "color": ["--color-surface-statement", "--color-text-primary", "--color-border-focus"],
+      "spacing": ["--space-layout-container", "--space-layout-element-gap"],
+      "typography": ["--font-family-body", "--tg-font-weight-medium", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Keep announcement text readable against the statement surface.",
-    "Use a real link when the message navigates somewhere.",
-    "Avoid placing critical checkout or legal information only in a dismissible promotional bar."
+    "Keep static page-load content neutral; do not add alert or live-region semantics by default.",
+    "Require a useful accessible region name for rotating content and expose each real message as an ordered slide group.",
+    "Provide native previous, next, conditional pause/play and dismiss buttons with localized names.",
+    "Pause opt-in autoplay for focus, hover and hidden documents, suppress it under reduced motion, and require explicit Play after user interaction.",
+    "Preserve direct touch scrolling and focused track keyboard scrolling without intercepting Arrow keys on the root.",
+    "Keep countdown units and rotating messages readable under narrow containers, localization, RTL, zoom, forced colors and reduced motion.",
+    "Do not place critical checkout, legal or safety information only in an automatically rotating promotional surface."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/global.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map theme announcement settings and optional campaign URL." },
+    "web": { "status": "implemented", "kind": "css-js-composition", "notes": "Canonical CSS, Countdown composition and shared Carousel rotation runtime implement all three controlled modes without target persistence." },
+    "shopify": { "status": "implemented", "kind": "liquid-css-static-profile", "notes": "The existing Theme section maps merchant rich text to the canonical static mode. Countdown, rotation and controlled dismissal remain explicit target maturity work rather than copied behavior." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

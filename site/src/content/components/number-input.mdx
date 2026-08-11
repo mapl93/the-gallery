@@ -1,38 +1,51 @@
 ## Overview
 
-Numeric stepper with increment/decrement buttons.
+Generic native numeric field with direct editing, explicit decrement/increment actions, constraints, and form semantics.
 
 ## Presentation
 
-Number Input supports `default`, `error`, `success`, and `warning` validation families. The field and stepper buttons retain the same family on hover and focus.
+Number Input remains separate from the commerce-oriented Quantity Selector while sharing the same native stepping model. Validation, disabled, readonly, required, and boundary availability are independent states.
 
-<Preview html={"<div><label class=\"field__label\" for=\"qty-demo\">Quantity</label><div class=\"number-input\"><button class=\"number-input__btn\" aria-label=\"Decrease quantity\">−</button><input id=\"qty-demo\" class=\"number-input__field\" type=\"number\" value=\"1\" min=\"0\" /><button class=\"number-input__btn\" aria-label=\"Increase quantity\">+</button></div></div>"} label="Number Input" />
+<Preview html={"<div class=\"field\"><label class=\"field__label\" for=\"number-demo\">Edition count</label><div class=\"number-input\"><button class=\"number-input__btn number-input__btn--decrement\" type=\"button\" aria-label=\"Decrease edition count\" aria-controls=\"number-demo\"><span aria-hidden=\"true\">−</span></button><input class=\"number-input__field\" id=\"number-demo\" name=\"editionCount\" type=\"number\" value=\"1\" min=\"0\" max=\"10\" step=\"1\" aria-label=\"Edition count\"><button class=\"number-input__btn number-input__btn--increment\" type=\"button\" aria-label=\"Increase edition count\" aria-controls=\"number-demo\"><span aria-hidden=\"true\">+</span></button></div></div>"} label="Number Input" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Always pair form inputs with visible labels for accessibility.</Do>
-  <Dont>Don't rely on placeholder text as the only label — it disappears on input.</Dont>
+  <Do>Use Number Input for actual numeric values and let the native field preserve empty or partial direct editing.</Do>
+  <Dont>Don't use it for postal codes, card numbers, identifiers, or other digit strings.</Dont>
 </DoDont>
 
 ## Accessibility
 
-<Callout type="tip">
-  Number Input keeps native `type="number"` semantics while exposing clearer stepper controls.
-</Callout>
-
-- Associate the field with a visible label.
-- Give increment and decrement buttons clear accessible names.
-- Respect `min`, `max`, `step`, `disabled`, and `readonly` constraints.
-- Disable increment or decrement buttons when the value reaches its limit.
+- Associate the field with a visible label or equivalent accessible name.
+- Give decrement and increment actions clear names and connect them to the field with `aria-controls`.
+- Keep native Arrow Up/Down and direct text editing available.
+- Respect `min`, `max`, `step`, `required`, `disabled`, and `readonly` constraints.
+- Disabled fields are unavailable and omitted from form data; readonly fields remain focusable and submittable with step actions disabled.
 
 ## References
 
+Number Input and [Quantity Selector](/components/quantity-selector) share an internal native stepping model but remain distinct public components under ADR 0060.
+
 <PropTable>
-  <tr><td>`.number-input`</td><td>class</td><td>—</td><td>Inline numeric stepper wrapper</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>Independent validation presentation</td></tr>
+  <tr><td>`value`</td><td>number</td><td>optional</td><td>Initial static value or adapter-bound live/default value</td></tr>
+  <tr><td>`min`</td><td>number</td><td>optional</td><td>Native lower boundary</td></tr>
+  <tr><td>`max`</td><td>number</td><td>optional</td><td>Native upper boundary</td></tr>
+  <tr><td>`step`</td><td>number</td><td>`1`</td><td>Positive native increment</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Whole-control unavailability</td></tr>
+  <tr><td>`name`</td><td>string</td><td>optional</td><td>Native form-data name</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Native non-empty valid-number constraint</td></tr>
+  <tr><td>`readOnly`</td><td>boolean</td><td>`false`</td><td>Focusable, submittable, non-editable value</td></tr>
+  <tr><td>`accessibleLabel`</td><td>string</td><td>required</td><td>Native field accessible name; visible label preferred</td></tr>
+  <tr><td>`decrementLabel`</td><td>string</td><td>required</td><td>Decrease action name</td></tr>
+  <tr><td>`incrementLabel`</td><td>string</td><td>required</td><td>Increase action name</td></tr>
+  <tr><td>`describedBy`</td><td>string</td><td>optional</td><td>Guidance or validation id</td></tr>
+  <tr><td>`.number-input`</td><td>class</td><td>—</td><td>Compact numeric control boundary</td></tr>
   <tr><td>`.number-input--error`</td><td>modifier</td><td>—</td><td>Error validation family</td></tr>
   <tr><td>`.number-input--success`</td><td>modifier</td><td>—</td><td>Success validation family</td></tr>
   <tr><td>`.number-input--warning`</td><td>modifier</td><td>—</td><td>Warning validation family</td></tr>
-  <tr><td>`.number-input__btn`</td><td>element</td><td>`disabled`</td><td>Increment or decrement control</td></tr>
-  <tr><td>`.number-input__field`</td><td>element</td><td>`type="number"`</td><td>Native number input field</td></tr>
+  <tr><td>`.number-input__btn--decrement`</td><td>class</td><td>`button`</td><td>Explicit decrement action</td></tr>
+  <tr><td>`.number-input__field`</td><td>class</td><td>`input[type=number]`</td><td>Sole native numeric owner</td></tr>
+  <tr><td>`.number-input__btn--increment`</td><td>class</td><td>`button`</td><td>Explicit increment action</td></tr>
 </PropTable>

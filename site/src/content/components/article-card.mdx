@@ -1,43 +1,124 @@
 ## Overview
 
-Article Card presents an article destination with a required title and optional media, category, metadata, excerpt, and author content. Media, metadata, and author identity remain target-owned slots.
+Article Card presents one self-contained native article summary on the
+canonical Card surface. One native Link contains its contextual media, passive
+summary content, and complete visible title as one destination. Passive category
+metadata, author destinations, and future conflicting controls stay outside
+that Link.
 
 ## Presentation
 
-<Preview html={'<article class="article-card tg-preview-card"><a class="article-card__media" href="#"><img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="A finished stoneware vessel beside a working sketch" /><span class="badge article-card__category">Studio Notes</span></a><div class="article-card__body"><div class="article-card__meta"><time datetime="2026-07-12">July 12, 2026</time><span class="article-card__meta-separator" aria-hidden="true">/</span><span>6 min read</span></div><h3 class="article-card__title"><a href="#">How a vessel finds its final form</a></h3><p class="article-card__excerpt">A studio journal about proportion, balance, and the decisions made before firing.</p></div></article>'} label="Article Card" />
+<Preview
+  html={`
+    <article class="card article-card" data-surface="default" data-excerpt-lines="none">
+      <div class="article-card__category-slot article-card__category-slot--overlay">
+        <span class="badge article-card__category">Studio Notes</span>
+      </div>
+      <a class="article-card__primary-link" href="#vessel-form">
+        <div class="article-card__layout">
+          <div class="card__media article-card__media">
+            <img class="tg-preview-media tg-preview-media--wide" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="A finished stoneware vessel beside a working sketch" />
+          </div>
+          <div class="card__body article-card__body">
+            <div class="article-card__meta">
+              <time datetime="2026-07-12">July 12, 2026</time>
+              <span class="article-card__meta-separator" aria-hidden="true">/</span>
+              <time datetime="PT6M">6 min read</time>
+            </div>
+            <h3 class="article-card__title">How a vessel finds its final form</h3>
+            <p class="article-card__excerpt">A studio journal about proportion, balance, and the decisions made before firing.</p>
+          </div>
+        </div>
+      </a>
+      <footer class="card__footer article-card__author">
+        <span class="article-card__author-name">Marina Paz</span>
+      </footer>
+    </article>
+  `}
+  label="Article Card"
+/>
 
-The default `standard` presentation has no modifier class. `featured`, `minimal`, `horizontal`, and `editorial` map to `.article-card--featured`, `.article-card--minimal`, `.article-card--horizontal`, and `.article-card--editorial`. The parent layout controls the card width.
+`variant` is the independent layout axis. `standard` has no Article Card
+modifier; `featured`, `minimal`, `horizontal`, and `editorial` map to
+`.article-card--featured`, `.article-card--minimal`,
+`.article-card--horizontal`, and `.article-card--editorial`. They respond to the
+card's own inline-size container.
+
+`surface` composes canonical Card: `default` uses `.card`, `flat` adds
+`.card--flat`, and `elevated` adds `.card--elevated`. Article Card does not copy
+Card border, shadow, radius, color, hover, focus-within, or reduced-motion
+properties.
+
+`excerptLines` is `none | 2 | 3 | 4`. `none` renders the complete excerpt;
+numeric values apply an explicit visual CSS line clamp while preserving the
+complete supplied source text in DOM.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep the media and title links pointed at the same article destination.</Do>
-  <Dont>Do not turn target-formatted dates, reading time, taxonomy, or author data into root-level component behavior.</Dont>
+  <Do>Use one complete Link for media and title, compose Card and Badge canonically, and keep independent destinations outside that Link.</Do>
+  <Dont>Do not forward root clicks, nest controls inside the primary Link, duplicate Card visual properties, or mutate excerpt source content to fit the card.</Dont>
 </DoDont>
 
-Use `minimal` for text-led lists, `horizontal` for compact rows, `featured` for higher-emphasis placements, and `editorial` when the accent title treatment is appropriate. The skeleton selector is presentation evidence only: whether it belongs to Article Card or the standalone Skeleton component remains unresolved.
+- Use `minimal` for text-led lists, `horizontal` for compact rows, `featured`
+  for higher-emphasis placements, and `editorial` for the accent title profile.
+- Choose Card surface independently from the layout profile.
+- Keep category as a passive canonical Badge outside the primary Link.
+- Keep target-formatted metadata passive inside the Link. Put author Links,
+  taxonomy Links, and future controls outside it.
+- Omit optional parts instead of rendering empty wrappers.
+- Compose canonical Skeleton externally while loading and replace it with
+  Article Card only when authoritative data is ready. L1 has no loading variant,
+  `aria-busy` lifecycle, or internal Skeleton markup.
 
 ## Accessibility
 
-- Use an `article` element and a heading level that fits the surrounding page hierarchy.
-- Keep media and title as separate links instead of wrapping the complete card in one link.
-- Use useful image alternative text when media adds information. Use `alt=""` when linked media only repeats the adjacent title, as in the preview.
-- Preserve visible keyboard focus and do not rely on hover lift or image zoom to communicate the destination.
+- Use `article` and a contextual heading level that fits the surrounding page.
+- Render exactly one native primary Link containing the media and complete
+  visible title. It must have no nested interactive descendants.
+- Use useful image alternative text when media adds information and `alt=""`
+  only when decorative or redundant in context.
+- Use machine-readable `time[datetime]` values and hide visual-only separators.
+- Treat excerpt fitting as visual only. Do not place essential differentiating
+  information exclusively after a clamp point.
+- Preserve full-Link focus, native Tab/Enter/context-menu/modifier behavior,
+  forced colors, coarse pointers, and canonical Card reduced motion.
 
 ## References
 
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`standard`</td><td>`standard`, `featured`, `minimal`, `horizontal`, or `editorial`</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible article title</td></tr>
-  <tr><td>`href`</td><td>string</td><td>required</td><td>Shared media and title destination</td></tr>
-  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-owned article image or media</td></tr>
-  <tr><td>`imageAlt`</td><td>string</td><td>optional</td><td>Alternative text for informative article media</td></tr>
-  <tr><td>`category`</td><td>string</td><td>optional</td><td>Article category label</td></tr>
-  <tr><td>`metadata`</td><td>slot</td><td>optional</td><td>Target-formatted publication, reading, or taxonomy metadata</td></tr>
-  <tr><td>`excerpt`</td><td>string</td><td>optional</td><td>Short article excerpt</td></tr>
-  <tr><td>`author`</td><td>slot</td><td>optional</td><td>Target-owned author identity</td></tr>
+  <tr><td>`variant`</td><td>enum</td><td>`standard`</td><td>`standard`, `featured`, `minimal`, `horizontal`, or `editorial` layout</td></tr>
+  <tr><td>`surface`</td><td>enum</td><td>`default`</td><td>Canonical Card `default`, `flat`, or `elevated` surface</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Complete visible contextual article heading and Link name</td></tr>
+  <tr><td>`href`</td><td>string</td><td>required</td><td>One primary destination containing media and title</td></tr>
+  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-owned non-interactive article media inside the Link</td></tr>
+  <tr><td>`imageAlt`</td><td>string</td><td>optional</td><td>Contextual alternative text for article media</td></tr>
+  <tr><td>`category`</td><td>string</td><td>optional</td><td>Passive canonical Badge outside the Link</td></tr>
+  <tr><td>`metadata`</td><td>slot</td><td>optional</td><td>Passive target-formatted date, duration, or taxonomy content</td></tr>
+  <tr><td>`excerpt`</td><td>string</td><td>optional</td><td>Complete supplied article excerpt</td></tr>
+  <tr><td>`excerptLines`</td><td>enum</td><td>`none`</td><td>`none`, `2`, `3`, or `4` visual lines</td></tr>
+  <tr><td>`author`</td><td>slot</td><td>optional</td><td>Target-owned author identity or destination outside the Link</td></tr>
 </PropTable>
 
-Anatomy: `.article-card`, `.article-card__media`, `.article-card__category`, `.article-card__body`, `.article-card__meta`, `.article-card__meta-separator`, `.article-card__title`, `.article-card__excerpt`, `.article-card__author`, and `.article-card__author-name`.
+Anatomy: `.card.article-card`, `.article-card__category-slot`,
+`.article-card__category`, `.article-card__primary-link`,
+`.article-card__layout`, `.card__media.article-card__media`,
+`.card__body.article-card__body`, `.article-card__meta`,
+`.article-card__meta-separator`, `.article-card__title`,
+`.article-card__excerpt`, `.card__footer.article-card__author`, and
+`.article-card__author-name`.
 
-Dependency: [Badge](/components/badge). The contract remains `pilot`; `.article-card--skeleton` is not a semantic property or registered variant while its ownership remains unresolved.
+Dependencies: [Card](/components/card), [Badge](/components/badge), and external
+[Skeleton](/components/skeleton) composition while loading. The contract
+remains `pilot`; no automatic `stable` promotion is implied.
+
+- [HTML `article`](https://html.spec.whatwg.org/multipage/sections.html#the-article-element)
+- [HTML `a`](https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element)
+- [HTML `time`](https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-time-element)
+- [WAI Images Tutorial](https://www.w3.org/WAI/tutorials/images/)
+- [WCAG Technique H2](https://www.w3.org/WAI/WCAG22/Techniques/html/H2)
+- [WCAG Link Purpose in Context](https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html)
+- [CSS Overflow Level 4 `line-clamp`](https://drafts.csswg.org/css-overflow-4/#line-clamp)
+- [Open UI Card research](https://open-ui.org/components/card.research/)
+- [Radix Themes Card](https://www.radix-ui.com/themes/docs/components/card)
+- [Shopify Liquid `article`](https://shopify.dev/docs/api/liquid/objects/article)

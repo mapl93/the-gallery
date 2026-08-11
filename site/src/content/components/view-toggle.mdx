@@ -1,37 +1,86 @@
 ## Overview
 
-Two-button control for switching a collection between grid and list presentation.
+Grid / List View Toggle is the fixed two-value collection presentation choice.
+It composes canonical Segmented Control so the browser owns one native Radio
+value, one Tab entry point, logical arrow navigation, form data, events, disabled
+propagation, and reset. The neutral component requests a mode; the target owns
+the actual results, preference lifecycle, and any useful announcement.
 
-<Preview html={"<div class=\"view-toggle\" role=\"group\" aria-label=\"Collection view\" data-view=\"grid\"><button class=\"view-toggle__btn\" type=\"button\" aria-pressed=\"true\" aria-label=\"Grid view\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/></svg></button><button class=\"view-toggle__btn\" type=\"button\" aria-pressed=\"false\" aria-label=\"List view\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg></button></div>"} label="Grid / List View Toggle" />
+<Preview html={"<fieldset class=\"segmented view-toggle tg-preview-frame tg-preview-frame--sm\"><legend class=\"segmented__legend view-toggle__legend\">Collection view</legend><div class=\"segmented__options view-toggle__options\"><label class=\"segmented__item view-toggle__item\"><input class=\"segmented__input view-toggle__input\" type=\"radio\" name=\"collection-view-preview\" value=\"grid\" checked><span class=\"segmented__label view-toggle__label\"><svg class=\"view-toggle__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/></svg><span class=\"view-toggle__text\">Grid</span></span></label><label class=\"segmented__item view-toggle__item\"><input class=\"segmented__input view-toggle__input\" type=\"radio\" name=\"collection-view-preview\" value=\"list\"><span class=\"segmented__label view-toggle__label\"><svg class=\"view-toggle__icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01\"/></svg><span class=\"view-toggle__text\">List</span></span></label></div></fieldset>"} label="Grid / List View Toggle" />
 
 ## Presentation
 
-The active button uses the primary-action background and text tokens. Both controls share a compact border and preserve a 4px focus indicator.
+E5 follows the owner-provided direction: one joined pill-like surface, Grid and
+List as equal segments, a fixed decorative icon plus visible text in each, and
+an unambiguous active surface. The reference establishes hierarchy and
+interaction, not exact final colors or dimensions.
+
+The Fieldset keeps a visible Legend. The two segments remain horizontal and
+share available width; localized text can wrap at narrow sizes without becoming
+icon-only. Canonical Segmented Control supplies the 44px minimum target,
+selected/hover/focus/disabled states, dark mode, forced colors, and reduced
+motion. E5 adds only profile width, pill radius, icon gap, and icon/text
+containment.
+
+The visual surface is not the state owner: the checked native Radio is. There
+are no pressed Buttons, `aria-pressed` mirrors, custom roles, roving tabindex
+runtime, or E5 keyboard listener.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Offer the toggle only when both layouts provide meaningful value.</Do>
-  <Dont>Do not reset filters, sort order, or scroll position solely because the view changes.</Dont>
+  <Do>Render E5 only when both Grid and List are real, useful presentations of the same current results.</Do>
+  <Dont>Do not reset filters, sort, pagination, product identity, or selection merely because the presentation changes.</Dont>
 </DoDont>
 
-- Keep Grid and List in a stable order.
-- Apply the selected mode to the results region without moving focus.
-- Persist the preference only when the target product has a clear policy for it.
+- Keep exactly two fixed values in stable source order: `grid`, then `list`.
+- Grid is the neutral initial value. A target may initialize List only from an
+  explicit valid merchant, URL, or account preference.
+- Omit the component when only one meaningful layout exists or the target cannot
+  coordinate both result modes truthfully.
+- Keep Grid and List as visible localized text. The fixed icons are redundant
+  visual cues and are never public icon choices.
+- Apply the selected mode to the existing result owner. Preserve filters, sort,
+  pagination, and product identity; decide URL, scroll, focus, analytics, and
+  persistence in that target.
+- Neutral E5 stores nothing and creates no live region. A target may update one
+  pre-existing localized result status only when the mode change produces a
+  meaningful result presentation update.
+- Shopify needs an owning collection section, translated labels, merchant/default
+  policy, result mapping, optional URL/persistence coordination, editor behavior,
+  and live-store proof before it is target-ready.
 
 ## Accessibility
 
-- Give the group and both icon-only buttons accessible names.
-- Keep `aria-pressed` synchronized so exactly one view is active.
-- Use native buttons for Space and Enter behavior.
-- Disable both buttons when view switching is unavailable.
+- Preserve the canonical native Fieldset, visible Legend, and exactly two
+  same-name Radios. Do not add redundant `radiogroup`, `radio`, Button, or
+  `aria-pressed` semantics.
+- Keep exactly one checked value. Native Tab enters/exits the group; logical
+  arrows move focus and selection; Space selects the focused value.
+- Keep the Grid/List text visible and complete. Hide decorative icons with
+  `aria-hidden="true"`; icon, order, color, or selected surface never supplies
+  unique meaning.
+- Native Radios retain `input`/`change`, FormData, disabled propagation, and
+  reset. Controlled framework adapters project one value, not two booleans.
+- Keep focus on the selected segment unless the owning result workflow has a
+  separately reviewed focus policy.
+- Preserve 44px targets, effective 200% text, user text spacing, RTL, dark mode,
+  reduced motion, forced colors, and narrow-container wrapping.
 
 ## References
 
 <PropTable>
-  <tr><td>`groupLabel`</td><td>string</td><td>required</td><td>Accessible group name</td></tr>
-  <tr><td>`activeView`</td><td>enum</td><td>`grid`</td><td>`grid` or `list`</td></tr>
-  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables both native buttons</td></tr>
-  <tr><td>`data-view`</td><td>attribute</td><td>`grid`</td><td>Web view-state mapping</td></tr>
-  <tr><td>`.view-toggle__btn[aria-pressed=&quot;true&quot;]`</td><td>state</td><td>required</td><td>Active view button</td></tr>
+  <tr><td>`groupLabel`</td><td>string</td><td>required</td><td>Visible localized Legend naming the choice</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Native form name shared by both Radios</td></tr>
+  <tr><td>`gridLabel`</td><td>string</td><td>required</td><td>Visible localized Grid text</td></tr>
+  <tr><td>`listLabel`</td><td>string</td><td>required</td><td>Visible localized List text</td></tr>
+  <tr><td>`activeView`</td><td>enum</td><td>`grid`</td><td>Current `grid` or `list` value</td></tr>
+  <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the native Fieldset and both choices</td></tr>
+  <tr><td>`value`</td><td>fixed attribute</td><td>required</td><td>Stable per-option `grid` or `list` identity</td></tr>
 </PropTable>
+
+Static and uncontrolled Web markup authors one initial `checked` Radio.
+Controlled adapters project one `activeView` and one change callback. Both use
+the same native value and result-coordinator boundary.
+
+Primary evidence: [WAI-ARIA APG Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), [Open UI Radio Button research](https://open-ui.org/components/radio-button.research/), [Radix Segmented Control](https://www.radix-ui.com/themes/docs/components/segmented-control), and [Shopify collection templates](https://shopify.dev/docs/storefronts/themes/architecture/templates/collection).

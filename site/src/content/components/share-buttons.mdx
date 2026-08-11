@@ -1,37 +1,84 @@
 ## Overview
 
-Share Buttons arranges target-owned share links or actions in inline or column presentation. It does not choose providers, destinations, native sharing behavior, copy feedback, or fallbacks.
+Share Actions is one named, finite group of target-selected ways to share a
+resource. It composes canonical Button roots and owns only intrinsic group
+layout. It does not discover the current page, build provider URLs, call Web
+Share or Clipboard, claim success, choose fallbacks, or position a viewport
+rail.
+
+The registry slug remains `share-buttons` because `.share-buttons` is the
+accepted canonical CSS family. The public component name is Share Actions.
 
 ## Presentation
 
-<Preview html={'<div class="share-buttons share-buttons--inline" role="group" aria-label="Share this article"><button type="button">Share</button><button type="button">Copy link</button></div>'} label="Share Buttons" />
+<Preview html={'<div class="share-buttons share-buttons--inline" role="group" aria-label="Share this studio note"><button class="btn btn--outline btn--sm share-buttons__action" type="button"><span dir="auto">System share</span></button><button class="btn btn--outline btn--sm share-buttons__action" type="button"><span dir="auto">Copy link</span></button><a class="btn btn--outline btn--sm share-buttons__action" href="mailto:studio@example.com?subject=Studio%20note&amp;body=https%3A%2F%2Fexample.com%2Fstudio-note"><span dir="auto">Email</span></a><a class="btn btn--outline btn--sm share-buttons__action" href="#send-to-studio"><span dir="auto">Send to studio</span></a></div>'} label="Share Actions" />
 
-`inline` maps to `.share-buttons--inline` and is the default. `sticky` maps to `.share-buttons--sticky`, which changes the action layout to a column but does not itself position the component. Each action retains the semantics and presentation owned by its target control.
+`inline` wraps a row from the available container. `stacked` arranges the same
+ordered actions vertically. Neither mode owns fixed or sticky placement.
 
-## Usage Guidelines
+The Studio fixture demonstrates the curated `native`, `copy`, and `email` ids
+plus one arbitrary custom destination. Those choices, labels, order, icons and
+destinations are evidence data, not defaults.
+
+## Guidelines
 
 <DoDont>
-  <Do>Use links for provider destinations and buttons for native share or copy actions.</Do>
-  <Dont>Do not infer providers, URLs, icons, feedback, or fallback behavior from the static preview.</Dont>
+  <Do>Supply only actions the current target can truthfully perform, with complete localized labels and real destination href values.</Do>
+  <Dont>Do not render every built-in action, keep unavailable providers disabled, fake a successful copy/share, or silently substitute another action.</Dont>
 </DoDont>
 
-Which CSS family is canonical between `.share-buttons` and `.share` remains unresolved. The layer that owns provider URLs, Web Share, copy feedback, and fallbacks also remains unresolved. This contract maps only the registry-backed `.share-buttons` family.
+The accepted built-in semantic id catalogue is `native`, `copy`, `email`,
+`whatsapp`, `facebook`, `x`, `pinterest`, `linkedin`, `telegram`, `reddit`,
+`instagram`, `threads`, and `tiktok`. Consumers may also supply arbitrary custom
+canonical actions. An id is an adapter request, not a frozen URL, an installed
+provider, a support claim, or an automatic visual default.
+
+Native Share and Copy use `button type="button"`. Email, provider flows and
+custom destinations use anchors when they have real target-supplied href
+values. The target owns canonical URL/title/text/media, encoding, capability,
+permission, popup/new-context security, success/cancel/error, feedback,
+analytics and cleanup.
+
+Instagram and TikTok are target-capability actions. Generic Web targets must
+omit them unless an official current SDK/app flow is configured. Native Share
+is a separate explicit action and cannot be relabelled as a guaranteed provider
+destination.
 
 ## Accessibility
 
-- Give the action group a useful accessible name when surrounding text does not identify it.
-- Use links for destinations and native buttons for actions.
-- Give icon-only actions provider-specific accessible names.
-- Preserve each composed control's visible focus and keyboard behavior.
-- Announce copy success or failure through the target action's accepted feedback pattern.
+- Use one non-empty localized `aria-label` on the ordinary `role="group"`.
+- Keep a complete visible name on every action. Icon-only density requires a
+  separately approved named Icon Button composition.
+- Preserve ordinary Tab order and native Enter/Space activation. This is not a
+  Toolbar, menu, selectable group or roving-focus widget.
+- Omit unavailable actions rather than exposing focusable dead controls.
+- Let canonical Button own focus, hover, active, disabled, busy, forced-colors,
+  target size and reduced-motion behavior.
+- Announce asynchronous results only through the target's accepted truthful
+  status pattern after the underlying operation resolves. User cancellation is
+  not automatically an error.
+- Keep fixed placement, safe areas, collision avoidance, responsive relocation
+  and print behavior in the page host or a separately reviewed Share Rail.
 
-## References
+References: [HTML Button](https://html.spec.whatwg.org/multipage/form-elements.html#the-button-element), [APG Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/), [ARIA group](https://www.w3.org/TR/wai-aria-1.2/#group), [Web Share](https://www.w3.org/TR/web-share/), [Clipboard](https://www.w3.org/TR/clipboard-apis/), [Telegram Sharing Button](https://core.telegram.org/widgets/share), [Pinterest Save Button](https://developers.pinterest.com/docs/web-features/buttons/), [LinkedIn Share Plugin](https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/plugins/share-plugin), and [TikTok Share Kit](https://developers.tiktok.com/products/share-kit).
+
+## Specification
 
 <PropTable>
-  <tr><td>`variant`</td><td>enum</td><td>`inline`</td><td>`inline` or `sticky`</td></tr>
-  <tr><td>`actions`</td><td>slot</td><td>required</td><td>Target-owned share links or buttons</td></tr>
+  <tr><td>`variant`</td><td>`inline | stacked`</td><td>`inline`</td><td>Intrinsic group layout; never viewport placement</td></tr>
+  <tr><td>`label`</td><td>string</td><td>required</td><td>Non-empty localized accessible group name</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>required</td><td>One or more ordered target-capable canonical Button or anchor Button actions</td></tr>
 </PropTable>
 
-Anatomy: `.share-buttons`. Registered modifiers: `.share-buttons--inline` and `.share-buttons--sticky`.
+Anatomy: `.share-buttons` and `.share-buttons__action`. Variants:
+`.share-buttons--inline` and `.share-buttons--stacked`. The former `.share`,
+`.share__btn`, `.share--sticky`, and `.share-buttons--sticky` identities are
+removed before v1.
 
-Dependencies: none. The contract remains `pilot`; the canonical share family and ownership of all provider behavior and feedback are explicitly unresolved.
+The base is fail-closed: a blank group label or zero valid actions emits no
+root. Duplicate action ids and blank action labels are invalid. The neutral
+component adds zero JavaScript; adapters own every capability and result.
+
+Dependency: canonical Button. Contract status remains `pilot`; final visuals,
+concrete Web/Shopify consumers, provider verification, L9-specific Figma
+evidence and explicit human review are still required.

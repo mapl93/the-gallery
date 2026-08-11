@@ -1,38 +1,75 @@
 ## Overview
 
-Empty collection result with clear guidance and an optional recovery action.
+Collection-specific resolved-empty profile with zero intentional visual
+divergence from canonical Empty State. The owning target selects it only after
+collection results are resolved, supplies truthful localized content, replaces
+stale results, and composes at most one recovery action.
 
-<Preview html={"<section class=\"empty-collection\"><h2 class=\"empty-collection__heading\">No works found</h2><p class=\"empty-collection__text\">Try removing a filter or exploring the full collection.</p><a class=\"empty-collection__cta\" href=\"#all-works\">Clear filters</a></section>"} label="Empty Collection State" />
+<Preview html={'<div class="empty-state empty-collection tg-preview-frame--md"><div class="empty-state__icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 16h6"/><path d="m19 13 3 3-3 3"/><path d="M21 10.5V6a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 6v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" x2="12" y1="22" y2="12"/></svg></div><h2 class="empty-state__title">No works found</h2><p class="empty-state__message">Try removing a filter or exploring the full collection.</p><button class="btn" type="button">Clear filters</button></div>'} label="Empty Collection State" />
 
 ## Presentation
 
-The message remains centered and intentionally sparse. An optional passive icon may reinforce the state, while the recovery action uses the primary button family.
+`.empty-collection` is a Collection-domain hook layered on `.empty-state`; it adds no independent visual API. Canonical Empty State owns centered composition, optional decorative icon, title/message typography, semantic spacing, container response, wrapping, light/dark behavior and optional action placement. Canonical Button or Link owns action presentation and behavior.
+
+The full candidate is intentionally sparse. The icon, copy and Clear filters Button are Studio fixtures, not defaults. Final center alignment, icon treatment, hierarchy, spacing, measure and action prominence require human visual review.
+
+<Preview html={'<div class="empty-state empty-collection tg-preview-frame--md"><h3 class="empty-state__title">This collection is waiting for its first work</h3><p class="empty-state__message">Explore the complete catalogue while this edit is being prepared.</p><a class="link" href="#all-works">Browse all works</a></div>'} label="Navigation recovery" />
+
+<Preview html={'<div class="empty-state empty-collection tg-preview-frame--sm"><h3 class="empty-state__title">No works are available</h3></div>'} label="Title only" />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Explain why no results are visible and offer the most direct recovery.</Do>
-  <Dont>Do not present an empty state when results are still loading.</Dont>
+  <Do>Select E7 from authoritative resolved collection state and offer one truthful recovery path.</Do>
+  <Dont>Do not show it while results are loading or leave stale cards and Pagination focus stops beside it.</Dont>
 </DoDont>
 
-- Tailor the guidance to filtered, searched, or genuinely empty inventory states.
-- Use one primary recovery action.
-- Remove the CTA when no honest recovery path exists.
+- Use concise localized title text that identifies the actual absence. Omit the complete profile when title is blank.
+- Use `message` only when it explains the cause or useful next step without repeating the title.
+- Keep the icon decorative and text-redundant. A meaningful illustration needs a different alternative-text contract.
+- Compose Button when recovery is a command such as an in-place reset. Compose Link when recovery navigates to a real URL. Do not invent a destination.
+- The parent collection target decides whether active filters/sort controls remain useful and atomically replaces Grid and Pagination output.
+- Do not expose no-inventory/no-results cause variants. Empty source inventory,
+  filtered/search zero and merchandising exclusion remain target lifecycle facts
+  expressed through truthful content and available recovery.
 
 ## Accessibility
 
-- Make the message understandable without the optional icon.
-- Move focus only when the surrounding workflow explicitly requires it.
-- Announce the transition to an empty result set when it follows an asynchronous action.
-- Keep the recovery label specific to its effect.
+- Render `title` in the contextual native heading selected by the host under ADR 0236. The docs target uses H2; heading rank is not an E7 property or visual control.
+- Keep static or route-rendered E7 as ordinary content with no role, landmark, `tabindex`, focus trap or automatic live region.
+- If an in-place filter, search, removal or section update produces a qualifying “no results” status message, announce concise target-owned text through a pre-existing Status owner without moving focus or duplicating the full visible title.
+- Use one native canonical Button or Link with a descriptive accessible name and preserve its keyboard, focus, disabled/loading, forced-color and reduced-motion behavior.
+- Remove stale result and Pagination focus stops in the same transition. Deliberately preserve useful filter controls when they are the recovery path.
+- Do not use E7 for loading, generic error, permissions, offline or unresolved data states.
+- Long localized, unbroken and bidirectional content must grow and wrap without clipping at narrow containers, text spacing and 200% zoom.
 
 ## References
 
+### Dependencies
+
+- [Empty State](/components/empty-state)
+- [Button](/components/button)
+- [Link](/components/link)
+
+### API Reference
+
 <PropTable>
-  <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Passive empty-state icon</td></tr>
-  <tr><td>`heading`</td><td>string</td><td>required</td><td>Empty-state heading</td></tr>
-  <tr><td>`text`</td><td>string</td><td>optional</td><td>Recovery guidance</td></tr>
-  <tr><td>`ctaLabel`</td><td>string</td><td>optional</td><td>Recovery action label</td></tr>
-  <tr><td>`href`</td><td>string</td><td>optional</td><td>Recovery destination</td></tr>
-  <tr><td>`.empty-collection__cta`</td><td>class</td><td>optional</td><td>Primary recovery action</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible collection-absence title</td></tr>
+  <tr><td>`message`</td><td>string</td><td>optional</td><td>Concise localized explanation or next step</td></tr>
+  <tr><td>`icon`</td><td>slot</td><td>optional</td><td>Decorative canonical Empty State icon</td></tr>
+  <tr><td>`action`</td><td>slot</td><td>optional</td><td>One canonical Button command or Link navigation</td></tr>
 </PropTable>
+
+E7 exposes no cause/reason, loading, error, result count, heading level, action label/destination/callback, focus target, announcement, icon name, variant, size, event, visual token or controlled/uncontrolled property. Those decisions belong to the target or canonical dependencies.
+
+### Research
+
+- [WAI Status Messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+- [WAI heading structure](https://www.w3.org/WAI/tutorials/page-structure/headings/)
+- [Open UI component index](https://open-ui.org/components/)
+- [Radix Primitives](https://www.radix-ui.com/primitives/docs/overview/introduction)
+- [Shopify POS EmptyState](https://shopify.dev/docs/api/pos-ui-extensions/2026-01/web-components/layout-and-structure/emptystate)
+- [Shopify collection object](https://shopify.dev/docs/api/liquid/objects/collection)
+- [Shopify storefront filtering](https://shopify.dev/docs/storefronts/themes/navigation-search/filtering/tag-filtering)
+- [Atlassian Empty State](https://atlassian.design/components/empty-state)
+- [Carbon Empty States](https://v10.carbondesignsystem.com/patterns/empty-states-pattern/)

@@ -1,4 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FocusEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+} from 'react';
 import { ChevronDown, Copy, Pencil, Trash2 } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
@@ -20,6 +30,7 @@ interface MenuFixtureItem {
   icon: typeof Copy;
   shortcut?: string;
   danger?: boolean;
+  disabled?: boolean;
 }
 
 function defaultValue(contract: ComponentContract, property: ContractProperty): StudioPropertyValue {
@@ -63,7 +74,19 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [highlightedItem, setHighlightedItem] = useState(0);
-  const menuItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [hoverCardDismissed, setHoverCardDismissed] = useState(false);
+  const [hoverCardInspectionOpen, setHoverCardInspectionOpen] = useState(true);
+  const [contextPosition, setContextPosition] = useState<{ left: number; top: number } | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const surfaceRef = useRef<HTMLDivElement | null>(null);
+  const contextAnchorRef = useRef<HTMLDivElement | null>(null);
+  const popoverId = useId();
+  const dropdownTriggerId = useId();
+  const dropdownMenuId = useId();
+  const dropdownGroupLabelId = useId();
+  const contextTriggerId = useId();
+  const contextMenuId = useId();
+  const contextGroupLabelId = useId();
 
   useEffect(() => {
     const read = () => {
@@ -86,44 +109,171 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
     if (next) setHighlightedItem(0);
   }
 
+  useEffect(() => {
+    if (!open || !['popover', 'popup', 'dropdown-menu', 'context-menu'].includes(contract.slug)) return undefined;
+    const dismissOutside = (event: globalThis.PointerEvent) => {
+      const target = event.target as Node;
+      if (triggerRef.current?.contains(target) || surfaceRef.current?.contains(target)) return;
+      setValues((current) => ({ ...current, open: false }));
+    };
+    document.addEventListener('pointerdown', dismissOutside, true);
+    return () => document.removeEventListener('pointerdown', dismissOutside, true);
+  }, [contract.slug, open]);
+
+  useEffect(() => {
+    if (!open || contract.slug !== 'context-menu') return undefined;
+    const dismissForViewportChange = () => {
+      setValues((current) => ({ ...current, open: false }));
+      requestAnimationFrame(() => triggerRef.current?.focus());
+    };
+    window.addEventListener('resize', dismissForViewportChange);
+    window.addEventListener('scroll', dismissForViewportChange, true);
+    return () => {
+      window.removeEventListener('resize', dismissForViewportChange);
+      window.removeEventListener('scroll', dismissForViewportChange, true);
+    };
+  }, [contract.slug, open]);
+
+  useEffect(() => {
+    if (!open || contract.slug !== 'context-menu' || contextPosition) return undefined;
+    const frame = requestAnimationFrame(() => {
+      const trigger = triggerRef.current?.getBoundingClientRect();
+      if (trigger) positionContextMenu(trigger.left, trigger.bottom + 4);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, contextPosition, open]);
+
+  function closeAndRestoreFocus() {
+    setOpen(false);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  }
+
+  function menuItems(): HTMLButtonElement[] {
+    return Array.from(surfaceRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []);
+  }
+
+  function focusMenuItem(index: number) {
+    const items = menuItems();
+    if (!items.length) return;
+    const next = (index + items.length) % items.length;
+    setHighlightedItem(next);
+    requestAnimationFrame(() => items[next]?.focus());
+  }
+
+  function openMenu(index: number) {
+    setOpen(true);
+    requestAnimationFrame(() => focusMenuItem(index));
+  }
+
+  function positionContextMenu(clientX: number, clientY: number) {
+    const anchor = contextAnchorRef.current;
+    const surface = surfaceRef.current;
+    if (!anchor || !surface) return;
+    const bounds = anchor.getBoundingClientRect();
+    const trigger = triggerRef.current?.getBoundingClientRect();
+    const invocationX = Number.isFinite(clientX) ? clientX : trigger?.left ?? bounds.left;
+    const invocationY = Number.isFinite(clientY) ? clientY : trigger?.bottom ?? bounds.top;
+    const inset = 8;
+    const left = Math.min(
+      Math.max(invocationX - bounds.left, inset),
+      Math.max(inset, bounds.width - surface.offsetWidth - inset),
+    );
+    const top = Math.min(
+      Math.max(invocationY - bounds.top, inset),
+      Math.max(inset, bounds.height - surface.offsetHeight - inset),
+    );
+    setContextPosition({ left, top });
+  }
+
+  function openContextMenuAt(clientX: number, clientY: number) {
+    setOpen(true);
+    requestAnimationFrame(() => {
+      positionContextMenu(clientX, clientY);
+      focusMenuItem(0);
+    });
+  }
+
+  function moveFocusFromMenu(reverse: boolean) {
+    const focusableSelector = [
+      'a[href]',
+      'button:not(:disabled)',
+      'input:not(:disabled)',
+      'select:not(:disabled)',
+      'textarea:not(:disabled)',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+    const focusables = Array.from(document.querySelectorAll<HTMLElement>(focusableSelector)).filter((element) => (
+      !surfaceRef.current?.contains(element)
+      && element.getClientRects().length > 0
+      && element.getAttribute('aria-hidden') !== 'true'
+    ));
+    const triggerIndex = triggerRef.current ? focusables.indexOf(triggerRef.current) : -1;
+    const fallbackIndex = reverse ? focusables.length - 1 : 0;
+    const nextIndex = triggerIndex < 0
+      ? fallbackIndex
+      : (triggerIndex + (reverse ? -1 : 1) + focusables.length) % focusables.length;
+    const next = focusables[nextIndex];
+    setOpen(false);
+    requestAnimationFrame(() => next?.focus());
+  }
+
   function reset() {
     setValues({ ...initialValues });
     setHighlightedItem(0);
+    setHoverCardDismissed(false);
+    setHoverCardInspectionOpen(true);
+    setContextPosition(null);
     setTokenOverrides({});
   }
 
   function menuKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    const itemCount = menuItemRefs.current.length;
+    const items = menuItems();
+    const itemCount = items.length;
     if (!itemCount) return;
-    let next = highlightedItem;
-    if (event.key === 'ArrowDown') next = (highlightedItem + 1) % itemCount;
-    else if (event.key === 'ArrowUp') next = (highlightedItem - 1 + itemCount) % itemCount;
+    const focusedIndex = items.indexOf(document.activeElement as HTMLButtonElement);
+    const current = focusedIndex >= 0 ? focusedIndex : highlightedItem;
+    let next = current;
+    if (event.key === 'ArrowDown') next = (current + 1) % itemCount;
+    else if (event.key === 'ArrowUp') next = (current - 1 + itemCount) % itemCount;
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = itemCount - 1;
     else if (event.key === 'Escape') {
       event.preventDefault();
-      setOpen(false);
+      closeAndRestoreFocus();
       return;
+    } else if (event.key === 'Tab') {
+      event.preventDefault();
+      moveFocusFromMenu(event.shiftKey);
+      return;
+    } else if (event.key.length === 1 && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      const query = event.key.toLocaleLowerCase();
+      const ordered = [...items.slice(current + 1), ...items.slice(0, current + 1)];
+      const match = ordered.find((item) => item.textContent?.trim().toLocaleLowerCase().startsWith(query));
+      if (!match) return;
+      next = items.indexOf(match);
     } else return;
     event.preventDefault();
-    setHighlightedItem(next);
-    menuItemRefs.current[next]?.focus();
+    focusMenuItem(next);
   }
 
-  function renderMenuItems(context = false) {
+  function renderMenuItems(context = false, group: 'all' | 'primary' | 'danger' = 'all') {
     const items: MenuFixtureItem[] = context
       ? [
           { label: 'Copy reference', icon: Copy },
           { label: 'Edit record', icon: Pencil },
+          { label: 'Export record', icon: Copy, disabled: true },
           { label: 'Remove record', icon: Trash2, danger: true },
         ]
       : [
           { label: 'Edit artwork', icon: Pencil, shortcut: 'E' },
           { label: 'Duplicate', icon: Copy, shortcut: 'D' },
+          { label: 'Export certificate', icon: Copy, disabled: true },
           { label: 'Delete', icon: Trash2, shortcut: 'Del', danger: true },
         ];
 
-    return items.map((item, index) => {
+    return items.map((item, index) => ({ item, index })).filter(({ item }) => (
+      group === 'all' || (group === 'danger' ? item.danger : !item.danger)
+    )).map(({ item, index }) => {
       const Icon = item.icon;
       const danger = item.danger && (context || values.itemVariant === 'danger');
       return (
@@ -132,10 +282,19 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
           type="button"
           role="menuitem"
           key={item.label}
-          ref={(element) => { menuItemRefs.current[index] = element; }}
+          tabIndex={highlightedItem === index ? 0 : -1}
+          aria-disabled={item.disabled || undefined}
+          data-disabled={item.disabled || undefined}
           data-highlighted={highlightedItem === index || undefined}
           onPointerMove={() => setHighlightedItem(index)}
-          onClick={() => setOpen(false)}
+          onFocus={() => setHighlightedItem(index)}
+          onClick={(event) => {
+            if (item.disabled) {
+              event.preventDefault();
+              return;
+            }
+            closeAndRestoreFocus();
+          }}
         >
           <Icon className="dropdown__item-icon" aria-hidden="true" />
           <span>{item.label}</span>
@@ -146,28 +305,58 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   }
 
   function renderPreview() {
-    if (contract.slug === 'popover') {
+    if (contract.slug === 'popover' || contract.slug === 'popup') {
+      const dimensionFields = [
+        ['Width', '100%'],
+        ['Max. width', '300px'],
+        ['Height', '25px'],
+        ['Max. height', 'none'],
+      ] as const;
       return (
         <div className="docs-studio__floating-anchor">
           <button
             className="btn btn--outline"
             type="button"
-            aria-haspopup="dialog"
+            ref={triggerRef}
             aria-expanded={open}
-            aria-controls="studio-popover"
+            aria-controls={popoverId}
             onClick={() => setOpen(!open)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Escape' || !open) return;
+              event.preventDefault();
+              closeAndRestoreFocus();
+            }}
           >
-            Artwork details
+            Open popover
           </button>
           <div
             className={`popover docs-studio__preview-popover${open ? ' popover--open' : ''}`}
-            id="studio-popover"
-            role="dialog"
-            aria-label="Artwork details"
+            id={popoverId}
+            ref={surfaceRef}
+            aria-hidden={!open}
+            hidden={!open}
+            onKeyDown={(event) => {
+              if (event.key !== 'Escape') return;
+              event.preventDefault();
+              closeAndRestoreFocus();
+            }}
           >
             <div className="popover__arrow" aria-hidden="true" />
-            <p className="popover__title">Stoneware vessel</p>
-            <div className="popover__content">Hand-thrown and finished with a satin celadon glaze.</div>
+            <p className="popover__title">Dimensions</p>
+            <div className="popover__content">
+              <p className="docs-studio__popover-description">Set the dimensions for the layer.</p>
+              <div className="docs-studio__popover-fields">
+                {dimensionFields.map(([label, value], index) => {
+                  const fieldId = `${popoverId}-dimension-${index}`;
+                  return (
+                    <div className="docs-studio__popover-field" key={label}>
+                      <label htmlFor={fieldId}>{label}</label>
+                      <input className="input__field docs-studio__popover-input" id={fieldId} defaultValue={value} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -175,11 +364,32 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
 
     if (contract.slug === 'hover-card') {
       return (
-        <div className="hover-card docs-studio__preview-hover-card docs-studio__preview-hover-card--open">
+        <div
+          className={`hover-card docs-studio__preview-hover-card${hoverCardInspectionOpen ? ' docs-studio__preview-hover-card--open' : ''}${hoverCardDismissed ? ' hover-card--dismissed' : ''}`}
+          onPointerEnter={() => setHoverCardInspectionOpen(false)}
+          onPointerLeave={() => {
+            setHoverCardDismissed(false);
+            setHoverCardInspectionOpen(false);
+          }}
+          onFocus={() => {
+            setHoverCardDismissed(false);
+            setHoverCardInspectionOpen(false);
+          }}
+          onBlur={(event: FocusEvent<HTMLDivElement>) => {
+            if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+            setHoverCardDismissed(false);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== 'Escape') return;
+            event.preventDefault();
+            setHoverCardDismissed(true);
+            setHoverCardInspectionOpen(false);
+          }}
+        >
           <a className="link" href="#studio-artist" onClick={(event) => event.preventDefault()}>View artist</a>
           <div className="hover-card__content">
-            <strong>Lucia Ferrer</strong>
-            <p>Clay studies shaped by coastal geology and quiet repetition.</p>
+            <p className="hover-card__title">Lucia Ferrer</p>
+            <p className="hover-card__description">Clay studies shaped by coastal geology and quiet repetition.</p>
           </div>
         </div>
       );
@@ -187,57 +397,115 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
 
     if (contract.slug === 'dropdown-menu') {
       return (
-        <div className={`dropdown docs-studio__preview-dropdown${open ? ' dropdown--open' : ''}`}>
-          <button
-            className="btn btn--outline"
-            type="button"
-            aria-haspopup="menu"
-            aria-expanded={open}
-            aria-controls="studio-dropdown-menu"
-            onClick={() => setOpen(!open)}
-          >
-            Actions
-            <ChevronDown className="btn__icon btn__icon--trailing" aria-hidden="true" />
-          </button>
-          <div
-            className="dropdown__menu"
-            id="studio-dropdown-menu"
-            role="menu"
-            aria-label="Artwork actions"
-            onKeyDown={menuKeyDown}
-          >
-            <div className="dropdown__label">Artwork</div>
-            {renderMenuItems()}
+        <div className="docs-studio__floating-menu-anchor">
+          <div className={`dropdown docs-studio__preview-dropdown${open ? ' dropdown--open' : ''}`}>
+            <button
+              className="btn btn--outline"
+              type="button"
+              id={dropdownTriggerId}
+              ref={triggerRef}
+              aria-haspopup="menu"
+              aria-expanded={open}
+              aria-controls={dropdownMenuId}
+              onClick={() => (open ? setOpen(false) : openMenu(0))}
+              onKeyDown={(event) => {
+                if (event.key === 'ArrowDown') {
+                  event.preventDefault();
+                  openMenu(0);
+                } else if (event.key === 'ArrowUp') {
+                  event.preventDefault();
+                  openMenu(-1);
+                } else if (event.key === 'Escape' && open) {
+                  event.preventDefault();
+                  closeAndRestoreFocus();
+                }
+              }}
+            >
+              Actions
+              <ChevronDown className="btn__icon btn__icon--trailing" aria-hidden="true" />
+            </button>
+            <div
+              className="dropdown__menu"
+              id={dropdownMenuId}
+              ref={surfaceRef}
+              role="menu"
+              aria-labelledby={dropdownTriggerId}
+              aria-hidden={!open}
+              onKeyDown={menuKeyDown}
+            >
+              <div className="dropdown__group" role="group" aria-labelledby={dropdownGroupLabelId}>
+                <div className="dropdown__label" id={dropdownGroupLabelId}>Artwork</div>
+                {renderMenuItems(false, 'primary')}
+              </div>
+              <div className="dropdown__separator" role="separator" />
+              <div className="dropdown__group" role="group" aria-label="Destructive actions">
+                {renderMenuItems(false, 'danger')}
+              </div>
+            </div>
           </div>
         </div>
       );
     }
 
-    function openContextMenu(event: MouseEvent<HTMLElement>) {
+    function openContextMenu(event: MouseEvent<HTMLButtonElement>) {
       event.preventDefault();
-      setOpen(true);
+      openContextMenuAt(event.clientX, event.clientY);
     }
 
     return (
-      <div className="docs-studio__context-anchor" onContextMenu={openContextMenu}>
+      <div className="docs-studio__context-anchor" ref={contextAnchorRef}>
         <button
           className="btn btn--outline"
           type="button"
+          id={contextTriggerId}
+          ref={triggerRef}
           aria-haspopup="menu"
           aria-expanded={open}
-          aria-controls="studio-context-menu"
-          onClick={() => setOpen(!open)}
+          aria-controls={contextMenuId}
+          onContextMenu={openContextMenu}
+          onClick={(event) => {
+            if (open) {
+              closeAndRestoreFocus();
+              return;
+            }
+            const rect = event.currentTarget.getBoundingClientRect();
+            openContextMenuAt(rect.left, rect.bottom + 4);
+          }}
+          onKeyDown={(event) => {
+            if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
+              event.preventDefault();
+              const rect = event.currentTarget.getBoundingClientRect();
+              openContextMenuAt(rect.left, rect.bottom + 4);
+            } else if (event.key === 'ArrowDown') {
+              event.preventDefault();
+              const rect = event.currentTarget.getBoundingClientRect();
+              openContextMenuAt(rect.left, rect.bottom + 4);
+            } else if (event.key === 'Escape' && open) {
+              event.preventDefault();
+              closeAndRestoreFocus();
+            }
+          }}
         >
           Artwork actions
         </button>
         <div
           className={`context-menu docs-studio__preview-context-menu${open ? ' context-menu--open' : ''}`}
-          id="studio-context-menu"
+          id={contextMenuId}
+          ref={surfaceRef}
           role="menu"
-          aria-label="Artwork context actions"
+          aria-labelledby={contextTriggerId}
+          aria-hidden={!open}
+          style={contextPosition ? { left: contextPosition.left, top: contextPosition.top } : undefined}
           onKeyDown={menuKeyDown}
         >
-          {renderMenuItems(true)}
+          <div className="dropdown__group" role="group" aria-labelledby={contextGroupLabelId}>
+            <div className="dropdown__label" id={contextGroupLabelId}>Artwork</div>
+            {renderMenuItems(true, 'primary')}
+          </div>
+          <div className="dropdown__separator" role="separator" />
+          <div className="dropdown__group" role="group" aria-label="Destructive actions">
+            {renderMenuItems(true, 'danger')}
+          </div>
         </div>
       </div>
     );
@@ -246,13 +514,19 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   const activeTokens: Record<string, string | null> = {
     surface: '--color-surface-primary',
     border: '--color-border-subtle',
+    focus: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-border-focus' : null,
     text: '--color-text-primary',
-    secondary: contract.slug === 'hover-card' ? null : '--color-text-secondary',
+    secondary: '--color-text-secondary',
     hover: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-surface-secondary' : null,
     disabled: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-text-disabled' : null,
     danger: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-feedback-error-default' : null,
     radius: contract.slug === 'hover-card' ? '--radius-lg' : '--radius-md',
     shadow: contract.slug === 'hover-card' ? '--shadow-xl' : '--shadow-lg',
+    'body-size': '--typo-body-size',
+    'body-small': ['popover', 'popup', 'hover-card'].includes(contract.slug) ? '--typo-body-sm-size' : null,
+    caption: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--typo-caption-size' : null,
+    spacing: '--space-layout-element-gap',
+    'touch-target': ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--space-layout-touch-target' : null,
     transition: contract.slug === 'hover-card' ? '--transition-base' : '--transition-fast',
   };
 

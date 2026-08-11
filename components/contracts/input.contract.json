@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.6.0",
+  "contractVersion": "0.7.0",
   "slug": "input",
   "name": "Input",
   "registryId": "A2",
   "category": "primitives",
   "status": "pilot",
-  "summary": "Text input with a visible label, optional supporting message, validation variants, and independent passive leading and trailing icon slots.",
+  "summary": "Native single-line text input with form semantics, visible labeling, optional supporting feedback, validation variants, and independent passive icon slots.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/input",
@@ -123,6 +123,11 @@
       "description": "Unavailable input state."
     },
     {
+      "name": "readOnly",
+      "selectors": [".input__field:read-only:not(:disabled)"],
+      "description": "Focusable native state whose value can be selected and submitted but not edited."
+    },
+    {
       "name": "errorFocusVisible",
       "selectors": [".input--error .input__field:focus-visible"],
       "description": "Focused error variant state."
@@ -171,6 +176,23 @@
       "description": "Unavailable fields use the native disabled attribute, which supplies form and focus behavior in addition to the visual disabled state."
     },
     {
+      "name": "nativeValueOwnership",
+      "selectors": [".input__field"],
+      "attributes": [
+        "value content attribute establishes the initial HTML value",
+        "value IDL property represents the live value"
+      ],
+      "events": ["input", "change", "form reset"],
+      "description": "Static HTML remains natively uncontrolled after its initial value. Framework adapters may bind the live value property and native events for controlled use without introducing a second value owner."
+    },
+    {
+      "name": "nativeFormSemantics",
+      "selectors": [".input__field"],
+      "attributes": ["name", "required", "readonly", "autocomplete", "minlength", "maxlength"],
+      "events": ["constraint validation", "form submit"],
+      "description": "Stable single-line form semantics stay on the sole native input owner; visual required communication remains author content in the visible label or associated instructions."
+    },
+    {
       "name": "passiveIconComposition",
       "selectors": [
         ".input__control",
@@ -213,6 +235,102 @@
             "elements": ["input"]
           }
         ]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name used to identify the submitted value.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".input__field",
+          "attribute": "name",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Participates in native required-value constraint validation; the visible label or associated instructions must also communicate the requirement.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".input__field",
+          "attribute": "required",
+          "values": { "true": "", "false": null },
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "readOnly",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Prevents native editing while preserving focus, selection, and form submission.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".input__field",
+          "attribute": "readonly",
+          "values": { "true": "", "false": null },
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "autocomplete",
+      "type": "string",
+      "required": false,
+      "description": "Native autofill hint, including standard autocomplete tokens and optional section or address-group prefixes.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".input__field",
+          "attribute": "autocomplete",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "minLength",
+      "type": "number",
+      "required": false,
+      "minimum": 0,
+      "step": 1,
+      "description": "Optional native minimum character length used by constraint validation.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".input__field",
+          "attribute": "minlength",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
+      }
+    },
+    {
+      "name": "maxLength",
+      "type": "number",
+      "required": false,
+      "minimum": 0,
+      "step": 1,
+      "description": "Optional native maximum character length accepted by the field.",
+      "targetMappings": {
+        "web": [{
+          "kind": "attribute",
+          "selector": ".input__field",
+          "attribute": "maxlength",
+          "valueFrom": "property",
+          "elements": ["input"]
+        }]
       }
     },
     {
@@ -392,7 +510,9 @@
     "Associate every input field with a visible label using matching for/id attributes or an equivalent accessible name.",
     "Use aria-describedby to connect supporting or validation messages to the input when messages are present.",
     "Use aria-invalid=\"true\" for error states; do not apply aria-invalid for success or warning.",
-    "Use native disabled when the field is unavailable.",
+    "Use native required, readonly, disabled, autocomplete, minlength, and maxlength semantics instead of recreating them with ARIA or script.",
+    "Communicate a required field visibly in the label or associated instructions; the native required attribute alone is not a visual instruction.",
+    "Use readOnly when a value remains focusable, selectable, and submittable; use disabled only when the field is unavailable.",
     "Do not rely on icon color alone to communicate validation status.",
     "Treat leading and trailing icon slots as decorative or status cues; use a specialized component for interactive field actions."
   ],
@@ -400,16 +520,17 @@
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/primitives.css."
+      "notes": "Canonical CSS styles the native input; static HTML is uncontrolled after its initial value while adapters may bind the live value property and native events."
     },
     "shopify": {
       "status": "implemented",
       "kind": "liquid-css-class",
-      "notes": "Shopify Liquid can render labels, native input elements, and validation messages with the same class contract."
+      "notes": "Shopify Liquid can render labels, native input elements, form attributes, and validation messages with the same class contract."
     },
     "react": {
       "status": "planned",
-      "kind": "component"
+      "kind": "component",
+      "notes": "A future adapter maps controlled value/onInput or an uncontrolled initial value to the same native input owner."
     },
     "figma": {
       "status": "planned",

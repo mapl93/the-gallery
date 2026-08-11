@@ -1,41 +1,81 @@
 ## Overview
 
-Dimensions pairs required textual measurements with optional diagram content and target-owned unit controls.
+Dimensions Display presents one required, target-formatted native measurement list with an optional explanatory visual and an optional canonical exclusive unit choice. The visible list remains authoritative; R5 does not measure, convert, round, localize, or infer values from media.
 
-<Preview html={'<section class="dimensions tg-preview-frame tg-preview-frame--sm" aria-label="Vessel dimensions"><div class="dimensions__visual"><div class="tg-preview-media tg-preview-media--portrait" role="img" aria-label="Diagram of a tall vessel with height and width annotations"></div></div><dl class="dimensions__table"><dt>Height</dt><dd>25 cm</dd><dt>Width</dt><dd>12 cm</dd><dt>Weight</dt><dd>450 g</dd></dl><div class="dimensions__unit-toggle" role="group" aria-label="Measurement unit"><button type="button" aria-pressed="true">cm</button><button type="button" aria-pressed="false">in</button></div></section>'} label="Dimensions Display" />
+<Preview html={'<div class="dimensions dimensions--with-visual tg-preview-frame tg-preview-frame--md"><figure class="dimensions__visual"><img src="/media/editorial/ceramic-tableware.jpg" alt="Nested ceramic bowls on a studio table" width="1800" height="2700"><div class="dimensions__annotations" aria-hidden="true"><span class="dimensions__label dimensions__label--height">Height · 12&nbsp;cm</span><span class="dimensions__label dimensions__label--diameter">Maximum diameter · 24&nbsp;cm</span></div></figure><div class="dimensions__content"><fieldset class="segmented dimensions__unit-control"><legend class="segmented__legend">Display length in</legend><div class="segmented__options"><label class="segmented__item"><input class="segmented__input" type="radio" name="dimension-preview-unit" value="cm" checked><span class="segmented__label">cm</span></label><label class="segmented__item"><input class="segmented__input" type="radio" name="dimension-preview-unit" value="in"><span class="segmented__label">in</span></label></div></fieldset><dl class="dimensions__table"><div class="dimensions__measurement"><dt>Height</dt><dd><bdi class="dimensions__value">12&nbsp;cm</bdi></dd></div><div class="dimensions__measurement"><dt>Maximum diameter</dt><dd><bdi class="dimensions__value">24&nbsp;cm</bdi></dd></div><div class="dimensions__measurement"><dt>Foot diameter</dt><dd><bdi class="dimensions__value">10&nbsp;cm</bdi></dd></div></dl></div></div>'} label="Dimensions Display" />
 
 ## Presentation
 
-The `measurements` slot is required. `visual` can contain a target-owned measurement diagram and textual annotations. `unitControls` is optional and preserves existing selected-unit visual hooks.
+The required `measurements` slot supplies one or more complete native `dl` name/value groups. Every value is already formatted by the target and includes its unit and any qualification. R5 treats the value as text, isolates its direction, and never parses or converts it.
 
-Targets own source values, formatting, conversion, rounding, control semantics, and synchronization. The artwork shows one coherent static state and does not supply conversion behavior.
+`visual` may contain target-owned image, SVG, diagram, and redundant annotations. Exact values must remain in the textual list. The shared specimen uses a truthful editorial image plus two assistive-hidden annotations; those are fixture/presentation details rather than public defaults or a product-media policy.
+
+`unitControls` is optional. When present, it composes canonical Segmented Control: a visible legend, native same-name radios, exactly one selected value, and native keyboard/focus behavior. The target coordinates that selected value with a complete preformatted measurement and annotation set. R5 does not own a second selected-unit state or a conversion function.
+
+### Behavior boundary
+
+Dimensions owns no measurement algorithm, controlled/uncontrolled store, listener, observer, request, timer, persistence, URL state, form submission, live region, or announcement. A host can control or initialize the canonical radio group and replace the active slot content from its authoritative data source.
+
+The current docs fixture holds independently authored `cm` and `in` strings so interaction can be exercised without implying a canonical numeric source, unit system, precision, or rounding rule.
+
+### Responsive behavior
+
+Canonical R5 responds to its own inline size. Visual and content stack by default; sufficiently wide hosts may use two regions. Measurement groups become one column in very narrow containers. Images, annotations, terms, formatted values, and canonical controls wrap or grow without a viewport or Studio-specific layout correction.
 
 ## Guidelines
 
 <DoDont>
-  <Do>Keep every displayed measurement in readable text even when a diagram repeats it visually.</Do>
-  <Dont>Do not perform or imply unit conversion in the component without target-owned values and rounding rules.</Dont>
+  <Do>Keep every quantity name, value, unit, qualifier, and tolerance in readable text even when a diagram repeats it.</Do>
+  <Dont>Do not compute or imply conversion, precision, scale, or equivalence unless the target owns verified source values and rounding rules.</Dont>
 </DoDont>
 
-- Keep units adjacent to their values.
-- Use a diagram only when it clarifies which dimension is being measured.
-- Omit unit controls when the target provides only one formatted unit set.
+- Supply one coherent active formatted set; omit incomplete peers and omit R5 when no valid measurement remains.
+- Keep the quantity name explicit. A unit symbol alone must not identify what was measured.
+- Keep a separating space between a number and unit symbol where the target standard requires it.
+- Use a diagram only when it clarifies where or how a quantity is measured.
+- Give informative media a truthful alternative; hide only annotations that fully duplicate the visible list.
+- Omit unit controls when the target provides one presentation or cannot guarantee equivalent sets.
+- Use canonical Segmented Control for exclusive unit choice; do not recreate it with independent pressed buttons.
+- Keep handmade variation, approximation, method, orientation, tolerance, and uncertainty visible when applicable.
 
 ## Accessibility
 
-- Expose every measurement as text, even when a diagram is present.
-- Give an informative diagram a useful text alternative.
-- Use tabular numeric presentation where comparison benefits from it.
-- If unit controls are provided, expose a coherent group name, selected state, and keyboard model.
+- Preserve native `dl > div > dt + dd` name/value relationships.
+- Keep exact values in text, independent from image, line, position, scale, or color.
+- Use `bdi` for target-formatted values and tabular numerals where comparison benefits from them.
+- Do not truncate localized values, unit names, tolerances, or qualifiers.
+- Name the optional unit choice with a visible legend and let native radio inputs own exclusivity, Arrow/Space behavior, focus, and checked state.
+- Do not duplicate the selected unit as R5 state or make the complete list a live region by default.
+- Preserve visual/list/control boundaries in forced colors and remove no focus indicator from the canonical control.
 
 ## Specification
 
-**Dependencies:** None.
+**Dependencies:** canonical `segmented-control` for the optional interactive choice. R5 remains passive when that slot is absent.
 
-**Anatomy:** `.dimensions`, optional visual and visual labels, required `.dimensions__table` term-value content, and optional `.dimensions__unit-toggle` controls.
+**Anatomy:** generic `.dimensions` root; optional native `.dimensions__visual` and redundant annotations; required `.dimensions__content`; required native `.dimensions__table`; repeated `.dimensions__measurement > dt + dd > bdi.dimensions__value`; optional canonical `.segmented.dimensions__unit-control`.
 
 <PropTable>
-  <tr><td>`visual`</td><td>slot</td><td>optional</td><td>Target-owned measurement diagram</td></tr>
-  <tr><td>`measurements`</td><td>slot</td><td>required</td><td>Target-formatted measurement terms and values</td></tr>
-  <tr><td>`unitControls`</td><td>slot</td><td>optional</td><td>Target-owned unit controls</td></tr>
+  <tr><td>`visual`</td><td>slot</td><td>optional</td><td>Target-owned informative visual/diagram and redundant annotations</td></tr>
+  <tr><td>`measurements`</td><td>slot</td><td>required non-empty</td><td>One active target-formatted native name/value composition</td></tr>
+  <tr><td>`unitControls`</td><td>slot</td><td>optional</td><td>Canonical Segmented Control; target owns selected value and content replacement</td></tr>
 </PropTable>
+
+### Targets
+
+- **Neutral Web:** generic root, native description list, optional truthful figure, optional canonical radio-backed Segmented Control, intrinsic CSS, and zero R5 JavaScript.
+- **Shopify:** planned until product/variant source, dimensions inventory, unit/precision/locale policy, merchant validation, and first consumer are approved.
+- **Webflow / React / Angular:** targets provide complete formatted records and own any active-set coordination; do not move conversion into R5.
+- **Figma / native targets:** model optional visual/control composition and narrow/wide modes; registered generic Figma nodes are not R5 visual approval.
+
+### References
+
+- [HTML description lists](https://html.spec.whatwg.org/dev/grouping-content.html#the-dl-element)
+- [WAI-ARIA APG Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/)
+- [WAI-ARIA APG Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/)
+- [Open UI proposal model](https://open-ui.org/proposal-guide/)
+- [BIPM SI Brochure](https://www.bipm.org/en/publications/si-brochure/)
+- [Radix Radio Group](https://www.radix-ui.com/primitives/docs/components/radio-group)
+- [Radix Toggle Group](https://www.radix-ui.com/primitives/docs/components/toggle-group)
+- [Polaris Choice List](https://shopify.dev/docs/api/app-home/web-components/forms/choice-list)
+
+R5 remains `pilot`. Human review and explicit product/target decisions are required before stability promotion.

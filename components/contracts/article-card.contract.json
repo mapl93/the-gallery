@@ -1,80 +1,101 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "article-card",
   "name": "Article Card",
   "registryId": "L1",
   "category": "blog",
   "status": "pilot",
-  "summary": "Blog post card with 5 variants: standard, featured, minimal, horizontal, editorial.",
-  "dependencies": ["badge"],
+  "summary": "Native article summary that composes canonical Card and Badge, exposes independent layout and surface axes, and uses one native Link containing its contextual media and complete title.",
+  "dependencies": ["card", "badge"],
   "source": {
     "registry": "registry.json#/components/article-card",
     "css": { "file": "components/css/blog.css", "selector": ".article-card" },
     "docs": "site/src/content/components/article-card.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".article-card", "className": ".article-card", "required": true, "description": "Article card container." },
-    { "name": "media", "selector": ".article-card__media", "className": ".article-card__media", "required": false, "description": "Optional linked article media." },
-    { "name": "category", "selector": ".article-card__category", "className": ".article-card__category", "required": false, "description": "Optional article category label." },
-    { "name": "body", "selector": ".article-card__body", "className": ".article-card__body", "required": true, "description": "Article text and metadata wrapper." },
-    { "name": "metadata", "selector": ".article-card__meta", "className": ".article-card__meta", "required": false, "description": "Optional target-formatted article metadata." },
-    { "name": "metadataSeparator", "selector": ".article-card__meta-separator", "className": ".article-card__meta-separator", "required": false, "description": "Optional visual separator between metadata values." },
-    { "name": "title", "selector": ".article-card__title", "className": ".article-card__title", "required": true, "description": "Article title heading and destination link." },
-    { "name": "excerpt", "selector": ".article-card__excerpt", "className": ".article-card__excerpt", "required": false, "description": "Optional article excerpt." },
-    { "name": "author", "selector": ".article-card__author", "className": ".article-card__author", "required": false, "description": "Optional target-owned author composition." },
-    { "name": "authorName", "selector": ".article-card__author-name", "className": ".article-card__author-name", "required": false, "description": "Author name within the author composition." }
+    { "name": "root", "selector": ".article-card", "className": ".article-card", "required": true, "description": "Native self-contained article summary composed on the canonical Card root." },
+    { "name": "categorySlot", "selector": ".article-card__category-slot", "className": ".article-card__category-slot", "required": false, "description": "Optional category placement outside the primary Link; overlays contextual media when present or precedes the Link when absent." },
+    { "name": "category", "selector": ".article-card__category", "className": ".article-card__category", "required": false, "description": "Optional passive canonical Badge; never part of the article destination name." },
+    { "name": "primaryLink", "selector": ".article-card__primary-link", "className": ".article-card__primary-link", "required": true, "description": "Only required article destination; contains the media, passive summary content, and complete contextual title without interactive descendants." },
+    { "name": "layout", "selector": ".article-card__layout", "className": ".article-card__layout", "required": true, "description": "Private media/body layout that responds to the root inline-size container." },
+    { "name": "media", "selector": ".article-card__media", "className": ".article-card__media", "required": false, "description": "Optional non-interactive target media contained by the primary Link and composed with canonical Card media." },
+    { "name": "body", "selector": ".article-card__body", "className": ".article-card__body", "required": true, "description": "Canonical Card body containing passive metadata, title, and optional excerpt within the primary Link." },
+    { "name": "metadata", "selector": ".article-card__meta", "className": ".article-card__meta", "required": false, "description": "Optional passive target-formatted publication date, duration, or taxonomy metadata." },
+    { "name": "metadataSeparator", "selector": ".article-card__meta-separator", "className": ".article-card__meta-separator", "required": false, "description": "Optional visual-only separator between metadata values." },
+    { "name": "title", "selector": ".article-card__title", "className": ".article-card__title", "required": true, "description": "Complete visible contextual heading inside the primary Link; rank is selected by target composition." },
+    { "name": "excerpt", "selector": ".article-card__excerpt", "className": ".article-card__excerpt", "required": false, "description": "Optional supplied summary; source text remains intact while an explicit excerptLines presentation may visually clamp it." },
+    { "name": "author", "selector": ".article-card__author", "className": ".article-card__author", "required": false, "description": "Optional canonical Card footer outside the primary Link for target-owned author identity or independent destinations." },
+    { "name": "authorName", "selector": ".article-card__author-name", "className": ".article-card__author-name", "required": false, "description": "Optional author-name text inside the target author composition." }
   ],
   "variants": [
-    { "name": "standard", "className": null, "default": true, "description": "Default vertical article card." },
-    { "name": "featured", "className": ".article-card--featured", "default": false, "description": "Responsive featured card with side-by-side media and body on wider viewports." },
-    { "name": "minimal", "className": ".article-card--minimal", "default": false, "description": "Text-led card with media hidden and a bottom divider." },
-    { "name": "horizontal", "className": ".article-card--horizontal", "default": false, "description": "Compact media-and-body row that stacks on narrow viewports." },
-    { "name": "editorial", "className": ".article-card--editorial", "default": false, "description": "Editorial title treatment using the accent typeface." }
+    { "name": "standard", "className": null, "default": true, "description": "Default vertical article layout independent from Card surface." },
+    { "name": "featured", "className": ".article-card--featured", "default": false, "description": "Higher-emphasis layout that splits media/body only when its own container is wide enough." },
+    { "name": "minimal", "className": ".article-card--minimal", "default": false, "description": "Text-led layout that omits media presentation without changing the selected Card surface." },
+    { "name": "horizontal", "className": ".article-card--horizontal", "default": false, "description": "Compact media/body layout that stacks when its own container is narrow." },
+    { "name": "editorial", "className": ".article-card--editorial", "default": false, "description": "Accent-family title treatment with unchanged native semantics and independent Card surface." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Fluid size controlled by the parent layout." }
+    { "name": "default", "className": null, "default": true, "description": "Fluid intrinsic size controlled by the parent and Article Card container." }
   ],
   "states": [
-    { "name": "default", "selectors": [".article-card"], "description": "Default article card state." },
-    { "name": "hover", "selectors": [".article-card:hover", ".article-card:hover .article-card__media img"], "description": "Card lift and media zoom on hover-capable targets." },
-    { "name": "linkFocus", "selectors": [".article-card a:focus-visible"], "description": "Visible keyboard focus for article destinations." },
-    { "name": "skeletonPresentation", "selectors": [".article-card--skeleton"], "description": "Existing placeholder presentation; public ownership remains unresolved." }
+    { "name": "default", "selectors": [".article-card"], "description": "Canonical default Card surface with standard layout and complete article destination." },
+    { "name": "flatSurface", "selectors": [".article-card"], "description": "Canonical card--flat dependency class and data-surface=flat remain independent from Article Card layout profile." },
+    { "name": "elevatedSurface", "selectors": [".article-card"], "description": "Canonical card--elevated dependency class and data-surface=elevated remain independent from Article Card layout profile." },
+    { "name": "withoutMedia", "selectors": [".article-card__layout"], "description": "Optional media is omitted while the title remains in the one primary Link." },
+    { "name": "excerptComplete", "selectors": [".article-card__excerpt"], "description": "data-excerpt-lines=none renders the complete supplied excerpt without a clamp." },
+    { "name": "excerptClamped", "selectors": [".article-card[data-excerpt-lines=\"2\"] .article-card__excerpt", ".article-card[data-excerpt-lines=\"3\"] .article-card__excerpt", ".article-card[data-excerpt-lines=\"4\"] .article-card__excerpt"], "description": "Explicit two-, three-, or four-line visual fitting preserves the source text in DOM." },
+    { "name": "linkHover", "selectors": [".article-card__primary-link:hover .article-card__title"], "description": "The complete primary destination gains a title underline; no JavaScript root delegation is used." },
+    { "name": "linkFocus", "selectors": [".article-card__primary-link:focus-visible"], "description": "Visible keyboard focus surrounds the one native primary Link." }
   ],
   "behavior": [
-    { "name": "articleNavigation", "selectors": [".article-card__media", ".article-card__title a"], "attributes": ["href"], "events": ["click"], "description": "Media and title links navigate to the same target-owned article destination." },
-    { "name": "targetMetadata", "selectors": [".article-card__meta", ".article-card__author"], "description": "Dates, reading time, taxonomy, and author data are formatted and supplied by the target." }
+    { "name": "nativeArticleSummary", "selectors": [".article-card", ".article-card__title"], "description": "Use native article and contextual heading elements without a Card widget role or custom keyboard model." },
+    { "name": "linkedMediaAndTitle", "selectors": [".article-card__primary-link", ".article-card__media", ".article-card__title"], "attributes": ["href"], "events": ["click"], "description": "One native Link contains the contextual media and complete title as one article destination; the root never forwards activation." },
+    { "name": "interactiveDescendantBoundary", "selectors": [".article-card__primary-link", ".article-card__category-slot", ".article-card__author"], "description": "The primary Link contains no nested interactive content. Passive category and any independent author or future action destination remain outside it." },
+    { "name": "canonicalCardComposition", "selectors": [".article-card", ".article-card__media", ".article-card__body", ".article-card__author"], "description": "Runtime markup adds canonical card, card__media, card__body, card__footer, card--flat, and card--elevated dependency classes. Card owns surface, border, shadow, radius, hover, focus-within clipping, media treatment, and reduced motion; Article Card owns article layout/content only." },
+    { "name": "externalSkeletonBoundary", "selectors": [".article-card"], "description": "Loading composes canonical Skeleton externally and replaces it with Article Card only when authoritative article data exists. L1 has no loading variant, busy lifecycle, or internal Skeleton markup." },
+    { "name": "contextualMedia", "selectors": [".article-card__media", ".article-card__media img"], "attributes": ["alt"], "description": "Media is non-interactive; the target supplies informative alt text or an explicit empty value according to context." },
+    { "name": "targetMetadata", "selectors": [".article-card__meta", ".article-card__author"], "description": "Dates, durations, taxonomy, author identity, locale, and independent destinations are supplied and formatted by the target; no reading time is inferred." },
+    { "name": "canonicalBadgeComposition", "selectors": [".article-card__category", ".badge"], "description": "Category composes canonical passive Badge visuals outside the primary Link; Article Card owns placement only." },
+    { "name": "intrinsicVariantLayout", "selectors": [".article-card", ".article-card__layout", ".article-card--featured", ".article-card--horizontal"], "description": "Featured and horizontal layouts respond to the Article Card named inline-size container rather than viewport or Studio breakpoints." },
+    { "name": "excerptFitting", "selectors": [".article-card__excerpt"], "attributes": ["data-excerpt-lines on root"], "description": "none renders the complete supplied excerpt; 2, 3, or 4 applies an explicit CSS visual line clamp without mutating target content." },
+    { "name": "passiveRuntime", "selectors": [".article-card"], "description": "Neutral Article Card owns no JavaScript, request, observer, timer, storage, link delegation, animation loop, or analytics behavior." }
   ],
   "properties": [
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Article card presentation supported by canonical CSS.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".article-card", "source": "variants" }] } },
-    { "name": "title", "type": "string", "required": true, "description": "Visible article title.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-card__title a" }] } },
-    { "name": "href", "type": "string", "required": true, "description": "Article destination shared by the media and title links.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".article-card__media", "attribute": "href", "valueFrom": "property", "elements": ["a"] }, { "kind": "attribute", "selector": ".article-card__title a", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
-    { "name": "media", "type": "slot", "required": false, "description": "Target-owned article image or media composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-card__media", "classNames": [".article-card__media"] }] } },
-    { "name": "imageAlt", "type": "string", "required": false, "description": "Alternative text when the article image conveys information beyond the adjacent title.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".article-card__media img", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
-    { "name": "category", "type": "string", "required": false, "description": "Optional article category label.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-card__category" }] } },
-    { "name": "metadata", "type": "slot", "required": false, "description": "Target-owned publication date, reading time, or taxonomy metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-card__meta", "classNames": [".article-card__meta"] }] } },
-    { "name": "excerpt", "type": "string", "required": false, "description": "Optional short article excerpt.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-card__excerpt" }] } },
-    { "name": "author", "type": "slot", "required": false, "description": "Target-owned author identity composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-card__author", "classNames": [".article-card__author"] }] } }
+    { "name": "variant", "type": "enum", "required": false, "defaultValue": "standard", "valuesFrom": "variants", "description": "One of the five accepted Article Card layout profiles, independent from surface.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".article-card", "source": "variants" }] } },
+    { "name": "surface", "type": "enum", "required": false, "defaultValue": "default", "values": ["default", "flat", "elevated"], "description": "Canonical Card surface variant, mapped to default, card--flat, or card--elevated without duplicating Card visual properties.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".article-card", "attribute": "data-surface", "values": { "default": "default", "flat": "flat", "elevated": "elevated" } }] } },
+    { "name": "title", "type": "string", "required": true, "description": "Complete visible contextual article heading and primary Link name.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-card__title" }] } },
+    { "name": "href", "type": "string", "required": true, "description": "Single native article destination used by the primary Link containing media and title.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".article-card__primary-link", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
+    { "name": "media", "type": "slot", "required": false, "description": "Target-owned non-interactive article picture, image, or media composition inside the primary Link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-card__media", "classNames": [".card__media", ".article-card__media"] }] } },
+    { "name": "imageAlt", "type": "string", "required": false, "unsetBehavior": "Use an empty alt value only when the image is decorative or duplicates adjacent article information; otherwise supply contextual informative text.", "description": "Alternative text for the target image inside the media slot.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".article-card__media img", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
+    { "name": "category", "type": "string", "required": false, "unsetBehavior": "Omit the category slot and Badge when no passive category label is supplied.", "description": "Optional passive article category composed with canonical Badge outside the primary Link.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-card__category" }] } },
+    { "name": "metadata", "type": "slot", "required": false, "unsetBehavior": "Omit the metadata wrapper when no target-formatted passive values are supplied.", "description": "Target-owned passive publication date, duration, or taxonomy composition; use machine-readable time elements where applicable and place interactive metadata outside the primary Link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-card__meta", "classNames": [".article-card__meta"] }] } },
+    { "name": "excerpt", "type": "string", "required": false, "unsetBehavior": "Omit the paragraph when no excerpt is available.", "description": "Optional supplied article summary; source content remains intact regardless of visual fitting.", "targetMappings": { "web": [{ "kind": "content", "selector": ".article-card__excerpt" }] } },
+    { "name": "excerptLines", "type": "enum", "required": false, "defaultValue": "none", "values": ["none", "2", "3", "4"], "description": "Complete excerpt or explicit two-, three-, or four-line visual clamp without source mutation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".article-card", "attribute": "data-excerpt-lines", "values": { "none": "none", "2": "2", "3": "3", "4": "4" } }] } },
+    { "name": "author", "type": "slot", "required": false, "unsetBehavior": "Omit the canonical Card footer when no author composition is supplied.", "description": "Target-owned author identity and optional independent destination outside the primary Link.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".article-card__author", "classNames": [".card__footer", ".article-card__author"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-focus", "--color-border-subtle", "--color-surface-primary", "--color-surface-secondary", "--color-text-primary", "--color-text-secondary"],
-      "easing": ["--easing-default", "--easing-out"],
-      "typography": ["--font-family-accent", "--font-family-heading", "--typo-body-line-height", "--typo-body-size", "--typo-h3-size", "--typo-h4-size"],
-      "radius": ["--radius-full", "--radius-md", "--radius-sm"],
-      "transition": ["--transition-base", "--transition-slow"]
+      "color": ["--color-border-focus", "--color-text-primary", "--color-text-secondary"],
+      "typography": ["--font-family-accent", "--font-family-heading", "--tg-font-weight-medium", "--tg-font-weight-regular", "--tg-font-weight-semibold", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size", "--typo-h3-size", "--typo-h4-line-height", "--typo-h4-size"],
+      "spacing": ["--space-layout-element-gap", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"]
     }
   },
   "accessibility": [
-    "Use semantic article and heading markup, with separate media and title links rather than wrapping all card content in one link.",
-    "Provide useful image alternative text when media adds information; use an empty alt value when the linked image only duplicates the adjacent article title.",
-    "Preserve visible keyboard focus and do not rely on hover motion to communicate the destination."
+    "Use a native article root and a contextual heading level selected by the surrounding composition; do not add a Card widget role or custom keyboard model.",
+    "Render exactly one native primary Link containing contextual media and the complete visible title. Do not add nested interactive descendants or JavaScript whole-card delegation.",
+    "Keep passive category Badge, author destinations, and any future independent actions outside the primary Link.",
+    "Supply contextual informative image alt text or an explicit empty value when the image is decorative or redundant; media itself adds no second destination.",
+    "Use machine-readable time datetime values for dates and durations when present, hide visual-only separators, and never infer reading time in neutral source.",
+    "Treat excerptLines as visual fitting only. Keep complete source text in DOM and ensure essential meaning is not available only after the clamp point.",
+    "Preserve visible Link focus around the linked summary, normal Tab order, Card descendant-focus visibility, forced-colors contrast, coarse-pointer behavior, and reduced motion.",
+    "Compose canonical Skeleton externally while loading; Article Card has no aria-busy state, loading variant, or internal placeholder anatomy."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/blog.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css-js", "notes": "Should map Shopify article, blog, image, author, and publication metadata." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
+    "web": { "status": "implemented", "kind": "html-css-composition", "notes": "Native article/heading/one-Link markup composes canonical Card and Badge, independent surface/layout axes, explicit excerpt fitting, intrinsic layout, and zero neutral runtime." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The article-card snippet maps Shopify article title, URL, image, published timestamp, excerpt, author, explicit display flags, heading rank, layout, Card surface, excerpt lines, and optional passed blog label without inferred reading time or JavaScript." },
+    "react": { "status": "planned", "kind": "component", "notes": "Preserve the one-Link media/title composition and let the target router own navigation interception or prefetch." },
+    "figma": { "status": "planned", "kind": "component-composition", "notes": "Compose canonical Card and Badge with independent five-profile, three-surface, excerpt-fitting, optional-part, and long-content states; registered nodes still reference generic Button shells." },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }
   }

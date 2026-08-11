@@ -1,39 +1,127 @@
 ## Overview
 
-Comments presents a required heading, optional target-formatted count, target-owned comment thread, and optional target-owned composer. It supplies static editorial structure without defining discussion-service behavior.
+Comment Section is a fail-closed, finite discussion associated with surrounding content. It requires a visible contextual heading plus one non-null discussion slot, renders at most two visible thread levels, and delegates identity, permissions, moderation, sanitization, persistence, authoritative counts and mutation results to the target.
+
+The default record order is oldest first. A target may compose canonical Select for another verified order and canonical numbered Pagination for a long discussion. The neutral component never sorts DOM records, loads infinitely or adopts Feed semantics.
 
 ## Presentation
 
-<Preview html={'<section class="comments tg-preview-frame--md" aria-labelledby="comments-title"><h2 id="comments-title" class="comments__title">Comments <span class="comments__count">(1)</span></h2><ol><li class="comment"><div class="comment__avatar"><span class="avatar" aria-hidden="true">AR</span></div><div class="comment__body"><div class="comment__header"><span id="comment-author-1" class="comment__author">Ana Ruiz</span><time class="comment__date" datetime="2026-07-12">July 12, 2026</time></div><p class="comment__text">The notes about proportion changed how I look at the rim of a vessel.</p><div class="comment__actions"><button class="comment__action-btn" type="button" aria-label="Reply to Ana Ruiz">Reply</button></div></div></li></ol><form class="comment-form" aria-labelledby="comment-form-title"><h3 id="comment-form-title" class="comment-form__title">Join the discussion</h3><div class="input"><label class="input__label" for="comment-message">Comment</label><div class="input__control"><textarea class="input__field textarea__field" id="comment-message" name="comment" placeholder="Write your comment"></textarea></div></div><button class="btn" type="submit">Post comment</button></form></section>'} label="Comments" />
+<Preview
+  html={`
+    <section class="comments tg-preview-frame--md" aria-labelledby="comments-title">
+      <h2 id="comments-title" class="comments__title" dir="auto">Conversation <span class="comments__count" dir="auto">24 comments</span></h2>
+      <div class="comments__toolbar">
+        <div class="select comments__order">
+          <label class="select__label" for="comments-order">Order comments</label>
+          <div class="select__control"><select class="select__field" id="comments-order" name="comment-order"><option>Oldest first</option><option>Newest first</option></select></div>
+        </div>
+      </div>
+      <ol class="comments__thread">
+        <li class="comments__item">
+          <article class="comment" aria-labelledby="comment-ana-author comment-ana-date">
+            <span class="avatar comment__avatar" aria-hidden="true">AR</span>
+            <div class="comment__body">
+              <header class="comment__header"><span id="comment-ana-author" class="comment__author" dir="auto">Ana Ruiz</span><time id="comment-ana-date" class="comment__date" datetime="2026-07-12">Today</time></header>
+              <div class="comment__content"><p class="comment__text" dir="auto">The notes about repetition feel true in every material practice.</p></div>
+              <footer class="comment__actions">
+                <button class="btn btn--link btn--sm comment__action" type="button" aria-label="Reply to Ana Ruiz">Reply</button>
+                <div class="comment__reactions" role="group" aria-label="Reactions to Ana Ruiz's comment">
+                  <button class="toggle comment__reaction" type="button" aria-label="Like Ana Ruiz's comment" aria-pressed="false"><span aria-hidden="true">♡</span><span class="comment__reaction-count" aria-hidden="true">4</span></button>
+                  <button class="toggle comment__reaction" type="button" aria-label="Mark Ana Ruiz's comment as useful" aria-pressed="true"><span aria-hidden="true">Useful</span><span class="comment__reaction-count" aria-hidden="true">2</span></button>
+                </div>
+              </footer>
+            </div>
+          </article>
+          <ol class="comment__replies">
+            <li class="comments__item">
+              <article class="comment" aria-labelledby="comment-marina-author comment-marina-date"><span class="avatar comment__avatar" aria-hidden="true">MP</span><div class="comment__body"><header class="comment__header"><span id="comment-marina-author" class="comment__author" dir="auto">Marina Paz</span><time id="comment-marina-date" class="comment__date" datetime="2026-07-12">Today</time></header><div class="comment__content"><p class="comment__text" dir="auto">Exactly. Repetition creates enough quiet to notice what changed.</p></div></div></article>
+            </li>
+            <li class="comments__item">
+              <article class="comment" aria-labelledby="comment-leo-author comment-leo-date"><span class="avatar comment__avatar" aria-hidden="true">LI</span><div class="comment__body"><header class="comment__header"><span id="comment-leo-author" class="comment__author" dir="auto">Leo Ibarra</span><time id="comment-leo-date" class="comment__date" datetime="2026-07-12">Today</time></header><div class="comment__content"><p class="comment__reply-to" dir="auto">Replying to Marina Paz</p><p class="comment__text" dir="auto">That quiet is where the smallest material decisions become visible.</p></div></div></article>
+            </li>
+          </ol>
+        </li>
+      </ol>
+      <nav class="pagination comments__pagination" aria-label="Comment pages" data-current-page="1"><ul class="pagination__list"><li class="pagination__item"><span class="pagination__current" aria-current="page">1</span></li><li class="pagination__item"><a class="link link--subtle pagination__link" href="#comments-page-2" aria-label="Page 2">2</a></li><li class="pagination__item"><a class="link link--subtle pagination__link" href="#comments-page-2" aria-label="Next page">Next</a></li></ul></nav>
+      <form class="comment-form" aria-labelledby="comment-form-title"><h3 id="comment-form-title" class="comment-form__title">Join the conversation</h3><div class="input"><label class="input__label" for="comment-message">Comment</label><div class="input__control"><textarea class="input__field textarea__field" id="comment-message" name="comment" rows="4" required></textarea></div></div><button class="btn" type="submit">Preview comment</button></form>
+    </section>
+  `}
+  label="Comment Section"
+/>
 
-The component has one fluid threaded presentation. Comment records use `.comment`; author, date, text, actions, and nested replies use their canonical elements. The optional `.comment-form` composes Textarea and Button controls but remains a target-owned slot.
+The runtime fixture deliberately includes a provider depth of three. It renders only one nested `ol`: the deepest reply becomes a second-level sibling and receives visible localized parent context. Its reaction arrays contain multiple, single and zero items, proving that the target vocabulary is configuration rather than a fixed Like variant.
+
+<Preview
+  html={`
+    <section class="comments tg-preview-frame--md" aria-labelledby="comments-empty-title">
+      <h2 id="comments-empty-title" class="comments__title">Conversation <span class="comments__count">0 comments</span></h2>
+      <div class="empty-state comments__empty"><h3 class="empty-state__title">No comments yet</h3><p class="empty-state__message">The conversation is ready when someone has something to add.</p></div>
+    </section>
+  `}
+  label="Resolved empty discussion"
+/>
+
+Resolved zero records compose canonical Empty State. Loading, provider error, moderation lock and unavailable comments are different target-owned page states and must not reuse this copy.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Supply comment data, nesting, controls, and form handling from the target integration.</Do>
-  <Dont>Do not infer sorting, reply logic, authentication, moderation, optimistic updates, or count synchronization from the static classes.</Dont>
+  <Do>Supply one authoritative oldest-first record set by default. If another verified order is offered, compose canonical Select and replace the complete projected set.</Do>
+  <Dont>Do not sort the rendered DOM, infer order from timestamps, append an infinite Feed or treat count text as pagination truth.</Dont>
 </DoDont>
 
-Which comment behaviors belong to the neutral component and which belong to targets remains unresolved. Until that boundary is accepted, thread actions and the composer are presentation slots rather than a neutral discussion API.
+<DoDont>
+  <Do>Give every record an ordered reaction array containing stable id, complete localized accessible label, optional target icon/count, selected state and availability.</Do>
+  <Dont>Do not add a `single | multiple` mode. An empty array removes reactions; after activation the target returns the complete authoritative array and may enforce its own independent or mutually exclusive policy.</Dont>
+</DoDont>
+
+<DoDont>
+  <Do>Show Reply only when an authenticated target composer and moderation lifecycle exist.</Do>
+  <Dont>Do not fabricate nesting or reactions in a flat provider such as Shopify, or let the neutral renderer claim posting success.</Dont>
+</DoDont>
+
+Fixture people, initials, dates, copy, count, reaction vocabulary/icons/counts, order choices, page window, Reply actions, composer labels and submit copy are evidence content—not defaults or public API.
 
 ## Accessibility
 
-- Use semantic lists or another structure that communicates comment and reply relationships without relying on indentation alone.
-- Expose author and date text clearly; use `time` with a machine-readable `datetime` value when available.
-- Use native buttons for comment actions with descriptive names and visible focus.
-- Keep Textarea labels, validation relationships, disabled state, and Button submission semantics intact.
-- Provide target-specific accessible status handling for authentication, moderation, submission feedback, and live updates.
+- Name the native `section` from its visible contextual heading; blank title or absent discussion composition omits the complete root.
+- Use `ol.comments__thread > li.comments__item > article.comment`, with at most one `ol.comment__replies` under a top-level item. Do not rely on indentation alone.
+- Name every comment article from visible author plus optional date. Use native `time[datetime]`, complete localized text and `dir="auto"` where the target direction is unknown.
+- Flatten deeper provider replies in authoritative order and display a localized `.comment__reply-to` label naming the immediate parent.
+- Hide redundant Avatar initials when adjacent visible author text already supplies identity.
+- Render every reaction as a standalone native Toggle button with `aria-pressed`, native `disabled` and the supplied complete label. The optional icon/count never replaces that name.
+- Do not wrap reactions in the exclusive `.toggle-group`: the target may preserve several independent selections or atomically return an exclusive array.
+- Preserve canonical Select, Pagination, Button, Textarea and Empty State keyboard/focus/state contracts. Target result replacement, announcements and focus restoration remain external.
+- Do not add `role="feed"` without the complete automatic loading, focus navigation, position/set-size and busy-state behavior required by APG.
+
+## Responsive And Targets
+
+The neutral shell has one intrinsic column and establishes an inline-size container. Metadata, actions, reactions and Pagination wrap; replies use logical container-relative indentation; complete localized content is never clamped. L11 owns no breakpoint, animation, request, storage or event listener.
+
+Shopify is implemented by `sections/comments.liquid`. It reads published `article.comments`, reuses canonical Empty State and Pagination, and uses `{% form 'new_comment', article %}` with exact `comment[author]`, `comment[email]` and `comment[body]` names plus localized moderation/error/success feedback. Shopify's native model is flat, so the adapter intentionally emits neither reply controls nor reactions.
 
 ## References
 
 <PropTable>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible comment-section heading</td></tr>
-  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted comment count</td></tr>
-  <tr><td>`thread`</td><td>slot</td><td>required</td><td>Target-owned records, nesting, actions, and empty state</td></tr>
-  <tr><td>`composer`</td><td>slot</td><td>optional</td><td>Target-owned top-level form composed from Textarea and Button</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Visible localized heading; blank omits the complete root</td></tr>
+  <tr><td>`count`</td><td>string</td><td>optional</td><td>Target-formatted authoritative static count text</td></tr>
+  <tr><td>`orderControl`</td><td>slot</td><td>optional</td><td>Canonical Select for a verified alternative order</td></tr>
+  <tr><td>`thread`</td><td>slot</td><td>required</td><td>Authoritative native thread or canonical resolved Empty State</td></tr>
+  <tr><td>`pagination`</td><td>slot</td><td>optional</td><td>Canonical finite numbered Pagination</td></tr>
+  <tr><td>`composer`</td><td>slot</td><td>optional</td><td>Target-owned native form using canonical controls</td></tr>
 </PropTable>
 
-Anatomy: `.comments`, `.comments__title`, `.comments__count`, `.comment`, `.comment__avatar`, `.comment__body`, `.comment__header`, `.comment__author`, `.comment__date`, `.comment__text`, `.comment__actions`, `.comment__action-btn`, `.comment__replies`, `.comment-form`, and `.comment-form__title`.
+Dependencies: [Avatar](/components/avatar), [Button](/components/button), [Empty State](/components/empty-state), [Pagination](/components/pagination), [Select](/components/select), [Textarea](/components/textarea), and [Toggle](/components/toggle). The contract remains `pilot`; final visuals, real provider/auth/moderation proof, L11-specific design evidence and explicit human review remain pending.
 
-Dependencies: [Avatar](/components/avatar), [Button](/components/button), and [Textarea](/components/textarea). The contract remains `pilot`; sorting, replies, authentication, moderation, optimistic updates, submission feedback, and count synchronization remain explicitly target-owned pending resolution.
+- [HTML `article`](https://html.spec.whatwg.org/multipage/sections.html#the-article-element)
+- [HTML `section`](https://html.spec.whatwg.org/multipage/sections.html#the-section-element)
+- [APG Feed pattern](https://www.w3.org/WAI/ARIA/apg/patterns/feed/)
+- [APG accessible names](https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/)
+- [Open UI components](https://open-ui.org/components/)
+- [Radix Toggle](https://www.radix-ui.com/primitives/docs/components/toggle)
+- [Radix Form](https://www.radix-ui.com/primitives/docs/components/form)
+- [Polaris Web Components](https://shopify.dev/docs/api/app-home/web-components)
+- [Shopify article object](https://shopify.dev/docs/api/liquid/objects/article)
+- [Shopify comment object](https://shopify.dev/docs/api/liquid/objects/comment)
+- [Shopify `new_comment` form](https://shopify.dev/docs/api/liquid/tags/form#form-new_comment)
+- [Shopify Dawn article reference](https://github.com/Shopify/dawn/blob/main/sections/main-article.liquid)

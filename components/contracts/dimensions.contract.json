@@ -1,19 +1,277 @@
 {
-  "$schema": "./contract.schema.json", "contractVersion": "0.2.0", "slug": "dimensions", "name": "Dimensions Display", "registryId": "R5", "category": "ceramics", "status": "pilot", "summary": "Product dimension diagram with measurement table and unit toggle.", "dependencies": [],
-  "source": { "registry": "registry.json#/components/dimensions", "css": { "file": "components/css/ceramics.css", "selector": ".dimensions" }, "docs": "site/src/content/components/dimensions.mdx" },
-  "anatomy": [
-    { "name": "root", "selector": ".dimensions", "className": ".dimensions", "required": true, "description": "Dimensions presentation." },
-    { "name": "visual", "selector": ".dimensions__visual", "className": ".dimensions__visual", "required": false, "description": "Optional measurement diagram." },
-    { "name": "visualLabel", "selector": ".dimensions__label", "className": ".dimensions__label", "required": false, "description": "Optional text annotation on the diagram." },
-    { "name": "measurements", "selector": ".dimensions__table", "className": ".dimensions__table", "required": true, "description": "Textual measurement terms and values." },
-    { "name": "unitControls", "selector": ".dimensions__unit-toggle", "className": ".dimensions__unit-toggle", "required": false, "description": "Optional target-owned unit controls." }
+  "$schema": "./contract.schema.json",
+  "contractVersion": "0.2.0",
+  "slug": "dimensions",
+  "name": "Dimensions Display",
+  "registryId": "R5",
+  "category": "ceramics",
+  "status": "pilot",
+  "summary": "Target-formatted native measurement list with an optional explanatory visual and optional canonical exclusive unit choice.",
+  "dependencies": [
+    "segmented-control"
   ],
-  "variants": [{ "name": "default", "className": null, "default": true, "description": "Diagram and textual measurements." }],
-  "sizes": [{ "name": "default", "className": null, "default": true, "description": "Contained responsive dimensions layout." }],
-  "states": [{ "name": "default", "selectors": [".dimensions"], "description": "Default measurement presentation." }, { "name": "selectedUnit", "selectors": [".dimensions__unit-toggle button[aria-pressed=\"true\"]"], "description": "Existing visual hook for the target-selected unit control." }],
-  "behavior": [{ "name": "unitOwnership", "selectors": [".dimensions__table", ".dimensions__unit-toggle"], "attributes": ["aria-pressed"], "description": "Targets own measurement source values, formatting, conversion, unit-control semantics, and synchronization." }],
-  "properties": [{ "name": "visual", "type": "slot", "required": false, "description": "Optional target-owned diagram with text alternatives.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".dimensions__visual", "classNames": [".dimensions__visual"] }] } }, { "name": "measurements", "type": "slot", "required": true, "description": "Target-formatted measurement terms and values; no unit schema is prescribed.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".dimensions__table", "classNames": [".dimensions__table"] }] } }, { "name": "unitControls", "type": "slot", "required": false, "description": "Optional target-owned unit controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".dimensions__unit-toggle", "classNames": [".dimensions__unit-toggle"] }] } }],
-  "tokens": { "public": { "color": ["--color-border-focus", "--color-border-subtle", "--color-button-primary-bg-default", "--color-button-primary-text", "--color-text-primary", "--color-text-secondary"], "typography": ["--typo-body-size"], "radius": ["--radius-md"], "spacing": ["--space-layout-touch-target"] } },
-  "accessibility": ["Expose every measurement as text, even when a diagram is present.", "Keep units adjacent to values and use tabular numeric presentation where helpful.", "If unit controls are provided, expose a coherent single-selection name, state, and keyboard model."],
-  "adapters": { "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/ceramics.css." }, "shopify": { "status": "planned", "kind": "liquid-css-js" }, "react": { "status": "planned", "kind": "component" }, "figma": { "status": "planned", "kind": "component" }, "swiftui": { "status": "planned", "kind": "native-component" }, "compose": { "status": "planned", "kind": "native-component" } }
+  "source": {
+    "registry": "registry.json#/components/dimensions",
+    "css": {
+      "file": "components/css/ceramics.css",
+      "selector": ".dimensions"
+    },
+    "docs": "site/src/content/components/dimensions.mdx"
+  },
+  "anatomy": [
+    {
+      "name": "root",
+      "selector": ".dimensions",
+      "className": ".dimensions",
+      "required": true,
+      "description": "Generic measurement-presentation container emitted only for a non-empty valid measurement set."
+    },
+    {
+      "name": "visual",
+      "selector": ".dimensions__visual",
+      "className": ".dimensions__visual",
+      "required": false,
+      "description": "Optional target-owned native figure containing truthful media/diagram content and redundant visual annotations."
+    },
+    {
+      "name": "visualAnnotations",
+      "selector": ".dimensions__annotations",
+      "className": ".dimensions__annotations",
+      "required": false,
+      "description": "Optional redundant visible annotations; exact values remain available in the required textual list."
+    },
+    {
+      "name": "content",
+      "selector": ".dimensions__content",
+      "className": ".dimensions__content",
+      "required": true,
+      "description": "Layout wrapper for the optional canonical control and required measurement list."
+    },
+    {
+      "name": "measurements",
+      "selector": ".dimensions__table",
+      "className": ".dimensions__table",
+      "required": true,
+      "description": "Native description list containing one active coherent target-formatted measurement set."
+    },
+    {
+      "name": "measurement",
+      "selector": ".dimensions__measurement",
+      "className": ".dimensions__measurement",
+      "required": true,
+      "description": "Repeated native description-list group containing one visible quantity term and value."
+    },
+    {
+      "name": "value",
+      "selector": ".dimensions__value",
+      "className": ".dimensions__value",
+      "required": true,
+      "description": "Directionally isolated complete formatted value, including its target-supplied unit and qualifiers."
+    },
+    {
+      "name": "unitControls",
+      "selector": ".dimensions__unit-control",
+      "className": ".dimensions__unit-control",
+      "required": false,
+      "description": "Optional canonical Segmented Control whose native radio value is coordinated by the target."
+    }
+  ],
+  "variants": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "One active target-formatted measurement set with optional visual and unit choice."
+    }
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "className": null,
+      "default": true,
+      "description": "Intrinsic component-width response with no public size or breakpoint property."
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "selectors": [
+        ".dimensions"
+      ],
+      "description": "Passive measurement presentation. Any checked unit state belongs to the composed Segmented Control."
+    }
+  ],
+  "behavior": [
+    {
+      "name": "requiredMeasurements",
+      "selectors": [
+        ".dimensions__table",
+        ".dimensions__measurement"
+      ],
+      "description": "Render only complete target-formatted name/value groups; no valid groups omits the complete Dimensions root."
+    },
+    {
+      "name": "targetFormattedValues",
+      "selectors": [
+        ".dimensions__value"
+      ],
+      "description": "Targets own source quantities, unit system, conversion, precision, rounding, locale, tolerance and the complete active formatted strings. Dimensions performs no arithmetic or parsing."
+    },
+    {
+      "name": "unitChoiceComposition",
+      "selectors": [
+        ".dimensions__unit-control",
+        ".segmented__input"
+      ],
+      "events": [
+        "change"
+      ],
+      "attributes": [
+        "<fieldset>",
+        "<legend>",
+        "type=\"radio\"",
+        "name",
+        "value",
+        "checked"
+      ],
+      "description": "If present, canonical Segmented Control owns one exclusive native choice and its keyboard/focus behavior; the target coordinates that semantic value with a complete formatted measurement/annotation set."
+    },
+    {
+      "name": "controlledUncontrolledBoundary",
+      "selectors": [
+        ".dimensions__table",
+        ".dimensions__unit-control"
+      ],
+      "description": "Dimensions receives the active rendered content and owns no second selected-unit store. A target may control or initialize the canonical radio group and replace the active content from its authoritative source."
+    },
+    {
+      "name": "passiveUpdateBoundary",
+      "selectors": [
+        ".dimensions__table"
+      ],
+      "description": "The measurement list is not a live region by default. Targets own any user-research-backed concise result announcement without duplicating every value."
+    }
+  ],
+  "properties": [
+    {
+      "name": "visual",
+      "type": "slot",
+      "required": false,
+      "description": "Optional target-owned informative visual/diagram and redundant annotations; exact values remain in text.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".dimensions__visual",
+            "classNames": [
+              ".dimensions__visual",
+              ".dimensions__annotations",
+              ".dimensions__label"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "measurements",
+      "type": "slot",
+      "required": true,
+      "description": "Required non-empty target-formatted native name/value composition; no raw-number or unit schema is prescribed.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".dimensions__table",
+            "classNames": [
+              ".dimensions__table",
+              ".dimensions__measurement",
+              ".dimensions__value"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "unitControls",
+      "type": "slot",
+      "required": false,
+      "description": "Optional canonical Segmented Control; the target owns selected value and complete-set replacement.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".dimensions__unit-control",
+            "classNames": [
+              ".dimensions__unit-control"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "tokens": {
+    "public": {
+      "color": [
+        "--color-border-subtle",
+        "--color-surface-primary",
+        "--color-surface-secondary",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--typo-body-line-height",
+        "--typo-body-size",
+        "--typo-body-sm-line-height",
+        "--typo-body-sm-size",
+        "--typo-button-weight"
+      ],
+      "radius": [
+        "--radius-md",
+        "--radius-sm"
+      ],
+      "shadow": [
+        "--shadow-sm"
+      ],
+      "spacing": [
+        "--space-layout-element-gap"
+      ]
+    }
+  },
+  "accessibility": [
+    "Expose every measurement as a complete visible native description-list name/value group, even when a visual repeats it.",
+    "Keep the quantity name explicit and keep the target-formatted unit adjacent to its numerical value; do not rely on position, lines or image scale.",
+    "Give informative visual media a truthful text alternative and hide fully redundant annotations from assistive technology.",
+    "Use direction isolation and tabular numerals without truncating localized values or qualifiers.",
+    "If unit choice is present, compose canonical Segmented Control with a visible legend, same-name native radios, exactly one active value and native keyboard behavior.",
+    "Do not duplicate selected-unit state with independent aria-pressed buttons and do not make the complete measurement list a live region by default."
+  ],
+  "adapters": {
+    "web": {
+      "status": "implemented",
+      "kind": "css-native-composition",
+      "notes": "Generic container, native dl/div/dt/dd/bdi measurement groups, optional figure and canonical radio-backed Segmented Control composition; R5 adds no neutral runtime."
+    },
+    "shopify": {
+      "status": "planned",
+      "kind": "liquid-css-data",
+      "notes": "Requires approved product/variant quantity source, unit/precision/locale policy, merchant validation and first consumer before Liquid/schema."
+    },
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "figma": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-component"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable"
+    }
+  }
 }

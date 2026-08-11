@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "card",
   "name": "Card",
   "registryId": "B1",
   "category": "layout",
   "status": "pilot",
-  "summary": "Layout container with tokenized surface, border, radius, shadow, media/body/footer anatomy, hover lift, and flat/elevated variants.",
+  "summary": "Layout container with tokenized surface, border, radius, shadow, media/body/footer anatomy, pointer-aware hover lift, and flat/elevated variants.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/card",
@@ -89,12 +89,12 @@
     {
       "name": "hover",
       "selectors": [".card:hover"],
-      "description": "Pointer hover state with lift and stronger shadow."
+      "description": "Fine-pointer hover state with lift and stronger shadow."
     },
     {
       "name": "mediaHover",
       "selectors": [".card:hover .card__media img"],
-      "description": "Optional media image scale on card hover."
+      "description": "Optional media image scale on fine-pointer card hover."
     },
     {
       "name": "flatHover",
@@ -116,12 +116,22 @@
     {
       "name": "contentComposition",
       "selectors": [".card__media", ".card__body", ".card__footer"],
-      "description": "Media, body content, headings, metadata, and actions are consumer-owned composition rather than Card defaults."
+      "description": "Media, body content, headings, metadata, and actions are consumer-owned composition rather than Card defaults; body and footer allow long unbroken content to wrap instead of forcing horizontal overflow."
     },
     {
       "name": "interactionBoundary",
       "selectors": [".card"],
       "description": "Targets avoid wrapping the entire card in one interactive element when nested controls are present."
+    },
+    {
+      "name": "pointerAndMotionPreferences",
+      "selectors": [".card:hover", ".card:hover .card__media img"],
+      "description": "Hover lift and media scaling run only for hover-capable fine pointers, and transform transitions are removed when reduced motion is requested."
+    },
+    {
+      "name": "descendantFocusVisibility",
+      "selectors": [".card:focus-within"],
+      "description": "The root releases overflow clipping while a descendant has focus so full-bleed controls can retain their visible focus indicator."
     }
   ],
   "properties": [
@@ -168,7 +178,11 @@
   "accessibility": [
     "Use semantic HTML appropriate to the card purpose, such as article, section, aside, or list item.",
     "Images inside card media must include meaningful alt text or empty alt text when decorative.",
+    "Do not render an empty Card with no meaningful content or accessible purpose.",
     "Do not make an entire card clickable if it contains nested interactive controls.",
+    "Keep descendant focus indicators visible, including for controls composed at a full-bleed card edge.",
+    "Do not require hover lift or media scaling to reveal content or actions.",
+    "Honor reduced-motion preferences and do not apply hover-only transforms to coarse or non-hover pointers.",
     "Preserve heading hierarchy inside card content."
   ],
   "adapters": {

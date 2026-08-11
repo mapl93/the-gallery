@@ -1,13 +1,13 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.2.0",
   "slug": "artist-profile",
   "name": "Artist Profile",
   "registryId": "F1",
   "category": "storytelling",
   "status": "pilot",
-  "summary": "Editorial artist bio with portrait and philosophy quote.",
-  "dependencies": [],
+  "summary": "Named, container-responsive artist biography with optional portrait, quotation, and canonical action composition.",
+  "dependencies": ["button"],
   "source": {
     "registry": "registry.json#/components/artist-profile",
     "css": {
@@ -22,21 +22,28 @@
       "selector": ".artist-profile",
       "className": ".artist-profile",
       "required": true,
-      "description": "Artist profile section."
+      "description": "Native artist-profile section named by its visible artist heading and establishing the inline-size container."
+    },
+    {
+      "name": "layout",
+      "selector": ".artist-profile__layout",
+      "className": ".artist-profile__layout",
+      "required": true,
+      "description": "Internal container-responsive layout that preserves portrait-before-content source order."
     },
     {
       "name": "portrait",
       "selector": ".artist-profile__portrait",
       "className": ".artist-profile__portrait",
       "required": false,
-      "description": "Optional artist portrait media region."
+      "description": "Optional passive artist portrait media region, omitted completely when no portrait is supplied."
     },
     {
       "name": "portraitImage",
       "selector": ".artist-profile__portrait img",
       "className": null,
       "required": false,
-      "description": "Portrait image supplied by the target."
+      "description": "Native portrait image supplied by the target with context-appropriate alternative text."
     },
     {
       "name": "content",
@@ -85,7 +92,7 @@
       "selector": ".artist-profile__actions",
       "className": ".artist-profile__actions",
       "required": false,
-      "description": "Optional target-owned action composition."
+      "description": "Optional ordinary action group composed from canonical Button or other target-owned native controls; it is not a navigation landmark."
     }
   ],
   "variants": [
@@ -93,7 +100,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default responsive artist profile."
+      "description": "Default archival editorial treatment."
     }
   ],
   "sizes": [
@@ -101,7 +108,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Single-column layout that becomes two columns at wider viewports."
+      "description": "Single-column layout that becomes two columns when the component content container is wide enough."
     }
   ],
   "states": [
@@ -110,7 +117,14 @@
       "selectors": [
         ".artist-profile"
       ],
-      "description": "Default artist profile state."
+      "description": "Required name and biography content with any accepted optional parts."
+    },
+    {
+      "name": "withPortrait",
+      "selectors": [
+        ".artist-profile__layout--split"
+      ],
+      "description": "Explicit portrait-present composition that becomes a two-column media/content split in a wide component container. Adapters omit the modifier with the optional portrait."
     }
   ],
   "behavior": [
@@ -120,6 +134,81 @@
         ".artist-profile__content"
       ],
       "description": "Adapters should preserve label, name, location, biography, philosophy, and action reading order independently of the visual columns."
+    },
+    {
+      "name": "sectionLabelling",
+      "selectors": [
+        ".artist-profile",
+        ".artist-profile__name"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "id"
+      ],
+      "description": "The native section references a target-unique id on the visible artist-name heading; heading rank remains owned by the surrounding document."
+    },
+    {
+      "name": "portraitAlternative",
+      "selectors": [
+        ".artist-profile__portrait img"
+      ],
+      "attributes": [
+        "alt"
+      ],
+      "description": "The target supplies useful alternative text for informative portraits or an empty alternative for decorative media and omits the entire portrait region when absent."
+    },
+    {
+      "name": "optionalContent",
+      "selectors": [
+        ".artist-profile__portrait",
+        ".artist-profile__label",
+        ".artist-profile__location",
+        ".artist-profile__philosophy",
+        ".artist-profile__actions"
+      ],
+      "description": "Optional parts are omitted without empty shells, placeholder controls, or changes to the required name/biography order."
+    },
+    {
+      "name": "containerComposition",
+      "selectors": [
+        ".artist-profile",
+        ".artist-profile__layout"
+      ],
+      "description": "The root establishes an isolated inline-size container; the internal layout stacks in narrow containers, splits media/content in wide containers only with its portrait-present modifier, and remains one column when portrait is absent."
+    },
+    {
+      "name": "quotationSemantics",
+      "selectors": [
+        ".artist-profile__philosophy"
+      ],
+      "description": "Philosophy content uses a native blockquote only when it is an actual quotation; citation metadata remains target-authored when needed."
+    },
+    {
+      "name": "actionComposition",
+      "selectors": [
+        ".artist-profile__actions"
+      ],
+      "events": [
+        "native activation from composed controls"
+      ],
+      "description": "The group adds no landmark or composite-widget semantics. Canonical Button or target-native links/buttons own href, activation, focus, disabled, busy, hover and pressed behavior."
+    },
+    {
+      "name": "contentResilience",
+      "selectors": [
+        ".artist-profile__content",
+        ".artist-profile__bio",
+        ".artist-profile__philosophy",
+        ".artist-profile__actions"
+      ],
+      "description": "Rich, localized and unbroken content wraps inside the actual container; actions wrap as a group without viewport overflow."
+    },
+    {
+      "name": "passiveRuntime",
+      "selectors": [
+        ".artist-profile"
+      ],
+      "description": "Artist Profile owns no controlled or uncontrolled state, listener, observer, live region, focus movement or animation. Data, rich-text safety, media loading and routing remain target responsibilities."
     }
   ],
   "properties": [
@@ -127,7 +216,7 @@
       "name": "portrait",
       "type": "slot",
       "required": false,
-      "description": "Target-owned portrait media with appropriate alternative text.",
+      "description": "Target-owned passive portrait media with informative or decorative native alternative text as context requires.",
       "targetMappings": {
         "web": [
           {
@@ -158,7 +247,7 @@
       "name": "name",
       "type": "string",
       "required": true,
-      "description": "Artist display name.",
+      "description": "Artist display name rendered as the visible section heading; its contextual native heading level remains target-owned.",
       "targetMappings": {
         "web": [
           {
@@ -217,7 +306,7 @@
       "name": "actions",
       "type": "slot",
       "required": false,
-      "description": "Optional target-owned calls to action; composed controls retain their own semantics.",
+      "description": "Optional target-owned calls to action; canonical Button or target-native controls retain their own semantics and destinations.",
       "targetMappings": {
         "web": [
           {
@@ -241,13 +330,20 @@
         "--color-text-secondary"
       ],
       "typography": [
-        "--font-family-accent",
+        "--typo-caption-size",
+        "--typo-caption-line-height",
+        "--tg-typography-body-caption-weight",
         "--font-family-heading",
+        "--typo-h2-size",
+        "--typo-h2-line-height",
+        "--tg-typography-h2-weight",
+        "--typo-body-size",
+        "--typo-body-line-height",
         "--typo-article-line-height",
         "--typo-article-size",
-        "--typo-body-size",
-        "--typo-h2-size",
-        "--typo-h4-size"
+        "--font-family-accent",
+        "--typo-h4-size",
+        "--typo-h4-line-height"
       ],
       "radius": [
         "--radius-lg"
@@ -261,10 +357,14 @@
     }
   },
   "accessibility": [
-    "Use a heading level appropriate to the surrounding page for the artist name.",
-    "Give meaningful portrait media useful alternative text and mark decorative media accordingly.",
-    "Preserve source reading order when the layout changes between one and two columns.",
-    "Keep any composed actions keyboard accessible with visible focus indicators."
+    "Associate the native section with the visible artist-name heading through a target-unique aria-labelledby/id pair.",
+    "Use a native heading level appropriate to the surrounding document; the visual class does not mandate h2.",
+    "Give informative portrait media concise useful alternative text, use alt=\"\" when it is decorative, and omit the portrait region when absent.",
+    "Preserve portrait-before-content and authored narrative source order when the layout changes between one and two columns.",
+    "Use blockquote only for content quoted from the artist and keep any source or citation target-authored.",
+    "Keep the action group out of the landmark list and preserve native keyboard semantics and visible focus from every composed Button or link.",
+    "Allow localized, unbroken, rich and zoomed content to reflow without horizontal viewport overflow.",
+    "Do not add Artist Profile widget roles, custom keyboard handling, focus movement, live announcements or motion."
   ],
   "adapters": {
     "web": {
@@ -273,8 +373,9 @@
       "notes": "Implemented in components/css/storytelling.css."
     },
     "shopify": {
-      "status": "planned",
-      "kind": "liquid-css-js"
+      "status": "implemented",
+      "kind": "section-adapter",
+      "notes": "Dedicated merchant-configurable Liquid section maps image, identity, biography, quotation and one canonical Button destination without neutral runtime."
     },
     "react": {
       "status": "planned",

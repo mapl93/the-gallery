@@ -1,35 +1,53 @@
 ## Overview
 
-Marquee presents an ordered line of target-owned text or content with an existing continuous-motion presentation and a static reduced-motion fallback.
+Marquee presents one ordered set of short, non-essential content as either a readable static strip or a progressively enhanced continuous motion rhythm. The authored native list always remains the source of truth.
 
 ## Presentation
 
-<Preview html={'<div class="marquee" aria-label="Studio notes"><div class="marquee__track" role="list"><span class="marquee__item" role="listitem">Handcrafted in Buenos Aires</span><span class="marquee__separator" aria-hidden="true">/</span><span class="marquee__item" role="listitem">Small batch stoneware</span><span class="marquee__separator" aria-hidden="true">/</span><span class="marquee__item" role="listitem">Each piece is unique</span></div></div>'} label="Marquee" />
+<Preview html={'<section class="marquee marquee--auto" aria-labelledby="marquee-example-label" data-marquee data-presentation="auto" data-direction="forward" data-pace="default" data-marquee-state="pending"><p class="marquee__label" id="marquee-example-label">Studio principles</p><div class="marquee__viewport"><div class="marquee__track"><ul class="marquee__group marquee__group--source"><li class="marquee__item">Made by hand</li><li class="marquee__item">Natural materials</li><li class="marquee__item">Small batches</li><li class="marquee__item">Made to be used</li><li class="marquee__item">Crafted in Buenos Aires</li><li class="marquee__item">Packed with care</li></ul></div></div><button class="btn btn--outline btn--sm marquee__control" type="button" data-pause-label="Pause scrolling" data-resume-label="Resume scrolling" aria-label="Pause scrolling" hidden>Pause scrolling</button></section>'} label="Marquee" />
 
-The component pauses its track on pointer hover or focus within and becomes static under reduced motion. Content duplication, speed, direction, repetition, and runtime controls are intentionally not public properties.
+`auto` is the default and maps to `.marquee--auto`; `static` maps to `.marquee--static`. When JavaScript, content, and motion preference allow it, the shared runtime creates one inert visual copy, measures one travel distance, and lets CSS animate the track. Static mode, reduced motion, one item, invalid markup, and failed or missing enhancement preserve the wrapping source list and omit the motion control.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Use short, non-essential messages that remain understandable in the static fallback.</Do>
-  <Dont>Do not use continuous motion as the only place for critical policy, price, or status information.</Dont>
+  <Do>Use concise supporting ideas that remain complete and understandable when the list is static.</Do>
+  <Dont>Do not make price, policy, availability, deadlines, errors, or task instructions available only in moving content.</Dont>
 </DoDont>
 
-Targets that duplicate items for seamless motion must treat those copies as presentation only.
+Use `direction="forward"` to reveal subsequent items from inline-end while the track moves toward inline-start. This resolves physically with the writing direction, so it does not mean “left.” `slow`, `default`, and `fast` map to private distance-normalized velocities; raw durations and clone counts are not public configuration.
+
+## Behavior And State
+
+- Auto enhancement creates at most one `.marquee__group--copy`. It is `aria-hidden`, inert, pointer-inactive, and its descendants cannot add focus stops.
+- The canonical Button persistently pauses or resumes motion and always displays the next action.
+- Pointer hover pauses temporarily. Focus entering creates a durable pause; only the explicit Resume action clears it.
+- A hidden document suspends animation work. Returning to the page preserves the user's durable pause state.
+- The runtime emits `marqueeplaybackchange` when effective playback state changes; it does not announce frames or loop boundaries.
+- Neutral Web is uncontrolled for the mounted component lifetime. Framework targets may wrap the same state and event with a controlled API without adding a second owner.
 
 ## Accessibility
 
-- Respect `prefers-reduced-motion` and preserve a readable static layout.
-- Hide animation-only duplicate content from assistive technology.
-- Keep separators decorative and avoid unnecessary live-region announcements.
-- Ensure any interactive content inside the track remains reachable and causes motion to pause while focused.
+- Author one native `ul` and one or more native `li` items in meaningful order.
+- Keep visual copies hidden from accessibility APIs and keyboard navigation.
+- Supply localized `pauseLabel` and `resumeLabel`; the control is absent when it cannot control motion.
+- Respect reduced motion and preserve source order, visible focus, RTL behavior, forced colors, localization, narrow containers, and 200 percent text zoom.
+- A fixed list that moves is not a live region and does not use the ARIA `marquee` role.
 
 ## References
 
-**Dependencies:** None.
+**Dependency:** canonical Button.
 
-**Anatomy:** `.marquee`, `.marquee__track`, `.marquee__item`, and `.marquee__separator`.
+**Anatomy:** `.marquee`, optional `.marquee__label`, `.marquee__viewport`, `.marquee__track`, authoritative `.marquee__group--source`, generated `.marquee__group--copy`, `.marquee__item`, and conditional `.marquee__control`.
 
 <PropTable>
-  <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered target-owned text or content; visual duplication is not semantic value</td></tr>
+  <tr><td>`presentation`</td><td>enum</td><td>`auto`</td><td>`auto` or `static`</td></tr>
+  <tr><td>`label`</td><td>string</td><td>optional</td><td>Visible contextual label; blank uses a generic root</td></tr>
+  <tr><td>`items`</td><td>slot</td><td>required</td><td>One authoritative ordered native list; Auto requires at least two items</td></tr>
+  <tr><td>`direction`</td><td>enum</td><td>`forward`</td><td>Logical `forward` or `reverse`</td></tr>
+  <tr><td>`pace`</td><td>enum</td><td>`default`</td><td>`slow`, `default`, or `fast` distance-normalized velocity</td></tr>
+  <tr><td>`pauseLabel`</td><td>string</td><td>required</td><td>Localized visible Pause action</td></tr>
+  <tr><td>`resumeLabel`</td><td>string</td><td>required</td><td>Localized visible Resume action</td></tr>
 </PropTable>
+
+See [WCAG Pause, Stop, Hide](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html), the [APG Carousel motion-control precedent](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/), [Media Queries reduced motion](https://www.w3.org/TR/mediaqueries-5/#prefers-reduced-motion), and the [HTML obsolete-features rule for `marquee`](https://html.spec.whatwg.org/multipage/obsolete.html).

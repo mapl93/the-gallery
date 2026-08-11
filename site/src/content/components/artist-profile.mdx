@@ -1,17 +1,17 @@
 ## Overview
 
-Artist Profile is a responsive editorial biography that preserves the reading order of portrait, label, name, location, biography, philosophy, and target-owned actions.
+Artist Profile is a named, container-responsive editorial biography that preserves portrait-first source order and composes target-owned rich content and canonical actions.
 
 <Preview
-  html={'<section class="artist-profile tg-preview-frame tg-preview-frame--lg"><div class="artist-profile__portrait"><img class="tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Portrait of ceramic artist Maria Garcia" /></div><div class="artist-profile__content"><span class="artist-profile__label">Featured artist</span><h2 class="artist-profile__name">Maria Garcia</h2><p class="artist-profile__location">Buenos Aires, Argentina</p><div class="artist-profile__bio"><p>Maria creates hand-thrown stoneware shaped by traditional firing and glazing practices.</p></div><blockquote class="artist-profile__philosophy">A useful object can still hold the memory of its maker.</blockquote><div class="artist-profile__actions"><a href="#artist-profile-work">View selected work</a></div></div></section>'}
+  html={'<section class="artist-profile tg-preview-frame tg-preview-frame--lg" aria-labelledby="artist-profile-preview-name"><div class="artist-profile__layout artist-profile__layout--split"><div class="artist-profile__portrait"><img class="tg-preview-media tg-preview-media--portrait" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Maria Garcia shaping a stoneware vessel in her studio" /></div><div class="artist-profile__content"><p class="artist-profile__label">Featured artist</p><h2 class="artist-profile__name" id="artist-profile-preview-name">Maria Garcia</h2><p class="artist-profile__location">Buenos Aires, Argentina</p><div class="artist-profile__bio"><p>Maria creates hand-thrown stoneware shaped by traditional firing and glazing practices.</p><p>Her work balances quiet utility with the visible traces of making.</p></div><blockquote class="artist-profile__philosophy">A useful object can still hold the memory of its maker.</blockquote><div class="artist-profile__actions"><a class="btn" href="#artist-profile-work">View selected work</a><a class="btn btn--outline" href="#artist-profile-journal">Studio journal</a></div></div></div></section>'}
   label="Artist Profile"
 />
 
 ## Presentation
 
-The default presentation stacks into one column and becomes a balanced two-column layout at wider viewports. `portrait`, `label`, `location`, `philosophy`, and `actions` are optional; `name` and `biography` are required.
+The default presentation stacks into one column and becomes a balanced two-column layout when the component content box is at least `36rem` wide. `portrait`, `label`, `location`, `philosophy`, and `actions` are optional; `name` and `biography` are required. Omitting the portrait leaves one full-width content column at every size.
 
-Biography and actions are target-owned slots. Their rich content and controls retain their own semantics, while Artist Profile owns the narrative order and responsive composition.
+Biography and actions are target-owned slots. Their rich content and controls retain their own semantics, while Artist Profile owns the named section, narrative order, intrinsic rhythm, and responsive composition. The component has no local state or JavaScript runtime.
 
 ## Usage Guidelines
 
@@ -22,29 +22,33 @@ Biography and actions are target-owned slots. Their rich content and controls re
 
 - Use portrait media that supports the biography rather than repeating it.
 - Keep the philosophy concise enough to remain a supporting quotation.
-- Compose only actions that belong to the artist context.
+- Compose only actions that belong to the artist context and use canonical Button or Link semantics for each control.
+- Omit optional parts instead of leaving empty media, quotation, or action wrappers.
 
 ## Accessibility
 
-- Use a heading level appropriate to the surrounding page for the artist name.
-- Give meaningful portrait media useful alternative text and mark decorative media accordingly.
+- Associate the section with the visible artist heading through a target-unique `aria-labelledby`/`id` pair.
+- Use a heading level appropriate to the surrounding page for the artist name; the visual class does not require `h2`.
+- Give informative portrait media concise useful alternative text, use `alt=""` when it is decorative, and omit the portrait region when absent.
 - Preserve source reading order when the layout changes between one and two columns.
-- Keep composed actions keyboard accessible with visible focus indicators.
+- Use `blockquote` only for a real quotation.
+- Keep composed actions keyboard accessible with native semantics and canonical visible focus; the action group is not an extra navigation landmark.
+- Allow localized, unbroken and zoomed content to reflow without horizontal viewport overflow.
 
 ## References
 
-**Dependencies:** None.
+**Dependencies:** Button.
 
-**Anatomy:** `.artist-profile` root; optional `.artist-profile__portrait` and portrait image; required `.artist-profile__content`, `.artist-profile__name`, and `.artist-profile__bio`; optional `.artist-profile__label`, `.artist-profile__location`, `.artist-profile__philosophy`, and `.artist-profile__actions`.
+**Anatomy:** named `.artist-profile` section root; required `.artist-profile__layout` and `.artist-profile__content`; optional `.artist-profile__portrait` and portrait image; required contextual `.artist-profile__name` heading and `.artist-profile__bio`; optional `.artist-profile__label`, `.artist-profile__location`, `.artist-profile__philosophy`, and ordinary `.artist-profile__actions` group.
 
 **API Reference**
 
 <PropTable>
-  <tr><td>`portrait`</td><td>slot</td><td>optional</td><td>Target-owned portrait media</td></tr>
+  <tr><td>`portrait`</td><td>slot</td><td>optional</td><td>Target-owned passive portrait media with native alternative text</td></tr>
   <tr><td>`label`</td><td>string</td><td>optional</td><td>Editorial label before the artist name</td></tr>
-  <tr><td>`name`</td><td>string</td><td>required</td><td>Artist display name</td></tr>
+  <tr><td>`name`</td><td>string</td><td>required</td><td>Artist display name rendered as the visible section heading</td></tr>
   <tr><td>`location`</td><td>string</td><td>optional</td><td>Human-readable artist location</td></tr>
   <tr><td>`biography`</td><td>slot</td><td>required</td><td>Target-owned biography rich content</td></tr>
   <tr><td>`philosophy`</td><td>string</td><td>optional</td><td>Artist philosophy quotation</td></tr>
-  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Target-owned calls to action</td></tr>
+  <tr><td>`actions`</td><td>slot</td><td>optional</td><td>Target-owned canonical Button or native control composition</td></tr>
 </PropTable>

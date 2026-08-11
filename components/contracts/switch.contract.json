@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "switch",
   "name": "Switch / Toggle",
   "registryId": "H1",
   "category": "forms",
   "status": "pilot",
-  "summary": "Native checkbox-backed switch with tokenized track and thumb, checked, focus-visible, disabled, and size states.",
+  "summary": "Immediate binary on/off setting backed by one native checkbox with switch semantics, stable labeling, form value, validation, and three visual sizes.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/switch",
@@ -49,8 +49,8 @@
       "name": "label",
       "selector": ".switch__label",
       "className": ".switch__label",
-      "required": false,
-      "description": "Visible label text."
+      "required": true,
+      "description": "Stable visible label text that does not change with checkedness."
     }
   ],
   "variants": [
@@ -97,7 +97,12 @@
     {
       "name": "default",
       "selectors": [".switch"],
-      "description": "Default unchecked switch state."
+      "description": "Default off switch state."
+    },
+    {
+      "name": "hover",
+      "selectors": [".switch:hover:not(:has(.switch__input:disabled)) .switch__track"],
+      "description": "Pointer hover on an available switch."
     },
     {
       "name": "checked",
@@ -111,36 +116,78 @@
     },
     {
       "name": "disabled",
-      "selectors": [".switch__input:disabled ~ .switch__track"],
+      "selectors": [".switch:has(.switch__input:disabled)"],
       "description": "Unavailable switch state."
+    },
+    {
+      "name": "requiredInvalid",
+      "selectors": [".switch__input"],
+      "description": "Native required switch whose current off state is invalid; invalidity is semantic and is not styled without the Error variant."
+    },
+    {
+      "name": "errorFocusVisible",
+      "selectors": [".switch--error", ".switch__input:focus-visible ~ .switch__track"],
+      "description": "Focused Error switch with its semantic outer ring."
+    },
+    {
+      "name": "successFocusVisible",
+      "selectors": [".switch--success", ".switch__input:focus-visible ~ .switch__track"],
+      "description": "Focused Success switch with its semantic outer ring."
+    },
+    {
+      "name": "warningFocusVisible",
+      "selectors": [".switch--warning", ".switch__input:focus-visible ~ .switch__track"],
+      "description": "Focused Warning switch with its semantic outer ring."
     }
   ],
   "behavior": [
     {
       "name": "nativeControl",
-      "attributes": ["type=\"checkbox\"", "checked", "disabled", "required"],
-      "description": "Switch should preserve native checkbox behavior for form submission, keyboard toggling, and assistive technology."
+      "selectors": [".switch__input"],
+      "attributes": ["type=\"checkbox\"", "role=\"switch\"", "name", "value", "checked", "disabled", "required"],
+      "events": ["click", "Space", "input", "change", "form submission", "form reset"],
+      "description": "Switch preserves native checkbox behavior while exposing switch semantics for assistive technology."
     },
     {
       "name": "checkedState",
       "selectors": [".switch__input:checked ~ .switch__track"],
-      "attributes": ["aria-checked", "role=\"switch\""],
-      "description": "Adapters may expose role=\"switch\", but checked state must stay synchronized with the native checked value."
+      "attributes": ["checked", "role=\"switch\""],
+      "description": "Native checked is the sole accessibility and visual state; redundant manually synchronized aria-checked is not required."
     },
     {
       "name": "keyboardToggle",
       "events": ["Space"],
       "description": "Keyboard users toggle the switch with Space through the native input."
+    },
+    {
+      "name": "checkedOwnership",
+      "selectors": [".switch__input"],
+      "attributes": ["checked establishes default checkedness in static HTML", "checked or defaultChecked in framework adapters"],
+      "events": ["input", "change", "form reset"],
+      "description": "Static Web delegates live checkedness to the native input; controlled adapters bind that same live property without a mirror input."
+    },
+    {
+      "name": "immediateEffect",
+      "selectors": [".switch__input"],
+      "events": ["input", "change"],
+      "description": "Consumers apply and persist the setting immediately; pending, retry, and side effects remain target-owned."
+    },
+    {
+      "name": "validationSemantics",
+      "selectors": [".switch--error", ".switch--success", ".switch--warning", ".switch__input"],
+      "attributes": ["aria-invalid=\"true\" only for Error", "aria-describedby references external feedback"],
+      "description": "Switch owns visual validation and native invalid state while Field Wrapper owns static feedback content."
     }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": true, "description": "Visible accessible label for the switch.", "targetMappings": { "web": [{ "kind": "content", "selector": ".switch__label" }] } },
+    { "name": "label", "type": "string", "required": true, "description": "Stable visible accessible label that does not change between on and off.", "targetMappings": { "web": [{ "kind": "content", "selector": ".switch__label" }] } },
     { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Canonical switch size.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".switch", "source": "sizes" }] } },
     { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation independent from checked state.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".switch", "source": "variants" }] } },
-    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Native checked state.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
+    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Establishes default checkedness in static HTML; framework adapters may bind the live checked property.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the native switch unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Participates in native required-choice validation.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
     { "name": "name", "type": "string", "required": false, "description": "Native form field name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
+    { "name": "value", "type": "string", "required": false, "defaultValue": "on", "description": "Native value submitted when the switch is on.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
     { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for helper or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
   ],
   "tokens": {
@@ -166,6 +213,9 @@
       "radius": [
         "--radius-full"
       ],
+      "spacing": [
+        "--space-input-icon-gap"
+      ],
       "shadow": [
         "--shadow-sm"
       ],
@@ -180,21 +230,25 @@
       ],
       "typography": [
         "--typo-body-size",
+        "--typo-body-line-height",
         "--font-family-body"
       ]
     }
   },
   "accessibility": [
-    "Use a native checkbox input or equivalent platform switch primitive.",
-    "Provide a visible label or an equivalent accessible name.",
-    "Keep checked, disabled, and required state synchronized with the input.",
-    "Support Space to toggle the switch."
+    "Use a native checkbox input with role=\"switch\" or an equivalent platform switch primitive.",
+    "Provide a stable visible label that does not change when checkedness changes.",
+    "Keep checked, disabled, required, name, and submitted value synchronized with the native input.",
+    "Support Space to toggle the switch and expose native input and change events.",
+    "Do not expose indeterminate state; use Checkbox for mixed selection.",
+    "Use Switch for immediate binary settings and keep persistence, pending, and failure recovery target-owned.",
+    "Use aria-invalid only for Error and associate external feedback with aria-describedby."
   ],
   "adapters": {
     "web": {
       "status": "implemented",
       "kind": "css",
-      "notes": "Implemented by class composition in components/css/forms.css with a visually hidden native checkbox."
+      "notes": "Implemented by class composition in components/css/forms.css with a visually hidden native checkbox, required role=switch, logical thumb travel, and native form ownership."
     },
     "shopify": {
       "status": "implemented",

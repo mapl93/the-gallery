@@ -1,6 +1,6 @@
 ## Overview
 
-Single-choice field with validation feedback, a custom trigger and listbox anchored below the control, plus a native select fallback for forms and no-JavaScript environments.
+Single-choice field with validation feedback, a select-only combobox trigger and listbox anchored below the control, plus a native select fallback and form-value owner.
 
 <Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select"><label class="select__label" for="select-country">Country</label><select class="select__field" id="select-country" name="country"><option value="" hidden selected>Choose a country</option><option value="ar">Argentina</option><option value="mx">Mexico</option><option value="es">Spain</option></select></div></div>'} label="Select" />
 
@@ -58,6 +58,7 @@ Use Combobox instead when the list requires search, filtering, asynchronous resu
 </Callout>
 
 - Associate the visible label with the enhanced trigger and listbox.
+- Expose the generated trigger as `role="combobox"` with a listbox popup.
 - Keep focus on the trigger while arrow keys update `aria-activedescendant`.
 - Expose `aria-expanded`, `aria-controls`, `aria-selected`, and `aria-disabled` as documented by the contract.
 - Support Arrow Up, Arrow Down, Home, End, Enter, Space, Escape, Tab, and typeahead.
@@ -67,6 +68,8 @@ Use Combobox instead when the list requires search, filtering, asynchronous resu
 - Add `aria-invalid="true"` to the native field for errors; the enhancer mirrors it to the trigger. Success and Warning do not use `aria-invalid`.
 - Keep the placeholder as a hidden empty-value native option so it labels the closed trigger without appearing as a disabled choice.
 - Use the native `disabled` attribute for unavailable fields and disabled native options for unavailable choices.
+- Put `name` and `required` on the native select. The enhancer reflects required state with `aria-required` on the combobox trigger.
+- Treat the native select as the only value owner. Framework adapters may set its value and consume native `input` and `change` events; they must not create a second enhanced value state.
 
 ## References
 
@@ -75,6 +78,12 @@ Use Combobox instead when the list requires search, filtering, asynchronous resu
   <tr><td>`message`</td><td>string</td><td>empty</td><td>Supporting or validation feedback associated with the control</td></tr>
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
   <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the native fallback and generated trigger</td></tr>
+  <tr><td>`name`</td><td>string</td><td>empty</td><td>Native form field name</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Participates in native validation and is reflected to the enhanced trigger</td></tr>
 </PropTable>
 
 Choices remain native `<option>` children of `.select__field`. The shared `theme.js` generates `.select__control`, `.select__trigger`, `.select__value`, `.select__indicator`, `.select__listbox`, `.select__option`, and `.select__option-check`, then keeps them synchronized with the native field. The chevron and selected check use Lucide geometry.
+
+The custom popup is deliberately limited to a flat, single-choice native select. A field with `multiple`, `size` greater than one, or `<optgroup>` content remains a styled native select so its richer selection and grouping semantics are not flattened. Use Combobox for search, filtering, asynchronous options, or free-form input.
+
+With reduced motion enabled, field transitions and the decorative chevron rotation are removed while open state remains available through `aria-expanded` and the visible popup.

@@ -1,71 +1,84 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.1.0",
+  "contractVersion": "0.3.0",
   "slug": "order-detail",
   "name": "Order Detail",
   "registryId": "U5",
   "category": "account",
   "status": "pilot",
-  "summary": "Single order view with order header and tracking timeline that can compose cart line items.",
-  "dependencies": ["badge", "cart-line-item"],
+  "summary": "Passive title-labelled single-order composition with optional target metadata, canonical Steps progress, and read-only canonical Cart Line Item records.",
+  "dependencies": ["steps", "cart-line-item"],
   "source": {
     "registry": "registry.json#/components/order-detail",
     "css": { "file": "components/css/account.css", "selector": ".order-detail" },
     "docs": "site/src/content/components/order-detail.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".order-detail", "className": ".order-detail", "required": true, "description": "Order detail container." },
-    { "name": "header", "selector": ".order-detail__header", "className": ".order-detail__header", "required": true, "description": "Order detail header." },
-    { "name": "title", "selector": ".order-detail__title", "className": ".order-detail__title", "required": true, "description": "Order title or number." },
-    { "name": "meta", "selector": ".order-detail__meta", "className": ".order-detail__meta", "required": false, "description": "Target-formatted order metadata." },
-    { "name": "tracking", "selector": ".order-tracking", "className": ".order-tracking", "required": false, "description": "Order tracking timeline." },
-    { "name": "trackingStep", "selector": ".order-tracking__step", "className": ".order-tracking__step", "required": false, "description": "Tracking step." },
-    { "name": "trackingConnector", "selector": ".order-tracking__step::before", "generated": true, "required": false, "description": "Generated tracking connector." },
-    { "name": "trackingDot", "selector": ".order-tracking__dot", "className": ".order-tracking__dot", "required": false, "description": "Tracking status dot." },
-    { "name": "trackingLabel", "selector": ".order-tracking__label", "className": ".order-tracking__label", "required": false, "description": "Tracking step label." },
-    { "name": "items", "selector": ".order-detail__items", "className": ".order-detail__items", "required": false, "description": "Purchased line-item composition region." }
+    { "name": "root", "selector": ".order-detail", "className": ".order-detail", "required": true, "description": "Required passive section named from the visible order title and established as the U5 inline-size container." },
+    { "name": "header", "selector": ".order-detail__header", "className": ".order-detail__header", "required": true, "description": "Required title and optional metadata grouping whose private layout responds to U5 width." },
+    { "name": "title", "selector": ".order-detail__title", "className": ".order-detail__title", "required": true, "description": "Required non-empty visible heading that labels the section; the target selects the context-appropriate heading rank." },
+    { "name": "meta", "selector": ".order-detail__meta", "className": ".order-detail__meta", "required": false, "description": "Optional target-owned semantic order metadata such as a native date or readable status composition." },
+    { "name": "tracking", "selector": ".order-detail__tracking", "className": ".order-detail__tracking", "required": false, "description": "Optional provider-trusted finite ordered milestones projected through canonical Steps; omitted when target facts do not form a trustworthy linear sequence." },
+    { "name": "items", "selector": ".order-detail__items", "className": ".order-detail__items", "required": false, "description": "Optional accessibly named purchased-items region containing a native canonical Cart Line Item list." },
+    { "name": "lineItem", "selector": ".order-detail__line-item", "className": ".order-detail__line-item", "required": false, "description": "Repeated read-only canonical Cart Line Item record supplied by the target without cart mutation controls." }
   ],
   "variants": [
-    { "name": "default", "className": null, "default": true, "description": "Default order detail page." }
+    { "name": "default", "className": null, "default": true, "description": "Single neutral order-detail profile; metadata and dependency regions are composition, not visual variants." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "Default order detail layout." }
+    { "name": "default", "className": null, "default": true, "description": "Intrinsic named-container profile with a private stacked-header threshold." }
   ],
   "states": [
-    { "name": "default", "selectors": [".order-detail"], "description": "Default order detail state." },
-    { "name": "trackingDone", "selectors": [".order-tracking__step--done::before", ".order-tracking__step--done .order-tracking__dot"], "description": "Completed tracking step." },
-    { "name": "trackingActive", "selectors": [".order-tracking__step--active::before", ".order-tracking__step--active .order-tracking__dot", ".order-tracking__step--active .order-tracking__label"], "description": "Active tracking step." }
+    { "name": "default", "selectors": [".order-detail"], "description": "Valid title-only passive order-detail composition." },
+    { "name": "metadataPresent", "selectors": [".order-detail__meta"], "description": "Optional target-owned semantic metadata is present." },
+    { "name": "trackingPresent", "selectors": [".order-detail__tracking"], "description": "Optional canonical Steps composition is present; completed/current/upcoming are dependency and target projections, not U5 states." },
+    { "name": "lineItemsPresent", "selectors": [".order-detail__items", ".order-detail__line-item"], "description": "Optional non-empty read-only canonical Cart Line Item collection is present." }
   ],
   "behavior": [
-    { "name": "orderData", "selectors": [".order-detail__title"], "description": "Order detail should map authenticated order number and metadata from target data." },
-    { "name": "trackingStatus", "selectors": [".order-tracking__step", ".order-tracking__label"], "attributes": ["aria-current=\"step\""], "description": "Tracking timeline should expose completed and active status as readable text." },
-    { "name": "lineItemsComposition", "selectors": [".order-detail__items"], "description": "Order Detail can compose Cart Line Item for purchased line item anatomy without cart mutation behavior." }
+    { "name": "requiredTitle", "selectors": [".order-detail", ".order-detail__title"], "attributes": ["aria-labelledby", "id"], "description": "A trimmed non-empty visible title is required; missing title omits the complete renderer rather than creating an unnamed section." },
+    { "name": "headingContext", "selectors": [".order-detail__title"], "description": "Targets choose the heading element that fits the host page outline; U5 does not hardcode one global heading rank." },
+    { "name": "orderData", "selectors": [".order-detail__title", ".order-detail__meta"], "description": "Title and optional metadata come from one authoritative order and are localized/formatted by the target." },
+    { "name": "metadataSemantics", "selectors": [".order-detail__meta"], "attributes": ["datetime"], "description": "When metadata represents a date or time, targets preserve a native time element with a conforming machine-readable value." },
+    { "name": "trackingComposition", "selectors": [".order-detail__tracking", ".steps"], "attributes": ["ol", "li", "aria-label", "aria-current=\"step\""], "description": "Optional tracking composes canonical passive Steps only from a provider-trusted finite ordered milestone model; the target supplies order, labels, completion and at most one current step." },
+    { "name": "trackingTruth", "selectors": [".order-detail__tracking", ".order-detail__meta"], "description": "U5 never infers a universal sequence from processing, fulfillment, shipment, pickup, return, refund, partial, split, or cancellation facts. When those facts are not a trustworthy linear model, omit Steps and render ordinary target-authored semantic status content." },
+    { "name": "lineItemsComposition", "selectors": [".order-detail__items", ".cart-lines", ".order-detail__line-item"], "attributes": ["ul", "li", "aria-label"], "description": "Optional purchased products use a non-empty native canonical Cart Line Item collection." },
+    { "name": "readOnlyPurchase", "selectors": [".order-detail__line-item"], "description": "Purchased quantity is readable content; Quantity Selector, removal, save-for-later, add-to-cart, and other cart commands are prohibited from the U5 profile." },
+    { "name": "productNavigation", "selectors": [".order-detail__line-item"], "attributes": ["href"], "events": ["click"], "description": "An available Cart Line Item title destination keeps canonical native Link semantics; target routing owns navigation, history, focus, and feedback." },
+    { "name": "optionalRegions", "selectors": [".order-detail__meta", ".order-detail__tracking", ".order-detail__items"], "description": "Metadata, tracking, and line items are independently optional and their empty wrappers are omitted." },
+    { "name": "externalLifecycle", "description": "Authentication, authorization, redaction, queries, loading, error, unavailable, not-found, expired-session, live updates, formatting, routing, analytics, and telemetry remain outside passive U5." },
+    { "name": "intrinsicLayout", "selectors": [".order-detail", ".order-detail__header"], "description": "The root is a named inline-size container; private header composition changes by component width while DOM order remains title, metadata, tracking, items." },
+    { "name": "passiveRuntime", "description": "Neutral U5 owns no listener, observer, timer, request, state mapper, formatter, auth SDK, tracker, or internal live region." }
   ],
   "properties": [
-    { "name": "title", "type": "string", "required": true, "description": "Order title or target-formatted number.", "targetMappings": { "web": [{ "kind": "content", "selector": ".order-detail__title" }] } },
-    { "name": "meta", "type": "slot", "required": false, "description": "Target-owned order date, status, or supporting metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__meta", "classNames": [".order-detail__meta"] }] } },
-    { "name": "tracking", "type": "slot", "required": false, "description": "Target-owned tracking steps and current-state semantics.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-tracking", "classNames": [".order-tracking"] }] } },
-    { "name": "lineItems", "type": "slot", "required": false, "description": "Purchased Cart Line Item compositions without cart mutation controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__items", "classNames": [".order-detail__items"] }] } }
+    { "name": "title", "type": "string", "required": true, "description": "Required non-empty localized visible order title and accessible section-name source; target context owns heading rank.", "targetMappings": { "web": [{ "kind": "content", "selector": ".order-detail__title" }] } },
+    { "name": "meta", "type": "slot", "required": false, "description": "Optional target-owned semantic order date, status, or supporting metadata.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__meta", "classNames": [".order-detail__meta"] }] } },
+    { "name": "tracking", "type": "slot", "required": false, "description": "Optional provider-trusted finite ordered milestone records projected through canonical Steps; omit when target facts are non-linear or uncertain. U5 defines no stage inventory or current-index state.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__tracking", "classNames": [".steps", ".order-detail__tracking"] }] } },
+    { "name": "lineItems", "type": "slot", "required": false, "description": "Optional non-empty read-only canonical Cart Line Item collection without cart mutation controls.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".order-detail__items", "classNames": [".order-detail__items", ".cart-lines", ".order-detail__line-item"] }] } }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-text-primary", "--color-border-subtle", "--color-feedback-success-default", "--color-surface-secondary", "--color-text-secondary"],
-      "spacing": ["--space-layout-section-gap", "--space-layout-container"],
-      "radius": ["--radius-full"],
-      "typography": ["--font-family-heading", "--typo-h3-size", "--typo-body-size"]
+      "color": ["--color-text-primary", "--color-text-secondary"],
+      "spacing": ["--space-layout-section-gap", "--space-layout-container", "--tg-space-stack-xs", "--tg-space-stack-md", "--tg-space-stack-lg"],
+      "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--typo-h3-size", "--typo-h3-line-height", "--typo-body-sm-size", "--typo-body-sm-line-height"]
     }
   },
   "accessibility": [
-    "Protect order details behind authentication.",
-    "Expose current tracking step with text and appropriate current-state semantics.",
-    "Do not treat purchased line items as editable cart controls."
+    "Render a section labelled by its required non-empty visible title and omit the complete component when that title is absent.",
+    "Use a heading rank appropriate to the surrounding page and preserve native time semantics when metadata represents a date or time.",
+    "Compose tracking from canonical native ordered Steps with readable status, at most one aria-current step, and no custom widget keyboard model.",
+    "Use Steps only for provider-trusted ordered milestones. When authoritative facts are non-linear or uncertain, omit Steps and expose ordinary semantic status content instead of fabricating progress.",
+    "Do not communicate progress only through connector, indicator, or color; canonical completed and current semantics must remain available as text or native state.",
+    "Keep purchased items in a native canonical Cart Line Item list and omit cart mutation controls from the read-only order profile.",
+    "Preserve native Link focus and activation when a valid product destination exists; do not make the complete row or order section a second interactive surface.",
+    "Keep title, metadata, tracking, and items in stable DOM order across container sizes, localization, RTL, zoom, forced colors, and reduced motion.",
+    "Protect or redact order details according to the target authentication and authorization context before providing U5 content."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/account.css." },
-    "shopify": { "status": "planned", "kind": "liquid-css", "notes": "Should map Shopify order detail, fulfillment status, tracking, and line items." },
-    "react": { "status": "planned", "kind": "component" },
-    "figma": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-component" },
-    "compose": { "status": "planned", "kind": "native-component" }
+    "web": { "status": "implemented", "kind": "css-composition", "notes": "Implemented as a zero-runtime named-container section composed from canonical Steps and Cart Line Item." },
+    "shopify": { "status": "planned", "kind": "canonical-or-native-order-detail-handoff", "notes": "Shopify v1 uses the hosted current-account Order status page as an intentional native handoff with no U5 parity claim. Target-controlled extensions or headless storefronts may project authoritative U5 metadata, provider-trusted Steps and read-only purchase lines. Classic Liquid is separately versioned compatibility; copied CSS is not target readiness." },
+    "react": { "status": "planned", "kind": "semantic-wrapper", "notes": "Thin wrapper over canonical Steps and Cart Line Item adapters with external authoritative order state." },
+    "figma": { "status": "planned", "kind": "component-composition", "notes": "Should compose approved canonical Steps and Cart Line Item instances; registered nodes currently show generic Button Studio UI." },
+    "swiftui": { "status": "planned", "kind": "native-composition" },
+    "compose": { "status": "planned", "kind": "native-composition" }
   }
 }

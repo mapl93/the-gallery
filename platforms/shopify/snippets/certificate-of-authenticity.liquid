@@ -1,62 +1,128 @@
-{%- comment -%}
-  Snippet: certificate-of-authenticity
-  Usage: {% render 'certificate-of-authenticity', product: product %}
-{%- endcomment -%}
+{% doc %}
+  Renders a passive certificate record from current product facts. A real
+  signature or verification destination must be supplied explicitly by the
+  calling target; this snippet never generates or guarantees either one.
 
-<div class="coa">
-  <p class="coa__header">Certificate of Authenticity</p>
+  @param {product} product - Product whose title, vendor, and current certificate-detail metafields are presented.
+  @param {string} [label] - Optional visible record-kind label; defaults to the localized certificate label.
+  @param {string} [title] - Optional visible record title; defaults to the product title.
+  @param {string} [artist] - Optional artist or maker attribution; defaults to the product vendor.
+  @param {string} [heading_id] - Optional target-unique title id used to name the article.
+  @param {string} [signature] - Optional real target-owned signature or artist-mark text.
+  @param {string} [verification_url] - Optional real target-owned certificate-record destination.
+  @param {image} [verification_image] - Optional target-owned QR or verification image shown inside the descriptive link.
+  @param {string} [verification_label] - Optional descriptive verification link text.
 
-  <h3 class="coa__title">{{ product.title }}</h3>
-  <p class="coa__artist">by {{ product.vendor }}</p>
+  @example
+  {% render 'certificate-of-authenticity', product: product, verification_url: certificate.url %}
+{% enddoc %}
 
-  <div class="coa__divider"></div>
+{%- liquid
+  assign certificate_label = label
+  if certificate_label == blank
+    assign certificate_label = 'certificate.label' | t
+  endif
 
-  <div class="coa__details">
-    {% if product.metafields.custom.medium %}
-      <div>
-        <p class="coa__detail-label">Medium</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.medium }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.dimensions %}
-      <div>
-        <p class="coa__detail-label">Dimensions</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.dimensions }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.year %}
-      <div>
-        <p class="coa__detail-label">Year</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.year }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.edition %}
-      <div>
-        <p class="coa__detail-label">Edition</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.edition }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.glaze_type %}
-      <div>
-        <p class="coa__detail-label">Glaze</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.glaze_type }}</p>
-      </div>
-    {% endif %}
-    {% if product.metafields.custom.firing_temperature %}
-      <div>
-        <p class="coa__detail-label">Firing</p>
-        <p class="coa__detail-value">{{ product.metafields.custom.firing_temperature }}</p>
-      </div>
-    {% endif %}
-  </div>
+  assign certificate_title = title | default: product.title
+  assign certificate_artist = artist | default: product.vendor
+  assign certificate_heading_id = heading_id
+  if certificate_heading_id == blank
+    capture certificate_heading_id
+      echo 'certificate-title-' | append: product.id
+    endcapture
+  endif
 
-  {% if product.vendor %}
-    <p class="coa__signature">{{ product.vendor }}</p>
+  assign medium = product.metafields.custom.medium.value
+  assign dimensions = product.metafields.custom.dimensions.value
+  assign year = product.metafields.custom.year.value
+  assign edition = product.metafields.custom.edition.value
+  assign glaze = product.metafields.custom.glaze_type.value
+  assign firing = product.metafields.custom.firing_temperature.value
+
+  assign has_details = false
+  if medium != blank or dimensions != blank or year != blank or edition != blank or glaze != blank or firing != blank
+    assign has_details = true
+  endif
+
+  assign has_lower_content = false
+  if has_details or signature != blank or verification_url != blank
+    assign has_lower_content = true
+  endif
+
+  assign resolved_verification_label = verification_label
+  if resolved_verification_label == blank
+    assign resolved_verification_label = 'certificate.verify_record' | t
+  endif
+-%}
+
+<article class="coa" aria-labelledby="{{ certificate_heading_id | escape }}">
+  {% if certificate_label != blank %}
+    <p class="coa__header">{{ certificate_label | escape }}</p>
   {% endif %}
 
-  <div class="coa__qr">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ shop.url }}{{ product.url }}"
-         alt="Verification QR code" width="80" height="80" loading="lazy">
-    <p class="coa__verify">Scan to verify authenticity</p>
-  </div>
-</div>
+  <h2 class="coa__title" id="{{ certificate_heading_id | escape }}">{{ certificate_title | escape }}</h2>
+
+  {% if certificate_artist != blank %}
+    <p class="coa__artist">{{ certificate_artist | escape }}</p>
+  {% endif %}
+
+  {% if has_lower_content %}
+    <div class="coa__divider" aria-hidden="true"></div>
+  {% endif %}
+
+  {% if has_details %}
+    <dl class="coa__details">
+      {% if medium != blank %}
+        <div class="coa__detail">
+          <dt class="coa__detail-label">{{ 'certificate.details.medium' | t }}</dt>
+          <dd class="coa__detail-value">{{ medium | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if dimensions != blank %}
+        <div class="coa__detail">
+          <dt class="coa__detail-label">{{ 'certificate.details.dimensions' | t }}</dt>
+          <dd class="coa__detail-value">{{ dimensions | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if year != blank %}
+        <div class="coa__detail">
+          <dt class="coa__detail-label">{{ 'certificate.details.year' | t }}</dt>
+          <dd class="coa__detail-value">{{ year | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if edition != blank %}
+        <div class="coa__detail">
+          <dt class="coa__detail-label">{{ 'certificate.details.edition' | t }}</dt>
+          <dd class="coa__detail-value">{{ edition | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if glaze != blank %}
+        <div class="coa__detail">
+          <dt class="coa__detail-label">{{ 'certificate.details.glaze' | t }}</dt>
+          <dd class="coa__detail-value">{{ glaze | escape }}</dd>
+        </div>
+      {% endif %}
+      {% if firing != blank %}
+        <div class="coa__detail">
+          <dt class="coa__detail-label">{{ 'certificate.details.firing' | t }}</dt>
+          <dd class="coa__detail-value">{{ firing | escape }}</dd>
+        </div>
+      {% endif %}
+    </dl>
+  {% endif %}
+
+  {% if signature != blank %}
+    <p class="coa__signature">{{ signature | escape }}</p>
+  {% endif %}
+
+  {% if verification_url != blank %}
+    <a class="coa__verification" href="{{ verification_url | escape }}">
+      {% if verification_image != blank %}
+        <span class="coa__qr" aria-hidden="true">
+          {{ verification_image | image_url: width: 160 | image_tag: alt: '', loading: 'lazy', widths: '80, 160', sizes: '80px' }}
+        </span>
+      {% endif %}
+      <span class="coa__verify">{{ resolved_verification_label | escape }}</span>
+    </a>
+  {% endif %}
+</article>

@@ -1,55 +1,56 @@
 ## Overview
 
-Cart Line Item represents one product in the cart with required media, product identity, destination, and formatted line price. Variant information, quantity, compare price, and secondary actions are optional.
+Cart Line Item is the canonical target-controlled record used by Cart Page, Cart Drawer, Order Detail, and future cart or order collections. It requires a visible product identity and canonical Price composition; media, destination, details, Quantity Selector, remove, and save-for-later actions are optional.
 
 <Preview
-  html={'<article class="cart-line tg-preview-frame--lg"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Artisan ceramic vase" /><div class="cart-line__info"><a class="cart-line__title" href="#">Artisan Ceramic Vase</a><span class="cart-line__variant">Large / White</span><div class="cart-line__quantity"><div class="qty" role="group" aria-label="Quantity selector" data-qty><button class="qty__btn qty__btn--decrement" type="button" aria-label="Decrease quantity" data-qty-minus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg></button><input class="qty__input" type="number" value="1" min="1" max="8" aria-label="Quantity" data-qty-input /><button class="qty__btn qty__btn--increment" type="button" aria-label="Increase quantity" data-qty-plus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></button></div></div><div class="cart-line__actions"><button class="cart-line__remove" type="button" aria-label="Remove Artisan Ceramic Vase">Remove</button><button class="cart-line__save" type="button" aria-label="Save Artisan Ceramic Vase for later">Save for later</button></div></div><div class="cart-line__prices"><span class="cart-line__price-compare">$150.00</span><span class="cart-line__price">$120.00</span></div></article>'}
+  html={'<ul class="cart-lines tg-preview-frame--lg"><li class="cart-line"><img class="cart-line__image tg-preview-media tg-preview-media--thumb" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" /><div class="cart-line__info"><a class="cart-line__title" href="#artisan-ceramic-vase">Artisan Ceramic Vase</a><div class="cart-line__details">Large / White</div><div class="qty cart-line__quantity" role="group" aria-label="Artisan Ceramic Vase quantity selector" data-qty><button class="qty__btn qty__btn--decrement" type="button" aria-label="Decrease Artisan Ceramic Vase quantity" data-qty-minus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14" /></svg></button><input class="qty__input" type="number" name="updates[artisan-ceramic-vase]" value="1" min="1" max="8" step="1" aria-label="Artisan Ceramic Vase quantity" data-qty-input /><button class="qty__btn qty__btn--increment" type="button" aria-label="Increase Artisan Ceramic Vase quantity" data-qty-plus><svg class="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></button></div><div class="cart-line__actions"><button class="btn btn--link cart-line__remove" type="button" aria-label="Remove Artisan Ceramic Vase from cart">Remove</button><button class="btn btn--link cart-line__save" type="button" aria-label="Save Artisan Ceramic Vase for later">Save for later</button></div></div><div class="cart-line__price"><span class="price price--on-sale"><s class="price__compare"><span class="price__label">Regular price: </span><bdi class="price__value">$150.00</bdi></s><span class="price__current"><span class="price__label">Sale price: </span><bdi class="price__value">$120.00</bdi></span></span></div></li></ul>'}
   label="Cart Line Item"
 />
 
 ## Presentation
 
-The required anatomy is media, product information, title link, and current line price. The optional Quantity Selector is composed inside `.cart-line__quantity`; Cart Line Item does not redefine its native stepping, bounds, or validation behavior.
+`.cart-lines` is the native list and inline-size container. Every target line identity renders as one `li.cart-line`; a standalone example still uses the list wrapper. The line uses intrinsic reflow rather than viewport breakpoints, so the same anatomy works in Cart Drawer, Cart Page, and read-only Order Detail contexts.
 
-The target formats `price` and `comparePrice`. Remove and save-for-later are independent optional actions and remain visually secondary to product navigation and quantity editing.
+`price` composes canonical Price; `quantitySelector` composes canonical Quantity Selector; `removeAction` and `saveAction` compose canonical Button. Cart Line Item does not reproduce their markup, value, formatting, busy, disabled, or focus contracts.
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Update the line price and cart summary immediately after a valid quantity change.</Do>
-  <Dont>Do not format commerce amounts or inventory rules inside the presentation layer.</Dont>
+  <Do>Keep one native line record synchronized with target cart or order truth and compose canonical dependencies.</Do>
+  <Dont>Do not mirror raw platform records, format money, calculate inventory, or run a cart mutation service inside the presentation component.</Dont>
 </DoDont>
 
-- Include variant text only when it distinguishes the selected purchasable item.
-- Preserve product context in remove and save-for-later labels.
-- Disable quantity transitions that exceed target-owned inventory boundaries.
+- Render the title as one link only when the target has a truthful destination; otherwise use plain text.
+- Treat adjacent media as decorative when title and details already identify the product. Use informative alt text only when the image adds unique meaning.
+- Use `details` for complete target-authored variant, property, selling-plan, fulfilment, or discount text rather than exposing a Shopify-specific record schema.
+- Omit Quantity Selector and mutation actions for read-only order records.
+- Render save for later only when the target supplies a real persistence capability and result model.
 
 ## Accessibility
 
-- Provide useful alternative text through `imageAlt`; use empty alternative text only when adjacent content makes the image redundant.
-- Keep `title` as a descriptive product link to `href`.
-- Give remove and save actions accessible names that include the product title.
-- Provide an accessible name for the Quantity Selector and announce resulting total or availability changes.
-- Keep every interactive element keyboard reachable with a visible focus indicator.
+- Use `ul.cart-lines` and one `li.cart-line` per target line. Do not add `article`, widget roles, roving focus, or an aggregate line label.
+- Keep every optional title link and Button keyboard reachable with the canonical visible focus treatment.
+- Give Quantity Selector, remove, and save actions names that include the product context.
+- Announce confirmed quantity/remove/save results and errors once from the surrounding target status policy; Price and each line are not live regions.
+- After confirmed removal, the Cart Page, Cart Drawer, or Order Detail target places focus on a logical surviving control or collection heading.
 
 ## References
 
 ### Dependencies
 
-- [Quantity Selector](/components/quantity-selector)
+- [Button](/components/button)
 - [Price](/components/price)
+- [Quantity Selector](/components/quantity-selector)
 
 ### API Reference
 
 <PropTable>
-  <tr><td>`image`</td><td>slot</td><td>required</td><td>Product image</td></tr>
-  <tr><td>`imageAlt`</td><td>string</td><td>required</td><td>Product image alternative text</td></tr>
-  <tr><td>`title`</td><td>string</td><td>required</td><td>Product title</td></tr>
-  <tr><td>`href`</td><td>string</td><td>required</td><td>Product destination</td></tr>
-  <tr><td>`variant`</td><td>string</td><td>optional</td><td>Selected variant description</td></tr>
-  <tr><td>`quantitySelector`</td><td>slot</td><td>optional</td><td>Quantity Selector dependency</td></tr>
-  <tr><td>`removeLabel`</td><td>string</td><td>optional</td><td>Accessible remove-action label</td></tr>
-  <tr><td>`saveLabel`</td><td>string</td><td>optional</td><td>Accessible save-for-later label</td></tr>
-  <tr><td>`price`</td><td>string</td><td>required</td><td>Target-formatted line price</td></tr>
-  <tr><td>`comparePrice`</td><td>string</td><td>optional</td><td>Target-formatted compare-at price</td></tr>
+  <tr><td>`media`</td><td>slot</td><td>optional</td><td>Target-owned product media with contextual alternative-text policy</td></tr>
+  <tr><td>`title`</td><td>string</td><td>required</td><td>Non-empty visible product or line identity</td></tr>
+  <tr><td>`href`</td><td>string</td><td>optional</td><td>Truthful destination for the one title link; omission renders plain text</td></tr>
+  <tr><td>`details`</td><td>slot</td><td>optional</td><td>Selected variant, properties, selling plan, fulfilment, discount, or equivalent target detail</td></tr>
+  <tr><td>`price`</td><td>slot</td><td>required</td><td>Canonical Price composition with target-formatted content</td></tr>
+  <tr><td>`quantitySelector`</td><td>slot</td><td>optional</td><td>Canonical Quantity Selector composition</td></tr>
+  <tr><td>`removeAction`</td><td>slot</td><td>optional</td><td>Canonical target-controlled removal Button</td></tr>
+  <tr><td>`saveAction`</td><td>slot</td><td>optional</td><td>Canonical target-controlled save-for-later Button</td></tr>
 </PropTable>

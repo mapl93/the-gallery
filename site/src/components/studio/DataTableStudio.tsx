@@ -6,6 +6,7 @@ import StudioInspector, {
   type StudioPropertyValues,
   type StudioSlotIconValues,
 } from './StudioInspector';
+import DataTableArtwork from './DataTableArtwork';
 
 interface DataTableStudioProps {
   contract: ComponentContract;
@@ -37,6 +38,8 @@ function resolveTokens(control: StudioControl, contract: ComponentContract): str
 
 export default function DataTableStudio({ contract, definition }: DataTableStudioProps) {
   const initialValues = useMemo<StudioPropertyValues>(() => ({
+    // Caption copy is preview content, not the contract default.
+    caption: 'Available gallery objects',
     striped: false,
     rowHover: false,
     sortable: false,
@@ -67,6 +70,7 @@ export default function DataTableStudio({ contract, definition }: DataTableStudi
   }, [studioTokens]);
 
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
+  const caption = typeof values.caption === 'string' ? values.caption : '';
   const sortable = values.sortable === true;
   const tableClasses = [
     'table',
@@ -111,6 +115,7 @@ export default function DataTableStudio({ contract, definition }: DataTableStudi
           tokenValues={tokenValues}
           activeTokens={{
             'border-color': '--color-border-subtle',
+            'focus-color': '--color-border-focus',
             'text-color': '--color-text-primary',
             'accent-surface': '--color-surface-secondary',
           }}
@@ -132,8 +137,11 @@ export default function DataTableStudio({ contract, definition }: DataTableStudi
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner docs-studio__preview-table">
-            <div className="table-wrapper">
-              <table className={tableClasses}>
+            <DataTableArtwork
+              caption={caption}
+              wrapperLabel={caption ? `${caption} table scroll area` : 'Data table scroll area'}
+              tableClassName={tableClasses.replace(/^table\s*/, '')}
+            >
                 <thead>
                   <tr>
                     <th scope="col" aria-sort={sortable ? sortDirection : undefined}>
@@ -157,8 +165,7 @@ export default function DataTableStudio({ contract, definition }: DataTableStudi
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
+            </DataTableArtwork>
           </div>
         </section>
       </div>

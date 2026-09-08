@@ -2,6 +2,9 @@
 
 Status: Accepted
 
+Amended by ADR 0295: the required marker now uses the public semantic
+`--color-field-required` color with a red default instead of inheriting the label.
+
 Date: 2026-08-12
 
 Owner confirmation: apply the centered Select required asterisk consistently
@@ -27,7 +30,7 @@ accessible name.
   `*` when it has a visible owned or composing label, legend, or primary field
   instruction.
 - The marker is optically centered with that text, uses a `0.25em` inline gap,
-  inherits `currentColor`, and is not rendered as a superscript.
+  uses `--color-field-required` (ADR 0295), and is not rendered as a superscript.
 - Native `required`, native constraint validation, or an explicit
   `aria-required` composition remains the semantic authority. The marker alone
   never makes a field required.
@@ -69,4 +72,3 @@ accessible name.
   semantic required state together without changing the accessible label text.
 - Applying this rule does not promote any component. Each component still
   requires its own dependency-ordered human visual approval.
-

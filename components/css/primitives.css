@@ -10,6 +10,9 @@
   --_btn-min-h: var(--space-button-min-height);
   --_btn-gap: var(--space-button-gap);
   --_btn-icon-size: var(--space-button-icon-size);
+  --_btn-icon-edge-offset: min(max(0px, var(--space-button-icon-edge-offset, 0px)), max(0px, var(--_btn-padding-x)), max(0px, calc(var(--_btn-icon-size) / 2 - var(--border-button-spinner-width))));
+  --_btn-icon-start-offset: 0px;
+  --_btn-icon-end-offset: 0px;
   --_btn-radius: var(--radius-button);
   --_btn-font: var(--font-family-body);
   --_btn-transition: var(--transition-button-duration) var(--easing-button);
@@ -19,15 +22,17 @@
   justify-content: center;
   gap: var(--_btn-gap);
   padding: var(--_btn-padding-y) var(--_btn-padding-x);
+  padding-inline-start: calc(var(--_btn-padding-x) - var(--_btn-icon-start-offset));
+  padding-inline-end: calc(var(--_btn-padding-x) - var(--_btn-icon-end-offset));
   min-height: var(--_btn-min-h);
   background: var(--_btn-bg);
   color: var(--_btn-text);
-  border: 1px solid var(--_btn-border);
+  border: var(--border-button-width) solid var(--_btn-border);
   border-radius: var(--_btn-radius);
   font-family: var(--_btn-font);
   font-size: var(--typo-button-size);
   font-weight: var(--typo-button-weight);
-  line-height: 1.5;
+  line-height: var(--typo-button-line-height);
   text-decoration: none;
   cursor: pointer;
   transition: background var(--_btn-transition),
@@ -43,6 +48,14 @@
   flex-shrink: 0;
 }
 
+/* Optical inset is an editable design choice, not a measurement of every SVG. */
+.btn:not(.btn--icon-only):not(.btn--link):has(> .btn__icon--leading) {
+  --_btn-icon-start-offset: var(--_btn-icon-edge-offset);
+}
+.btn:not(.btn--icon-only):not(.btn--link):has(> .btn__icon--trailing) {
+  --_btn-icon-end-offset: var(--_btn-icon-edge-offset);
+}
+
 .btn:hover {
   --_btn-bg: var(--color-button-primary-bg-hover);
   --_btn-text: var(--color-button-primary-text-hover);
@@ -53,7 +66,10 @@
   --_btn-text: var(--color-button-primary-text-active);
   --_btn-border: var(--color-button-primary-border-active);
 }
-.btn:focus-visible,
+.btn:focus-visible {
+  outline: var(--border-button-focus-ring-width) solid var(--color-border-focus);
+  outline-offset: var(--border-button-focus-ring-offset);
+}
 .icon-btn:focus-visible,
 .close-btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
@@ -73,16 +89,23 @@
 .btn[aria-busy="true"]::after {
   box-sizing: border-box;
   display: block;
-  width: var(--_btn-icon-size);
-  height: var(--_btn-icon-size);
+  width: calc(var(--_btn-icon-size) - 2 * var(--_btn-spinner-inset));
+  height: calc(var(--_btn-icon-size) - 2 * var(--_btn-spinner-inset));
+  margin: var(--_btn-spinner-inset);
   flex: none;
-  border: 2px solid currentColor;
+  border: var(--border-button-spinner-width) solid currentColor;
   border-right-color: transparent;
   border-radius: var(--radius-full);
-  animation: btn-spin 0.6s linear infinite;
+  animation: btn-spin var(--transition-button-spinner-duration) linear infinite;
 }
-.btn[aria-busy="true"]::before { content: ""; }
-.btn[aria-busy="true"]::after { content: none; }
+.btn[aria-busy="true"]::before {
+  --_btn-spinner-inset: var(--_btn-icon-start-offset);
+  content: "";
+}
+.btn[aria-busy="true"]::after {
+  --_btn-spinner-inset: var(--_btn-icon-end-offset);
+  content: none;
+}
 
 .btn[aria-busy="true"] .btn__icon--leading,
 .btn[aria-busy="true"] .btn__icon:not(.btn__icon--leading):not(.btn__icon--trailing) {
@@ -162,7 +185,7 @@
   --_btn-padding-y: 0;
   --_btn-min-h: auto;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: var(--space-button-underline-offset);
 }
 .btn--link:hover {
   --_btn-bg: var(--color-button-link-bg-hover);
@@ -276,7 +299,7 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   display: inline-block;
   margin-inline-start: 0.25em;
   line-height: 1;
-  color: currentColor;
+  color: var(--color-field-required);
   transform: translateY(0.1em);
 }
 
@@ -433,7 +456,9 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   --_input-message-size: var(--typo-input-message-size);
   --_input-message-line-height: var(--typo-input-message-line-height);
   --_select-indicator: var(--color-input-default-unfocused-icon);
-  --_select-panel-padding: 4px;
+  --_select-panel-padding: var(--space-select-panel-padding);
+  --_select-indicator-size: var(--space-select-indicator-size);
+  --_select-indicator-gap: var(--space-select-indicator-gap);
   --_select-semantic-boundary-weight: 80%;
   --_select-semantic-copy-weight: 60%;
   --_input-transition: var(--transition-fast) var(--easing-default);
@@ -441,17 +466,20 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   display: inline-flex;
   flex-direction: column;
   max-width: 100%;
-  gap: 4px;
+  gap: 0;
+  font-family: var(--font-family-body);
   margin-bottom: var(--space-input-margin-bottom);
 }
 .select__label {
   align-self: flex-start;
   font-size: var(--_input-label-size);
   line-height: var(--_input-label-line-height);
-  font-weight: 500;
+  font-weight: var(--typo-input-label-weight);
+  margin-block-end: var(--space-input-label-gap);
   color: var(--_input-label);
 }
 .select__message {
+  margin-block-start: var(--space-input-message-gap);
   font-size: var(--_input-message-size);
   line-height: var(--_input-message-line-height);
   color: var(--_input-message);
@@ -463,20 +491,20 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
 }
 .select__field {
   appearance: none;
-  padding: var(--_input-padding-y) calc(var(--_input-padding-x) + 24px) var(--_input-padding-y) var(--_input-padding-x);
+  padding: var(--_input-padding-y) calc(var(--_input-padding-x) + var(--_select-indicator-size) + var(--_select-indicator-gap)) var(--_input-padding-y) var(--_input-padding-x);
   background-color: var(--_input-bg);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23525252' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-position: right var(--_input-padding-x) center;
   background-repeat: no-repeat;
-  background-size: 16px;
+  background-size: var(--_select-indicator-size);
   color: var(--_input-text);
-  border: 1px solid var(--_input-border);
+  border: var(--border-input-width) solid var(--_input-border);
   border-radius: var(--_input-radius);
   font-family: var(--font-family-body);
   font-size: var(--_input-value-size);
   line-height: var(--_input-value-line-height);
-  outline: 4px solid transparent;
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid transparent;
+  outline-offset: var(--border-input-focus-ring-offset);
   cursor: pointer;
   transition: border-color var(--_input-transition),
               outline-color var(--_input-transition),
@@ -546,7 +574,7 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--_select-indicator-gap);
   width: 100%;
   padding-right: var(--_input-padding-x);
   text-align: left;
@@ -561,9 +589,9 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
 }
 .select__indicator {
   display: block;
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
+  width: var(--_select-indicator-size);
+  height: var(--_select-indicator-size);
+  flex: 0 0 var(--_select-indicator-size);
   color: var(--_select-indicator);
   transition: transform var(--_input-transition);
 }
@@ -575,17 +603,17 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
 }
 .select__listbox {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + var(--space-select-panel-gap));
   left: 0;
   z-index: var(--z-dropdown);
   width: max-content;
   min-width: 100%;
-  max-width: min(360px, calc(100vw - 32px));
-  max-height: 240px;
+  max-width: min(var(--space-select-panel-max-width), calc(100vw - 32px));
+  max-height: var(--space-select-panel-max-height);
   overflow: auto;
   padding: var(--_select-panel-padding);
   background: var(--color-surface-primary);
-  border: 1px solid var(--color-border-subtle);
+  border: var(--border-select-panel-width) solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
 }
@@ -601,8 +629,8 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 44px;
-  padding: 10px calc(var(--_input-padding-x) + 24px) 10px var(--_input-padding-x);
+  min-height: var(--space-select-option-min-height);
+  padding: var(--space-select-option-padding-y) calc(var(--space-select-option-padding-x) + var(--_select-indicator-size) + var(--_select-indicator-gap)) var(--space-select-option-padding-y) var(--space-select-option-padding-x);
   border-radius: var(--radius-sm);
   color: var(--color-text-primary);
   font-family: var(--font-family-body);
@@ -624,15 +652,15 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   cursor: not-allowed;
 }
 .select__option[aria-selected="true"] {
-  font-weight: 600;
+  font-weight: var(--typo-select-option-selected-weight);
 }
 .select__option-check {
   position: absolute;
   top: 50%;
-  right: calc(var(--_input-padding-x) - var(--_select-panel-padding));
+  right: max(0px, calc(var(--space-select-option-padding-x) - var(--_select-panel-padding)));
   display: block;
-  width: 16px;
-  height: 16px;
+  width: var(--_select-indicator-size);
+  height: var(--_select-indicator-size);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-50%);

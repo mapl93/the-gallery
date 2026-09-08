@@ -19,6 +19,7 @@ export default function ControlPilot() {
   const [result, setResult] = useState('');
   return <>
     <h1>Input + Button pilot</h1>
+    <p>Continue the review in the <Link to="/compositions/contact">contact form composition</Link>, which also includes Select and Textarea.</p>
     <p>Review matching control height, text alignment and focus in real compositions. Use the page theme control for Light / Dark, resize the window, and navigate with Tab. This is a local demonstration; actions only update the message below.</p>
     <p>Default Input and Button target 46 px with the default 16 px text. Longer button labels can wrap and grow. Small and large Button retain their own sizes. The owner reviewed the overall treatment; label and supporting-message spacing follows the 4 px Input gap.</p>
     <div className="docs-control-pilot">

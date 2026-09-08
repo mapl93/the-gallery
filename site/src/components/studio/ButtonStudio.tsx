@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
-import type { StudioControl, StudioDefinition } from '../../lib/studio';
+import { resolveStudioControlTokens as resolveControlTokens, type StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
   type StudioPropertyValue,
   type StudioPropertyValues,
@@ -69,18 +69,6 @@ function initialButtonSlotIcons(definition: StudioDefinition): StudioSlotIconVal
   };
 }
 
-function resolveControlTokens(
-  control: StudioControl,
-  contract: ComponentContract
-): string[] {
-  if (!control.tokens) return [];
-  const categoryTokens = contract.tokens.public[control.tokens.category] ?? [];
-  if (control.tokens.names) return control.tokens.names;
-  if (!control.tokens.match) return [];
-  const pattern = new RegExp(control.tokens.match);
-  return categoryTokens.filter((token) => pattern.test(token));
-}
-
 function collectStudioTokens(
   definition: StudioDefinition,
   contract: ComponentContract
@@ -113,10 +101,9 @@ function activeColorTokens(
 
   const candidates: Record<string, string | null> = {
     fill: `--color-button-${variant}-bg-${state}`,
-    text: variant === 'link'
-      ? '--color-button-link-text-default'
-      : `--color-button-${variant}-text-${state}`,
+    text: `--color-button-${variant}-text-${state}`,
     border: `--color-button-${variant}-border-${state}`,
+    'focus-ring': '--color-border-focus',
   };
 
   return Object.fromEntries(
@@ -133,8 +120,8 @@ function simulatedStateStyle(
 ): CSSProperties {
   if (previewState === 'focusVisible') {
     return {
-      outline: '2px solid var(--color-border-focus)',
-      outlineOffset: 2,
+      outline: 'var(--border-button-focus-ring-width) solid var(--color-border-focus)',
+      outlineOffset: 'var(--border-button-focus-ring-offset)',
     };
   }
 

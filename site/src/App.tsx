@@ -7,6 +7,7 @@ import Contracts from './pages/Contracts';
 import Foundations from './pages/Foundations';
 import Tokens from './pages/Tokens';
 import ControlPilot from './pages/ControlPilot';
+import ContactComposition from './pages/ContactComposition';
 import ComponentList from './pages/ComponentList';
 import ComponentDetail from './pages/ComponentDetail';
 
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="contracts" element={<Contracts />} />
         <Route path="foundations" element={<Foundations />} />
         <Route path="foundations/control-pilot" element={<ControlPilot />} />
+        <Route path="compositions/contact" element={<ContactComposition />} />
         <Route path="tokens" element={<Tokens />} />
         <Route path="components" element={<ComponentList />} />
         <Route path="components/:slug" element={<ComponentDetail />} />

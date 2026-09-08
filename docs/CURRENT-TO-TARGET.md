@@ -1,5 +1,14 @@
 # Current State To Target Architecture
 
+## Current checkpoint — 2026-09-08
+
+The canonical catalogue/Input work is backed up remotely at `0ce4881`. ADR 0294
+extends Button and Select public customization and adds `/compositions/contact`
+for integration review. The owner approved the overall result with the required
+marker color follow-up in ADR 0295, before the bounded Shopify brand-editor and
+Figma pilots. The Foundations control matrix
+remains until equivalent adjacent/state coverage exists in real compositions.
+
 This document compares what The Gallery has today with the target architecture in `docs/NORTH-STAR.md`. It is the working backlog map for evolving the repo.
 
 ## Summary

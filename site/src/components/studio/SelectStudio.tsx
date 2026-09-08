@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
-import type { StudioControl, StudioDefinition } from '../../lib/studio';
+import { resolveStudioControlTokens as resolveControlTokens, type StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
   type StudioPropertyValue,
   type StudioPropertyValues,
@@ -60,15 +60,6 @@ function initialSelectValues(contract: ComponentContract): StudioPropertyValues 
   return values;
 }
 
-function resolveControlTokens(control: StudioControl, contract: ComponentContract): string[] {
-  if (!control.tokens) return [];
-  const categoryTokens = contract.tokens.public[control.tokens.category] ?? [];
-  if (control.tokens.names) return control.tokens.names;
-  if (!control.tokens.match) return [];
-  const pattern = new RegExp(control.tokens.match);
-  return categoryTokens.filter((token) => pattern.test(token));
-}
-
 function collectStudioTokens(definition: StudioDefinition, contract: ComponentContract): string[] {
   return [...new Set(
     definition.groups.flatMap((group) => (
@@ -95,7 +86,7 @@ function activeColorTokens(
     ? 'hover'
     : state === 'disabled'
       ? 'disabled'
-      : state === 'focusVisible'
+      : ['focusVisible', 'open', 'optionHover', 'optionHighlighted', 'optionSelected', 'optionDisabled'].includes(state)
         ? 'focused'
         : 'unfocused';
   const variantState = variant === 'default' ? stateName : stateName === 'focused' ? 'focused' : 'unfocused';
@@ -109,7 +100,7 @@ function activeColorTokens(
       `--color-input-default-${stateName}-bg`,
       '--color-input-default-unfocused-bg',
     ]),
-    'value-color': firstAllowed('value-color', [
+    'value-color': state === 'disabled' ? null : firstAllowed('value-color', [
       `--color-input-default-${stateName}-value`,
       '--color-input-default-unfocused-value',
     ]),
@@ -126,14 +117,16 @@ function activeColorTokens(
       `--color-input-${variant}-unfocused-message`,
       '--color-input-default-unfocused-message',
     ]),
-    'indicator-color': firstAllowed('indicator-color', [
+    'indicator-color': state === 'disabled' ? null : firstAllowed('indicator-color', [
       `--color-input-${variant}-unfocused-icon`,
       '--color-input-default-unfocused-icon',
     ]),
+    'focus-ring': firstAllowed('focus-ring', [`--color-input-${variant}-focused-outer-border`]),
     'panel-fill': firstAllowed('panel-fill', ['--color-surface-primary']),
     'panel-border': firstAllowed('panel-border', ['--color-border-subtle']),
     'option-fill': firstAllowed('option-fill', ['--color-surface-secondary']),
-    'option-text': firstAllowed('option-text', ['--color-text-primary']),
+    'option-text': state === 'optionDisabled' ? null : firstAllowed('option-text', ['--color-text-primary']),
+    'disabled-color': firstAllowed('disabled-color', ['--color-input-default-disabled-value']),
   };
 }
 

@@ -92,10 +92,10 @@ function splitNumericValue(token: string, value: string): { number: string; unit
   }
 
   const authoredUnit = match[2].toLowerCase();
-  const unit = supportedCssUnits.has(authoredUnit)
+  const unit = authoredUnit === '' ? '' : supportedCssUnits.has(authoredUnit)
     ? authoredUnit
     : inferredUnit ?? '';
-  return { number: match[1], unit: unit || inferredUnit || '' };
+  return { number: match[1], unit };
 }
 
 function authoredNumber(value: string): string | null {
@@ -839,7 +839,11 @@ export default function StudioInspector({
     }
 
     if (control.kind === 'token-swatch') {
-      const token = activeTokens[control.id] ?? null;
+      // Explicit state mappings (including null) win. A fixed one-token swatch
+      // can otherwise resolve directly from metadata without renderer glue.
+      const token = Object.prototype.hasOwnProperty.call(activeTokens, control.id)
+        ? activeTokens[control.id]
+        : tokens.length === 1 ? tokens[0] : null;
       const value = token ? tokenValues[token] ?? '' : 'transparent';
       const transparent = value.trim() === 'transparent' || !token;
       return (

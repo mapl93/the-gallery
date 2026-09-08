@@ -1,8 +1,8 @@
 # COMPONENTS.md — The Gallery Design System
 
-> **Purpose**: Complete component specification for "The Gallery," a ceramic art e-commerce Shopify store. This document is the single source of truth for generating production-ready CSS and Liquid markup. Every component maps exclusively to Theme tokens (colors) and Breakpoint tokens (layout) — there is NO component token layer.
+> **Authority**: Current component CSS, contracts, registry and Studio metadata are canonical together with `tokens/source/`. This long-form guide includes historical component specifications; examples below may predate accepted ADRs and must be checked against those sources.
 
-> **For AI agents**: Use this document to generate CSS with `--_` private custom property contracts, semantic HTML with BEM naming, and Shopify Liquid integration. Every token reference is explicit. Do not invent tokens — use only what is documented here.
+> **Customization**: [ADR 0293](decisions/0293-public-visual-customization-coverage.md) requires the meaningful visual decisions of a component to be editable through its public token API and visible in documentation. Use shared tokens when they already express the decision; introduce component-scoped tokens for component-specific controls. CSS `--_` properties remain private wiring, not a reason to omit a requested customization control.
 
 ---
 
@@ -56,8 +56,8 @@ These button tokens must resolve in every viewport mode:
 | Token | Mobile | Tablet | Desktop | XL |
 |-------|--------|--------|---------|----|
 | `--space-button-padding-x` | 16px | 16px | 20px | 24px |
-| `--space-button-padding-y` | 10px | 10px | 12px | 12px |
-| `--space-button-min-height` | 44px | 44px | 40px | 40px |
+| `--space-button-padding-y` | 10px | 10px | 10px | 10px |
+| `--space-button-min-height` | 46px | 46px | 46px | 46px |
 | `--space-button-gap` | 8px | 8px | 8px | 8px |
 | `--space-button-icon-size` | 18px | 18px | 20px | 20px |
 | `--typo-button-size` | 16px | 16px | 16px | 16px |

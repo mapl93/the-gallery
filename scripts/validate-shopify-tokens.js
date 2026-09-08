@@ -46,8 +46,8 @@ assertIncludes(shopifyTokens, '--color-input-success-focused-outer-border: var(-
 assertIncludes(shopifyTokens, '--color-input-warning-unfocused-label: var(--tg-color-feedback-warning-default);', shopifyTokensPath);
 assertIncludes(shopifyTokens, '--color-input-warning-focused-inner-border: var(--tg-color-feedback-warning-default);', shopifyTokensPath);
 assertIncludes(shopifyTokens, '--color-input-warning-focused-outer-border: var(--tg-color-feedback-warning-background);', shopifyTokensPath);
-assertIncludes(shopifyTokens, '--space-input-padding-y: var(--tg-dimension-10);', shopifyTokensPath);
-assertIncludes(shopifyTokens, '--space-input-icon-gap: var(--tg-dimension-8);', shopifyTokensPath);
+assertIncludes(shopifyTokens, '--space-input-padding-y: var(--tg-component-input-padding-y);', shopifyTokensPath);
+assertIncludes(shopifyTokens, '--space-input-icon-gap: var(--tg-component-input-icon-gap);', shopifyTokensPath);
 assertIncludes(shopifyTokens, '--typo-input-label-size: var(--tg-typography-body-small-size);', shopifyTokensPath);
 assertIncludes(shopifyTokens, '--typo-input-label-line-height: var(--tg-typography-body-small-line-height);', shopifyTokensPath);
 assertIncludes(shopifyTokens, '--typo-input-value-size: var(--tg-typography-body-default-size);', shopifyTokensPath);

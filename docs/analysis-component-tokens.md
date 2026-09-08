@@ -1,5 +1,7 @@
 # Should Component Tokens Live in Their Own File?
 
+> Historical analysis of an earlier pipeline. Its recommendation to remove the component layer is superseded by ADR 0007 and ADR 0040; see ADR 0292 for the current bounded pilot. Preserve this file as rationale history, not implementation instructions.
+
 ## A Thorough Analysis for The Gallery Design System
 
 > **TL;DR Recommendation:** **Remove the component token file.** Keep component colors in Theme, component layout in Breakpoints, and let CSS do the composition. For a 1–2 person team building a Shopify theme with Style Dictionary, the component file adds indirection and maintenance burden without meaningful benefit. The "component API" argument only holds at enterprise scale with separate component-library consumers.

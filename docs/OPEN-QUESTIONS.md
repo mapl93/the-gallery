@@ -4,6 +4,8 @@ This file tracks questions that are still genuinely open. Resolved architecture 
 
 ## Recently Resolved
 
+- The owner requires broad public token coverage for meaningful component visual customization. Input/Textarea implement the first expanded surface, and Exhibit lists the same token controls as Studio. This does not turn semantic behavior or every structural CSS declaration into a token. See [ADR 0293](decisions/0293-public-visual-customization-coverage.md).
+
 The first architecture questions were resolved on 2026-05-23:
 
 - The repo is the source of truth; Figma is a target. See `docs/decisions/0001-repo-is-design-system-source-of-truth.md`.

@@ -1,3 +1,5 @@
+import type { ComponentContract } from './contracts';
+
 export type StudioControlKind =
   | 'text'
   | 'collection'
@@ -82,4 +84,14 @@ export function hasStudioDefinition(slug: string): boolean {
 
 export function getStudioDefinitions(): StudioDefinition[] {
   return Object.values(studioBySlug).sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
+/** Public token selection shared by the Input editor and Exhibit reference. */
+export function resolveStudioControlTokens(control: StudioControl, contract: ComponentContract): string[] {
+  if (!control.tokens) return [];
+  const categoryTokens = contract.tokens.public[control.tokens.category] ?? [];
+  if (control.tokens.names) return control.tokens.names;
+  if (!control.tokens.match) return [];
+  const pattern = new RegExp(control.tokens.match);
+  return categoryTokens.filter((token) => pattern.test(token));
 }

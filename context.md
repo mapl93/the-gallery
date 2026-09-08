@@ -1,5 +1,7 @@
 # The Gallery — Design System & Multi-Platform Context
 
+> Historical long-form context. Current authority is AGENTS.md, docs/PROJECT-BRIEF.md, docs/ARCHITECTURE.md and accepted ADRs. In particular, the repository is the source of truth, Figma is a target, and old token/Horizon implementation descriptions below may be superseded.
+
 > **Purpose of this document:** Complete context for GitHub Copilot and any AI assistant working on The Gallery design system. This document consolidates all design decisions, token architecture, branding guidelines, and technical requirements defined across multiple working sessions. The system is platform-agnostic — the Shopify theme is the first implementation, but the design tokens and architecture are built to support Framer, Webflow, and other platforms from the same repository.
 
 ---

@@ -22,6 +22,7 @@ import {
 import type { ComponentContract } from '../lib/contracts';
 import type { StudioDefinition } from '../lib/studio';
 import { ContractReference } from './ContractSummary';
+import CustomizationReference from './CustomizationReference';
 
 type ExhibitSectionKey =
   | 'overview'
@@ -258,7 +259,10 @@ export default function ExhibitDocument({ children }: { children: ReactNode }) {
             <div className="docs-exhibit__section-body">
               {content}
               {key === 'specification' && contract && (
-                <ContractReference contract={contract} />
+                <>
+                  <ContractReference contract={contract} />
+                  {sharedRenderer && <CustomizationReference contract={contract} definition={sharedRenderer.definition} />}
+                </>
               )}
             </div>
           </section>

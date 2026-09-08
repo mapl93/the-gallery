@@ -66,7 +66,7 @@ tokens/source/components
 tokens/source/modes
 ```
 
-This source is not yet wired into the production build. It is validated with:
+This source generates the neutral web token output and the Shopify wrapper. Webflow and Framer still use legacy input. Source structure is validated with:
 
 ```sh
 npm run validate:tokens:source
@@ -169,7 +169,7 @@ Shopify adapter maturity is computed per component in `adapter.manifest.json` wi
 
 Shopify target-ready also requires target-native editor and platform integration when a component owns those surfaces. Dedicated sections need Liquid plus schema/settings, data mapping, and behavior where applicable; snippets need stable render APIs; global theme controls belong in `config/settings_schema.json`. See `docs/adapters/shopify.md`.
 
-The current production token flow still uses the legacy files:
+The retained Webflow/Framer token flow uses the legacy files:
 
 ```text
 tokens/*_tokens.json

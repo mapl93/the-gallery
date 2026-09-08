@@ -48,8 +48,8 @@ includes('--color-input-success-focused-outer-border: var(--tg-color-feedback-su
 includes('--color-input-warning-unfocused-label: var(--tg-color-feedback-warning-default);');
 includes('--color-input-warning-focused-inner-border: var(--tg-color-feedback-warning-default);');
 includes('--color-input-warning-focused-outer-border: var(--tg-color-feedback-warning-background);');
-includes('--space-input-padding-y: var(--tg-dimension-10);');
-includes('--space-input-icon-gap: var(--tg-dimension-8);');
+includes('--space-input-padding-y: var(--tg-component-input-padding-y);');
+includes('--space-input-icon-gap: var(--tg-component-input-icon-gap);');
 includes('--typo-input-label-size: var(--tg-typography-body-small-size);');
 includes('--typo-input-label-line-height: var(--tg-typography-body-small-line-height);');
 includes('--typo-input-value-size: var(--tg-typography-body-default-size);');

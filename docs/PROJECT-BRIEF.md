@@ -72,3 +72,13 @@ Current Shopify implementation lives in `platforms/shopify/`. Shopify tokens now
 ## Working Agreement For Agents
 
 The owner explicitly asked agents not to assume. When the repository does not make a decision 100% clear, ask a concrete question before changing architecture or product direction.
+
+## Owner clarifications — 2026-09-08
+
+- Adjacent Input and Button must align and share visual density, including icons
+  and loading. ADR 0292 records the bounded implementation pilot.
+- Shopify should expose intentional brand controls through the theme editor.
+- The Figma pilot may use the existing “The Gallery Design System” file; a new
+  file is also acceptable. The repository remains the official source.
+- These preferences do not imply additional platforms, modes, shadows or a
+  wholesale token reconstruction. Review the small pilot before expansion.

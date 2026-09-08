@@ -153,3 +153,21 @@ These are the highest-leverage next tasks:
 6. Define package/release policy for source-generated target artifacts.
 
 These tasks turn the north star into executable structure without forcing a risky full migration.
+
+## Control coherence pilot (2026-09-08)
+
+ADR 0292 scopes the first audit follow-up: canonical catalogue and historical-doc
+clarity, targeted contrast corrections, and an Input/Button density pilot.
+The owner reviewed the overall pilot; its Input label/message spacing follow-up preserves 4 px. Shopify editor customization and Figma
+Professional portability are subsequent checkpoints, not completed integrations.
+
+
+## Public visual customization coverage (ADR 0293)
+
+Owner review requires meaningful visual choices to be editable through public
+tokens and discoverable in Exhibit/Studio. Input and Textarea now expose
+independent label/message gaps, border thickness, focus geometry and label
+weight, plus previously declared font-family, bottom-margin and opacity tokens.
+Exhibit's visual-control inventory is generated from the same metadata as Studio.
+Other components still require a coverage review; contract validity alone does
+not certify that their visual customization surface is complete.

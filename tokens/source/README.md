@@ -1,11 +1,11 @@
 # The Gallery Token Source
 
-This directory is the new canonical token-source structure for The Gallery. It is intentionally parallel to the current legacy build input in `tokens/*_tokens.json`.
+This directory is the canonical token source for neutral web and Shopify. The retained Webflow/Framer pipeline uses `tokens/*_tokens.json`.
 
 Current status:
 
-- `tokens/source/` is the DTCG-style source direction.
-- `tokens/*_tokens.json` is still the active legacy Style Dictionary build input.
+- `tokens/source/` is the active DTCG-style source for web and Shopify.
+- `tokens/*_tokens.json` is the legacy Style Dictionary input for Webflow/Framer and the migration-parity baseline.
 - Root-level `*.tokens.json` files are Figma export snapshots, not source of truth.
 
 ## Layers
@@ -45,7 +45,7 @@ tokens/source/build/json/light.desktop.resolved.json
 tokens/source/build/manifest.json
 ```
 
-These files are for migration comparison only. They are not production target outputs yet.
+These sandbox files support migration comparison and the web generator. The tracked target is `platforms/web/tokens.css`; Shopify wraps that target. Never edit sandbox outputs as source.
 
 ## Migration Map
 
@@ -114,3 +114,28 @@ The `--transition-*` and `--easing-*` names are compatibility aliases for curren
 ## Migration Rule
 
 Migrate gradually. Add a token to `tokens/source/`, validate it, compile it for one target, compare it to the legacy output, then expand.
+
+## Catalogue and control pilot
+
+The docs catalogue reads these source files directly, selecting the same file
+precedence as the compiler. It shows aliases, resolved source values and mode
+provenance. It is not a strict DTCG conformance claim: this repository retains
+Style Dictionary-compatible string dimensions/durations and its own mode layout.
+
+`components/input.tokens.json` gives the five existing public Input layout
+controls explicit source paths. It adds no new public CSS aliases. Typography
+continues to use shared body roles; private `--_` variables stay private.
+See ADR 0292 for the bounded density and contrast pilot.
+
+After building source matrices, run `npm run validate:tokens:catalogue` to compare
+the actual site resolver with every compiled matrix (including equivalent color
+serialization). This requires the existing site TypeScript dependency.
+
+## Public visual coverage
+
+ADR 0293 expands Input's source API with independent `labelGap` and `messageGap`,
+`borderWidth`, `focusRingWidth`, `focusRingOffset`, and `labelFontWeight`.
+Existing radius, colors, typography, opacity and motion aliases remain public.
+Input and Textarea Studio expose these decisions; Exhibit derives its control
+inventory from the same contract and presentation metadata. A source token alone
+is not evidence that a consumer can discover and edit the corresponding control.

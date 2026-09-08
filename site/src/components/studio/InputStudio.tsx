@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
-import type { StudioControl, StudioDefinition } from '../../lib/studio';
+import { resolveStudioControlTokens as resolveControlTokens, type StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
   type StudioPropertyValue,
   type StudioPropertyValues,
@@ -71,15 +71,6 @@ function initialSlotIcons(definition: StudioDefinition): StudioSlotIconValues {
   };
 }
 
-function resolveControlTokens(control: StudioControl, contract: ComponentContract): string[] {
-  if (!control.tokens) return [];
-  const categoryTokens = contract.tokens.public[control.tokens.category] ?? [];
-  if (control.tokens.names) return control.tokens.names;
-  if (!control.tokens.match) return [];
-  const pattern = new RegExp(control.tokens.match);
-  return categoryTokens.filter((token) => pattern.test(token));
-}
-
 function collectStudioTokens(definition: StudioDefinition, contract: ComponentContract): string[] {
   return [...new Set(
     definition.groups.flatMap((group) => (
@@ -107,9 +98,6 @@ function activeColorTokens(
     : state === 'disabled'
       ? 'disabled'
       : state === 'focusVisible'
-        || state === 'errorFocusVisible'
-        || state === 'successFocusVisible'
-        || state === 'warningFocusVisible'
         ? 'focused'
         : 'unfocused';
   const variantState = variant === 'default' ? stateName : stateName === 'focused' ? 'focused' : 'unfocused';
@@ -159,10 +147,7 @@ function simulatedFieldStyle(
   state: string,
   variant: string
 ): CSSProperties {
-  const focused = state === 'focusVisible'
-    || state === 'errorFocusVisible'
-    || state === 'successFocusVisible'
-    || state === 'warningFocusVisible';
+  const focused = state === 'focusVisible';
   const simulated = state === 'hover' || focused;
   if (!simulated) return {};
 
@@ -170,7 +155,9 @@ function simulatedFieldStyle(
   const borderColor = activeTokens.border
     ? semanticVariant
       ? `color-mix(in srgb, var(${activeTokens.border}) 70%, var(--color-text-primary))`
-      : `var(${activeTokens.border})`
+      : focused
+        ? `color-mix(in srgb, var(${activeTokens.border}) 60%, var(--color-text-primary))`
+        : `var(${activeTokens.border})`
     : undefined;
 
   return {
@@ -268,13 +255,6 @@ export default function InputStudio({ contract, definition }: InputStudioProps) 
       ...current,
       disabled: state === 'disabled',
       readOnly: state === 'readOnly',
-      variant: state === 'errorFocusVisible'
-        ? 'error'
-        : state === 'successFocusVisible'
-          ? 'success'
-          : state === 'warningFocusVisible'
-            ? 'warning'
-            : current.variant,
     }));
   }
 

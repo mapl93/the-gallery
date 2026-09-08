@@ -176,6 +176,14 @@ Use global settings when:
 
 Do not use `settings_data.json` as source. It stores saved selections from the Theme Editor.
 
+ADR 0297 connects ten Light color settings to canonical semantic and primary
+Button variables through `snippets/theme-brand-settings.liquid`. The same snippet
+owns shared font loading and the interface/editorial mapping. Main, password
+and gift-card shells render it after their CSS. Run `npm run validate:shopify:brand`
+after editing its bindings, schema defaults, locales or load order; rebuild
+source tokens first if those changed. The hosted Theme Editor checkpoint remains
+separate from local CSS and schema validation.
+
 ## Contract-To-Shopify Mapping
 
 | Contract field | Shopify mapping |

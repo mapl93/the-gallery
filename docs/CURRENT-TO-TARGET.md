@@ -2,12 +2,14 @@
 
 ## Current checkpoint — 2026-09-08
 
-The canonical catalogue/Input work is backed up remotely at `0ce4881`. ADR 0294
-extends Button and Select public customization and adds `/compositions/contact`
-for integration review. The owner approved the overall result with the required
-marker color follow-up in ADR 0295, before the bounded Shopify brand-editor and
-Figma pilots. The Foundations control matrix
-remains until equivalent adjacent/state coverage exists in real compositions.
+The reviewed form customization, required marker and Button optical-spacing
+work is backed up remotely at `8162b62`. ADR 0297 implements the next Shopify
+brand-settings checkpoint: ten Light color controls, shared font bindings and
+source-default validation. The unpublished Shopify pilot `188631449907` has
+passed hosted editing, save/reload, restored-default and mobile preview checks;
+owner visual review is next, followed by Figma. See the dated pilot report for
+the exact evidence and remaining limits. The Foundations control matrix remains
+until equivalent adjacent/state coverage exists in real compositions.
 
 This document compares what The Gallery has today with the target architecture in `docs/NORTH-STAR.md`. It is the working backlog map for evolving the repo.
 

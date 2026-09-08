@@ -1,6 +1,6 @@
 # 0296. Button Icon Optical Edge Offset
 
-Status: Implemented for owner review
+Status: Owner approved
 
 Date: 2026-09-08
 

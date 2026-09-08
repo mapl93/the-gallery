@@ -35,6 +35,7 @@ Read these files before making non-trivial changes:
 - `docs/decisions/0294-button-select-customization-and-contact-composition.md` for Button/Select visual controls, shared field geometry, unitless token editing and the contact composition checkpoint.
 - `docs/decisions/0295-required-marker-public-color.md` for the shared red required-marker token and its Studio/Exhibit exposure.
 - `docs/decisions/0296-button-icon-optical-edge-offset.md` for editable Button icon-side optical spacing and loading-slot geometry.
+- `docs/decisions/0297-shopify-brand-settings-pilot.md` for Shopify Light brand settings, shared typography and the hosted-editor verification boundary.
 - `docs/decisions/0292-control-coherence-pilot.md` for the canonical token catalogue, Input/Button density pilot, targeted contrast corrections and the owner-reviewed spacing follow-up.
 - `docs/decisions/0277-interface-numerals-and-editorial-serif-boundary.md` for ordinary interface zeroes, removal of the slashed-zero API, and the UI-versus-editorial typeface boundary.
 - `docs/decisions/0007-token-source-architecture.md` for the accepted token source layering.
@@ -126,6 +127,7 @@ npm run validate:tokens:web
 npm run validate:tokens:web-components
 npm run build:tokens:shopify
 npm run validate:tokens:shopify
+npm run validate:shopify:brand
 npm run build:adapter:web
 npm run validate:adapter:web
 npm run build:adapter:shopify

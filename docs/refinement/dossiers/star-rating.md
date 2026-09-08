@@ -76,7 +76,7 @@ values outside `0..5`, non-half-step values, and unsupported size options.
 
 - Deprecated V2 declares dependency on `rating`; that edge means
   "replace with canonical Rating", not composition ownership.
-- Review Summary and Review Card now depend directly on `rating` and contain no
+- Review Summary and Review now depend directly on `rating` and contain no
   V2 selector or renderer.
 - `ReviewsStudio` no longer has a Star Rating display branch.
 - Both `/components/star-rating` views are mapped to `RatingStudio` only to

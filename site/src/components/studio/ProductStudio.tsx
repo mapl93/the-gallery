@@ -52,8 +52,10 @@ const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 const fixtureValues: Record<string, StudioPropertyValues> = {
   'product-card': {
     title: 'Celadon Study No. 4', href: '#product', vendor: 'Lucia Ferrer',
-    subtitle: 'Hand-thrown stoneware', imageAlt: 'Celadon glazed stoneware vessel',
-    mediaRatio: 'square', hoverImage: true, badges: true, quickAddAction: true, footer: true,
+    showVendor: true,
+    description: "Hand-thrown stoneware with a satin celadon glaze, shaped and finished individually in Lucia Ferrer's Buenos Aires studio.",
+    imageAlt: 'Celadon glazed stoneware vessel',
+    mediaRatio: 'square', hoverImage: true, badges: true, quickLookAction: true, price: true, footer: false,
   },
   'product-gallery': {
     imageDetail: 'lightbox', loop: false,
@@ -366,12 +368,13 @@ export default function ProductStudio({ contract, definition }: ProductStudioPro
       imageAlt={String(values.imageAlt || 'Studio product fixture')}
       mediaRatio={values.mediaRatio === 'portrait' ? 'portrait' : 'square'}
       mediaIndex={index}
-      vendor={compact ? '' : String(values.vendor || '')}
-      subtitle={compact ? '' : String(values.subtitle || '')}
+      vendor={compact || values.showVendor === false ? '' : String(values.vendor || '')}
+      description={compact ? '' : String(values.description || '')}
       hoverMediaIndex={!compact && values.hoverImage === true ? index + 1 : undefined}
       badgeLabel={!compact && values.badges === true ? 'New' : ''}
-      quickAddLabel={!compact && values.quickAddAction === true ? `Quick add ${String(values.title || 'product')}` : ''}
-      currentPrice={compact || values.footer === true ? `$${90 + index * 12}.00` : ''}
+      quickLookLabel={!compact && values.quickLookAction === true ? `Quick look at ${String(values.title || 'product')}` : ''}
+      currentPrice={`$${90 + index * 12}.00`}
+      footerAction={!compact && values.footer === true ? <button className="btn btn--outline btn--sm" type="button">Save</button> : undefined}
       className={`docs-studio__product-card${compact ? ' docs-studio__product-card--compact' : ''}`}
     />;
   }
@@ -442,7 +445,7 @@ export default function ProductStudio({ contract, definition }: ProductStudioPro
     return (
       <div className="variant-selector docs-studio__variant-selector">
         <fieldset className="variant-selector__group" disabled={contract.slug === 'variant-selector' && values.groupDisabled === true}>
-          <legend className="variant-selector__legend"><span className="variant-selector__label" dir="auto">{String(values.label || 'Glaze')}</span>: <span className="variant-selector__selection" aria-hidden="true" dir="auto">{selectedSwatch}</span></legend>
+          <legend className="variant-selector__legend"><span className={`variant-selector__label${values.required === true ? ' variant-selector__label--required' : ''}`} dir="auto">{String(values.label || 'Glaze')}</span>: <span className="variant-selector__selection" aria-hidden="true" dir="auto">{selectedSwatch}</span></legend>
           <div className="variant-swatches">
             {colors.map((option, index) => {
               const unavailable = option.fixture ? values.unavailable === true : option.value === 'porcelain';

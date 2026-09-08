@@ -21,7 +21,7 @@ No visual approval or `stable` promotion is implied.
 | Purpose and limits | pass | Presents complete formatted current/compare/unit text; is not a money formatter, calculator, inventory state, legal disclosure, structured-data source, or live region. |
 | Anatomy and composition | pass | Generic root, required current, optional native `s` compare-at, optional unit, localized hidden labels, and `bdi` values; no dependencies or duplicated behavior. |
 | Variants, sizes, states | pass | Default/On sale, one container-responsive size, one passive state, and clean optional compare/unit omission. |
-| Public API and ownership | pass | Seven semantic content/variant properties plus five accepted OpenType switches; target owns complete strings and relationship truth. |
+| Public API and ownership | pass | Seven semantic content/variant properties plus four retained OpenType switches; ordinary zero is fixed by ADR 0277 and the target owns complete strings and relationship truth. |
 | Tokens and visual system | pass | Nine existing semantic type/color tokens; wrapping, gaps, weights, strike, labels, isolation, and forced-color mapping remain private. |
 | Accessibility and motion | pass | Native `s`, DOM labels, BDI, no group/widget/live role, no focus/keyboard behavior, no animation, and forced-color preservation. |
 | Responsive/content resilience | pass | Four viewports plus current-only, long Arabic/mixed-direction range, dark, forced colors, reduced motion, and 200% zoom evidence without overflow. |
@@ -31,8 +31,8 @@ No visual approval or `stable` promotion is implied.
 
 ## Contract And Browser Evidence
 
-- Contract `0.4.0`: six anatomy parts, two variants, one size, one passive state,
-  five behaviors, 12 properties, nine unique public token references, and no
+- Contract `0.5.0`: six anatomy parts, two variants, one size, one passive state,
+  five behaviors, 11 properties, nine unique public token references, and no
   component dependencies.
 - Rendered root is a generic `span` with no `role`, `aria-label`, `aria-live`, or
   interactive descendant. Compare-at is native `S`; three `.price__label` nodes
@@ -40,9 +40,9 @@ No visual approval or `stable` promotion is implied.
 - Default computed presentation is current `20/32px` weight 600, compare
   `16/24px` weight 400, and unit `14/20px` weight 400. Current is primary text;
   compare and unit use supporting text rather than disabled or feedback colors.
-- Default OpenType settings are `calt`, `tnum`, and `zero` enabled with `frac`
-  and `ss01` disabled. Toggling all five independently produces `calt 0`,
-  `tnum 0`, `zero 0`, `frac`, and `ss01`, with matching data attributes.
+- Default OpenType settings keep `calt` and `tnum` enabled with `frac` and
+  `ss01` disabled. ADR 0277 fixes `zero 0` and removes its public attribute;
+  the other four switches retain matching data attributes.
 - Exhibit and Studio outer markup is exactly identical and comes from the same
   renderer and fixture.
 - Current-only Default removes compare and unit parts and the on-sale class.
@@ -70,7 +70,7 @@ No visual approval or `stable` promotion is implied.
 | Web | Generic root, localized labels, native `s`, `bdi` values, canonical CSS and direct formatted strings. | Implemented and evidenced without neutral JavaScript. |
 | Shopify | Product/variant money filters, English/Spanish label keys, native `s`, `bdi`, official unit-measurement filter, optional label overrides. | Implemented; selected-variant/product-wide and dynamic announcement policy stay target-owned. |
 | React / Angular / Hydrogen | Target formatter/provider supplies complete text; semantic parts render equivalently. | Boundary documented; no canonical framework or raw amount API added. |
-| Figma | Default/On sale, current/compare/unit content, five OpenType choices, and nine public presentation tokens. | Studio validates the source presentation; formatting algorithms stay outside Figma. |
+| Figma | Default/On sale, current/compare/unit content, four OpenType choices, ordinary zero, and nine public presentation tokens. | Studio validates the source presentation; formatting algorithms stay outside Figma. |
 | SwiftUI / Compose | Target-native formatted text and explicit localized sale/unit meaning with platform announcement ownership. | Conceptual mapping; data, accessibility combination, and updates stay platform-native. |
 
 ## Performance And Risks

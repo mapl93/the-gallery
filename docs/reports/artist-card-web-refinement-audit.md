@@ -9,16 +9,16 @@ Component: Artist Card (`F6a`)
 ## Outcome
 
 Artist Card is reconciled as a passive artist summary with optional target-owned
-portrait, canonical Badge, required name, omitted-empty metadata, conditional
+portrait, canonical Flat Card and Badge, required name, omitted-empty metadata, conditional
 native-root interaction hooks and zero neutral runtime. Contract, registry,
 canonical CSS, MDX, shared Exhibit/Studio renderer, Studio metadata, generated
 Web/Shopify outputs, dossier, ADR and browser evidence agree.
 
 The component is `human-review-ready` but remains `pilot`. Human review must
 approve the visual candidate and decide whether v1 is always passive, always a
-full-card link or target-selectable through native markup. Generic Card
-composition and Shopify artist modeling also remain explicit owner/target
-boundaries.
+full-card link or target-selectable through native markup. Canonical Flat Card
+composition is accepted by owner decision 82; Shopify artist modeling remains
+an explicit target boundary.
 
 ## Research And Decision
 
@@ -36,15 +36,15 @@ boundaries.
   and inspector `1020:480` found only the generic Button Studio prototype, not
   Artist Card artwork or states.
 
-ADR 0129 records the safe boundary: passive default, conditional native link/
-button hooks, canonical Badge composition, no inferred Card shell, target-owned
-media and Shopify data, exact shared renderer and zero neutral runtime.
+ADRs 0129 and 0285 record the safe boundary: passive default, conditional native
+link/button hooks, canonical Flat Card and Badge composition, target-owned media
+and Shopify data, exact shared renderer and zero neutral runtime.
 
 ## Contract And Implementation Result
 
-- Contract `0.2.0` remains `pilot`: eight anatomy parts, one variant/size,
-  four states, four behaviors, six semantic properties, seventeen public tokens
-  and one Badge dependency.
+- Contract `0.3.0` remains `pilot`: eight anatomy parts, one variant/size,
+  four states, five behaviors, six semantic properties, seventeen public tokens
+  and Card plus Badge dependencies.
 - The shared root is a passive `article` with zero focusable descendants.
   `a[href].artist-card` and `button.artist-card` are optional target mappings,
   not public neutral properties.
@@ -135,19 +135,21 @@ The canonical Badge mix now retains 10% semantic color with primary text.
 
 ## Performance And Risks
 
-- Storytelling CSS is `4,584 B / 4.2 KiB`, a `284 B` exception and `13 B`
-  increase from Batch 43.
-- Complete neutral Web component CSS is `66,469 B / 64 KiB`, a `933 B`
-  program gap and `50 B` increase from Batch 43.
-- Shared runtime remains `10,492 B / 8 KiB`, the existing `2,300 B`
-  exception. Artist Card adds `0 B` runtime, listener, observer, timer or
-  request.
-- Primitives CSS is `10,485 B / 10.3 KiB`, retaining approximately `62 B`
-  headroom after the Badge contrast correction.
+- Artist Card adds `0 B` runtime, listener, observer, timer, request, or asset.
+- Owner decision 82 makes Card a truthful dependency. Because the current
+  copy-and-own adapter closes dependencies at CSS-file granularity, the largest
+  Storytelling install slice now includes `layout.css` and measures `25,072 B`
+  against the fixed `21,504 B` ceiling: a documented `3,568 B` required gap.
+- The ceiling is not raised and the dependency is not hidden. Closing this gap
+  requires finer-grained component CSS packaging or another accepted modular
+  output change; removing canonical Card composition would contradict the owner
+  decision.
+- Complete neutral CSS and shared runtime remain diagnostic aggregate
+  measurements and are not reclassified as Artist Card-owned bytes.
 - Human review must approve portrait ratio/crop/radius, Badge inset, name/
   metadata hierarchy, rhythm, focus geometry and native-root motion.
-- Owner/product/architecture must decide final activation policy and whether a
-  future visual shell composes Card.
+- Owner/product/architecture must decide final activation policy. The visual
+  shell now composes canonical Flat Card by owner decision 82.
 - Shopify remains a documented target gap until an artist record/editor/route
   and responsive-media policy are accepted.
 
@@ -156,7 +158,7 @@ than silently raised budgets.
 
 ## Validation
 
-Registry/docs, source tokens, 183 contracts, 183 Studio definitions, neutral
+Registry/docs, source tokens, 182 contracts, 182 Studio definitions, neutral
 Web, Shopify and copied platform CSS, official Shopify validation, structural
 certification, static Preview audit, Exhibit/Studio audit, exact four-viewport
 DOM parity, passive/native/disabled probes, optional omission, isolated
@@ -175,7 +177,7 @@ outside `site/dist`, diff checks, final console inspection and explicit
 - Approve or remove the private `1.03` native-root motion and approve focus
   geometry.
 - Decide always-passive, always-linked or target-selectable native activation.
-- Decide whether a future shell composes canonical Card.
+- Reconfirm the accepted canonical Flat Card composition in live Artist Card review.
 - Define Shopify artist data/editor/route/responsive-media ownership before
   dedicated Liquid.
 - Confirm that ratio, crop, density, size, destination, activation, events and

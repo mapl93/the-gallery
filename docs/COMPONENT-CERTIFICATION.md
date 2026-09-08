@@ -58,11 +58,28 @@ work.
 - Every real variant and size is represented exactly once.
 - Defaults are explicit and supported by source evidence.
 - Boolean modifiers and other capabilities are not hidden only in CSS.
+- Interface numeral APIs do not expose or enable slashed zero. Explicitly
+  editorial article/prose composition may use its accepted typography family;
+  catalog, commerce, control, and other UI surfaces use the body/UI family.
+- Variants remain independent from states. A variant is a persistent
+  presentation or configuration profile, not an interaction or lifecycle
+  condition.
+- A component that exposes `required` shows the ADR 0275 marker once on its
+  visible label, group legend, or primary field instruction. The marker is
+  optically centered, inherits the text color, stays out of the accessible
+  name, and never substitutes for native `required` or `aria-required`.
+- Named choice groups place the marker on the group legend rather than repeating
+  it on every option label. Accessible-name-only target compositions do not
+  invent a visible label solely for the marker.
 
 ### 4. State And Behavior
 
 - Resting, interaction, validation, visibility, loading, and disabled states are
   represented when applicable.
+- States remain independent from variants. A contract or Studio control does not
+  create combined options such as `Warning focus`; it composes the selected
+  Warning variant with the generic Focus state. Combined CSS selectors and test
+  evidence remain valid implementation details under ADR 0274.
 - Every value-entry field exposes `default`, `error`, `success`, and `warning`
   validation variants before it can become `stable`, unless an accepted ADR
   records a component-specific exemption.

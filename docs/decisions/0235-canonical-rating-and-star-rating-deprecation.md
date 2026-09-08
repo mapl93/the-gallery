@@ -3,7 +3,7 @@
 - Status: Accepted
 - Date: 2026-07-20
 - Decision owner: The Gallery owner
-- Applies to: A11 Rating, V2 Star Rating, Review Summary and Review Card
+- Applies to: A11 Rating, V2 Star Rating, Review Summary and Review
 - Supersedes identity boundary in: ADR 0110 and ADR 0133
 
 ## Context
@@ -35,7 +35,7 @@ permanent alias.
 6. V2 `star-rating` becomes a deprecated pre-v1 migration record that points to
    canonical Rating. It owns no selector alias, CSS, renderer, fixture,
    behavior, tokens or target adapter and is removed at the version boundary.
-7. Review Summary and Review Card compose canonical Rating and declare that
+7. Review Summary and Review compose canonical Rating and declare that
    dependency. Review Summary keeps its exact aggregate separate from the
    target-supplied half-step `ratingDisplayValue` used by Rating, so neutral
    code never performs an implicit rounding decision.
@@ -54,5 +54,5 @@ permanent alias.
 - Review Summary may display an exact score such as `4.6` while its target
   deliberately supplies a half-step star projection such as `4.5`; the two
   values and labels are explicit rather than silently rounded.
-- Rating, Review Summary and Review Card remain `pilot` pending explicit human
+- Rating, Review Summary and Review remain `pilot` pending explicit human
   visual/stability review.

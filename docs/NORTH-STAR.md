@@ -198,7 +198,7 @@ The current repo already has a strong base:
   `adapter.manifest.json`, and `adapter.summary.json`.
 - Shopify token wrapper generated from the neutral web token target.
 - Shopify adapter manifest and validation for generated/copied assets, Liquid selector inventory, and contract maturity warnings.
-- First component contract schema with 183 validated contracts in `components/contracts/`, covering every component in `registry.json`: Button is `stable` and the remaining 182 contracts are `pilot`.
+- First component contract schema with 182 validated contracts in `components/contracts/`, covering every component in `registry.json`: 4 are human-approved `stable`, 174 remain `pilot`, and 4 are `deprecated`.
 - The docs site can render component contract metadata directly from contract source files.
 - A site-owned Studio presentation schema and validated Button definition that
   reference contract properties and public tokens without duplicating source facts.

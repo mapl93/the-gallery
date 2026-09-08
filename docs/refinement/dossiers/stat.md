@@ -28,8 +28,8 @@ container-resilient; and the Studio-only root minimum width is removed.
 - Registry `A24`, primitive, no dependencies; contract already `0.3.0`, `pilot`.
 - DOM reading order is value, label, optional change. Required empty values render
   empty rather than receiving fixture fallbacks.
-- Studio emits all five OpenType attributes with Price-aligned defaults and the
-  browser resolves `ss01`, `zero`, `tnum`, `calt`, and `frac` settings.
+- Studio emits the four remaining OpenType attributes with Price-aligned
+  defaults; canonical CSS fixes `zero` off under ADR 0277.
 - Contract states now describe upward/downward movement, include class and
   `[data-direction]` selectors, and leave favorability to target content.
 - Semantic type resolves to `32/40px` value, `16/24px` label, and `12/16px`
@@ -55,7 +55,7 @@ this remains passive content composition rather than an interaction pattern.
 
 - Required root, value, label; optional change; optional layout-only Stat Group.
 - Properties: required formatted `value`/`label`, optional formatted `change`,
-  explicit direction, and five independent typography switches.
+  explicit direction, and four independent typography switches.
 - No controlled/uncontrolled state. Targets own calculation, formatting,
   comparison period, business meaning, refresh cadence, and announcements.
 

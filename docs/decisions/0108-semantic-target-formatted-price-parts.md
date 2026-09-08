@@ -2,6 +2,8 @@
 
 Status: Accepted
 
+Superseded in part by ADR 0277: Price no longer exposes `slashedZero`.
+
 Date: 2026-07-14
 
 ## Context

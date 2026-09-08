@@ -9,7 +9,7 @@ interface WebAdapterSummary {
     status: string;
     description: string;
   };
-  outputs: Record<string, string>;
+  outputs: Record<string, string | string[]>;
   loadOrder: Array<{
     type: string;
     path: string;

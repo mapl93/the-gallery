@@ -23,7 +23,7 @@ optional localized count.
 | Selector removal | pass | No `.star-rating*` selector remains in canonical CSS, site renderer/styles, or Shopify source. |
 | Renderer removal | pass | `ReviewsStudio` has no V2 display branch; deprecated route maps to `RatingStudio`. |
 | Fixture removal | pass | Deprecated route uses canonical Rating fixture; no independent V2 fixture exists. |
-| Consumer migration | pass | Review Summary and Review Card declare and render canonical Rating. |
+| Consumer migration | pass | Review Summary and Review declare and render canonical Rating. |
 | Adapter removal | pass | V2 Shopify status is unsupported/deprecated; canonical Rating owns the Liquid adapter. |
 | Runtime/assets | pass | `0 B` V2 CSS/JS/assets and no listener, observer, timer, formatter, or request. |
 | Evidence | pass | Deprecated Exhibit/Studio roots exactly match canonical roots and contain zero legacy selectors. |
@@ -51,7 +51,7 @@ necessary; Review Summary now exposes that distinction explicitly.
 - The final fixture exposes `.rating[data-rating="3.5"]`, one named image, five
   decorative states, optional localized count, and zero focusables.
 - Deprecated routes match zero legacy selectors.
-- Review Summary and Review Card each render canonical
+- Review Summary and Review each render canonical
   `.rating[data-rating="4.5"]` and match zero legacy selectors.
 - The evidence run used one managed server, one headless Playwright session,
   one tab, and finished with zero console errors/warnings plus a clean resource

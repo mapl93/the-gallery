@@ -27,7 +27,8 @@ That use case does not restore Popup as a second component.
   `role="dialog"`.
 - Closes on repeated trigger activation, Escape and outside interaction.
 - Long workflows or mandatory decisions use Modal; menu-shaped action lists use
-  Dropdown Menu; passive hover-only explanation uses Tooltip/Hover Card.
+  Dropdown Menu; passive destination preview content composes Popover, while a
+  short non-interactive explanation uses Tooltip.
 
 ## Research And Reference Analysis
 

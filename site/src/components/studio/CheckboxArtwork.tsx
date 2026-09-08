@@ -62,7 +62,11 @@ export default function CheckboxArtwork({
         style={inputStyle}
         onChange={onChange}
       />
-      <span className={['checkbox__label', labelClassName].filter(Boolean).join(' ')}>
+      <span className={[
+        'checkbox__label',
+        required ? 'checkbox__label--required' : '',
+        labelClassName,
+      ].filter(Boolean).join(' ')}>
         {label}
       </span>
     </label>

@@ -1,9 +1,9 @@
 ## Overview
 
-The product card is the primary way to display items in collection grids and related product sections. It combines an image with hover effects, vendor info, title, and pricing.
+The product card is the primary way to display items in collection grids and related product sections. It combines passive media, a close artist-and-piece identity, a two-line description, pricing, and an optional compact Quick Look overlay.
 
 <Preview
-  html='<article class="card product-card tg-preview-frame--sm" data-media-ratio="square"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" role="img" aria-label="Ceramic Vase"></div></div><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Artisan Ceramic Vase</a></h3><div class="product-card__footer"><span class="price"><span class="price__current"><bdi class="price__value">$120.00</bdi></span></span></div></div></article>'
+  html='<article class="card product-card tg-preview-frame--sm" data-media-ratio="square"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" role="img" aria-label="Ceramic Vase"></div><div class="product-card__quick-look"><button class="btn btn--sm" type="button" aria-label="Quick look at Artisan Ceramic Vase">Quick look</button></div></div><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Artisan Ceramic Vase</a></h3><span class="product-card__description">Hand-thrown stoneware finished with a satin glaze, shaped and fired individually in the artist&apos;s studio.</span></div><div class="product-card__price"><span class="price"><span class="price__current"><bdi class="price__value">$120.00</bdi></span></span></div></article>'
   label="Product Card"
 />
 
@@ -18,16 +18,20 @@ The product card is the primary way to display items in collection grids and rel
 | Primary Image               | `.product-card__image--primary` | Primary image when hover media exists |
 | Hover Image                 | `.product-card__image--hover` | Optional alternate image revealed on hover |
 | Badges                      | `.product-card__badges`  | Badge stack                   |
-| Quick Add                   | `.product-card__quick-add` | Optional quick-add action     |
 | Body                        | `.product-card__body`    | Text content area             |
-| Vendor                      | `.product-card__vendor`  | Brand/vendor name             |
+| Artist                      | `.product-card__vendor`  | Optional artist/vendor name   |
 | Title                       | `.product-card__title`   | Product name (link)           |
-| Subtitle                    | `.product-card__subtitle` | Optional short descriptor     |
-| Footer                      | `.product-card__footer`  | Price and actions              |
+| Description                 | `.product-card__description` | Complete text, visually clamped to two lines |
+| Price                       | `.product-card__price`   | Required canonical Price composition |
+| Footer                      | `.product-card__footer`  | Optional secondary action region |
+| Quick Look                  | `.product-card__quick-look` | Intrinsic-width media overlay for target-owned Quick View |
 
 ### Usage in Grids
 
 Product cards are designed to work inside CSS Grid layouts. The card is fully fluid — it fills its grid cell width.
+Badge, text, Price, Quick Look, and optional footer actions share the same compact
+logical inset so the complete composition aligns as one column in either text
+direction.
 Every card in one grid, slider, recommendation surface, or saved-product list
 should receive the same `mediaRatio` value so rows remain aligned. `square`
 maps to 1:1 and `portrait` maps to the established 3:4 portrait proportion;
@@ -48,15 +52,15 @@ arbitrary numeric ratios are intentionally not part of the public API.
 ### With Badge and Compare Price
 
 <Preview
-  html='<article class="card product-card tg-preview-frame--sm" data-media-ratio="portrait"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" role="img" aria-label="Limited Print"></div><span class="product-card__badges"><span class="badge badge--warning">Sale</span></span></div><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Limited Edition Print</a></h3><div class="product-card__footer"><span class="price price--on-sale"><s class="price__compare"><span class="price__label">Regular price: </span><bdi class="price__value">$180.00</bdi></s><span class="price__current"><span class="price__label">Sale price: </span><bdi class="price__value">$144.00</bdi></span></span></div></div></article>'
+  html='<article class="card product-card tg-preview-frame--sm" data-media-ratio="portrait"><div class="product-card__media"><div class="product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait" role="img" aria-label="Limited Print"></div><span class="product-card__badges"><span class="badge badge--warning">Sale</span></span><div class="product-card__quick-look"><button class="btn btn--sm" type="button" aria-label="Quick look at Limited Edition Print">Quick look</button></div></div><div class="product-card__body"><span class="product-card__vendor">The Gallery</span><h3 class="product-card__title"><a href="#">Limited Edition Print</a></h3><span class="product-card__description">A numbered archival print exploring repetition, material memory, and the changing light of the studio.</span></div><div class="product-card__price"><span class="price price--on-sale"><s class="price__compare"><span class="price__label">Regular price: </span><bdi class="price__value">$180.00</bdi></s><span class="price__current"><span class="price__label">Sale price: </span><bdi class="price__value">$144.00</bdi></span></span></div></article>'
   label="Portrait + Badge + Sale Price"
 />
 
 ## Usage Guidelines
 
 <DoDont>
-  <Do>Keep card content minimal: image, vendor, title, price. Let the image do the heavy lifting.</Do>
-  <Dont>Don't overload cards with descriptions, ratings, and multiple CTAs. Save detail for the product page.</Dont>
+  <Do>Keep artist and piece name close, separate the optional two-line description and Price, and place one compact Quick Look action over the media.</Do>
+  <Dont>Don't place complete Product Form controls or multiple competing actions directly on the card.</Dont>
 </DoDont>
 
 <DoDont>
@@ -67,9 +71,10 @@ arbitrary numeric ratios are intentionally not part of the public API.
 ## Accessibility
 
 - Use one descriptive product-title link as the navigation target and keep media passive; do not add a redundant image link.
+- Treat the artist name as optional presentation. Hiding it must not remove the title or the required Price.
 - Give the primary image descriptive alternative text when it adds information. Alternate hover imagery for the same product uses empty alternative text.
-- Keep quick add and any other interactive descendants above the stretched title-link hit area and preserve their native focus behavior.
-- Keep quick add visible when hover is unavailable and include the product name in its accessible name when cards repeat.
+- Keep Quick Look above the stretched title-link hit area. Reveal it on fine-pointer hover or focus-within, keep it visible on coarse/no-hover input, and include the product name in its accessible name when cards repeat.
+- Preserve the complete description in DOM content even though CSS shows at most two lines; Quick View or product detail provides the complete reading context.
 - Preserve the card-sized title focus indicator and reduced-motion behavior from canonical CSS.
 
 ## References
@@ -77,9 +82,9 @@ arbitrary numeric ratios are intentionally not part of the public API.
 ### Dependencies
 
 This component uses:
-- [Card](/components/card) — for the canonical surface, border, radius, shadow, clipping, and lift
+- [Card](/components/card) — for the canonical surface, border, radius, resting shadow, and clipping; Product Card suppresses hover elevation
 - [Badge](/components/badge) — for sale/new/limited tags
-- [Button](/components/button) — for optional quick-add actions
+- [Button](/components/button) — for the optional Quick Look request
 - [Price](/components/price) — for current and compare-at pricing
 
 ### API Reference
@@ -92,10 +97,12 @@ This component uses:
   <tr><td>`.product-card__image--hover`</td><td>modifier</td><td>—</td><td>Hover image layer</td></tr>
   <tr><td>`mediaRatio`</td><td>`square \| portrait`</td><td>`square`</td><td>Semantic media proportion shared by cards in the same composed surface</td></tr>
   <tr><td>`.product-card__badges`</td><td>class</td><td>—</td><td>Badge stack for sale, new, or availability labels</td></tr>
-  <tr><td>`.product-card__quick-add`</td><td>class</td><td>—</td><td>Optional quick-add action area</td></tr>
   <tr><td>`.product-card__body`</td><td>class</td><td>—</td><td>Text content container</td></tr>
   <tr><td>`.product-card__vendor`</td><td>class</td><td>—</td><td>Vendor/brand name (secondary text color)</td></tr>
+  <tr><td>`showVendor`</td><td>boolean</td><td>`true`</td><td>Shows or hides the optional artist/vendor line without changing its content value</td></tr>
   <tr><td>`.product-card__title`</td><td>class</td><td>—</td><td>Product name heading</td></tr>
-  <tr><td>`.product-card__subtitle`</td><td>class</td><td>—</td><td>Optional product subtitle</td></tr>
-  <tr><td>`.product-card__footer`</td><td>class</td><td>—</td><td>Footer row for price and actions</td></tr>
+  <tr><td>`.product-card__description`</td><td>class</td><td>—</td><td>Optional complete description visually clamped to two lines</td></tr>
+  <tr><td>`.product-card__price`</td><td>required slot</td><td>required</td><td>Always-visible canonical Price composition</td></tr>
+  <tr><td>`.product-card__footer`</td><td>class</td><td>—</td><td>Optional region for a secondary action; never owns Price</td></tr>
+  <tr><td>`.product-card__quick-look`</td><td>class</td><td>—</td><td>Optional intrinsic-width media-overlay Button that requests target-owned Quick View</td></tr>
 </PropTable>

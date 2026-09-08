@@ -4,6 +4,15 @@ Status: Ready for human review; remains `pilot`
 
 Date: 2026-07-14
 
+## 2026-08-25 Owner Consolidation
+
+Owner decision 83 and ADR 0286 remove Hover Card from the active pre-v1
+inventory and make Popover the single canonical floating surface. Contract
+`0.4.0` now has two properties: `open` and independent `showArrow`, defaulting
+to `true`. Exhibit renders the default arrow; Studio uses the same Popover
+implementation and can omit that anatomy with its Show arrow toggle. Popover
+remains `pilot`.
+
 ## Outcome
 
 Popover is now a bounded non-modal floating-surface contract with content-
@@ -21,7 +30,7 @@ implied.
 | Purpose and limits | pass | Concise trigger-owned non-modal content; Dialog/Menu and rich workflow boundaries are explicit. |
 | Anatomy and composition | pass | Required panel/content, optional arrow/title, and target-owned native trigger relationship. |
 | Variants, sizes, states | pass | One compact treatment; closed/open, focus, narrow/localized, dark, reduced-motion and forced-colors modes. |
-| Public API and ownership | pass | Only `open`; controlled/uncontrolled target state and equivalent change signal; role/positioning remain contextual. |
+| Public API and ownership | pass | `open` owns visibility and `showArrow` owns decorative arrow presence; role/positioning remain contextual. |
 | Tokens and visual system | pass | Fifteen existing public references; padding, bounds, arrow and offset remain private. |
 | Accessibility and motion | pass | No forced dialog semantics or trap; synchronized relationship, Escape/outside lifecycle, focus restoration and `0s` reduced motion. |
 | Responsive/content resilience | pass | 390px long/unbroken localized proof with equal root/surface client and scroll widths. |
@@ -31,8 +40,8 @@ implied.
 
 ## Contract And Browser Evidence
 
-- Contract `0.3.0`: 4 anatomy parts, 1 variant, 1 size, 2 contract states,
-  6 behaviors, 1 property and 15 public token references.
+- Contract `0.4.0`: 4 anatomy parts, 1 variant, 1 size, 2 contract states,
+  7 behaviors, 2 properties and 15 public token references.
 - The trigger has a complete native Button name, synchronized `aria-expanded`
   and `aria-controls`, no `aria-haspopup="dialog"`, and the passive fixture
   exposes no dialog role.

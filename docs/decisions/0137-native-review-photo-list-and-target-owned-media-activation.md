@@ -128,6 +128,6 @@ belong to each target pipeline.
 - passive, link, download, Lightbox, Modal or target-specific action;
 - provider, moderation, consent, sensitive imagery, deletion and reporting;
 - source formats, responsive transformations, loading and failure policy;
-- captions, reviewer attribution and Review Card duplication;
+- captions, reviewer attribution and Review duplication;
 - count, ordering, gestures, navigation, preloading, history and analytics;
 - component-specific Figma artwork and explicit human stability approval.

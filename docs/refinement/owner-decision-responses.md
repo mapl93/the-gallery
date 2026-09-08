@@ -6,8 +6,9 @@ Started: 2026-07-19
 
 Completed: 2026-07-20
 
-Coverage: 67 component decisions represented by 66 response records; combined
-records resolve identity or shared-boundary questions together.
+Coverage: 67 component decisions represented by 66 packet response records;
+combined records resolve identity or shared-boundary questions together. One
+additional live global certification rule was accepted during component review.
 
 This ledger records the owner's component-refinement decisions one point at a
 time. The four decision packets remain the immutable proposal and evidence
@@ -1642,3 +1643,408 @@ visual approval and does not promote a component to `stable`.
 - Approval scope: semantic direction accepted; metaobject schema, interaction,
   responsive table evidence and final human visual review remain required, and
   no `stable` promotion is implied.
+
+### 67. Global — Variant And State Orthogonality
+
+- Status: `accepted`
+- Owner note: do not mix states with variants; they are separate dimensions and
+  this applies to every component.
+- Contract boundary: a state inventory does not encode a selected variant in
+  names such as `warningFocusVisible`. Studio combines Variant Warning with
+  State Focus and neither control mutates the other.
+- Implementation boundary: variant-aware focus, hover, open, selected, or other
+  combined CSS selectors remain valid implementation details and evidence; they
+  do not create additional contract states.
+- Rollout: apply the rule to Select now and reconcile the remaining pilots only
+  when each reaches its individual human-review turn. No mixed-axis component
+  may be promoted to `stable`.
+- ADR: `docs/decisions/0274-variant-state-orthogonality.md`.
+
+### 68. A3 — Select Required Indicator
+
+- Status: `accepted`
+- Owner note: turning Required on or off must have a visible effect; show an
+  asterisk beside the label and center it with the text instead of placing it in
+  the conventional raised position.
+- Semantic boundary: native `required` remains the sole constraint-validation
+  authority and the enhanced trigger mirrors it with `aria-required`; the
+  asterisk is decorative and does not enter the accessible label.
+- Visual direction: use the existing label-marker convention with a Select
+  optical alignment adjustment and the current label color, including its active
+  validation variant.
+- Visual result: accepted. After seeing the centered marker in Select, the owner
+  said the Required treatment looked excellent and requested it across all
+  required-capable fields.
+- Approval scope: the marker treatment is approved and globalized by decision
+  69; Select remains `pilot` until the owner explicitly approves the complete
+  component as stable.
+
+### 69. Global — Required Field Indicator Standard
+
+- Status: `accepted`
+- Owner note: apply the centered Select required asterisk to every field that
+  exposes Required so the visual treatment is standardized.
+- Visual direction: one decorative `*`, optically centered with the visible
+  label, legend, or primary field instruction; it inherits the text color and
+  is not raised like a superscript.
+- Semantic boundary: native `required`, native validity, or explicit
+  `aria-required` remains authoritative. The marker is excluded from accessible
+  names and does not make a field required by itself.
+- Group boundary: named choice groups display the marker once on their legend,
+  never on every option. Checkbox and Switch keep it on their single label.
+- Composition boundary: controls without an owned visible label use Field
+  Wrapper or Fieldset composition; accessible-name-only targets do not invent a
+  visible label solely for the marker.
+- Rollout: the canonical CSS, contracts, Studio fixtures, composite examples,
+  and target projections are reconciled together under ADR 0275. No component
+  is promoted to `stable`; each still requires its individual human approval.
+- ADR: `docs/decisions/0275-required-field-indicator-standard.md`.
+
+### 70. A3 — Select Final Stability Approval
+
+- Status: `accepted`
+- Owner approval: after live interaction in Studio and review in Light and Dark,
+  the owner explicitly answered yes to promoting the complete Select and asked
+  to continue with the next component.
+- Accepted surface: the progressively enhanced single-choice popup, native
+  fallback and form ownership, Default/Error/Success/Warning presentation,
+  independent Variant and State controls, keyboard and dismissal behavior,
+  responsive popup sizing, and the centered Required marker.
+- Deferred motion: popup entrance and exit animation remains a future
+  cross-target motion decision. The owner already recorded it as non-blocking
+  for v1; no React-only dependency is introduced.
+- Result: Select contract status changes from `pilot` to `stable` on
+  2026-08-12. No other component is promoted by this approval.
+
+### 71. D1 — Product Card Hierarchy And Quick Look
+
+- Status: `accepted`
+- Owner reference: use the supplied product-grid screenshot as visual
+  inspiration rather than literal target markup.
+- Hierarchy: artist/vendor and piece name form the close identity pair;
+  description and Price occupy visibly separated spacing tiers.
+- Description: use realistic longer copy, keep the complete string in the DOM,
+  and visually show no more than two lines with automatic ellipsis.
+- Action: replace Quick Add with a persistent Quick Look request. Quick View may
+  compose add-to-cart through Product Form, but Product Card does not mutate the
+  cart directly.
+- Surface: remove whole-card hover translation and shadow growth. Optional media
+  replacement/scale remains independent image behavior.
+- Typography: Product Card uses one UI sans/body family; no editorial serif is
+  mixed into this catalog surface.
+- Approval scope: these directions are accepted for implementation and live
+  review. Product Card remains `pilot` until the owner sees the result and
+  explicitly approves the complete component as stable.
+- ADR: `docs/decisions/0276-product-card-hierarchy-description-and-quick-look.md`.
+
+### 72. Global — Interface Numerals And Editorial Serif Boundary
+
+- Status: `accepted`
+- Owner note: remove the crossed/slashed zero from every number presented by the
+  design system; the treatment is no longer desired.
+- Numeric boundary: Price and Stat were the only canonical components exposing
+  the OpenType `zero` switch. The property, Studio control, data attributes, and
+  adapter parameters are removed, and canonical CSS fixes `zero` off.
+- Typeface boundary: catalog, commerce, control, and other interface surfaces
+  use the UI body family. Serif is reserved for explicitly editorial article or
+  prose composition.
+- Rollout: Product Card is reconciled now. Other pilots adopt the typeface rule
+  during their individual review so the systemic decision does not promote or
+  silently redesign unrelated components.
+- Approval scope: Price and Stat remain `pilot`; this global decision changes
+  their public API but does not constitute visual stability approval.
+- ADR: `docs/decisions/0277-interface-numerals-and-editorial-serif-boundary.md`.
+
+### 73. D1 — Product Card Quick Look Placement And Width
+
+- Status: `accepted`
+- Owner follow-up: restore Quick Look to its earlier placement over the product
+  image while preserving the new compact width instead of the former fill-width
+  treatment.
+- Interaction: reveal the overlay on fine-pointer hover or focus-within and keep
+  it visible when hover is unavailable so the action remains discoverable and
+  keyboard/touch accessible.
+- API boundary: this changes presentation and state behavior only. Quick Look
+  still requests target-owned Quick View and remains separate from cart mutation.
+- Approval scope: the follow-up is accepted for implementation and live review.
+  Product Card remains `pilot` until the owner explicitly approves the complete
+  component as stable.
+- ADR: `docs/decisions/0278-product-card-quick-look-overlay-width.md`.
+
+### 74. D1 — Product Card Artist, Price, And Quick Look Alignment
+
+- Status: `accepted`
+- Artist: expose a reversible visibility control so the optional artist name can
+  be hidden without deleting its configured text.
+- Price: make canonical Price required and always visible outside the optional
+  footer; the footer may contain only an explicitly composed secondary action.
+- Alignment: align the Quick Look Button with the logical start edge of the text
+  and Price columns below it.
+- Target boundary: Shopify maps the same artist visibility and required Price
+  anatomy; Price formatting remains owned by canonical Price.
+- Approval scope: these changes are accepted for implementation and renewed live
+  review. Product Card remains `pilot` until the owner explicitly approves the
+  complete component as stable.
+- ADR: `docs/decisions/0279-product-card-artist-price-and-overlay-alignment.md`.
+
+### 75. D1 — Product Card Unified Compact Inset
+
+- Status: `accepted`
+- Alignment: use the `New` Badge's `12px` inset as the shared lateral spacing
+  for Badge, text, required Price, Quick Look, and optional footer actions.
+- Lower edge: use the same compact value below Quick Look and below the final
+  Price or optional footer action instead of the previous wider system gap.
+- Hierarchy: retain the accepted vertical spacing between artist, title,
+  description, and Price; this decision changes the outer content inset only.
+- API boundary: the value remains private to Product Card composition. Remove
+  the no-longer-effective public spacing reference rather than inventing a new
+  component token.
+- Approval scope: accepted for implementation and renewed live review. Product
+  Card remains `pilot` until the owner explicitly approves the complete result.
+- ADR: `docs/decisions/0280-product-card-unified-content-inset.md`.
+
+### 76. D1 — Product Card Final Stability Approval
+
+- Status: `accepted`
+- Owner wording: after reviewing the compact inset live, the owner said
+  "Listo pasemos al siguiente componente" in direct response to the explicit
+  Product Card stability question.
+- Approved baseline: close artist/title hierarchy, optional reversible artist,
+  two-line description, always-visible Price, compact media-overlay Quick Look,
+  stationary Card surface, UI body typography, ordinary zeroes, and the unified
+  `12px` Badge/content/lower-edge inset in Light and Dark.
+- Renderer boundary: Exhibit and Studio retain the same registered renderer,
+  fixture, canonical classes, and implementation; Studio only adds inspection.
+- Result: Product Card contract status changes from `pilot` to `stable` on
+  2026-08-12. No other component is promoted by this approval.
+
+### 77. A14 — Divider Parent-Owned Spacing And Purpose
+
+- Status: `accepted`
+- Owner observation: `Default` and `Section` looked identical because Section
+  changed only external whitespace; `Meaning: Decorative | Structural` was also
+  unclear because it intentionally changed no visual styling.
+- Variant boundary: remove `Section`. Keep only `Default` and `Decorative` as
+  visual styles.
+- Layout boundary: Divider owns no external margin; its parent stack, grid, or
+  region owns the space around it.
+- Semantic boundary: preserve the public `semantics` property, but present it in
+  Studio as `Purpose: Visual only | Semantic` and state explicitly
+  that it changes accessibility exposure rather than appearance.
+- Approval scope: accepted for implementation and renewed live review. Divider
+  remains `pilot` until the owner explicitly approves the complete result.
+- ADR: `docs/decisions/0281-divider-parent-owned-spacing-and-purpose.md`.
+
+### 78. Studio Customize — Canonical Gallery Control Dogfooding
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner observation: the Variant, Orientation, and Purpose selectors in
+  Customize overlapped and did not appear to be the same controls being built
+  by The Gallery.
+- Root cause: `StudioInspector` rendered a site-owned `div` with selected
+  Segmented Control class names, fixed its height to `28px`, and omitted the
+  canonical fieldset, legend, and options wrapper. Canonical segment labels kept
+  their `44px` minimum height and overflowed into adjacent rows.
+- Decision: metadata-driven segmented selectors must render the shared
+  `SegmentedControlArtwork` and its complete native radio anatomy. The common
+  Studio row places one visible presentation label in its `64px` left column
+  and the full-width option surface in the right column. The renderer's native
+  legend remains the accessible group name but is visually hidden to avoid a
+  duplicate label and native fieldset displacement. The surface uses the same
+  `28px` editor height as Rule, Input, and Select controls.
+- Scope: the shared fix applies to all `83` segmented selectors across `63`
+  Customize panels. Sets of more than four choices use the compact Select
+  presentation instead of compressing or stacking labels; no component contract
+  status changes as a result.
+- ADR: `docs/decisions/0282-studio-inspector-canonical-control-dogfooding.md`.
+
+### 79. Studio — Preview Top Alignment
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner observation: short component previews looked disconnected from
+  Customize because the fixed-height stage centered them far below the top of
+  the inspector card.
+- Decision: in the desktop two-column Studio workspace, the component preview
+  begins at the same vertical coordinate as Customize. The stage remains
+  horizontally centered and keeps lateral and lower breathing room, but no
+  longer adds a desktop top inset or centers content vertically.
+- Scope: the alignment is Studio presentation only. It does not change a
+  component renderer, fixture, contract, target adapter, Exhibit composition,
+  or stability status. Overlay and viewport fixtures retain their explicit
+  internal positioning behavior.
+- ADR: `docs/decisions/0283-studio-preview-top-alignment.md`.
+
+### 80. A14 — Divider Final Stability Approval
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner wording: in direct response to “¿Apruebas ahora el Divider completo para
+  promoverlo a `stable`?”, the owner answered “Perfecto, vamos con el siguiente
+  componente.”
+- Approved baseline: Default and Decorative visual styles; independent
+  horizontal and vertical orientation; parent-owned external spacing; Visual
+  only and Semantic purpose; native separator exposure; canonical compact
+  Customize controls; and top-aligned Studio preview in Light and Dark.
+- Renderer boundary: Exhibit and Studio retain the same registered renderer,
+  fixture, canonical classes, and implementation. The inspector and preview
+  alignment are site-owned presentation only.
+- Result: Divider contract status changes from `pilot` to `stable` on
+  2026-08-25. No other component is promoted by this approval.
+
+### 81. B1 — Card Fine-Pointer Hover Treatment
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner wording: after comparing Stationary, Shadow only, and Current, the
+  owner answered “Me gusta el actual.”
+- Decision: retain the current fine-pointer treatment. Default and Elevated
+  lift by `2px` and advance their shadow; Flat remains stationary and
+  shadowless; an optional media image may scale to `1.03`.
+- Input and motion boundary: coarse/non-hover pointers keep the resting state;
+  reduced-motion mode removes transitions and hover transforms. Hover remains
+  decorative and does not create an interaction contract.
+- Composition boundary: specialized components may override the base hover
+  only through their own accepted decision. Product Card retains its approved
+  stationary surface while still composing canonical Card.
+- Approval scope: Hover is accepted. Card remains `pilot` until the complete
+  component receives explicit stability approval.
+- ADR: `docs/decisions/0284-card-fine-pointer-hover-treatment.md`.
+
+### 82. Card Family — Canonical Base And Review Identity
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner direction: specialized cards should share the canonical Card base;
+  Review Card is too complex to be defined as merely a card and becomes Review.
+- Composition: Author Card uses the default Card surface and canonical Flat for
+  Compact; Artist Card uses canonical Flat; Product Card and Article Card keep
+  their existing Card composition.
+- Boundary: Review retains its self-contained article, Rating, photos,
+  helpfulness, and reply contract without a Card dependency. Gift Card remains
+  a commerce identity rather than a layout-card family member.
+- Approval scope: apply the structural changes now, but keep every affected
+  component at its current maturity until its own live review is complete.
+- ADR: `docs/decisions/0285-card-family-composition-and-review-identity.md`.
+
+### 83. B9/B10 — Consolidate Hover Card Into Popover
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner direction: Hover Card and Popover represent the same floating-surface
+  need; keep only Popover.
+- Arrow: add a public option to show or hide the bubble “pico”, named
+  `showArrow` in the target-agnostic contract and “Show arrow” in Studio.
+- Migration: remove Hover Card from the active pre-v1 inventory rather than
+  preserving a duplicate alias; current component count becomes 182.
+- Approval scope: Popover remains `pilot`; final visuals and target activation,
+  positioning, collision, and focus policy still require their own review.
+- ADR: `docs/decisions/0286-hover-card-consolidation-into-popover.md`.
+
+### 84. B1 — Card Editorial Fixture And Compact Inset
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner observation: the CSS-drawn vessel did not read as the image placeholder
+  used by the other component fixtures. The `32px` content inset and the full
+  body-to-footer separation also made the text composition feel too loose.
+- Fixture: the one renderer shared by Exhibit and Studio uses the existing
+  licensed `textured-vase.jpg` site fixture with informative alternative text.
+  Card still exposes no image-source property and production media stays owned
+  by the consumer or target.
+- Spacing: Card body and footer use the existing
+  `--tg-space-component-xs` inset, currently `16px` in the reviewed desktop
+  mode. This compacts both outer text padding and the description-to-footer
+  separation without adding a density or arbitrary-padding property.
+- Approval scope: these directions are accepted for implementation and renewed
+  live review. Card remains `pilot` until the owner explicitly approves the
+  complete refined component.
+- ADR: `docs/decisions/0287-card-editorial-fixture-and-compact-inset.md`.
+
+### 85. Global Studio — Numeric Units, Token Names, And Label Columns
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner observation: Appearance fields accepted values that produced no
+  visible result, token names leaked `//`, and the fixed label column wrapped
+  ordinary field names too early.
+- Numeric editing: a simple measurement or duration token accepts a number in
+  the input while Studio displays its unit, such as `px` or `ms`, as a badge
+  beside the token name. Studio combines them into a valid preview value; a
+  malformed suffix cannot replace the last valid value.
+- Composite boundary: multi-part CSS values such as shadows remain editable as
+  complete text and do not receive a false single-unit badge.
+- Naming: display labels remove technical custom-property and token-family
+  prefixes before presenting the remaining hierarchy with `/`; raw identifiers
+  remain available as titles.
+- Layout: the complete Customize panel shares a label column sized to the
+  widest visible label across all groups up to `128px`. Controls fill the
+  remaining right column, and labels wrap only when they exceed that cap.
+- Scope: this is a shared, site-owned Studio inspector rule. It applies to all
+  Customize panels without changing component contracts, adapters, fixtures,
+  or maturity status. Card remains `pilot`.
+- ADR: `docs/decisions/0288-studio-inspector-numeric-units-token-names-and-label-columns.md`.
+
+### 86. Global Studio — Structured Shadow Token Editing
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner observation: raw box-shadow strings are not user friendly; Figma makes
+  the anatomy understandable by separating the values into named controls.
+- Decision: Studio renders shadow tokens as inline structured editors with X,
+  Y, Blur, Spread, Color, and Opacity fields rather than requiring raw CSS.
+- Input behavior: dimensional fields accept numbers and display their units;
+  color has a picker and hexadecimal field; opacity is a percentage. Every
+  valid edit is serialized to the same shadow custom property and reflected in
+  the live preview.
+- Safety: incomplete values keep the last valid preview. Blur cannot become
+  negative, opacity is bounded from `0` to `100`, signed offsets and spread are
+  retained, and reset restores the canonical theme value.
+- Scope: the shared rule covers the current 22 shadow controls across 20 Studio
+  definitions. It changes only the site-owned inspector, not source tokens,
+  component contracts, adapters, Exhibit fixtures, or maturity. Card remains
+  `pilot`.
+- ADR: `docs/decisions/0289-studio-structured-shadow-token-editor.md`.
+
+### 87. B1 — Card Final Stability Approval
+
+- Date: 2026-08-25.
+- Status: `accepted`
+- Owner wording: after the editorial fixture, compact inset, and structured
+  shadow controls were reviewed live, the owner said “Ok listo aprobado el
+  componente, cual es el siguiente?”
+- Approved baseline: retain Card as a passive compositional surface with
+  Default, Flat, and Elevated variants; independent Default and Hover states;
+  the accepted fine-pointer lift/media zoom; compact `16px` content inset; and
+  the shared editorial fixture.
+- Inspector and modes: the approval includes the structured Studio Appearance
+  controls plus the reviewed Light/Dark, coarse-pointer, reduced-motion, forced
+  colors, focus, and content-resilience behavior.
+- Renderer boundary: Exhibit and Studio keep the same registered renderer,
+  fixture, canonical classes, and implementation. Studio adds only its
+  customization interface.
+- Approval scope: promote only Card from `pilot` to `stable`. Product Card,
+  Article Card, Author Card, Artist Card, Review, and other related components
+  keep their independently recorded maturity.
+- ADR: `docs/decisions/0290-card-final-stability-approval.md`.
+
+### 88. A16 — Button Group Configurable Studio Fixture
+
+- Date: 2026-08-26.
+- Status: `accepted`
+- Owner observation: Studio did not allow configuring either the number of
+  buttons or the visible label of each Button.
+- Decision: add a bounded Button Group documentation fixture with a Button count
+  field and one editable text field per rendered child.
+- Composition boundary: every rendered child remains a canonical Button. The
+  fixture controls do not add `buttonCount`, `buttons`, or child-label properties
+  to Button Group's public contract; consumer and target composition still own
+  the real children.
+- Parity: Exhibit and Studio retain the same registered renderer and initial
+  three-button fixture. Interactive Studio changes are preview state, and Reset
+  restores the shared initial fixture.
+- Approval scope: the fixture controls are accepted for implementation and
+  renewed live review. Button Group remains `pilot` until the complete component
+  receives explicit stability approval.
+- ADR: `docs/decisions/0291-button-group-configurable-studio-fixture.md`.

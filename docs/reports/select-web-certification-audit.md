@@ -1,6 +1,6 @@
 # Select Neutral Web Certification Audit
 
-Status: Pending owner review
+Status: Approved stable by owner on 2026-08-12
 
 Date: 2026-07-12
 
@@ -24,7 +24,7 @@ Warning are included following the field-wide validation requirement in ADRs
   viewport-safe maximum.
 - The contract records root, label, generated control wrapper, native fallback,
   trigger, current value, optional message, listbox, option, generated indicator,
-  and generated selected-check anatomy.
+  generated selected-check anatomy, and a decorative required indicator.
 - The initial prompt is a hidden empty-value native option. It labels the closed
   trigger but is absent from the custom listbox and is not disabled.
 - ChevronDown and Check use the accepted Lucide geometry without adding an icon
@@ -32,9 +32,10 @@ Warning are included following the field-wide validation requirement in ADRs
 - Default, Error, Success, and Warning variants reuse the accepted Input
   validation token hierarchy. Label, field border, message, indicator, and
   focused outer ring are symmetrical between validation variants.
-- Default, hover, focus-visible, disabled, Error focus-visible, Success
-  focus-visible, Warning focus-visible, open, option hover, option highlighted,
-  option selected, and option disabled states are represented.
+- Default, hover, focus-visible, disabled, open, option hover, option
+  highlighted, option selected, and option disabled states are represented.
+  Focus combines independently with Default, Error, Success, or Warning under
+  ADR 0274 instead of duplicating three variant-specific Focus states.
 - Labeling, trigger/listbox relationships, native synchronization, keyboard
   navigation, typeahead, dismissal, form reset, and disabled synchronization are
   explicit behavior requirements.
@@ -47,7 +48,7 @@ Warning are included following the field-wide validation requirement in ADRs
 ## Final Evidence
 
 - Automated gate: pass; no structural failures or web manifest drift.
-- Contract: 11 anatomy parts, 4 variants, 1 size, 12 states, 14 behavior rules,
+- Contract: 12 anatomy parts, 4 variants, 1 size, 9 states, 14 behavior rules,
   6 semantic properties, and 52 public tokens.
 - Studio: 4 groups, 27 controls, all 6 semantic properties bound, 21 token
   controls, 43 referenced public tokens, and a renderer that uses the canonical
@@ -65,6 +66,11 @@ Warning are included following the field-wide validation requirement in ADRs
 - The popup does not cover the current field value.
 - The generated `.select__control` keeps popup positioning independent from the
   optional feedback message.
+- Toggling Required synchronizes native `required`, trigger `aria-required`, and
+  the label marker. The asterisk is decorative, excluded from the accessible
+  name, and optically centered with the label rather than superscripted. ADR
+  0275 now makes this the global required-field treatment rather than a
+  Select-only exception.
 - Exhibit progressive enhancement creates one trigger and one listbox, hides the
   native field, and leaves the source markup as a functional fallback.
 - The native placeholder is `hidden` and not `disabled`; its generated option
@@ -86,10 +92,11 @@ Warning are included following the field-wide validation requirement in ADRs
 - Label activation opens the enhanced trigger.
 - A form reset restores both native value and visible trigger label; native
   disabled changes synchronize to the trigger.
-- Batch 08 contrast reconciliation keeps the accepted source tokens while using
-  private mixes: default boundary `3.07:1` light / `5.19:1` dark; semantic
-  boundary/indicator minimum `3.86:1` light / `8.64:1` dark; semantic label
-  minimum `5.36:1` / `10.06:1`. Error alone exposes `aria-invalid="true"`;
+- The owner Light-theme refinement keeps the accepted source tokens while using
+  private perceptual mixes: default boundary `3.07:1` light / `5.19:1` dark;
+  semantic boundary/indicator minimum `3.24:1` light / `8.06:1` dark; semantic
+  label/message minimum `5.11:1` / `9.93:1`. Error alone exposes
+  `aria-invalid="true"`;
   Success and Warning remain associated non-invalid feedback.
 - Real pointer hover preserves the active Error, Success, or Warning trigger
   border instead of applying the neutral Default hover border.
@@ -105,9 +112,10 @@ Warning are included following the field-wide validation requirement in ADRs
 
 ## Expanded v1 Refinement Evidence — 2026-07-13
 
-- The contract is now `0.6.0`. `name` and `required` map to the native form
+- The contract is now `0.8.0`. `name` and `required` map to the native form
   owner; the visible trigger exposes `role="combobox"` and mirrors
-  `aria-required="true"`.
+  `aria-required="true"`, while the label mirrors required visually without
+  changing its accessible name.
 - Multiple selection, `size` greater than one, and `<optgroup>` content now skip
   the flat single-choice enhancer and remain functional native controls. A
   browser probe confirmed no generated trigger and a visible native field for
@@ -132,12 +140,52 @@ Warning are included following the field-wide validation requirement in ADRs
   primitives CSS measures `10,378 B` against the `10.3 KiB` family ceiling;
   Neutral Web components CSS measures `57,952 B` against `64 KiB`.
 
-## Owner Review Required
+## Final Owner Review
 
-The custom popup direction is implemented from the latest human review. Select
-now exposes the required Default, Error, Success, and Warning variants and one
-default size. Promotion to `stable` requires final visual approval and
-confirmation that no alternate sizes are added in this cycle.
+The owner approved the complete Select in the live review on 2026-08-12 after
+testing the custom popup in Studio, reviewing Light and Dark, accepting the
+semantic-color correction, keeping Variant and State independent, and accepting
+the centered Required marker. The contract is `stable`. No alternate size is
+added in this cycle.
+
+### Live owner review continuation — 2026-08-12
+
+- The owner indicated that the current Select presentation looks good.
+- The option panel's entrance and exit motion is deferred to a future
+  cross-target review and is not a v1 approval blocker. No React-only motion
+  dependency is introduced in this cycle.
+- The newly exposed Light theme completed its first owner review; explicit
+  `stable` approval remains pending a re-review after the semantic-color
+  correction. The theme selector belongs to the docs site and does not change
+  the Select contract or target adapters.
+- The owner found Error, Success, and Warning clear in Dark but too dark and
+  insufficiently differentiated in Light. Select now mixes the existing
+  semantic tokens in OKLCH, with `80%` semantic color for the border/indicator
+  and `60%` for label/message. Light resolves the three boundaries to
+  `rgb(192, 62, 60)`, `rgb(35, 149, 106)`, and `rgb(195, 129, 32)` respectively;
+  all remain above the `3:1` non-text threshold and their copy remains above
+  `4.5:1`.
+- Dark remains strong after the same source change: semantic boundary contrast
+  ranges from `8.06:1` to `11.89:1`, and no runtime console error was observed.
+- The refinement changes canonical Select CSS plus generated neutral-web and
+  Shopify copies. No public property, variant, or token was added.
+- The owner then established ADR 0274: Variant and State are separate axes for
+  every component. Select contract `0.7.0` removes `errorFocusVisible`,
+  `successFocusVisible`, and `warningFocusVisible`; Studio now renders the same
+  visual intersections through Error/Success/Warning + generic Focus. Changing
+  State no longer changes Variant.
+- The owner accepted the Select marker as the library-wide standard in ADR
+  0275. All 20 contracts exposing `required` now document one centered marker on
+  the owned or composing label, group legend, or primary instruction. No pilot
+  receives a stability promotion from this consistency change.
+- The resulting matrix passed 40 of 40 Studio checks across the 20
+  required-capable contracts in Light and Dark. Required on/off, native or ARIA
+  semantic authority, current-color inheritance, optical translation, and clean
+  accessible text all matched the convention.
+- The owner then explicitly answered yes to the complete Select stability
+  question and asked to continue with the next component. This is the human
+  promotion gate required by Component Certification; no automated audit made
+  the decision.
 
 ## Validation
 

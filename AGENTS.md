@@ -17,6 +17,21 @@ Read these files before making non-trivial changes:
 - `docs/decisions/0002-layered-source-contract-adapter-architecture.md` for the accepted layered architecture.
 - `docs/adapters/README.md` and `docs/adapters/shopify.md` for target-native adapter implementation rules.
 - `docs/COMPONENT-CERTIFICATION.md`, `docs/decisions/0034-web-component-certification-and-docs-dogfooding.md`, and `docs/decisions/0035-button-semantic-properties-and-loading-placement.md` for web-first maturity gates, semantic Studio property ownership, the Button property-schema pilot, and docs-site adapter consumption.
+- `docs/decisions/0274-variant-state-orthogonality.md` for the global rule that variants and states remain independent contract and Studio axes; combined CSS selectors are implementation evidence, not additional states.
+- `docs/decisions/0275-required-field-indicator-standard.md` for the global centered required-marker treatment, single-marker group rule, and native or ARIA semantic-authority boundary.
+- `docs/decisions/0276-product-card-hierarchy-description-and-quick-look.md` for Product Card spacing hierarchy, two-line description, Quick Look semantics, and non-elevating Card surface.
+- `docs/decisions/0278-product-card-quick-look-overlay-width.md` for Product Card's intrinsic-width media-overlay Quick Look placement and hover/focus/coarse-input visibility.
+- `docs/decisions/0279-product-card-artist-price-and-overlay-alignment.md` for Product Card's reversible artist visibility, required Price composition outside optional footer actions, and logical Quick Look/content alignment.
+- `docs/decisions/0280-product-card-unified-content-inset.md` for Product Card's shared compact inset across badges, content, Price, Quick Look, and optional footer actions.
+- `docs/decisions/0281-divider-parent-owned-spacing-and-purpose.md` for Divider's visual-only variants, parent-owned external spacing, and independent purpose/semantics control.
+- `docs/decisions/0282-studio-inspector-canonical-control-dogfooding.md` for the rule that Studio Customize controls must compose complete shared Gallery renderers instead of imitating them with partial class reuse.
+- `docs/decisions/0283-studio-preview-top-alignment.md` for the Studio-only rule that desktop previews align with the top of Customize without changing shared component renderers or Exhibit fixtures.
+- `docs/decisions/0284-card-fine-pointer-hover-treatment.md`, `docs/decisions/0285-card-family-composition-and-review-identity.md`, `docs/decisions/0286-hover-card-consolidation-into-popover.md`, and `docs/decisions/0287-card-editorial-fixture-and-compact-inset.md` for Card hover, Card-family composition, Hover Card consolidation, and Card's shared editorial fixture plus compact content inset.
+- `docs/decisions/0288-studio-inspector-numeric-units-token-names-and-label-columns.md` for number-only Studio token editing, visible unit badges, normalized token display names, and bounded dynamic label columns.
+- `docs/decisions/0289-studio-structured-shadow-token-editor.md` for the shared inline X, Y, Blur, Spread, Color, and Opacity authoring treatment for Studio shadow tokens.
+- `docs/decisions/0290-card-final-stability-approval.md` for the owner-approved Card v1 baseline and its promotion from `pilot` to `stable` without changing related components' maturity.
+- `docs/decisions/0291-button-group-configurable-studio-fixture.md` for Button Group's site-owned count and per-child label controls without promoting fixture data into the target-agnostic contract.
+- `docs/decisions/0277-interface-numerals-and-editorial-serif-boundary.md` for ordinary interface zeroes, removal of the slashed-zero API, and the UI-versus-editorial typeface boundary.
 - `docs/decisions/0007-token-source-architecture.md` for the accepted token source layering.
 - `docs/decisions/0051-field-variant-hover-preservation.md` for the requirement
   that field hover preserve the active validation color family.

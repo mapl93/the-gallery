@@ -177,7 +177,6 @@ export default function PriceStudio({ contract, definition }: PriceStudioProps) 
               unitPrice={unitPrice}
               unitPriceLabel={unitPriceLabel}
               alternateDigits={values.alternateDigits === true}
-              slashedZero={values.slashedZero !== false}
               tabularNumbers={values.tabularNumbers !== false}
               contextualAlternates={values.contextualAlternates !== false}
               fractions={values.fractions === true}

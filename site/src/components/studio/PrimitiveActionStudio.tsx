@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useMemo, useState, type CSSProperties } from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -11,6 +11,77 @@ import { getStudioLucideIcon } from './lucideCatalogue';
 interface PrimitiveActionStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
+}
+
+const initialButtonGroupLabels = ['Option 1', 'Option 2', 'Option 3'];
+const maxButtonGroupFixtureButtons = 8;
+
+interface ButtonGroupFixtureControlsProps {
+  labels: string[];
+  onChange: (labels: string[]) => void;
+}
+
+function ButtonGroupFixtureControls({
+  labels,
+  onChange,
+}: ButtonGroupFixtureControlsProps) {
+  const baseId = useId();
+
+  function setCount(authoredCount: string) {
+    const parsed = Number.parseInt(authoredCount, 10);
+    if (!Number.isFinite(parsed)) return;
+    const count = Math.min(maxButtonGroupFixtureButtons, Math.max(1, parsed));
+    onChange(Array.from(
+      { length: count },
+      (_, index) => labels[index] ?? `Option ${index + 1}`
+    ));
+  }
+
+  function setLabel(index: number, label: string) {
+    onChange(labels.map((current, currentIndex) => (
+      currentIndex === index ? label : current
+    )));
+  }
+
+  return (
+    <>
+      <div className="docs-studio__control-group">
+        <div className="docs-studio__control">
+          <label htmlFor={`${baseId}-count`}>Button count</label>
+          <div className="docs-studio__control-value">
+            <input
+              id={`${baseId}-count`}
+              className="input__field docs-studio__input"
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={maxButtonGroupFixtureButtons}
+              step={1}
+              value={labels.length}
+              title={`Studio fixture supports 1 to ${maxButtonGroupFixtureButtons} buttons`}
+              onChange={(event) => setCount(event.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+      {labels.map((label, index) => (
+        <div className="docs-studio__control-group" key={`button-label-${index}`}>
+          <div className="docs-studio__control">
+            <label htmlFor={`${baseId}-label-${index}`}>{`Button ${index + 1}`}</label>
+            <div className="docs-studio__control-value">
+              <input
+                id={`${baseId}-label-${index}`}
+                className="input__field docs-studio__input"
+                type="text"
+                value={label}
+                onChange={(event) => setLabel(index, event.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+    </>
+  );
 }
 
 function defaultPropertyValue(
@@ -161,6 +232,9 @@ export default function PrimitiveActionStudio({
   const [values, setValues] = useState<StudioPropertyValues>(initialValues);
   const [slotIconValues, setSlotIconValues] = useState<StudioSlotIconValues>(initialIcons);
   const [previewState, setPreviewState] = useState(initialStateFor(contract.slug));
+  const [buttonGroupLabels, setButtonGroupLabels] = useState<string[]>([
+    ...initialButtonGroupLabels,
+  ]);
   const [selectedToggle, setSelectedToggle] = useState(0);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
@@ -221,6 +295,7 @@ export default function PrimitiveActionStudio({
     setValues({ ...initialValues });
     setSlotIconValues({ ...initialIcons });
     setPreviewState(initialStateFor(contract.slug));
+    setButtonGroupLabels([...initialButtonGroupLabels]);
     setSelectedToggle(0);
     setTokenOverrides({});
   }
@@ -237,8 +312,10 @@ export default function PrimitiveActionStudio({
           role="group"
           aria-label={String(values.groupLabel ?? '')}
         >
-          {['Option 1', 'Option 2', 'Option 3'].map((label) => (
-            <button className="btn btn--outline" type="button" key={label}>{label}</button>
+          {buttonGroupLabels.map((label, index) => (
+            <button className="btn btn--outline" type="button" key={`button-${index}`}>
+              {label}
+            </button>
           ))}
         </div>
       );
@@ -360,6 +437,16 @@ export default function PrimitiveActionStudio({
           stateValue={previewState}
           tokenValues={tokenValues}
           activeTokens={activeTokens}
+          fixtureControlsByGroup={contract.slug === 'button-group'
+            ? {
+                content: (
+                  <ButtonGroupFixtureControls
+                    labels={buttonGroupLabels}
+                    onChange={setButtonGroupLabels}
+                  />
+                ),
+              }
+            : undefined}
           onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))}
           onSlotIconChange={(slot, iconName) => (
             setSlotIconValues((current) => ({ ...current, [slot]: iconName }))

@@ -1,8 +1,9 @@
-import { useId } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { RotateCcw } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import { getStudioLucideIcon, studioLucideIcons } from './lucideCatalogue';
+import SegmentedControlArtwork from './SegmentedControlArtwork';
 
 export type StudioPropertyValue = string | string[] | boolean | number | null;
 export type StudioPropertyValues = Record<string, StudioPropertyValue>;
@@ -19,6 +20,7 @@ interface StudioInspectorProps {
   stateValue: string;
   tokenValues: Record<string, string>;
   activeTokens: Record<string, string | null>;
+  fixtureControlsByGroup?: Partial<Record<string, ReactNode>>;
   onPropertiesChange: (values: StudioPropertyValues) => void;
   onSlotIconChange: (slot: keyof StudioSlotIconValues, iconName: string) => void;
   onStateChange: (state: string) => void;
@@ -58,13 +60,103 @@ function normalizedNumber(value: number, property: ContractProperty): number {
 
 function formatTokenName(token: string): string {
   return token
-    .replace(/^--(?:color|space|radius|typo|transition|easing)-/, '')
+    .replace(/^--/, '')
+    .replace(/^tg-/, '')
+    .replace(/^(?:color|space|radius|shadow|typo|transition|easing)-/, '')
     .replace(/-/g, '/');
 }
 
-function splitNumericValue(value: string): { number: string; unit: string } {
-  const match = value.trim().match(/^(-?(?:\d+|\d*\.\d+))([a-z%]+)$/i);
-  return match ? { number: match[1], unit: match[2] } : { number: value, unit: '' };
+const supportedCssUnits = new Set([
+  '%', 'cap', 'ch', 'cm', 'cqb', 'cqh', 'cqi', 'cqmax', 'cqmin', 'cqw', 'deg',
+  'dvh', 'dvw', 'em', 'ex', 'fr', 'grad', 'ic', 'in', 'lh', 'lvh', 'lvw', 'mm',
+  'ms', 'pc', 'pt', 'px', 'rad', 'rem', 'rlh', 's', 'svh', 'svw', 'turn', 'vb',
+  'vh', 'vi', 'vmax', 'vmin', 'vw',
+]);
+
+function inferredTokenUnit(token: string): string | null {
+  if (/(?:transition|duration)/.test(token) && !token.includes('motion-transition')) return 'ms';
+  if (/(?:radius|space|size|line-height|padding|margin|gap|offset|width|height|target)/.test(token)) return 'px';
+  if (/(?:opacity|weight|scale|z-index|^--z-)/.test(token)) return '';
+  return null;
+}
+
+function splitNumericValue(token: string, value: string): { number: string; unit: string } | null {
+  const normalized = value.trim();
+  const match = normalized.match(/^(-?(?:\d+|\d*\.\d+))([a-z%]*)$/i);
+  const inferredUnit = inferredTokenUnit(token);
+
+  if (!match) {
+    return normalized === '' && inferredUnit !== null
+      ? { number: '', unit: inferredUnit }
+      : null;
+  }
+
+  const authoredUnit = match[2].toLowerCase();
+  const unit = supportedCssUnits.has(authoredUnit)
+    ? authoredUnit
+    : inferredUnit ?? '';
+  return { number: match[1], unit: unit || inferredUnit || '' };
+}
+
+function authoredNumber(value: string): string | null {
+  return value.trim().match(/^(-?(?:\d+|\d*\.\d+))(?:[a-z%]+)?$/i)?.[1] ?? null;
+}
+
+interface StudioTokenInputProps {
+  id: string;
+  label: string;
+  token: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function StudioTokenInput({ id, label, token, value, onChange }: StudioTokenInputProps) {
+  const numeric = splitNumericValue(token, value);
+  const externalValue = numeric?.number ?? value;
+  const [draft, setDraft] = useState(externalValue);
+
+  useEffect(() => {
+    setDraft(externalValue);
+  }, [externalValue, token]);
+
+  function commit(nextDraft: string) {
+    if (!numeric) {
+      onChange(nextDraft);
+      return;
+    }
+
+    const nextNumber = authoredNumber(nextDraft);
+    if (nextNumber === null) {
+      setDraft(externalValue);
+      return;
+    }
+
+    setDraft(nextNumber);
+    onChange(`${nextNumber}${numeric.unit}`);
+  }
+
+  return (
+    <input
+      id={id}
+      type="text"
+      inputMode={numeric ? 'decimal' : undefined}
+      value={draft}
+      aria-label={label}
+      onChange={(event) => {
+        const nextDraft = event.target.value;
+        setDraft(nextDraft);
+        if (numeric && authoredNumber(nextDraft) !== null) commit(nextDraft);
+      }}
+      onBlur={() => commit(draft)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') event.currentTarget.blur();
+        if (event.key === 'Escape') {
+          setDraft(externalValue);
+          event.currentTarget.blur();
+        }
+      }}
+    />
+  );
 }
 
 function toColorInputValue(value: string): string {
@@ -81,6 +173,300 @@ function toColorInputValue(value: string): string {
   }
 
   return '#000000';
+}
+
+interface StudioShadowLength {
+  number: string;
+  unit: string;
+}
+
+interface StudioShadowValue {
+  inset: boolean;
+  x: StudioShadowLength;
+  y: StudioShadowLength;
+  blur: StudioShadowLength;
+  spread: StudioShadowLength;
+  color: string;
+  opacity: string;
+}
+
+type StudioShadowLengthName = 'x' | 'y' | 'blur' | 'spread';
+
+function normalizedHexColor(value: string): string | null {
+  const normalized = value.trim().replace(/^#/, '');
+  if (/^[0-9a-f]{3}$/i.test(normalized)) {
+    return `#${normalized.split('').map((character) => character + character).join('')}`.toLowerCase();
+  }
+  return /^[0-9a-f]{6}$/i.test(normalized) ? `#${normalized.toLowerCase()}` : null;
+}
+
+function shadowColorParts(value: string): { color: string; opacity: string } {
+  const normalized = value.trim();
+  const hexWithAlpha = normalized.match(/^#([0-9a-f]{8})$/i);
+  if (hexWithAlpha) {
+    const opacity = Math.round((parseInt(hexWithAlpha[1].slice(6), 16) / 255) * 100);
+    return { color: `#${hexWithAlpha[1].slice(0, 6).toLowerCase()}`, opacity: String(opacity) };
+  }
+
+  if (/^rgba?\(/i.test(normalized)) {
+    const channels = normalized.match(/-?(?:\d*\.\d+|\d+)%?/g) ?? [];
+    if (channels.length >= 3) {
+      const channel = (index: number) => Math.max(0, Math.min(255, Number(channels[index])));
+      const color = `#${[channel(0), channel(1), channel(2)]
+        .map((part) => Math.round(part).toString(16).padStart(2, '0'))
+        .join('')}`;
+      const alpha = channels[3]
+        ? (channels[3].endsWith('%') ? Number(channels[3].slice(0, -1)) : Number(channels[3]) * 100)
+        : 100;
+      return { color, opacity: String(Math.max(0, Math.min(100, Math.round(alpha * 100) / 100))) };
+    }
+  }
+
+  return { color: toColorInputValue(normalized), opacity: '100' };
+}
+
+function parseShadowValue(value: string): StudioShadowValue | null {
+  const length = '(-?(?:\\d+|\\d*\\.\\d+))([a-z%]*)';
+  const match = value.trim().match(new RegExp(
+    `^(inset\\s+)?${length}\\s+${length}\\s+${length}\\s+${length}\\s+(.+)$`,
+    'i'
+  ));
+  if (!match) return null;
+
+  const part = (numberIndex: number): StudioShadowLength => ({
+    number: match[numberIndex],
+    unit: match[numberIndex + 1].toLowerCase() || 'px',
+  });
+  const color = shadowColorParts(match[10]);
+  return {
+    inset: Boolean(match[1]),
+    x: part(2),
+    y: part(4),
+    blur: part(6),
+    spread: part(8),
+    color: color.color,
+    opacity: color.opacity,
+  };
+}
+
+function serializeShadowValue(value: StudioShadowValue): string {
+  const length = (part: StudioShadowLength) => `${part.number}${part.unit}`;
+  const normalizedColor = normalizedHexColor(value.color) ?? '#000000';
+  const channels = [
+    parseInt(normalizedColor.slice(1, 3), 16),
+    parseInt(normalizedColor.slice(3, 5), 16),
+    parseInt(normalizedColor.slice(5, 7), 16),
+  ];
+  const opacity = Math.max(0, Math.min(100, Number(value.opacity)));
+  const alpha = Number((opacity / 100).toFixed(3));
+  return [
+    value.inset ? 'inset' : '',
+    length(value.x),
+    length(value.y),
+    length(value.blur),
+    length(value.spread),
+    `rgba(${channels.join(', ')}, ${alpha})`,
+  ].filter(Boolean).join(' ');
+}
+
+interface StudioShadowNumberInputProps {
+  id: string;
+  label: string;
+  value: string;
+  minimum?: number;
+  maximum?: number;
+  onChange: (value: string) => void;
+}
+
+function StudioShadowNumberInput({
+  id,
+  label,
+  value,
+  minimum,
+  maximum,
+  onChange,
+}: StudioShadowNumberInputProps) {
+  const [draft, setDraft] = useState(value);
+
+  useEffect(() => setDraft(value), [value]);
+
+  function commit(nextDraft: string) {
+    const authored = authoredNumber(nextDraft);
+    if (authored === null) {
+      setDraft(value);
+      return;
+    }
+    let numeric = Number(authored);
+    if (typeof minimum === 'number') numeric = Math.max(minimum, numeric);
+    if (typeof maximum === 'number') numeric = Math.min(maximum, numeric);
+    const normalized = String(numeric);
+    setDraft(normalized);
+    onChange(normalized);
+  }
+
+  return (
+    <input
+      id={id}
+      type="text"
+      inputMode="decimal"
+      aria-label={label}
+      value={draft}
+      onChange={(event) => {
+        const nextDraft = event.target.value;
+        setDraft(nextDraft);
+        if (authoredNumber(nextDraft) !== null) commit(nextDraft);
+      }}
+      onBlur={() => commit(draft)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') event.currentTarget.blur();
+        if (event.key === 'Escape') {
+          setDraft(value);
+          event.currentTarget.blur();
+        }
+      }}
+    />
+  );
+}
+
+interface StudioShadowColorInputProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function StudioShadowColorInput({ id, label, value, onChange }: StudioShadowColorInputProps) {
+  const [draft, setDraft] = useState(value);
+
+  useEffect(() => setDraft(value), [value]);
+
+  function commit(nextDraft: string) {
+    const normalized = normalizedHexColor(nextDraft);
+    if (!normalized) {
+      setDraft(value);
+      return;
+    }
+    setDraft(normalized);
+    onChange(normalized);
+  }
+
+  return (
+    <>
+      <input
+        className="docs-studio__shadow-color-swatch"
+        type="color"
+        value={value}
+        aria-label={`Pick ${label.toLowerCase()}`}
+        onInput={(event) => onChange(event.currentTarget.value)}
+      />
+      <input
+        id={id}
+        className="docs-studio__shadow-color-text"
+        type="text"
+        value={draft}
+        aria-label={label}
+        spellCheck="false"
+        onChange={(event) => {
+          const nextDraft = event.target.value;
+          setDraft(nextDraft);
+          if (normalizedHexColor(nextDraft)) commit(nextDraft);
+        }}
+        onBlur={() => commit(draft)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') event.currentTarget.blur();
+          if (event.key === 'Escape') {
+            setDraft(value);
+            event.currentTarget.blur();
+          }
+        }}
+      />
+    </>
+  );
+}
+
+interface StudioShadowEditorProps {
+  id: string;
+  label: string;
+  token: string;
+  value: string;
+  shadow: StudioShadowValue;
+  onChange: (value: string) => void;
+}
+
+function StudioShadowEditor({ id, label, token, value, shadow, onChange }: StudioShadowEditorProps) {
+  function changeLength(name: StudioShadowLengthName, number: string) {
+    onChange(serializeShadowValue({
+      ...shadow,
+      [name]: { ...shadow[name], number },
+    }));
+  }
+
+  function changeColor(color: string) {
+    onChange(serializeShadowValue({ ...shadow, color }));
+  }
+
+  function changeOpacity(opacity: string) {
+    onChange(serializeShadowValue({ ...shadow, opacity }));
+  }
+
+  const lengthFields: Array<{
+    name: StudioShadowLengthName;
+    label: string;
+    minimum?: number;
+  }> = [
+    { name: 'x', label: 'X' },
+    { name: 'y', label: 'Y' },
+    { name: 'blur', label: 'Blur', minimum: 0 },
+    { name: 'spread', label: 'Spread' },
+  ];
+
+  return (
+    <fieldset className="docs-studio__shadow-editor">
+      <legend className="visually-hidden">{label}</legend>
+      <div className="docs-studio__shadow-header">
+        <span
+          className="docs-studio__shadow-sample"
+          aria-hidden="true"
+          style={{ boxShadow: value }}
+        />
+        <span className="docs-studio__token-name" title={token}>{formatTokenName(token)}</span>
+      </div>
+      {lengthFields.map((field) => (
+        <label className="docs-studio__shadow-field" key={field.name} htmlFor={`${id}-${field.name}`}>
+          <span className="docs-studio__shadow-field-label">{field.label}</span>
+          <StudioShadowNumberInput
+            id={`${id}-${field.name}`}
+            label={`${label} ${field.label}`}
+            value={shadow[field.name].number}
+            minimum={field.minimum}
+            onChange={(number) => changeLength(field.name, number)}
+          />
+          <span className="docs-studio__token-unit">{shadow[field.name].unit}</span>
+        </label>
+      ))}
+      <div className="docs-studio__shadow-field">
+        <label className="docs-studio__shadow-field-label" htmlFor={`${id}-color`}>Color</label>
+        <StudioShadowColorInput
+          id={`${id}-color`}
+          label={`${label} color`}
+          value={shadow.color}
+          onChange={changeColor}
+        />
+      </div>
+      <label className="docs-studio__shadow-field" htmlFor={`${id}-opacity`}>
+        <span className="docs-studio__shadow-field-label">Opacity</span>
+        <StudioShadowNumberInput
+          id={`${id}-opacity`}
+          label={`${label} opacity`}
+          value={shadow.opacity}
+          minimum={0}
+          maximum={100}
+          onChange={changeOpacity}
+        />
+        <span className="docs-studio__token-unit">%</span>
+      </label>
+    </fieldset>
+  );
 }
 
 function getSlotComposition(
@@ -157,6 +543,7 @@ export default function StudioInspector({
   stateValue,
   tokenValues,
   activeTokens,
+  fixtureControlsByGroup,
   onPropertiesChange,
   onSlotIconChange,
   onStateChange,
@@ -248,33 +635,41 @@ export default function StudioInspector({
 
     if (control.kind === 'segmented' && property) {
       const options = propertyOptions(contract, property);
+      if (options.length > 4) {
+        return (
+          <select
+            id={id}
+            className="select__field docs-studio__select"
+            value={fieldValue(values[property.name])}
+            onChange={(event) => onPropertiesChange({
+              [property.name]: event.target.value || null,
+            })}
+          >
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {control.optionLabels?.[option] ?? humanize(option)}
+              </option>
+            ))}
+          </select>
+        );
+      }
+
       return (
-        <div
-          className="segmented docs-studio__segmented"
-          role="radiogroup"
-          aria-label={control.label}
-          style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
-        >
-          {options.map((option) => {
-            const optionId = `${id}-${option}`;
-            return (
-              <label className="segmented__item docs-studio__segment" key={option} htmlFor={optionId}>
-                <input
-                  id={optionId}
-                  className="segmented__input"
-                  type="radio"
-                  name={id}
-                  value={option}
-                  checked={values[property.name] === option}
-                  onChange={() => onPropertiesChange({ [property.name]: option })}
-                />
-                <span className="segmented__label docs-studio__segment-label">
-                  {control.optionLabels?.[option] ?? humanize(option)}
-                </span>
-              </label>
-            );
-          })}
-        </div>
+        <SegmentedControlArtwork
+          className="docs-studio__segmented"
+          groupLabel={control.label}
+          legendClassName="visually-hidden"
+          name={id}
+          options={options.map((option) => ({
+            label: control.optionLabels?.[option] ?? humanize(option),
+            value: option,
+            itemClassName: 'docs-studio__segment',
+            labelClassName: 'docs-studio__segment-label',
+          }))}
+          value={fieldValue(values[property.name])}
+          optionsClassName="docs-studio__segmented-options"
+          onValueChange={(value) => onPropertiesChange({ [property.name]: value })}
+        />
       );
     }
 
@@ -382,25 +777,41 @@ export default function StudioInspector({
     const id = `${baseId}-${control.id}`;
     const tokens = control.tokens?.names ?? [];
 
+    if (control.kind === 'token' && control.tokens?.category === 'shadow') {
+      const token = tokens[0];
+      const value = tokenValues[token] ?? '';
+      const shadow = parseShadowValue(value);
+      if (shadow) {
+        return (
+          <StudioShadowEditor
+            id={id}
+            label={control.label}
+            token={token}
+            value={value}
+            shadow={shadow}
+            onChange={(nextValue) => onTokenChange(token, nextValue)}
+          />
+        );
+      }
+    }
+
     if (control.kind === 'token-pair') {
       return (
         <div className="docs-studio__token-pair">
           {tokens.map((token, index) => {
-            const current = splitNumericValue(tokenValues[token] ?? '');
+            const value = tokenValues[token] ?? '';
+            const numeric = splitNumericValue(token, value);
             return (
               <label className="docs-studio__number-field" key={token} htmlFor={`${id}-${index}`}>
                 <span aria-hidden="true">{index === 0 ? 'X' : 'Y'}</span>
-                <input
+                <StudioTokenInput
                   id={`${id}-${index}`}
-                  type="text"
-                  inputMode="decimal"
-                  value={current.number}
-                  aria-label={`${control.label} ${index === 0 ? 'horizontal' : 'vertical'}`}
-                  onChange={(event) => onTokenChange(
-                    token,
-                    `${event.target.value}${current.unit}`
-                  )}
+                  label={`${control.label} ${index === 0 ? 'horizontal' : 'vertical'}`}
+                  token={token}
+                  value={value}
+                  onChange={(nextValue) => onTokenChange(token, nextValue)}
                 />
+                {numeric?.unit && <span className="docs-studio__token-unit">{numeric.unit}</span>}
               </label>
             );
           })}
@@ -410,18 +821,19 @@ export default function StudioInspector({
 
     if (control.kind === 'token') {
       const token = tokens[0];
-      const current = splitNumericValue(tokenValues[token] ?? '');
+      const value = tokenValues[token] ?? '';
+      const numeric = splitNumericValue(token, value);
       return (
         <label className="docs-studio__token-field" htmlFor={id}>
-          <input
+          <StudioTokenInput
             id={id}
-            type="text"
-            inputMode="decimal"
-            value={current.number}
-            aria-label={control.label}
-            onChange={(event) => onTokenChange(token, `${event.target.value}${current.unit}`)}
+            label={control.label}
+            token={token}
+            value={value}
+            onChange={(nextValue) => onTokenChange(token, nextValue)}
           />
-          <span title={token}>{formatTokenName(token)}</span>
+          <span className="docs-studio__token-name" title={token}>{formatTokenName(token)}</span>
+          {numeric?.unit && <span className="docs-studio__token-unit">{numeric.unit}</span>}
         </label>
       );
     }
@@ -442,7 +854,7 @@ export default function StudioInspector({
               if (token) onTokenChange(token, event.currentTarget.value);
             }}
           />
-          <span title={token ?? 'No public token for this combination'}>
+          <span className="docs-studio__token-name" title={token ?? 'No public token for this combination'}>
             {token ? formatTokenName(token) : 'transparent'}
           </span>
         </div>
@@ -506,42 +918,60 @@ export default function StudioInspector({
         </button>
       </header>
 
-      {definition.groups.map((group) => {
-        const controls = group.controls.filter((control) => {
-          if (!control.visibleWhen) return true;
-          return values[control.visibleWhen.property] === control.visibleWhen.equals;
-        });
-        if (controls.length === 0) return null;
+      <div className="docs-studio__sections">
+        {definition.groups.map((group) => {
+          const controls = group.controls.filter((control) => {
+            if (!control.visibleWhen) return true;
+            return values[control.visibleWhen.property] === control.visibleWhen.equals;
+          });
+          if (controls.length === 0) return null;
 
-        return (
-          <section className="docs-studio__section" key={group.id}>
-            <h3>{group.label}</h3>
-            <div className="docs-studio__controls">
-              {controls.map((control) => {
-                const id = `${baseId}-${control.id}`;
-                const groupedControl = control.kind === 'segmented'
-                  || control.kind === 'collection'
-                  || control.kind === 'token-pair';
-                return (
-                  <div className="docs-studio__control-group" key={control.id}>
-                    <div className="docs-studio__control">
-                      {groupedControl
-                        ? <span>{control.label}</span>
-                        : <label htmlFor={id}>{control.label}</label>}
-                      <div className="docs-studio__control-value">
-                        {control.properties
-                          ? renderPropertyControl(control)
-                          : renderTokenControl(control)}
+          return (
+            <section className="docs-studio__section" key={group.id}>
+              <h3>{group.label}</h3>
+              <div className="docs-studio__controls">
+                {controls.map((control) => {
+                  const id = `${baseId}-${control.id}`;
+                  const propertyName = control.properties?.[0];
+                  const property = propertyName ? propertiesByName[propertyName] : undefined;
+                  const segmentedOptionCount = control.kind === 'segmented' && property
+                    ? propertyOptions(contract, property).length
+                    : 0;
+                  const segmentedRendersAsSelect = control.kind === 'segmented'
+                    && segmentedOptionCount > 4;
+                  const groupedControl = (
+                    control.kind === 'segmented' && !segmentedRendersAsSelect
+                  ) || control.kind === 'collection'
+                    || control.kind === 'token-pair'
+                    || control.tokens?.category === 'shadow';
+                  return (
+                    <div className="docs-studio__control-group" key={control.id}>
+                      <div className="docs-studio__control">
+                        {groupedControl
+                          ? (
+                            <span aria-hidden={(
+                              control.kind === 'segmented' || control.tokens?.category === 'shadow'
+                            ) ? 'true' : undefined}>
+                              {control.label}
+                            </span>
+                          )
+                          : <label htmlFor={id}>{control.label}</label>}
+                        <div className="docs-studio__control-value">
+                          {control.kind === 'state' || control.properties
+                            ? renderPropertyControl(control)
+                            : renderTokenControl(control)}
+                        </div>
                       </div>
+                      {renderSlotIconControls(control)}
                     </div>
-                    {renderSlotIconControls(control)}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        );
-      })}
+                  );
+                })}
+                {fixtureControlsByGroup?.[group.id]}
+              </div>
+            </section>
+          );
+        })}
+      </div>
     </aside>
   );
 }

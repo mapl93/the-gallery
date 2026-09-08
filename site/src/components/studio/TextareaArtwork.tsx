@@ -69,7 +69,7 @@ export default function TextareaArtwork({
 
   return (
     <div className={rootClassName}>
-      <label className="input__label" htmlFor={id}>{visibleLabel}</label>
+      <label className={`input__label${required ? ' input__label--required' : ''}`} htmlFor={id}>{visibleLabel}</label>
       <div className="input__control">
         <textarea
           ref={fieldRef}

@@ -3,6 +3,7 @@ Renders one canonical Product Card from a Shopify product resource.
 
 @param {product} product - Product resource rendered by the owning section.
 @param {string} [media_ratio] - Bounded canonical media ratio: square or portrait. Defaults to square.
+@param {boolean} [show_vendor] - Whether to render the optional artist/vendor name. Defaults to true.
 
 @example
 {% render 'product-card', product: product %}
@@ -10,6 +11,10 @@ Renders one canonical Product Card from a Shopify product resource.
 
 {%- assign product_image_alt = product.featured_image.alt | default: product.title -%}
 {%- assign product_card_media_ratio = media_ratio | default: 'square' -%}
+{%- assign product_card_show_vendor = true -%}
+{%- if show_vendor == false -%}
+  {%- assign product_card_show_vendor = false -%}
+{%- endif -%}
 {%- unless product_card_media_ratio == 'portrait' -%}
   {%- assign product_card_media_ratio = 'square' -%}
 {%- endunless -%}
@@ -40,30 +45,29 @@ Renders one canonical Product Card from a Shopify product resource.
       {{ 'product-1' | placeholder_svg_tag: 'product-card__image product-card__image--primary' }}
     {%- endif -%}
 
-    {% if product.available and product.variants.size == 1 %}
-      <div class="product-card__quick-add">
-        <button class="btn btn--full btn--sm" type="button"
-                aria-label="{{ 'products.quick_add_named' | t: title: product.title | escape }}"
-                data-quick-add="{{ product.variants.first.id }}">
-          {{ 'products.quick_add' | t }}
-        </button>
-      </div>
-    {% endif %}
+    <div class="product-card__quick-look">
+      <button class="btn btn--sm" type="button"
+              aria-label="{{ 'products.quick_look_named' | t: title: product.title | escape }}"
+              data-quick-look="{{ product.handle | escape }}">
+        {{ 'products.quick_look' | t }}
+      </button>
+    </div>
   </div>
 
   <div class="product-card__body">
-    {% if product.vendor != blank %}
+    {% if product_card_show_vendor and product.vendor != blank %}
       <span class="product-card__vendor">{{ product.vendor | escape }}</span>
     {% endif %}
     <h3 class="product-card__title">
       <a href="{{ product.url | within: collection }}">{{ product.title | escape }}</a>
     </h3>
-    {% if product.metafields.custom.subtitle %}
-      <span class="product-card__subtitle">{{ product.metafields.custom.subtitle | escape }}</span>
+    {% if product.description != blank %}
+      <span class="product-card__description">{{ product.description | strip_html | escape }}</span>
     {% endif %}
   </div>
 
-  <div class="product-card__footer">
+  <div class="product-card__price">
     {% render 'price', product: product %}
   </div>
+
 </article>

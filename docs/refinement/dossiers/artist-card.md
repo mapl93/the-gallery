@@ -16,10 +16,10 @@ roots so a passive record never promises activation.
 
 Compose the optional over-media label from canonical Badge and keep portrait,
 name, medium, location and target-formatted piece count as the Artist Card
-content API. Omit optional elements when their values are absent. Do not make
-canonical Card a dependency yet: the current flat portrait-plus-metadata
-candidate has no Card surface, body or footer shell, and adopting one would be a
-visual product decision rather than an implementation correction.
+content API. Omit optional elements when their values are absent. Owner decision
+82 resolves the shell: always compose canonical `.card.card--flat` so the
+portrait-plus-metadata candidate shares the base geometry without gaining
+border, shadow, or Card lift.
 
 Keep the `3 / 4` portrait ratio, portrait radius, overlay inset, metadata rhythm
 and image scale as private compositional decisions pending human visual review.
@@ -112,7 +112,7 @@ visual review.
 
 | Part | Required | Semantic element/role | Owner | Notes |
 | --- | --- | --- | --- | --- |
-| Root | yes | passive `article.artist-card`, or one target-owned native `a[href]`/`button` | Artist Card / target | No generic `div` activation or nested interactive descendants. |
+| Root | yes | passive `article.card.card--flat.artist-card`, or one target-owned native `a[href]`/`button` with the same Card classes | Card + Artist Card / target | Canonical flat shell; no generic `div` activation or nested interactive descendants. |
 | Portrait | no | media wrapper | Artist Card | Private `3 / 4` crop candidate; omitted with no portrait. |
 | Portrait image | no | target media / `img` | target | Target owns source, dimensions, loading and alt purpose. |
 | Badge | no | `.badge.artist-card__badge` | Badge | Short passive metadata over an existing portrait; omitted without portrait. |
@@ -121,9 +121,8 @@ visual review.
 | Location | no | text | target | Omit when empty; logical direction must remain robust. |
 | Piece count | no | target-formatted text | target | Omit when empty; no numeric/pluralization logic in the component. |
 
-Canonical Badge is the only accepted component dependency. Generic Card is not
-a dependency because Artist Card does not currently use Card surface/body/footer
-anatomy; changing that shell remains an owner visual decision.
+Canonical Card and Badge are the accepted component dependencies. Card owns the
+Flat shell; Artist Card owns portrait, metadata, and optional native activation.
 
 ## Variant, Size, State, And Mode Matrix
 
@@ -244,15 +243,15 @@ activation owns its destination/action and accessible name as one boundary.
 | Typography and logical positioning are incomplete. | medium | Use existing full type tokens, logical properties and robust wrapping. | implementable now |
 | MDX portrait claims inaccessible visual information. | medium | Use a decorative preview surface or truthful target media. | implementable now |
 | Whole-card link versus passive usage is not universally decided. | product boundary | Keep passive default and conditional native hooks; request owner approval before making navigation canonical. | owner |
-| Generic Card surface/composition is unresolved. | visual/architecture boundary | Do not add Card dependency without explicit shell approval. | owner |
+| Generic Card surface/composition was unresolved. | resolved | Owner decision 82 requires canonical Flat Card composition without adding elevation. | owner / implementation |
 | Shopify has no accepted artist model or destination. | target boundary | Validate CSS copy and document the planned Liquid/data mapping without inventing it. | owner / target |
 | Figma contains no Artist Card evidence. | human review | Use repository before/after evidence and request explicit visual approval. | owner |
 
 ## Refinement Result
 
-- Contract `0.2.0` remains `pilot`: eight anatomy parts, one variant/size,
-  four states, four behaviors, six semantic properties, seventeen public tokens
-  and one canonical Badge dependency.
+- Contract `0.3.0` remains `pilot`: eight anatomy parts, one variant/size,
+  four states, five behaviors, six semantic properties, seventeen public tokens
+  and canonical Card plus Badge dependencies.
 - Passive Exhibit/Studio markup uses one article, decorative fixture portrait,
   canonical Badge, required heading and omitted-empty metadata.
 - Pointer, motion and focus hooks are conditional on a native target link or
@@ -308,7 +307,8 @@ activation owns its destination/action and accessible name as one boundary.
   placement, typography and metadata rhythm.
 - Owner decision: must Artist Card remain passive in some contexts, become a
   whole-card link everywhere, or support both at target level?
-- Owner decision: should a future visual shell compose canonical Card?
+- Canonical Flat Card composition is resolved by owner decision 82; review its
+  combined visual result with Artist Card when this component reaches live review.
 - Target decision: which Shopify record and destination model represents an
   artist, and does merchant editing require a metaobject or another source?
 - Architecture decision: a reusable cross-target media contract may eventually
@@ -320,6 +320,6 @@ Ready for human stability review, but not approved and not `stable`. The
 passive/native boundary, canonical dependency, optional content, responsive
 containment, accessibility modes, cross-target translation, performance and
 Exhibit/Studio parity are technically reconciled. Human review must still
-approve the visual candidate and decide activation, generic Card composition
-and Shopify artist modeling. The contract remains `pilot` until that explicit
+approve the visual candidate and decide activation and Shopify artist modeling.
+Canonical Card composition is already resolved. The contract remains `pilot` until that explicit
 review.

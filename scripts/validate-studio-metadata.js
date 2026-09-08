@@ -420,7 +420,18 @@ function validateStudioDefinition(filePath, iconCatalogues) {
 
       const hasProperties = 'properties' in control;
       const hasTokens = 'tokens' in control;
-      if (hasProperties === hasTokens) {
+      const isUnboundState = control.kind === 'state' && !hasProperties && !hasTokens;
+      if (isUnboundState) {
+        if (control.source !== 'states') {
+          errors.push(`${controlLabel} state controls must use source "states"`);
+        }
+        validateOptionLabels(
+          errors,
+          control,
+          (contract.states ?? []).map((state) => state.name),
+          controlLabel
+        );
+      } else if (hasProperties === hasTokens) {
         errors.push(`${controlLabel} must define exactly one of properties or tokens`);
       } else if (hasProperties) {
         if (!propertyKinds.has(control.kind)) errors.push(`${controlLabel}.${control.kind} cannot bind semantic properties`);

@@ -1,11 +1,11 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.6.0",
+  "contractVersion": "0.8.0",
   "slug": "select",
   "name": "Select",
   "registryId": "A3",
   "category": "primitives",
-  "status": "pilot",
+  "status": "stable",
   "summary": "Progressively enhanced single-choice field with validation variants, associated feedback, a custom trigger and listbox, native form fallback, and complete keyboard behavior.",
   "dependencies": [],
   "source": {
@@ -30,6 +30,14 @@
       "className": ".select__label",
       "required": true,
       "description": "Visible label associated with the enhanced trigger."
+    },
+    {
+      "name": "requiredIndicator",
+      "selector": ".select__label--required::after",
+      "className": ".select__label--required",
+      "required": false,
+      "generated": true,
+      "description": "Decorative asterisk optically centered with the label text when the native select is required."
     },
     {
       "name": "control",
@@ -157,7 +165,7 @@
       "selectors": [
         ".select__field:focus-visible"
       ],
-      "description": "Keyboard focus indicator with the shared field focus-ring hierarchy."
+      "description": "Keyboard focus indicator with the shared field focus-ring hierarchy; the independently selected variant determines the color family."
     },
     {
       "name": "disabled",
@@ -165,27 +173,6 @@
         ".select__field:disabled"
       ],
       "description": "Unavailable native field and enhanced trigger state."
-    },
-    {
-      "name": "errorFocusVisible",
-      "selectors": [
-        ".select--error .select__field:focus-visible"
-      ],
-      "description": "Focused error variant with semantic inner and outer borders."
-    },
-    {
-      "name": "successFocusVisible",
-      "selectors": [
-        ".select--success .select__field:focus-visible"
-      ],
-      "description": "Focused success variant with semantic inner and outer borders."
-    },
-    {
-      "name": "warningFocusVisible",
-      "selectors": [
-        ".select--warning .select__field:focus-visible"
-      ],
-      "description": "Focused warning variant with semantic inner and outer borders."
     },
     {
       "name": "open",
@@ -302,19 +289,21 @@
       "name": "nativeFormOwnership",
       "selectors": [
         ".select__native",
-        ".select__trigger"
+        ".select__trigger",
+        ".select__label--required::after"
       ],
       "attributes": [
         "name on .select__native",
         "required on .select__native",
-        "aria-required=\"true\" on .select__trigger when required"
+        "aria-required=\"true\" on .select__trigger when required",
+        ".select__label--required on .select__label when required"
       ],
       "events": [
         "input",
         "change",
         "reset"
       ],
-      "description": "The native select remains the sole value, validity, reset, and form-submission owner; the enhanced trigger reflects required semantics and emits no competing value state."
+      "description": "The native select remains the sole value, validity, reset, and form-submission owner; the enhanced trigger reflects required semantics, the label mirrors them with a decorative centered marker, and no competing value state is emitted."
     },
     {
       "name": "listboxSemantics",
@@ -504,7 +493,7 @@
       "type": "boolean",
       "required": false,
       "defaultValue": false,
-      "description": "Participates in native constraint validation and is reflected to the enhanced combobox trigger.",
+      "description": "Participates in native constraint validation, is reflected to the enhanced combobox trigger, and shows a decorative centered asterisk beside the label.",
       "targetMappings": {
         "web": [
           {
@@ -517,6 +506,13 @@
             },
             "elements": [
               "select"
+            ]
+          },
+          {
+            "kind": "class",
+            "selector": ".select__label",
+            "classNames": [
+              ".select__label--required"
             ]
           }
         ]
@@ -604,7 +600,7 @@
     "Use aria-invalid=\"true\" on both native and enhanced controls for the error variant; do not apply aria-invalid for success or warning.",
     "Do not rely on validation color or the indicator alone; include associated feedback text.",
     "Expose aria-haspopup, aria-expanded, aria-controls, and aria-activedescendant on the trigger.",
-    "Expose the enhanced trigger as a select-only combobox and reflect native required state with aria-required.",
+    "Expose the enhanced trigger as a select-only combobox, reflect native required state with aria-required, and keep the decorative label marker synchronized without adding it to the accessible name.",
     "Expose role=listbox, role=option, aria-selected, and aria-disabled on the custom popup and options.",
     "Keep an initial placeholder out of the option panel with a hidden empty-value native option; do not represent it as a disabled listbox choice.",
     "Keep DOM focus on the trigger while arrow keys update the highlighted option.",

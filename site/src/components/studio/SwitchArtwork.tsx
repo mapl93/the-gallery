@@ -76,7 +76,7 @@ export default function SwitchArtwork({
       <span className="switch__track" aria-hidden="true" style={trackStyle}>
         <span className="switch__thumb" />
       </span>
-      <span className="switch__label">{visibleLabel}</span>
+      <span className={`switch__label${required ? ' switch__label--required' : ''}`}>{visibleLabel}</span>
     </label>
   );
 }

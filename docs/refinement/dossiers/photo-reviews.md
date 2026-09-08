@@ -116,7 +116,7 @@ Differences that remain product or target decisions:
 - passive versus full-media link versus download versus overlay trigger;
 - Lightbox versus Modal versus non-modal presentation;
 - individual or group captions and reviewer attribution;
-- number/order of photos and duplicate-photo policy across Review Card;
+- number/order of photos and duplicate-photo policy across Review;
 - `srcset`, sizes, formats, CDN transforms, eager/lazy thresholds and fallback;
 - moderation, sensitive imagery, deletion, reporting and consent;
 - enlarged-media index, gestures, preloading, history and analytics.
@@ -260,7 +260,7 @@ separate action anatomy; raising the ceiling is not authorized.
 | Provider and moderation are unknown. | target/data | Select provider, consent, moderation, sensitive-content and deletion policies. |
 | Delivery/failure policy is unknown. | target/performance | Define responsive formats, CDN, loading, fallback and status ownership. |
 | Captions and attribution are unknown. | product/content | Decide whether figures/captions are required before adding anatomy. |
-| Review Card may repeat the same photos. | content/accessibility | Decide whether duplicates stay informative or become decorative in context. |
+| Review may repeat the same photos. | content/accessibility | Decide whether duplicates stay informative or become decorative in context. |
 | No component-specific Figma artwork exists. | human visual | Approve browser candidate before creating the Figma target. |
 | Reviews CSS has only 1 B final headroom. | performance | Reconcile within the family rather than raising the ceiling silently. |
 

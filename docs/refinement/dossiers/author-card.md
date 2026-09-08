@@ -31,6 +31,10 @@ describes/contact the author of the nearest article. Avatar content remains
 explicit and context-sensitive; with the adjacent visible name, its image alt
 or initials are normally redundant and hidden/null.
 
+Owner decision 82 standardizes the shell on canonical Card. Full composes the
+default Card surface; Compact composes `.card--flat` and keeps its tighter local
+layout. Author Card no longer duplicates Card border or radius values.
+
 For `full`, render every supplied optional part. For `compact`, render only
 Avatar, name and role: do not merely leave biography/links in hidden DOM.
 Replace viewport-driven stacking with intrinsic wrapping based on the card's

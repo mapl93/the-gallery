@@ -95,7 +95,12 @@ export default function FileUploadArtwork({
         onChange={onChange}
       />
       {icon}
-      <span className="file-upload__text" id={labelId}>{visibleLabel}</span>
+      <span
+        className={`file-upload__text${required ? ' file-upload__text--required' : ''}`}
+        id={labelId}
+      >
+        {visibleLabel}
+      </span>
       {visibleHint && (
         <span className="file-upload__hint" id={hintId}>{visibleHint}</span>
       )}

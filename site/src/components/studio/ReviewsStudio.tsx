@@ -52,7 +52,7 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     disabled: false,
     describedBy: 'studio-rating-help',
   },
-  'review-card': {
+  'review': {
     author: 'Mara Vidal',
     date: 'July 8, 2026',
     dateTime: '2026-07-08',
@@ -176,7 +176,7 @@ function StarInput({ idPrefix, label, name, value, variant = 'default', required
       aria-invalid={variant === 'error' ? true : undefined}
       aria-describedby={describedBy || undefined}
     >
-      <legend className="star-input__legend">{label}</legend>
+      <legend className={`star-input__legend${required ? ' star-input__legend--required' : ''}`}>{label}</legend>
       <span className="star-input__choices">
         {[1, 2, 3, 4, 5].map((rating) => (
           <label className="star-input__label" key={rating}>
@@ -318,7 +318,7 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
     );
   }
 
-  function renderReviewCard() {
+  function renderReview() {
     const pressed = values.helpfulPressed === true;
     const title = String(values.title || '');
     const date = String(values.date || '');
@@ -327,40 +327,40 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
     const titleId = `${id}-review-title`;
     const helpfulCountId = `${id}-review-helpful-count`;
     return (
-      <article className="review-card" aria-labelledby={title ? titleId : undefined}>
-        <header className="review-card__header">
+      <article className="review" aria-labelledby={title ? titleId : undefined}>
+        <header className="review__header">
           {values.avatar === true && (
             <img
-              className="review-card__avatar docs-studio__reviews-avatar"
+              className="review__avatar docs-studio__reviews-avatar"
               src={editorialMedia.artistInStudio}
               alt=""
             />
           )}
-          <div className="review-card__meta">
-            <span className="review-card__author">{String(values.author)}</span>
-            {date && <time className="review-card__date" dateTime={String(values.dateTime || '') || undefined}>{date}</time>}
+          <div className="review__meta">
+            <span className="review__author">{String(values.author)}</span>
+            {date && <time className="review__date" dateTime={String(values.dateTime || '') || undefined}>{date}</time>}
           </div>
-          {values.verifiedStatus === true && <span className="review-card__verified"><BadgeCheck aria-hidden="true" />Verified purchase</span>}
+          {values.verifiedStatus === true && <span className="review__verified"><BadgeCheck aria-hidden="true" />Verified purchase</span>}
         </header>
         {values.rating === true && (
           <RatingArtwork ratingValue={4.5} accessibleLabel="4.5 out of 5 stars" />
         )}
-        {title && <h3 className="review-card__title" id={titleId}>{title}</h3>}
-        <p className="review-card__body">{String(values.body)}</p>
+        {title && <h3 className="review__title" id={titleId}>{title}</h3>}
+        <p className="review__body">{String(values.body)}</p>
         {values.photos === true && (
-          <ul className="review-card__photos" aria-label={String(values.photosLabel)}>
+          <ul className="review__photos" aria-label={String(values.photosLabel)}>
             {photoAlts.slice(0, 3).map((alt, index) => (
-              <li className="review-card__photo" key={alt}>
+              <li className="review__photo" key={alt}>
                 <img className={`docs-studio__reviews-media docs-studio__reviews-media--${index + 1}`} src={editorialImage(index)} alt={alt} />
               </li>
             ))}
           </ul>
         )}
         {(helpfulLabel || helpfulCount) && (
-          <div className="review-card__actions">
+          <div className="review__actions">
             {helpfulLabel && (
               <button
-                className="review-card__helpful-btn"
+                className="review__helpful-btn"
                 type="button"
                 aria-pressed={pressed}
                 aria-describedby={helpfulCount ? helpfulCountId : undefined}
@@ -370,13 +370,13 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
                 <ThumbsUp aria-hidden="true" />{helpfulLabel}
               </button>
             )}
-            {helpfulCount && <span className="review-card__helpful-count" id={helpfulCountId}>{helpfulCount}</span>}
+            {helpfulCount && <span className="review__helpful-count" id={helpfulCountId}>{helpfulCount}</span>}
           </div>
         )}
         {values.reply === true && (
-          <div className="review-card__reply">
-            <div className="review-card__reply-label">Gallery reply</div>
-            <p className="review-card__reply-body">Thank you for sharing how the piece lives in your space.</p>
+          <div className="review__reply">
+            <div className="review__reply-label">Gallery reply</div>
+            <p className="review__reply-body">Thank you for sharing how the piece lives in your space.</p>
           </div>
         )}
       </article>
@@ -441,7 +441,7 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
             <div className="review-form__group">
               <StarInput
                 idPrefix={`${id}-form-rating`}
-                label="Your rating (required)"
+                label="Your rating"
                 name={`${id}-form-rating`}
                 value={formRating}
                 required
@@ -557,7 +557,7 @@ export default function ReviewsStudio({ contract, definition }: ReviewsStudioPro
   function renderPreview() {
     if (contract.slug === 'review-summary') return renderSummary();
     if (contract.slug === 'star-input') return renderStarInput();
-    if (contract.slug === 'review-card') return renderReviewCard();
+    if (contract.slug === 'review') return renderReview();
     if (contract.slug === 'review-highlights') return renderHighlights();
     if (contract.slug === 'photo-reviews') return renderPhotoReviews();
     if (contract.slug === 'review-form') return renderReviewForm();

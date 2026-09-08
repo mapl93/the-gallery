@@ -17,6 +17,9 @@ group label instead of substituting a Studio value.
 ## Source Reconciliation
 
 - `groupLabel` and `variant` remain the complete public API.
+- Full is represented only on the layout Variant axis. The root state inventory
+  contains Default only, in accordance with the global variant/state
+  orthogonality rule in ADR 0274.
 - Button continues to own labels, visual variants, sizes, disabled/busy state,
   focus, activation, and events for every child.
 - The group adds no selected value, roving tabindex, arrow-key navigation,
@@ -27,6 +30,10 @@ group label instead of substituting a Studio value.
   `overflow-wrap: anywhere`; Default remains intentionally content-width.
 - The Studio-only `white-space: nowrap` override was removed so both docs modes
   exercise the canonical Full behavior.
+- Studio now exposes site-owned fixture controls for one to eight Button
+  children and each visible child label. They update the same registered
+  renderer used by Exhibit and Studio without adding child arrays, counts, or
+  labels to the Button Group contract.
 
 ## Semantics And Keyboard
 
@@ -64,7 +71,7 @@ Evidence: `button-group-extreme-full-mobile-before.png`,
 
 ## Exhibit And Studio Parity
 
-Both modes render byte-identical root markup and fixtures:
+Both modes render byte-identical initial root markup and fixtures:
 
 ```html
 <div class="btn-group docs-studio__preview-button-group" role="group" aria-label="Display options"><button class="btn btn--outline" type="button">Option 1</button><button class="btn btn--outline" type="button">Option 2</button><button class="btn btn--outline" type="button">Option 3</button></div>
@@ -74,6 +81,15 @@ Eight canonical screenshots cover Mobile `390 x 844`, Tablet `768 x 1024`,
 Desktop `1280 x 800`, and XL `1600 x 1000` in Exhibit and Studio. Full/dark,
 disabled-child, keyboard focus, forced colors, reduced motion, RTL, and extreme
 content supplement the matrix under `output/playwright/refinement-batch-03/`.
+
+Studio may then vary the site-owned child fixture interactively. Reset restores
+the same three-button initial fixture consumed by Exhibit.
+
+A focused live pass on 2026-08-26 changed the fixture from three to five
+children, edited Button 1 to `View collection` and Button 5 to a longer
+localized-style destination label, and observed all five values in the
+canonical preview. Reset then restored count `3` and `Option 1`, `Option 2`,
+and `Option 3` exactly.
 
 ## Tokens, Performance, And Targets
 
@@ -87,6 +103,10 @@ content supplement the matrix under `output/playwright/refinement-batch-03/`.
   consumer Button children; Figma and native-app mappings remain planned.
 
 ## Human Review Input
+
+On 2026-08-26, the owner observed that Studio did not allow changing the number
+of buttons or their labels. ADR 0291 records the accepted fixture controls while
+preserving Button ownership of child content and behavior.
 
 Approve the repository render or provide a Button Group-specific reference for
 joined border weight, outer radius, equal-width distribution, and the accepted

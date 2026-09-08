@@ -661,7 +661,7 @@ export default function AccountStudio({ contract, definition }: AccountStudioPro
                 imageAlt={`${product.title}, ${product.selection}, ceramic artwork fixture`}
                 mediaIndex={index + 1}
                 vendor={product.vendor}
-                subtitle={product.selection}
+                description={product.selection}
                 badgeLabel={product.availabilityLabel}
                 currentPrice={product.price}
                 className="docs-studio__product-card docs-studio__wishlist-product"

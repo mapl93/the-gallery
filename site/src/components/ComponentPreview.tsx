@@ -379,21 +379,15 @@ const previewHostCss = `${previewBundleCss}
 }
 
 .tg-preview-card-media {
-  display: grid;
-  place-items: center;
   aspect-ratio: 16 / 10;
   background: #e5e5e5;
 }
 
-.tg-preview-card-media::before {
-  content: "";
+.tg-preview-card-media img {
   display: block;
-  width: 72px;
-  height: 96px;
-  border: 1px solid #a3a3a3;
-  border-radius: 44% 44% 28% 28%;
-  background: #fafafa;
-  box-shadow: inset 0 -16px 0 #d4d4d4;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .tg-preview-carousel {

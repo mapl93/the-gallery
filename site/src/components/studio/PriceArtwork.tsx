@@ -8,7 +8,6 @@ interface PriceArtworkProps {
   variant?: string;
   className?: string | null;
   alternateDigits?: boolean;
-  slashedZero?: boolean;
   tabularNumbers?: boolean;
   contextualAlternates?: boolean;
   fractions?: boolean;
@@ -24,7 +23,6 @@ export default function PriceArtwork({
   variant = 'default',
   className = null,
   alternateDigits = false,
-  slashedZero = true,
   tabularNumbers = true,
   contextualAlternates = true,
   fractions = false,
@@ -35,7 +33,6 @@ export default function PriceArtwork({
     <span
       className={classes}
       data-price-alternate-digits={String(alternateDigits)}
-      data-price-slashed-zero={String(slashedZero)}
       data-price-tabular-numbers={String(tabularNumbers)}
       data-price-contextual-alternates={String(contextualAlternates)}
       data-price-fractions={String(fractions)}

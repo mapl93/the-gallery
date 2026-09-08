@@ -2,6 +2,9 @@
 
 Status: Accepted
 
+Superseded in part by ADR 0286. Hover Card is no longer an active component,
+and Popover now also owns the independent `showArrow` property.
+
 Date: 2026-07-14
 
 ## Context

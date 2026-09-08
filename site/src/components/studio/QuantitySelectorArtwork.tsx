@@ -1,6 +1,7 @@
 import { useRef, type CSSProperties } from 'react';
 
 interface QuantitySelectorArtworkProps {
+  id?: string;
   value: number | null;
   onValueChange: (value: number | null) => void;
   min?: number | null;
@@ -23,6 +24,7 @@ interface QuantitySelectorArtworkProps {
 }
 
 export default function QuantitySelectorArtwork({
+  id,
   value,
   onValueChange,
   min = null,
@@ -85,6 +87,7 @@ export default function QuantitySelectorArtwork({
       <input
         ref={inputRef}
         className="qty__input"
+        id={id}
         type="number"
         name={name || undefined}
         value={value ?? ''}

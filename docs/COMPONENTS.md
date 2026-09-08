@@ -1367,10 +1367,11 @@ Button or Link slot: use a Link for navigation and a Button for a command.
 
 ```css
 .divider {
+  width: 100%;
   border: none;
   height: 1px;
   background: var(--color-border-subtle);
-  margin: var(--space-layout-element-gap) 0;
+  margin: 0;
 }
 
 .divider--decorative {
@@ -1378,10 +1379,17 @@ Button or Link slot: use a Link for navigation and a Button for a command.
   background: var(--color-border-decorative);
 }
 
-.divider--section {
-  margin: var(--space-layout-section-gap) 0;
+.divider[data-orientation="vertical"] {
+  align-self: stretch;
+  width: 1px;
+  height: 100%;
 }
 ```
+
+Divider owns the rule only. Parent layout composition owns all surrounding
+spacing. The independent `semantics` property controls whether the rule is
+visual-only or exposed as a structural separator; it intentionally has no
+visual effect.
 
 ---
 
@@ -1865,31 +1873,11 @@ state through `.popover--open` and implement dismissal/focus restoration.
 Do not add `role="dialog"` or `aria-haspopup="dialog"` from appearance alone.
 Non-modal Popover preserves natural Tab order; targets own anchor geometry,
 collision handling, and controlled/uncontrolled `open` state.
-
----
-
-### B10. Hover Card
-
-Hover Card is a passive, supplemental preview of information fully available
-behind a native link. It remains visible while pointer or focus is within the
-combined trigger/content region. Targets apply `.hover-card--dismissed` after
-Escape and remove it only after pointer and focus leave that region.
-
-```html
-<span class="hover-card">
-  <a class="link" href="/artists/lucia-ferrer">View artist</a>
-  <span class="hover-card__content">
-    <span class="hover-card__title">Lucia Ferrer</span>
-    <span class="hover-card__description">
-      Clay studies shaped by coastal geology and quiet repetition.
-    </span>
-  </span>
-</span>
-```
-
-Do not place controls, required instructions, destructive actions, or unique
-information in Hover Card. Delay, collision, portals, and future Web
-`interestfor` support remain target concerns rather than public v1 properties.
+`showArrow` defaults to `true`; when it is false, omit `.popover__arrow` or set
+its native `hidden` attribute. The arrow is decorative and does not alter
+semantics or behavior. The former Hover Card identity was consolidated into
+Popover by ADR 0286; passive destination previews now use this same surface and
+must keep the complete information available through an accessible path.
 
 ---
 
@@ -2303,15 +2291,17 @@ persistence.
 
 ### D1. Product Card
 
-The primary browsing unit. Appears in collection grids, related products, and search results.
+The primary browsing unit. Appears in collection grids, related products, and
+search results. ADRs 0276, 0278, 0279, and 0280 own the current hierarchy, optional
+artist line, required Price, compact media-overlay Quick Look request, UI
+typography, and stationary Card surface. The
+canonical implementation is `components/css/product.css`; the excerpt below
+shows only the component-specific profile.
 
 ```css
 .product-card {
-  /* Extends .card — inherits card contract */
-  --_card-bg: var(--color-surface-primary);
-  --_card-border: var(--color-border-subtle);
-  --_card-radius: var(--radius-md);
-  --_card-shadow: var(--shadow-sm);
+  --_product-card-media-ratio: 1;
+  --_product-card-content-inset: 12px;
 
   position: relative;
   display: flex;
@@ -2320,9 +2310,8 @@ The primary browsing unit. Appears in collection grids, related products, and se
 
 .product-card__media {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: var(--_product-card-media-ratio);
   overflow: hidden;
-  border-radius: var(--_card-radius) var(--_card-radius) 0 0;
 }
 
 .product-card__image {
@@ -2344,35 +2333,20 @@ The primary browsing unit. Appears in collection grids, related products, and se
 
 .product-card__badges {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  inset-block-start: var(--_product-card-content-inset);
+  inset-inline-start: var(--_product-card-content-inset);
   display: flex;
   flex-direction: column;
   gap: 4px;
   z-index: 1;
 }
 
-.product-card__quick-add {
-  position: absolute;
-  bottom: 12px;
-  left: 12px;
-  right: 12px;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity var(--transition-base) var(--easing-default),
-              transform var(--transition-base) var(--easing-default);
-}
-.product-card:hover .product-card__quick-add {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .product-card__body {
-  padding: 12px var(--space-layout-element-gap);
+  padding: var(--_product-card-content-inset) var(--_product-card-content-inset) 0;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .product-card__vendor {
@@ -2383,7 +2357,7 @@ The primary browsing unit. Appears in collection grids, related products, and se
 }
 
 .product-card__title {
-  font-family: var(--font-family-heading);
+  font-family: var(--font-family-body);
   font-size: var(--typo-body-size);
   font-weight: 500;
   color: var(--color-text-primary);
@@ -2400,16 +2374,56 @@ The primary browsing unit. Appears in collection grids, related products, and se
   inset: 0;
 }
 
-.product-card__subtitle {
+.product-card__description {
+  display: -webkit-box;
+  margin-top: 10px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: calc(var(--typo-body-size) * 0.875);
+  line-height: var(--typo-body-line-height);
   color: var(--color-text-secondary);
 }
 
+.product-card__price {
+  padding: var(--_product-card-content-inset) var(--_product-card-content-inset) 0;
+  min-width: 0;
+}
+.product-card__price:last-child {
+  padding-bottom: var(--_product-card-content-inset);
+}
+
 .product-card__footer {
-  padding: 0 var(--space-layout-element-gap) var(--space-layout-element-gap);
+  padding: var(--_product-card-content-inset);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+}
+
+.product-card__quick-look {
+  position: absolute;
+  inset-inline-start: var(--_product-card-content-inset);
+  inset-block-end: var(--_product-card-content-inset);
+  z-index: 2;
+  inline-size: max-content;
+  max-inline-size: calc(100% - var(--_product-card-content-inset) - var(--_product-card-content-inset));
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .product-card__quick-look {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+  }
+  .product-card:hover .product-card__quick-look,
+  .product-card:focus-within .product-card__quick-look {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
 }
 ```
 
@@ -2437,35 +2451,31 @@ The primary browsing unit. Appears in collection grids, related products, and se
          alt: product.title, loading: 'lazy', widths: '300,450,600' }}
     {% endif %}
 
-    {% if product.available and product.variants.size == 1 %}
-      <div class="product-card__quick-add">
-        <button class="btn btn--full btn--sm"
-                data-quick-add="{{ product.variants.first.id }}">
-          Quick Add
-        </button>
-      </div>
-    {% endif %}
+    <div class="product-card__quick-look">
+      <button class="btn btn--sm" type="button"
+              aria-label="Quick look at {{ product.title }}"
+              data-quick-look="{{ product.handle }}">
+        Quick look
+      </button>
+    </div>
   </div>
 
   <div class="product-card__body">
-    {% if product.vendor %}
+    {% if show_vendor != false and product.vendor %}
       <span class="product-card__vendor">{{ product.vendor }}</span>
     {% endif %}
     <h3 class="product-card__title">
       <a href="{{ product.url | within: collection }}">{{ product.title }}</a>
     </h3>
-    {% if product.metafields.custom.subtitle %}
-      <span class="product-card__subtitle">{{ product.metafields.custom.subtitle }}</span>
+    {% if product.description != blank %}
+      <span class="product-card__description">{{ product.description | strip_html }}</span>
     {% endif %}
   </div>
 
-  <div class="product-card__footer">
+  <div class="product-card__price">
     {% render 'price', product: product %}
-    {% if product.metafields.reviews.rating %}
-      {% render 'rating', rating: product.metafields.reviews.rating,
-         count: product.metafields.reviews.rating_count %}
-    {% endif %}
   </div>
+
 </article>
 ```
 

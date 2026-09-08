@@ -2,6 +2,8 @@
 
 Status: Accepted
 
+Superseded in part by ADR 0277: `slashedZero` is removed and `zero` is fixed off.
+
 Date: 2026-07-12
 
 ## Context

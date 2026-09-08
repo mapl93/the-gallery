@@ -11,12 +11,12 @@ interface ProductCardArtworkProps {
   mediaRatio?: ProductCardMediaRatio;
   mediaIndex?: number;
   vendor?: string;
-  subtitle?: string;
+  description?: string;
   hoverMediaIndex?: number;
   badgeLabel?: string;
-  quickAddLabel?: string;
-  quickAddText?: string;
-  currentPrice?: string;
+  quickLookLabel?: string;
+  quickLookText?: string;
+  currentPrice: string;
   currentPriceLabel?: string;
   footerAction?: ReactNode;
   className?: string;
@@ -29,12 +29,12 @@ export default function ProductCardArtwork({
   mediaRatio = 'square',
   mediaIndex = 1,
   vendor = '',
-  subtitle = '',
+  description = '',
   hoverMediaIndex,
   badgeLabel = '',
-  quickAddLabel = '',
-  quickAddText = 'Quick add',
-  currentPrice = '',
+  quickLookLabel = '',
+  quickLookText = 'Quick look',
+  currentPrice,
   currentPriceLabel = 'Price',
   footerAction,
   className = '',
@@ -58,9 +58,9 @@ export default function ProductCardArtwork({
           />
         )}
         {badgeLabel && <div className="product-card__badges"><span className="badge">{badgeLabel}</span></div>}
-        {quickAddLabel && (
-          <div className="product-card__quick-add">
-            <button className="btn btn--full" type="button" aria-label={quickAddLabel}>{quickAddText}</button>
+        {quickLookLabel && (
+          <div className="product-card__quick-look">
+            <button className="btn btn--sm" type="button" aria-label={quickLookLabel}>{quickLookText}</button>
           </div>
         )}
       </div>
@@ -69,13 +69,13 @@ export default function ProductCardArtwork({
         <h3 className="product-card__title">
           <a href={href} dir="auto">{title}</a>
         </h3>
-        {subtitle && <span className="product-card__subtitle" dir="auto">{subtitle}</span>}
+        {description && <span className="product-card__description" dir="auto">{description}</span>}
       </div>
-      {(currentPrice || footerAction) && (
+      <div className="product-card__price">
+        <PriceArtwork currentPrice={currentPrice} currentPriceLabel={currentPriceLabel} />
+      </div>
+      {footerAction && (
         <div className="product-card__footer">
-          {currentPrice && (
-            <PriceArtwork currentPrice={currentPrice} currentPriceLabel={currentPriceLabel} />
-          )}
           {footerAction}
         </div>
       )}

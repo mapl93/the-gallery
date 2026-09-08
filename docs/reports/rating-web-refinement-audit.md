@@ -13,7 +13,7 @@ combines the useful former A11 and V2 capabilities: a required target-supplied
 `0..5` half-step value, required localized accessible label, optional localized
 count, and `default | lg` presentation. The shared renderer fails closed for
 invalid required composition, adds no neutral runtime, and is used unchanged by
-Exhibit, Studio, Review Summary, Review Card, and the temporary deprecated V2
+Exhibit, Studio, Review Summary, Review, and the temporary deprecated V2
 migration page.
 
 V2 Star Rating is deprecated before v1 and owns no alias or implementation.
@@ -32,7 +32,7 @@ for explicit human visual/stability review but is not promoted to `stable`.
 | Accessibility | pass | One image name, hidden glyphs, shape plus color, no focus/keyboard/pointer/live-region behavior. |
 | Responsive/content | pass | Four viewports, long Arabic RTL count, wrapping, omitted content, 200% zoom, no component overflow. |
 | Runtime/assets | pass | Zero component JS, listeners, observers, timers, requests, animations, layout reads, or assets. |
-| Canonical dependencies | pass | Review Summary and Review Card compose `.rating`; no `.star-rating*` selector remains. |
+| Canonical dependencies | pass | Review Summary and Review compose `.rating`; no `.star-rating*` selector remains. |
 | Cross-target mapping | pass | Neutral Web and Shopify implemented; future framework/Figma/native mappings documented. |
 | Exhibit/Studio parity | pass | One `RatingArtwork` renderer and one fixture produce exact canonical root DOM. |
 | Performance | pass | Primitives `10,547/10,547 B` gzip; Rating slice `1,551 B` raw / `598 B` gzip; zero runtime. |
@@ -48,7 +48,7 @@ for explicit human visual/stability review but is not promoted to `stable`.
   missing value emit no root.
 - The deprecated Exhibit and Studio routes emit the same canonical root, with
   zero `.star-rating`, `.star-rating__stars`, or `.star-rating__star` matches.
-- Review Summary and Review Card each render `.rating[data-rating="4.5"]` with
+- Review Summary and Review each render `.rating[data-rating="4.5"]` with
   matching localized image text and zero legacy selectors.
 - Long Arabic RTL content has no stage or Rating overflow. At effective 200%
   zoom the Rating remains contained inside the preview stage.
@@ -66,7 +66,7 @@ for explicit human visual/stability review but is not promoted to `stable`.
 - `RatingArtwork.tsx` performs strict composition and supplies the one shared
   Exhibit/Studio DOM. This site renderer is evidence tooling, not neutral
   component runtime.
-- `components/css/reviews.css`, Review Summary, and Review Card depend on
+- `components/css/reviews.css`, Review Summary, and Review depend on
   canonical Rating; the former V2 CSS block is removed.
 - Shopify's `rating.liquid` maps official Rating metadata, validates compatible
   scale/value data, owns the deliberate nearest-half projection, localizes
@@ -90,7 +90,7 @@ Rating or hidden by a budget increase.
 
 1. Approve or revise accent, empty outline, half fill, `default`/`lg` scale,
    gaps, count hierarchy, and baseline alignment.
-2. Review standalone Rating plus Review Summary and Review Card compositions.
+2. Review standalone Rating plus Review Summary and Review compositions.
 3. Confirm the documentation fixture; it is not a semantic default.
 4. Keep provider normalization, rounding, missing/zero, aggregation, structured
    data, navigation, and announcements target-owned.

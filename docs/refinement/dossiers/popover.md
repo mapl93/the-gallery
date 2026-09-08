@@ -6,10 +6,19 @@ Target reviewed: Neutral Web
 
 Contract: `components/contracts/popover.contract.json`
 
+## Owner Update: Hover Card Consolidation (2026-08-25)
+
+Owner decision 83 and ADR 0286 remove Hover Card from the pre-v1 inventory and
+make Popover the single floating-surface identity. Contract `0.4.0` adds
+`showArrow: boolean`, default `true`; it independently renders or omits the
+decorative arrow without changing semantics or behavior. Historical statements
+below that `open` is the only property or that Hover Card is a separate
+component are superseded by this decision.
+
 ## Recommendation
 
-Keep Popover as a non-modal, trigger-owned floating surface with one public
-`open` state. Do not assign `role="dialog"` or `aria-haspopup="dialog"` by
+Keep Popover as a non-modal, trigger-owned floating surface with public `open`
+state and independent `showArrow` presentation. Do not assign `role="dialog"` or `aria-haspopup="dialog"` by
 default: HTML popovers do not acquire semantics automatically, and the correct
 role depends on their content. Require a native Button trigger, a stable
 trigger/panel relationship, Escape and outside dismissal, focus restoration
@@ -31,8 +40,9 @@ target under ADR 0072.
 - Not a modal: it does not inert the page, lock scroll or trap focus.
 - Not a Menu: an action list that requires arrow-key menu semantics is Dropdown
   Menu, not a generic Popover.
-- Not a Tooltip or Hover Card: activation is explicit and content may be
-  interactive.
+- Not a Tooltip: activation is explicit and content may be
+  interactive. The former Hover Card identity is consolidated into this same
+  Popover surface by owner decision 83 and ADR 0286.
 - Long workflows, destructive confirmation and content requiring isolation use
   Modal or Drawer.
 
@@ -105,11 +115,13 @@ canonical Button markup without making Button presentation mandatory.
 
 ## Public API And State Ownership
 
-- `open` remains the only semantic property, with controlled and uncontrolled
-  target implementations allowed.
+- `open` owns visibility, with controlled and uncontrolled target
+  implementations allowed.
+- `showArrow` is an independent boolean presentation property, defaults to
+  `true`, and omits or natively hides the decorative arrow when false.
 - Targets expose `openChange`/dismiss equivalents and keep trigger state in sync.
-- Trigger label, title, content, arrow presence and close control are slots or
-  composition, not scalar properties.
+- Trigger label, title, content and close control remain composition. Arrow
+  presence is the one explicit visual boolean and carries no semantic meaning.
 - Role is content-derived: no default, `dialog` only for a correctly implemented
   non-modal dialog, `menu` only through Dropdown Menu, and native semantics when
   sufficient.

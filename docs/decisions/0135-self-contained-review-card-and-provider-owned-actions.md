@@ -1,12 +1,15 @@
-# 0135. Self-Contained Review Card And Provider-Owned Actions
+# 0135. Self-Contained Review And Provider-Owned Actions
 
 Status: Accepted
+
+Renamed by ADR 0285. The accepted component is now Review (`V4`); its semantic
+and provider boundaries remain unchanged.
 
 Date: 2026-07-15
 
 ## Context
 
-V4 Review Card entered component refinement with the provider boundary accepted
+V4 Review entered component refinement with the provider boundary accepted
 by ADR 0085 and a canonical V2 Star Rating dependency. Its shared renderer
 already presented a complete review candidate, but several semantics diverged
 from its contract and MDX fallback:
@@ -30,7 +33,7 @@ record model, verification source, moderation workflow or helpfulness endpoint.
 
 ## Decision
 
-- One Review Card is one native `article` containing one independently
+- One Review is one native `article` containing one independently
   meaningful target-supplied review record.
 - Required source order remains author metadata, one canonical passive Star
   Rating and review body. Optional title, media, action and reply content follow
@@ -39,10 +42,10 @@ record model, verification source, moderation workflow or helpfulness endpoint.
   heading rank remains contextual and is not added as a neutral public property.
   The docs target uses `h3` consistently in Exhibit, Studio and MDX.
 - Visible localized `date` and optional machine-readable `dateTime` are separate
-  target values. Review Card performs no parsing, formatting or timezone work.
+  target values. Review performs no parsing, formatting or timezone work.
 - `photosLabel` names the optional native `ul`; repeated `li` items contain
   passive images by default. Targets may supply a native link or button, but
-  Review Card does not select or implement Lightbox, Modal or navigation.
+  Review does not select or implement Lightbox, Modal or navigation.
 - Avatar alternative text remains part of the target-owned media slot. The
   shared fixture uses empty alternative text because adjacent author text
   already identifies the reviewer.
@@ -60,7 +63,7 @@ record model, verification source, moderation workflow or helpfulness endpoint.
   component-confirmed update.
 - A direct reply remains ordinary grouped content inside the article. It does
   not create an `aside`, region, disclosure, thread, status or moderation flow.
-- Review Card continues to compose the current V2 Star Rating dependency. This
+- Review continues to compose the current V2 Star Rating dependency. This
   decision does not resolve V2 versus A11 Rating identity or provider scale
   policy.
 - Complete H3, body, caption and supporting typography uses existing public
@@ -76,7 +79,7 @@ record model, verification source, moderation workflow or helpfulness endpoint.
 
 ## Performance
 
-Review Card adds no neutral component listener, observer, timer, request,
+Review adds no neutral component listener, observer, timer, request,
 formatter, layout read, animation or asset. The Studio-only demonstration click
 handler is not target runtime.
 

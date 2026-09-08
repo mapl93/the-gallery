@@ -5,7 +5,6 @@ interface StatArtworkProps {
   change?: string;
   changeDirection?: 'neutral' | 'up' | 'down';
   alternateDigits?: boolean;
-  slashedZero?: boolean;
   tabularNumbers?: boolean;
   contextualAlternates?: boolean;
   fractions?: boolean;
@@ -19,7 +18,6 @@ export default function StatArtwork({
   change = '',
   changeDirection = 'neutral',
   alternateDigits = false,
-  slashedZero = true,
   tabularNumbers = true,
   contextualAlternates = true,
   fractions = false,
@@ -29,7 +27,6 @@ export default function StatArtwork({
     <Root
       className={['stat', className].filter(Boolean).join(' ')}
       data-stat-alternate-digits={String(alternateDigits)}
-      data-stat-slashed-zero={String(slashedZero)}
       data-stat-tabular-numbers={String(tabularNumbers)}
       data-stat-contextual-alternates={String(contextualAlternates)}
       data-stat-fractions={String(fractions)}

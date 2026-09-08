@@ -1,26 +1,35 @@
-# Component Dossier: Review Card
+# Component Dossier: Review
 
 Status: `human-review-ready`
 
 Target reviewed: Neutral Web
 
-Contract: `components/contracts/review-card.contract.json`
+Contract: `components/contracts/review.contract.json`
+
+## Owner Update: Review Identity (2026-08-25)
+
+Owner decision 82 and ADR 0285 rename Review Card to Review because this is a
+self-contained domain component, not merely a Card surface. Contract `0.5.0`,
+registry, canonical `.review*` classes, Exhibit, Studio, dossiers, reports, and
+generated adapters use the new identity. Review deliberately does not depend on
+Card and remains `pilot`. Historical statements below about earlier contract
+versions or an unresolved Rating identity are superseded by ADRs 0235 and 0285.
 
 ## ADR 0235 Canonical Rating Update (2026-07-20)
 
-The owner has resolved the former A11/V2 identity question. Review Card contract
-`0.4.0` now declares and composes canonical A11 Rating; V2 Star Rating is
+The owner has resolved the former A11/V2 identity question. Review contract
+`0.5.0` now declares and composes canonical A11 Rating; V2 Star Rating is
 deprecated and owns no selector, renderer, fixture, or adapter. The final
-migration probe renders `.review-card .rating[data-rating="4.5"]` and zero
+migration probe renders `.review .rating[data-rating="4.5"]` and zero
 legacy `.star-rating*` selectors. Any later reference in this historical dossier
 to V2 as the dependency or to an open A11/V2 decision is superseded by ADR 0235.
-The existing Review Card visual, interaction, provider, and human-review
+The existing Review visual, interaction, provider, and human-review
 findings remain otherwise valid.
 
 ## Recommendation
 
-Refine Review Card as one self-contained native `article` whose source order is
-reviewer metadata, one required canonical Star Rating, optional contextual
+Refine Review as one self-contained native `article` whose source order is
+reviewer metadata, one required canonical Rating, optional contextual
 title, required body, optional photo list, optional helpfulness request and an
 optional ordinary reply group. Keep all review records, truth claims,
 formatting, moderation and persistence target-owned.
@@ -37,7 +46,7 @@ The helpfulness button remains a native pressed button. The static neutral Web
 contract projects authored state and emits native activation; Studio may own a
 local demonstration state, while framework/provider targets may control state
 and reconcile persistence. Photo activation remains target-owned and passive by
-default. Review Card does not select a provider, lightbox, structured-data
+default. Review does not select a provider, lightbox, structured-data
 vocabulary, heading API or rating identity.
 
 This refinement can be prepared for human review without resolving the open
@@ -66,14 +75,14 @@ for explicit human approval. The contract stays `pilot`.
 
 ## Current Gallery Baseline
 
-- Registry identity: `V4`, `review-card`, category `reviews`, dependency
+- Registry identity: `V4`, `review`, category `reviews`, dependency
   `star-rating`, review order 151.
 - Contract: `0.2.0`, `pilot`; 18 anatomy parts, 13 properties, one variant, one
   size, six states, three behavior rules and 19 public token references.
 - ADR 0085 already fixes review/provider data boundaries and allows one local
   `aria-pressed` helpfulness state while leaving persistence target-owned.
 - ADR 0133 refines V2 Star Rating but leaves its identity relative to A11 Rating
-  unresolved. Review Card can compose the current canonical dependency without
+  unresolved. Review can compose the current canonical dependency without
   settling that separate architecture decision.
 - The shared `ReviewsStudio` renderer serves Exhibit and Studio, but its title
   is `h2` while the MDX fallback uses `h3`; the contract correctly says heading
@@ -92,12 +101,12 @@ for explicit human approval. The contract stays `pilot`.
   body typography still depend partly on host defaults and two line heights are
   hardcoded.
 - Baseline Reviews CSS is `3,724 B` deterministic gzip against the permanent
-  `3.7 KiB` (`3,788 B`) family ceiling. Shared runtime is `10,501 B`; Review Card has no
+  `3.7 KiB` (`3,788 B`) family ceiling. Shared runtime is `10,501 B`; Review has no
   neutral component listener of its own.
 - Eight paired baseline screenshots cover Exhibit and Studio at Mobile, Tablet,
   Desktop and XL under `output/playwright/refinement-batch-50/before/`.
 - Figma nodes `943:7` and `1020:480` are generic Studio shell and inspector
-  references, not approved Review Card artwork. No visual value may be promoted
+  references, not approved Review artwork. No visual value may be promoted
   from them.
 
 ## External Evidence
@@ -109,7 +118,7 @@ for explicit human approval. The contract stays `pilot`.
 | [APG Button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/) | Native buttons activate with Enter/Space; a toggle exposes `aria-pressed` and keeps a stable label when state changes. | Keep one stable helpfulness label, native activation and boolean pressed state. |
 | [Open UI Press Button explainer](https://open-ui.org/components/press-button.explainer/) | The proposed press button addresses persistent two-state button semantics; current interoperable authoring still relies on button plus pressed state. | Use native `button` + `aria-pressed`; do not depend on a proposed element or add custom keyboard handling. |
 | [Radix Toggle](https://www.radix-ui.com/primitives/docs/components/toggle) | A two-state button exposes `pressed`, `defaultPressed`, change, disabled and native Enter/Space behavior. | Document controlled and uncontrolled target mappings, but keep persistence outside the neutral component. |
-| [Polaris Button](https://shopify.dev/docs/api/app-home/web-components/actions/button) | Polaris separates action label, disabled, loading, visual emphasis and click behavior; asynchronous policy remains consumer logic. | Review Card owns a low-emphasis native request surface, not authentication, loading or provider confirmation. |
+| [Polaris Button](https://shopify.dev/docs/api/app-home/web-components/actions/button) | Polaris separates action label, disabled, loading, visual emphasis and click behavior; asynchronous policy remains consumer logic. | Review owns a low-emphasis native request surface, not authentication, loading or provider confirmation. |
 | [Shopify theme app extensions](https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration) | Shopify identifies product reviews and star ratings as dynamic-source app-block use cases and requires app blocks to adapt to their section. | Keep Shopify CSS-ready/planned and provider-owned; do not invent theme Liquid review records or settings. |
 | [WCAG Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html) | Pointer targets should provide at least a 24 by 24 CSS-pixel area or qualifying spacing. | Preserve the existing 44px Gallery touch-target token for helpfulness and any target-supplied photo action. |
 | [WCAG Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html) | Visible focus needs sufficient area and contrast; a solid 2px perimeter is the simplest conforming shape. | Keep the 2px focused perimeter and verify it in light, dark and forced colors. |
@@ -132,7 +141,7 @@ for explicit human approval. The contract stays `pilot`.
 
 | Part | Required | Recommended semantic owner |
 | --- | --- | --- |
-| Root | yes | `article.review-card`; `aria-labelledby` only when a contextual title is present. |
+| Root | yes | `article.review`; `aria-labelledby` only when a contextual title is present. |
 | Header | yes | Native `header` containing target-supplied reviewer metadata. |
 | Avatar | no | Target-owned media slot; decorative when adjacent text fully conveys identity. |
 | Author | yes | Visible ordinary text; do not misuse `cite` for a person. |
@@ -154,7 +163,7 @@ for explicit human approval. The contract stays `pilot`.
 | Variant/size | `default` | One reviewed visual candidate; no source-backed alternatives. |
 | Content | title/date/avatar/verification/photos/action/count/reply present or absent | Derived from optional content, not visual variants. |
 | Helpfulness | unpressed, pressed, disabled, hover, focus-visible | Authored/projected state plus target request handling. |
-| Photos | passive, target link, target button | Target decides action and destination; Review Card supplies no lightbox. |
+| Photos | passive, target link, target button | Target decides action and destination; Review supplies no lightbox. |
 | Width | intrinsic wrap plus horizontal photo containment | Derived from the containing inline size, not viewport labels. |
 | Theme/input | light, dark, forced colors, reduced motion, coarse/fine pointer | Token, media-query and native behavior projection. |
 | Direction/content | LTR, RTL, short, long, localized, unbroken, empty optional regions | Logical layout and target content. |
@@ -208,7 +217,7 @@ loading/success/error, analytics, count calculation or heading rank.
 - Native/semantic literals: 1px separators/borders and 2px focus perimeter.
 - Replace hardcoded body/reply line heights with accepted typography tokens and
   make title appearance independent from the contextual heading element.
-- Expose no Review Card-specific custom property solely to eliminate a literal.
+- Expose no Review-specific custom property solely to eliminate a literal.
 
 ## Accessibility And Interaction
 
@@ -260,13 +269,13 @@ loading/success/error, analytics, count calculation or heading rank.
 
 | Risk/question | Status | Required action |
 | --- | --- | --- |
-| A11 Rating versus V2 Star Rating identity is unresolved. | architecture boundary | Resolve globally; Review Card composes current registry dependency without duplicating it. |
+| A11 Rating versus V2 Star Rating identity was unresolved. | resolved | ADR 0235 makes A11 Rating canonical; Review composes it directly. |
 | Provider, authentication, verification, moderation and helpfulness persistence are unresolved. | target boundary | Choose per integration/app block before target implementation. |
 | Photo activation/lightbox ownership is unresolved. | target/product boundary | Keep passive; add native action only with explicit destination/overlay owner. |
 | Structured review data vocabulary is not accepted. | architecture/SEO boundary | Decide separately; do not add schema.org attributes during visual refinement. |
 | No component-specific Figma artwork exists. | human visual gap | Approve browser candidate before creating target artwork. |
 | Reviews CSS has only 7 B post-refinement headroom. | performance risk | Keep later Review refinements bounded and do not raise the family ceiling silently. |
-| Global Web CSS/runtime exceed provisional ceilings. | program gap | Preserve explicit exceptions and attribute zero neutral runtime to Review Card. |
+| Global Web CSS/runtime exceed provisional ceilings. | program gap | Preserve explicit exceptions and attribute zero neutral runtime to Review. |
 
 ## Readiness Boundary
 
@@ -278,7 +287,7 @@ status.
 
 ## Refinement Evidence
 
-- Contract `0.3.0`, ADR 0135, Studio metadata, shared renderer and MDX now agree
+- Contract `0.5.0`, ADRs 0135, 0235, and 0285, Studio metadata, shared renderer and MDX now agree
   on the article/time/list/button/reply semantics and provider boundary.
 - After normalizing per-mount React IDs, Exhibit and Studio root DOM is identical
   at Mobile, Tablet, Desktop and XL with SHA-256
@@ -301,9 +310,9 @@ status.
   final viewport images in `output/playwright/refinement-batch-50/final/`.
 - Deterministic gzip is `3,781 B / 3,788 B` for Reviews CSS,
   `68,119 B / 65,536 B` for complete Neutral Web component CSS and `10,565 B /
-  8,192 B` for shared runtime. Review Card adds zero neutral component runtime.
+  8,192 B` for shared runtime. Review adds zero neutral component runtime.
 - Canonical, Shopify and Webflow Reviews CSS are byte-identical. Official
-  Shopify artifact `review-card-batch-50`, revision 2, passes without inventing
+  Shopify artifact `review-batch-50`, revision 2, passes without inventing
   a provider Liquid implementation.
 
 ## Readiness Decision

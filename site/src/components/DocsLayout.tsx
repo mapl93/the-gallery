@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
+import ThemeControl from './ThemeControl';
 
 export default function DocsLayout() {
   const mainRef = useRef<HTMLElement>(null);
@@ -14,6 +15,7 @@ export default function DocsLayout() {
   return (
     <div className="docs-layout">
       <Sidebar />
+      <ThemeControl />
 
       <main className="docs-main" ref={mainRef}>
         <Outlet />

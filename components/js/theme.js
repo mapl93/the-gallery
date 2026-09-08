@@ -177,6 +177,7 @@
       else trigger.removeAttribute('aria-invalid');
       if (nativeField.required) trigger.setAttribute('aria-required', 'true');
       else trigger.removeAttribute('aria-required');
+      label?.classList.toggle('select__label--required', nativeField.required);
       optionElements.forEach((option, index) => {
         option.setAttribute('aria-selected', String(index === nativeField.selectedIndex));
       });

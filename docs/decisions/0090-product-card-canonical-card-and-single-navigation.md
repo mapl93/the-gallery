@@ -2,6 +2,9 @@
 
 Status: Accepted
 
+Superseded in part by ADR 0276: Quick Add becomes persistent Quick Look and
+Product Card suppresses inherited Card hover elevation/shadow growth.
+
 Date: 2026-07-13
 
 ## Context

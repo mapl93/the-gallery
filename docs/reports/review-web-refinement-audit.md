@@ -1,23 +1,31 @@
-# Review Card Web Refinement Audit
+# Review Web Refinement Audit
 
 Status: Technically refined; ready for human review; remains `pilot`
 
 Date: 2026-07-15
 
+## 2026-08-25 Identity Update
+
+Owner decision 82 and ADR 0285 rename Review Card to Review because its complete
+review record, Rating, media, helpfulness, and reply behavior are not a generic
+Card variant. Contract `0.5.0`, registry, `.review*` CSS, Exhibit, Studio,
+dossier, report, and generated adapters use the new identity. Review remains
+`pilot` and deliberately has no Card dependency.
+
 ## ADR 0235 Update (2026-07-20)
 
-Review Card contract `0.4.0` now depends on canonical A11 Rating. V2 Star Rating
+Review contract `0.5.0` now depends on canonical A11 Rating. V2 Star Rating
 is deprecated and has no implementation. The final composed browser probe finds
 `.rating[data-rating="4.5"]`, a matching localized image label, and zero legacy
 selectors. Historical references below to a required V2 child or unresolved
-A11/V2 identity are superseded; the original Review Card interaction,
+A11/V2 identity are superseded; the original Review interaction,
 responsive, provider, and visual-review evidence remains valid.
 
 ## Outcome
 
-V4 Review Card now presents one target-supplied review as a self-contained
+V4 Review now presents one target-supplied review as a self-contained
 native article with truthful optional time semantics, one required canonical
-Star Rating, contextual title ownership, a localized native photo list, a
+Rating, contextual title ownership, a localized native photo list, a
 described pressed helpfulness button and an associated reply without an
 unnecessary landmark. The shared renderer, contract, Studio metadata and MDX
 fallback now describe the same anatomy.
@@ -45,7 +53,7 @@ still open.
 | Tokens and visual system | pass | Complete existing H3/body/supporting/caption typography and semantic color/radius/spacing/motion tokens; hardcoded geometry remains private and audited. |
 | Accessibility and motion | pass | Contextual article label, truthful time, decorative avatar, named photo list, stable pressed label, count description, native disabled/focus and no reply landmark/live count. |
 | Responsive/content resilience | pass | Four viewports, 220px host, 200% type, long/unbroken Arabic RTL, minimal content and internal photo scrolling produce no root/document overflow. |
-| Runtime and assets | pass | Zero neutral Review Card listener, observer, timer, formatter, request, layout read or asset; site-only media/Lucide remain fixtures. |
+| Runtime and assets | pass | Zero neutral Review listener, observer, timer, formatter, request, layout read or asset; site-only media/Lucide remain fixtures. |
 | Cross-target translation | pass | Web implemented; Shopify/Webflow CSS regenerated; provider app block and future native/framework mappings are documented. |
 | Exhibit/Studio parity | pass | One `ReviewsStudio` renderer and fixture; normalized root DOM is identical in both modes at four viewports. |
 | Human readiness | pass | Dossier, ADR, contract, docs, generated targets, evidence, performance, interaction and release gates are complete; status stays `pilot`. |
@@ -76,7 +84,7 @@ still open.
 - The minimal composition omits title/date/avatar/verification/photos/actions/
   reply and the article label while retaining required rating and body nodes.
 - In a `220px` RTL host with 200% root type and long/unbroken Arabic content,
-  Review Card is `220/220px` and the document is `390/390px`. The deliberate
+  Review is `220/220px` and the document is `390/390px`. The deliberate
   photo scroller is `220/256px` and does not expand its parent.
 - Normalized Exhibit/Studio `outerHTML` is identical at Mobile, Tablet, Desktop
   and XL with SHA-256
@@ -97,17 +105,17 @@ still open.
   ratings and requires them to adapt to their section. No theme-owned review
   records or settings were invented.
 - Figma nodes `943:7` and `1020:480` remain generic Studio shell/inspector
-  frames, not approved Review Card artwork. No visual value was promoted.
+  frames, not approved Review artwork. No visual value was promoted.
 
 The full source comparison and links are recorded in
-`docs/refinement/dossiers/review-card.md`.
+`docs/refinement/dossiers/review.md`.
 
 ## Cross-Target Result
 
 | Target | Mapping | Result |
 | --- | --- | --- |
 | Web | Native article/header/time/list/button, contextual title and canonical Star Rating. | Implemented, generated and browser-evidenced with zero component JS. |
-| Shopify | Dynamic-source provider theme app block plus generated Gallery Reviews CSS. | CSS-ready/planned; official CSS artifact `review-card-batch-50` revision 2 passes. |
+| Shopify | Dynamic-source provider theme app block plus generated Gallery Reviews CSS. | CSS-ready/planned; official CSS artifact `review-batch-50` revision 2 passes. |
 | Webflow | Byte-identical canonical Reviews CSS plus CMS/provider-authored semantic markup. | Generated path available; provider behavior remains external. |
 | React / Angular | Same tree with controlled pressed/request or explicit initial state. | Contract-ready; persistence/rollback/reset are target responsibilities. |
 | Figma | Content presence, pressed/disabled states and reviewed public tokens. | Planned; component artwork absent. |
@@ -115,7 +123,7 @@ The full source comparison and links are recorded in
 
 Canonical `components/css/reviews.css`, Shopify `assets/reviews.css` and Webflow
 `reviews.css` are byte-identical. Shopify remains at 56 target-ready components,
-28 dedicated Liquid templates and 19/19 schema-ready components. Review Card
+28 dedicated Liquid templates and 19/19 schema-ready components. Review
 correctly adds no dedicated provider-free Liquid file.
 
 ## Performance And Risks
@@ -123,7 +131,7 @@ correctly adds no dedicated provider-free Liquid file.
 | Surface | Deterministic gzip | Ceiling | Result |
 | --- | ---: | ---: | --- |
 | Reviews CSS | `3,781 B` | `3.7 KiB` (`3,788 B`) | pass (`7 B` remaining; `+57 B` from the recorded Batch 49 snapshot) |
-| Shared neutral runtime | `10,565 B` | `8 KiB` (`8,192 B`) | existing exception (`2,373 B` over; Review Card adds `0 B`) |
+| Shared neutral runtime | `10,565 B` | `8 KiB` (`8,192 B`) | existing exception (`2,373 B` over; Review adds `0 B`) |
 | Neutral Web components CSS | `68,119 B` | `64 KiB` (`65,536 B`) | current program gap (`2,583 B` over; the full regeneration includes accumulated worktree drift) |
 
 - Human review must approve title/reviewer hierarchy, density, photo size/crop/
@@ -141,9 +149,9 @@ correctly adds no dedicated provider-free Liquid file.
 
 ## Validation
 
-Registry/docs, source tokens, 183 contracts, 183 Studio definitions, Neutral
+Registry/docs, source tokens, 182 contracts, 182 Studio definitions, Neutral
 Web, Shopify and copied CSS, mandatory Shopify research and official artifact
-`review-card-batch-50` revision 2, canonical static preview markup,
+`review-batch-50` revision 2, canonical static preview markup,
 article/time/list/button semantics, native activation/disabled/focus/hover,
 four-viewport normalized parity, optional/minimal content, RTL/narrow/200%
 containment, dark/forced colors/reduced motion, deterministic gzip,
@@ -159,8 +167,7 @@ browser errors comprise Batch 50.
    helpfulness emphasis, reply surface and separator.
 2. Confirm the current optional-part inventory and whether helpfulness remains a
    reversible pressed request for v1.
-3. Resolve the global A11 Rating versus V2 Star Rating identity separately.
-4. Select provider/data/moderation/persistence and photo-activation policies per
+3. Select provider/data/moderation/persistence and photo-activation policies per
    target before implementing Shopify or framework adapters.
-5. Create component-specific Figma artwork only after browser approval.
+4. Create component-specific Figma artwork only after browser approval.
 6. Keep the contract `pilot` until explicit human stability approval.

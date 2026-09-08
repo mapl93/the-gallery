@@ -4,7 +4,7 @@ Status: Ready for human review; remains `pilot`
 
 Date: 2026-07-13
 
-Contract: `components/contracts/stat.contract.json` (`0.3.0`)
+Contract: `components/contracts/stat.contract.json` (`0.4.0`)
 
 ## Result
 
@@ -22,8 +22,9 @@ pairs, wraps extreme content, and keeps Stat Group within its container.
 - `changeDirection=up|down` is mathematical direction only. Targets must keep the
   visible sign/word aligned with that direction and separately explain business
   meaning; Studio does not rewrite authored content.
-- `ss01`, `zero`, `tnum`, `calt`, and `frac` remain independent attributes with
-  Price-aligned defaults. Unsupported font features fail harmlessly.
+- `ss01`, `tnum`, `calt`, and `frac` remain independent attributes with
+  Price-aligned defaults. ADR 0277 fixes `zero` off and removes its public
+  attribute. Unsupported enabled font features fail harmlessly.
 - Targets own calculation, locale/currency/unit/percent formatting, comparison
   period, refresh cadence, and announcements. There is no controlled state.
 

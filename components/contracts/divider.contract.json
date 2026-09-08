@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.4.0",
   "slug": "divider",
   "name": "Divider",
   "registryId": "A14",
   "category": "primitives",
-  "status": "pilot",
-  "summary": "Horizontal or vertical divider primitive with default, decorative, and section spacing variants for visual or semantic separation.",
+  "status": "stable",
+  "summary": "Horizontal or vertical divider primitive with default and decorative visual styles plus independently configured separator semantics.",
   "dependencies": [],
   "source": {
     "registry": "registry.json#/components/divider",
@@ -37,12 +37,6 @@
       "className": ".divider--decorative",
       "default": false,
       "description": "More visible decorative divider."
-    },
-    {
-      "name": "section",
-      "className": ".divider--section",
-      "default": false,
-      "description": "Section divider with larger vertical spacing."
     }
   ],
   "sizes": [
@@ -50,7 +44,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Default divider thickness and spacing."
+      "description": "Default divider thickness; the parent layout owns length and external spacing."
     }
   ],
   "states": [
@@ -74,7 +68,7 @@
       "type": "enum",
       "required": false,
       "valuesFrom": "variants",
-      "description": "Visual emphasis and spacing presentation for the horizontal rule.",
+      "description": "Visual style of the rule; surrounding layout owns all external spacing.",
       "targetMappings": {
         "web": [{ "kind": "optionClass", "selector": ".divider", "source": "variants" }]
       }
@@ -99,7 +93,7 @@
       "required": false,
       "defaultValue": "decorative",
       "values": ["decorative", "structural"],
-      "description": "Whether the divider is hidden from assistive technology or communicates structure between regions.",
+      "description": "Purpose of the divider: decorative is visual only and hidden from assistive technology; structural communicates a separator between regions.",
       "targetMappings": {
         "web": [{ "kind": "attribute", "selector": ".divider", "attribute": "aria-hidden", "values": { "decorative": "true", "structural": null }, "elements": ["hr"] }]
       }
@@ -110,10 +104,6 @@
       "color": [
         "--color-border-subtle",
         "--color-border-decorative"
-      ],
-      "spacing": [
-        "--space-layout-element-gap",
-        "--space-layout-section-gap"
       ]
     }
   },
@@ -122,7 +112,7 @@
     "Mark decorative dividers as aria-hidden when they add no semantic value.",
     "Set aria-orientation=\"vertical\" when a structural divider uses the vertical axis; horizontal is the implicit separator default.",
     "Keep the rule visible in forced-colors mode without relying on its authored background color.",
-    "Do not use divider spacing as the only cue for grouped content."
+    "Do not use the divider line as the only cue for grouped content."
   ],
   "adapters": {
     "web": {

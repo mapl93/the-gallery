@@ -4,7 +4,7 @@ Component contracts are The Gallery's target-agnostic component source layer.
 
 They describe what a component is before it becomes CSS, Liquid, React, SwiftUI, Compose, Figma, or another target implementation.
 
-Current coverage is 183 validated contracts for 183 registry components.
+Current coverage is 182 validated contracts for 182 registry components.
 
 Current contract shape:
 
@@ -107,7 +107,6 @@ components/contracts/glaze-guide.contract.json
 components/contracts/header.contract.json
 components/contracts/hero-section.contract.json
 components/contracts/hero.contract.json
-components/contracts/hover-card.contract.json
 components/contracts/icon-button.contract.json
 components/contracts/image-text.contract.json
 components/contracts/inline-error.contract.json
@@ -154,7 +153,7 @@ components/contracts/radio.contract.json
 components/contracts/rating.contract.json
 components/contracts/reading-progress.contract.json
 components/contracts/related-articles.contract.json
-components/contracts/review-card.contract.json
+components/contracts/review.contract.json
 components/contracts/review-form.contract.json
 components/contracts/review-highlights.contract.json
 components/contracts/review-pagination.contract.json

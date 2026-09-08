@@ -86,7 +86,7 @@ export function ArticleBodyFixture() {
           imageAlt="Warm stoneware vessel with a softly faceted profile"
           mediaRatio="portrait"
           vendor="Marina Paz Studio"
-          subtitle="One of one"
+          description="One of one"
           currentPrice="$180.00"
           currentPriceLabel="Price"
         />

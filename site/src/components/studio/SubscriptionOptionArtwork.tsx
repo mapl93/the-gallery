@@ -123,7 +123,10 @@ export default function SubscriptionOptionArtwork({
       aria-describedby={descriptionId}
       disabled={disabled}
     >
-      <legend className="fieldset__legend subscription-option__legend" dir="auto">
+      <legend
+        className={`fieldset__legend subscription-option__legend${required ? ' subscription-option__legend--required' : ''}`}
+        dir="auto"
+      >
         {visibleLegend}
       </legend>
       {visibleDescription && (

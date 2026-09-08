@@ -232,8 +232,12 @@ export default function QuantitySelectorStudio({
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <div>
+            <div className="field docs-studio__field-fixture">
+              <label className="field__label" htmlFor="studio-quantity-selector">
+                {String(values.accessibleLabel || 'Quantity')}
+              </label>
               <QuantitySelectorArtwork
+                id="studio-quantity-selector"
                 value={current}
                 min={min}
                 max={max}

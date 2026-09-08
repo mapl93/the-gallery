@@ -159,7 +159,7 @@ function ArtistCardFixture({
   badge?: string;
 }) {
   return (
-    <article className="artist-card docs-studio__artist-card">
+    <article className="card card--flat artist-card docs-studio__artist-card">
       {showPortrait && (
         <div className="artist-card__portrait">
           <StoryMedia

@@ -228,25 +228,30 @@ export default function RadioStudio({ contract, definition }: RadioStudioProps) 
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <RadioArtwork
-              className={classes}
-              label={label}
-              name={name}
-              value={value}
-              checked={checked}
-              disabled={disabled}
-              required={required}
-              variant={variant === 'error' || variant === 'success' || variant === 'warning'
-                ? variant
-                : 'default'}
-              describedBy={describedBy}
-              studioState={previewState}
-              inputStyle={controlStyle}
-              onCheckedChange={(next) => setValues((current) => ({
-                ...current,
-                checked: next,
-              }))}
-            />
+            <fieldset className="fieldset docs-studio__field-fixture">
+              <legend className="fieldset__legend">Options</legend>
+              <div className="fieldset__content">
+                <RadioArtwork
+                  className={classes}
+                  label={label}
+                  name={name}
+                  value={value}
+                  checked={checked}
+                  disabled={disabled}
+                  required={required}
+                  variant={variant === 'error' || variant === 'success' || variant === 'warning'
+                    ? variant
+                    : 'default'}
+                  describedBy={describedBy}
+                  studioState={previewState}
+                  inputStyle={controlStyle}
+                  onCheckedChange={(next) => setValues((current) => ({
+                    ...current,
+                    checked: next,
+                  }))}
+                />
+              </div>
+            </fieldset>
           </div>
         </section>
       </div>

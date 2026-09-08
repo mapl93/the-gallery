@@ -17,7 +17,8 @@ between current, compare-at, and unit-price text.
 Replace the optional named ARIA group with localized part labels in DOM content.
 Render the no-longer-current compare-at value with native `s`, isolate each
 formatted value with `bdi`, and leave live-region ownership to the changing
-product or cart surface. Preserve ADR 0061's five independent OpenType switches.
+product or cart surface. Preserve the four remaining ADR 0061 OpenType switches;
+ADR 0277 removes slashed zero and fixes ordinary zero across the interface.
 The `on-sale` variant is coherent only when both a current value and a higher
 target-validated compare-at value are supplied; Price does not calculate or
 verify the discount.
@@ -87,8 +88,9 @@ standards define the portable boundary.
 
 - Gallery already separates formatted content from visual presentation and has
   a dedicated Shopify snippet plus target status in the contract.
-- ADR 0061 explicitly accepts five OpenType switches; refinement must preserve
-  them rather than recasting glyph features as tokens or private hardcoding.
+- ADR 0061 accepted five OpenType switches; ADR 0277 supersedes its
+  slashed-zero portion. Preserve `ss01`, `tnum`, `calt`, and `frac` rather than
+  recasting those remaining glyph features as tokens.
 - The current aggregate `accessibleLabel` can clarify sale meaning, but it
   requires an artificial group role and can replace rather than complement the
   visible child content in accessibility APIs.
@@ -126,7 +128,7 @@ structured data, or a formatter. Those are parent compositions or target service
 | Formatted content | Symbol, ISO code, prefix/suffix currency, no-decimal currency, range/from text, free/unavailable text, long localized qualifier. |
 | Direction | LTR, RTL, Arabic digits, and mixed-direction currency/code strings isolated per value. |
 | Environment | Light, dark, forced colors, reduced motion (no motion), 200% zoom, narrow container. |
-| OpenType | Independent alternate digits, slashed zero, tabular numbers, contextual alternates, and opt-in fractions per ADR 0061. |
+| OpenType | Independent alternate digits, tabular numbers, contextual alternates, and opt-in fractions; ordinary zero is fixed under ADR 0277. |
 
 Invalid/incomplete combinations are `on-sale` without compare-at, compare-at in
 Default, empty required current content, unlocalized labels, or a target claiming
@@ -145,8 +147,8 @@ strings as stress evidence rather than silently repair them.
 - `unitPriceLabel` — optional localized Unit price label, recommended whenever
   unit content is rendered.
 - `variant` — Default or On sale; target owns the truth of the relationship.
-- `alternateDigits`, `slashedZero`, `tabularNumbers`,
-  `contextualAlternates`, `fractions` — accepted ADR 0061 typography switches.
+- `alternateDigits`, `tabularNumbers`, `contextualAlternates`, `fractions` —
+  retained ADR 0061 typography switches after ADR 0277 removes `slashedZero`.
 
 Remove aggregate `accessibleLabel` from the pilot API after replacing it with
 part labels; it is less composable, requires a role solely to receive a name, and
@@ -243,7 +245,7 @@ fallback evidence and must use the same semantic anatomy.
 - Light contrast is `17.93:1` current and `7.81:1` supporting; dark is
   `17.18:1` and `12.09:1`. Forced colors uses CanvasText and preserves the native
   line-through. No animation or transition remains under reduced motion.
-- All five OpenType switches independently update their data attributes and
+- All four remaining OpenType switches independently update their data attributes and
   computed feature settings. Default and current-only optional composition are
   verified; empty required current remains an explicit invalid authoring case.
 - Shopify label/unit output, 183 contracts/Studio entries, docs, Neutral Web,

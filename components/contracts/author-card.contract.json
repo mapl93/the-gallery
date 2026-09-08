@@ -1,20 +1,20 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.0",
+  "contractVersion": "0.3.0",
   "slug": "author-card",
   "name": "Author Card",
   "registryId": "L6",
   "category": "blog",
   "status": "pilot",
-  "summary": "Passive fail-closed identity composition for one target-supplied author, with optional canonical Avatar, role, full-only biography and author Links, intrinsic full/compact layout, and zero neutral runtime.",
-  "dependencies": ["avatar", "link"],
+  "summary": "Passive fail-closed identity composition for one target-supplied author on canonical Card, with optional Avatar, role, full-only biography and author Links, intrinsic full/compact layout, and zero neutral runtime.",
+  "dependencies": ["card", "avatar", "link"],
   "source": {
     "registry": "registry.json#/components/author-card",
     "css": { "file": "components/css/blog.css", "selector": ".author-card" },
     "docs": "site/src/content/components/author-card.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".author-card", "className": ".author-card", "required": true, "description": "Neutral non-landmark container for exactly one author identity; omitted when name is empty." },
+    { "name": "root", "selector": ".author-card", "className": ".author-card", "required": true, "description": "Neutral non-landmark container for exactly one author identity, composed with canonical .card and omitted when name is empty." },
     { "name": "avatar", "selector": ".author-card__avatar", "className": ".author-card__avatar", "required": false, "description": "Optional canonical Avatar composition with target-authored image or initials semantics." },
     { "name": "info", "selector": ".author-card__info", "className": ".author-card__info", "required": true, "description": "Intrinsic author text column." },
     { "name": "name", "selector": ".author-card__name", "className": ".author-card__name", "required": true, "description": "Required non-empty visible localized author name rendered as neutral text by the shared implementation." },
@@ -24,8 +24,8 @@
     { "name": "link", "selector": ".author-card__link", "className": ".author-card__link", "required": false, "description": "Target-owned author destination composed from canonical Link." }
   ],
   "variants": [
-    { "name": "full", "className": null, "default": true, "description": "Framed identity composition that renders every supplied optional part." },
-    { "name": "compact", "className": ".author-card--compact", "default": false, "description": "Unframed concise Avatar, name and role row; biography and Links are omitted from its DOM." }
+    { "name": "full", "className": null, "default": true, "description": "Canonical default Card surface that renders every supplied optional part." },
+    { "name": "compact", "className": ".author-card--compact", "default": false, "description": "Canonical flat Card with a concise Avatar, name and role row; biography and Links are omitted from its DOM." }
   ],
   "sizes": [
     { "name": "default", "className": null, "default": true, "description": "One fluid intrinsic size; Avatar selects its own canonical semantic size independently." }
@@ -36,7 +36,7 @@
   "behavior": [
     { "name": "requiredIdentity", "selectors": [".author-card", ".author-card__name"], "description": "A non-empty visible name is required; missing or blank name omits the complete root rather than emitting an unidentified card." },
     { "name": "hostSemantics", "selectors": [".author-card", ".author-card__name"], "description": "Neutral Web uses a div root and neutral name text. The consuming article owns contextual footer, aside, contact-only address, heading rank, author Link, structured data and placement semantics." },
-    { "name": "canonicalComposition", "selectors": [".author-card__avatar", ".author-card__link"], "attributes": ["href", "rel"], "events": ["click"], "description": "Visual identity composes canonical Avatar and destinations compose canonical native Links. Targets own image/initials alternatives, destinations, labels, target/rel security, author relationship and navigation." },
+    { "name": "canonicalComposition", "selectors": [".card", ".card--flat", ".author-card", ".author-card--compact", ".author-card__avatar", ".author-card__link"], "attributes": ["href", "rel"], "events": ["click"], "description": "The root composes canonical Card, compact also composes its Flat variant, visual identity composes canonical Avatar, and destinations compose canonical native Links. Targets own image/initials alternatives, destinations, labels, target/rel security, author relationship and navigation." },
     { "name": "compactOmission", "selectors": [".author-card--compact", ".author-card__bio", ".author-card__links"], "description": "Compact rendering omits biography and Links from the DOM instead of serializing permanently unavailable hidden content; defensive CSS still hides incompatible copied markup." },
     { "name": "singleAuthor", "selectors": [".author-card"], "description": "One root represents one author. Targets repeat L6 in an appropriate semantic collection for multiple authors instead of passing a provider-specific collection API." },
     { "name": "intrinsicResponse", "selectors": [".author-card", ".author-card__info", ".author-card__links"], "description": "Full presentation wraps from available inline size, strings and Links remain complete, and logical geometry avoids viewport coupling and document-level overflow." },
@@ -95,9 +95,8 @@
   ],
   "tokens": {
     "public": {
-      "color": ["--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
+      "color": ["--color-text-primary", "--color-text-secondary"],
       "typography": ["--font-family-heading", "--tg-font-weight-semibold", "--typo-body-line-height", "--typo-body-size", "--typo-body-sm-line-height", "--typo-body-sm-size"],
-      "radius": ["--radius-lg"],
       "spacing": ["--space-layout-touch-target", "--tg-space-stack-lg", "--tg-space-stack-md", "--tg-space-stack-sm", "--tg-space-stack-xs"]
     }
   },
@@ -111,7 +110,7 @@
     "Do not introduce whole-card activation, nested interactive surfaces, person/card roles, menus, status/live announcements, roving focus, loading state or automated fallback behavior."
   ],
   "adapters": {
-    "web": { "status": "implemented", "kind": "html-css", "notes": "Canonical Blog CSS and shared renderer implement fail-closed neutral semantics, canonical Avatar/Link composition, semantic full/compact omission, intrinsic wrapping and zero neutral runtime." },
+    "web": { "status": "implemented", "kind": "html-css", "notes": "Canonical Blog CSS and shared renderer implement fail-closed neutral semantics, canonical Card/Avatar/Link composition, semantic full/compact omission, intrinsic wrapping and zero neutral runtime." },
     "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "A passive snippet maps explicit user or article.user data, requires a name, omits unavailable parts and keeps homepage/email off until explicitly enabled with localized labels. First consumer, contextual placement, privacy approval, role/social extensions and multiple authors remain target-owned." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },

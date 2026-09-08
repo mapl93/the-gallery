@@ -611,7 +611,7 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
           )}
           <form className="contact-section__form" aria-label={formLabel} method="post" onSubmit={submitContact}>
             <div className="input">
-              <label className="input__label" htmlFor={emailId}>Email (required)</label>
+              <label className="input__label" htmlFor={emailId}>Email</label>
               <div className="input__control">
                 <input
                   className="input__field"
@@ -629,7 +629,7 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
               </div>
             </div>
             <div className="input">
-              <label className="input__label" htmlFor={messageId}>Message (required)</label>
+              <label className="input__label" htmlFor={messageId}>Message</label>
               <div className="input__control">
                 <textarea
                   className="input__field textarea__field"

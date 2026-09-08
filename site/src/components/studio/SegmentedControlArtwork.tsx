@@ -54,7 +54,11 @@ export default function SegmentedControlArtwork({
 
   return (
     <fieldset className={classes} disabled={disabled} aria-describedby={describedBy}>
-      <legend className={['segmented__legend', legendClassName].filter(Boolean).join(' ')}>{groupLabel}</legend>
+      <legend className={[
+        'segmented__legend',
+        required ? 'segmented__legend--required' : '',
+        legendClassName,
+      ].filter(Boolean).join(' ')}>{groupLabel}</legend>
       <div className={['segmented__options', optionsClassName].filter(Boolean).join(' ')}>
         {validOptions.map((option) => (
           <label

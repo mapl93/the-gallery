@@ -13,7 +13,7 @@ Decision: ADR 0235
 Use A11 `rating` as The Gallery's only canonical passive rating display. The
 owner selected consolidation: the former V2 `star-rating` identity is deprecated
 before v1 and owns no permanent alias, CSS, renderer, fixture, token, behavior,
-or adapter. Review Summary and Review Card compose Rating; Star Input remains
+or adapter. Review Summary and Review compose Rating; Star Input remains
 the separate interactive field.
 
 Rating receives an already-valid half-step value, a matching localized text
@@ -139,7 +139,7 @@ precision, clip percentage, gap, icon, or dimension API is added.
 
 Human review must approve accent, outline weight, half-fill treatment, default
 and large scale, gap, count hierarchy, line alignment, and composed appearance
-inside Review Summary and Review Card.
+inside Review Summary and Review.
 
 ## Accessibility And Interaction
 
@@ -188,14 +188,14 @@ canonical Rating before v1.
 The canonical Exhibit and Studio roots serialize to byte-for-byte identical
 `outerHTML` in the final fixture. The deprecated Star Rating route maps to that
 same renderer and fixture only as migration documentation; it emits no legacy
-selector. Review Summary and Review Card render canonical `.rating` roots.
+selector. Review Summary and Review render canonical `.rating` roots.
 
 ## Evidence And Validation
 
 - Eight paired Rating images cover Exhibit/Studio at mobile, tablet, desktop,
   and XL under `output/playwright/refinement-primitives/rating-0235/`.
 - Additional images cover large size, long RTL content, dark, forced colors,
-  200% zoom, deprecated migration, Review Summary, and Review Card.
+  200% zoom, deprecated migration, Review Summary, and Review.
 - Browser inspection confirms exact Exhibit/Studio DOM, five decorative stars,
   one named image, zero focusables, optional count omission, strict invalid
   composition, one tab, and zero console errors/warnings.

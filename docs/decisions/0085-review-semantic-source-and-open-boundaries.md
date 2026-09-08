@@ -36,7 +36,7 @@ target-agnostic contract.
 
 ### The Review family remains a pilot
 
-Review Summary, Star Rating, Star Input, Review Card, Review Highlights, Photo
+Review Summary, Star Rating, Star Input, Review, Review Highlights, Photo
 Reviews, Review Form, Review Toolbar, and Review Pagination advance to contract
 version `0.2.0` and remain `pilot`.
 
@@ -65,7 +65,7 @@ Review contract to `stable`.
   composition with visible bucket labels and counts.
 - Review Summary does not calculate averages, normalize rating scales, select
   buckets, synchronize counts, or infer distribution widths.
-- Review Card exposes author, date, title, body, Star Rating, and optional
+- Review exposes author, date, title, body, Star Rating, and optional
   avatar, verification, photo, helpfulness, and reply regions.
 - Verification truth, dates, review records, photos, replies, and counts remain
   target data rather than component defaults.
@@ -83,7 +83,7 @@ Review contract to `stable`.
 - Photo Reviews exposes an accessible gallery label and ordered target-owned
   items. Items are passive by default.
 - A target may render a photo as a native link or button, but Photo Reviews and
-  Review Card do not select or implement a Lightbox or Modal contract.
+  Review do not select or implement a Lightbox or Modal contract.
 
 ### Review Form composes canonical controls
 

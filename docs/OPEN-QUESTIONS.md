@@ -27,7 +27,7 @@ The first architecture questions were resolved on 2026-05-23:
 - Checkbox, Radio, Modal, and Drawer expand contracts into native choice controls and overlays with explicit behavior requirements. See `docs/decisions/0016-control-and-overlay-contract-expansion.md`.
 - The docs site now renders contract metadata, and Toast, Tabs, Accordion, Popover, and Combobox expand the behavior contract pilots. See `docs/decisions/0017-contract-docs-and-interactive-expansion.md`.
 - Tooltip, Dropdown Menu, Context Menu, Command Palette, and Date Picker expand contracts into generated helper text, command menus, context-triggered menus, modal command search, and calendar controls. See `docs/decisions/0018-floating-command-and-date-contract-expansion.md`.
-- Hover Card, Steps, Carousel, Scroll Area, and Lightbox expand contracts into layout interaction primitives with progress, scroll, gallery, and modal image-viewer behavior. See `docs/decisions/0019-layout-interaction-contract-expansion.md`.
+- Steps, Carousel, Scroll Area, and Lightbox expand contracts into layout interaction primitives with progress, scroll, gallery, and modal image-viewer behavior. The former Hover Card was consolidated into Popover by ADR 0286. See `docs/decisions/0019-layout-interaction-contract-expansion.md` for the historical expansion.
 - Switch, Slider, Color Picker, File Upload, Tags Input, Segmented Control, and Number Input expand contracts into advanced form controls. See `docs/decisions/0020-advanced-form-contract-expansion.md`.
 - Pin Input, Field Wrapper, Fieldset, Inline Error, Password Input, and Form complete the first form infrastructure contract pass. See `docs/decisions/0021-form-infrastructure-contract-expansion.md`.
 - Badge, Tag, Price, Quantity Selector, Rating, Loading Skeleton, Empty State, Divider, Avatar, and Breadcrumb formalize commerce-oriented primitive dependencies. See `docs/decisions/0022-commerce-primitive-contract-expansion.md`.
@@ -87,12 +87,13 @@ The first architecture questions were resolved on 2026-05-23:
   navigation, search provider/status policy, and global overlay orchestration
   remain open under ADR 0086. See
   `docs/decisions/0101-footer-mobile-navigation-and-modal-search-boundaries.md`.
-- Popover now has content-derived non-modal semantics and progressive native Web
-  state, Hover Card is a dismissible passive destination preview with RTL-safe
-  geometry, and Dropdown Menu is a complete immediate-command menu composite.
-  Placement/collision services, Hover Card timing, and checkable/submenu breadth
-  remain explicit target or future product decisions. See
-  `docs/decisions/0102-popover-hover-card-and-action-menu-boundaries.md`.
+- Popover now has content-derived non-modal semantics, progressive native Web
+  state, and an independent optional decorative arrow. The former Hover Card
+  identity is consolidated into Popover, while Dropdown Menu remains a complete
+  immediate-command menu composite. Placement/collision services, passive
+  preview activation timing, and checkable/submenu breadth remain explicit
+  target or future product decisions. See ADR 0286 and the historical boundary
+  in `docs/decisions/0102-popover-hover-card-and-action-menu-boundaries.md`.
 - Carousel now preserves native finite scroll with synchronized canonical
   controls, Scroll Area remains one conditional named overflow region, and
   Lightbox composes the accepted Modal/Close/Icon primitives with finite or
@@ -2018,8 +2019,10 @@ Questions:
   native contextual heading selected by its host, never a `headingLevel` visual
   property or ordinary-text demotion. ADR 0064 continues to define the optional
   action as one canonical Button-or-Link composition slot.
-- For Divider, are `decorative` and `section` exclusive variants or orthogonal
-  modifiers, and does separator/decorative accessibility remain markup-owned?
+- ADR 0281 resolves Divider composition: `section` is removed, surrounding
+  spacing belongs to the parent layout, `default | decorative` remain visual
+  styles, and the independent semantics property owns assistive-technology
+  exposure.
 - ADR 0237 resolves Avatar composition and initials scaling: targets explicitly
   provide either contextual native image markup or pre-derived one/two-grapheme
   initials, while loading/failure/source selection and fallback choice remain

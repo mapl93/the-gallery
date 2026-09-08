@@ -1,12 +1,12 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.0",
+  "contractVersion": "0.7.0",
   "slug": "product-card",
   "name": "Product Card",
   "registryId": "D1",
   "category": "product",
-  "status": "pilot",
-  "summary": "Product listing card with media, title, vendor, badges, price area, and optional quick-add composition.",
+  "status": "stable",
+  "summary": "Product listing card with media, close artist-and-piece identity, a two-line description, price, badges, and an optional compact Quick Look overlay.",
   "dependencies": ["card", "badge", "button", "price"],
   "source": {
     "registry": "registry.json#/components/product-card",
@@ -20,12 +20,13 @@
     { "name": "primaryImage", "selector": ".product-card__image--primary", "className": ".product-card__image--primary", "required": false, "description": "Primary image when a hover image is also present." },
     { "name": "hoverImage", "selector": ".product-card__image--hover", "className": ".product-card__image--hover", "required": false, "description": "Optional hover image layer." },
     { "name": "badges", "selector": ".product-card__badges", "className": ".product-card__badges", "required": false, "description": "Badge stack for sale, new, or availability labels." },
-    { "name": "quickAdd", "selector": ".product-card__quick-add", "className": ".product-card__quick-add", "required": false, "description": "Optional quick-add action area." },
     { "name": "body", "selector": ".product-card__body", "className": ".product-card__body", "required": true, "description": "Text content wrapper." },
     { "name": "vendor", "selector": ".product-card__vendor", "className": ".product-card__vendor", "required": false, "description": "Vendor or brand text." },
     { "name": "title", "selector": ".product-card__title", "className": ".product-card__title", "required": true, "description": "Product title heading." },
-    { "name": "subtitle", "selector": ".product-card__subtitle", "className": ".product-card__subtitle", "required": false, "description": "Optional subtitle or short descriptor." },
-    { "name": "footer", "selector": ".product-card__footer", "className": ".product-card__footer", "required": false, "description": "Footer area for price and secondary actions." }
+    { "name": "description", "selector": ".product-card__description", "className": ".product-card__description", "required": false, "description": "Optional product description visually clamped to two lines while preserving the complete text in the DOM." },
+    { "name": "price", "selector": ".product-card__price", "className": ".product-card__price", "required": true, "description": "Required Price composition, visibly separated from description and independent from optional footer actions." },
+    { "name": "footer", "selector": ".product-card__footer", "className": ".product-card__footer", "required": false, "description": "Optional footer area for an explicitly composed secondary action; Price never belongs to this region." },
+    { "name": "quickLook", "selector": ".product-card__quick-look", "className": ".product-card__quick-look", "required": false, "description": "Optional intrinsic-width Button over the media that requests the target-owned Quick View for this product." }
   ],
   "variants": [
     { "name": "default", "className": null, "default": true, "description": "Default product card." }
@@ -36,34 +37,37 @@
   "states": [
     { "name": "default", "selectors": [".product-card"], "description": "Default card state." },
     { "name": "hoverImage", "selectors": [".product-card:hover .product-card__image--hover", ".product-card:hover .product-card__image--primary", ".product-card:focus-within .product-card__image--hover"], "description": "Alternate image reveal and primary image scale on fine-pointer hover or keyboard focus within the card." },
-    { "name": "quickAddVisible", "selectors": [".product-card:hover .product-card__quick-add", ".product-card:focus-within .product-card__quick-add"], "description": "Quick-add becomes visible on fine-pointer hover and keyboard focus within the card." },
-    { "name": "coarsePointerAction", "selectors": [".product-card__quick-add"], "description": "Quick-add remains persistently visible when hover is absent or the primary pointer is coarse." },
+    { "name": "quickLookVisible", "selectors": [".product-card:hover .product-card__quick-look", ".product-card:focus-within .product-card__quick-look"], "description": "The compact media-overlay action is revealed on fine-pointer hover and whenever keyboard focus is within the card." },
     { "name": "titleFocusVisible", "selectors": [".product-card:has(.product-card__title a:focus-visible)"], "description": "The stretched title link produces a visible card-sized focus indicator." }
   ],
   "behavior": [
-    { "name": "canonicalCardComposition", "selectors": [".product-card", ".card"], "description": "The root article consumes canonical Card surface, border, radius, shadow, overflow, and lift behavior instead of recreating them." },
+    { "name": "canonicalCardComposition", "selectors": [".product-card", ".card"], "description": "The root article consumes canonical Card surface, border, radius, clipping, and resting shadow while Product Card suppresses Card hover elevation and shadow growth." },
     { "name": "navigation", "selectors": [".product-card__title a::after"], "attributes": ["href"], "description": "One descriptive title link is stretched across the passive card content; media is not a second link and separately interactive descendants remain above the stretched hit area." },
-    { "name": "quickAdd", "selectors": [".product-card__quick-add"], "events": ["click"], "description": "Optional quick-add composes Button, remains reachable by keyboard and coarse pointers, includes product context in its accessible name when repeated, and delegates mutation and validation to the target product workflow." },
-    { "name": "pricing", "selectors": [".product-card__footer"], "description": "Price formatting should be delegated to the Price dependency." },
+    { "name": "descriptionClamp", "selectors": [".product-card__description"], "description": "The optional full description remains in DOM content and is visually limited to two lines with automatic ellipsis; Quick View or product detail owns complete reading." },
+    { "name": "quickLook", "selectors": [".product-card__quick-look"], "events": ["click"], "description": "Optional intrinsic-width media-overlay Button requests the coherent target-owned Quick View. It is revealed on fine-pointer hover or focus-within, remains visible without hover or a fine pointer, includes product context in its accessible name when repeated, and performs no direct cart mutation. Product Form inside Quick View may provide add-to-cart." },
+    { "name": "artistVisibility", "selectors": [".product-card__vendor"], "attributes": ["hidden"], "description": "The optional artist/vendor name may be omitted or hidden without discarding its target-owned content value; its absence does not change the title or Price." },
+    { "name": "pricing", "selectors": [".product-card__price"], "description": "A visible Price composition is required and formatting is delegated to the Price dependency; optional footer actions cannot hide or replace it." },
     { "name": "mediaRatio", "selectors": [".product-card", ".product-card__media"], "attributes": ["data-media-ratio"], "description": "One bounded semantic ratio applies to the complete passive media region; square is the default and portrait uses the shared 3:4 portrait proportion without exposing arbitrary numeric ratios." }
   ],
   "properties": [
     { "name": "title", "type": "string", "required": true, "description": "Visible product title and accessible name of the single product-detail link.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-card__title a" }] } },
     { "name": "href", "type": "string", "required": true, "description": "Product-detail destination used by the title link.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-card__title a", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] } },
-    { "name": "vendor", "type": "string", "required": false, "description": "Optional vendor or brand line.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-card__vendor" }] } },
-    { "name": "subtitle", "type": "string", "required": false, "description": "Optional short product descriptor.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-card__subtitle" }] } },
+    { "name": "showVendor", "type": "boolean", "required": false, "defaultValue": true, "description": "Keeps the optional artist/vendor content available while controlling whether its visible line is rendered.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-card__vendor", "attribute": "hidden", "values": { "true": null, "false": "" } }] } },
+    { "name": "vendor", "type": "string", "required": false, "description": "Optional artist, vendor, or brand line.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-card__vendor" }] } },
+    { "name": "description", "type": "string", "required": false, "description": "Optional complete product description visually clamped to two lines without truncating the DOM text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".product-card__description" }] } },
     { "name": "imageAlt", "type": "string", "required": true, "description": "Alternative text for the primary product image.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-card__image--primary", "attribute": "alt", "valueFrom": "property", "elements": ["img"] }] } },
     { "name": "mediaRatio", "type": "enum", "required": false, "defaultValue": "square", "values": ["square", "portrait"], "description": "Shared semantic media proportion used consistently by Product Card collections; square maps to 1:1 and portrait maps to the established 3:4 portrait proportion.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".product-card", "attribute": "data-media-ratio", "values": { "square": "square", "portrait": "portrait" } }] } },
     { "name": "hoverImage", "type": "slot", "required": false, "description": "Optional alternate media revealed by hover or focus-within.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__image--hover", "classNames": [".product-card__image", ".product-card__image--hover"] }] } },
     { "name": "badges", "type": "slot", "required": false, "description": "Optional Badge composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__badges", "classNames": [".product-card__badges"] }] } },
-    { "name": "quickAddAction", "type": "slot", "required": false, "description": "Optional Button composition for quick add.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__quick-add", "classNames": [".product-card__quick-add"] }] } },
-    { "name": "footer", "type": "slot", "required": false, "description": "Optional Price and secondary-action composition.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__footer", "classNames": [".product-card__footer"] }] } }
+    { "name": "quickLookAction", "type": "slot", "required": false, "description": "Optional intrinsic-width Button composition over the media that requests the target-owned Quick View for the represented product.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__quick-look", "classNames": [".product-card__quick-look"] }] } },
+    { "name": "price", "type": "slot", "required": true, "description": "Required canonical Price composition that remains visible independently from optional actions.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__price", "classNames": [".product-card__price"] }] } },
+    { "name": "footer", "type": "slot", "required": false, "description": "Optional secondary-action composition after the required Price.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".product-card__footer", "classNames": [".product-card__footer"] }] } }
   ],
   "tokens": {
     "public": {
       "color": ["--color-border-focus", "--color-text-primary", "--color-text-secondary"],
-      "spacing": ["--space-layout-element-gap"],
-      "typography": ["--typo-body-size", "--font-family-heading"],
+      "shadow": ["--shadow-sm"],
+      "typography": ["--typo-body-size", "--typo-body-line-height", "--font-family-body"],
       "transition": ["--transition-slow", "--transition-base"],
       "easing": ["--easing-out", "--easing-default"]
     }
@@ -72,13 +76,14 @@
     "Use one descriptive product-title link as the card navigation target; keep media passive and do not add a redundant image link.",
     "Give the primary product image descriptive alternative text when it adds information; alternate hover imagery for the same product uses empty alternative text.",
     "Keep separately interactive descendants above the stretched title-link hit area and preserve their native focus and activation behavior.",
-    "Keep quick add visible without hover on coarse pointers and include product context in its accessible name when cards repeat.",
+    "Keep the canonical Price visibly present outside any optional footer action region.",
+    "Reveal Quick Look on fine-pointer hover or focus-within, keep it visible for coarse or no-hover input, include product context in its accessible name when cards repeat, and let the target open one coherent Quick View without direct cart mutation from the card.",
     "Expose a visible card-sized focus indicator for the stretched title link and stop decorative transitions under reduced motion.",
     "Badges and sale information should be exposed as text, not only color."
   ],
   "adapters": {
     "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/product.css." },
-    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The product-card snippet maps Shopify product data to canonical Card, Badge, Button, Price, media, title-link, and quick-add anatomy." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The product-card snippet maps Shopify product data to canonical Card, Badge, Button, Price, media, title-link, clamped description, and a target-coordination Quick Look hook." },
     "react": { "status": "planned", "kind": "component" },
     "figma": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },

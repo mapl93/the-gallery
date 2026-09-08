@@ -226,7 +226,6 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
         change={String(values.change || '')}
         changeDirection={direction}
         alternateDigits={values.alternateDigits === true}
-        slashedZero={values.slashedZero !== false}
         tabularNumbers={values.tabularNumbers !== false}
         contextualAlternates={values.contextualAlternates !== false}
         fractions={values.fractions === true}

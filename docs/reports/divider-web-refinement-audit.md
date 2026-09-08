@@ -1,107 +1,121 @@
 # Divider Neutral Web Refinement Audit
 
-Status: Ready for human review; remains `pilot`
+Status: Approved stable by owner on 2026-08-25
 
-Date: 2026-07-13
+Date: 2026-08-25
 
-Contract: `components/contracts/divider.contract.json` (`0.3.0`)
+Contract: `components/contracts/divider.contract.json` (`0.4.0`, `stable`)
 
 ## Result
 
-Divider now keeps its visual axis, accessible orientation, and forced-colors
-render in agreement. The accepted `variant`, `orientation`, and `semantics` API
-remains unchanged. No size, thickness, length, arbitrary spacing, or color
-property was added.
+Divider now has two visual variants: Default and Decorative. The former Section
+variant was removed because its only effect was external whitespace that belongs
+to the composing parent. Both orientations now have zero external margin.
 
-The component is technically ready for human review. It is not promoted to
-`stable`; the existing question about exclusive variants versus orthogonal
-emphasis/spacing remains owner/architecture input.
+The public `semantics` property remains compatible. Studio presents it as the
+clearer `Purpose: Visual only | Semantic`. Purpose intentionally
+changes accessibility-tree exposure without changing appearance.
+
+The owner approved the complete component after renewed Light/Dark review of
+its visual styles, axes, purpose, Customize controls, and top-aligned Studio
+presentation.
 
 ## Source Reconciliation
 
-- Structural vertical `hr` now receives `aria-orientation="vertical"` in the
-  shared renderer. Horizontal keeps the implicit ARIA default.
-- Decorative semantics continues to map to `aria-hidden="true"` and does not add
-  a redundant orientation attribute.
-- Forced colors maps the rule background to the `CanvasText` system color.
-- Contract, Studio, MDX, neutral Web, and Shopify CSS copies are aligned.
-- The four existing public tokens remain the complete customization surface.
-  Literal `1px`/`2px` rule thickness stays private geometry.
+- Canonical `.divider--section` styling and its registry/contract option were
+  removed.
+- `.divider` sets `margin: 0`; vertical orientation no longer substitutes a
+  horizontal layout gap.
+- The former public spacing references were removed from Divider's customization
+  surface. Parent layouts may still use their own spacing tokens.
+- `--color-border-subtle` and `--color-border-decorative` remain the complete
+  public customization surface.
+- Literal `1px`/`2px` rule thickness remains private geometry.
+- Contract, Studio metadata, MDX, dossier, registry, Neutral Web, Webflow, and
+  Shopify copies are reconciled from canonical sources.
 
 ## State And Geometry Evidence
 
-The browser matrix measured all six variant/orientation combinations:
-
-| Orientation | Variant | Rule | Active-axis margin |
+| Orientation | Variant | Rule | External margin |
 | --- | --- | ---: | ---: |
-| Horizontal | Default | `468 x 1px` | `32px 0` |
-| Horizontal | Decorative | `468 x 2px` | `32px 0` |
-| Horizontal | Section | `468 x 1px` | `96px 0` |
-| Vertical | Default | `1 x 192px` | `0 32px` |
-| Vertical | Decorative | `2 x 192px` | `0 32px` |
-| Vertical | Section | `1 x 192px` | `0 96px` |
+| Horizontal | Default | `1px` high | `0px` |
+| Horizontal | Decorative | `2px` high | `0px` |
+| Vertical | Default | `1px` wide | `0px` |
+| Vertical | Decorative | `2px` wide | `0px` |
 
-The bounded parent owns vertical length; no viewport breakpoint, observer, or
+The bounded parent owns vertical length. No viewport breakpoint, observer, or
 runtime measurement is introduced.
 
-## Before And After
+At the desktop Studio fixture, the horizontal rule measured `672px` across and
+the bounded vertical rule measured `192px` high. Exhibit measured `520px` across
+because its parent pedestal is narrower; thickness, margins, color, markup, and
+renderer remained identical. In Light, Default resolved to `rgb(229, 229, 229)`
+and Decorative to `rgb(191, 161, 147)`. In Dark, against the `rgb(23, 23, 23)`
+stage, they resolved to `rgb(64, 64, 64)` and `rgb(139, 101, 83)` respectively.
 
-- Before: a structural vertical divider had visual
-  `data-orientation="vertical"` but inherited the horizontal accessibility
-  default.
-- After: the same node exposes `aria-orientation="vertical"`, no
-  `aria-hidden`, and remains a native `hr` separator.
-- Before forced colors: the authored background resolved to white on the white
-  system canvas and the rule disappeared.
-- After forced colors: it resolves to black `CanvasText` while retaining the
-  measured `1 x 192px` geometry.
+## Purpose Evidence
 
-Evidence:
-
-- `output/playwright/refinement-batch-02/divider-vertical-structural-forced-colors-desktop.png`
-- `output/playwright/refinement-batch-02/divider-vertical-structural-forced-colors-desktop-after.png`
+- Visual only: the rule has `aria-hidden="true"`.
+- Semantic separator: the rule remains visually identical and is exposed as a
+  native separator.
+- Semantic vertical: the rule additionally has
+  `aria-orientation="vertical"`.
+- Browser comparison confirmed identical width, height, four margins, and color
+  before and after changing only Purpose.
 
 ## Exhibit And Studio Parity
 
-Exhibit and Studio render identical default markup:
+ADR 0087 makes both views mount the same registered Divider renderer, contract,
+Studio definition, implementation, and initial fixture. The default fixture is:
 
 ```html
 <hr class="divider" aria-hidden="true">
 ```
 
-The same renderer, fixture, classes, and attributes are used in both modes.
-Eight canonical screenshots cover `390 x 844`, `768 x 1024`, `1280 x 800`, and
-`1600 x 1000`. Decorative and Section desktop evidence is also stored under
-`output/playwright/refinement-batch-02/`.
+Exhibit removes only the Studio inspector. It does not render the MDX preview as
+a second live implementation.
 
 ## Performance And Targets
 
 - Component JS, listeners, observers, timers, assets, and network requests: zero.
-- Primitives CSS: `9,335 B` gzip, below the `10.3 KiB` ceiling.
-- Neutral component CSS: `56,336 B` gzip, below the `64 KiB` ceiling.
-- Neutral Web and Shopify adapters contain the canonical rule. React, Angular,
-  Figma, SwiftUI, and Compose remain planned target translations, not certified
-  artifacts.
+- Neutral Web and Shopify adapters contain the regenerated canonical rule.
+- The performance audit reports `19/21` passing surfaces and no required gaps;
+  its two diagnostic aggregate overages are pre-existing global bundle items
+  documented by ADR 0273, not Divider regressions.
+- React, Angular, Figma, SwiftUI, and Compose remain planned translations rather
+  than certified artifacts.
 
-## Human Review Input
+## Accepted Human Decision
 
-1. Recommended for v1: retain `default | decorative | section` as the existing
-   exclusive variant set because it avoids an API migration without consumer
-   evidence that combined decorative emphasis plus section spacing is required.
-2. Alternative: split emphasis and spacing into orthogonal properties, allowing
-   combinations but expanding the state matrix and every target mapping.
-3. Approve the repository render as the Divider visual reference or provide a
-   component-specific reference.
+ADR 0281 records the owner decision applied in this pass:
+
+1. Keep Default and Decorative as the only visual variants.
+2. Make the parent layout own all surrounding spacing.
+3. Keep the public semantic property and present it in Studio as Purpose with
+   Visual only and Semantic options.
+4. Do not manufacture a visual difference for purpose.
+
+On 2026-08-25, in direct response to the explicit stability question, the owner
+said “Perfecto, vamos con el siguiente componente.” This closes the renewed
+human review and promotes Divider to `stable` without promoting any other
+component.
 
 ## Validation
 
 - `npm run validate:contracts`
 - `npm run validate:studio`
 - `npm run validate:docs`
+- `npm run validate:refinement-decisions`
+- `npm run build:components`
 - `npm run build:adapter:web`
 - `npm run build:adapter:shopify`
+- `npm run validate:adapter:web`
+- `npm run validate:adapter:shopify`
 - `npm run audit:components`
 - `npm run audit:refinement`
+- `npm run audit:refinement:performance`
+- `npm run audit:exhibit-studio-parity`
+- temporary docs build outside `site/dist`
 - `git diff --check`
 
 `site/dist` was not rebuilt.

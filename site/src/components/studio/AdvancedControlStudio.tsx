@@ -335,7 +335,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     return (
       <div className="docs-studio__field-fixture">
         <fieldset className={rootClass} aria-describedby={describedBy}>
-          <legend className="color-picker__legend">{String(values.groupLabel || '')}</legend>
+          <legend className={`color-picker__legend${values.required === true ? ' color-picker__legend--required' : ''}`}>{String(values.groupLabel || '')}</legend>
           <div className="color-picker__options">
             {colors.map((color, index) => (
               <label className={['color-swatch', swatchSize].filter(Boolean).join(' ')} key={color.value}>

@@ -96,9 +96,6 @@ function activeColorTokens(
     : state === 'disabled'
       ? 'disabled'
       : state === 'focusVisible'
-        || state === 'errorFocusVisible'
-        || state === 'successFocusVisible'
-        || state === 'warningFocusVisible'
         ? 'focused'
         : 'unfocused';
   const variantState = variant === 'default' ? stateName : stateName === 'focused' ? 'focused' : 'unfocused';
@@ -146,12 +143,7 @@ function simulatedFieldStyle(
   variant: string
 ): CSSProperties {
   const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
-  const focused = [
-    'focusVisible',
-    'errorFocusVisible',
-    'successFocusVisible',
-    'warningFocusVisible',
-  ].includes(state);
+  const focused = state === 'focusVisible';
   if (state !== 'hover' && !focused) return {};
 
   const outerBorder = variant === 'error'
@@ -167,7 +159,7 @@ function simulatedFieldStyle(
     color: activeTokens['value-color'] ? `var(${activeTokens['value-color']})` : undefined,
     borderColor: activeTokens.border
       ? semantic
-        ? `color-mix(in srgb, var(${activeTokens.border}) 70%, var(--color-text-primary))`
+        ? `color-mix(in oklch, var(${activeTokens.border}) var(--_select-semantic-boundary-weight), var(--color-text-primary))`
         : `var(${activeTokens.border})`
       : undefined,
     outlineColor: focused ? `var(${outerBorder})` : undefined,
@@ -318,13 +310,6 @@ export default function SelectStudio({ contract, definition }: SelectStudioProps
     setValues((current) => ({
       ...current,
       disabled: state === 'disabled',
-      variant: state === 'errorFocusVisible'
-        ? 'error'
-        : state === 'successFocusVisible'
-          ? 'success'
-          : state === 'warningFocusVisible'
-            ? 'warning'
-          : current.variant,
     }));
     setOpen(state === 'open' || optionState);
     setHighlightedIndex(optionState ? 1 : -1);
@@ -372,7 +357,13 @@ export default function SelectStudio({ contract, definition }: SelectStudioProps
               className={classes}
               data-select-enhanced="true"
             >
-              <label className="select__label" id={labelId} htmlFor={triggerId}>{label}</label>
+              <label
+                className={`select__label${required ? ' select__label--required' : ''}`}
+                id={labelId}
+                htmlFor={triggerId}
+              >
+                {label}
+              </label>
               <div className="select__control">
                 <select
                   className="select__field select__native"

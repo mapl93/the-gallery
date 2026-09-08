@@ -2,6 +2,8 @@
 
 Status: Accepted
 
+Superseded in part by ADR 0277: Stat no longer exposes `zero` as a switch.
+
 Date: 2026-07-12
 
 ## Decision

@@ -277,7 +277,6 @@ components/contracts/glaze-guide.contract.json
 components/contracts/header.contract.json
 components/contracts/hero-section.contract.json
 components/contracts/hero.contract.json
-components/contracts/hover-card.contract.json
 components/contracts/icon-button.contract.json
 components/contracts/image-text.contract.json
 components/contracts/inline-error.contract.json
@@ -323,7 +322,7 @@ components/contracts/radio.contract.json
 components/contracts/rating.contract.json
 components/contracts/reading-progress.contract.json
 components/contracts/related-articles.contract.json
-components/contracts/review-card.contract.json
+components/contracts/review.contract.json
 components/contracts/review-form.contract.json
 components/contracts/review-highlights.contract.json
 components/contracts/review-pagination.contract.json
@@ -372,7 +371,7 @@ components/contracts/wishlist.contract.json
 components/contracts/workshop-listing.contract.json
 ```
 
-Contracts define target-agnostic anatomy, variants, sizes, states, optional semantic properties and target mappings, optional behavior requirements, public tokens, dependencies, accessibility requirements, and adapter status. The current contract source has 183 validated contracts and covers every component in `registry.json`: Button is the first `stable` neutral-web contract and the remaining 182 are `pilot`. Button is also the first reviewed semantic-property implementation; the property surface remains optional for other pilot contracts until their evidence is reviewed. See ADR 0035.
+Contracts define target-agnostic anatomy, variants, sizes, states, optional semantic properties and target mappings, optional behavior requirements, public tokens, dependencies, accessibility requirements, and adapter status. The current contract source has 182 validated contracts and covers every component in `registry.json`: 4 are human-approved `stable`, 174 remain `pilot`, and 4 are `deprecated`. Button established the first reviewed semantic-property implementation; the property surface remains optional for other pilot contracts until their evidence is reviewed. See ADR 0035.
 
 The docs site reads contract files from `components/contracts/` and renders contract metadata on component pages that have a contract.
 
@@ -390,9 +389,22 @@ Studio definitions may group and label contract facts, choose control presentati
 and reference public tokens. They do not own property types, values, defaults,
 target mappings, behavior, or token values. Button is the first validated Studio
 definition and covers all ten of its reviewed semantic properties. Its renderer
-uses the canonical `.btn` implementation and reuses public form-control CSS for the
-inspector. Studio icon selectors use a validated site-only Lucide projection while
-component slots remain library agnostic. See ADRs 0036 and 0037.
+uses the canonical `.btn` implementation. Inspector controls compose complete
+shared Gallery renderers when a public control exists; for example, every
+`segmented` metadata control uses the same `SegmentedControlArtwork`, native
+fieldset/radio anatomy, and generated adapter CSS as the Segmented Control page.
+Site styles may arrange those controls and apply the documented compact editor
+density, but must not replace or omit their canonical semantic anatomy. The
+common row owns the visible left-column label while the native legend remains
+the accessible group name. Studio icon selectors use a validated site-only
+Lucide projection while component slots remain library agnostic. See ADRs 0036,
+0037, and 0282.
+
+In the desktop Studio workspace, the preview stage aligns its content start with
+the top of the Customize inspector while preserving horizontal centering. This
+site-only composition rule does not change the shared renderer or Exhibit
+fixture. Overlay and viewport fixtures may retain explicit internal positioning.
+See ADR 0283.
 
 Validate contracts with:
 

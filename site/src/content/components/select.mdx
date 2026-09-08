@@ -10,6 +10,8 @@ Select has default, error, success, and warning variants plus one default size. 
 
 Hover preserves the active Error, Success, or Warning color family instead of returning the trigger border to Default.
 
+When `required` is true, the native select owns constraint validation, the enhanced trigger mirrors it with `aria-required`, and the label shows a decorative asterisk optically centered with the text. The marker is not part of the accessible name.
+
 | Property | Value | Web mapping |
 | --- | --- | --- |
 | `variant` | `default` | `.select` |
@@ -29,6 +31,10 @@ Hover preserves the active Error, Success, or Warning color family instead of re
 ### Warning
 
 <Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select select--warning"><label class="select__label" for="select-country-warning">Country</label><select class="select__field" id="select-country-warning" name="country-warning" aria-describedby="select-country-warning-message"><option value="ar">Argentina</option><option value="mx" selected>Mexico</option><option value="es">Spain</option></select><span class="select__message" id="select-country-warning-message">Confirm that this matches the billing country.</span></div></div>'} label="Select warning" />
+
+### Required
+
+<Preview html={'<div class="tg-preview-frame tg-preview-frame--sm"><div class="select"><label class="select__label select__label--required" for="select-country-required">Country</label><select class="select__field" id="select-country-required" name="country-required" required><option value="" hidden selected>Choose a country</option><option value="ar">Argentina</option><option value="mx">Mexico</option><option value="es">Spain</option></select></div></div>'} label="Select required" />
 
 The option collection belongs to each use case. The countries shown in the preview are documentation fixtures, not component defaults. Without JavaScript, the original native select remains visible and functional.
 
@@ -68,7 +74,7 @@ Use Combobox instead when the list requires search, filtering, asynchronous resu
 - Add `aria-invalid="true"` to the native field for errors; the enhancer mirrors it to the trigger. Success and Warning do not use `aria-invalid`.
 - Keep the placeholder as a hidden empty-value native option so it labels the closed trigger without appearing as a disabled choice.
 - Use the native `disabled` attribute for unavailable fields and disabled native options for unavailable choices.
-- Put `name` and `required` on the native select. The enhancer reflects required state with `aria-required` on the combobox trigger.
+- Put `name` and `required` on the native select. The enhancer reflects required state with `aria-required` on the combobox trigger and synchronizes `.select__label--required` for the decorative visual marker.
 - Treat the native select as the only value owner. Framework adapters may set its value and consume native `input` and `change` events; they must not create a second enhanced value state.
 
 ## References
@@ -79,7 +85,7 @@ Use Combobox instead when the list requires search, filtering, asynchronous resu
   <tr><td>`variant`</td><td>enum</td><td>`default`</td><td>`default`, `error`, `success`, or `warning`</td></tr>
   <tr><td>`disabled`</td><td>boolean</td><td>`false`</td><td>Disables the native fallback and generated trigger</td></tr>
   <tr><td>`name`</td><td>string</td><td>empty</td><td>Native form field name</td></tr>
-  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Participates in native validation and is reflected to the enhanced trigger</td></tr>
+  <tr><td>`required`</td><td>boolean</td><td>`false`</td><td>Participates in native validation, is reflected to the enhanced trigger, and shows a centered decorative label marker</td></tr>
 </PropTable>
 
 Choices remain native `<option>` children of `.select__field`. The shared `theme.js` generates `.select__control`, `.select__trigger`, `.select__value`, `.select__indicator`, `.select__listbox`, `.select__option`, and `.select__option-check`, then keeps them synchronized with the native field. The chevron and selected check use Lucide geometry.

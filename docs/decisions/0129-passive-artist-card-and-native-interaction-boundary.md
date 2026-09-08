@@ -2,6 +2,9 @@
 
 Status: Accepted
 
+Superseded in part by ADR 0285 for canonical Flat Card composition. The passive
+default and optional native interaction boundary remain accepted.
+
 Date: 2026-07-14
 
 ## Context

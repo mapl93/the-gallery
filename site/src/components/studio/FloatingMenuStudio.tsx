@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
 } from 'react';
@@ -74,8 +73,6 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [highlightedItem, setHighlightedItem] = useState(0);
-  const [hoverCardDismissed, setHoverCardDismissed] = useState(false);
-  const [hoverCardInspectionOpen, setHoverCardInspectionOpen] = useState(true);
   const [contextPosition, setContextPosition] = useState<{ left: number; top: number } | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
@@ -220,8 +217,6 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   function reset() {
     setValues({ ...initialValues });
     setHighlightedItem(0);
-    setHoverCardDismissed(false);
-    setHoverCardInspectionOpen(true);
     setContextPosition(null);
     setTokenOverrides({});
   }
@@ -341,7 +336,7 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
               closeAndRestoreFocus();
             }}
           >
-            <div className="popover__arrow" aria-hidden="true" />
+            {values.showArrow !== false && <div className="popover__arrow" aria-hidden="true" />}
             <p className="popover__title">Dimensions</p>
             <div className="popover__content">
               <p className="docs-studio__popover-description">Set the dimensions for the layer.</p>
@@ -357,39 +352,6 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
                 })}
               </div>
             </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (contract.slug === 'hover-card') {
-      return (
-        <div
-          className={`hover-card docs-studio__preview-hover-card${hoverCardInspectionOpen ? ' docs-studio__preview-hover-card--open' : ''}${hoverCardDismissed ? ' hover-card--dismissed' : ''}`}
-          onPointerEnter={() => setHoverCardInspectionOpen(false)}
-          onPointerLeave={() => {
-            setHoverCardDismissed(false);
-            setHoverCardInspectionOpen(false);
-          }}
-          onFocus={() => {
-            setHoverCardDismissed(false);
-            setHoverCardInspectionOpen(false);
-          }}
-          onBlur={(event: FocusEvent<HTMLDivElement>) => {
-            if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
-            setHoverCardDismissed(false);
-          }}
-          onKeyDown={(event) => {
-            if (event.key !== 'Escape') return;
-            event.preventDefault();
-            setHoverCardDismissed(true);
-            setHoverCardInspectionOpen(false);
-          }}
-        >
-          <a className="link" href="#studio-artist" onClick={(event) => event.preventDefault()}>View artist</a>
-          <div className="hover-card__content">
-            <p className="hover-card__title">Lucia Ferrer</p>
-            <p className="hover-card__description">Clay studies shaped by coastal geology and quiet repetition.</p>
           </div>
         </div>
       );
@@ -520,14 +482,14 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
     hover: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-surface-secondary' : null,
     disabled: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-text-disabled' : null,
     danger: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--color-feedback-error-default' : null,
-    radius: contract.slug === 'hover-card' ? '--radius-lg' : '--radius-md',
-    shadow: contract.slug === 'hover-card' ? '--shadow-xl' : '--shadow-lg',
+    radius: '--radius-md',
+    shadow: '--shadow-lg',
     'body-size': '--typo-body-size',
-    'body-small': ['popover', 'popup', 'hover-card'].includes(contract.slug) ? '--typo-body-sm-size' : null,
+    'body-small': ['popover', 'popup'].includes(contract.slug) ? '--typo-body-sm-size' : null,
     caption: ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--typo-caption-size' : null,
     spacing: '--space-layout-element-gap',
     'touch-target': ['dropdown-menu', 'context-menu'].includes(contract.slug) ? '--space-layout-touch-target' : null,
-    transition: contract.slug === 'hover-card' ? '--transition-base' : '--transition-fast',
+    transition: '--transition-fast',
   };
 
   return (

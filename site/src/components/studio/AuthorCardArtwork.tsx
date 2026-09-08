@@ -51,6 +51,8 @@ export default function AuthorCardArtwork({
   return (
     <div
       className={[
+        'card',
+        compact ? 'card--flat' : null,
         'author-card',
         compact ? 'author-card--compact' : null,
         className.trim() || null,

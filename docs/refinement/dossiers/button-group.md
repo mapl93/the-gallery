@@ -30,14 +30,16 @@ labels instead of inventing a Studio fallback.
 
 - Registry identity: `A16`, primitive, dependency `button`.
 - Contract: `0.3.0`, `pilot`; two anatomy parts, two variants, one inherited
-  size, two states, three behavior rules, two properties, and one public token.
+  size, one state, three behavior rules, two properties, and one public token.
 - ADR 0062 accepts required `groupLabel` and Default/Full only.
 - Canonical CSS joins child borders on logical inline edges, restores logical
   outer radii, and raises the focused Button above adjacent borders.
 - Full distributes equal width and wraps localized or indivisible labels without
   page-level overflow; Default remains intrinsic.
-- Studio composes three canonical outline Buttons and renders the supplied
-  required group label verbatim, including an invalid empty value.
+- Studio composes between one and eight canonical outline Buttons in its
+  bounded documentation fixture. The reviewer can change the fixture count and
+  every visible Button label while the supplied required group label continues
+  to render verbatim, including an invalid empty value.
 - The design reference is the generic Button pilot frame, not a Button
   Group-specific owner reference.
 
@@ -67,7 +69,8 @@ by child ownership but require human visual review inside joined borders.
 
 - Variants: Default content-width and Full distributed width.
 - Size: inherited from each Button; the group adds no density.
-- Root states: Default and Full only.
+- Root state: Default only. Full is a layout variant, not a state, under the
+  global variant/state orthogonality rule in ADR 0274.
 - Child states: the complete accepted Button matrix, including focus-visible,
   disabled, busy, and reduced motion.
 - Modes: LTR/RTL, light/dark, forced colors, short/long/localized/unbroken labels,
@@ -80,6 +83,10 @@ by child ownership but require human visual review inside joined borders.
 does not expose child arrays, labels, priority, disabled state, or activation.
 `aria-labelledby` remains a valid authored alternative at a raw target level,
 but the accepted cross-target property is the direct group label.
+
+Studio's Button count and per-button label fields are explicitly fixture
+controls. They exercise consumer-owned Button composition without becoming
+Button Group properties or target mappings (ADR 0291).
 
 ## Token And Value Audit
 
@@ -119,6 +126,7 @@ corner and reading-order behavior. Default remains intentionally intrinsic.
 | First/last radii used physical left/right corners. | resolved | Logical inline-start/end corners and overlap verified in RTL. | implementation |
 | Full retained child overflow under extreme labels. | resolved | Equal shares, `min-width: 0`, and resilient wrapping keep the document at viewport width. | implementation |
 | Studio invented a group label when the required property was empty. | resolved | Supplied values render verbatim and empty remains visibly invalid. | implementation |
+| Studio fixed the child composition to three labels. | resolved | Add bounded fixture controls for one to eight canonical Button children and every visible label without changing the public contract. | owner, ADR 0291 |
 | Automatic stacked/wrapped layout has no accepted contract. | decision-needed if required | Keep current variants; present a separate responsive-layout proposal only with owner demand. | owner / architecture |
 | No component-specific visual reference exists. | review input | Approve repository render or supply reference. | owner |
 

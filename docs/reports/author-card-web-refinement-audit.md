@@ -11,7 +11,7 @@ Component: Author Card (`L6`, dependency order `120`)
 
 Author Card is now one passive, fail-closed identity composition for exactly one
 target-supplied author. It requires a visible name, composes optional canonical
-Avatar and author Links, uses neutral root/name semantics, omits biography and
+Card, Avatar and author Links, uses neutral root/name semantics, omits biography and
 Links from compact DOM, responds intrinsically to its real container, and adds
 zero neutral runtime.
 
@@ -30,8 +30,8 @@ the same `AuthorCardArtwork`, data, Avatar, and Link fixtures.
 | Variants, sizes and states | pass with host boundary | Full and compact; one fluid intrinsic size; compact semantically omits unavailable content. Article placement remains host-owned. |
 | Public API | pass | Six stable semantic decisions: variant, Avatar, required name, role, bio, Links. No root element, heading rank, provider fields, breakpoints, icon, padding, or fallback internals. |
 | Controlled/uncontrolled | not applicable / explicit | Passive content and native navigation only; no mutable component state, lifecycle or custom event. |
-| Dependencies | pass | Canonical Avatar owns identity thumbnail semantics/geometry; canonical Link owns anchors, focus, hover, wrapping and reduced-motion transition. |
-| Tokens and values | pass | Existing border/text/type/weight/radius/stack/touch-target tokens; private intrinsic basis only; no new public token or hardcoded public geometry. |
+| Dependencies | pass | Canonical Card owns the default/Flat shell; Avatar owns identity thumbnail semantics/geometry; Link owns anchors, focus, hover, wrapping and reduced-motion transition. |
+| Tokens and values | pass | Existing Card-owned shell plus Author Card text/type/weight/stack/touch-target tokens; private intrinsic basis only; no new public token or hardcoded public geometry. |
 | Accessibility | pass for neutral base | Required visible identity, no guessed landmark/heading, redundant Avatar hidden, native named Links, 44px targets, visible focus, AA contrast, RTL/reflow, forced colors and reduced motion. |
 | Responsive/content | pass | Four viewports per surface plus missing optionals, compact, localized RTL/unbroken 200px, effective 200% type and text spacing have zero overflow. |
 | Runtime/performance | pass for L6/Blog | Zero L6 runtime; L6 slice remains 16 B gzip below baseline; current Blog has 399 B headroom. Existing documented global Web CSS/runtime gaps remain separate program debt. |
@@ -68,15 +68,15 @@ the same `AuthorCardArtwork`, data, Avatar, and Link fixtures.
 
 | Property | Contract | Mapping |
 | --- | --- | --- |
-| `variant` | `full \| compact`, default `full` | Classless framed full or `.author-card--compact` semantic density profile. |
+| `variant` | `full \| compact`, default `full` | `.card.author-card` full or `.card.card--flat.author-card--compact` semantic density profile. |
 | `avatar` | optional semantic slot | Canonical `.avatar.author-card__avatar`; target owns content, alternative, size, loading and fallback. |
 | `name` | required non-empty string | Complete visible neutral `.author-card__name`; blank omission removes root. |
 | `role` | optional string | Complete visible neutral `.author-card__role`; not an ARIA role. |
 | `bio` | optional string | Complete plain `.author-card__bio` in full only. |
 | `links` | optional semantic slot | Full-only wrapping group of target-owned canonical author destinations. |
 
-Contract and Studio metadata advance from `0.1.0` to `0.2.0` and stay `pilot`.
-Registry and contract dependencies become `avatar` plus `link`. Framework,
+Contract and Studio metadata now use contract `0.3.0` and stay `pilot`.
+Registry and contract dependencies are `card`, `avatar`, and `link`. Framework,
 Shopify, Figma, provider data and fixture icons/initials do not enter the
 target-agnostic property API.
 
@@ -133,7 +133,7 @@ target-agnostic property API.
 
 ## Cross-Target Result
 
-- Neutral Web validates all 183 components and records the Avatar/Link
+- Neutral Web validates all 182 components and records the Card/Avatar/Link
   dependencies, refined semantic contract, canonical Blog CSS and zero L6
   runtime.
 - Webflow and Shopify Blog CSS copies are byte-identical to canonical source.

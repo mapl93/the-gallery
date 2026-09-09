@@ -518,23 +518,24 @@
   container-type: inline-size;
   position: relative;
   display: inline-block;
-  width: min(100%, 360px);
+  width: min(100%, var(--space-combobox-max-width));
   min-width: 0;
   max-width: 100%;
 }
 .combobox__input {
   width: 100%;
   min-width: 0;
-  min-height: 46px;
+  min-height: var(--space-button-min-height);
   padding-block: var(--space-input-padding-y);
   padding-inline: var(--space-input-padding-x);
-  border: 1px solid var(--_combobox-border);
+  border: var(--border-input-width) solid var(--_combobox-border);
   border-radius: var(--radius-md);
-  outline: 4px solid transparent;
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid transparent;
+  outline-offset: var(--border-input-focus-ring-offset);
   background: var(--_combobox-bg);
   color: var(--_combobox-text);
   font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
   font-size: var(--typo-input-value-size);
   line-height: var(--typo-input-value-line-height);
   transition: border-color var(--transition-fast) var(--easing-default),
@@ -564,15 +565,15 @@
   z-index: var(--z-dropdown);
   width: max-content;
   min-width: 100%;
-  max-width: min(420px, calc(100vw - 32px));
-  max-height: 240px;
-  margin-block-start: 8px;
-  padding-block: 4px;
+  max-width: min(var(--space-combobox-panel-max-width), calc(100vw - 2 * var(--space-combobox-viewport-inset)));
+  max-height: var(--space-combobox-panel-max-height);
+  margin-block-start: var(--space-combobox-panel-gap);
+  padding-block: var(--space-combobox-panel-padding-y);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   background: var(--color-surface-primary);
-  border: 1px solid var(--color-border-subtle);
+  border: var(--border-combobox-panel-border-width) solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   opacity: 0;
@@ -593,14 +594,15 @@
 .combobox__option {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-combobox-option-gap);
   width: 100%;
-  min-height: 44px;
-  padding-block: 10px;
-  padding-inline: 12px;
+  min-height: var(--space-combobox-option-min-height);
+  padding-block: var(--space-combobox-option-padding-y);
+  padding-inline: var(--space-combobox-option-padding-x);
   border: 0;
   background: transparent;
   font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
   font-size: var(--typo-body-size);
   line-height: var(--typo-body-line-height);
   color: var(--color-text-primary);
@@ -610,19 +612,21 @@
   transition: background var(--transition-fast) var(--easing-default);
 }
 .combobox__check {
-  width: 16px;
-  height: 16px;
+  width: var(--space-combobox-check-size);
+  height: var(--space-combobox-check-size);
   margin-inline-start: auto;
-  flex: 0 0 16px;
+  flex: 0 0 var(--space-combobox-check-size);
   opacity: 0;
   pointer-events: none;
 }
+.combobox__option[hidden],
+.combobox__empty[hidden] { display: none; }
 .combobox__option:hover,
 .combobox__option[data-highlighted] {
   background: var(--color-surface-secondary);
 }
 .combobox__option[aria-selected="true"] {
-  font-weight: 600;
+  font-weight: var(--typo-combobox-selected-weight);
   color: var(--color-text-primary);
 }
 .combobox__option[aria-selected="true"] .combobox__check {
@@ -636,8 +640,11 @@
   background: transparent;
 }
 .combobox__empty {
-  min-height: 44px;
-  padding: 12px;
+  font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
+  line-height: var(--typo-body-line-height);
+  min-height: var(--space-combobox-option-min-height);
+  padding: var(--space-combobox-empty-padding);
   text-align: center;
   font-size: var(--typo-body-size);
   color: var(--color-text-disabled);
@@ -662,9 +669,6 @@
   --_combobox-focus-border: color-mix(in srgb, var(--color-input-warning-focused-inner-border) 70%, var(--color-text-primary));
   --_combobox-focus-ring: var(--color-input-warning-focused-outer-border);
   --_combobox-label: color-mix(in srgb, var(--color-input-warning-unfocused-label) 55%, var(--color-text-primary));
-}
-.field:has(> .combobox) > .field__label {
-  color: var(--_combobox-label);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -726,24 +730,25 @@
   container-type: inline-size;
   position: relative;
   display: inline-block;
-  width: min(100%, 360px);
+  width: min(100%, var(--space-date-picker-max-width));
   min-width: 0;
   max-width: 100%;
 }
 .datepicker__input {
   width: 100%;
   min-width: 0;
-  min-height: 46px;
+  min-height: var(--space-button-min-height);
   padding-block: var(--space-input-padding-y);
   padding-inline-start: var(--space-input-padding-x);
-  padding-inline-end: calc(var(--space-input-padding-x) + 36px);
-  border: 1px solid var(--_datepicker-border);
+  padding-inline-end: max(var(--space-input-padding-x), calc(var(--space-date-picker-trigger-inset) + var(--space-date-picker-trigger-size) + var(--space-date-picker-trigger-gap)));
+  border: var(--border-input-width) solid var(--_datepicker-border);
   border-radius: var(--radius-md);
-  outline: 4px solid transparent;
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid transparent;
+  outline-offset: var(--border-input-focus-ring-offset);
   background: var(--_datepicker-bg);
   color: var(--_datepicker-text);
   font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
   font-size: var(--typo-input-value-size);
   line-height: var(--typo-input-value-line-height);
   transition: border-color var(--transition-fast) var(--easing-default),
@@ -773,13 +778,14 @@
 }
 .datepicker__trigger {
   position: absolute;
-  inset-block-start: 7px;
-  inset-inline-end: 7px;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  inset-inline-end: var(--space-date-picker-trigger-inset);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--space-date-picker-trigger-size);
+  height: var(--space-date-picker-trigger-size);
   padding: 0;
   border: 0;
   border-radius: var(--radius-sm);
@@ -792,29 +798,29 @@
   color: var(--color-text-primary);
 }
 .datepicker__trigger:focus-visible {
-  outline: 4px solid var(--_datepicker-focus-ring);
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid var(--_datepicker-focus-ring);
+  outline-offset: var(--border-input-focus-ring-offset);
 }
 .datepicker__trigger:disabled {
   color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 .datepicker__trigger > svg {
-  width: 18px;
-  height: 18px;
+  width: var(--space-date-picker-trigger-icon-size);
+  height: var(--space-date-picker-trigger-icon-size);
 }
 .datepicker__calendar {
   position: absolute;
-  inset-block-start: calc(100% + 8px);
+  inset-block-start: calc(100% + var(--space-date-picker-panel-gap));
   inset-inline-start: 0;
   z-index: var(--z-dropdown);
   background: var(--color-surface-primary);
-  border: 1px solid var(--color-border-subtle);
+  border: var(--border-date-picker-panel-border-width) solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  width: min(320px, calc(100vw - 32px));
-  max-width: calc(100vw - 32px);
-  padding: 16px;
+  width: min(var(--space-date-picker-panel-width), calc(100vw - 2 * var(--space-date-picker-viewport-inset)));
+  max-width: calc(100vw - 2 * var(--space-date-picker-viewport-inset));
+  padding: var(--space-date-picker-panel-padding);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-4px);
@@ -834,37 +840,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-block-end: 12px;
+  gap: var(--space-date-picker-header-gap);
+  margin-block-end: var(--space-date-picker-header-bottom-gap);
 }
 .datepicker__month-year {
   min-width: 0;
   font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
   font-size: var(--typo-body-size);
   line-height: var(--typo-body-line-height);
-  font-weight: 600;
+  font-weight: var(--typo-date-picker-month-weight);
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
 }
 .datepicker__nav {
   display: flex;
   flex: 0 0 auto;
-  gap: 4px;
+  gap: var(--space-date-picker-nav-gap);
 }
 .datepicker__nav-btn {
-  width: 40px;
-  height: 40px;
+  width: var(--space-date-picker-nav-size);
+  height: var(--space-date-picker-nav-size);
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: none;
-  border: 1px solid var(--color-border-subtle);
+  border: var(--border-date-picker-nav-border-width) solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: background var(--transition-fast) var(--easing-default),
               border-color var(--transition-fast) var(--easing-default);
+}
+.datepicker__nav-btn > svg {
+  width: var(--space-date-picker-nav-icon-size);
+  height: var(--space-date-picker-nav-icon-size);
 }
 .datepicker__nav-btn:hover:not(:disabled) { background: var(--color-surface-secondary); }
 .datepicker__nav-btn:disabled {
@@ -873,8 +884,8 @@
 }
 .datepicker__nav-btn:focus-visible,
 .datepicker__day:focus-visible {
-  outline: 4px solid var(--color-input-default-focused-outer-border);
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid var(--color-input-default-focused-outer-border);
+  outline-offset: var(--border-input-focus-ring-offset);
 }
 .datepicker__grid {
   display: block;
@@ -882,17 +893,18 @@
 .datepicker__weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: var(--space-date-picker-day-gap);
   text-align: center;
   font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
   font-size: var(--typo-body-sm-size);
   line-height: var(--typo-body-sm-line-height);
   color: var(--color-text-secondary);
-  margin-block-end: 4px;
+  margin-block-end: var(--space-date-picker-weekday-bottom-gap);
 }
 .datepicker__weekday {
   min-width: 0;
-  padding-block: 4px;
+  padding-block: var(--space-date-picker-weekday-padding-y);
 }
 .datepicker__weekday abbr {
   text-decoration: none;
@@ -900,23 +912,24 @@
 .datepicker__week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: var(--space-date-picker-day-gap);
 }
 .datepicker__day {
   width: 100%;
   min-width: 0;
-  min-height: 36px;
+  min-height: var(--space-date-picker-day-min-size);
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
   font-size: var(--typo-body-size);
   line-height: 1;
   color: var(--color-text-primary);
   background: none;
-  border: 1px solid transparent;
+  border: var(--border-date-picker-day-border-width) solid transparent;
   border-radius: var(--radius-full);
   cursor: pointer;
   font-variant-numeric: tabular-nums;
@@ -926,8 +939,8 @@
 }
 .datepicker__day:hover:not(:disabled) { background: var(--color-surface-secondary); }
 .datepicker__day--today {
-  font-weight: 700;
-  border: 1px solid var(--color-border-default);
+  font-weight: var(--typo-date-picker-today-weight);
+  border: var(--border-date-picker-day-border-width) solid var(--color-border-default);
 }
 .datepicker__day--selected {
   background: var(--color-button-primary-bg-default);
@@ -963,19 +976,16 @@
   --_datepicker-focus-ring: var(--color-input-warning-focused-outer-border);
   --_datepicker-label: color-mix(in srgb, var(--color-input-warning-unfocused-label) 55%, var(--color-text-primary));
 }
-.field:has(> .datepicker) > .field__label {
-  color: var(--_datepicker-label);
-}
 
 @container (max-width: 300px) {
   .datepicker__calendar {
     width: 100%;
-    padding: 12px;
+    padding: var(--space-date-picker-panel-compact-padding);
   }
 
   .datepicker__nav-btn {
-    width: 36px;
-    height: 36px;
+    width: var(--space-date-picker-nav-compact-size);
+    height: var(--space-date-picker-nav-compact-size);
   }
 }
 
@@ -1860,10 +1870,10 @@
 }
 .field__control {
   margin-block: 0;
-  width: 100%;
   min-width: 0;
   max-width: 100%;
 }
+:where(.field__control) { width: 100%; }
 .field__description,
 .field__feedback,
 .field__error,

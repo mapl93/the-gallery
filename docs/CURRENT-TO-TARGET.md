@@ -212,3 +212,12 @@ width. Contact and Auth Forms exercise the shared implementations. See
 `docs/reports/2026-09-09-specialized-fields-checkpoint.md` for evidence and
 copy-and-own adoption notes. Component coverage and certification continue;
 this checkpoint does not certify the hosted Shopify target.
+
+## Popup field customization (ADR 0307)
+
+Combobox and Date Picker expose 39 new visual decisions and reuse shared field
+roles. Studio-only overrides and the wrapper width precedence are corrected;
+Combobox IME and Date Picker focus follow their existing contracts. The owner
+removed the Studio-only search icon. See
+`docs/reports/2026-09-09-popup-fields-checkpoint.md` for measured overrides,
+native HTML composition and adoption limits.

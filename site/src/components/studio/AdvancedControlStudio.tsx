@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ClipboardEvent, type KeyboardEvent, type ReactElement } from 'react';
-import { CalendarDays, Check, ChevronLeft, ChevronRight, Search, Upload, Minus, Plus } from 'lucide-react';
+import { CalendarDays, Check, ChevronLeft, ChevronRight, Upload, Minus, Plus } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -130,6 +130,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   const [tagStatus, setTagStatus] = useState('');
   const [segment, setSegment] = useState('grid');
   const [comboHighlighted, setComboHighlighted] = useState(-1);
+  const comboComposing = useRef(false);
   const [monthOffset, setMonthOffset] = useState(0);
   const [focusedDate, setFocusedDate] = useState('2026-07-12');
   const [previewState, setPreviewState] = useState('default');
@@ -577,12 +578,13 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     const query = String(values.value || '').toLocaleLowerCase();
     const filtered = options.filter((option) => option.toLocaleLowerCase().includes(query));
     const open = values.open === true && values.disabled !== true;
-    const classes = ['combobox', variantClass(contract, values.variant), open ? 'combobox--open' : null, 'docs-studio__preview-combobox'].filter(Boolean).join(' ');
+    const classes = ['combobox', variantClass(contract, values.variant), open ? 'combobox--open' : null, 'field__control', 'docs-studio__preview-combobox'].filter(Boolean).join(' ');
     const selectOption = (option: string) => {
       setValues((current) => ({ ...current, value: option, open: false }));
       setComboHighlighted(-1);
     };
     const keyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+      if (comboComposing.current || event.nativeEvent.isComposing || event.keyCode === 229) return;
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         setValues((current) => ({ ...current, open: true }));
@@ -600,12 +602,12 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       }
     };
     return (
-      <div className="field docs-studio__field-fixture">
-        <label className={`field__label${values.required === true ? ' field__label--required' : ''}`} htmlFor="studio-combobox">{String(values.label || '')}</label>
+      <div className="docs-studio__field-fixture">
+        <FieldWrapperArtwork controlId="studio-combobox" label={String(values.label || '')} required={values.required === true}
+          variant={variant as PasswordInputArtworkVariant} feedback={message}>
         <div className={classes} data-combobox-enhanced="true">
-          <Search className="docs-studio__combobox-search" aria-hidden="true" />
           <input
-            className="combobox__input docs-studio__combobox-input"
+            className="combobox__input"
             id="studio-combobox"
             type="text"
             role="combobox"
@@ -614,7 +616,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
             aria-controls="studio-combobox-listbox"
             aria-activedescendant={open && filtered[comboHighlighted] ? `studio-combobox-option-${comboHighlighted}` : undefined}
             aria-invalid={invalid || undefined}
-            aria-describedby={describedBy}
+            aria-describedby={[String(values.describedBy || ''), message ? 'studio-combobox-feedback' : ''].filter(Boolean).join(' ') || undefined}
             value={String(values.value || '')}
             name={String(values.name || '') || undefined}
             placeholder={String(values.placeholder || '')}
@@ -630,6 +632,8 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
                 setComboHighlighted(-1);
               }
             }}
+            onCompositionStart={() => { comboComposing.current = true; }}
+            onCompositionEnd={() => { comboComposing.current = false; }}
             onKeyDown={keyDown}
           />
           <div className="combobox__listbox" id="studio-combobox-listbox" role="listbox" aria-label="Artwork results">
@@ -656,7 +660,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
             }) : <div className="combobox__empty" role="status">No artworks found.</div>}
           </div>
         </div>
-        {feedback()}
+        </FieldWrapperArtwork>
       </div>
     );
   }
@@ -693,8 +697,8 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       if (offsetDay > daysInMonth) return { day: offsetDay - daysInMonth, outside: true, date: new Date(year, monthIndex + 1, offsetDay - daysInMonth) };
       return { day: offsetDay, outside: false, date: new Date(year, monthIndex, offsetDay) };
     });
-    const open = values.open === true && values.disabled !== true;
-    const classes = ['datepicker', variantClass(contract, values.variant), open ? 'datepicker--open' : null, 'docs-studio__preview-datepicker'].filter(Boolean).join(' ');
+    const open = values.open === true && values.disabled !== true && values.readOnly !== true;
+    const classes = ['datepicker', variantClass(contract, values.variant), open ? 'datepicker--open' : null, 'field__control', 'docs-studio__preview-datepicker'].filter(Boolean).join(' ');
     const weekdays = [
       ['Sunday', 'Sun'], ['Monday', 'Mon'], ['Tuesday', 'Tue'], ['Wednesday', 'Wed'],
       ['Thursday', 'Thu'], ['Friday', 'Fri'], ['Saturday', 'Sat'],
@@ -713,7 +717,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       setFocusedDate(iso(date));
       setMonthOffset((date.getFullYear() - 2026) * 12 + date.getMonth() - 6);
       window.requestAnimationFrame(() => {
-        const root = target?.closest('.datepicker') || document.querySelector('.docs-studio__preview-datepicker');
+        const root = target?.closest('.datepicker') || document.getElementById('studio-datepicker')?.closest('.datepicker');
         const button = root?.querySelector(`[data-date="${iso(date)}"]`);
         if (button instanceof HTMLButtonElement) button.focus();
       });
@@ -733,6 +737,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       if (unavailable(date)) return;
       setFocusedDate(iso(date));
       setValues((current) => ({ ...current, value: iso(date), open: false }));
+      window.requestAnimationFrame(() => document.getElementById('studio-datepicker')?.focus());
     };
     const keyDown = (event: KeyboardEvent<HTMLButtonElement>, date: Date) => {
       const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
@@ -762,8 +767,9 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       }
     };
     return (
-      <div className="field docs-studio__field-fixture">
-        <label className={`field__label${values.required === true ? ' field__label--required' : ''}`} htmlFor="studio-datepicker">{String(values.label || '')}</label>
+      <div className="docs-studio__field-fixture">
+        <FieldWrapperArtwork controlId="studio-datepicker" label={String(values.label || '')} required={values.required === true}
+          variant={variant as PasswordInputArtworkVariant} feedback={message}>
         <div className={classes} data-datepicker-enhanced="true" data-today="2026-07-12">
           <input
             className="datepicker__input"
@@ -785,7 +791,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
             aria-expanded={open}
             aria-controls="studio-datepicker-calendar"
             aria-invalid={invalid || undefined}
-            aria-describedby={describedBy}
+            aria-describedby={[String(values.describedBy || ''), message ? 'studio-datepicker-feedback' : ''].filter(Boolean).join(' ') || undefined}
             onChange={(event) => {
               const date = parseIso(event.target.value);
               setValues((current) => ({ ...current, value: event.target.value }));
@@ -852,7 +858,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
             </div>
           </div>
         </div>
-        {feedback()}
+        </FieldWrapperArtwork>
       </div>
     );
   }

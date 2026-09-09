@@ -784,6 +784,7 @@
       open();
     });
     input.addEventListener('keydown', (event) => {
+      if (composing || event.isComposing || event.keyCode === 229) return;
       const isOpen = root.classList.contains('combobox--open');
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault();

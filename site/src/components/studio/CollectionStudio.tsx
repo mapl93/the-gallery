@@ -13,6 +13,7 @@ import PaginationArtwork from './PaginationArtwork';
 import ViewToggleArtwork, { type ViewToggleValue, viewToggleFixture } from './ViewToggleArtwork';
 import CollectionPromoArtwork, { type CollectionPromoVariant } from './CollectionPromoArtwork';
 import EmptyCollectionArtwork from './EmptyCollectionArtwork';
+import CheckboxArtwork from './CheckboxArtwork';
 import FilterPanelArtwork, { type FilterPanelCommitMode } from './FilterPanelArtwork';
 
 interface CollectionStudioProps {
@@ -101,6 +102,7 @@ export default function CollectionStudio({ contract, definition }: CollectionStu
   const [values, setValues] = useState<StudioPropertyValues>(initialValues);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
+  const [compactPromoPreview, setCompactPromoPreview] = useState(false);
   const initialFilters = ['Stoneware', 'Available now'];
   const [committedFilters, setCommittedFilters] = useState(initialFilters);
   const [draftFilters, setDraftFilters] = useState(initialFilters);
@@ -125,6 +127,7 @@ export default function CollectionStudio({ contract, definition }: CollectionStu
   function reset() {
     setValues({ ...initialValues });
     setTokenOverrides({});
+    setCompactPromoPreview(false);
     setCommittedFilters(initialFilters);
     setDraftFilters(initialFilters);
   }
@@ -290,7 +293,7 @@ export default function CollectionStudio({ contract, definition }: CollectionStu
   function renderPromo() {
     return (
       <CollectionPromoArtwork
-        className="docs-studio__collection-promo"
+        className={['docs-studio__collection-promo', compactPromoPreview ? 'docs-studio__collection-promo--compact' : ''].filter(Boolean).join(' ')}
         variant={(values.variant === 'span-2' ? 'span-2' : 'default') as CollectionPromoVariant}
         media={values.media === true
           ? <CollectionMedia className="collection-promo__media" alt={String(values.mediaAlt || '')} />
@@ -331,7 +334,7 @@ export default function CollectionStudio({ contract, definition }: CollectionStu
     <div className="docs-studio">
       <h1 className="docs-studio__title">{contract.name}</h1>
       <div className={['docs-studio__workspace', contract.slug === 'collection-grid' ? 'docs-studio__workspace--collection-grid' : ''].filter(Boolean).join(' ')}>
-        <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue="default" tokenValues={tokenValues} activeTokens={activeTokens} onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))} onSlotIconChange={() => undefined} onStateChange={() => undefined} onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))} onReset={reset} />
+        <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue="default" tokenValues={tokenValues} activeTokens={activeTokens} fixtureControlsByGroup={contract.slug === 'collection-promo' ? { presentation: (<CheckboxArtwork label="Compact preview" checked={compactPromoPreview} onChange={(event) => setCompactPromoPreview(event.target.checked)} />) } : undefined} onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))} onSlotIconChange={() => undefined} onStateChange={() => undefined} onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))} onReset={reset} />
         <section className="docs-studio__stage" aria-label={`${contract.name} preview`} style={tokenOverrides as CSSProperties}><div className={['docs-studio__stage-inner', 'docs-studio__collection-stage-inner', contract.slug === 'collection-grid' ? 'docs-studio__collection-stage-inner--grid' : ''].filter(Boolean).join(' ')}>{renderPreview()}</div></section>
       </div>
     </div>

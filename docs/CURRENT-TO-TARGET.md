@@ -386,3 +386,12 @@ values and pointer/motion guards as canonical CSS. Default parity and specialize
 Card boundaries pass; the approved stable baseline is preserved. See
 `docs/reports/2026-09-09-card-checkpoint.md`.
 Continue Collection Promo and remaining component/composition coverage.
+
+## Collection Promo visual values (ADR 0327)
+
+Collection Promo exposes its meaningful dimensions, factors, density and Link
+composition roles. This resolves the local underline exception recorded in ADR
+0325. Default parity, compact container response, parent Grid span, native Link
+and omission semantics pass: `docs/reports/2026-09-09-collection-promo-checkpoint.md`.
+Shopify data/schema/insertion/editor validation remains separate; E6 stays pilot.
+Continue Modal and Drawer.

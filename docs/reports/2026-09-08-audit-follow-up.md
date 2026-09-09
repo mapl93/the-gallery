@@ -256,3 +256,8 @@ ADR 0326 completa Card con tres tokens y catorce roles públicos, corrigiendo la
 simulación de Hover de Studio para usar escala, elevación y preferencias reales.
 Pasan 48 combinaciones, pruebas de puntero/movimiento y Author/Product Card.
 Se conserva su stable previo; ver `2026-09-09-card-checkpoint.md`.
+
+ADR 0327 resuelve Collection Promo, incluida la excepción de subrayado de Link:
+13 tokens nuevos y 32 roles públicos, con factores que conservan las relaciones
+responsive. Pasan 232 mediciones, compact preview, Grid Span 2, omisiones y Link.
+Ver `2026-09-09-collection-promo-checkpoint.md`; continúa Modal/Drawer.

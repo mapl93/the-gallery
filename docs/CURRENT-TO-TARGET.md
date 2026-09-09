@@ -461,3 +461,14 @@ auto sizing. Product Slider inherits shared control/focus values. Both remain
 pilot; no remote target certification. Evidence:
 `docs/reports/2026-09-09-carousel-scroll-area-checkpoint.md`.
 Continue Lightbox and dependent compositions.
+
+## Lightbox geometry and preview lifecycle (ADR 0335)
+
+Fifteen geometry roles complete 38 public tokens and retain 240 measured default
+element comparisons. Studio exposes canonical image bounds, restores focus after
+closing, and resolves nested direction. Zoom focus shares the existing on-scrim
+foreground. Product Gallery inherits the same Lightbox. Source/adapters/CLI and
+local evidence pass; component remains pilot. Palette scope is still an explicit
+owner question (component-local tokens versus shared media family), so color
+customization is not complete. Evidence:
+`docs/reports/2026-09-09-lightbox-geometry-checkpoint.md`.

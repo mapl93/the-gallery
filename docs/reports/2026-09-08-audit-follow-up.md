@@ -309,3 +309,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   límites nativos de fallback y respeta auto coarse. Puntos 5/7 continúan sin
   promoción automática ni Shopify remoto. Evidencia:
   `docs/reports/2026-09-09-carousel-scroll-area-checkpoint.md`.
+
+- ADR 0335 completa geometría de Lightbox: 15 valores fuente, 38 roles públicos,
+  240 comparaciones iniciales y composición Product Gallery verificadas. Corrige
+  foco al cerrar, dirección anidada y foco de zoom; retira el cap extra de imagen
+  de Studio. Su paleta sigue pendiente de decisión explícita del propietario;
+  no se declara cobertura completa del punto 5. Evidencia:
+  `docs/reports/2026-09-09-lightbox-geometry-checkpoint.md`.

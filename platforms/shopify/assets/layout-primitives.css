@@ -1379,7 +1379,10 @@
   --_lightbox-control-text: #171717;
 
   background: var(--_lightbox-scrim);
-  padding: max(var(--space-layout-element-gap), env(safe-area-inset-top)) max(var(--space-layout-element-gap), env(safe-area-inset-right)) max(var(--space-layout-element-gap), env(safe-area-inset-bottom)) max(var(--space-layout-element-gap), env(safe-area-inset-left));
+  font-family: var(--font-family-body);
+  line-height: var(--typo-body-line-height);
+  font-weight: var(--tg-font-weight-regular);
+  padding: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-viewport-padding)), env(safe-area-inset-top)) max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-viewport-padding)), env(safe-area-inset-right)) max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-viewport-padding)), env(safe-area-inset-bottom)) max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-viewport-padding)), env(safe-area-inset-left));
 }
 .lightbox--open {
   opacity: 1;
@@ -1420,10 +1423,10 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto auto;
   justify-items: center;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
-  inline-size: min(100%, 960px);
-  block-size: min(85dvh, 100%);
-  max-block-size: min(85dvh, 100%);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-lightbox-content-gap));
+  inline-size: min(100%, var(--space-lightbox-content-max-width));
+  block-size: min(calc(100dvh * var(--ratio-lightbox-content-viewport-height)), 100%);
+  max-block-size: min(calc(100dvh * var(--ratio-lightbox-content-viewport-height)), 100%);
   margin: 0;
   color: var(--_lightbox-on-scrim);
   touch-action: none;
@@ -1452,14 +1455,14 @@
   display: block;
   max-inline-size: 100%;
   min-block-size: 0;
-  max-block-size: min(72dvh, 100%);
+  max-block-size: min(calc(100dvh * var(--ratio-lightbox-image-viewport-height)), 100%);
   object-fit: contain;
   border-radius: var(--radius-sm);
 }
 .lightbox__close {
   position: absolute;
-  inset-block-start: max(calc(var(--space-layout-element-gap) * 0.5), env(safe-area-inset-top));
-  inset-inline-end: max(calc(var(--space-layout-element-gap) * 0.5), env(safe-area-inset-right));
+  inset-block-start: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-close-inset)), env(safe-area-inset-top));
+  inset-inline-end: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-close-inset)), env(safe-area-inset-right));
   z-index: 1;
   background: var(--_lightbox-control-surface);
   color: var(--_lightbox-control-text);
@@ -1481,20 +1484,21 @@
 .lightbox__nav:hover { --_icon-btn-bg: var(--_lightbox-control-surface); }
 .lightbox__nav:disabled { cursor: not-allowed; }
 .lightbox .lightbox__nav:focus-visible,
+.lightbox .lightbox__zoom-action:focus-visible,
 .lightbox .lightbox__close:focus-visible { outline-color: var(--_lightbox-on-scrim); }
-.lightbox__nav--prev { inset-inline-start: max(calc(var(--space-layout-element-gap) * 0.5), env(safe-area-inset-left)); }
-.lightbox__nav--next { inset-inline-end: max(calc(var(--space-layout-element-gap) * 0.5), env(safe-area-inset-right)); }
+.lightbox__nav--prev { inset-inline-start: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-nav-inset)), env(safe-area-inset-left)); }
+.lightbox__nav--next { inset-inline-end: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-nav-inset)), env(safe-area-inset-right)); }
 .lightbox__counter {
   color: var(--_lightbox-on-scrim);
   font-size: var(--typo-body-sm-size);
 }
 .lightbox__zoom {
   position: absolute;
-  inset-block-end: max(calc(var(--space-layout-element-gap) * 0.5), env(safe-area-inset-bottom));
-  inset-inline-end: max(calc(var(--space-layout-element-gap) * 0.5), env(safe-area-inset-right));
+  inset-block-end: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-zoom-inset)), env(safe-area-inset-bottom));
+  inset-inline-end: max(calc(var(--space-layout-element-gap) * var(--ratio-lightbox-zoom-inset)), env(safe-area-inset-right));
   z-index: 1;
   display: flex;
-  gap: calc(var(--space-layout-element-gap) * 0.25);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-lightbox-zoom-gap));
 }
 .lightbox__zoom-action {
   --_icon-btn-bg: var(--_lightbox-control-surface);
@@ -1505,24 +1509,24 @@
   color: var(--_lightbox-on-scrim);
   font-size: var(--typo-body-size);
   text-align: center;
-  max-inline-size: 60ch;
+  max-inline-size: var(--space-lightbox-caption-max-width);
   overflow-wrap: anywhere;
 }
 .lightbox__fallback {
   display: grid;
   place-items: center;
-  inline-size: min(80vw, 640px);
-  block-size: min(60dvh, 480px);
+  inline-size: min(calc(100vw * var(--ratio-lightbox-fallback-viewport-width)), var(--space-lightbox-fallback-max-width));
+  block-size: min(calc(100dvh * var(--ratio-lightbox-fallback-viewport-height)), var(--space-lightbox-fallback-max-height));
   min-block-size: 0;
   max-block-size: 100%;
-  border: 1px solid var(--_lightbox-on-scrim);
+  border: var(--border-lightbox-fallback-width) solid var(--_lightbox-on-scrim);
   border-radius: var(--radius-sm);
   color: var(--_lightbox-on-scrim);
 }
 .lightbox__title,
 .lightbox__status { pointer-events: none; }
 
-[dir="rtl"] .lightbox__nav svg { transform: rotate(180deg); }
+.lightbox__nav:dir(rtl) svg { transform: rotate(180deg); }
 
 @media (prefers-reduced-motion: reduce) {
   .lightbox,

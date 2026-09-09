@@ -69,6 +69,7 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   const [imageIndex, setImageIndex] = useState(0);
   const commandRefs = useRef<Array<HTMLDivElement | null>>([]);
   const commandTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const lightboxTriggerRef = useRef<HTMLButtonElement | null>(null);
   const commandDialogRef = useRef<HTMLDivElement | null>(null);
   const commandInputRef = useRef<HTMLInputElement | null>(null);
   const commandPreviousFocusRef = useRef<HTMLElement | null>(null);
@@ -328,23 +329,26 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   }
 
   function renderLightbox() {
-    if (!open) return <button className="btn" type="button" onClick={openLightbox}>Open lightbox</button>;
     const images = lightboxFixtures.map((fixture, index) => index === imageIndex ? {
       ...fixture,
       alt: String(values.alt || ''),
       caption: String(values.caption || '').trim(),
     } : fixture);
     return (
-      <LightboxArtwork
-        images={images}
-        currentId={lightboxFixtures[imageIndex].id}
-        open
-        loop={values.loop === true}
-        title="Artwork viewer"
-        className="docs-studio__preview-lightbox"
-        onCurrentIdChange={selectLightboxImage}
-        onOpenChange={(next) => { if (!next) closeLightbox(); }}
-      />
+      <>
+        {!open && <button ref={lightboxTriggerRef} className="btn" type="button" onClick={openLightbox}>Open lightbox</button>}
+        <LightboxArtwork
+          images={images}
+          currentId={lightboxFixtures[imageIndex].id}
+          open={open}
+          loop={values.loop === true}
+          title="Artwork viewer"
+          className="docs-studio__preview-lightbox"
+          returnFocusRef={lightboxTriggerRef}
+          onCurrentIdChange={selectLightboxImage}
+          onOpenChange={(next) => { if (!next) closeLightbox(); }}
+        />
+      </>
     );
   }
 

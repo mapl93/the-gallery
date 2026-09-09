@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.5.0",
+  "contractVersion": "0.6.0",
   "slug": "switch",
   "name": "Switch / Toggle",
   "registryId": "H1",
@@ -69,15 +69,21 @@
       "description": "Default switch treatment."
     },
     {
-      "name": "error", "className": ".switch--error", "default": false,
+      "name": "error",
+      "className": ".switch--error",
+      "default": false,
       "description": "Invalid switch value using the shared Error field hierarchy."
     },
     {
-      "name": "success", "className": ".switch--success", "default": false,
+      "name": "success",
+      "className": ".switch--success",
+      "default": false,
       "description": "Validated switch value using the shared Success field hierarchy."
     },
     {
-      "name": "warning", "className": ".switch--warning", "default": false,
+      "name": "warning",
+      "className": ".switch--warning",
+      "default": false,
       "description": "Switch value that needs attention using the shared Warning field hierarchy."
     }
   ],
@@ -152,52 +158,269 @@
   "behavior": [
     {
       "name": "nativeControl",
-      "selectors": [".switch__input"],
-      "attributes": ["type=\"checkbox\"", "role=\"switch\"", "name", "value", "checked", "disabled", "required"],
-      "events": ["click", "Space", "input", "change", "form submission", "form reset"],
+      "selectors": [
+        ".switch__input"
+      ],
+      "attributes": [
+        "type=\"checkbox\"",
+        "role=\"switch\"",
+        "name",
+        "value",
+        "checked",
+        "disabled",
+        "required"
+      ],
+      "events": [
+        "click",
+        "Space",
+        "input",
+        "change",
+        "form submission",
+        "form reset"
+      ],
       "description": "Switch preserves native checkbox behavior while exposing switch semantics for assistive technology."
     },
     {
       "name": "checkedState",
-      "selectors": [".switch__input:checked ~ .switch__track"],
-      "attributes": ["checked", "role=\"switch\""],
+      "selectors": [
+        ".switch__input:checked ~ .switch__track"
+      ],
+      "attributes": [
+        "checked",
+        "role=\"switch\""
+      ],
       "description": "Native checked is the sole accessibility and visual state; redundant manually synchronized aria-checked is not required."
     },
     {
       "name": "keyboardToggle",
-      "events": ["Space"],
+      "events": [
+        "Space"
+      ],
       "description": "Keyboard users toggle the switch with Space through the native input."
     },
     {
       "name": "checkedOwnership",
-      "selectors": [".switch__input"],
-      "attributes": ["checked establishes default checkedness in static HTML", "checked or defaultChecked in framework adapters"],
-      "events": ["input", "change", "form reset"],
+      "selectors": [
+        ".switch__input"
+      ],
+      "attributes": [
+        "checked establishes default checkedness in static HTML",
+        "checked or defaultChecked in framework adapters"
+      ],
+      "events": [
+        "input",
+        "change",
+        "form reset"
+      ],
       "description": "Static Web delegates live checkedness to the native input; controlled adapters bind that same live property without a mirror input."
     },
     {
       "name": "immediateEffect",
-      "selectors": [".switch__input"],
-      "events": ["input", "change"],
+      "selectors": [
+        ".switch__input"
+      ],
+      "events": [
+        "input",
+        "change"
+      ],
       "description": "Consumers apply and persist the setting immediately; pending, retry, and side effects remain target-owned."
     },
     {
       "name": "validationSemantics",
-      "selectors": [".switch--error", ".switch--success", ".switch--warning", ".switch__input"],
-      "attributes": ["aria-invalid=\"true\" only for Error", "aria-describedby references external feedback"],
+      "selectors": [
+        ".switch--error",
+        ".switch--success",
+        ".switch--warning",
+        ".switch__input"
+      ],
+      "attributes": [
+        "aria-invalid=\"true\" only for Error",
+        "aria-describedby references external feedback"
+      ],
       "description": "Switch owns visual validation and native invalid state while Field Wrapper owns static feedback content."
     }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": true, "description": "Stable visible accessible label that does not change between on and off.", "targetMappings": { "web": [{ "kind": "content", "selector": ".switch__label" }] } },
-    { "name": "size", "type": "enum", "required": false, "valuesFrom": "sizes", "description": "Canonical switch size.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".switch", "source": "sizes" }] } },
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Validation presentation independent from checked state.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".switch", "source": "variants" }] } },
-    { "name": "checked", "type": "boolean", "required": false, "defaultValue": false, "description": "Establishes default checkedness in static HTML; framework adapters may bind the live checked property.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "checked", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "disabled", "type": "boolean", "required": false, "defaultValue": false, "description": "Makes the native switch unavailable.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["input"] }] } },
-    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Participates in native required-choice validation and shows the standardized decorative marker beside the label.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "required", "values": { "true": "", "false": null }, "elements": ["input"] }, { "kind": "class", "selector": ".switch__label", "classNames": [".switch__label--required"] }] } },
-    { "name": "name", "type": "string", "required": false, "description": "Native form field name.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "name", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "value", "type": "string", "required": false, "defaultValue": "on", "description": "Native value submitted when the switch is on.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "value", "valueFrom": "property", "elements": ["input"] }] } },
-    { "name": "describedBy", "type": "string", "required": false, "description": "Id reference for helper or validation feedback.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".switch__input", "attribute": "aria-describedby", "valueFrom": "property", "elements": ["input"] }] } }
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Stable visible accessible label that does not change between on and off.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".switch__label"
+          }
+        ]
+      }
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "sizes",
+      "description": "Canonical switch size.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".switch",
+            "source": "sizes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Validation presentation independent from checked state.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".switch",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "checked",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Establishes default checkedness in static HTML; framework adapters may bind the live checked property.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".switch__input",
+            "attribute": "checked",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "input"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Makes the native switch unavailable.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".switch__input",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "input"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Participates in native required-choice validation and shows the standardized decorative marker beside the label.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".switch__input",
+            "attribute": "required",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "input"
+            ]
+          },
+          {
+            "kind": "class",
+            "selector": ".switch__label",
+            "classNames": [
+              ".switch__label--required"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": false,
+      "description": "Native form field name.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".switch__input",
+            "attribute": "name",
+            "valueFrom": "property",
+            "elements": [
+              "input"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": false,
+      "defaultValue": "on",
+      "description": "Native value submitted when the switch is on.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".switch__input",
+            "attribute": "value",
+            "valueFrom": "property",
+            "elements": [
+              "input"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "describedBy",
+      "type": "string",
+      "required": false,
+      "description": "Id reference for helper or validation feedback.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".switch__input",
+            "attribute": "aria-describedby",
+            "valueFrom": "property",
+            "elements": [
+              "input"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
@@ -224,7 +447,17 @@
         "--radius-full"
       ],
       "spacing": [
-        "--space-input-icon-gap"
+        "--space-input-icon-gap",
+        "--space-switch-width",
+        "--space-switch-height",
+        "--space-switch-thumb-size",
+        "--space-switch-sm-width",
+        "--space-switch-sm-height",
+        "--space-switch-sm-thumb-size",
+        "--space-switch-lg-width",
+        "--space-switch-lg-height",
+        "--space-switch-lg-thumb-size",
+        "--space-switch-thumb-inset"
       ],
       "shadow": [
         "--shadow-sm"
@@ -241,7 +474,13 @@
       "typography": [
         "--typo-body-size",
         "--typo-body-line-height",
-        "--font-family-body"
+        "--font-family-body",
+        "--typo-body-weight"
+      ],
+      "border": [
+        "--border-switch-width",
+        "--border-input-focus-ring-width",
+        "--border-input-focus-ring-offset"
       ]
     }
   },
@@ -266,10 +505,6 @@
       "notes": "Shopify Liquid can render native checkbox switches with the same class contract."
     },
     "react": {
-      "status": "planned",
-      "kind": "component"
-    },
-    "figma": {
       "status": "planned",
       "kind": "component"
     },

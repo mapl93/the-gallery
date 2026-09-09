@@ -20,7 +20,7 @@ The repo is the source of truth.
 
 Targets are translations of the repo source:
 
-- Figma is a target.
+- Web and Shopify are the delivery targets.
 - Shopify is a target.
 - Webflow is a target.
 - Framer is a target.
@@ -80,7 +80,6 @@ flowchart TD
   C --> D1["Web Output: CSS variables, JS, HTML patterns"]
   C --> D2["Shopify Output: Liquid, assets, theme settings"]
   C --> D3["React Output: components, hooks, CSS"]
-  C --> D4["Figma Output: variables, components, docs"]
   C --> D5["SwiftUI Output: tokens, styles, components"]
   C --> D6["Compose Output: tokens, styles, components"]
   C --> D7["Webflow And Framer Output"]
@@ -88,7 +87,6 @@ flowchart TD
   D1 --> E["Docs, Gallery, Registry, CLI"]
   D2 --> E
   D3 --> E
-  D4 --> E
   D5 --> E
   D6 --> E
   D7 --> E
@@ -163,7 +161,6 @@ Component Contract
   -> React: component, hooks, styles
   -> SwiftUI: style and component files
   -> Compose: style and composable files
-  -> Figma: component, variants, and variables
 ```
 
 ## Target Principles
@@ -182,11 +179,10 @@ Current owner-approved delivery order (2026-09-08):
 
 1. Complete and validate the base Web system: tokens, contracts, components and docs.
 2. Continue Shopify from the existing unpublished pilot.
-3. Resume Figma from the preserved library pilot.
 
-Framework, other web-platform and native adapters remain long-term targets.
-Their presence in the architecture diagram is not a request to implement them
-before this sequence. Figma feedback does not block base Web certification.
+The plan ends at Shopify (ADR 0303). Figma is removed rather than deferred.
+Earlier multi-target diagrams describe architectural possibilities, not active
+commitments. Existing Figma pilot files are historical evidence only.
 
 ## What This Means For The Current Repo
 

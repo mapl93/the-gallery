@@ -1,5 +1,10 @@
 # COMPONENTS.md — The Gallery Design System
 
+Current delivery scope (ADR 0303): **complete Web, then Shopify**. Figma is removed
+from the plan, including artwork, feedback, synchronization and release gates.
+References to its exports or pilot below are historical evidence only; other
+platform ideas are outside the current delivery plan.
+
 > **Authority**: Current component CSS, contracts, registry and Studio metadata are canonical together with `tokens/source/`. This long-form guide includes historical component specifications; examples below may predate accepted ADRs and must be checked against those sources.
 
 > **Customization**: [ADR 0293](decisions/0293-public-visual-customization-coverage.md) requires the meaningful visual decisions of a component to be editable through its public token API and visible in documentation. Use shared tokens when they already express the decision; introduce component-scoped tokens for component-specific controls. CSS `--_` properties remain private wiring, not a reason to omit a requested customization control.
@@ -845,6 +850,10 @@ and an omitted maximum remains unbounded.
 
 ### A5. Checkbox
 
+ADR 0304 exposes border/focus dimensions and Check/Minus indicator size/color.
+The canonical mask rendering and validation derivations live in
+`components/css/primitives.css`; the excerpt below is illustrative.
+
 #### CSS Contract
 
 ```css
@@ -870,7 +879,7 @@ and an omitted maximum remains unbounded.
   width: var(--_check-size);
   height: var(--_check-size);
   flex-shrink: 0;
-  border: 1.5px solid var(--_check-border);
+  border: var(--border-checkbox-width) solid var(--_check-border);
   border-radius: var(--_check-radius);
   background: var(--_check-bg);
   cursor: pointer;
@@ -889,8 +898,8 @@ and an omitted maximum remains unbounded.
 
 .checkbox:hover .checkbox__input:not(:disabled) { --_check-border: var(--_check-hover-border); }
 .checkbox__input:focus-visible {
-  outline: 4px solid var(--_check-focus);
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid var(--_check-focus);
+  outline-offset: var(--border-input-focus-ring-offset);
 }
 
 .checkbox__label {
@@ -931,8 +940,8 @@ validation boundary from Checkbox while retaining native named-group behavior.
   box-shadow: inset 0 0 0 4px var(--_radio-active);
 }
 .radio__input:focus-visible {
-  outline: 4px solid var(--_radio-focus);
-  outline-offset: 0;
+  outline: var(--border-input-focus-ring-width) solid var(--_radio-focus);
+  outline-offset: var(--border-input-focus-ring-offset);
 }
 ```
 

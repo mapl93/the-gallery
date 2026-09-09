@@ -1,10 +1,15 @@
 # Component Certification
 
+Current delivery scope (ADR 0303): **complete Web, then Shopify**. Figma is removed
+from the plan, including artwork, feedback, synchronization and release gates.
+References to its exports or pilot below are historical evidence only; other
+platform ideas are outside the current delivery plan.
+
 This document defines how The Gallery distinguishes structural component coverage
 from target-ready component maturity.
 
-The first certification target is neutral web, following ADR 0034. Certification
-for Shopify, React, Figma, native, and future targets is independent.
+The first certification target is neutral web, following ADR 0034. Shopify
+certification follows as the final delivery target (ADR 0303).
 
 ## Status Meaning
 
@@ -66,7 +71,7 @@ work.
   condition.
 - A component that exposes `required` shows the ADR 0275 marker once on its
   visible label, group legend, or primary field instruction. The marker is
-  optically centered, inherits the text color, stays out of the accessible
+  optically centered, uses the public required-marker color (ADR 0295), stays out of the accessible
   name, and never substitutes for native `required` or `aria-required`.
 - Named choice groups place the marker on the group legend rather than repeating
   it on every option label. Accessible-name-only target compositions do not
@@ -145,7 +150,8 @@ work.
 - Registry, contract, token, and web-manifest alignment.
 - Source component tokens reaching public aliases consumed by contract and CSS.
 - Contract depth counts.
-- Studio definition, property-binding, and design-reference coverage.
+- Studio definition and property-binding coverage. Historical design references
+  are informational and never a readiness gate.
 - Exhibit preview evidence and registered Studio renderer interaction evidence.
 - Inline-style and external-asset evidence.
 

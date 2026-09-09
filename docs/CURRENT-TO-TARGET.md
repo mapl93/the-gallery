@@ -4,11 +4,11 @@
 
 The Shopify brand-settings pilot is backed up remotely at `0f13e5e`; the bounded
 Figma pilot is backed up remotely at `b6e62ac`. The owner liked both pilots and
-changed the delivery priority to **complete the base Web system, then Shopify,
-then Figma**. Further Figma feedback and expansion are deferred. The existing
-library and Shopify pilot remain unpublished.
+removed Figma from the plan: **complete the base Web system, then Shopify**
+(ADR 0303). The existing Figma pilot is historical and unmaintained. The Shopify
+pilot remains unpublished.
 
-The next audit corrections are tracked explicitly by the original nine findings
+The audit corrections backed up at `8c86add` are tracked explicitly by the original nine findings
 in `docs/reports/2026-09-08-audit-follow-up.md`: consumer-file protection (9),
 typography (3), variant/state intersections (7), and the accepted fixed/adaptive
 spacing distinction (8). Strict interoperable export (6) is deferred; neither
@@ -36,14 +36,14 @@ The main gap is not volume of components. The main gap is formalization: token s
 | --- | --- | --- | --- |
 | Governance | `AGENTS.md`, project docs, and ADR 0001 now exist. | Decisions are captured as ADRs; agents know what is accepted vs open. | Keep adding ADRs for architecture decisions; make docs the first stop for every agent. |
 | Token source | `tokens/*_tokens.json` is the legacy Style Dictionary build input for targets that have not switched. Root `*.tokens.json` are Figma snapshots. A small DTCG spike passes, `tokens/source/` exists, and `migration-map.json` covers every unique legacy token path. | Repo-native token source lives in DTCG-style `tokens/source/` with primitives, semantics, components, selected modes, and executable migration parity. | Continue switching targets one by one; define parity threshold before deleting legacy token files; archive or move Figma snapshots. |
-| Token outputs | Legacy Webflow CSS and Framer JS outputs exist but have known unit-transform defects and are not production-ready. The new source compiler generates ignored comparison CSS/JSON under `tokens/source/build/`; the first real neutral web target exists at `platforms/web/tokens.css`; Shopify now has a thin token wrapper at `platforms/shopify/assets/tokens.css`. | Outputs include CSS, JS/TS, Figma variables, Shopify, Webflow, Framer, SwiftUI, Compose, and future targets. | Add Webflow wrapper or JS/TS output next; expand target by target. |
+| Token outputs | Legacy Webflow CSS and Framer JS outputs exist but have known unit-transform defects and are not production-ready. The new source compiler generates ignored comparison CSS/JSON under `tokens/source/build/`; the first real neutral web target exists at `platforms/web/tokens.css`; Shopify now has a thin token wrapper at `platforms/shopify/assets/tokens.css`. | The maintained delivery outputs are Web CSS/runtime and Shopify. | Validate Web and Shopify output parity; other targets are outside this plan. |
 | Component source | Canonical source is now CSS plus MDX examples, registry metadata, and 182 validated component contracts covering every component in `registry.json`. Button is the first contract with reviewed semantic properties and web mappings; its site-owned Studio definition covers all ten properties without duplicating contract facts. | Component contracts define anatomy, slots, variants, states, semantic properties, target mappings, dependencies, tokens, behavior, and accessibility independent of Studio presentation. | Continue component-by-component property review without inferring missing capabilities; decide generation vs validation role for contracts; use contract metadata for target guidance. |
 | Web/CSS adapter | The neutral web adapter generates complete compatibility bundles plus copied CSS family modules, 17 selective runtime modules, a small loader/core, and per-component dependency-closed install descriptors. | CSS is one concrete adapter backed by contracts, with explicit modular delivery and validation. | Keep CSS hand-authored; consider component-level CSS extraction only if measured family slices become a material bottleneck. |
 | Shopify adapter | `platforms/shopify/` has active Liquid theme work, a generated token wrapper, generated/copied CSS assets, selective runtime modules, adapter manifest/summary validation, `shopify-maturity-v1`, and Shopify-specific adapter documentation. Layouts load the selective runtime rather than the complete compatibility runtime. | Shopify consumes tokens and component contracts through explicit Liquid/assets/settings/schema/data/behavior/template/editor adapter rules. | Reconcile `planned` contracts with Liquid/schema evidence; add stricter contract-specific snippet/section validation and Theme Check. |
 | Registry | `registry.json` drives docs and CLI; `registry.schema.json` now exists with local structural validation. | Registry is schema-validated, target-aware, version-aware, and dependency-aware. | Expand target fields; align component count/categories over time; decide package vs registry versioning. |
 | CLI | CLI reads Web dependency slices and canonical token CSS, records per-file upstream baselines, supports dry-run and explicit keep-local resolution, and stops unresolved conflicts before writes. | CLI installs by target, version, and dependency graph, preserving copy-and-own semantics. | Validate real consumer migrations before distribution; later consider `--target shopify/react/webflow`. |
 | Documentation site | React/Vite docs app uses registry, MDX pages, previews, architecture pages, and a contracts index. It consumes `platforms/web/index.css` as a first-party adapter client; isolated previews use generated adapter component CSS and inherit the document token matrix. Exhibit now groups canonical MDX into five curatorial sections, promotes one preview as the artwork, and adapts its index and pedestal across desktop and mobile. A validated Studio presentation layer and generic inspector exist, with Button as the first interactive renderer and a site-only Lucide icon catalogue. | Exhibit and Studio consume contract facts through site-owned presentation metadata while docs expose north star, tokens, target-specific usage, versions, copy commands, and migration guidance. | Expand Studio only as component contracts are reviewed; implement the separately approved main-menu experience; improve token pages and reduce MDX inline style warnings over time. |
-| Figma target | Root exports remain historical snapshots. ADR 0298 adds a bounded Plugin API pilot in `platforms/figma/pilot/`, with variables, styles, four form components and persistent IDs. | Figma variables and components are generated/synced from repo source. | Deferred after base Web and Shopify; preserve the pilot and decide the general delivery/update model when resumed. |
+| Historical Figma pilot | ADR 0298 records the bounded pilot and its files. | Removed from delivery scope by ADR 0303. | No expansion, synchronization, feedback or release work. |
 | Native targets | No SwiftUI or Compose output yet. | Tokens generate Swift/Kotlin values; contracts generate or guide native styles/components. | After token source stabilizes, add token-only native output spike; later pilot Button in SwiftUI and Compose. |
 | Generated artifacts | `site/dist` is tracked and produces hash churn. | Docs builds are deployment output; consumer-ready outputs are release/package artifacts generated from source. | Remove or de-emphasize `site/dist` as source; define package/release artifact generation. |
 | Quality gates | `npm run validate:docs` checks registry/MDX/CSS/contract relationships and validated Studio presentation metadata. `npm run validate:tokens:source` checks the new DTCG source structure. `npm run validate:tokens:web-components` verifies that the neutral web target defines every public token used by component CSS. `npm run audit:components` generates exact neutral web certification evidence, including Studio property coverage, without automatic status promotion. | Token, contract, registry, adapter, visual, generated-output, and human-reviewed maturity validation exist. | Certify the docs-site component kernel first, keep validations current, and add target adapter tests as adapters mature. |
@@ -72,7 +72,7 @@ Status: completed.
 - Audit current `tokens/` against root Figma export snapshots.
 - Document intended token hierarchy: primitives, semantics, modes, breakpoints, and optional component-specific tokens. Done; see `docs/decisions/0007-token-source-architecture.md`.
 - Run a DTCG spike with a small token subset. Done; see `docs/spikes/0001-dtcg-token-source-spike.md`.
-- Verify outputs for CSS, Shopify, Webflow, Framer, Figma import, Swift, and Kotlin/Compose.
+- Verify maintained outputs for Web and Shopify.
 - Create first `tokens/source/` structure. Done.
 - Add token source validation. Done; run `npm run validate:tokens:source`.
 - Add source compiler mode matrix. Done; see `docs/decisions/0008-token-source-compiler.md`.
@@ -154,12 +154,12 @@ the-gallery add button --target webflow
 
 - Define npm package structure for CLI, core web, React, Angular, and adapter artifacts.
 - Define Shopify release outputs: theme zips, npm assets, GitHub releases, and possible Theme Store submissions.
-- Define Webflow, Framer, and Figma delivery formats.
+- Other target delivery formats are outside this plan (ADR 0303).
 - Define future Swift Package Manager and Maven/Gradle distribution paths.
 
 ## First Recommended Tasks
 
-The current owner-approved sequence is base Web system, Shopify, then Figma.
+The current owner-approved sequence is base Web system, then Shopify; it ends there.
 Close the original audit findings using the dated audit follow-up report before
 expanding unrelated targets. Continue component visual-customization coverage
 and individual certification after the shared corrections. Package/release
@@ -171,9 +171,8 @@ ADR 0292 scopes the first audit follow-up: canonical catalogue and historical-do
 clarity, targeted contrast corrections, and an Input/Button density pilot.
 The owner reviewed the overall pilot; its Input label/message spacing follow-up
 preserves 4 px. Shopify editor customization and Figma Professional portability
-now have owner-viewed bounded implementations in ADRs 0297 and 0298. Further
-work is deferred until after the base Web system; neither pilot certifies its
-entire target.
+now have owner-viewed bounded implementations in ADRs 0297 and 0298. Shopify work continues after the base Web system; Figma work is removed from
+scope. Neither historical pilot certifies an entire target.
 
 
 ## Public visual customization coverage (ADR 0293)
@@ -185,3 +184,12 @@ weight, plus previously declared font-family, bottom-margin and opacity tokens.
 Exhibit's visual-control inventory is generated from the same metadata as Studio.
 Other components still require a coverage review; contract validity alone does
 not certify that their visual customization surface is complete.
+
+
+## Choice control customization (ADR 0304)
+
+Checkbox, Radio and Switch expose 17 additional source decisions, shared focus
+dimensions and label typography through contracts and Exhibit/Studio. The contact
+composition now covers their different immediate/deferred behaviors. Continue
+with Field Wrapper, Fieldset and Form after this bounded checkpoint; do not infer
+complete catalogue coverage or stable status from structural validation.

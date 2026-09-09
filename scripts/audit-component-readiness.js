@@ -386,13 +386,13 @@ function main() {
     const interactionEvidence = interactivePreviews + Number(interactiveStudio);
     checks.studioMetadataPresent = propertyCount === 0 || Boolean(studio);
     checks.studioPropertiesCovered = studioPropertiesCovered;
+    // ADR 0303: optional historical provenance, never a readiness gate.
     checks.studioDesignReferencePresent = studioDesignReferencePresent;
     checks.studioRendererPresent = studioRendererPresent;
 
     const studioFailures = [
       ['studioMetadataPresent', checks.studioMetadataPresent],
       ['studioPropertiesCovered', checks.studioPropertiesCovered],
-      ['studioDesignReferencePresent', checks.studioDesignReferencePresent],
       ['studioRendererPresent', checks.studioRendererPresent],
     ].filter(([, passed]) => !passed).map(([name]) => name);
     structuralFailures.push(...studioFailures);

@@ -17,7 +17,7 @@ const layers = [
   {
     name: 'Target Adapters',
     responsibility: 'Translation rules and implementation details for each platform.',
-    example: 'CSS, Shopify Liquid, React, Figma, SwiftUI, Compose',
+    example: 'Web CSS/runtime and Shopify Liquid',
   },
   {
     name: 'Distribution',
@@ -40,8 +40,8 @@ export default function Architecture() {
       <h1>Architecture</h1>
       <p>
         The Gallery is the source of truth for a platform-agnostic design system.
-        Targets such as Shopify, Webflow, Framer, React, Angular, Figma, SwiftUI,
-        and Compose consume the source model; they do not define it.
+        Web and Shopify consume the source model. The delivery plan completes the Web
+        system first and ends with Shopify integration.
       </p>
 
       <h2>North Star</h2>
@@ -91,7 +91,7 @@ export default function Architecture() {
         <section className="docs-feature-card">
           <span className="docs-feature-card__label">Structure</span>
           <h3>Contracts</h3>
-          <p>Contracts describe what a component is before it becomes CSS, Liquid, JSX, Figma, or native UI.</p>
+          <p>Contracts describe what a component is before it becomes Web CSS or Shopify Liquid.</p>
         </section>
         <section className="docs-feature-card">
           <span className="docs-feature-card__label">Output</span>
@@ -103,10 +103,7 @@ export default function Architecture() {
       <h2>Target Priority</h2>
       <ol className="docs-ordered-list">
         <li><strong>Web foundation:</strong> vanilla CSS, HTML, and progressive enhancement.</li>
-        <li><strong>Web frameworks:</strong> React, Angular, and later other framework targets.</li>
-        <li><strong>Web platforms and e-commerce:</strong> Shopify, Webflow, Framer, and similar systems.</li>
-        <li><strong>Design tools:</strong> Figma and future design-tool targets.</li>
-        <li><strong>Native apps:</strong> SwiftUI, Jetpack Compose, and later other native platforms.</li>
+        <li><strong>Shopify:</strong> native Liquid composition, brand controls, theme-editor behavior, and verified consumer delivery.</li>
       </ol>
 
       <h2>Current Implementation Facts</h2>

@@ -1,5 +1,10 @@
 # Figma form pilot
 
+Current delivery scope (ADR 0303): **complete Web, then Shopify**. Figma is removed
+from the plan, including artwork, feedback, synchronization and release gates.
+References to its exports or pilot below are historical evidence only; other
+platform ideas are outside the current delivery plan.
+
 Status: implemented, unpublished, owner visual review pending (ADR 0298).
 
 [Open the form](https://www.figma.com/design/k3axoTaF87g17fBRgJ0PMY/The-Gallery--Design-System?node-id=1149-5).

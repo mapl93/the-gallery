@@ -1,11 +1,16 @@
 # The Gallery Open Questions
 
+Current delivery scope (ADR 0303): **complete Web, then Shopify**. Figma is removed
+from the plan, including artwork, feedback, synchronization and release gates.
+References to its exports or pilot below are historical evidence only; other
+platform ideas are outside the current delivery plan.
+
 This file tracks questions that are still genuinely open. Resolved architecture questions should move into ADRs under `docs/decisions/`.
 
 ## Recently Resolved
 
-- Current delivery priority: complete base Web, then Shopify, then Figma. Existing
-  pilots are preserved; further Figma feedback is deferred by the owner.
+- Current delivery scope: complete base Web, then Shopify. Figma is removed,
+  including its artwork and release requirements (ADR 0303).
 - Audit spacing policy: preserve fixed 4px utility steps and adaptive semantic
   spacing roles, documenting their distinct indexes. See ADR 0302.
 - Consumer files are protected during CLI installation through per-file
@@ -2062,8 +2067,4 @@ Questions:
 
 - Which npm packages should exist for web, React, Angular, and CLI consumption?
 - Should Shopify templates ship as GitHub release zips, npm package assets, Theme Store submissions, or all of these?
-- How should Figma outputs ship: DTCG import files, plugin workflow, generated `.fig` files, or another route?
-  ADR 0298 validates a bounded Plugin API pilot on Professional, preserving
-  source aliases and Figma IDs. It does not choose the general release model,
-  authorize publication, or define reverse synchronization from Figma.
 - When native targets arrive, should Swift ship as a Swift Package and Kotlin as Maven/Gradle artifacts?

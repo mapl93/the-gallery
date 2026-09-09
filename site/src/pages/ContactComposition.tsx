@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Mail } from 'lucide-react';
 import InputArtwork from '../components/studio/InputArtwork';
 import TextareaArtwork from '../components/studio/TextareaArtwork';
+import CheckboxArtwork from '../components/studio/CheckboxArtwork';
+import RadioArtwork from '../components/studio/RadioArtwork';
+import SwitchArtwork from '../components/studio/SwitchArtwork';
 
 // This composition owns its content and validation flow. Native fields own data;
 // the web adapter owns Select enhancement and all four controls' appearance.
@@ -11,6 +14,9 @@ export default function ContactComposition() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [replyMethod, setReplyMethod] = useState('');
+  const [careNotes, setCareNotes] = useState(false);
+  const [visitInfo, setVisitInfo] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [result, setResult] = useState('');
   const [busy, setBusy] = useState(false);
@@ -27,6 +33,7 @@ export default function ContactComposition() {
   function reset() {
     if (timerRef.current) clearTimeout(timerRef.current);
     setName(''); setEmail(''); setMessage('');
+    setReplyMethod(''); setCareNotes(false); setVisitInfo(false);
     setErrors([]); setResult(''); setBusy(false);
   }
 
@@ -55,7 +62,7 @@ export default function ContactComposition() {
   const topicError = errors.includes('topic');
   return <>
     <h1>Contact form composition</h1>
-    <p>A local example using Button, Input, Select and Textarea. Complete the fields to preview a request, or submit an empty form to review validation.</p>
+    <p>Complete the fields and choose how you would like to hear from the studio. Preview a request, or submit an empty form to review validation.</p>
     <form ref={formRef} className="form docs-contact-composition" noValidate onSubmit={submit} onReset={reset} aria-label="Contact the studio">
       <section className="form__section" aria-labelledby="contact-details-title">
         <h2 className="form__section-title" id="contact-details-title">Contact the studio</h2>
@@ -85,7 +92,27 @@ export default function ContactComposition() {
         <TextareaArtwork id="contact-message" name="message" label="Message" value={message} required minLength={10}
           onChange={(event) => setMessage(event.target.value)}
           variant={errors.includes('message') ? 'error' : 'default'}
-          message={errors.includes('message') ? 'Add at least 10 characters about your request.' : 'Include any dimensions, timing or delivery details that matter.'} />
+            message={errors.includes('message') ? 'Add at least 10 characters about your request.' : 'Include any dimensions, timing or delivery details that matter.'} />
+        <fieldset className="fieldset">
+          <legend className="fieldset__legend">Preferred reply</legend>
+          <div className="fieldset__content">
+            {[
+              ['email', 'Reply by email'],
+              ['call', 'Arrange a studio call'],
+            ].map(([value, label]) => <RadioArtwork key={value} name="replyMethod" value={value} label={label}
+              checked={replyMethod === value} required describedBy="contact-reply-message"
+              variant={errors.includes('replyMethod') ? 'error' : 'default'}
+              onCheckedChange={(checked) => { if (checked) setReplyMethod(value); }} />)}
+          </div>
+          <span id="contact-reply-message" className={errors.includes('replyMethod') ? 'field__error' : 'field__description'}>
+            {errors.includes('replyMethod') ? 'Choose a reply preference.' : 'We will use your email to coordinate either option.'}
+          </span>
+        </fieldset>
+        <CheckboxArtwork label="Include care instructions in the reply" name="careNotes" value="include"
+          checked={careNotes} onChange={(event) => setCareNotes(event.target.checked)} />
+        <SwitchArtwork label="Show studio visit information" checked={visitInfo}
+          onChange={(event) => setVisitInfo(event.target.checked)} />
+        {visitInfo && <p>Visits are arranged by appointment. Include your preferred dates in the message.</p>}
       </section>
       <div className="form__actions">
         <button className="btn btn--outline" type="reset">Reset</button>
@@ -96,6 +123,6 @@ export default function ContactComposition() {
       </div>
       <p role="status" aria-atomic="true">{result || (errors.length ? 'Review the highlighted fields before continuing.' : 'No request sent.')}</p>
     </form>
-    <p>Customize the controls in <Link to="/components/button">Button</Link>, <Link to="/components/input">Input</Link>, <Link to="/components/select">Select</Link> and <Link to="/components/textarea">Textarea</Link>. The <Link to="/foundations/control-pilot">control matrix</Link> retains side-by-side alignment and state checks.</p>
+    <p>Customize <Link to="/components/button">Button</Link>, <Link to="/components/input">Input</Link>, <Link to="/components/select">Select</Link>, <Link to="/components/textarea">Textarea</Link>, <Link to="/components/checkbox">Checkbox</Link>, <Link to="/components/radio">Radio</Link> and <Link to="/components/switch">Switch</Link>. The <Link to="/foundations/control-pilot">control matrix</Link> retains side-by-side alignment and state checks.</p>
   </>;
 }

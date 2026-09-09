@@ -91,31 +91,19 @@ function activeColorTokens(
 
   return {
     fill: '--color-input-default-unfocused-bg',
+    'indicator-color': semantic ? '--color-checkbox-indicator-validation' : '--color-checkbox-indicator-default',
     'control-color': controlColor,
     'label-color': labelColor,
     'focus-ring': focusRing,
   };
 }
 
-function simulatedControlStyle(
-  activeTokens: Record<string, string | null>,
-  state: string,
-  variant: string
-): CSSProperties {
+function simulatedControlStyle(state: string, selected: boolean): CSSProperties {
   const focused = state === 'focusVisible';
-  const hover = state === 'hover';
-  if (!focused && !hover) return {};
-
   return {
-    borderColor: activeTokens['control-color']
-      ? variant === 'error' || variant === 'success' || variant === 'warning'
-        ? `color-mix(in srgb, var(${activeTokens['control-color']}) 70%, var(--color-text-primary))`
-        : `var(${activeTokens['control-color']})`
-      : undefined,
-    outline: focused && activeTokens['focus-ring']
-      ? `4px solid var(${activeTokens['focus-ring']})`
-      : undefined,
-    outlineOffset: focused ? 0 : undefined,
+    borderColor: state === 'hover' && !selected ? 'var(--_check-hover-border)' : undefined,
+    outline: focused ? 'var(--border-input-focus-ring-width) solid var(--_check-focus)' : undefined,
+    outlineOffset: focused ? 'var(--border-input-focus-ring-offset)' : undefined,
   };
 }
 
@@ -173,7 +161,7 @@ export default function CheckboxStudio({ contract, definition }: CheckboxStudioP
     () => activeColorTokens(variant, previewState, checked || indeterminate),
     [variant, previewState, checked, indeterminate]
   );
-  const controlStyle = simulatedControlStyle(activeTokens, previewState, variant);
+  const controlStyle = simulatedControlStyle(previewState, checked || indeterminate);
   const classes = [
     'checkbox',
     'docs-studio__preview-checkbox',

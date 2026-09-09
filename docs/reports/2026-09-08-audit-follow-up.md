@@ -2,7 +2,8 @@
 
 Fecha: 2026-09-08. Alcance aprobado: corregir 9, 3 y 7; conservar y documentar
 las escalas del 8; delimitar y posponer la exportación interoperable del 6.
-Prioridad: sistema base Web → Shopify → Figma.
+Prioridad actualizada por ADR 0303: sistema base Web → Shopify. Figma queda fuera
+del plan; las referencias a su piloto en este informe son antecedentes.
 
 Antes de editar se validó el piloto Figma y se guardó en GitHub el checkpoint
 `b6e62ac`, sobre el checkpoint Shopify `0f13e5e`. Las correcciones de este informe
@@ -132,5 +133,13 @@ Ningún contrato se promovió automáticamente a `stable`.
 
 Conservar esta base, revisar la cobertura de personalización pública por familias
 y continuar la certificación Web con composiciones reales. El cierre de estos
-hallazgos no equivale a que todo el catálogo esté terminado. Shopify y Figma
-retoman sus pilotos después, en el orden decidido por el propietario.
+hallazgos no equivale a que todo el catálogo esté terminado. Shopify retoma su piloto después. Figma queda fuera del plan por ADR 0303.
+
+## Evidencia posterior — 2026-09-09
+
+El checkpoint de controles de selección se documenta en
+`docs/reports/2026-09-09-choice-controls-checkpoint.md`. Cierra las pruebas de
+interacción pendientes de Drawer, Slider, Link y Mega Menu, añade un consumidor
+HTML independiente del CLI y amplía la personalización de Checkbox/Radio/Switch.
+La captura oscura detectó y permitió corregir un indicador Checkbox invisible.
+ADR 0303 retira Figma de los contratos planificados y requisitos de entrega.

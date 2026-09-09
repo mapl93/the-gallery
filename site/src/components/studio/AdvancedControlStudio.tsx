@@ -220,24 +220,11 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   }
 
   function renderSwitch() {
-    const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
     const focused = previewState === 'focusVisible';
-    const controlToken = semantic
-      ? `--color-input-${variant}-unfocused-inner-border`
-      : previewState === 'hover'
-        ? '--color-input-default-hover-inner-border'
-        : '--color-border-default';
-    const controlColor = semantic
-      ? `color-mix(in srgb, var(${controlToken}) 70%, var(--color-text-primary))`
-      : `var(${controlToken})`;
-    const focusToken = semantic
-      ? `--color-input-${variant}-focused-outer-border`
-      : '--color-input-default-focused-outer-border';
     const trackStyle: CSSProperties = {
-      borderColor: previewState === 'hover' || focused ? controlColor : undefined,
-      backgroundColor: values.checked === true && semantic ? controlColor : undefined,
-      outline: focused ? `4px solid var(${focusToken})` : undefined,
-      outlineOffset: focused ? 0 : undefined,
+      borderColor: previewState === 'hover' ? 'var(--_switch-hover-border)' : undefined,
+      outline: focused ? 'var(--border-input-focus-ring-width) solid var(--_switch-focus-ring)' : undefined,
+      outlineOffset: focused ? 'var(--border-input-focus-ring-offset)' : undefined,
     };
     return (
       <div className="docs-studio__field-fixture">

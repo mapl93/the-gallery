@@ -12,7 +12,7 @@ The north star is:
 The Gallery = tokens + component contracts + adapters + registry + docs
 ```
 
-Tokens define values. Component contracts define what components are independently of target. Adapters translate tokens and contracts into Shopify, Webflow, Framer, React, Angular, Figma, SwiftUI, Jetpack Compose, and future targets.
+Tokens define values. Component contracts define what components are independently of target. Adapters translate tokens and contracts into Web and Shopify.
 
 The desired distribution model is similar to shadcn/ui:
 
@@ -24,9 +24,9 @@ The desired distribution model is similar to shadcn/ui:
 
 ## Design Tokens
 
-The system should define primitive and semantic variables used by all components. Tokens should support long-term evolution across targets such as Figma, Framer, Webflow, Shopify, React, Angular, and future platforms.
+The system should define primitive and semantic variables used by all components. Tokens should support long-term evolution across the Web and Shopify outputs.
 
-Accepted direction: the repo is the source of truth for design tokens. Figma is a target, not the source. Root-level `*.tokens.json` files are larger Figma-style exports that were used to bring earlier Figma work into the repo; they are reference/migration snapshots and are not canonical.
+Accepted direction: the repo is the source of truth for design tokens. Figma exports and the bounded pilot are historical references, not current deliverables. Root-level `*.tokens.json` files are larger Figma-style exports that were used to bring earlier Figma work into the repo; they are reference/migration snapshots and are not canonical.
 
 Known current implementation fact: the legacy Style Dictionary pipeline still reads `tokens/*_tokens.json` for targets that have not switched. The repo now also has a DTCG-style source structure in `tokens/source/`, a source-token compiler, migration parity checks, a first neutral web token target at `platforms/web/tokens.css`, a neutral web component adapter in `platforms/web/`, and a Shopify token/asset adapter generated from source facts.
 
@@ -85,9 +85,10 @@ The owner explicitly asked agents not to assume. When the repository does not ma
 
 ## Delivery priority after pilot review — 2026-09-08
 
-The owner liked the Shopify and Figma pilots but prioritized completing the
-base Web system first, then Shopify, then Figma. Preserve both pilots. Further
-Figma feedback/expansion is deferred and does not block base-system audit fixes.
+The owner removed Figma from scope (ADR 0303). Complete the base Web system,
+then Shopify; the plan ends there. Preserve the earlier Figma pilot only as
+historical evidence. There is no future Figma feedback, synchronization or
+publication checkpoint.
 Fixed utility spacing and adaptive semantic spacing may coexist with explicit
 names and guidance; do not change current utility measures to match semantic
 scale indexes.

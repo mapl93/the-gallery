@@ -1,5 +1,10 @@
 # The Gallery Architecture
 
+Current delivery scope (ADR 0303): **complete Web, then Shopify**. Figma is removed
+from the plan, including artwork, feedback, synchronization and release gates.
+References to its exports or pilot below are historical evidence only; other
+platform ideas are outside the current delivery plan.
+
 This document describes what the repository currently does. If it conflicts with source files, trust the source files and update this document.
 
 For the target architecture, read `docs/NORTH-STAR.md`. For the current-to-target gap map, read `docs/CURRENT-TO-TARGET.md`.

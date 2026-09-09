@@ -59,7 +59,7 @@ export interface StudioDefinition {
   $schema: string;
   studioVersion: string;
   slug: string;
-  designReference: StudioDesignReference;
+  designReference?: StudioDesignReference;
   groups: StudioGroup[];
 }
 

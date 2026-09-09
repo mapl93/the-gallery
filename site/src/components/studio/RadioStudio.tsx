@@ -93,26 +93,12 @@ function activeColorTokens(
   };
 }
 
-function simulatedControlStyle(
-  activeTokens: Record<string, string | null>,
-  state: string,
-  variant: string
-): CSSProperties {
-  const focused = [
-    'focusVisible',
-  ].includes(state);
-  if (!focused && state !== 'hover') return {};
-
+function simulatedControlStyle(state: string, selected: boolean): CSSProperties {
+  const focused = state === 'focusVisible';
   return {
-    borderColor: activeTokens['control-color']
-      ? variant === 'error' || variant === 'success' || variant === 'warning'
-        ? `color-mix(in srgb, var(${activeTokens['control-color']}) 70%, var(--color-text-primary))`
-        : `var(${activeTokens['control-color']})`
-      : undefined,
-    outline: focused && activeTokens['focus-ring']
-      ? `4px solid var(${activeTokens['focus-ring']})`
-      : undefined,
-    outlineOffset: focused ? 0 : undefined,
+    borderColor: state === 'hover' && !selected ? 'var(--_radio-hover-border)' : undefined,
+    outline: focused ? 'var(--border-input-focus-ring-width) solid var(--_radio-focus)' : undefined,
+    outlineOffset: focused ? 'var(--border-input-focus-ring-offset)' : undefined,
   };
 }
 
@@ -168,7 +154,7 @@ export default function RadioStudio({ contract, definition }: RadioStudioProps) 
     () => activeColorTokens(variant, previewState, checked),
     [variant, previewState, checked]
   );
-  const controlStyle = simulatedControlStyle(activeTokens, previewState, variant);
+  const controlStyle = simulatedControlStyle(previewState, checked);
   const classes = 'docs-studio__preview-radio';
 
   function handleStateChange(state: string) {

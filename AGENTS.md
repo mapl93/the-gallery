@@ -2,7 +2,9 @@
 
 This file is the first stop for any AI agent working in this repository.
 
-The Gallery is intended to become a long-lived, platform-agnostic design system: design tokens, target-agnostic component sources, a documentation/gallery site, and target adapters for Shopify, Webflow, Framer, React, Angular, Figma, and future platforms. It follows a copy-and-own distribution model inspired by shadcn/ui: consumers copy the pieces they need into their own project and can customize them locally.
+The Gallery is a long-lived design system with design tokens, target-agnostic component sources, a documentation/gallery site, and Web and Shopify delivery. It follows a copy-and-own distribution model inspired by shadcn/ui: consumers copy the pieces they need into their own project and can customize them locally.
+
+The owner-approved scope ends at Shopify: complete Web, then Shopify. Figma is removed from the plan, including feedback, synchronization and certification requirements. Existing pilot/export files are historical evidence only. Other platform ideas in older documents are outside this delivery plan. See `docs/decisions/0303-web-and-shopify-delivery-scope.md`.
 
 ## Start Here
 
@@ -31,6 +33,7 @@ Read these files before making non-trivial changes:
 - `docs/decisions/0289-studio-structured-shadow-token-editor.md` for the shared inline X, Y, Blur, Spread, Color, and Opacity authoring treatment for Studio shadow tokens.
 - `docs/decisions/0290-card-final-stability-approval.md` for the owner-approved Card v1 baseline and its promotion from `pilot` to `stable` without changing related components' maturity.
 - `docs/decisions/0291-button-group-configurable-studio-fixture.md` for Button Group's site-owned count and per-child label controls without promoting fixture data into the target-agnostic contract.
+- `docs/decisions/0304-choice-control-visual-customization.md` for Checkbox/Radio/Switch visual tokens, native semantics and the contact composition.
 - `docs/decisions/0293-public-visual-customization-coverage.md` for broad public visual customization coverage, independent Input label/message spacing, and shared Exhibit/Studio token controls.
 - `docs/decisions/0294-button-select-customization-and-contact-composition.md` for Button/Select visual controls, shared field geometry, unitless token editing and the contact composition checkpoint.
 - `docs/decisions/0295-required-marker-public-color.md` for the shared red required-marker token and its Studio/Exhibit exposure.

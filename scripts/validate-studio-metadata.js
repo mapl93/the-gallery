@@ -351,19 +351,21 @@ function validateStudioDefinition(filePath, iconCatalogues) {
   const contract = readJson(contractPath);
   const propertiesByName = Object.fromEntries((contract.properties ?? []).map((property) => [property.name, property]));
 
-  assertKnownKeys(
-    errors,
-    definition.designReference,
-    `${label}.designReference`,
-    new Set(['fileKey', 'frameNodeId', 'inspectorNodeId'])
-  );
-  const reference = definition.designReference;
-  if (!isObject(reference) || !hasString(reference.fileKey)) {
-    errors.push(`${label}.designReference must define fileKey, frameNodeId, and inspectorNodeId`);
-  } else {
-    for (const key of ['frameNodeId', 'inspectorNodeId']) {
-      if (!/^\d+:\d+$/.test(String(reference[key] ?? ''))) {
-        errors.push(`${label}.designReference.${key} must be a Figma node id`);
+  if (definition.designReference !== undefined) {
+    assertKnownKeys(
+      errors,
+      definition.designReference,
+      `${label}.designReference`,
+      new Set(['fileKey', 'frameNodeId', 'inspectorNodeId'])
+    );
+    const reference = definition.designReference;
+    if (!isObject(reference) || !hasString(reference.fileKey)) {
+      errors.push(`${label}.designReference must define fileKey, frameNodeId, and inspectorNodeId`);
+    } else {
+      for (const key of ['frameNodeId', 'inspectorNodeId']) {
+        if (!/^\d+:\d+$/.test(String(reference[key] ?? ''))) {
+          errors.push(`${label}.designReference.${key} must be a Figma node id`);
+        }
       }
     }
   }

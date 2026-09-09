@@ -14,7 +14,7 @@ const shape = [
   ['Behavior', 'Target-agnostic interaction requirements such as keyboard, focus, dismissal, and ARIA state.'],
   ['Tokens', 'Public customization API that target adapters must preserve.'],
   ['Accessibility', 'Required semantic, keyboard, and assistive technology behavior.'],
-  ['Adapters', 'Target support status for web, Shopify, React, Figma, SwiftUI, Compose, and future targets.'],
+  ['Adapters', 'Target support status for Web and Shopify.'],
 ];
 
 export default function Contracts() {
@@ -24,7 +24,7 @@ export default function Contracts() {
       <p>
         Contracts are The Gallery's target-agnostic component source layer. They
         describe what each component is before it becomes CSS, Liquid, React,
-        Figma, SwiftUI, Compose, or another target implementation.
+        Shopify Liquid or Web implementation.
       </p>
 
       <div className="docs-stats">

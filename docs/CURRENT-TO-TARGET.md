@@ -569,3 +569,15 @@ layout mode or stable promotion. Evidence:
 `docs/reports/2026-09-09-collection-hero-checkpoint.md`.
 Continue Collection Grid: owner selected tokens for every density with existing
 consumer compatibility, replacing desktop columns as the primary semantic API.
+
+## Collection Grid density tokens (ADR 0346)
+
+Owner-selected token authority now covers all four responsive counts with one
+track formula. Seven public values include actual Studio gap/padding controls.
+1780 legacy default comparisons pass; no-override wide density is deliberately
+corrected from the unrelated twelve-column alias to four. Existing attributes
+and local/inherited overrides retain compatibility. Shopify's saved columns
+setting now writes the public token; remote validation remains separate.
+Evidence: `docs/reports/2026-09-09-collection-grid-checkpoint.md`.
+Both lifecycle and system-process checks confirm test browsers closed. Continue
+Filter Panel and Pagination; Grid remains pilot.

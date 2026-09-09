@@ -382,3 +382,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   contraste del fixture actual. Sigue pilot y conserva la paleta aprobada.
   Evidencia: `2026-09-09-collection-hero-checkpoint.md`. Continúa Grid con todas
   las densidades mediante tokens, según la decisión explícita del propietario.
+- ADR 0346 entrega las cuatro densidades de Collection Grid como tokens, por
+  decisión del propietario. Conserva overrides antiguos, corrige el default
+  sin override de doce a cuatro, y conecta el setting existente de Shopify al
+  token. 1780 comparaciones, edición/reset, RTL y consumidor pasan. El tema
+  completo conserva tres errores históricos en `_legacy`; no se publica.
+  Evidencia: `2026-09-09-collection-grid-checkpoint.md`. Continúan Filter Panel
+  y Pagination. Navegadores cerrados, verificado también a nivel de procesos.

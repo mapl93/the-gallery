@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.2.1",
+  "contractVersion": "0.3.0",
   "slug": "collection-grid",
   "name": "Collection Grid",
   "registryId": "E2",
@@ -14,7 +14,7 @@
     "docs": "site/src/content/components/collection-grid.mdx"
   },
   "anatomy": [
-    { "name": "root", "selector": ".collection-grid", "className": ".collection-grid", "required": true, "description": "Neutral wrapper that owns page spacing, the wide column request, and inline-size containment without adding a landmark or widget role." },
+    { "name": "root", "selector": ".collection-grid", "className": ".collection-grid", "required": true, "description": "Neutral wrapper that owns page spacing, public token densities, and inline-size containment without adding a landmark or widget role." },
     { "name": "items", "selector": ".collection-grid__items", "className": ".collection-grid__items", "required": true, "description": "Native unordered list and responsive CSS grid for the current finite product results." },
     { "name": "item", "selector": ".collection-grid__item", "className": ".collection-grid__item", "required": true, "description": "Repeated native list item containing exactly one canonical Product Card." }
   ],
@@ -22,35 +22,42 @@
     { "name": "default", "className": null, "default": true, "description": "Default responsive collection grid." }
   ],
   "sizes": [
-    { "name": "default", "className": null, "default": true, "description": "One intrinsic responsive size: one constrained column, two base columns, three intermediate columns, and the requested wide column count." }
+    { "name": "default", "className": null, "default": true, "description": "One intrinsic responsive size: four token-controlled density bands, initially one/two/three/four columns." }
   ],
   "states": [
     { "name": "default", "selectors": [".collection-grid", ".collection-grid__items", ".collection-grid__item"], "description": "Passive list layout; populated and zero-item content do not add Grid-owned interactive state." }
   ],
   "behavior": [
     { "name": "nativeList", "selectors": [".collection-grid__items", ".collection-grid__item"], "description": "Render a native ul/li collection without APG grid, row, or gridcell roles and without a second keyboard model." },
-    { "name": "productCardComposition", "selectors": [".collection-grid__item"], "description": "Each item contains one canonical Product Card and does not duplicate its Card, Price, Badge, Button, media, focus, or quick-add behavior." },
-    { "name": "containerResponsiveColumns", "selectors": [".collection-grid", ".collection-grid__items"], "description": "Respond to the component inline-size: one constrained column, two base columns, three at the intermediate threshold, and the requested two-through-six count at the wide threshold." },
+    { "name": "productCardComposition", "selectors": [".collection-grid__item"], "description": "Each item contains one canonical Product Card and does not duplicate its Card, Price, Badge, Button, media, focus, or Quick Look behavior." },
+    { "name": "containerResponsiveColumns", "selectors": [".collection-grid", ".collection-grid__items"], "description": "Respond to the component inline-size: four public density tokens selected at the existing 20rem/48rem/64rem thresholds." },
     { "name": "passiveProjection", "selectors": [".collection-grid"], "description": "Filtering, sorting, pagination, loading, result announcements, empty recovery, product data, and virtualization remain parent or target owned." }
   ],
   "properties": [
-    { "name": "columns", "type": "number", "required": false, "defaultValue": 4, "min": 2, "max": 6, "step": 1, "description": "Requested Product Card column count when the component reaches its wide container mode; intermediate responsive counts remain private layout geometry.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".collection-grid", "attribute": "data-columns", "valueFrom": "property" }] } },
     { "name": "items", "type": "slot", "required": true, "description": "Ordered collection of zero or more canonical Product Cards, each wrapped by one native list item.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".collection-grid__items", "classNames": [".collection-grid__items", ".collection-grid__item"] }] } }
   ],
   "tokens": {
     "public": {
-      "spacing": ["--space-layout-grid-gap", "--space-layout-section-gap", "--space-layout-container"]
+      "spacing": [
+        "--space-layout-grid-gap",
+        "--space-layout-section-gap",
+        "--space-layout-container",
+        "--grid-collection-grid-constrained-columns",
+        "--grid-collection-grid-base-columns",
+        "--grid-collection-grid-intermediate-columns",
+        "--grid-columns"
+      ]
     }
   },
   "accessibility": [
     "Render native ul/li semantics and do not apply APG grid, row, or gridcell roles without the complete composite focus model.",
     "Keep every Product Card and its controls reachable in DOM order; do not use dense packing, CSS order, or layout-only reordering.",
-    "Preserve Product Card accessible names, focus, Button, Price, Badge, media, and quick-add requirements for every list item.",
+    "Preserve Product Card accessible names, focus, Button, Price, Badge, media, and Quick Look requirements for every list item.",
     "Keep result-count announcements, busy state, filtering focus, pagination, and empty recovery outside the passive Collection Grid."
   ],
   "adapters": {
     "web": { "status": "implemented", "kind": "css", "notes": "Implemented in components/css/collection.css." },
-    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The collection page section paginates collection.products, maps the wide column setting, and renders one canonical Product Card snippet per native list item." },
+    "shopify": { "status": "implemented", "kind": "liquid-css", "notes": "The collection page section paginates collection.products, maps the existing wide-column setting to the public --grid-columns token, and renders one canonical Product Card snippet per native list item." },
     "react": { "status": "planned", "kind": "component" },
     "swiftui": { "status": "planned", "kind": "native-component" },
     "compose": { "status": "planned", "kind": "native-component" }

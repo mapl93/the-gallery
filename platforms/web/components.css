@@ -9553,17 +9553,18 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 
 /* ── E2. COLLECTION GRID ── */
 .collection-grid {
-  --_collection-grid-columns: var(--grid-columns, 4);
+  --_collection-grid-wide-columns: var(--grid-columns);
   container: collection-grid / inline-size;
 }
-.collection-grid[data-columns="2"] { --_collection-grid-columns: 2; }
-.collection-grid[data-columns="3"] { --_collection-grid-columns: 3; }
-.collection-grid[data-columns="4"] { --_collection-grid-columns: 4; }
-.collection-grid[data-columns="5"] { --_collection-grid-columns: 5; }
-.collection-grid[data-columns="6"] { --_collection-grid-columns: 6; }
+.collection-grid[data-columns="2"] { --_collection-grid-wide-columns: 2; }
+.collection-grid[data-columns="3"] { --_collection-grid-wide-columns: 3; }
+.collection-grid[data-columns="4"] { --_collection-grid-wide-columns: 4; }
+.collection-grid[data-columns="5"] { --_collection-grid-wide-columns: 5; }
+.collection-grid[data-columns="6"] { --_collection-grid-wide-columns: 6; }
 .collection-grid__items {
+  --_collection-grid-columns: var(--grid-collection-grid-constrained-columns);
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(max(1, var(--_collection-grid-columns)), minmax(0, 1fr));
   gap: var(--space-layout-grid-gap);
   margin: 0;
   padding: var(--space-layout-section-gap) var(--space-layout-container);
@@ -9571,13 +9572,13 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 }
 .collection-grid__item { min-inline-size: 0; }
 @container collection-grid (min-width: 20rem) {
-  .collection-grid__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .collection-grid__items { --_collection-grid-columns: var(--grid-collection-grid-base-columns); }
 }
 @container collection-grid (min-width: 48rem) {
-  .collection-grid__items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .collection-grid__items { --_collection-grid-columns: var(--grid-collection-grid-intermediate-columns); }
 }
 @container collection-grid (min-width: 64rem) {
-  .collection-grid__items { grid-template-columns: repeat(var(--_collection-grid-columns), minmax(0, 1fr)); }
+  .collection-grid__items { --_collection-grid-columns: var(--_collection-grid-wide-columns); }
 }
 
 

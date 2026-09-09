@@ -28,7 +28,7 @@ const fixtureValues: Record<string, StudioPropertyValues> = {
     title: 'Quiet Forms', description: 'A study in balance, texture, and useful objects.',
     count: '24 works', image: true, imageAlt: 'Stoneware vessels arranged in soft gallery light',
   },
-  'collection-grid': { columns: 4, items: true },
+  'collection-grid': { items: true },
   'filter-panel': {
     commitMode: 'immediate', label: 'Filter works', formAction: '/collections/quiet-forms',
     triggerLabel: 'Filters', dismissLabel: 'Close filters', applyLabel: 'Apply filters',
@@ -151,9 +151,8 @@ export default function CollectionStudio({ contract, definition }: CollectionStu
   }
 
   function renderGrid() {
-    const columns = Math.max(2, Math.min(6, Number(values.columns) || 4));
     return (
-      <div className="collection-grid docs-studio__collection-grid" data-columns={columns}>
+      <div className="collection-grid docs-studio__collection-grid">
         <ul className="collection-grid__items" role="list">
           {values.items === true && collectionGridFixtures.map((item, index) => (
             <li className="collection-grid__item" key={item.title}>

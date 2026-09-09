@@ -2,13 +2,29 @@
 
 Passive, container-responsive product list that composes one canonical Product Card per item.
 
-<Preview html={"<div class=\"collection-grid tg-preview-frame tg-preview-collection-grid\" data-columns=\"4\"><ul class=\"collection-grid__items\" role=\"list\"><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#quiet-form\">Quiet Form</a></h3></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#carved-vessel\">Carved Vessel</a></h3></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#chawan\">茶碗 · Chawan</a></h3></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#archive\">Night Archive</a></h3></div></article></li></ul></div>"} label="Collection Grid" />
+<Preview html={"<div class=\"collection-grid tg-preview-frame tg-preview-collection-grid\"><ul class=\"collection-grid__items\" role=\"list\"><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#quiet-form\">Quiet Form</a></h3></div><div class=\"product-card__price\"><span class=\"price\"><span class=\"price__current\"><bdi class=\"price__value\">$120.00</bdi></span></span></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#carved-vessel\">Carved Vessel</a></h3></div><div class=\"product-card__price\"><span class=\"price\"><span class=\"price__current\"><bdi class=\"price__value\">$120.00</bdi></span></span></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#chawan\">茶碗 · Chawan</a></h3></div><div class=\"product-card__price\"><span class=\"price\"><span class=\"price__current\"><bdi class=\"price__value\">$120.00</bdi></span></span></div></article></li><li class=\"collection-grid__item\"><article class=\"card product-card\"><div class=\"product-card__media\"><div class=\"product-card__image product-card__image--primary tg-preview-media tg-preview-media--portrait\"></div></div><div class=\"product-card__body\"><h3 class=\"product-card__title\"><a href=\"#archive\">Night Archive</a></h3></div><div class=\"product-card__price\"><span class=\"price\"><span class=\"price__current\"><bdi class=\"price__value\">$120.00</bdi></span></span></div></article></li></ul></div>"} label="Collection Grid" />
 
 ## Presentation
 
-The root responds to its own inline size. It uses one column in unusually constrained embeds, two at the base width, three at the intermediate threshold, and four in wide containers by default. `data-columns` requests two through six columns for the wide mode without changing the smaller responsive modes.
+The root responds to its own inline size. It uses one column in unusually constrained embeds, two at the base width, three at the intermediate threshold, and four in wide containers by default. All four counts are public tokens. The existing `--grid-columns` name controls the wide band and defaults to four; it now aliases the component role rather than the general twelve-column layout grid.
 
 ## Usage Guidelines
+
+Use `--grid-collection-grid-constrained-columns` below 20rem,
+`--grid-collection-grid-base-columns` from 20rem,
+`--grid-collection-grid-intermediate-columns` from 48rem, and `--grid-columns`
+from 64rem. Thresholds use the component container; there is one shared CSS
+track formula. Tokens contain positive integer counts. CSS math protects the
+minimum of one track and applies its native integer rounding to fractional
+consumer overrides; no neutral upper ceiling is imposed.
+
+For existing copies, `data-columns="2"` through `"6"` remains a Web compatibility
+override for the wide band and takes precedence over the token. Remove that
+attribute when adopting token ownership. Existing inline or inherited
+`--grid-columns` customizations still work. Without an override, wide density is
+now the documented four rather than the unrelated twelve-column grid alias.
+Product Card retains its own complete API. Copy-and-own consumers explicitly
+adopt this source/token update; they are not changed remotely.
 
 <DoDont>
   <Do>Keep Product Card children in stable collection order.</Do>
@@ -36,10 +52,10 @@ The root responds to its own inline size. It uses one column in unusually constr
 ### API Reference
 
 <PropTable>
-  <tr><td>`columns`</td><td>number</td><td>`4`</td><td>Wide-container Product Card columns from 2 through 6</td></tr>
+  <tr><td>`--grid-columns`</td><td>number token</td><td>`4`</td><td>Positive integer count in the wide container band</td></tr>
   <tr><td>`items`</td><td>slot</td><td>required</td><td>Ordered canonical Product Cards, each in one native list item</td></tr>
   <tr><td>`.collection-grid`</td><td>class</td><td>required</td><td>Neutral root and inline-size query container</td></tr>
   <tr><td>`.collection-grid__items`</td><td>class</td><td>required</td><td>Native list and responsive CSS grid</td></tr>
   <tr><td>`.collection-grid__item`</td><td>class</td><td>repeated</td><td>Native list item containing one Product Card</td></tr>
-  <tr><td>`data-columns`</td><td>attribute</td><td>`4`</td><td>Web mapping for the wide column request</td></tr>
+  <tr><td>`data-columns`</td><td>legacy attribute</td><td>omitted</td><td>Compatibility override for existing wide counts 2–6; new consumers edit tokens</td></tr>
 </PropTable>

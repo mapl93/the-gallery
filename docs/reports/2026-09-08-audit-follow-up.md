@@ -370,3 +370,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   consumidor se reemplaza por controles reales; el mapa de Studio sale del CSS
   público. Ambos siguen pilot, sin proveedor ni Shopify remoto.
   Evidencia: `2026-09-09-location-checkpoint.md`. Continúa Subscription Option.
+
+- ADR 0344 completa Subscription Option con nueve roles nuevos y 24 valores
+  públicos; separa gaps de metadata conservando el inset derivado de Radio.
+  Pasan 560 comparaciones, tokens, RTL, selección/FormData/reset, required,
+  disabled, términos y Studio/Exhibit. Sigue pilot, sin compra real ni Shopify.
+  Evidencia: `2026-09-09-subscription-checkpoint.md`. Continúan Hero/Grid.

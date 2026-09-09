@@ -550,3 +550,12 @@ private pickup indentation is replaced by actual details controls; the illustrat
 map moves to site CSS. No provider implementation or target certification.
 Evidence: `docs/reports/2026-09-09-location-checkpoint.md`.
 Both remain pilot. Continue Subscription Option.
+
+## Subscription Option visual values (ADR 0344)
+
+Nine source roles complete 24 public values with independent choice/metadata
+spacing and weights. Radio still owns the derived text inset. 560 default element
+comparisons, custom geometry, RTL/native value/reset/required/disabled, selected
+terms and Studio/Exhibit pass. No commerce provider work or stable promotion.
+Evidence: `docs/reports/2026-09-09-subscription-checkpoint.md`.
+Continue Collection Hero and Collection Grid.

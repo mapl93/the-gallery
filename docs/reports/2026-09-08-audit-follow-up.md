@@ -356,3 +356,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Sticky ATC oculto se verifica sólo por asociación. Ambos siguen pilot.
   Evidencia: `2026-09-09-variant-form-checkpoint.md`.
   Continúan Size Chart y Back in Stock dentro del punto 5.
+
+- ADR 0342 completa Size Chart/Back in Stock con diez roles nuevos y 6/31
+  valores públicos. Pasan 476 comparaciones; la alineación amplia usa las filas
+  reales de Input y conserva gaps incluso con label multilínea. Studio/reset,
+  unidades authored, foco y error honesto del preview pasan. Ambos siguen pilot.
+  Evidencia: `2026-09-09-size-chart-stock-checkpoint.md`.
+  Continúan Location Search y Store Locator dentro del punto 5.

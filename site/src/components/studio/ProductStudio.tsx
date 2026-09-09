@@ -588,7 +588,10 @@ export default function ProductStudio({ contract, definition }: ProductStudioPro
           />
         ) : undefined}
         notes={values.notes === true ? (
-          <p>Measurements are approximate because each work is finished by hand.</p>
+          <>
+            <p>Measurements are approximate because each work is finished by hand.</p>
+            <p>Check the dimensions of your intended display space before choosing a size.</p>
+          </>
         ) : undefined}
       />
     );

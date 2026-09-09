@@ -531,3 +531,12 @@ native radio/FormData, editor/reset, pending/availability and dependent composit
 pass. Sticky ATC's hidden source form has association-only evidence. Both remain
 pilot. Evidence: `docs/reports/2026-09-09-variant-form-checkpoint.md`.
 Continue Size Chart and Back in Stock; Shopify remote remains separate.
+
+## Size Chart and Back in Stock visual values (ADR 0342)
+
+Ten source roles complete 6/31 public values. 476 default comparisons pass;
+wide notification alignment now shares actual Input rows instead of estimating
+label height. Wrapping labels, gaps, RTL, plain/icon fields, simulated fallback,
+Studio/reset and truthful preview request failure pass. Both stay pilot. Evidence:
+`docs/reports/2026-09-09-size-chart-stock-checkpoint.md`.
+Continue Location Search and Store Locator; Shopify remote remains separate.

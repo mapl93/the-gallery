@@ -1,5 +1,7 @@
 # 0335. Lightbox Public Geometry And Preview Lifecycle
 
+> The palette decision recorded as pending below is resolved by ADR 0336.
+
 Status: Accepted
 
 Date: 2026-09-09

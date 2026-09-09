@@ -112,10 +112,10 @@ The first architecture questions were resolved on 2026-05-23:
 - Carousel now preserves native finite scroll with synchronized canonical
   controls, Scroll Area remains one conditional named overflow region, and
   Lightbox composes the accepted Modal/Close/Icon primitives with finite or
-  looping navigation, swipe, bounded zoom/pan and a documented private on-scrim
-  literal. Scroll presentation breadth, production modal services, downloads,
-  preload/full-screen policy, and visual/token approval remain explicit target
-  or owner decisions. See ADRs 0104 and 0238.
+  looping navigation, swipe, bounded zoom/pan and component semantic palette
+  tokens anchored to existing system values (ADR 0336). Scroll presentation
+  breadth, production modal services, downloads, preload/full-screen policy, and
+  visual approval remain explicit target or owner decisions. See ADRs 0104 and 0238.
 - Mega Menu is now a non-modal native grouped-link disclosure with an external
   target-owned Button controller, while Bottom Navigation is a native mobile
   destination list with router-owned current state and link-owned count meaning.
@@ -414,9 +414,9 @@ Questions:
 - Do any consumers require Scroll Area axis, viewport size, scrollbar position,
   custom thumb geometry, or scroll shadows as semantic properties, or should
   those remain layout/target composition?
-- Should the private Lightbox black/white on-scrim values become an accepted
-  semantic media-canvas token family, or remain private component geometry after
-  human visual review?
+- Resolved by ADR 0336: Lightbox uses component semantic color roles anchored
+  to existing system tokens, retaining its current palette in both themes.
+  A shared media-canvas family is deferred until another consumer requires it.
 - Which production modal coordinator owns Lightbox portal/inertness, scroll
   lock, mutual exclusion, stacking, route dismissal, and focus restoration?
 - Do standalone Lightbox consumers require thumbnails, downloads, preload,

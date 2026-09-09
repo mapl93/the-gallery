@@ -1,5 +1,7 @@
 # Checkpoint: geometría de Lightbox
 
+> The palette decision recorded as pending below is resolved by ADR 0336.
+
 Fecha: 2026-09-09. ADR 0335. Continúa los puntos 5 y 7 de la auditoría.
 
 ## Resultado

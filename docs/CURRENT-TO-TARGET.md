@@ -472,3 +472,13 @@ local evidence pass; component remains pilot. Palette scope is still an explicit
 owner question (component-local tokens versus shared media family), so color
 customization is not complete. Evidence:
 `docs/reports/2026-09-09-lightbox-geometry-checkpoint.md`.
+
+## Lightbox component semantic palette (ADR 0336)
+
+Owner selected component palette tokens anchored to existing system values.
+Four color aliases plus the existing 0.92 density complete 43 public roles;
+there is no new global media family. Hover preserves control foreground.
+120 default element comparisons, upstream aliases, local overrides, Studio,
+forced colors and Product Gallery composition pass. This resolves ADR 0335's
+palette question; Lightbox remains pilot. Evidence:
+`docs/reports/2026-09-09-lightbox-palette-checkpoint.md`.

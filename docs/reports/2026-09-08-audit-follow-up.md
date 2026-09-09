@@ -316,3 +316,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   de Studio. Su paleta sigue pendiente de decisión explícita del propietario;
   no se declara cobertura completa del punto 5. Evidencia:
   `docs/reports/2026-09-09-lightbox-geometry-checkpoint.md`.
+
+- ADR 0336 resuelve la paleta pendiente de Lightbox: tokens semánticos propios,
+  cuatro aliases a valores del sistema y densidad 0.92 en fuente. 43 roles
+  públicos; 120 comparaciones iniciales y propagación de aliases/Studio/hover
+  verificadas. El punto 5 sigue abierto para el resto del sistema. Evidencia:
+  `docs/reports/2026-09-09-lightbox-palette-checkpoint.md`.

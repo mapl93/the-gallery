@@ -592,3 +592,13 @@ its control minimum for taller text. No JS or source-mode changes; both stay
 pilot. Evidence: `docs/reports/2026-09-09-collection-navigation-checkpoint.md`.
 Test browser session and system processes are closed after evidence. Continue
 Artist Profile and Artist Card; Shopify remote follows the Web system.
+
+## Artist Profile and Artist Card visual values (ADR 0348)
+
+Seventeen source roles complete 32/27 public values. 328 initial comparisons,
+relative spacing/type, ratio, palette mix, native/passive boundaries, focus,
+RTL, reduced motion and Studio/Exhibit pass. Artist Card's registry inventory
+now matches the contract using existing transition/transform categories.
+Evidence: `docs/reports/2026-09-09-artist-checkpoint.md`. Both remain pilot;
+artist target data and remote Shopify are separate. Browsers/processes are
+closed. Continue Process Timeline and Collection Story.

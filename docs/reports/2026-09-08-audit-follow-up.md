@@ -395,3 +395,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   seleccionó iconos de 18px en ambos targets. No hay nuevos modos, JS ni promoción
   a stable. Evidencia: `2026-09-09-collection-navigation-checkpoint.md`.
   Continúan Artist Profile y Artist Card; navegadores cerrados y procesos limpios.
+- ADR 0348 completa Artist Profile/Card con 17 roles y 32/27 valores públicos;
+  328 comparaciones iniciales, unidades relativas, ratio, paleta, RTL, foco,
+  movimiento reducido y Studio pasan. Registry incorpora el inventario ausente
+  de Artist Card con categorías existentes. Evidencia: `2026-09-09-artist-checkpoint.md`.
+  Continúan Process Timeline y Collection Story; ambos siguen pilot y el
+  navegador quedó cerrado, también verificado por procesos.

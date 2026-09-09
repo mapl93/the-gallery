@@ -72,12 +72,7 @@ export default function CardStudio({ contract, definition }: CardStudioProps) {
     .filter(Boolean)
     .join(' ');
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
-  const previewStyle: CSSProperties = previewState === 'hover' && variant !== 'flat'
-    ? {
-        boxShadow: variant === 'elevated' ? 'var(--shadow-lg)' : 'var(--shadow-md)',
-        transform: 'translateY(-2px)',
-      }
-    : {};
+
 
   function reset() {
     setValues({ ...initialValues });
@@ -108,6 +103,7 @@ export default function CardStudio({ contract, definition }: CardStudioProps) {
             'hover-shadow': variant === 'elevated' && previewState === 'hover' ? '--shadow-lg' : null,
             'content-padding': '--tg-space-component-xs',
             transition: '--transition-base',
+            'hover-lift': variant === 'flat' ? null : '--space-card-hover-lift',
           }}
           onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))}
           onSlotIconChange={() => undefined}
@@ -125,7 +121,6 @@ export default function CardStudio({ contract, definition }: CardStudioProps) {
             <article
               className={classes}
               data-studio-state={previewState}
-              style={previewStyle}
             >
               <div className="card__media docs-studio__card-media">
                 <img

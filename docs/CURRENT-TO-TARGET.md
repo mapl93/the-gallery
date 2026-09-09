@@ -378,3 +378,11 @@ Visible default parity, states, RTL, native navigation and Studio pass:
 `docs/reports/2026-09-09-timeline-link-checkpoint.md`.
 Continue component/composition coverage. Collection Promo retains local underline
 offset/hover literals despite inheriting Link focus; reconcile in its own batch.
+
+## Card visual values (ADR 0326)
+
+Card exposes border width, Hover lift and media scale, and Studio uses the same
+values and pointer/motion guards as canonical CSS. Default parity and specialized
+Card boundaries pass; the approved stable baseline is preserved. See
+`docs/reports/2026-09-09-card-checkpoint.md`.
+Continue Collection Promo and remaining component/composition coverage.

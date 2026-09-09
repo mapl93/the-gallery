@@ -251,3 +251,8 @@ Timeline deriva de sus dimensiones y Link conserva el grosor del subrayado entre
 variantes. Paridad visible, estados, RTL, navegación y Studio pasan. Ver
 `2026-09-09-timeline-link-checkpoint.md`. Collection Promo hereda foco pero mantiene
 subrayado local; esa excepción requiere el lote de la composición, sin bloqueo.
+
+ADR 0326 completa Card con tres tokens y catorce roles públicos, corrigiendo la
+simulación de Hover de Studio para usar escala, elevación y preferencias reales.
+Pasan 48 combinaciones, pruebas de puntero/movimiento y Author/Product Card.
+Se conserva su stable previo; ver `2026-09-09-card-checkpoint.md`.

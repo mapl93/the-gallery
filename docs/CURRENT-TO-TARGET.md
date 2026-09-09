@@ -251,3 +251,14 @@ The 1,008-case Chromium comparison and Studio/Contact checks are recorded in
 `docs/reports/2026-09-09-responsive-token-checkpoint.md`. This supersedes the
 pending output-optimization proposal above. Component batches can continue;
 copy-and-own consumers and the hosted Shopify theme are not updated automatically.
+
+## Native choice customization (ADR 0312)
+
+Color Picker and Segmented Control expose 23 additional source decisions and
+their complete reviewed public inventories in Studio/Exhibit. Native HTML remains
+the selection/form owner. Studio retains third/fourth choices, Segmented Control's
+legend gap now applies, and forced-color swatch selection has a real boundary.
+The 96-case CSS comparison, 58 Studio measurements and native/composed checks are
+recorded in `docs/reports/2026-09-09-native-choice-checkpoint.md`. Both remain pilot;
+Slider is the next small customization batch. Full Shopify integration follows
+completion of the base Web system.

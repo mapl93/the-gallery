@@ -157,13 +157,6 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     return () => observer.disconnect();
   }, [studioTokens]);
 
-  useEffect(() => {
-    if (contract.slug === 'color-picker') setSelectedColor(values.checked === false ? 1 : 0);
-    if (contract.slug === 'segmented-control') {
-      setSegment(values.checked === false ? 'list' : String(values.value || 'grid'));
-    }
-  }, [contract.slug, values.checked, values.value]);
-
   useEffect(() => () => { filePreviews.forEach(({ url }) => URL.revokeObjectURL(url)); }, [filePreviews]);
 
   function readFilePreviews(files: FileList | null, enabled: boolean) {
@@ -968,6 +961,18 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
           </>,
         } : undefined} onPropertiesChange={(next) => {
           setValues((current) => ({ ...current, ...next }));
+          // Inspector commands may choose a fixture default; a native change
+          // already supplies the exact option and must never be coerced to it.
+          if (contract.slug === 'color-picker' && typeof next.checked === 'boolean') {
+            setSelectedColor(next.checked ? 0 : 1);
+          }
+          if (contract.slug === 'segmented-control') {
+            if (typeof next.checked === 'boolean') {
+              setSegment(next.checked ? String(next.value ?? values.value ?? 'grid') : 'list');
+            } else if (typeof next.value === 'string' && values.checked === true) {
+              setSegment(next.value || 'grid');
+            }
+          }
           if (contract.slug === 'switch' && typeof next.checked === 'boolean') {
             setPreviewState(next.checked ? 'checked' : 'default');
           }

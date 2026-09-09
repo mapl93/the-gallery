@@ -18,7 +18,7 @@ el tema con este bloque.
 | 2 | Controles de marca Shopify desconectados | Piloto implementado y comprobado en tema no publicado (ADR 0297). La integración Shopify completa sigue después del sistema base. |
 | 3 | Roles tipográficos inconsistentes y pesos sin consumir | Corregidos en fuente, aliases, utilidades y composiciones editoriales; comprobados en ocho matrices y con un cambio temporal de marca. ADR 0300. |
 | 4 | Catálogo y documentación tomando fuentes antiguas | Superficies identificadas corregidas en ADR 0292; se mantiene la distinción entre fuentes, referencias históricas y salidas. |
-| 5 | Decisiones públicas de Input ocultas en el generador | Migradas a fuente y expuestas en contratos/Studio/Exhibit por ADRs 0292–0294. La cobertura de personalización de todos los demás componentes sigue siendo trabajo del sistema completo. |
+| 5 | Decisiones públicas de Input ocultas en el generador | Migradas a fuente y expuestas en contratos/Studio/Exhibit por ADRs 0292–0294; cobertura ampliada por batches en ADRs 0304–0309 y 0312, hasta Color Picker y Segmented Control. El resto del catálogo continúa pendiente de revisión de cobertura. |
 | 6 | DTCG-style presentado como interoperabilidad estricta | Parcial y pospuesto explícitamente: límites documentados, sin cambiar formato ni afirmar conformidad estricta. El piloto Figma no sustituye una exportación conforme. |
 | 7 | Variantes y estados mezclados | Corregidas las intersecciones identificadas en 12 contratos y sus controles; las combinaciones conservan sus selectores de implementación. ADR 0301. La revisión semántica y certificación completa por componente continúa. |
 | 8 | Dos vocabularios de espaciado ambiguos | Decisión aceptada y aplicada: utilidades fijas con primitivas existentes; roles semánticos adaptativos. Se conservan nombres y medidas. ADR 0302. |
@@ -162,8 +162,14 @@ File Upload y Pin Input: 24 decisiones, reset nativo, miniaturas locales y medid
 compactas consistentes, con pruebas de formulario independiente.
 
 ADR 0309 añade Tag/Tags Input (15 decisiones) y corrige contraste de eliminación,
-padding RTL y controles compuestos. La corrida de seis componentes se detiene en
-los presupuestos obligatorios de tokens Web y Storytelling. Véase
-`docs/reports/2026-09-09-component-batches-checkpoint.md`: las pruebas funcionales
-pasan, pero no se declara resuelto el gate global de rendimiento. Se propone
-reducir redundancia de salida y probar un slice CSS acotado antes del próximo batch.
+padding RTL y controles compuestos. Su checkpoint histórico detuvo la corrida en
+los antiguos presupuestos internos de tokens Web y Storytelling; ADR 0310 los
+retira después por decisión del propietario y exige límites por target con fuente.
+ADR 0311 completa la deduplicación responsive con equivalencia comprobada. El
+slice CSS propuesto queda como mejora opcional, sin bloquear nuevos batches.
+
+ADR 0312 continúa el punto 5 con Color Picker y Segmented Control: 23 decisiones,
+43 controles visuales por componente, selección de opciones corregida en Studio,
+gap de leyenda efectivo y contorno seleccionado en colores forzados. Véase
+`docs/reports/2026-09-09-native-choice-checkpoint.md` para comparaciones, pruebas
+nativas y composiciones. Ambos conservan `pilot`; Slider es el siguiente batch.

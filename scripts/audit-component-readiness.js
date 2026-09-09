@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { componentCompositionCss } from './lib/component-composition-css.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = path.join(repoRoot, 'registry.json');
@@ -301,6 +302,7 @@ function toMarkdown(report) {
 
 function main() {
   const registry = readJson(registryPath);
+  const compositionContext = { rootDir: repoRoot, registry, compositionCss: new Map() };
   const webManifest = fs.existsSync(webManifestPath) ? readJson(webManifestPath) : { components: [] };
   const manifestBySlug = Object.fromEntries((webManifest.components ?? []).map((component) => [component.slug, component]));
   const studioRendererRegistry = fs.existsSync(studioRendererRegistryPath)
@@ -325,7 +327,7 @@ function main() {
     const docs = fs.existsSync(docsPath) ? read(docsPath) : '';
     const css = fs.existsSync(cssPath) ? read(cssPath) : '';
     const publicTokens = flattenPublicTokens(contract);
-    const cssRefs = cssVariableRefs(css);
+    const cssRefs = cssVariableRefs(componentCompositionCss(slug, compositionContext));
     const manifestEntry = manifestBySlug[slug];
     const componentTokensPath = path.join(componentTokensDir, `${slug}.tokens.json`);
     const sourceComponentTokens = fs.existsSync(componentTokensPath)

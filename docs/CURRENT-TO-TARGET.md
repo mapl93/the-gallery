@@ -228,3 +228,12 @@ File Upload and Pin Input expose 24 source decisions, with generated Studio/Exhi
 controls and Web/Shopify outputs. Native selection/reset, image-preview cleanup,
 compact cell geometry and readonly paste are verified in Studio and a native HTML
 consumer. See `docs/reports/2026-09-09-file-pin-checkpoint.md` for evidence and limits.
+
+## Tag composition customization and performance checkpoint (ADR 0309)
+
+Tag and Tags Input expose 15 decisions; composed public tokens are validated
+through declared CSS dependencies. RTL padding, removal contrast and field
+customization are verified. Further batches pause at the required Web-token and
+Storytelling install-size gates, both already above their limits before this run.
+See `docs/reports/2026-09-09-component-batches-checkpoint.md` for history and a
+bounded output-optimization proposal; no budget change is accepted here.

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { componentCompositionCss } from './lib/component-composition-css.js';
 
 const rootDir = process.cwd();
 const contractsDir = path.join(rootDir, 'components', 'contracts');
@@ -59,30 +60,6 @@ function cssVariableDefinitions(css) {
   return new Set([...css.matchAll(/^\s*(--[a-zA-Z0-9_-]+)\s*:/gm)].map((match) => match[1]));
 }
 
-function componentCompositionCss(slug, context, ancestry = new Set()) {
-  if (context.compositionCss.has(slug)) {
-    return context.compositionCss.get(slug);
-  }
-
-  if (ancestry.has(slug)) {
-    return '';
-  }
-
-  const component = context.registry.components?.[slug];
-  if (!component) {
-    return '';
-  }
-
-  const nextAncestry = new Set(ancestry).add(slug);
-  const sourcePath = path.join(rootDir, component.file ?? '');
-  const sourceCss = fs.existsSync(sourcePath) ? read(sourcePath) : '';
-  const dependencyCss = (component.dependencies ?? [])
-    .map((dependency) => componentCompositionCss(dependency, context, nextAncestry))
-    .filter(Boolean);
-  const css = [sourceCss, ...dependencyCss].join('\n');
-  context.compositionCss.set(slug, css);
-  return css;
-}
 
 function flattenPublicTokens(contract) {
   return Object.values(contract.tokens?.public ?? {}).flat();
@@ -468,10 +445,9 @@ function validateContract(contractPath, context) {
     return errors;
   }
 
-  const sourceCss = read(cssPath);
   const css = componentCompositionCss(contract.slug, context);
   const docs = fs.existsSync(docsPath) ? read(docsPath) : '';
-  const cssRefs = cssVariableRefs(sourceCss);
+  const cssRefs = cssVariableRefs(css);
   const webDefinitions = context.webDefinitions;
 
   validateOptionList(errors, contract, 'variants');
@@ -549,7 +525,7 @@ function validateContract(contractPath, context) {
   const publicTokens = flattenPublicTokens(contract);
   for (const token of publicTokens) {
     if (!cssRefs.has(token)) {
-      errors.push(`${contract.slug} public token ${token} is not referenced by ${contract.source.css.file}`);
+      errors.push(`${contract.slug} public token ${token} is not referenced by ${contract.source.css.file} or its declared dependencies`);
     }
     if (!webDefinitions.has(token)) {
       errors.push(`${contract.slug} public token ${token} is not defined by platforms/web/tokens.css`);
@@ -597,6 +573,7 @@ function main() {
   }
 
   const context = {
+    rootDir,
     registry: readJson(registryPath),
     webDefinitions: fs.existsSync(webTokensPath) ? cssVariableDefinitions(read(webTokensPath)) : new Set(),
     compositionCss: new Map()

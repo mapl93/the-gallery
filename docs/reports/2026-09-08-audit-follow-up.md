@@ -160,3 +160,10 @@ y evidencia en un formulario HTML con el adaptador público.
 `docs/reports/2026-09-09-file-pin-checkpoint.md` amplía el mismo punto 5 con
 File Upload y Pin Input: 24 decisiones, reset nativo, miniaturas locales y medidas
 compactas consistentes, con pruebas de formulario independiente.
+
+ADR 0309 añade Tag/Tags Input (15 decisiones) y corrige contraste de eliminación,
+padding RTL y controles compuestos. La corrida de seis componentes se detiene en
+los presupuestos obligatorios de tokens Web y Storytelling. Véase
+`docs/reports/2026-09-09-component-batches-checkpoint.md`: las pruebas funcionales
+pasan, pero no se declara resuelto el gate global de rendimiento. Se propone
+reducir redundancia de salida y probar un slice CSS acotado antes del próximo batch.

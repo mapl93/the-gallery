@@ -20,6 +20,7 @@ import FileUploadArtwork from './FileUploadArtwork';
 import FieldWrapperArtwork from './FieldWrapperArtwork';
 import NumberInputArtwork from './NumberInputArtwork';
 import CheckboxArtwork from './CheckboxArtwork';
+import TagArtwork from './TagArtwork';
 
 interface AdvancedControlStudioProps {
   contract: ComponentContract;
@@ -474,7 +475,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     const classes = ['field', 'tags-input', variantClass(contract, values.variant), 'docs-studio__preview-tags'].filter(Boolean).join(' ');
     const description = String(values.description || '').trim();
     const authoredFeedback = String(values.feedback || '').trim();
-    const currentFeedback = authoredFeedback || message || '';
+    const currentFeedback = authoredFeedback;
     const descriptionId = `${tagsInputId}-description`;
     const feedbackId = `${tagsInputId}-feedback`;
     const describedBy = [description ? descriptionId : '', currentFeedback ? feedbackId : ''].filter(Boolean).join(' ') || undefined;
@@ -501,10 +502,9 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
             {values.selectedValues === true && <ul className="tags-input__values" aria-label="Selected materials">
               {tags.map((tag) => (
                 <li className="tags-input__item" key={tag}>
-                  <span className="tag">
-                    <span className="tag__label">{tag}</span>
-                    {values.readOnly !== true && <button className="tag__remove" type="button" aria-label={`Remove ${tag} material`} disabled={values.disabled === true} onClick={(event) => { event.stopPropagation(); removeTag(tag); }} />}
-                  </span>
+                  <TagArtwork label={tag} removeAction={values.readOnly !== true}
+                    removeLabel={`Remove ${tag} material`} removalDisabled={values.disabled === true}
+                    onRemove={(event) => { event.stopPropagation(); removeTag(tag); }} />
                 </li>
               ))}
             </ul>}

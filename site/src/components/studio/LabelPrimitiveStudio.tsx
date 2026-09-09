@@ -177,7 +177,7 @@ export default function LabelPrimitiveStudio({
   const removeStyle: CSSProperties = previewState === 'removeHover'
     ? { opacity: 1 }
     : previewState === 'removeFocusVisible'
-      ? { outline: '2px solid var(--color-border-focus)', outlineOffset: 2 }
+      ? { outline: 'var(--border-tag-focus-width) solid var(--color-border-focus)', outlineOffset: 'var(--border-tag-focus-offset)' }
       : {};
 
   return (

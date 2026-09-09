@@ -349,3 +349,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   densidades pasan. Ambos siguen pilot; Shopify remoto permanece separado.
   Evidencia: `2026-09-09-product-info-slider-checkpoint.md`.
   Continúan Variant Selector y Product Form dentro del punto 5.
+
+- ADR 0341 completa 40 roles de Variant Selector con 14 valores fuente. Form
+  expone su gap existente y elimina constantes sin efecto para su única acción.
+  Pasan 1024 comparaciones, teclado/FormData, RTL, estados y composiciones;
+  Sticky ATC oculto se verifica sólo por asociación. Ambos siguen pilot.
+  Evidencia: `2026-09-09-variant-form-checkpoint.md`.
+  Continúan Size Chart y Back in Stock dentro del punto 5.

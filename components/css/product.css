@@ -491,9 +491,9 @@
 
 /* D4 */
 .variant-selector {
-  --_variant-gap: calc(var(--space-layout-element-gap) * 0.5);
-  --_variant-option-gap: calc(var(--space-layout-element-gap) * 0.25);
-  --_variant-swatch-size: calc(var(--space-layout-touch-target) - var(--_variant-option-gap));
+  --_variant-gap: calc(var(--space-layout-element-gap) * var(--ratio-variant-selector-group-gap));
+  --_variant-option-gap: calc(var(--space-layout-element-gap) * var(--ratio-variant-selector-option-gap));
+  --_variant-swatch-size: calc(var(--space-layout-touch-target) - var(--space-layout-element-gap) * var(--ratio-variant-selector-swatch-inset));
   display: grid;
   gap: var(--_variant-gap);
   min-inline-size: 0;
@@ -511,12 +511,12 @@
   font-family: var(--font-family-body);
   font-size: var(--typo-body-size);
   line-height: var(--typo-body-line-height);
-  font-weight: 600;
+  font-weight: var(--typo-variant-selector-legend-weight);
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
 }
 .variant-selector__selection {
-  font-weight: 400;
+  font-weight: var(--typo-variant-selector-selection-weight);
   color: var(--color-text-secondary);
 }
 .variant-selector__label { color: inherit; }
@@ -568,7 +568,7 @@
   box-sizing: border-box;
   inline-size: var(--_variant-swatch-size);
   block-size: var(--_variant-swatch-size);
-  border: 2px solid var(--color-border-focus);
+  border: var(--border-variant-selector-swatch-border-width) solid var(--color-border-focus);
   border-radius: var(--radius-full);
   background-color: var(--_variant-swatch-color, var(--color-surface-primary));
   background-image: var(--_variant-swatch-image, none);
@@ -580,12 +580,12 @@
 }
 .variant-swatch__input:checked + .variant-swatch__color {
   border-color: var(--color-border-strong);
-  box-shadow: 0 0 0 2px var(--color-surface-primary),
-              0 0 0 4px var(--color-border-strong);
+  box-shadow: 0 0 0 var(--border-variant-selector-selection-gap) var(--color-surface-primary),
+              0 0 0 calc(var(--border-variant-selector-selection-gap) + var(--border-variant-selector-selection-width)) var(--color-border-strong);
 }
 .variant-swatch__input:focus-visible + .variant-swatch__color {
-  outline: 4px solid var(--color-border-focus);
-  outline-offset: 4px;
+  outline: var(--border-variant-selector-focus-width) solid var(--color-border-focus);
+  outline-offset: var(--border-variant-selector-swatch-focus-offset);
 }
 .variant-swatch__label,
 .variant-selector__option-status {
@@ -605,9 +605,12 @@
   inset-block-start: 50%;
   inset-inline-start: 50%;
   inline-size: 140%;
-  block-size: 2px;
+  block-size: var(--border-variant-selector-unavailable-width);
   background: var(--color-text-disabled);
   transform: translate(-50%, -50%) rotate(-45deg);
+}
+.variant-swatch--unavailable .variant-swatch__color:dir(rtl)::after {
+  transform: translate(50%, -50%) rotate(-45deg);
 }
 .variant-swatch:has(.variant-swatch__input:disabled),
 .variant-pill:has(.variant-pill__input:disabled) {
@@ -623,14 +626,14 @@
   min-block-size: var(--space-layout-touch-target);
   max-inline-size: 100%;
   padding: var(--_variant-option-gap) var(--_variant-gap);
-  border: 1px solid var(--color-border-default);
+  border: var(--border-variant-selector-pill-border-width) solid var(--color-border-default);
   border-radius: var(--radius-md);
   background: var(--color-surface-primary);
   color: var(--color-text-primary);
   font-family: var(--font-family-body);
   font-size: var(--typo-body-sm-size);
   line-height: var(--typo-body-sm-line-height);
-  font-weight: 500;
+  font-weight: var(--typo-variant-selector-pill-weight);
   text-align: center;
   overflow-wrap: anywhere;
   cursor: pointer;
@@ -644,12 +647,12 @@
   border-color: var(--color-button-primary-border-default);
 }
 .variant-pill:has(.variant-pill__input:focus-visible) {
-  outline: 4px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: var(--border-variant-selector-focus-width) solid var(--color-border-focus);
+  outline-offset: var(--border-variant-selector-pill-focus-offset);
 }
 .variant-pill--unavailable {
   text-decoration: line-through;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: var(--border-variant-selector-unavailable-width);
   text-decoration-color: var(--color-text-disabled);
 }
 
@@ -709,13 +712,12 @@
 .product-form__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: calc(var(--_product-form-gap) * 0.75);
 }
 .product-form__submit,
 .product-form__submit:disabled,
 .product-form__submit[aria-busy="true"] {
-  flex: 1 1 16rem;
-  min-inline-size: min(100%, 12rem);
+  flex: 1;
+  min-inline-size: 0;
 }
 
 

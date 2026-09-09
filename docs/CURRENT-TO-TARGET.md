@@ -521,3 +521,13 @@ Native rich content, RTL, editor/reset, finite navigation/focus and changed over
 bounds pass. No JS changes or new source modes. Both remain pilot. Evidence:
 `docs/reports/2026-09-09-product-info-slider-checkpoint.md`.
 Continue Variant Selector and Product Form; remote Shopify follows Web.
+
+## Variant Selector and Product Form visual values (ADR 0341)
+
+Fourteen source roles complete 40 Variant Selector values; Product Form exposes
+its existing section gap and removes ineffective single-action layout constants
+instead of adding tokens. 1024 element comparisons preserve geometry; RTL slash,
+native radio/FormData, editor/reset, pending/availability and dependent compositions
+pass. Sticky ATC's hidden source form has association-only evidence. Both remain
+pilot. Evidence: `docs/reports/2026-09-09-variant-form-checkpoint.md`.
+Continue Size Chart and Back in Stock; Shopify remote remains separate.

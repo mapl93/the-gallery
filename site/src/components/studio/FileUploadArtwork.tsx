@@ -21,6 +21,7 @@ interface FileUploadArtworkProps {
   selectedFileNames?: string;
   describedBy?: string;
   icon?: ReactNode;
+  preview?: ReactNode;
   className?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   onDragEnter?: HTMLAttributes<HTMLLabelElement>['onDragEnter'];
@@ -45,6 +46,7 @@ export default function FileUploadArtwork({
   selectedFileNames = '',
   describedBy = '',
   icon,
+  preview,
   className = '',
   onChange,
   onDragEnter,
@@ -112,6 +114,7 @@ export default function FileUploadArtwork({
       >
         {visibleSelection || visibleEmptyStatus}
       </span>
+      {preview}
     </label>
   );
 }

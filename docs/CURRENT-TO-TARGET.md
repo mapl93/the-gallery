@@ -221,3 +221,10 @@ Combobox IME and Date Picker focus follow their existing contracts. The owner
 removed the Studio-only search icon. See
 `docs/reports/2026-09-09-popup-fields-checkpoint.md` for measured overrides,
 native HTML composition and adoption limits.
+
+## File Upload and Pin Input customization (ADR 0308)
+
+File Upload and Pin Input expose 24 source decisions, with generated Studio/Exhibit
+controls and Web/Shopify outputs. Native selection/reset, image-preview cleanup,
+compact cell geometry and readonly paste are verified in Studio and a native HTML
+consumer. See `docs/reports/2026-09-09-file-pin-checkpoint.md` for evidence and limits.

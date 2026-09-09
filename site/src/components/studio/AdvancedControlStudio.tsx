@@ -125,6 +125,9 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   const [selectedColor, setSelectedColor] = useState(0);
   const [numberActionIcons, setNumberActionIcons] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [filePreviewEnabled, setFilePreviewEnabled] = useState(false);
+  const [fileIconVisible, setFileIconVisible] = useState(true);
+  const [filePreviews, setFilePreviews] = useState<Array<{ name: string; url: string }>>([]);
   const [pin, setPin] = useState(['2', '0', '', '', '', '']);
   const [tags, setTags] = useState(['Stoneware', 'Celadon']);
   const [tagStatus, setTagStatus] = useState('');
@@ -160,6 +163,13 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     }
   }, [contract.slug, values.checked, values.value]);
 
+  useEffect(() => () => { filePreviews.forEach(({ url }) => URL.revokeObjectURL(url)); }, [filePreviews]);
+
+  function readFilePreviews(files: FileList | null, enabled: boolean) {
+    setFilePreviews(enabled && files ? Array.from(files).filter((file) => file.type.startsWith('image/'))
+      .map((file) => ({ name: file.name, url: URL.createObjectURL(file) })) : []);
+  }
+
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
   const variant = String(values.variant || 'default');
   const message = validationMessages[variant];
@@ -172,6 +182,11 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     setSelectedColor(0);
     setNumberActionIcons(false);
     setSelectedFileName('');
+    setFilePreviewEnabled(false);
+    setFileIconVisible(true);
+    setFilePreviews([]);
+    const fileInput = document.getElementById('studio-file-upload');
+    if (fileInput instanceof HTMLInputElement) fileInput.value = '';
     setPin(['2', '0', '', '', '', '']);
     setTags(['Stoneware', 'Celadon']);
     setTagStatus('');
@@ -346,12 +361,14 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
           variant={String(values.variant || 'default') as 'default' | 'error' | 'success' | 'warning'}
           selectedFileNames={selectedFileName}
           describedBy={describedBy}
-          icon={<Upload className="file-upload__icon" aria-hidden="true" />}
-          onChange={(event) => setSelectedFileName(
-            event.target.files
-              ? Array.from(event.target.files, (file) => file.name).join(', ')
-              : '',
-          )}
+          icon={fileIconVisible ? <Upload className="file-upload__icon" aria-hidden="true" /> : undefined}
+          preview={filePreviewEnabled && filePreviews.length ? <div className="file-upload__preview">
+            {filePreviews.map(({ name, url }) => <img key={url} className="file-upload__thumb" src={url} alt={name} />)}
+          </div> : undefined}
+          onChange={(event) => {
+            setSelectedFileName(event.target.files ? Array.from(event.target.files, (file) => file.name).join(', ') : '');
+            readFilePreviews(event.target.files, filePreviewEnabled);
+          }}
         />
         {feedback()}
       </div>
@@ -382,6 +399,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   }
 
   function pinPaste(event: ClipboardEvent<HTMLInputElement>, requestedStart: number) {
+    if (event.currentTarget.readOnly || event.currentTarget.disabled) return;
     event.preventDefault();
     const next = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, pin.length).split('');
     if (next.length === 0) return;
@@ -399,7 +417,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     const labelId = `${pinInputId}-label`;
     const description = String(values.description || '').trim();
     const authoredFeedback = String(values.feedback || '').trim();
-    const currentFeedback = authoredFeedback || message || '';
+    const currentFeedback = authoredFeedback;
     const descriptionId = `${pinInputId}-description`;
     const feedbackId = `${pinInputId}-feedback`;
     const pinDescribedBy = [String(values.describedBy || '').trim(), description ? descriptionId : '', currentFeedback ? feedbackId : ''].filter(Boolean).join(' ') || undefined;
@@ -408,7 +426,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       ? 'field__feedback field__error'
       : variant === 'success'
         ? 'field__feedback field__success'
-        : 'field__feedback field__warning';
+        : variant === 'warning' ? 'field__feedback field__warning' : 'field__feedback';
     return (
       <div className="docs-studio__field-fixture">
         <div className={classes} role="group" aria-labelledby={labelId} aria-describedby={pinDescribedBy} data-pin-input data-pin-input-enhanced="true" data-complete={String(complete)}>
@@ -938,6 +956,16 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
         <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue={previewState} tokenValues={tokenValues} activeTokens={activeTokens} fixtureControlsByGroup={contract.slug === 'number-input' ? {
           presentation: <CheckboxArtwork label="Use icon actions" checked={numberActionIcons}
             onChange={(event) => setNumberActionIcons(event.target.checked)} />,
+        } : contract.slug === 'file-upload' ? {
+          presentation: <>
+            <CheckboxArtwork label="Show upload icon" checked={fileIconVisible} onChange={(event) => setFileIconVisible(event.target.checked)} />
+            <CheckboxArtwork label="Show selected image previews" checked={filePreviewEnabled} onChange={(event) => {
+              const enabled = event.target.checked;
+              setFilePreviewEnabled(enabled);
+              const input = document.getElementById('studio-file-upload');
+              readFilePreviews(input instanceof HTMLInputElement ? input.files : null, enabled);
+            }} />
+          </>,
         } : undefined} onPropertiesChange={(next) => {
           setValues((current) => ({ ...current, ...next }));
           if (contract.slug === 'switch' && typeof next.checked === 'boolean') {

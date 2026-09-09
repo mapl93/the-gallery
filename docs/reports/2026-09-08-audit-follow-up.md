@@ -156,3 +156,7 @@ y Auth Forms verifican composición, datos nativos, estados y personalización.
 `docs/reports/2026-09-09-popup-fields-checkpoint.md` continúa el punto 5 con
 Combobox y Date Picker: 39 decisiones, corrección del ancho compuesto, IME y foco,
 y evidencia en un formulario HTML con el adaptador público.
+
+`docs/reports/2026-09-09-file-pin-checkpoint.md` amplía el mismo punto 5 con
+File Upload y Pin Input: 24 decisiones, reset nativo, miniaturas locales y medidas
+compactas consistentes, con pruebas de formulario independiente.

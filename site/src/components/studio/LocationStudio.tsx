@@ -180,7 +180,7 @@ export default function LocationStudio({ contract, definition }: LocationStudioP
   }
 
   const map = values.map === true ? (
-    <div className="location-search__map-fixture" role="img" aria-label="Supplemental location map preview">
+    <div className="docs-studio__location-map" role="img" aria-label="Supplemental location map preview">
       <span>Supplemental map</span>
       <small>The searchable list remains complete without it.</small>
     </div>

@@ -363,3 +363,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   unidades authored, foco y error honesto del preview pasan. Ambos siguen pilot.
   Evidencia: `2026-09-09-size-chart-stock-checkpoint.md`.
   Continúan Location Search y Store Locator dentro del punto 5.
+
+- ADR 0343 completa Pickup Location Selector/Store Locator con 20 roles fuente
+  y 37 valores públicos cada uno. Pasan 472 comparaciones, personalización,
+  teclado, RTL, búsqueda de fixture, mapa ilustrativo y reset. La sangría sin
+  consumidor se reemplaza por controles reales; el mapa de Studio sale del CSS
+  público. Ambos siguen pilot, sin proveedor ni Shopify remoto.
+  Evidencia: `2026-09-09-location-checkpoint.md`. Continúa Subscription Option.

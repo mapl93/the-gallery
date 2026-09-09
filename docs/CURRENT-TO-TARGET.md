@@ -540,3 +540,13 @@ label height. Wrapping labels, gaps, RTL, plain/icon fields, simulated fallback,
 Studio/reset and truthful preview request failure pass. Both stay pilot. Evidence:
 `docs/reports/2026-09-09-size-chart-stock-checkpoint.md`.
 Continue Location Search and Store Locator; Shopify remote remains separate.
+
+## Pickup and Store Locator visual values (ADR 0343)
+
+Twenty source roles complete 37 public values per component around the existing
+shared Location Search anatomy. 472 default comparisons, custom geometry/type,
+RTL radio/FormData, forced colors, Studio/reset and fixture search pass. Dead
+private pickup indentation is replaced by actual details controls; the illustrative
+map moves to site CSS. No provider implementation or target certification.
+Evidence: `docs/reports/2026-09-09-location-checkpoint.md`.
+Both remain pilot. Continue Subscription Option.

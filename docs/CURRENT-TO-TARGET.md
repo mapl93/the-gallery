@@ -280,3 +280,12 @@ units; Price supporting weights reuse Body. The 48 presentation comparisons,
 16 Studio measurements and Product Card checks are recorded in
 `docs/reports/2026-09-09-passive-primitives-checkpoint.md`. Both remain pilot;
 continue with Quantity Selector and remaining base Web customization coverage.
+
+## Quantity customization and composition (ADR 0315)
+
+Quantity Selector exposes seven source decisions and 39 public controls, shares
+the 46px outer control height with Button, and remains compact inside grid fields.
+Studio composes Field Wrapper and the canonical native enhancer. Evidence covers
+32 default comparisons, 22 Studio measurements, native form ownership and Product
+Form/Cart Line Item: `docs/reports/2026-09-09-quantity-checkpoint.md`. Keep pilot;
+continue Rating and Loading Skeleton before broader commercial compositions.

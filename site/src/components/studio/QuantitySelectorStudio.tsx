@@ -7,6 +7,7 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import QuantitySelectorArtwork from './QuantitySelectorArtwork';
+import FieldWrapperArtwork from './FieldWrapperArtwork';
 
 interface QuantitySelectorStudioProps {
   contract: ComponentContract;
@@ -49,7 +50,7 @@ function initialQuantityValues(contract: ComponentContract): StudioPropertyValue
   values.accessibleLabel = 'Quantity';
   values.decrementLabel = 'Decrease quantity';
   values.incrementLabel = 'Increase quantity';
-  values.describedBy = 'quantity-feedback';
+  values.describedBy = 'studio-quantity-selector-feedback';
   return values;
 }
 
@@ -85,6 +86,7 @@ function activeColorTokens(variant: string, state: string): Record<string, strin
     'button-color': semantic
       ? `--color-input-${variant}-unfocused-icon`
       : '--color-text-secondary',
+    'focus-ring': `--color-input-${semantic ? variant : 'default'}-focused-outer-border`,
     border: semantic
       ? `--color-input-${variant}-${focused ? 'focused' : 'unfocused'}-inner-border`
       : `--color-input-default-${focused ? 'focused' : state === 'hover' ? 'hover' : 'unfocused'}-inner-border`,
@@ -96,6 +98,7 @@ function numberValue(value: StudioPropertyValue): number | null {
 }
 
 function simulatedRootStyle(variant: string, state: string): CSSProperties {
+  if (state !== 'hover' && state !== 'focusWithin') return {};
   const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
   const focused = state === 'focusWithin';
   const border = semantic
@@ -106,11 +109,11 @@ function simulatedRootStyle(variant: string, state: string): CSSProperties {
     : '--color-input-default-focused-outer-border';
 
   return {
-    borderColor: semantic
+    '--_qty-border': semantic
       ? `color-mix(in srgb, var(${border}) 70%, var(--color-text-primary))`
       : `var(${border})`,
     outlineColor: focused ? `var(${ring})` : undefined,
-  };
+  } as CSSProperties;
 }
 
 export default function QuantitySelectorStudio({
@@ -219,10 +222,14 @@ export default function QuantitySelectorStudio({
           style={tokenOverrides as CSSProperties}
         >
           <div className="docs-studio__stage-inner">
-            <div className="field docs-studio__field-fixture">
-              <label className="field__label" htmlFor="studio-quantity-selector">
-                {String(values.accessibleLabel || 'Quantity')}
-              </label>
+            <div className="docs-studio__field-fixture">
+              <FieldWrapperArtwork
+                controlId="studio-quantity-selector"
+                label={String(values.accessibleLabel || 'Quantity')}
+                required={required}
+                variant={variant as 'default' | 'error' | 'success' | 'warning'}
+                feedback={feedback}
+              >
               <QuantitySelectorArtwork
                 id="studio-quantity-selector"
                 value={current}
@@ -249,13 +256,7 @@ export default function QuantitySelectorStudio({
                   value,
                 }))}
               />
-              <p
-                id="quantity-feedback"
-                className="docs-studio__preview-message"
-                data-variant={variant}
-              >
-                {feedback}
-              </p>
+              </FieldWrapperArtwork>
             </div>
           </div>
         </section>

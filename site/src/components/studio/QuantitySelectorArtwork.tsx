@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 
 interface QuantitySelectorArtworkProps {
   id?: string;
@@ -45,28 +45,21 @@ export default function QuantitySelectorArtwork({
   rootStyle,
   decrementStyle,
 }: QuantitySelectorArtworkProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const normalizedStep = Number.isFinite(step) && step > 0 ? step : 1;
   const classes = ['qty', className].filter(Boolean).join(' ');
 
-  function updateValue(direction: -1 | 1) {
-    const input = inputRef.current;
-    if (!input || disabled || readOnly) return;
-
-    try {
-      if (direction < 0) input.stepDown();
-      else input.stepUp();
-      onValueChange(Number.isNaN(input.valueAsNumber) ? null : input.valueAsNumber);
-    } catch {
-      const base = value ?? min ?? 0;
-      const next = Number((base + direction * normalizedStep).toFixed(10));
-      onValueChange(Math.min(max ?? next, Math.max(min ?? next, next)));
+  useEffect(() => {
+    if (rootRef.current) {
+      window.TheGallery?.enhanceQuantities(rootRef.current);
     }
-  }
+  }, [value, min, max, normalizedStep, disabled, readOnly]);
 
   return (
     <div
+      ref={rootRef}
       className={classes}
+      data-qty
       role="group"
       aria-label={groupLabel}
       data-studio-state={studioState}
@@ -74,19 +67,19 @@ export default function QuantitySelectorArtwork({
     >
       <button
         className="qty__btn qty__btn--decrement"
+        data-qty-minus
         type="button"
         aria-label={decrementLabel}
         disabled={disabled || readOnly || (value !== null && min !== null && value <= min)}
         style={decrementStyle}
-        onClick={() => updateValue(-1)}
       >
         <svg className="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <path d="M5 12h14" />
         </svg>
       </button>
       <input
-        ref={inputRef}
         className="qty__input"
+        data-qty-input
         id={id}
         type="number"
         name={name || undefined}
@@ -100,16 +93,16 @@ export default function QuantitySelectorArtwork({
         aria-label={accessibleLabel}
         aria-describedby={describedBy || undefined}
         aria-invalid={invalid || undefined}
-        onChange={(event) => onValueChange(
-          event.target.value === '' ? null : event.target.valueAsNumber
+        onInput={(event) => onValueChange(
+          event.currentTarget.value === '' ? null : event.currentTarget.valueAsNumber
         )}
       />
       <button
         className="qty__btn qty__btn--increment"
+        data-qty-plus
         type="button"
         aria-label={incrementLabel}
         disabled={disabled || readOnly || (value !== null && max !== null && value >= max)}
-        onClick={() => updateValue(1)}
       >
         <svg className="qty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />

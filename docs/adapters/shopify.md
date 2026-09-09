@@ -972,3 +972,15 @@ The next implementation pass should:
 - Shopify theme editor: https://shopify.dev/docs/storefronts/themes/tools/online-editor
 - Shopify blocks: https://shopify.dev/docs/storefronts/themes/architecture/blocks
 - Shopify theme architecture: https://shopify.dev/docs/storefronts/themes/architecture
+
+## Performance evidence scope (ADR 0310)
+
+The current delivery target is an Online Store theme. The refinement performance
+inventory measures Shopify assets separately from neutral Web output and records
+Theme Check's configurable local-file size references as advisory raw-byte
+comparisons. It includes unreferenced compatibility assets; it is not a Theme
+Check run or a page payload. Theme upload/package limits and hosted page behavior
+remain separate evidence. Theme app extension and Theme Store submission rules
+must not become theme-wide gates without their corresponding delivery scope.
+See `docs/decisions/0310-target-specific-performance-evidence.md` and
+`docs/reports/component-refinement-performance.md`.

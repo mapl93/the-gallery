@@ -4,6 +4,10 @@ Status: Accepted
 
 Date: 2026-07-13
 
+Numeric performance ceilings are superseded by
+[ADR 0310](0310-target-specific-performance-evidence.md). Keep the remaining
+refinement, evidence and human-review requirements.
+
 ## Context
 
 The repository has 183 registry components, 183 contracts, 183 Studio definitions,

@@ -174,61 +174,53 @@ remain shared.
 - Accessible name, description, roles, states, relationships, live regions, and
   contrast sampled from the rendered component.
 
-## Performance Budgets
+## Performance Evidence By Target
 
-These are v1 review budgets. ADR 0273 makes the dependency-closed copy-and-own
-install slice the required release unit. Measurements use `gzip -9 -c`, exclude
-`site/dist` and site-only editorial fixtures, and keep complete all-component
-bundles visible as diagnostics.
+ADR 0310 supersedes the numeric budget policy in ADRs 0088 and 0273. Keep the
+copy-and-own dependency slice as the useful delivery unit, and keep measuring
+complete compatibility outputs. A byte threshold must belong to a specific
+target and have a verified external basis; historical Gallery ceilings are not
+platform requirements.
 
-The executable byte ceilings and source groups live in
-`docs/refinement/performance-budgets.json`. Run
-`npm run audit:refinement:performance` to regenerate the current report. A
-required overage fails the audit and leaves its ceiling unchanged. Diagnostic
-overages do not fail the install-slice gate, but remain measured, hashed and
-linked to the architecture decision.
+The executable policy remains at `docs/refinement/performance-budgets.json`
+(version 3). Run `npm run audit:refinement:performance` to regenerate the report
+and `npm run validate:refinement:performance` to exercise its policy safeguards.
+The report separates raw bytes from local `gzip -9 -n -c` size. Concatenated
+install slices exclude the separately measured tokens and are a comparison
+model, not the sum of actual HTTP responses or the cost of a whole page.
 
-### Required delivery surfaces
+| Target / evidence | Treatment |
+| --- | --- |
+| Neutral Web tokens, dependency-closed installs, runtime modules and compatibility bundles | Observed raw/gzip sizes with exact files and hashes. No adopted external byte ceiling. |
+| Shopify local CSS and JS assets | Separate inventory, including compatibility files. Theme Check default references are advisory, use raw local bytes, and carry official sources and applicability. |
+| A mandatory platform limit | May block only its applicable target; record the authority, primary URL, verification date, exact metric and applicability before enforcing it. |
+| Hosted page performance, upload/package limits and target tool execution | Require their own evidence; the asset inventory does not mark them passed. |
 
-| Surface | v1 ceiling | Rule |
-| --- | ---: | --- |
-| Neutral Web token target | `64 KiB` gzip | Measured once as the shared token layer, not duplicated into every family ceiling. |
-| Selective runtime loader | `2 KiB` gzip | Only detection and dynamic module import; no component behavior. |
-| Modular runtime core | `2 KiB` gzip | Shared exposure and mutation coordination only. |
-| Any individual enhancer | `5 KiB` gzip | Each accepted progressive enhancement remains independently bounded. |
-| Passive component runtime | `0 B` owned JS | Passive primitives and display compositions remain CSS/HTML only unless a declared dependency introduces behavior. |
-| Canonical component assets | `0` component-owned requests | Consumer media and site fixtures are data, not bundled component assets. |
+The former 64 KiB token, 21 KiB Storytelling and other family/runtime ceilings
+remain `historicalReference` metadata only. They cannot stop a component batch,
+serve as acceptance criteria or be described as standards. Do not substitute
+another arbitrary threshold or inflate a limit just to clear a report.
 
-### Dependency-closed family ceilings
+`tool-guideline` rules are advisory. Only `platform-requirement` rules can be
+required, and the validator rejects missing target, provenance, applicability or
+units. Missing files and failed measurements remain errors, never zero-byte
+passes. `--allow-gaps` no longer bypasses a required target failure. Source review
+must verify that a cited rule actually supports its encoded threshold; metadata
+validation alone cannot establish that fact.
 
-For every registry category the audit measures the largest component install:
-reset, foundations, utilities, all transitive component family CSS and all
-required runtime modules. Tokens are measured separately. Initial ceilings are
-the post-refinement worst case plus approximately ten percent rounded upward to
-1 KiB.
+A successful inventory means it was measured without an applicable required
+failure; it does not certify speed or Shopify release readiness. Shopify theme
+app extensions and Theme Store submission criteria do not apply automatically
+to this Online Store theme. See ADR 0310 for the current source discrepancy and
+its resolution for local asset size.
 
-| Component family | v1 install ceiling |
-| --- | ---: |
-| Primitives | `20 KiB` |
-| Layout / overlays | `23 KiB` |
-| Forms | `30 KiB` |
-| Global | `38 KiB` |
-| Product | `38 KiB` |
-| Collection | `30 KiB` |
-| Storytelling | `21 KiB` |
-| Marketing | `38 KiB` |
-| Cart | `35 KiB` |
-| Account | `32 KiB` |
-| Blog | `33 KiB` |
-| Sections | `36 KiB` |
-| Ceramics | `33 KiB` |
-| Reviews | `34 KiB` |
-| Pages | `19 KiB` |
+### Component architecture contracts
 
-The complete 183-component CSS and complete shared runtime retain the original
-`64 KiB` and `8 KiB` ceilings as diagnostic compatibility measurements. They do
-not replace install-slice gates and may not be removed from reports to hide
-system-wide growth.
+Passive components retain their existing no-owned-JavaScript contract unless a
+declared dependency introduces behavior. Consumer media and editorial fixtures
+remain data rather than bundled component-owned assets. These are accepted
+architecture/ownership decisions, not universal byte limits or external target
+standards; they remain subject to their own contract and lifecycle validation.
 
 ### Runtime rules by family
 
@@ -283,7 +275,7 @@ Neutral-web readiness and target readiness are independent:
   exactly once.
 - Current performance measurements:
   `docs/reports/component-refinement-performance.md` and its JSON companion,
-  generated from the fixed budget manifest.
+  generated from the sourced target policy and measurement inventory (ADR 0310).
 - Requirement-by-requirement completion audit:
   `docs/reports/component-refinement-completion-audit.md`.
 - Structural certification matrix: `docs/reports/component-web-certification.md`.

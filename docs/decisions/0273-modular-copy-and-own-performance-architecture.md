@@ -4,6 +4,11 @@ Status: Accepted
 
 Date: 2026-08-11
 
+Numeric ceiling policy superseded on 2026-09-09 by
+[ADR 0310](0310-target-specific-performance-evidence.md). The delivery architecture,
+module boundaries and copy-and-own contracts below remain accepted; the recorded
+v2 ceiling outcomes are historical, not current release gates.
+
 Owner confirmation: v1 performance architecture option 3
 
 Supersedes ADR 0028 only where that decision treated `components.css` and

@@ -5,206 +5,182 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const budgetPath = path.join(repoRoot, 'docs', 'refinement', 'performance-budgets.json');
-const jsonReportPath = path.join(repoRoot, 'docs', 'reports', 'component-refinement-performance.json');
-const markdownReportPath = path.join(repoRoot, 'docs', 'reports', 'component-refinement-performance.md');
-const shouldWrite = process.argv.includes('--write');
-const allowGaps = process.argv.includes('--allow-gaps');
-const webManifestPath = path.join(repoRoot, 'platforms', 'web', 'adapter.manifest.json');
-const webManifest = fs.existsSync(webManifestPath) ? JSON.parse(fs.readFileSync(webManifestPath, 'utf8')) : null;
+const policyFile = 'docs/refinement/performance-budgets.json';
+const reportBase = 'docs/reports/component-refinement-performance';
+const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
+const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
-const budget = JSON.parse(fs.readFileSync(budgetPath, 'utf8'));
-const errors = [];
-const seenIds = new Set();
-
-function gzipBytes(files) {
-  const absoluteFiles = files.map((file) => path.join(repoRoot, file));
-  const missing = absoluteFiles.filter((file) => !fs.existsSync(file));
-  if (missing.length > 0) {
-    throw new Error(`missing source file(s): ${missing.map((file) => path.relative(repoRoot, file)).join(', ')}`);
+export function validatePolicy(policy) {
+  if (!isRecord(policy)) return ['policy must be an object'];
+  const errors = [];
+  const ids = new Set();
+  if (policy.budgetVersion !== '3.0.0') errors.push('budgetVersion must be 3.0.0');
+  if (policy.compression !== 'gzip-level-9-no-name') errors.push('unsupported compression method');
+  if (!Array.isArray(policy.surfaces) || !policy.surfaces.length) errors.push('surfaces must be non-empty');
+  if (!isRecord(policy.targets) || !Object.keys(policy.targets).length) errors.push('targets must be configured');
+  for (const [target, context] of Object.entries(policy.targets ?? {})) {
+    if (!['web', 'shopify'].includes(target)) errors.push(`unsupported target ${target}`);
+    if (!hasText(context?.scope) || !Array.isArray(context?.unverified) || !context.unverified.every(hasText)) errors.push(`${target}: scope and unverified evidence boundaries are required`);
   }
-
-  if (absoluteFiles.length === 1) {
-    const result = spawnSync('gzip', ['-9', '-c', absoluteFiles[0]], {
-      cwd: repoRoot,
-      encoding: null,
-      maxBuffer: 20 * 1024 * 1024,
-    });
-    if (result.status !== 0) {
-      throw new Error(result.stderr?.toString().trim() || 'gzip failed');
+  for (const surface of Array.isArray(policy.surfaces) ? policy.surfaces : []) {
+    if (!isRecord(surface)) { errors.push('surface must be an object'); continue; }
+    const fail = (message) => errors.push(`${surface.id}: ${message}`);
+    if (!hasText(surface.id) || ids.has(surface.id)) fail('missing or duplicate surface id');
+    ids.add(surface.id);
+    if (!policy.targets?.[surface.target]) fail('explicit configured target is required');
+    if (!['global', 'runtime', 'install-family', 'runtime-module-set', 'asset-set'].includes(surface.kind)) fail('unsupported kind');
+    if (surface.kind === 'install-family' && !hasText(surface.category)) fail('install-family requires category');
+    if (['global', 'runtime'].includes(surface.kind) && (!Array.isArray(surface.files) || !surface.files.length)) fail('files must be non-empty');
+    if (surface.kind === 'asset-set' && (!hasText(surface.directory) || !['.css', '.js'].includes(surface.extension))) fail('asset-set requires directory and .css/.js extension');
+    if (surface.files !== undefined && !Array.isArray(surface.files)) fail('files must be an array');
+    for (const file of [...(Array.isArray(surface.files) ? surface.files : []), ...(surface.directory ? [surface.directory] : [])]) {
+      if (typeof file !== 'string' || !file.startsWith(`platforms/${surface.target}/`) || path.normalize(file) !== file) fail('measurement paths must belong to the declared target');
     }
-    return result.stdout.length;
+    if ('ceilingBytes' in surface || 'enforcement' in surface) fail('global ceilings are retired; a target rule with provenance is required');
+    const rule = surface.rule;
+    if (rule === undefined) continue;
+    if (!isRecord(rule)) { fail('rule must be an object'); continue; }
+    if (!['tool-guideline', 'platform-requirement'].includes(rule.classification)) fail('rule classification must identify its external basis');
+    if (!['advisory', 'required'].includes(rule.enforcement)) fail('rule enforcement must be advisory or required');
+    if (rule.enforcement === 'required' && rule.classification !== 'platform-requirement') fail('a tool guideline cannot become a required platform limit');
+    if (!['rawBytes', 'gzipBytes'].includes(rule.metric)) fail('rule metric must specify rawBytes or gzipBytes');
+    if (!Number.isInteger(rule.ceilingBytes) || rule.ceilingBytes <= 0) fail('rule ceilingBytes must be a positive integer');
+    if (!hasText(rule.applicability) || !hasText(rule.source?.authority)) fail('rule applicability and source authority are required');
+    if (!/^https:\/\/[^\s]+$/.test(rule.source?.url ?? '') || !/^\d{4}-\d{2}-\d{2}$/.test(rule.source?.checkedOn ?? '')) fail('rule requires a primary-source URL and verification date');
   }
-
-  const source = Buffer.concat(
-    absoluteFiles.flatMap((file) => [fs.readFileSync(file), Buffer.from('\n')]),
-  );
-  const result = spawnSync('gzip', ['-9', '-c'], {
-    cwd: repoRoot,
-    input: source,
-    encoding: null,
-    maxBuffer: 20 * 1024 * 1024,
-  });
-  if (result.status !== 0) {
-    throw new Error(result.stderr?.toString().trim() || 'gzip failed');
-  }
-  return result.stdout.length;
+  return errors;
 }
 
-function measureSurface(surface) {
-  if (surface.kind === 'install-family') {
-    if (!webManifest) throw new Error('platforms/web/adapter.manifest.json is required for install-family budgets');
-    const candidates = webManifest.components.filter((component) => component.category === surface.category);
-    if (candidates.length === 0) throw new Error(`no web components found for category ${surface.category}`);
-    return candidates
-      .map((component) => {
-        const files = [...new Set([...(component.install?.css ?? []), ...(component.install?.runtime ?? [])])];
-        return { actualBytes: gzipBytes(files), files, measuredComponent: component.slug };
-      })
-      .sort((a, b) => b.actualBytes - a.actualBytes)[0];
-  }
-  if (surface.kind === 'runtime-module-set') {
-    if (!webManifest) throw new Error('platforms/web/adapter.manifest.json is required for runtime-module-set budgets');
-    const candidates = webManifest.outputs?.runtimeModules ?? [];
-    if (candidates.length === 0) throw new Error('web manifest has no runtime modules');
-    return candidates
-      .map((file) => ({ actualBytes: gzipBytes([file]), files: [file], measuredComponent: path.basename(file, '.js') }))
-      .sort((a, b) => b.actualBytes - a.actualBytes)[0];
-  }
-  return { actualBytes: gzipBytes(surface.files ?? []), files: surface.files ?? [], measuredComponent: null };
-}
-
-const surfaces = budget.surfaces.map((surface) => {
-  if (seenIds.has(surface.id)) errors.push(`duplicate budget id ${surface.id}`);
-  seenIds.add(surface.id);
-  if (!Number.isInteger(surface.ceilingBytes) || surface.ceilingBytes <= 0) {
-    errors.push(`${surface.id}: ceilingBytes must be a positive integer`);
-  }
-  if (!['install-family', 'runtime-module-set'].includes(surface.kind)
-      && (!Array.isArray(surface.files) || surface.files.length === 0)) {
-    errors.push(`${surface.id}: files must be a non-empty array`);
-  }
-  if (surface.kind === 'install-family' && (typeof surface.category !== 'string' || surface.category.length === 0)) {
-    errors.push(`${surface.id}: install-family budgets require category`);
-  }
-  if (!['required', 'diagnostic'].includes(surface.enforcement ?? 'required')) {
-    errors.push(`${surface.id}: enforcement must be required or diagnostic`);
-  }
-  if (surface.gapEvidence !== undefined && !Array.isArray(surface.gapEvidence)) {
-    errors.push(`${surface.id}: gapEvidence must be an array when present`);
-  }
-  for (const evidencePath of surface.gapEvidence ?? []) {
-    if (typeof evidencePath !== 'string' || evidencePath.length === 0) {
-      errors.push(`${surface.id}: gapEvidence entries must be non-empty paths`);
-    } else if (!fs.existsSync(path.join(repoRoot, evidencePath))) {
-      errors.push(`${surface.id}: gap evidence does not exist: ${evidencePath}`);
-    }
-  }
-
-  let measurement = { actualBytes: 0, files: surface.files ?? [], measuredComponent: null };
-  try {
-    measurement = measureSurface(surface);
-  } catch (error) {
-    errors.push(`${surface.id}: ${error.message}`);
-  }
-  const source = Buffer.concat(
-    measurement.files.map((file) => fs.existsSync(path.join(repoRoot, file))
-      ? fs.readFileSync(path.join(repoRoot, file))
-      : Buffer.alloc(0)),
-  );
-  const actualBytes = measurement.actualBytes;
-  const deltaBytes = surface.ceilingBytes - actualBytes;
-  const enforcement = surface.enforcement ?? 'required';
+function measureFiles(root, files) {
+  if (!files.length) throw new Error('empty file selection cannot be measured');
+  const buffers = files.map((file) => fs.readFileSync(path.join(root, file)));
+  // Retain the historical concatenated-slice model; this is not HTTP transfer size.
+  const payload = Buffer.concat(buffers.length === 1 ? buffers : buffers.flatMap((buffer) => [buffer, Buffer.from('\n')]));
+  const result = spawnSync('gzip', ['-9', '-n', '-c'], { input: payload, maxBuffer: 20 * 1024 * 1024 });
+  if (result.status !== 0) throw new Error(result.error?.message || result.stderr?.toString().trim() || 'gzip failed');
   return {
-    ...surface,
-    enforcement,
-    files: measurement.files,
-    measuredComponent: measurement.measuredComponent,
-    actualBytes,
-    deltaBytes,
-    status: deltaBytes >= 0 ? 'pass' : enforcement === 'diagnostic' ? 'diagnostic-overage' : 'gap',
-    sha256: crypto.createHash('sha256').update(source).digest('hex'),
+    files,
+    rawBytes: buffers.reduce((total, buffer) => total + buffer.length, 0),
+    gzipBytes: result.stdout.length,
+    sha256: crypto.createHash('sha256').update(payload).digest('hex'),
   };
-});
-
-const gaps = surfaces.filter((surface) => surface.status === 'gap');
-const diagnosticOverages = surfaces.filter((surface) => surface.status === 'diagnostic-overage');
-const documentedGaps = gaps.filter((surface) => (surface.gapEvidence ?? []).length > 0);
-const undocumentedGaps = gaps.filter((surface) => (surface.gapEvidence ?? []).length === 0);
-for (const gap of undocumentedGaps) {
-  errors.push(`${gap.id}: current budget gap has no gapEvidence`);
-}
-const report = {
-  reportVersion: '0.1.0',
-  generatedAt: new Date().toISOString(),
-  budgetVersion: budget.budgetVersion,
-  compression: budget.compression,
-  summary: {
-    surfaces: surfaces.length,
-    pass: surfaces.filter((surface) => surface.status === 'pass').length,
-    gaps: gaps.length,
-    documentedGaps: documentedGaps.length,
-    undocumentedGaps: undocumentedGaps.length,
-    globalGaps: gaps.filter((surface) => surface.kind === 'global').length,
-    familyGaps: gaps.filter((surface) => surface.kind === 'family').length,
-    installFamilyGaps: gaps.filter((surface) => surface.kind === 'install-family').length,
-    diagnosticOverages: diagnosticOverages.length,
-  },
-  surfaces,
-};
-
-const markdown = `# Component Refinement Performance Audit
-
-Generated from \`docs/refinement/performance-budgets.json\` using
-\`${budget.compression}\`. A gap is not an implicit budget increase; the fixed
-v1.0.0 release gates apply to dependency-closed install slices and modular
-runtime outputs. Complete aggregate bundles remain visible as diagnostic
-compatibility measurements and do not redefine what a consumer installs.
-
-## Summary
-
-| Metric | Count |
-| --- | ---: |
-| Surfaces | ${report.summary.surfaces} |
-| Passing | ${report.summary.pass} |
-| Gaps | ${report.summary.gaps} |
-| Documented gaps | ${report.summary.documentedGaps} |
-| Undocumented gaps | ${report.summary.undocumentedGaps} |
-| Global gaps | ${report.summary.globalGaps} |
-| Family gaps | ${report.summary.familyGaps} |
-| Install-family gaps | ${report.summary.installFamilyGaps} |
-| Diagnostic overages | ${report.summary.diagnosticOverages} |
-
-## Current Measurements
-
-| Surface | Kind | Enforcement | Worst component/module | Gzip bytes | Ceiling | Headroom / overage | Result | Gap evidence |
-| --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
-${surfaces.map((surface) => `| ${surface.label} | ${surface.kind} | ${surface.enforcement} | ${surface.measuredComponent ?? '—'} | ${surface.actualBytes} | ${surface.ceilingBytes} | ${surface.deltaBytes} | ${surface.status} | ${(surface.gapEvidence ?? []).map((item) => `\`${item}\``).join('<br>') || '—'} |`).join('\n')}
-
-Positive headroom is available budget. A negative value is the exact current
-overage. Component-owned assets and passive-component runtime remain separate
-zero-tolerance policy gates in \`docs/COMPONENT-REFINEMENT.md\`.
-`;
-
-if (shouldWrite) {
-  fs.mkdirSync(path.dirname(jsonReportPath), { recursive: true });
-  fs.writeFileSync(jsonReportPath, `${JSON.stringify(report, null, 2)}\n`);
-  fs.writeFileSync(markdownReportPath, markdown);
 }
 
-console.log(
-  `Component refinement performance: ${surfaces.length} surfaces, ${report.summary.pass} pass, ${report.summary.gaps} required gap(s), ${report.summary.diagnosticOverages} diagnostic overage(s).`,
-);
-for (const gap of gaps) {
-  console.log(`- ${gap.id}: ${gap.actualBytes}/${gap.ceilingBytes} B (${Math.abs(gap.deltaBytes)} B over)`);
-}
-for (const item of diagnosticOverages) {
-  console.log(`- ${item.id}: diagnostic ${item.actualBytes}/${item.ceilingBytes} B (${Math.abs(item.deltaBytes)} B over)`);
+function resultStatus(rule, measurement) {
+  if (!rule) return 'observed';
+  const exceeded = measurement[rule.metric] > rule.ceilingBytes;
+  return rule.enforcement === 'required'
+    ? (exceeded ? 'gap' : 'pass')
+    : (exceeded ? 'advisory-overage' : 'within-guideline');
 }
 
-if (errors.length > 0) {
-  console.error(errors.join('\n'));
-  process.exit(1);
+export function createPerformanceReport(policy, root = repoRoot) {
+  const errors = validatePolicy(policy);
+  const surfaces = [];
+  const cache = new Map();
+  const measure = (files) => {
+    const key = JSON.stringify(files);
+    if (!cache.has(key)) cache.set(key, measureFiles(root, files));
+    return cache.get(key);
+  };
+  if (!errors.length) for (const surface of policy.surfaces) {
+    try {
+      let candidates;
+      if (['install-family', 'runtime-module-set'].includes(surface.kind)) {
+        const manifest = JSON.parse(fs.readFileSync(path.join(root, 'platforms', surface.target, 'adapter.manifest.json'), 'utf8'));
+        candidates = surface.kind === 'install-family'
+          ? manifest.components.filter((component) => component.category === surface.category).map((component) => ({
+            files: [...new Set([...(component.install?.css ?? []), ...(component.install?.runtime ?? [])])],
+            measuredComponent: component.slug,
+          }))
+          : (manifest.outputs?.runtimeModules ?? []).map((file) => ({ files: [file], measuredComponent: path.basename(file, '.js') }));
+      } else if (surface.kind === 'asset-set') {
+        candidates = fs.readdirSync(path.join(root, surface.directory), { withFileTypes: true })
+          .filter((entry) => entry.isFile() && entry.name.endsWith(surface.extension))
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((entry) => ({ files: [`${surface.directory}/${entry.name}`], measuredComponent: entry.name }));
+      } else {
+        candidates = [{ files: surface.files, measuredComponent: null }];
+      }
+      if (!candidates.length) throw new Error('no matching assets/components; evidence is unavailable');
+      const metric = surface.rule?.metric ?? 'gzipBytes';
+      const measurements = candidates.map((candidate) => {
+        for (const file of candidate.files) {
+          if (!file.startsWith(`platforms/${surface.target}/`) || path.normalize(file) !== file) throw new Error(`asset is outside declared target: ${file}`);
+        }
+        const measured = { ...measure(candidate.files), measuredComponent: candidate.measuredComponent };
+        return { ...measured, status: resultStatus(surface.rule, measured) };
+      }).sort((a, b) => b[metric] - a[metric]);
+      surfaces.push({
+        ...surface, ...measurements[0], rankedBy: metric, candidatesMeasured: measurements.length,
+        ...(surface.kind === 'asset-set' ? { assetMeasurements: measurements } : {}),
+      });
+    } catch (error) {
+      errors.push(`${surface.id}: ${error.message}`);
+      surfaces.push({ ...surface, status: 'measurement-error', rawBytes: null, gzipBytes: null, sha256: null, error: error.message });
+    }
+  }
+  const count = (status) => surfaces.filter((surface) => surface.status === status).length;
+  return {
+    reportVersion: '0.2.0', generatedAt: new Date().toISOString(), budgetVersion: policy?.budgetVersion,
+    compression: policy?.compression, targets: policy?.targets,
+    summary: {
+      surfaces: surfaces.length, observed: count('observed'), requiredPass: count('pass'), requiredGaps: count('gap'),
+      withinGuideline: count('within-guideline'), advisoryOverages: count('advisory-overage'),
+      measurementErrors: count('measurement-error'), errors: errors.length,
+    },
+    surfaces, errors,
+  };
 }
 
-if (gaps.length > 0 && !allowGaps) process.exit(1);
+export function renderMarkdown(report) {
+  const lines = [
+    '# Component Refinement Performance Audit', '',
+    `Policy v${report.budgetVersion}; generated from \`${policyFile}\`. See ADR 0310.`, '',
+    'Sizes are observations unless a sourced target rule is attached. Advisory overages do not block component batches.',
+    'Only applicable platform requirements may be required byte gates. A successful inventory is not performance certification.', '',
+    `Summary: ${report.summary.observed} observations, ${report.summary.requiredPass} required passes, ${report.summary.requiredGaps} required gaps, ${report.summary.withinGuideline} within guidelines, ${report.summary.advisoryOverages} advisory overages, ${report.summary.errors} errors.`, '',
+    `Compression: \`${report.compression}\` (local gzip -9 -n -c, no filename or timestamp). Raw bytes sum file contents.`,
+    'Install slices are dependency-closed CSS/runtime concatenations separated by newlines, with tokens measured separately.',
+    'Neither concatenated gzip nor the complete asset inventory represents actual page transfer, CDN minification, request count or execution cost.', '',
+  ];
+  for (const [target, context] of Object.entries(report.targets ?? {})) {
+    if (!isRecord(context) || !Array.isArray(context.unverified)) continue;
+    lines.push(`## ${target}`, '', context.scope, '',
+      '| Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |',
+      '| --- | --- | ---: | ---: | --- | --- |');
+    for (const surface of report.surfaces.filter((item) => item.target === target)) {
+      const rule = surface.rule;
+      lines.push(`| ${surface.label} | ${surface.measuredComponent ?? '—'} | ${surface.rawBytes ?? 'unavailable'} | ${surface.gzipBytes ?? 'unavailable'} | ${rule ? `${rule.ceilingBytes} ${rule.metric}; ${rule.enforcement}` : 'None'} | ${surface.status} |`);
+    }
+    lines.push('', 'Unverified by this report:', '', ...context.unverified.map((item) => `- ${item}`), '');
+    for (const surface of report.surfaces.filter((item) => item.target === target && item.rule)) {
+      const { rule } = surface;
+      lines.push(`### ${surface.id}`, '', rule.applicability, '',
+        `[${rule.source.authority}](${rule.source.url}), checked ${rule.source.checkedOn}.`, '', rule.source.note ?? '', '');
+      for (const url of rule.source.implementationUrls ?? []) lines.push(`- [Implementation evidence](${url})`);
+      const overages = (surface.assetMeasurements ?? []).filter((item) => item.status === 'advisory-overage' || item.status === 'gap');
+      if (overages.length) lines.push('', 'Assets above this reference:', '', ...overages.map((item) => `- \`${item.files[0]}\`: ${item.rawBytes} raw bytes, ${item.gzipBytes} gzip bytes.`), '');
+    }
+  }
+  lines.push('## Historical references and limits of evidence', '',
+    'The former 64 KiB token ceiling, family ceilings and runtime ceilings remain in JSON as historicalReference only.',
+    'They are retired internal policy, not external standards. Historical reports retain their original measurements and outcomes.',
+    'The old single-file gzip method included a filename header; current measurements omit it. This method change is not an asset optimization.',
+    'Passive-component behavior and component-asset ownership remain architectural contracts under docs/COMPONENT-REFINEMENT.md.', '');
+  if (report.errors.length) lines.push('## Errors', '', ...report.errors.map((error) => `- ${error}`), '');
+  return lines.join('\n');
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  if (process.argv.includes('--allow-gaps')) throw new Error('--allow-gaps is retired; required target failures cannot be waived by this audit');
+  const report = createPerformanceReport(JSON.parse(fs.readFileSync(path.join(repoRoot, policyFile), 'utf8')));
+  if (process.argv.includes('--write')) {
+    fs.writeFileSync(path.join(repoRoot, `${reportBase}.json`), `${JSON.stringify(report, null, 2)}\n`);
+    fs.writeFileSync(path.join(repoRoot, `${reportBase}.md`), renderMarkdown(report));
+  }
+  console.log(`Target performance inventory: ${report.summary.surfaces} surfaces, ${report.summary.observed} observed, ${report.summary.requiredGaps} required gaps, ${report.summary.advisoryOverages} advisory overages, ${report.summary.errors} errors. Not target certification.`);
+  for (const surface of report.surfaces.filter((item) => ['advisory-overage', 'gap'].includes(item.status))) console.log(`- ${surface.target}/${surface.id}: ${surface[surface.rule.metric]}/${surface.rule.ceilingBytes} ${surface.rule.metric} (${surface.status})`);
+  if (report.errors.length) console.error(report.errors.join('\n'));
+  if (report.errors.length || report.summary.requiredGaps) process.exitCode = 1;
+}

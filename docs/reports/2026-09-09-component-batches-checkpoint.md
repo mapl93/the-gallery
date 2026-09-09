@@ -1,5 +1,12 @@
 # Corrida de batches pequeños — 2026-09-09
 
+> Actualización posterior: el propietario aclaró que los límites deben ser por
+> target y tener fundamento externo. ADR 0310 retira los topes internos y sus
+> criterios de aceptación de 64/21 KiB. Este informe conserva el resultado
+> histórico: fue un bloqueo de política interna, no una restricción técnica del
+> target ni una medición de lentitud. Los batches pueden continuar; la optimización
+> del generador sigue pendiente. Véase `2026-09-09-target-performance-checkpoint.md`.
+
 ## Resultado y checkpoints
 
 Se avanzó en tres batches de dos componentes, hasta encontrar un bloqueo de

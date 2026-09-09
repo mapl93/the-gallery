@@ -278,19 +278,23 @@ Questions:
 
 ### Refinement Performance Architecture
 
-Resolved by owner selection and ADR 0273: v1 uses dependency-closed copy-and-own
-install slices as the required performance unit. The executable audit now passes
-19/19 required surfaces and retains two complete-bundle overages as explicit
-diagnostics. See `docs/reports/component-refinement-performance.md` and
-`docs/reports/modular-runtime-cross-target-certification.md`.
+ADR 0273 preserves dependency-closed copy-and-own installs as the delivery unit.
+ADR 0310 supersedes its numeric ceilings after explicit owner direction: every
+limit must be target-specific and externally grounded. Current Web sizes are
+observations; Shopify local assets are compared with sourced, configurable
+Theme Check guidance. See `docs/reports/component-refinement-performance.md` for
+the current measurements and unverified target evidence. Historical 19/19 gate
+results are dated snapshots under an earlier policy, not current certification.
 
 Follow-up optimization questions:
 
-- Which compatibility aliases can be removed before v1 rather than charged
-- When a measured family install slice becomes the next material bottleneck,
-  should CSS remain family-copied or gain deterministic component extraction?
-- How should complete compatibility aggregates trend over time without turning
-  their diagnostic ceilings into hidden permission for unlimited growth?
+- Can responsive token output omit unchanged declarations while preserving all
+  aliases, theme scopes, overrides and computed values? This needs an equivalence
+  pilot before changing the generator; no arbitrary byte target is acceptance.
+- If target page evidence identifies family CSS as a material cost, should it
+  remain family-copied or gain deterministic component extraction?
+- Which real consumer pages and target conditions should provide load and
+  interaction evidence before release? Asset inventory alone cannot answer this.
 
 ### Password, Number, And Form Product Boundaries
 
@@ -1569,7 +1573,8 @@ model rejection/fallback/conversion rules, all public view/unit/lifecycle modes,
 native SVG/table semantics, two named overflow focus owners, AA text and line
 contrast, forced colors, reduced motion, four paired viewports, narrow/RTL/
 localized/200%/spacing/print resilience, exact Exhibit/Studio DOM/style parity,
-source-identical target projections, the fixed Ceramics budget and clean
+source-identical target projections, the then-current Ceramics budget (now
+retired under ADR 0310) and clean
 browser/server lifecycle. R6 is ready for explicit human review; the questions
 below are production, target, migration and final visual gates rather than
 missing automated evidence.

@@ -233,7 +233,11 @@ consumer. See `docs/reports/2026-09-09-file-pin-checkpoint.md` for evidence and 
 
 Tag and Tags Input expose 15 decisions; composed public tokens are validated
 through declared CSS dependencies. RTL padding, removal contrast and field
-customization are verified. Further batches pause at the required Web-token and
-Storytelling install-size gates, both already above their limits before this run.
-See `docs/reports/2026-09-09-component-batches-checkpoint.md` for history and a
-bounded output-optimization proposal; no budget change is accepted here.
+customization are verified. The batch initially paused under the former internal
+Web-token and Storytelling byte ceilings. ADR 0310 subsequently retires those
+ceilings with owner approval: limits must be target-specific and sourced.
+See `docs/reports/2026-09-09-component-batches-checkpoint.md` for the historical
+measurements and `docs/reports/2026-09-09-target-performance-checkpoint.md` for the
+new policy. Component batches can continue; token-output deduplication remains
+a proposed optimization with equivalence acceptance, not a condition imposed by
+an arbitrary byte budget.

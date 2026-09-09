@@ -1,51 +1,104 @@
 # Component Refinement Performance Audit
 
-Generated from `docs/refinement/performance-budgets.json` using
-`gzip-level-9`. A gap is not an implicit budget increase; the fixed
-v1.0.0 release gates apply to dependency-closed install slices and modular
-runtime outputs. Complete aggregate bundles remain visible as diagnostic
-compatibility measurements and do not redefine what a consumer installs.
+Policy v3.0.0; generated from `docs/refinement/performance-budgets.json`. See ADR 0310.
 
-## Summary
+Sizes are observations unless a sourced target rule is attached. Advisory overages do not block component batches.
+Only applicable platform requirements may be required byte gates. A successful inventory is not performance certification.
 
-| Metric | Count |
-| --- | ---: |
-| Surfaces | 21 |
-| Passing | 18 |
-| Gaps | 1 |
-| Documented gaps | 1 |
-| Undocumented gaps | 0 |
-| Global gaps | 0 |
-| Family gaps | 0 |
-| Install-family gaps | 1 |
-| Diagnostic overages | 2 |
+Summary: 22 observations, 0 required passes, 0 required gaps, 0 within guidelines, 2 advisory overages, 0 errors.
 
-## Current Measurements
+Compression: `gzip-level-9-no-name` (local gzip -9 -n -c, no filename or timestamp). Raw bytes sum file contents.
+Install slices are dependency-closed CSS/runtime concatenations separated by newlines, with tokens measured separately.
+Neither concatenated gzip nor the complete asset inventory represents actual page transfer, CDN minification, request count or execution cost.
 
-| Surface | Kind | Enforcement | Worst component/module | Gzip bytes | Ceiling | Headroom / overage | Result | Gap evidence |
-| --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
-| Complete neutral component CSS compatibility bundle | global | diagnostic | — | 73144 | 65536 | -7608 | diagnostic-overage | `docs/decisions/0273-modular-copy-and-own-performance-architecture.md` |
-| Complete progressive-enhancement compatibility runtime | global | diagnostic | — | 22822 | 8192 | -14630 | diagnostic-overage | `docs/decisions/0273-modular-copy-and-own-performance-architecture.md` |
-| Neutral web token target | global | required | — | 53118 | 65536 | 12418 | pass | — |
-| Selective runtime loader | runtime | required | — | 765 | 2048 | 1283 | pass | — |
-| Shared modular runtime core | runtime | required | — | 715 | 2048 | 1333 | pass | — |
-| Largest individual progressive-enhancement module | runtime-module-set | required | date-picker | 3396 | 5120 | 1724 | pass | — |
-| Largest dependency-closed Primitives install slice | install-family | required | select | 18343 | 20480 | 2137 | pass | — |
-| Largest dependency-closed Layout install slice | install-family | required | modal | 21069 | 23552 | 2483 | pass | — |
-| Largest dependency-closed Forms install slice | install-family | required | date-picker | 28117 | 30720 | 2603 | pass | — |
-| Largest dependency-closed Global install slice | install-family | required | announcement-bar | 34915 | 38912 | 3997 | pass | — |
-| Largest dependency-closed Product install slice | install-family | required | size-chart | 35012 | 38912 | 3900 | pass | — |
-| Largest dependency-closed Collection install slice | install-family | required | collection-grid | 27452 | 30720 | 3268 | pass | — |
-| Largest dependency-closed Storytelling install slice | install-family | required | artist-card | 25072 | 21504 | -3568 | gap | `docs/reports/artist-card-web-refinement-audit.md` |
-| Largest dependency-closed Marketing install slice | install-family | required | announcement-extended | 34915 | 38912 | 3997 | pass | — |
-| Largest dependency-closed Cart install slice | install-family | required | quick-view | 32281 | 35840 | 3559 | pass | — |
-| Largest dependency-closed Account install slice | install-family | required | address-form | 29781 | 32768 | 2987 | pass | — |
-| Largest dependency-closed Blog install slice | install-family | required | article-body | 30335 | 33792 | 3457 | pass | — |
-| Largest dependency-closed Sections install slice | install-family | required | featured-collection | 33180 | 36864 | 3684 | pass | — |
-| Largest dependency-closed Ceramics install slice | install-family | required | commission-form | 30988 | 33792 | 2804 | pass | — |
-| Largest dependency-closed Reviews install slice | install-family | required | review-form | 31185 | 34816 | 3631 | pass | — |
-| Largest dependency-closed Pages install slice | install-family | required | page-404 | 17340 | 19456 | 2116 | pass | — |
+## web
 
-Positive headroom is available budget. A negative value is the exact current
-overage. Component-owned assets and passive-component runtime remain separate
-zero-tolerance policy gates in `docs/COMPONENT-REFINEMENT.md`.
+Neutral Web copy-and-own outputs
+
+| Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
+| --- | --- | ---: | ---: | --- | --- |
+| Complete neutral component CSS compatibility bundle | — | 554131 | 74810 | None | observed |
+| Complete progressive-enhancement compatibility runtime | — | 117896 | 22837 | None | observed |
+| Neutral web token target | — | 731093 | 89489 | None | observed |
+| Selective runtime loader | — | 2399 | 747 | None | observed |
+| Shared modular runtime core | — | 1678 | 707 | None | observed |
+| Largest individual progressive-enhancement module | date-picker | 14351 | 3381 | None | observed |
+| Largest dependency-closed Primitives install slice | select | 116756 | 19128 | None | observed |
+| Largest dependency-closed Layout install slice | modal | 150649 | 21854 | None | observed |
+| Largest dependency-closed Forms install slice | date-picker | 209346 | 29695 | None | observed |
+| Largest dependency-closed Global install slice | announcement-bar | 226524 | 35679 | None | observed |
+| Largest dependency-closed Product install slice | size-chart | 273989 | 36623 | None | observed |
+| Largest dependency-closed Collection install slice | collection-grid | 196515 | 28261 | None | observed |
+| Largest dependency-closed Storytelling install slice | artist-card | 182508 | 25880 | None | observed |
+| Largest dependency-closed Marketing install slice | announcement-extended | 226524 | 35679 | None | observed |
+| Largest dependency-closed Cart install slice | quick-view | 220893 | 33051 | None | observed |
+| Largest dependency-closed Account install slice | address-form | 221962 | 31395 | None | observed |
+| Largest dependency-closed Blog install slice | filter-bar | 226914 | 31398 | None | observed |
+| Largest dependency-closed Sections install slice | featured-collection | 237660 | 33978 | None | observed |
+| Largest dependency-closed Ceramics install slice | commission-form | 236722 | 32535 | None | observed |
+| Largest dependency-closed Reviews install slice | review-form | 229803 | 32746 | None | observed |
+| Largest dependency-closed Pages install slice | page-404 | 121337 | 18127 | None | observed |
+
+Unverified by this report:
+
+- Real consumer page load, network transfer and interaction performance are not measured by this asset inventory.
+
+## shopify
+
+Shopify Online Store theme; not a theme app extension or Theme Store submission
+
+| Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
+| --- | --- | ---: | ---: | --- | --- |
+| Shopify theme token asset | — | 731253 | 89537 | None | observed |
+| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 731253 | 89537 | 100000 rawBytes; advisory | advisory-overage |
+| Largest Shopify local JS asset (inventory, including compatibility files) | theme.js | 117896 | 22837 | 10000 rawBytes; advisory | advisory-overage |
+
+Unverified by this report:
+
+- Hosted page performance, CDN transformations and the assets actually loaded by a page require target browser evidence.
+- Theme upload/package limits and Theme Check execution remain separate target checks; this report does not certify them.
+
+### shopify-css-asset-maximum
+
+AssetSizeCSS default for local theme assets. Inventory comparison only: includes unreferenced assets; does not reproduce Liquid-reference traversal, remote checks or page loading.
+
+[Shopify official documentation and Theme Check source](https://shopify.dev/docs/storefronts/themes/best-practices/performance/finding-worst-offenders), checked 2026-09-09.
+
+Upstream main inspected on checkedOn; configurable and disabled by default for themes. The individual check page says compressed size, but the performance guide and local-file implementation use raw stat size. No threshold is copied into .theme-check.yml.
+
+- [Implementation evidence](https://github.com/Shopify/theme-tools/blob/main/packages/theme-check-common/src/checks/asset-size-css/index.ts)
+- [Implementation evidence](https://github.com/Shopify/theme-tools/blob/main/packages/theme-check-common/src/utils/file-utils.ts)
+- [Implementation evidence](https://github.com/Shopify/theme-tools/blob/main/packages/theme-check-node/src/NodeFileSystem.ts)
+
+Assets above this reference:
+
+- `platforms/shopify/assets/tokens.css`: 731253 raw bytes, 89537 gzip bytes.
+
+### shopify-js-asset-maximum
+
+AssetSizeJavaScript default for local theme assets. Inventory comparison only: includes unreferenced assets; does not reproduce Liquid-reference traversal, remote checks or page loading.
+
+[Shopify official documentation and Theme Check source](https://shopify.dev/docs/storefronts/themes/best-practices/performance/finding-worst-offenders), checked 2026-09-09.
+
+Upstream main inspected on checkedOn; configurable and disabled by default for themes. The individual check page says compressed size, but the performance guide and local-file implementation use raw stat size. No threshold is copied into .theme-check.yml.
+
+- [Implementation evidence](https://github.com/Shopify/theme-tools/blob/main/packages/theme-check-common/src/checks/asset-size-javascript/index.ts)
+- [Implementation evidence](https://github.com/Shopify/theme-tools/blob/main/packages/theme-check-common/src/utils/file-utils.ts)
+- [Implementation evidence](https://github.com/Shopify/theme-tools/blob/main/packages/theme-check-node/src/NodeFileSystem.ts)
+
+Assets above this reference:
+
+- `platforms/shopify/assets/theme.js`: 117896 raw bytes, 22837 gzip bytes.
+- `platforms/shopify/assets/tg-runtime-date-picker.js`: 14362 raw bytes, 3389 gzip bytes.
+- `platforms/shopify/assets/tg-runtime-product-gallery.js`: 13332 raw bytes, 3028 gzip bytes.
+- `platforms/shopify/assets/tg-runtime-carousel-rotation.js`: 12679 raw bytes, 3308 gzip bytes.
+- `platforms/shopify/assets/tg-runtime-marquee.js`: 10669 raw bytes, 2745 gzip bytes.
+- `platforms/shopify/assets/tg-runtime-select.js`: 10543 raw bytes, 2836 gzip bytes.
+- `platforms/shopify/assets/tg-runtime-countdown.js`: 10166 raw bytes, 2909 gzip bytes.
+
+## Historical references and limits of evidence
+
+The former 64 KiB token ceiling, family ceilings and runtime ceilings remain in JSON as historicalReference only.
+They are retired internal policy, not external standards. Historical reports retain their original measurements and outcomes.
+The old single-file gzip method included a filename header; current measurements omit it. This method change is not an asset optimization.
+Passive-component behavior and component-asset ownership remain architectural contracts under docs/COMPONENT-REFINEMENT.md.

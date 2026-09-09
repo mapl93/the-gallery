@@ -122,12 +122,7 @@ export default function DisclosureNavigationStudio({
     if (contract.slug === 'accordion') {
       setExpandedItems((current) => [values.expanded === true, ...current.slice(1)]);
     }
-    if (contract.slug === 'tabs') {
-      const next = values.selected === true ? 1 : 0;
-      setActiveTab(next);
-      setRovingTab(next);
-    }
-  }, [contract.slug, values.expanded, values.selected]);
+  }, [contract.slug, values.expanded]);
 
   useEffect(() => {
     if (contract.slug !== 'tabs' || values.disabled !== true) return;
@@ -154,6 +149,9 @@ export default function DisclosureNavigationStudio({
 
   function setProperties(next: StudioPropertyValues) {
     setValues((current) => ({ ...current, ...next }));
+    if (contract.slug === 'tabs' && typeof next.selected === 'boolean') {
+      selectTab(next.selected ? 1 : 0);
+    }
   }
 
   function reset() {
@@ -177,6 +175,7 @@ export default function DisclosureNavigationStudio({
   function selectTab(index: number) {
     setActiveTab(index);
     setRovingTab(index);
+    setValues((current) => ({ ...current, selected: index === 1 }));
   }
 
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
@@ -202,7 +201,7 @@ export default function DisclosureNavigationStudio({
     event.preventDefault();
     const nextIndex = enabledIndexes[(nextPosition + enabledIndexes.length) % enabledIndexes.length];
     setRovingTab(nextIndex);
-    if (activationMode === 'automatic') setActiveTab(nextIndex);
+    if (activationMode === 'automatic') selectTab(nextIndex);
     tabRefs.current[nextIndex]?.focus();
   }
 
@@ -296,7 +295,7 @@ export default function DisclosureNavigationStudio({
                 onClick={() => selectTab(index)}
                 onFocus={() => {
                   setRovingTab(index);
-                  if (activationMode === 'automatic') setActiveTab(index);
+                  if (activationMode === 'automatic') selectTab(index);
                 }}
                 onKeyDown={(event) => handleTabKeyDown(event, index)}
               >

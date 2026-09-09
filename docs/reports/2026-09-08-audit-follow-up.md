@@ -271,3 +271,9 @@ ADR 0329 completa Toast/Tooltip con 14 tokens nuevos y 24/16 roles públicos. Pa
 344 mediciones, RTL, acción responsive, puente de puntero, teclado y herencia
 pasiva en Social Proof. Studio reserva la altura real de Tooltip más el gap de
 tokens. Ver `2026-09-09-toast-tooltip-checkpoint.md`; continúan Accordion/Tabs.
+
+ADR 0330 completa Accordion/Tabs con 19 tokens nuevos y 28/22 roles públicos.
+Corrige selección desincronizada en Studio e indicador de Tabs recortado por scroll.
+Pasan 296 mediciones de geometría/tipo, teclado, FAQ y seis capturas con verificación
+de píxeles del indicador; cambios de pintado y fallback forzado explícitos. Ver
+`2026-09-09-accordion-tabs-checkpoint.md`; continúan Breadcrumb/Popover.

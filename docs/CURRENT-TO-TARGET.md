@@ -411,3 +411,11 @@ and positioning separate. Tooltip corrects RTL centering and its Studio reserves
 measured content height plus the token-driven gap. Default parity, pointer bridge,
 keyboard, narrow action placement and Social Proof inheritance pass:
 `docs/reports/2026-09-09-toast-tooltip-checkpoint.md`. Continue Accordion and Tabs.
+
+## Accordion and Tabs visual values (ADR 0330)
+
+Accordion/Tabs expose meaningful geometry and focus, preserving responsive bases.
+Tabs Studio synchronizes its Details-selected control; its formerly clipped
+indicator is verified by rendered pixels with token-driven widths in light/dark
+and forced colors. Geometry, keyboard, native disclosure and FAQ inheritance pass:
+`docs/reports/2026-09-09-accordion-tabs-checkpoint.md`. Continue Breadcrumb/Popover.

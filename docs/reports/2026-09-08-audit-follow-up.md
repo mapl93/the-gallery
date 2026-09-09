@@ -179,3 +179,8 @@ separados de modo/validación, inicialización real en Studio, límites nativos,
 foco al activar la pista y reglas de colores forzados/movimiento reducido por
 motor. Véase `docs/reports/2026-09-09-slider-checkpoint.md`. Mantiene `pilot` y
 continúa la cobertura de la base Web, con Shopify como destino posterior.
+
+ADR 0314 añade siete decisiones a Badge/Price, con 17/13 controles públicos,
+semántica pasiva conservada y evidencia de personalización en Product Card.
+`docs/reports/2026-09-09-passive-primitives-checkpoint.md` registra 48 comparaciones
+de presentación y 16 mediciones Studio; continúa el punto 5 sin promover madurez.

@@ -271,3 +271,12 @@ form behavior and Before / After composition, including actual Chromium thumb
 styles: `docs/reports/2026-09-09-slider-checkpoint.md`. Slider remains pilot.
 Continue the remaining base Web customization batches; full Shopify integration
 follows completion of the base Web system.
+
+## Passive primitive customization (ADR 0314)
+
+Badge and Price expose seven source decisions with unchanged defaults, 17/13
+public controls and no additional runtime. Badge tracking preserves relative em
+units; Price supporting weights reuse Body. The 48 presentation comparisons,
+16 Studio measurements and Product Card checks are recorded in
+`docs/reports/2026-09-09-passive-primitives-checkpoint.md`. Both remain pilot;
+continue with Quantity Selector and remaining base Web customization coverage.

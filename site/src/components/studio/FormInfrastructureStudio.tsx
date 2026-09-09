@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactElement } from 'react';
 import { CircleAlert } from 'lucide-react';
 import FieldWrapperArtwork from './FieldWrapperArtwork';
+import InlineErrorArtwork from './InlineErrorArtwork';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -141,10 +142,8 @@ export default function FormInfrastructureStudio({ contract, definition }: FormI
     const announcement = String(values.announcement || 'none');
     return (
       <div className="docs-studio__field-fixture">
-        <div className="inline-error" role={announcement === 'assertive' ? 'alert' : announcement === 'polite' ? 'status' : undefined} aria-live={announcement === 'none' ? undefined : announcement as 'polite' | 'assertive'} aria-atomic={announcement === 'none' ? undefined : true}>
-          {values.icon === true && <CircleAlert className="inline-error__icon" aria-hidden="true" focusable="false" />}
-          <span className="inline-error__message">{String(values.message || '')}</span>
-        </div>
+        <InlineErrorArtwork message={String(values.message || '')} icon={values.icon === true}
+          announcement={announcement as 'none' | 'polite' | 'assertive'} />
       </div>
     );
   }

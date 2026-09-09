@@ -147,3 +147,8 @@ ADR 0303 retira Figma de los contratos planificados y requisitos de entrega.
 El siguiente bloque del punto 5 está registrado en
 `docs/reports/2026-09-09-form-infrastructure-checkpoint.md`: Field Wrapper,
 Fieldset y Form, con 30 decisiones de fuente y evidencia de composición real.
+
+Continúa en `docs/reports/2026-09-09-specialized-fields-checkpoint.md`: Inline
+Error, Password Input y Number Input incorporan 25 decisiones públicas. Las
+mediciones corrigen la altura exterior de Number Input de 48px a 46px; Contacto
+y Auth Forms verifican composición, datos nativos, estados y personalización.

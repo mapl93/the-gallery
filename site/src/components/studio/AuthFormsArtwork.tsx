@@ -79,6 +79,7 @@ export default function AuthFormsArtwork({
         <div className="field docs-studio__account-field">
           <label className="field__label field__label--required" htmlFor={passwordId}>Password</label>
           <PasswordInputArtwork
+            className="field__control"
             id={passwordId}
             name="password"
             value={password}

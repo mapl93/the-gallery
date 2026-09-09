@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ClipboardEvent, type KeyboardEvent, type ReactElement } from 'react';
-import { CalendarDays, Check, ChevronLeft, ChevronRight, Search, Upload } from 'lucide-react';
+import { CalendarDays, Check, ChevronLeft, ChevronRight, Search, Upload, Minus, Plus } from 'lucide-react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -17,6 +17,9 @@ import SwitchArtwork, {
   type SwitchArtworkVariant,
 } from './SwitchArtwork';
 import FileUploadArtwork from './FileUploadArtwork';
+import FieldWrapperArtwork from './FieldWrapperArtwork';
+import NumberInputArtwork from './NumberInputArtwork';
+import CheckboxArtwork from './CheckboxArtwork';
 
 interface AdvancedControlStudioProps {
   contract: ComponentContract;
@@ -120,6 +123,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [selectedColor, setSelectedColor] = useState(0);
+  const [numberActionIcons, setNumberActionIcons] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
   const [pin, setPin] = useState(['2', '0', '', '', '', '']);
   const [tags, setTags] = useState(['Stoneware', 'Celadon']);
@@ -165,6 +169,7 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     setValues({ ...initialValues });
     setTokenOverrides({});
     setSelectedColor(0);
+    setNumberActionIcons(false);
     setSelectedFileName('');
     setPin(['2', '0', '', '', '', '']);
     setTags(['Stoneware', 'Celadon']);
@@ -546,27 +551,25 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   }
 
   function renderNumberInput() {
-    const min = typeof values.min === 'number' ? values.min : null;
-    const max = typeof values.max === 'number' ? values.max : null;
-    const step = typeof values.step === 'number' ? values.step : 1;
-    const value = typeof values.value === 'number' ? values.value : null;
-    const unavailable = values.disabled === true || values.readOnly === true;
     const fieldId = 'number-demo';
-    const classes = ['number-input', variantClass(contract, values.variant)].filter(Boolean).join(' ');
-    return (
-      <div className="field docs-studio__field-fixture">
-        <label className={`field__label${values.required === true ? ' field__label--required' : ''}`} htmlFor={fieldId}>{String(values.accessibleLabel || '')}</label>
-        <div className={classes}>
-          <button className="number-input__btn number-input__btn--decrement" type="button" aria-label={String(values.decrementLabel || '')} aria-controls={fieldId} disabled={unavailable || (value !== null && min !== null && value <= min)}><span aria-hidden="true">−</span></button>
-          <input className="number-input__field" id={fieldId} name={String(values.name || '') || undefined} type="number" value={value ?? ''} min={min ?? undefined} max={max ?? undefined} step={step} disabled={values.disabled === true} readOnly={values.readOnly === true} required={values.required === true} aria-label={String(values.accessibleLabel || '')} aria-invalid={invalid || undefined} aria-describedby={describedBy} onChange={(event) => {
-            const nextValue = event.currentTarget.value === '' ? null : event.currentTarget.valueAsNumber;
-            setValues((current) => ({ ...current, value: nextValue }));
-          }} />
-          <button className="number-input__btn number-input__btn--increment" type="button" aria-label={String(values.incrementLabel || '')} aria-controls={fieldId} disabled={unavailable || (value !== null && max !== null && value >= max)}><span aria-hidden="true">+</span></button>
-        </div>
-        {feedback()}
-      </div>
-    );
+    const fieldDescribedBy = [String(values.describedBy || ''), message ? `${fieldId}-feedback` : ''].filter(Boolean).join(' ') || undefined;
+    return <div className="docs-studio__field-fixture">
+      <FieldWrapperArtwork controlId={fieldId} label={String(values.accessibleLabel || '')}
+        required={values.required === true} variant={variant as PasswordInputArtworkVariant} feedback={message}>
+        <NumberInputArtwork id={fieldId} className="field__control"
+          label={String(values.accessibleLabel || '')} name={String(values.name || '')}
+          value={typeof values.value === 'number' ? values.value : null}
+          min={typeof values.min === 'number' ? values.min : undefined}
+          max={typeof values.max === 'number' ? values.max : undefined}
+          step={typeof values.step === 'number' ? values.step : undefined}
+          disabled={values.disabled === true} readOnly={values.readOnly === true} required={values.required === true}
+          variant={variant as PasswordInputArtworkVariant} describedBy={fieldDescribedBy}
+          decrementLabel={String(values.decrementLabel || '')} incrementLabel={String(values.incrementLabel || '')}
+          decrementIcon={numberActionIcons ? <Minus aria-hidden="true" /> : undefined}
+          incrementIcon={numberActionIcons ? <Plus aria-hidden="true" /> : undefined}
+          onValueChange={(value) => setValues((current) => ({ ...current, value }))} />
+      </FieldWrapperArtwork>
+    </div>;
   }
 
   function renderCombobox() {
@@ -858,11 +861,12 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     const visible = values.visible === true;
     const strength = String(values.strength || 'none') as PasswordInputArtworkStrength;
     return (
-      <div className="field docs-studio__field-fixture">
-        <label className={`field__label${values.required === true ? ' field__label--required' : ''}`} htmlFor="password-demo">Create password</label>
+      <div className="docs-studio__field-fixture">
+        <FieldWrapperArtwork controlId="password-demo" label="Create password"
+          required={values.required === true} variant={variant as PasswordInputArtworkVariant} feedback={message}>
         <PasswordInputArtwork
           id="password-demo"
-          className="docs-studio__preview-password"
+          className="field__control"
           variant={variant as PasswordInputArtworkVariant}
           value={String(values.value || '')}
           visible={visible}
@@ -872,14 +876,14 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
           disabled={values.disabled === true}
           readOnly={values.readOnly === true}
           required={values.required === true}
-          describedBy={describedBy}
+          describedBy={[String(values.describedBy || ''), message ? 'password-demo-feedback' : ''].filter(Boolean).join(' ')}
           strength={strength}
           strengthText={String(values.strengthText || '')}
           dataState={previewState}
           onChange={(event) => setValues((current) => ({ ...current, value: event.target.value }))}
           onVisibleChange={(nextVisible) => setValues((current) => ({ ...current, visible: nextVisible }))}
         />
-        {feedback()}
+        </FieldWrapperArtwork>
       </div>
     );
   }
@@ -925,7 +929,10 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
     <div className="docs-studio">
       <h1 className="docs-studio__title">{contract.name}</h1>
       <div className="docs-studio__workspace">
-        <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue={previewState} tokenValues={tokenValues} activeTokens={activeTokens} onPropertiesChange={(next) => {
+        <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue={previewState} tokenValues={tokenValues} activeTokens={activeTokens} fixtureControlsByGroup={contract.slug === 'number-input' ? {
+          presentation: <CheckboxArtwork label="Use icon actions" checked={numberActionIcons}
+            onChange={(event) => setNumberActionIcons(event.target.checked)} />,
+        } : undefined} onPropertiesChange={(next) => {
           setValues((current) => ({ ...current, ...next }));
           if (contract.slug === 'switch' && typeof next.checked === 'boolean') {
             setPreviewState(next.checked ? 'checked' : 'default');

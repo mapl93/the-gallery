@@ -4094,3 +4094,11 @@ MDX pages and Studio definitions provide the complete shared control inventory.
 The wrapper no longer uses `--space-input-margin-bottom` as a uniform gap; copied
 consumers must migrate wrapper-specific overrides to the two gap tokens when
 adopting this checkpoint. No contract maturity is promoted.
+
+## Specialized field customization checkpoint
+
+ADR 0306 exposes Inline Error, Password Input and Number Input visual decisions
+through source tokens and shared Studio/Exhibit controls. Password visibility
+keeps the same native field; Number Input keeps native stepping and empty edits;
+Inline Error keeps announcement separate from appearance. Their MDX references
+record shared roles, contrast derivations and geometry constraints.

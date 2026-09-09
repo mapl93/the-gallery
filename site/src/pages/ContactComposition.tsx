@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Mail } from 'lucide-react';
 import InputArtwork from '../components/studio/InputArtwork';
 import FieldWrapperArtwork from '../components/studio/FieldWrapperArtwork';
+import NumberInputArtwork from '../components/studio/NumberInputArtwork';
+import InlineErrorArtwork from '../components/studio/InlineErrorArtwork';
 import TextareaArtwork from '../components/studio/TextareaArtwork';
 import CheckboxArtwork from '../components/studio/CheckboxArtwork';
 import RadioArtwork from '../components/studio/RadioArtwork';
@@ -15,6 +17,7 @@ export default function ContactComposition() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [pieceCount, setPieceCount] = useState<number | null>(null);
   const [replyMethod, setReplyMethod] = useState('');
   const [careNotes, setCareNotes] = useState(false);
   const [visitInfo, setVisitInfo] = useState(false);
@@ -33,7 +36,7 @@ export default function ContactComposition() {
 
   function reset() {
     if (timerRef.current) clearTimeout(timerRef.current);
-    setName(''); setEmail(''); setMessage('');
+    setName(''); setEmail(''); setMessage(''); setPieceCount(null);
     setReplyMethod(''); setCareNotes(false); setVisitInfo(false);
     setErrors([]); setResult(''); setBusy(false);
   }
@@ -69,7 +72,7 @@ export default function ContactComposition() {
         <h2 className="form__error-summary-title" id="contact-errors-title">Review these fields</h2>
         <ul className="form__error-summary-list">{errors.map((field) => {
           const targetId = field === 'replyMethod' ? 'contact-reply-email' : `contact-${field}`;
-          const label = { name: 'Name', email: 'Email', topic: 'Subject', message: 'Message', replyMethod: 'Preferred reply' }[field] || field;
+          const label = { name: 'Name', email: 'Email', topic: 'Subject', message: 'Message', replyMethod: 'Preferred reply', pieceCount: 'Number of pieces' }[field] || field;
           return <li key={field}><a href={`#${targetId}`} onClick={(event) => {
             const target = field === 'topic' ? formRef.current?.querySelector<HTMLElement>('.select__trigger') || document.getElementById(targetId) : document.getElementById(targetId);
             if (target) { event.preventDefault(); target.focus(); }
@@ -112,6 +115,16 @@ export default function ContactComposition() {
           onChange={(event) => setMessage(event.target.value)}
           variant={errors.includes('message') ? 'error' : 'default'}
             message={errors.includes('message') ? 'Add at least 10 characters about your request.' : 'Include any dimensions, timing or delivery details that matter.'} />
+        <FieldWrapperArtwork controlId="contact-pieceCount" label="Number of pieces"
+          description="For a set or series; leave empty if undecided."
+          variant={errors.includes('pieceCount') ? 'error' : 'default'}
+          feedback={errors.includes('pieceCount') ? 'Use a whole number between 1 and 99.' : ''}>
+          <NumberInputArtwork id="contact-pieceCount" name="pieceCount" label="Number of pieces"
+            decrementLabel="Decrease number of pieces" incrementLabel="Increase number of pieces"
+            className="field__control" value={pieceCount} onValueChange={setPieceCount} min={1} max={99} step={1}
+            variant={errors.includes('pieceCount') ? 'error' : 'default'}
+            describedBy={`contact-pieceCount-help${errors.includes('pieceCount') ? ' contact-pieceCount-feedback' : ''}`} />
+        </FieldWrapperArtwork>
         <fieldset className="fieldset" aria-describedby={`contact-reply-help${errors.includes('replyMethod') ? ' contact-reply-message' : ''}`}>
           <legend className="fieldset__legend">Preferred reply</legend>
           <p className="fieldset__description" id="contact-reply-help">We will use your email to coordinate either option.</p>
@@ -124,7 +137,7 @@ export default function ContactComposition() {
               describedBy={`contact-reply-help${errors.includes('replyMethod') ? ' contact-reply-message' : ''}`}
               variant={errors.includes('replyMethod') ? 'error' : 'default'}
               onCheckedChange={(checked) => { if (checked) setReplyMethod(value); }} />)}
-            {errors.includes('replyMethod') && <span id="contact-reply-message" className="field__feedback field__error">Choose a reply preference.</span>}
+            {errors.includes('replyMethod') && <InlineErrorArtwork id="contact-reply-message" message="Choose a reply preference." announcement="none" />}
           </div>
         </fieldset>
         <CheckboxArtwork label="Include care instructions in the reply" name="careNotes" value="include"
@@ -142,6 +155,6 @@ export default function ContactComposition() {
       </div>
       <p role="status" aria-atomic="true">{result || (errors.length ? 'Review the highlighted fields before continuing.' : 'No request sent.')}</p>
     </form>
-    <p>Customize <Link to="/components/button">Button</Link>, <Link to="/components/input">Input</Link>, <Link to="/components/select">Select</Link>, <Link to="/components/textarea">Textarea</Link>, <Link to="/components/checkbox">Checkbox</Link>, <Link to="/components/radio">Radio</Link>, <Link to="/components/switch">Switch</Link>, <Link to="/components/field-wrapper">Field Wrapper</Link>, <Link to="/components/fieldset">Fieldset</Link> and <Link to="/components/form">Form</Link>. The <Link to="/foundations/control-pilot">control matrix</Link> retains side-by-side alignment and state checks.</p>
+    <p>Customize <Link to="/components/button">Button</Link>, <Link to="/components/input">Input</Link>, <Link to="/components/select">Select</Link>, <Link to="/components/textarea">Textarea</Link>, <Link to="/components/checkbox">Checkbox</Link>, <Link to="/components/radio">Radio</Link>, <Link to="/components/switch">Switch</Link>, <Link to="/components/field-wrapper">Field Wrapper</Link>, <Link to="/components/fieldset">Fieldset</Link>, <Link to="/components/form">Form</Link>, <Link to="/components/number-input">Number Input</Link> and <Link to="/components/inline-error">Inline Error</Link>. The <Link to="/foundations/control-pilot">control matrix</Link> retains side-by-side alignment and state checks.</p>
   </>;
 }

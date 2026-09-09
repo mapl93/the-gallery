@@ -202,3 +202,13 @@ preview width and contact heading isolation are corrected. Native form ownership
 and contract maturity remain unchanged. See
 `docs/reports/2026-09-09-form-infrastructure-checkpoint.md` for browser evidence,
 copy-and-own compatibility and remaining scope.
+
+## Specialized field customization (ADR 0306)
+
+Inline Error, Password Input and Number Input expose 25 additional source
+decisions through contracts and Studio/Exhibit. Number Input now shares the
+46px outer density of Input, Password Input and Button, with independent action
+width. Contact and Auth Forms exercise the shared implementations. See
+`docs/reports/2026-09-09-specialized-fields-checkpoint.md` for evidence and
+copy-and-own adoption notes. Component coverage and certification continue;
+this checkpoint does not certify the hosted Shopify target.

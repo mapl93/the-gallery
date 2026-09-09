@@ -13,10 +13,11 @@
  *   npx the-gallery diff          — Show what's changed upstream
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, cpSync } from 'node:fs';
-import { resolve, dirname, join, relative, basename } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { resolve, dirname, relative, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
+import { INSTALL_FILE, hash, inspectFile, loadInstallState, planInstall, contentDiff } from './install-plan.js';
 
 // ── Paths ────────────────────────────────────────────────────
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,6 +31,12 @@ const registry = JSON.parse(readFileSync(REGISTRY_PATH, 'utf-8'));
 const webManifest = JSON.parse(readFileSync(WEB_MANIFEST_PATH, 'utf-8'));
 
 const CONFIG_FILE = 'tg.config.json';
+const packageVersion = JSON.parse(readFileSync(resolve(PACKAGE_ROOT, 'package.json'), 'utf8')).version;
+const defaultConfig = () => ({
+  $schema: 'https://the-gallery.dev/schema/config.json',
+  cssDir: './styles/the-gallery', tokensDir: './styles/tokens',
+  jsDir: './scripts/the-gallery', components: [],
+});
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -60,8 +67,13 @@ function ask(question) {
 // ── Config ───────────────────────────────────────────────────
 function loadConfig() {
   const configPath = resolve(CWD, CONFIG_FILE);
-  if (!existsSync(configPath)) return null;
-  return JSON.parse(readFileSync(configPath, 'utf-8'));
+  const content = inspectFile(configPath, CWD);
+  if (content === null) return null;
+  const config = JSON.parse(content);
+  if (!Array.isArray(config.components) || typeof config.cssDir !== 'string' || typeof config.tokensDir !== 'string') {
+    throw new Error(`${CONFIG_FILE} requires components[], cssDir and tokensDir.`);
+  }
+  return config;
 }
 
 function saveConfig(config) {
@@ -71,8 +83,10 @@ function saveConfig(config) {
 // ── Dependency resolution ────────────────────────────────────
 
 /** Resolve a component + all transitive dependencies (topological). */
-function resolveDeps(componentId, resolved = new Set(), order = []) {
+function resolveDeps(componentId, resolved = new Set(), order = [], visiting = new Set()) {
   if (resolved.has(componentId)) return order;
+  if (visiting.has(componentId)) throw new Error(`Circular component dependency: ${componentId}`);
+  visiting.add(componentId);
 
   const entry = registry.components[componentId];
   if (!entry) {
@@ -82,10 +96,11 @@ function resolveDeps(componentId, resolved = new Set(), order = []) {
 
   // Resolve dependencies first (depth-first)
   for (const dep of entry.dependencies || []) {
-    resolveDeps(dep, resolved, order);
+    resolveDeps(dep, resolved, order, visiting);
   }
 
   resolved.add(componentId);
+  visiting.delete(componentId);
   order.push(componentId);
   return order;
 }
@@ -137,6 +152,10 @@ function getRequiredTokens(componentIds) {
 // ── Commands ─────────────────────────────────────────────────
 
 async function cmdInit() {
+  if (inspectFile(resolve(CWD, CONFIG_FILE), CWD) !== null) {
+    info(`${CONFIG_FILE} already exists; edit it directly to change install paths.`);
+    return;
+  }
   log('');
   log(`${COLORS.bold}The Gallery${COLORS.reset} — Design System Setup`);
   log('');
@@ -152,7 +171,7 @@ async function cmdInit() {
     components: [],
   };
 
-  saveConfig(config);
+  writeFileSync(resolve(CWD, CONFIG_FILE), JSON.stringify(config, null, 2) + '\n', { flag: 'wx' });
   log('');
   success(`Created ${CONFIG_FILE}`);
   info(`Run ${COLORS.bold}npx the-gallery add button${COLORS.reset} to add your first component.`);
@@ -160,11 +179,24 @@ async function cmdInit() {
 }
 
 async function cmdAdd(args) {
+  const dryRun = args.includes('--dry-run');
+  const keepLocal = [];
+  args = args.filter((arg, index) => {
+    if (arg === '--keep-local') {
+      const file = args[index + 1];
+      if (!file || file.startsWith('-')) throw new Error('--keep-local requires one exact destination path.');
+      keepLocal.push(relative(CWD, resolve(CWD, file)));
+      return false;
+    }
+    return args[index - 1] !== '--keep-local';
+  });
+  const unknownFlags = args.filter((arg) => arg.startsWith('-') && !['-a', '--all', '--dry-run'].includes(arg));
+  if (unknownFlags.length) throw new Error(`Unknown add option: ${unknownFlags.join(', ')}`);
   let config = loadConfig();
+  if (!config && dryRun) config = defaultConfig();
   if (!config) {
-    warn(`No ${CONFIG_FILE} found. Running init first...\n`);
-    await cmdInit();
-    config = loadConfig();
+    info(`No ${CONFIG_FILE} found; using default paths. Run init first to choose other paths.`);
+    config = defaultConfig();
   }
 
   const addAll = args.includes('-a') || args.includes('--all');
@@ -208,11 +240,7 @@ async function cmdAdd(args) {
   const deps = newComponents.filter((id) => !requestedIds.includes(id));
 
   log('');
-  if (newComponents.length === 0) {
-    info('All requested components are already installed.');
-    log('');
-    return;
-  }
+  if (newComponents.length === 0) info('Checking the installed component files.');
 
   log(`${COLORS.bold}Components to install:${COLORS.reset}`);
   for (const id of newComponents) {
@@ -223,85 +251,106 @@ async function cmdAdd(args) {
   }
   log('');
 
-  // Get required files
   const mergedComponents = [...new Set([...config.components, ...allComponents])];
-  const resolvedAll = [];
-  for (const id of mergedComponents) {
-    for (const dep of resolveDeps(id)) {
-      if (!resolvedAll.includes(dep)) resolvedAll.push(dep);
+  const state = loadInstallState(CWD);
+  const plan = createInstallPlan(config, mergedComponents, state);
+  for (const key of keepLocal) {
+    const file = plan.find((entry) => entry.key === key);
+    if (!file || !['conflict', 'untracked', 'preserve'].includes(file.status)) {
+      throw new Error(`--keep-local needs an existing differing file in this plan: ${key}`);
+    }
+    file.status = 'keep';
+    file.conflict = false;
+    file.provenance = { source: file.source, upstreamHash: hash(file.content), packageVersion, resolution: 'kept-local', acceptedLocalHash: file.localHash };
+  }
+  printPlan(plan);
+  if (plan.some((file) => file.conflict)) {
+    error('Installation stopped before writing any component, token, runtime or config file.');
+    info('Run diff to inspect local/upstream content. Back up and reconcile conflicts, then retry add with --keep-local <exact-path> for each reviewed file. No force overwrite is performed.');
+    process.exitCode = 1;
+    return;
+  }
+  if (dryRun) {
+    info('Dry run: no files or directories written.');
+    return;
+  }
+
+  // Preflight metadata and every file before the first write. A changed file
+  // between planning and installation is a conflict, not an overwrite request.
+  inspectFile(resolve(CWD, CONFIG_FILE), CWD);
+  inspectFile(resolve(CWD, INSTALL_FILE), CWD);
+  for (const file of plan) {
+    const current = inspectFile(file.destination, CWD);
+    if ((current === null ? null : hash(current)) !== file.localHash) {
+      throw new Error(`File changed while planning: ${file.key}; retry to review it.`);
     }
   }
-
-  const files = getRequiredFiles(resolvedAll);
-  const runtimeFiles = getRequiredRuntimeFiles(resolvedAll);
-  const tokenCategories = getRequiredTokens(resolvedAll);
-
-  // Create target directories
-  const cssDir = resolve(CWD, config.cssDir);
-  const tokensDir = resolve(CWD, config.tokensDir);
-  const jsDir = resolve(CWD, config.jsDir || './scripts/the-gallery');
-  mkdirSync(cssDir, { recursive: true });
-  mkdirSync(tokensDir, { recursive: true });
-
-  // Copy CSS files
-  let copied = 0;
-  for (const srcPath of files) {
-    const fileName = basename(srcPath);
-    const destPath = resolve(cssDir, fileName);
-    cpSync(srcPath, destPath);
-    copied++;
-  }
-  success(`Copied ${copied} CSS file(s) → ${relative(CWD, cssDir)}/`);
-
-  if (runtimeFiles.length > 0) {
-    mkdirSync(jsDir, { recursive: true });
-    for (const srcPath of runtimeFiles) {
-      cpSync(srcPath, resolve(jsDir, basename(srcPath)));
+  for (const file of plan) {
+    if (['new', 'update'].includes(file.status)) {
+      mkdirSync(dirname(file.destination), { recursive: true });
+      writeFileSync(file.destination, file.content, file.status === 'new' ? { flag: 'wx' } : undefined);
     }
-    const moduleFiles = runtimeFiles
-      .map((file) => basename(file))
-      .filter((file) => file !== 'core.js');
-    const entry = [
-      '/** The Gallery dependency-closed runtime entry. */',
-      ...moduleFiles.map((file) => `import './${file}';`),
-      '',
-    ].join('\n');
-    writeFileSync(resolve(jsDir, 'runtime.js'), entry);
-    success(`Copied ${runtimeFiles.length} runtime module(s) → ${relative(CWD, jsDir)}/`);
+    state.files[file.key] = file.provenance;
   }
-
-  // Copy token source files
-  let tokensCopied = 0;
-  for (const [name, file] of Object.entries(registry.tokens.files)) {
-    const srcPath = resolve(PACKAGE_ROOT, file);
-    const destPath = resolve(tokensDir, basename(file));
-    if (existsSync(srcPath)) {
-      cpSync(srcPath, destPath);
-      tokensCopied++;
-    }
-  }
-  success(`Copied ${tokensCopied} token file(s) → ${relative(CWD, tokensDir)}/`);
-
-  // Update config
   config.components = mergedComponents;
-  config.tokenCategories = tokenCategories;
+  config.tokenCategories = getRequiredTokens(mergedComponents);
   saveConfig(config);
-  success(`Updated ${CONFIG_FILE}`);
-
-  // Show next steps
+  writeFileSync(resolve(CWD, INSTALL_FILE), JSON.stringify(state, null, 2) + '\n');
+  success(`Installed dependency slice; provenance recorded in ${INSTALL_FILE}.`);
   log('');
-  log(`${COLORS.bold}Next steps:${COLORS.reset}`);
-  log(`  1. Create a ${COLORS.cyan}tokens.css${COLORS.reset} with your brand values (or use Style Dictionary)`);
-  log(`  2. Import tokens.css + component CSS in your project`);
-  if (runtimeFiles.length > 0) {
-    log(`  3. Load ${COLORS.cyan}${relative(CWD, resolve(jsDir, 'runtime.js'))}${COLORS.reset} with a module script`);
-    log(`  4. Use the HTML/class patterns from the docs`);
-  } else {
-    log(`  3. Use the HTML/class patterns from the docs`);
+  log('Import these styles in order, then load the runtime as a module when present:');
+  for (const file of plan) {
+    if (file.destination.endsWith('.css')) log(`  ${file.key}`);
   }
+  const runtime = plan.find((file) => file.source === 'generated:runtime-entry');
+  if (runtime) log(`  <script type="module" src="${runtime.key}"></script>`);
+  info('Keep brand overrides in a separate stylesheet loaded after tokens.css. Existing legacy JSON files are preserved; their custom values are not converted automatically.');
   log('');
-  log(`${COLORS.dim}Tokens needed: ${tokenCategories.join(', ')}${COLORS.reset}`);
-  log('');
+}
+
+function createInstallPlan(config, componentIds, state) {
+  const resolved = [...new Set(componentIds.flatMap((id) => resolveDeps(id)))];
+  for (const id of resolved) {
+    if (!webManifest.components.some((component) => component.slug === id && component.install?.tokens && component.install?.css?.length)) {
+      throw new Error(`Missing Web install manifest for ${id}. Rebuild the adapter before distribution.`);
+    }
+  }
+  const files = [];
+  const addSource = (source, directory) => files.push({
+    source: relative(PACKAGE_ROOT, source),
+    destination: resolve(CWD, directory, basename(source)),
+    content: readFileSync(source),
+  });
+  const tokens = [...new Set(resolved.map((id) => webManifest.components.find((component) => component.slug === id).install.tokens))];
+  for (const source of tokens) addSource(resolve(PACKAGE_ROOT, source), config.tokensDir);
+  for (const source of getRequiredFiles(resolved)) addSource(source, config.cssDir);
+  const runtimeFiles = getRequiredRuntimeFiles(resolved);
+  const jsDir = config.jsDir || './scripts/the-gallery';
+  for (const source of runtimeFiles) addSource(source, jsDir);
+  if (runtimeFiles.length) {
+    files.push({
+      source: 'generated:runtime-entry',
+      destination: resolve(CWD, jsDir, 'runtime.js'),
+      content: Buffer.from([
+        '/** The Gallery dependency-closed runtime entry. */',
+        ...runtimeFiles.map((file) => basename(file)).filter((file) => file !== 'core.js').map((file) => `import './${file}';`),
+        '',
+      ].join('\n')),
+    });
+  }
+  return planInstall({ cwd: CWD, files, state, packageVersion });
+}
+
+const statusLabels = {
+  new: 'new file', unchanged: 'matches upstream', update: 'upstream update; local unchanged',
+  preserve: 'preserved local changes; upstream unchanged',
+  keep: 'keep local file by explicit choice; accept current upstream baseline',
+  conflict: 'CONFLICT: local and upstream both changed',
+  untracked: 'CONFLICT: existing file differs; no matching baseline',
+  removed: 'CONFLICT: previously installed file was removed locally',
+};
+function printPlan(plan) {
+  for (const file of plan) log(`  ${file.key} — ${statusLabels[file.status]}`);
 }
 
 function cmdList() {
@@ -345,43 +394,14 @@ function cmdList() {
 
 function cmdDiff() {
   const config = loadConfig();
-  if (!config) {
-    error(`No ${CONFIG_FILE} found. Run ${COLORS.bold}npx the-gallery init${COLORS.reset} first.`);
-    process.exit(1);
+  if (!config) throw new Error(`No ${CONFIG_FILE} found. Run init first.`);
+  const plan = createInstallPlan(config, config.components || [], loadInstallState(CWD));
+  printPlan(plan);
+  for (const file of plan) {
+    if (file.status !== 'unchanged') log(contentDiff(file.local, file.content, file.key));
   }
-
-  const cssDir = resolve(CWD, config.cssDir);
-  let diffs = 0;
-
-  for (const id of config.components || []) {
-    const entry = registry.components[id];
-    if (!entry) continue;
-
-    const srcPath = resolve(PACKAGE_ROOT, entry.file);
-    const fileName = basename(entry.file);
-    const localPath = resolve(cssDir, fileName);
-
-    if (!existsSync(localPath)) {
-      warn(`${fileName} — missing locally (run add to restore)`);
-      diffs++;
-      continue;
-    }
-
-    const src = readFileSync(srcPath, 'utf-8');
-    const local = readFileSync(localPath, 'utf-8');
-
-    if (src !== local) {
-      info(`${fileName} — local changes detected`);
-      diffs++;
-    }
-  }
-
-  if (diffs === 0) {
-    success('All components match upstream. No changes detected.');
-  } else {
-    log(`\n${COLORS.dim}${diffs} file(s) differ from upstream.${COLORS.reset}`);
-    log(`${COLORS.dim}This is expected if you customized components for your target.${COLORS.reset}\n`);
-  }
+  if (plan.every((file) => file.status === 'unchanged')) success('All installed files match upstream.');
+  info('Comparison only; no files written. Baselines identify the last accepted upstream bytes, not package-version guesses.');
 }
 
 function cmdHelp() {
@@ -392,6 +412,8 @@ function cmdHelp() {
   log(`  ${COLORS.cyan}init${COLORS.reset}               Configure your project`);
   log(`  ${COLORS.cyan}add${COLORS.reset} <name...>       Add component(s) with dependencies`);
   log(`  ${COLORS.cyan}add${COLORS.reset} --all           Add all components`);
+  log(`  ${COLORS.cyan}add${COLORS.reset} <name> --dry-run Preview all writes and conflicts`);
+  log(`  ${COLORS.cyan}add${COLORS.reset} <name> --keep-local <path> Keep one reviewed conflicting file`);
   log(`  ${COLORS.cyan}list${COLORS.reset}               List all available components`);
   log(`  ${COLORS.cyan}diff${COLORS.reset}               Compare local files with upstream`);
   log('');
@@ -406,12 +428,13 @@ function cmdHelp() {
 // ── Main ─────────────────────────────────────────────────────
 const [, , command, ...args] = process.argv;
 
+try {
 switch (command) {
   case 'init':
-    cmdInit();
+    await cmdInit();
     break;
   case 'add':
-    cmdAdd(args);
+    await cmdAdd(args);
     break;
   case 'list':
     cmdList();
@@ -430,4 +453,9 @@ switch (command) {
     }
     cmdHelp();
     break;
+}
+
+} catch (cause) {
+  error(cause.message);
+  process.exitCode = 1;
 }

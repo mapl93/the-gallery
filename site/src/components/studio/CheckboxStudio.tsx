@@ -102,10 +102,7 @@ function simulatedControlStyle(
   state: string,
   variant: string
 ): CSSProperties {
-  const focused = state === 'focusVisible'
-    || state === 'errorFocusVisible'
-    || state === 'successFocusVisible'
-    || state === 'warningFocusVisible';
+  const focused = state === 'focusVisible';
   const hover = state === 'hover';
   if (!focused && !hover) return {};
 
@@ -194,13 +191,6 @@ export default function CheckboxStudio({ contract, definition }: CheckboxStudioP
       checked: state === 'checked' ? true : state === 'indeterminate' ? false : current.checked,
       indeterminate: state === 'indeterminate' ? true : state === 'checked' ? false : current.indeterminate,
       disabled: state === 'disabled',
-      variant: state === 'errorFocusVisible'
-        ? 'error'
-        : state === 'successFocusVisible'
-          ? 'success'
-          : state === 'warningFocusVisible'
-            ? 'warning'
-            : current.variant,
     }));
   }
 

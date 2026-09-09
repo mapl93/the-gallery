@@ -28,6 +28,24 @@ Every component declares its dependencies as private custom properties (`--_` pr
 }
 ```
 
+### Fixed utilities and adaptive spacing
+
+ADR 0302 preserves two explicit vocabularies: `.p-8` is eight fixed 4px steps
+(32px at every viewport); `space.scale.8` is a semantic scale index (40px on
+Mobile/Tablet, 64px on Desktop/XL). Utility values reference fixed dimension
+primitives; semantic layout, section, stack and component roles may adapt.
+Choose by intent, never by matching the numeric suffix. Public component
+customization continues through the component contract and token catalogue.
+
+### Interface and editorial typography
+
+ADR 0300 applies the existing ADR 0277 boundary to the shared source/output:
+H1–H3 use the UI family and their own source weights; Display is an explicit
+editorial role. `.prose`, Article Hero and Article Body consume the editorial
+family, while `.prose-excluded` resets embedded components to UI typography.
+Body utilities apply source family, weight and line height instead of inheriting
+an unrelated parent style. Source values, not this historical guide, are canonical.
+
 ### Available Theme Tokens (Color — per mode: Light / Dark)
 
 | Group | Pattern | Examples |
@@ -69,7 +87,8 @@ These button tokens must resolve in every viewport mode:
 
 ```
 --font-family-body          /* Primary sans-serif */
---font-family-heading       /* Display serif */
+--font-family-heading       /* Interface heading family */
+--font-family-article       /* Editorial article/prose family */
 --font-family-accent        /* Handwritten / artisan feel */
 --font-family-mono          /* Code / technical */
 --radius-none | sm | md | lg | full

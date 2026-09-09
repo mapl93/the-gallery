@@ -4,6 +4,14 @@ This file tracks questions that are still genuinely open. Resolved architecture 
 
 ## Recently Resolved
 
+- Current delivery priority: complete base Web, then Shopify, then Figma. Existing
+  pilots are preserved; further Figma feedback is deferred by the owner.
+- Audit spacing policy: preserve fixed 4px utility steps and adaptive semantic
+  spacing roles, documenting their distinct indexes. See ADR 0302.
+- Consumer files are protected during CLI installation through per-file
+  baselines and conflict review (ADR 0299). Package/release versioning remains
+  a separate unresolved policy.
+
 - The owner requires broad public token coverage for meaningful component visual customization. Input/Textarea implement the first expanded surface, and Exhibit lists the same token controls as Studio. This does not turn semantic behavior or every structural CSS declaration into a token. See [ADR 0293](decisions/0293-public-visual-customization-coverage.md).
 
 The first architecture questions were resolved on 2026-05-23:

@@ -185,26 +185,17 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   function handleStateChange(state: string) {
     setPreviewState(state);
     if (contract.slug === 'tags-input') {
-      const semanticVariant = state === 'errorFocusVisible'
-        ? 'error'
-        : state === 'successFocusVisible'
-          ? 'success'
-          : state === 'warningFocusVisible'
-            ? 'warning'
-            : undefined;
       setValues((current) => ({
         ...current,
         disabled: state === 'disabled',
         readOnly: state === 'readOnly',
-        invalid: state === 'errorFocusVisible' ? true : semanticVariant ? false : current.invalid,
-        variant: semanticVariant ?? (state === 'default' || state === 'empty' ? 'default' : current.variant),
         selectedValues: state === 'empty' ? true : current.selectedValues,
       }));
       if (state === 'empty') setTags([]);
       requestAnimationFrame(() => {
         if (state === 'removeFocusVisible') {
           tagsInputRootRef.current?.querySelector<HTMLButtonElement>('.tag__remove')?.focus();
-        } else if (state === 'focusVisible' || state.endsWith('FocusVisible')) {
+        } else if (state === 'focusVisible') {
           tagsInputFieldRef.current?.focus();
         } else {
           tagsInputRootRef.current?.querySelector<HTMLElement>(':focus')?.blur();
@@ -225,22 +216,12 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
           : current.checked,
       disabled: state === 'disabled',
       required: state === 'requiredInvalid' ? true : current.required,
-      variant: state === 'errorFocusVisible'
-        ? 'error'
-        : state === 'successFocusVisible'
-          ? 'success'
-          : state === 'warningFocusVisible'
-            ? 'warning'
-            : current.variant,
     }));
   }
 
   function renderSwitch() {
     const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
-    const focused = previewState === 'focusVisible'
-      || previewState === 'errorFocusVisible'
-      || previewState === 'successFocusVisible'
-      || previewState === 'warningFocusVisible';
+    const focused = previewState === 'focusVisible';
     const controlToken = semantic
       ? `--color-input-${variant}-unfocused-inner-border`
       : previewState === 'hover'
@@ -500,7 +481,10 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
       <div className="docs-studio__field-fixture docs-studio__preview-tags-wrap">
         <div className={classes} ref={tagsInputRootRef} style={rootStyle} data-studio-state={previewState}>
           <label className={`field__label${values.required === true ? ' field__label--required' : ''}`} htmlFor={`${tagsInputId}-field`}>{String(values.label || '')}</label>
-          <div className="field__control tags-input__control" onClick={(event) => {
+          <div className="field__control tags-input__control" style={previewState === 'focusVisible' ? {
+            '--_tags-border': 'var(--_tags-focus-border)',
+            outlineColor: 'var(--_tags-focus-ring)',
+          } as CSSProperties : undefined} onClick={(event) => {
             if (!(event.target as HTMLElement).closest('button')) tagsInputFieldRef.current?.focus();
           }}>
             {values.selectedValues === true && <ul className="tags-input__values" aria-label="Selected materials">

@@ -178,13 +178,15 @@ Component Contract
 
 ## Target Priority
 
-The Gallery should grow from the easiest targets to the hardest:
+Current owner-approved delivery order (2026-09-08):
 
-1. Web foundation: vanilla CSS/HTML/JS.
-2. Web frameworks: React, Angular, and later other frameworks.
-3. Web platforms and e-commerce: Shopify, Webflow, Framer, and similar targets.
-4. Design tools: Figma and future design-tool targets.
-5. Native app targets: SwiftUI, Jetpack Compose, and later other native platforms.
+1. Complete and validate the base Web system: tokens, contracts, components and docs.
+2. Continue Shopify from the existing unpublished pilot.
+3. Resume Figma from the preserved library pilot.
+
+Framework, other web-platform and native adapters remain long-term targets.
+Their presence in the architecture diagram is not a request to implement them
+before this sequence. Figma feedback does not block base Web certification.
 
 ## What This Means For The Current Repo
 

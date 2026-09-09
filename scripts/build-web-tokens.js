@@ -153,7 +153,7 @@ function publicAliasDeclarations() {
     '--color-input-validation-unfocused-inner-border: var(--tg-color-feedback-info-default);',
 
     '--font-family-body: var(--tg-font-family-sans);',
-    '--font-family-heading: var(--tg-font-family-serif);',
+    '--font-family-heading: var(--tg-typography-h1-family);',
     '--font-family-accent: var(--tg-font-family-serif);',
     '--font-family-article: var(--tg-typography-article-body-family);',
     "--font-family-mono: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;",

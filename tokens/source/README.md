@@ -139,3 +139,22 @@ Existing radius, colors, typography, opacity and motion aliases remain public.
 Input and Textarea Studio expose these decisions; Exhibit derives its control
 inventory from the same contract and presentation metadata. A source token alone
 is not evidence that a consumer can discover and edit the corresponding control.
+
+## Fixed and adaptive spacing
+
+ADR 0302 preserves fixed utility steps (`.p-8` = 32px everywhere) independently
+from semantic indexes (`space.scale.8` = 40/40/64/64px across the viewport matrix).
+Utilities consume existing dimension primitives; choose a named semantic role
+for an adaptive layout decision. Neither vocabulary is a conversion of the other.
+
+## Interoperability checkpoint
+
+Audit finding 6 remains partially open. The current validators prove this
+repository's supported source shape, references, selected modes and output
+relationships; they do not prove strict DTCG conformance or round-trip support
+in arbitrary tools. The source keeps string dimensions/durations/colors, CSS
+font fallback stacks and repository-owned mode composition. A future export
+must define its target profile, transform unsupported values, preserve identity
+and aliases where possible, and pass that target's import/update checks before
+claiming interoperability. The owner deferred that export work with Figma; the
+canonical source format remains unchanged in this audit follow-up.

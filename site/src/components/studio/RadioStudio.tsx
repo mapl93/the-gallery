@@ -100,9 +100,6 @@ function simulatedControlStyle(
 ): CSSProperties {
   const focused = [
     'focusVisible',
-    'errorFocusVisible',
-    'successFocusVisible',
-    'warningFocusVisible',
   ].includes(state);
   if (!focused && state !== 'hover') return {};
 
@@ -185,13 +182,6 @@ export default function RadioStudio({ contract, definition }: RadioStudioProps) 
           : current.checked,
       disabled: state === 'disabled',
       required: state === 'requiredInvalid' ? true : current.required,
-      variant: state === 'errorFocusVisible'
-        ? 'error'
-        : state === 'successFocusVisible'
-          ? 'success'
-          : state === 'warningFocusVisible'
-            ? 'warning'
-            : current.variant,
     }));
   }
 

@@ -494,8 +494,12 @@ For components without contracts yet, use `registry.json`, CSS, and MDX docs as 
 
 The CLI reads the Web adapter manifest, resolves the transitive component graph,
 copies the exact base/family CSS and runtime modules for that graph, writes a
-local `runtime.js` module entry when behavior is needed, copies token source
-files, and records local state in `tg.config.json`.
+local `runtime.js` module entry when behavior is needed, and copies the manifest
+token CSS generated from `tokens/source/`. `tg.config.json` records the installed
+graph; `tg.install.json` records per-file upstream hashes and source/package
+provenance. Dry runs do not write. Local customizations are preserved, unresolved
+conflicts stop the whole plan, and reviewed files can be kept explicitly by path.
+See `docs/CLI.md` and ADR 0299.
 
 ## Documentation Site
 

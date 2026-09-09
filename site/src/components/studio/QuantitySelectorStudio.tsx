@@ -76,10 +76,7 @@ function optionClass(options: ComponentContract['variants'], value: StudioProper
 
 function activeColorTokens(variant: string, state: string): Record<string, string | null> {
   const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
-  const focused = state === 'focusWithin'
-    || state === 'errorFocusWithin'
-    || state === 'successFocusWithin'
-    || state === 'warningFocusWithin';
+  const focused = state === 'focusWithin';
 
   return {
     fill: '--color-input-default-unfocused-bg',
@@ -100,10 +97,7 @@ function numberValue(value: StudioPropertyValue): number | null {
 
 function simulatedRootStyle(variant: string, state: string): CSSProperties {
   const semantic = variant === 'error' || variant === 'success' || variant === 'warning';
-  const focused = state === 'focusWithin'
-    || state === 'errorFocusWithin'
-    || state === 'successFocusWithin'
-    || state === 'warningFocusWithin';
+  const focused = state === 'focusWithin';
   const border = semantic
     ? `--color-input-${variant}-${focused ? 'focused' : 'unfocused'}-inner-border`
     : `--color-input-default-${focused ? 'focused' : state === 'hover' ? 'hover' : 'unfocused'}-inner-border`;
@@ -189,13 +183,6 @@ export default function QuantitySelectorStudio({
       value: state === 'buttonDisabled' && numberValue(currentValues.max) !== null
         ? currentValues.max
         : currentValues.value,
-      variant: state === 'errorFocusWithin'
-        ? 'error'
-        : state === 'successFocusWithin'
-          ? 'success'
-          : state === 'warningFocusWithin'
-            ? 'warning'
-            : currentValues.variant,
     }));
   }
 

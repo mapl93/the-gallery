@@ -516,6 +516,12 @@ function validateContract(contractPath, context) {
     if (!hasString(state.name)) {
       errors.push(`${contract.slug}.states contains a state without a name`);
     }
+    for (const variant of contract.variants ?? []) {
+      const suffix = state.name?.startsWith(variant.name) ? state.name.slice(variant.name.length) : '';
+      if (/^(Hover|FocusVisible|FocusWithin|Open|Closed|Active|Pressed|Disabled|Selected)$/.test(suffix)) {
+        errors.push(`${contract.slug}.states.${state.name} combines variant ${variant.name} with ${suffix}; use independent axes (ADR 0274).`);
+      }
+    }
     if (!hasStringArray(state.selectors)) {
       errors.push(`${contract.slug}.states.${state.name} selectors must be unique non-empty strings`);
       continue;

@@ -82,3 +82,12 @@ The owner explicitly asked agents not to assume. When the repository does not ma
   file is also acceptable. The repository remains the official source.
 - These preferences do not imply additional platforms, modes, shadows or a
   wholesale token reconstruction. Review the small pilot before expansion.
+
+## Delivery priority after pilot review — 2026-09-08
+
+The owner liked the Shopify and Figma pilots but prioritized completing the
+base Web system first, then Shopify, then Figma. Preserve both pilots. Further
+Figma feedback/expansion is deferred and does not block base-system audit fixes.
+Fixed utility spacing and adaptive semantic spacing may coexist with explicit
+names and guidance; do not change current utility measures to match semantic
+scale indexes.

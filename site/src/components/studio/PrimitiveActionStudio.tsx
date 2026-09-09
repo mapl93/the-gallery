@@ -170,7 +170,7 @@ function activeTokensFor(
   if (slug === 'icon-button') {
     const filled = values.variant === 'filled';
     return {
-      background: state === 'filledHover'
+      background: filled && state === 'hover'
         ? '--color-border-subtle'
         : filled || state === 'hover'
           ? '--color-surface-secondary'
@@ -284,9 +284,6 @@ export default function PrimitiveActionStudio({
       return {
         ...current,
         disabled: state === 'disabled',
-        variant: contract.slug === 'icon-button' && state === 'filledHover'
-          ? 'filled'
-          : current.variant,
       };
     });
   }
@@ -324,10 +321,8 @@ export default function PrimitiveActionStudio({
     if (contract.slug === 'icon-button') {
       const style: CSSProperties = {
         ...(previewState === 'hover'
-          ? { background: 'var(--color-surface-secondary)', color: 'var(--color-text-primary)' }
-          : previewState === 'filledHover'
-            ? { background: 'var(--color-border-subtle)' }
-            : {}),
+          ? { background: values.variant === 'filled' ? 'var(--color-border-subtle)' : 'var(--color-surface-secondary)', color: 'var(--color-text-primary)' }
+          : {}),
         ...focusStyle(previewState),
       };
       return (

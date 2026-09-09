@@ -36,6 +36,7 @@ Read these files before making non-trivial changes:
 - `docs/decisions/0295-required-marker-public-color.md` for the shared red required-marker token and its Studio/Exhibit exposure.
 - `docs/decisions/0296-button-icon-optical-edge-offset.md` for editable Button icon-side optical spacing and loading-slot geometry.
 - `docs/decisions/0297-shopify-brand-settings-pilot.md` for Shopify Light brand settings, shared typography and the hosted-editor verification boundary.
+- `docs/decisions/0299-cli-consumer-file-protection.md`, `docs/CLI.md`, `docs/decisions/0300-interface-editorial-typography-reconciliation.md`, `docs/decisions/0301-variant-state-intersection-reconciliation.md`, and `docs/decisions/0302-fixed-utilities-and-adaptive-spacing.md` for audit corrections to copy-and-own safety, typography, independent states, and spacing vocabularies.
 - `docs/decisions/0292-control-coherence-pilot.md` for the canonical token catalogue, Input/Button density pilot, targeted contrast corrections and the owner-reviewed spacing follow-up.
 - `docs/decisions/0277-interface-numerals-and-editorial-serif-boundary.md` for ordinary interface zeroes, removal of the slashed-zero API, and the UI-versus-editorial typeface boundary.
 - `docs/decisions/0007-token-source-architecture.md` for the accepted token source layering.

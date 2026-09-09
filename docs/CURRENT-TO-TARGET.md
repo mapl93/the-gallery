@@ -2,14 +2,14 @@
 
 ## Current checkpoint — 2026-09-08
 
-The reviewed form customization, required marker and Button optical-spacing
-work is backed up remotely at `8162b62`. ADR 0297 implements the next Shopify
-brand-settings checkpoint: ten Light color controls, shared font bindings and
-source-default validation. The unpublished Shopify pilot `188631449907` has
-passed hosted editing, save/reload, restored-default and mobile preview checks;
-owner visual review is next, followed by Figma. See the dated pilot report for
-the exact evidence and remaining limits. The Foundations control matrix remains
-until equivalent adjacent/state coverage exists in real compositions.
+The Shopify brand-settings pilot is backed up remotely at `0f13e5e` after
+hosted checks in unpublished theme `188631449907` (ADR 0297). ADR 0298 adds a
+bounded repo-to-Figma pilot in the existing Design System file: four editable
+form components, 154 variables, three compositions and an identity-preserving
+4 → 8 → 4 px spacing update. Owner visual review is pending; the library is
+unpublished. See the dated Shopify and Figma pilot reports for exact evidence
+and limitations. The Foundations control matrix remains until equivalent
+adjacent/state coverage exists in real compositions.
 
 This document compares what The Gallery has today with the target architecture in `docs/NORTH-STAR.md`. It is the working backlog map for evolving the repo.
 
@@ -38,7 +38,7 @@ The main gap is not volume of components. The main gap is formalization: token s
 | Registry | `registry.json` drives docs and CLI; `registry.schema.json` now exists with local structural validation. | Registry is schema-validated, target-aware, version-aware, and dependency-aware. | Expand target fields; align component count/categories over time; decide package vs registry versioning. |
 | CLI | CLI can init, add, list and diff; Web installs now read the adapter manifest, copy dependency-closed CSS/runtime slices and generate a local module entry. | CLI installs by target, version, and dependency graph, preserving copy-and-own semantics. | Add dry-run/manifest output and later support `--target shopify/react/webflow`. |
 | Documentation site | React/Vite docs app uses registry, MDX pages, previews, architecture pages, and a contracts index. It consumes `platforms/web/index.css` as a first-party adapter client; isolated previews use generated adapter component CSS and inherit the document token matrix. Exhibit now groups canonical MDX into five curatorial sections, promotes one preview as the artwork, and adapts its index and pedestal across desktop and mobile. A validated Studio presentation layer and generic inspector exist, with Button as the first interactive renderer and a site-only Lucide icon catalogue. | Exhibit and Studio consume contract facts through site-owned presentation metadata while docs expose north star, tokens, target-specific usage, versions, copy commands, and migration guidance. | Expand Studio only as component contracts are reviewed; implement the separately approved main-menu experience; improve token pages and reduce MDX inline style warnings over time. |
-| Figma target | Root Figma exports exist as snapshots. No repo-to-Figma generation yet. | Figma variables and components are generated/synced from repo source. | Decide Figma sync path; generate DTCG import files; later create Figma components from contracts. |
+| Figma target | Root exports remain historical snapshots. ADR 0298 adds a bounded Plugin API pilot in `platforms/figma/pilot/`, with variables, styles, four form components and persistent IDs. | Figma variables and components are generated/synced from repo source. | Review the pilot, including derived CSS transformations; decide the general delivery/update model before expansion. |
 | Native targets | No SwiftUI or Compose output yet. | Tokens generate Swift/Kotlin values; contracts generate or guide native styles/components. | After token source stabilizes, add token-only native output spike; later pilot Button in SwiftUI and Compose. |
 | Generated artifacts | `site/dist` is tracked and produces hash churn. | Docs builds are deployment output; consumer-ready outputs are release/package artifacts generated from source. | Remove or de-emphasize `site/dist` as source; define package/release artifact generation. |
 | Quality gates | `npm run validate:docs` checks registry/MDX/CSS/contract relationships and validated Studio presentation metadata. `npm run validate:tokens:source` checks the new DTCG source structure. `npm run validate:tokens:web-components` verifies that the neutral web target defines every public token used by component CSS. `npm run audit:components` generates exact neutral web certification evidence, including Studio property coverage, without automatic status promotion. | Token, contract, registry, adapter, visual, generated-output, and human-reviewed maturity validation exist. | Certify the docs-site component kernel first, keep validations current, and add target adapter tests as adapters mature. |
@@ -169,8 +169,9 @@ These tasks turn the north star into executable structure without forcing a risk
 
 ADR 0292 scopes the first audit follow-up: canonical catalogue and historical-doc
 clarity, targeted contrast corrections, and an Input/Button density pilot.
-The owner reviewed the overall pilot; its Input label/message spacing follow-up preserves 4 px. Shopify editor customization and Figma
-Professional portability are subsequent checkpoints, not completed integrations.
+The owner reviewed the overall pilot; its Input label/message spacing follow-up
+preserves 4 px. Shopify editor customization and Figma Professional portability
+now have bounded implementations in ADRs 0297 and 0298, pending owner review.
 
 
 ## Public visual customization coverage (ADR 0293)

@@ -2055,4 +2055,7 @@ Questions:
 - Which npm packages should exist for web, React, Angular, and CLI consumption?
 - Should Shopify templates ship as GitHub release zips, npm package assets, Theme Store submissions, or all of these?
 - How should Figma outputs ship: DTCG import files, plugin workflow, generated `.fig` files, or another route?
+  ADR 0298 validates a bounded Plugin API pilot on Professional, preserving
+  source aliases and Figma IDs. It does not choose the general release model,
+  authorize publication, or define reverse synchronization from Figma.
 - When native targets arrive, should Swift ship as a Swift Package and Kotlin as Maven/Gradle artifacts?

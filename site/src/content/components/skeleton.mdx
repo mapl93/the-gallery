@@ -27,7 +27,13 @@ Default is an unopinionated block whose dimensions come from its composition. Te
 - Keep every Skeleton shape `aria-hidden="true"`; do not give it Status, Progressbar, label, focus, or interaction semantics.
 - If explicit feedback is useful, provide one actual localized `role="status"` message outside the decorative shapes.
 - Replace Skeletons promptly and keep placeholder/final geometry aligned to avoid layout shift.
-- Neutral Web stops shimmer after 4.5 seconds and renders static solid geometry for reduced motion and forced colors.
+- Neutral Web stops shimmer after at most 4.5 seconds and renders static solid geometry for reduced motion and forced colors.
+
+## Visual Customization
+
+Studio and Exhibit expose Text/Title height and width, Button width and shared height, surface colors, radii, cycle duration, and easing. Text heights keep `em` units and line widths keep percentages; they adapt to the consumer font and container. Default dimensions and Circle diameter remain composition-owned.
+
+The requested cycle duration is bounded to 0–1500ms in Web CSS, with three cycles and a 4.5-second maximum established by ADR 0111. Editing the Studio preview starts one new bounded run; it creates no component timer or automatic loop. Reduced-motion and forced-color preferences always remove the animation. This is Skeleton’s existing behavior choice, not a system-wide motion limit. [WCAG 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html) describes the conditions requiring a pause, stop, or hide mechanism for automatic motion lasting more than five seconds alongside other content.
 
 ## References
 
@@ -45,4 +51,4 @@ Use Spinner when future geometry cannot be represented, Progress when measurable
 
 ## Motion And Targets
 
-The base shimmer is finite and uses no JavaScript. React and Angular keep request/state ownership outside the component; Shopify composes the generated class contract inside target Liquid; SwiftUI and Compose map the same decorative geometry through native motion and accessibility preferences. Figma receives the six visual shapes but no data/loading behavior.
+The base shimmer is finite and uses no JavaScript. Neutral Web consumers keep request/state ownership outside the component; Shopify composes the generated class contract inside target Liquid. Neither generated output owns request completion or loading announcements.

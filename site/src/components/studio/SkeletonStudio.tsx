@@ -128,7 +128,7 @@ export default function SkeletonStudio({ contract, definition }: SkeletonStudioP
               aria-busy="true"
               aria-label="Loading preview content"
             >
-              <div className={classes} aria-hidden="true" />
+              <div key={`${variant}:${JSON.stringify(tokenOverrides)}`} className={classes} aria-hidden="true" />
             </div>
             <span className="visually-hidden" role="status">Loading content</span>
           </div>

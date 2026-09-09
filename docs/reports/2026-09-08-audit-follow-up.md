@@ -189,3 +189,9 @@ ADR 0315 continúa con Quantity Selector: siete decisiones, 39 controles, altura
 exterior compartida de 46px y ancho compacto en grids. Studio consume Field
 Wrapper y el enhancer canónico; se verifican eventos nativos y composiciones en
 `docs/reports/2026-09-09-quantity-checkpoint.md`. Permanece `pilot`.
+
+ADR 0316 continúa el punto 5 con Rating y Loading Skeleton: nueve decisiones,
+10/13 roles públicos, unidades relativas y máximo de movimiento de Skeleton
+preservados. Pasan 64 comparaciones y veinte mediciones de Studio, con terminación
+real de la animación, preferencias estáticas y composiciones Review verificadas.
+Véase `2026-09-09-rating-skeleton-checkpoint.md`; no se promovió madurez humana.

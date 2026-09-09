@@ -289,3 +289,12 @@ Studio composes Field Wrapper and the canonical native enhancer. Evidence covers
 32 default comparisons, 22 Studio measurements, native form ownership and Product
 Form/Cart Line Item: `docs/reports/2026-09-09-quantity-checkpoint.md`. Keep pilot;
 continue Rating and Loading Skeleton before broader commercial compositions.
+
+## Rating and Skeleton customization (ADR 0316)
+
+Rating and Loading Skeleton expose nine source decisions and ten/thirteen public
+roles respectively. Defaults and relative units remain stable. Skeleton preserves
+its existing 4.5-second maximum and static preference modes. Evidence covers 64
+comparisons, twenty Studio measurements, installed CSS, real animation completion,
+Review compositions and Exhibit: `docs/reports/2026-09-09-rating-skeleton-checkpoint.md`.
+Continue remaining primitives and commercial compositions; both remain pilot.

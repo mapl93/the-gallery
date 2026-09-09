@@ -21,7 +21,7 @@ export default function EmptyStateArtwork({
   titleId,
   titleElement,
 }: EmptyStateArtworkProps) {
-  if (!title.trim()) return null;
+  if (!title.trim() || !/^h[1-6]$/.test(titleElement)) return null;
 
   const Title = titleElement;
 

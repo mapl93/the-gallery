@@ -195,3 +195,8 @@ ADR 0316 continúa el punto 5 con Rating y Loading Skeleton: nueve decisiones,
 preservados. Pasan 64 comparaciones y veinte mediciones de Studio, con terminación
 real de la animación, preferencias estáticas y composiciones Review verificadas.
 Véase `2026-09-09-rating-skeleton-checkpoint.md`; no se promovió madurez humana.
+
+ADR 0317 amplía Empty State/Divider con seis decisiones y 17/4 roles públicos.
+Corrige la validación en ejecución del encabezado contextual de Empty State.
+Cuarenta y ocho presentaciones y quince mediciones pasan, incluyendo Cart Empty,
+Empty Collection, textos largos y RTL. Véase `2026-09-09-empty-divider-checkpoint.md`.

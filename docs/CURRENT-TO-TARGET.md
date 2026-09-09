@@ -298,3 +298,12 @@ its existing 4.5-second maximum and static preference modes. Evidence covers 64
 comparisons, twenty Studio measurements, installed CSS, real animation completion,
 Review compositions and Exhibit: `docs/reports/2026-09-09-rating-skeleton-checkpoint.md`.
 Continue remaining primitives and commercial compositions; both remain pilot.
+
+## Empty State and Divider customization (ADR 0317)
+
+Empty State exposes four additional geometry choices and enforces contextual
+heading validation at runtime. Divider exposes two thicknesses without changing
+parent-owned spacing or Purpose. Evidence covers 48 presentations, fifteen Studio
+measurements, RTL/narrow containment and Cart Empty/Empty Collection composition:
+`docs/reports/2026-09-09-empty-divider-checkpoint.md`. Avatar's paired-scale
+clarification is independent; continue other base component coverage meanwhile.

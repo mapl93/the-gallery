@@ -76,6 +76,7 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [dimensionValues, setDimensionValues] = useState<string[]>(dimensionFields.map(([, value]) => value));
+  const contextTokenValuesRef = useRef(tokenOverrides);
   const [highlightedItem, setHighlightedItem] = useState(0);
   const [contextPosition, setContextPosition] = useState<{ left: number; top: number } | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -123,7 +124,9 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
 
   useEffect(() => {
     if (!open || contract.slug !== 'context-menu') return undefined;
-    const dismissForViewportChange = () => {
+    const dismissForViewportChange = (event: Event) => {
+      // Scrolling commands inside the menu does not move its owning viewport.
+      if (event.type === 'scroll' && event.target instanceof Node && surfaceRef.current?.contains(event.target)) return;
       setValues((current) => ({ ...current, open: false }));
       requestAnimationFrame(() => triggerRef.current?.focus());
     };
@@ -143,6 +146,20 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
     });
     return () => cancelAnimationFrame(frame);
   }, [contract.slug, contextPosition, open]);
+
+  useEffect(() => {
+    const changed = contextTokenValuesRef.current !== tokenOverrides;
+    contextTokenValuesRef.current = tokenOverrides;
+    if (!changed || !open || contract.slug !== 'context-menu') return undefined;
+    const frame = requestAnimationFrame(() => {
+      const anchor = contextAnchorRef.current;
+      const surface = surfaceRef.current;
+      if (!anchor || !surface) return;
+      const bounds = anchor.getBoundingClientRect();
+      positionContextMenu(bounds.left + surface.offsetLeft, bounds.top + surface.offsetTop);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [contract.slug, open, tokenOverrides]);
 
   function closeAndRestoreFocus() {
     setOpen(false);
@@ -174,7 +191,7 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
     const trigger = triggerRef.current?.getBoundingClientRect();
     const invocationX = Number.isFinite(clientX) ? clientX : trigger?.left ?? bounds.left;
     const invocationY = Number.isFinite(clientY) ? clientY : trigger?.bottom ?? bounds.top;
-    const inset = 8;
+    const inset = Number.parseFloat(getComputedStyle(anchor).getPropertyValue('--_studio-context-inset')) || 0;
     const left = Math.min(
       Math.max(invocationX - bounds.left, inset),
       Math.max(inset, bounds.width - surface.offsetWidth - inset),

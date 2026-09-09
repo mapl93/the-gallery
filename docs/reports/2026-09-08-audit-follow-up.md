@@ -286,3 +286,11 @@ foco natural, Escape/cierre exterior, RTL estrecho y herencia de Input pasan.
 Fuente/adapters/CLI validados; sin certificación integral ni entrega remota.
 Detalle: `2026-09-09-breadcrumb-popover-checkpoint.md`. Continúan Dropdown Menu y
 Context Menu dentro del punto 5; no se declaran cerrados los nueve puntos.
+
+ADR 0332 completa Dropdown/Context Menu con 30 tokens nuevos y 46/45 roles públicos;
+Context referencia los valores internos de Dropdown. Se quitan variantes duplicadas
+en estados, se conserva altura personalizada mayor en coarse y se corrige el cierre
+indebido por scroll interno de Context Studio. Cuatrocientas comparaciones de defaults,
+interacciones, coordenadas, reclamp por tokens, adapters y CLI pasan. Sin promoción
+de madurez ni subida remota. Detalle: `2026-09-09-action-menu-checkpoint.md`.
+Continúan Command Palette y Steps; los nueve puntos no se declaran cerrados.

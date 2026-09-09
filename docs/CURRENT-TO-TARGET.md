@@ -429,3 +429,13 @@ complete Input anatomy. Keyboard/reset, narrow RTL, forced/reduced, CLI and
 source/adapters checks pass. Both remain pilot; remote Shopify follows Web.
 Evidence: `docs/reports/2026-09-09-breadcrumb-popover-checkpoint.md`.
 Continue Dropdown Menu and Context Menu.
+
+## Action menu visual values (ADR 0332)
+
+Thirty new source values complete 46/45 Dropdown/Context roles, with shared item
+references rather than duplicate values. Canonical defaults preserve 400 measured
+element comparisons. Larger custom coarse rows are retained; Context Studio
+permits internal scrolling and preserves invocation coordinates while re-clamping
+after token edits. Source/adapters/CLI and local behavior checks pass; both remain
+pilot. Evidence: `docs/reports/2026-09-09-action-menu-checkpoint.md`.
+Continue Command Palette and Steps, keeping Shopify remote delivery after Web.

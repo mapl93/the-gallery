@@ -248,16 +248,19 @@ const previewHostCss = `${previewBundleCss}
   position: relative;
   display: grid;
   place-items: start center;
-  width: min(100%, 320px);
-  min-height: 220px;
+  width: 100%;
+  min-height: max(220px, calc(var(--space-context-menu-max-height) + 72px));
 }
 
 .tg-preview-context-layer {
   position: absolute !important;
   top: 72px !important;
   left: 50% !important;
-  transform: translateX(-50%) !important;
+  min-inline-size: min(var(--_context-menu-min-inline-size), 100%, calc(100vw - (var(--space-layout-element-gap) * var(--ratio-context-menu-viewport-gutter))));
+  max-inline-size: min(var(--_context-menu-max-inline-size), 100%, calc(100vw - (var(--space-layout-element-gap) * var(--ratio-context-menu-viewport-gutter))));
+  transform: translate(-50%, calc(-1 * var(--space-context-menu-entrance-offset))) !important;
 }
+.tg-preview-context-layer.context-menu--open { transform: translate(-50%, 0) !important; }
 
 .tg-preview-stage--overlay [data-preview-trigger][aria-expanded="true"],
 [data-preview-trigger][hidden] {

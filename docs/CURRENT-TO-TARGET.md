@@ -502,3 +502,12 @@ zoom. Local typography, RTL alignment, Studio/reset and Product Slider inheritan
 pass. Existing stable status is retained without new human approval claims.
 Evidence: `docs/reports/2026-09-09-product-card-checkpoint.md`.
 Continue Product Info and Product Slider; remote Shopify remains separate.
+
+## CLI CSS union order (ADR 0340)
+
+Combined, incremental and add-all installs now emit the canonical stylesheet
+subset from Web manifest source order instead of dependency encounter order.
+Product Info followed by Slider previously loaded Carousel after its specialized
+grid. Integration tests and Chromium reproduce flex before/grid after; all 20
+copy-protection scenarios pass. Existing consumers must adopt import order
+explicitly. Evidence: `docs/reports/2026-09-09-cli-css-order-checkpoint.md`.

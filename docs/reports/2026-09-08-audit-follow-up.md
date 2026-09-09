@@ -336,3 +336,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   en Product Slider pasan. Mantiene madurez previa sin nueva aprobación humana.
   Evidencia: `docs/reports/2026-09-09-product-card-checkpoint.md`.
   Continúan Product Info y Product Slider dentro del punto 5.
+
+- ADR 0340 corrige el orden de CSS recomendado por la CLI para conjuntos de
+  componentes: siempre sigue el subconjunto canónico. Product Info/Slider
+  reproducía flex en lugar de grid. Pruebas conjuntas/incrementales/add-all,
+  los 20 escenarios de protección y evidencia Chromium pasan. Las copias
+  existentes adoptan el orden explícitamente. Ver `2026-09-09-cli-css-order-checkpoint.md`.

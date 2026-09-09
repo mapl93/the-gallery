@@ -51,6 +51,40 @@ try {
   assert(config.components.includes('product-gallery'), 'CLI config must record Product Gallery');
   assert(config.components.includes('filter-panel'), 'CLI config must record Filter Panel');
   assert(config.components.includes('checkbox'), 'CLI config must record transitive Checkbox dependency');
+
+  // Family CSS order must not depend on component request or installation order.
+  // Product Info encounters product.css before Slider discovers layout.css;
+  // loading that union in encounter order makes Carousel override Slider's grid.
+  const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'platforms/web/adapter.manifest.json'), 'utf8'));
+  const cases = [
+    [['product-info', 'product-slider']],
+    [['product-slider', 'product-info']],
+    [['product-info'], ['product-slider']],
+    [['-a']],
+  ];
+  for (const [index, batches] of cases.entries()) {
+    const destination = path.join(fixture, `css-order-${index}`);
+    fs.mkdirSync(destination);
+    fs.writeFileSync(path.join(destination, 'tg.config.json'), JSON.stringify({
+      cssDir: './styles/the-gallery', tokensDir: './styles/tokens',
+      jsDir: './scripts/the-gallery', components: [],
+    }));
+    for (const requested of batches) {
+      const installed = spawnSync(process.execPath, [path.join(repoRoot, 'cli/index.js'), 'add', ...requested], {
+        cwd: destination, encoding: 'utf8',
+      });
+      assert(installed.status === 0, `CSS order case ${index} failed: ${installed.stderr || installed.stdout}`);
+      const output = installed.stdout.split('Import these styles in order, then load the runtime as a module when present:')[1] ?? '';
+      const imports = output.split('\n').map((line) => line.trim()).filter((line) => /^styles\/.*\.css$/.test(line));
+      const expected = ['styles/tokens/tokens.css', ...manifest.sources.cssFiles
+        .filter((file) => fs.existsSync(path.join(destination, 'styles/the-gallery', path.basename(file.output))))
+        .map((file) => `styles/the-gallery/${path.basename(file.output)}`)];
+      assert(JSON.stringify(imports) === JSON.stringify(expected),
+        `CSS order case ${index} (${requested.join(', ')}): ${imports.join(', ')} must preserve canonical cascade ${expected.join(', ')}`);
+      assert(imports.indexOf('styles/the-gallery/layout.css') < imports.indexOf('styles/the-gallery/product.css') || !requested.includes('product-slider'),
+        'Slider must load its product rules after Carousel layout rules');
+    }
+  }
 } finally {
   fs.rmSync(fixture, { recursive: true, force: true });
 }
@@ -61,4 +95,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log('Validated CLI dependency-closed install: CSS foundations, selected runtime, and no unrelated enhancers.');
+console.log('Validated CLI dependency-closed install: canonical CSS cascade across request orders, incremental/all installs, selected runtime, and no unrelated enhancers.');

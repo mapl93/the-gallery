@@ -105,19 +105,22 @@ function resolveDeps(componentId, resolved = new Set(), order = [], visiting = n
   return order;
 }
 
-/** Get the CSS file(s) needed for a list of components. Returns unique file paths in order. */
+/** Union dependency slices in the adapter's canonical CSS cascade order. */
 function getRequiredFiles(componentIds) {
-  const outputs = [];
-  const seen = new Set();
+  const required = new Set();
   for (const id of componentIds) {
     const component = webManifest.components.find((entry) => entry.slug === id);
     for (const file of component?.install?.css ?? []) {
-      if (seen.has(file)) continue;
-      seen.add(file);
-      outputs.push(resolve(PACKAGE_ROOT, file));
+      required.add(file);
     }
   }
-  return outputs;
+  const ordered = webManifest.sources.cssFiles.map((file) => file.output);
+  for (const file of required) {
+    if (!ordered.includes(file)) {
+      throw new Error(`Missing canonical CSS order for ${file}. Rebuild the adapter before distribution.`);
+    }
+  }
+  return ordered.filter((file) => required.has(file)).map((file) => resolve(PACKAGE_ROOT, file));
 }
 
 /** Get the dependency-closed progressive-enhancement modules for installed components. */

@@ -376,3 +376,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Pasan 560 comparaciones, tokens, RTL, selección/FormData/reset, required,
   disabled, términos y Studio/Exhibit. Sigue pilot, sin compra real ni Shopify.
   Evidencia: `2026-09-09-subscription-checkpoint.md`. Continúan Hero/Grid.
+
+- ADR 0345 completa Collection Hero con siete roles nuevos y 23 valores
+  públicos. Pasan 88 comparaciones, límites/altura/ancho/tipo, Studio/reset y
+  contraste del fixture actual. Sigue pilot y conserva la paleta aprobada.
+  Evidencia: `2026-09-09-collection-hero-checkpoint.md`. Continúa Grid con todas
+  las densidades mediante tokens, según la decisión explícita del propietario.

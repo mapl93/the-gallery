@@ -559,3 +559,13 @@ comparisons, custom geometry, RTL/native value/reset/required/disabled, selected
 terms and Studio/Exhibit pass. No commerce provider work or stable promotion.
 Evidence: `docs/reports/2026-09-09-subscription-checkpoint.md`.
 Continue Collection Hero and Collection Grid.
+
+## Collection Hero visual values (ADR 0345)
+
+Seven source roles complete 23 public values. 88 initial comparisons retain the
+image-derived composition in both themes. Custom bounds/width/height/type,
+forced colors, Studio/reset and current-image contrast pass. No new palette,
+layout mode or stable promotion. Evidence:
+`docs/reports/2026-09-09-collection-hero-checkpoint.md`.
+Continue Collection Grid: owner selected tokens for every density with existing
+consumer compatibility, replacing desktop columns as the primary semantic API.

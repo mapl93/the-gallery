@@ -1,5 +1,9 @@
 # 0237. Explicit Avatar Composition And Semantic Initials Scale
 
+> Update (2026-09-09): ADR 0319 supersedes the restriction on independent
+> diameter/type token controls. The original pairings remain defaults; explicit
+> composition, target-owned image policy and passive semantics still apply.
+
 Status: Accepted
 
 Date: 2026-07-20

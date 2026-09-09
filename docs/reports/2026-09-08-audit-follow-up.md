@@ -205,3 +205,10 @@ ADR 0318 corrige un problema transversal del punto 5: Studio perdía alfa al edi
 RGBA y mostraba negro para expresiones como el color-mix de Empty State. El editor
 conserva transparencia, muestra su resultado y mantiene completas las expresiones
 no interpretadas. Evidencia en `2026-09-09-studio-color-checkpoint.md`.
+
+
+ADR 0319 resuelve la decisión de Avatar: diámetro e iniciales son personalizables
+por tokens, conservando las parejas como defaults. Cuatro decisiones nuevas y los
+roles tipográficos existentes completan trece controles. Pasan 56 raíces y cuatro
+parejas independientes en CLI/Studio, con Author Card y Comment Section como
+consumidores. Véase `2026-09-09-avatar-checkpoint.md`.

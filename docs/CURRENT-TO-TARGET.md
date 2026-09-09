@@ -306,7 +306,7 @@ heading validation at runtime. Divider exposes two thicknesses without changing
 parent-owned spacing or Purpose. Evidence covers 48 presentations, fifteen Studio
 measurements, RTL/narrow containment and Cart Empty/Empty Collection composition:
 `docs/reports/2026-09-09-empty-divider-checkpoint.md`. Avatar's paired-scale
-clarification is independent; continue other base component coverage meanwhile.
+clarification is resolved by ADR 0319; continue base component coverage.
 
 ## Studio color editing (ADR 0318)
 
@@ -315,3 +315,13 @@ transparency, and retains unsupported color expressions in a complete text edito
 Empty State color-mix, authored RGBA, Button transparent border and Slider shadow
 regression pass: `docs/reports/2026-09-09-studio-color-checkpoint.md`. Site-only;
 no source values, component maturity or target outputs change.
+
+
+## Avatar customization (ADR 0319)
+
+The owner resolved the paired-scale blocker: diameter and initials size are
+independently customizable through tokens. Four diameter decisions and the existing
+semantic type roles expose all thirteen visual controls, with unchanged defaults.
+Evidence covers 56 roots, four independent pairs, CLI, Studio, Exhibit, Author Card,
+Comment Section and image/naming boundaries: `docs/reports/2026-09-09-avatar-checkpoint.md`.
+Continue Button Group, Icon Button and Close Button; Avatar remains pilot.

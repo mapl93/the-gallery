@@ -2048,7 +2048,9 @@ Questions:
   initials, while loading/failure/source selection and fallback choice remain
   target-owned. The four existing sizes couple to Caption, Body Small, Body
   Default and Body Large typography respectively; no image URL, content mode,
-  loading state or independent font-size property enters the neutral API.
+  loading state or independent font-size property enters the neutral API. ADR 0319
+  records the owner clarification that diameter and initials size are independently
+  customizable through public tokens and Studio; the four pairings remain defaults.
 - Which property fields become required for contracts seeking `stable` after the pilot?
 - Which generated contract families need hand-refinement before adapter code generation?
 - Which `template-detected` Shopify components should be promoted from `planned` to `implemented` first after schema, settings, data, behavior, and editor readiness are validated?

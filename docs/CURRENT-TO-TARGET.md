@@ -581,3 +581,14 @@ setting now writes the public token; remote validation remains separate.
 Evidence: `docs/reports/2026-09-09-collection-grid-checkpoint.md`.
 Both lifecycle and system-process checks confirm test browsers closed. Continue
 Filter Panel and Pagination; Grid remains pilot.
+
+## Filter Panel and Pagination visual values (ADR 0347)
+
+Seventeen source roles complete 19/16 public values. 544 default comparisons
+retain geometry; independent visual controls, native/adaptive form lifecycle,
+controlled draft/commit/reset, pagination boundaries and Studio/Exhibit pass.
+The owner selected 18px icons on Web and Shopify. Pagination now grows beyond
+its control minimum for taller text. No JS or source-mode changes; both stay
+pilot. Evidence: `docs/reports/2026-09-09-collection-navigation-checkpoint.md`.
+Test browser session and system processes are closed after evidence. Continue
+Artist Profile and Artist Card; Shopify remote follows the Web system.

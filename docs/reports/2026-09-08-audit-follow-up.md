@@ -389,3 +389,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   completo conserva tres errores históricos en `_legacy`; no se publica.
   Evidencia: `2026-09-09-collection-grid-checkpoint.md`. Continúan Filter Panel
   y Pagination. Navegadores cerrados, verificado también a nivel de procesos.
+- ADR 0347 completa Filter Panel/Pagination con 17 roles fuente y 19/16 valores
+  públicos. Se conservan 544 comparaciones iniciales; pasan personalización,
+  formulario adaptativo, draft/commit/cancel, navegación y Studio. El propietario
+  seleccionó iconos de 18px en ambos targets. No hay nuevos modos, JS ni promoción
+  a stable. Evidencia: `2026-09-09-collection-navigation-checkpoint.md`.
+  Continúan Artist Profile y Artist Card; navegadores cerrados y procesos limpios.

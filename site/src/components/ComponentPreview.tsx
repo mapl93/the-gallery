@@ -212,7 +212,7 @@ const previewHostCss = `${previewBundleCss}
 }
 
 .tg-preview-anchor-stage--popover {
-  padding-bottom: 128px;
+  width: 100%;
 }
 
 .tg-preview-anchor-stage--calendar {
@@ -233,8 +233,15 @@ const previewHostCss = `${previewBundleCss}
 }
 
 .tg-preview-anchor-popover {
-  top: calc(100% - 120px) !important;
-  left: 0 !important;
+  position: relative;
+  inset: auto;
+  margin-block-start: calc(var(--space-layout-element-gap) * 0.25);
+  min-inline-size: min(var(--_popover-min-inline-size), 100%, calc(100vw - (var(--space-layout-element-gap) * var(--ratio-popover-viewport-gutter))));
+  max-inline-size: min(var(--_popover-max-inline-size), 100%, calc(100vw - (var(--space-layout-element-gap) * var(--ratio-popover-viewport-gutter))));
+}
+.tg-preview-popover-fields {
+  display: grid;
+  gap: calc(var(--space-layout-element-gap) * 0.5);
 }
 
 .tg-preview-context-stage {

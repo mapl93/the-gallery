@@ -9,6 +9,7 @@ import {
   type MouseEvent,
 } from 'react';
 import { ChevronDown, Copy, Pencil, Trash2 } from 'lucide-react';
+import InputArtwork from './InputArtwork';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -21,6 +22,8 @@ interface FloatingMenuStudioProps {
   contract: ComponentContract;
   definition: StudioDefinition;
 }
+
+const dimensionFields = [['Width', '100%'], ['Max. width', '300px'], ['Height', '25px'], ['Max. height', 'none']] as const;
 
 const emptySlotIcons: StudioSlotIconValues = { leading: '', trailing: '' };
 
@@ -72,6 +75,7 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   const [values, setValues] = useState<StudioPropertyValues>(initialValues);
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
+  const [dimensionValues, setDimensionValues] = useState<string[]>(dimensionFields.map(([, value]) => value));
   const [highlightedItem, setHighlightedItem] = useState(0);
   const [contextPosition, setContextPosition] = useState<{ left: number; top: number } | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -215,6 +219,7 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
   }
 
   function reset() {
+    setDimensionValues(dimensionFields.map(([, value]) => value));
     setValues({ ...initialValues });
     setHighlightedItem(0);
     setContextPosition(null);
@@ -301,12 +306,6 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
 
   function renderPreview() {
     if (contract.slug === 'popover' || contract.slug === 'popup') {
-      const dimensionFields = [
-        ['Width', '100%'],
-        ['Max. width', '300px'],
-        ['Height', '25px'],
-        ['Max. height', 'none'],
-      ] as const;
       return (
         <div className="docs-studio__floating-anchor">
           <button
@@ -341,15 +340,17 @@ export default function FloatingMenuStudio({ contract, definition }: FloatingMen
             <div className="popover__content">
               <p className="docs-studio__popover-description">Set the dimensions for the layer.</p>
               <div className="docs-studio__popover-fields">
-                {dimensionFields.map(([label, value], index) => {
-                  const fieldId = `${popoverId}-dimension-${index}`;
-                  return (
-                    <div className="docs-studio__popover-field" key={label}>
-                      <label htmlFor={fieldId}>{label}</label>
-                      <input className="input__field docs-studio__popover-input" id={fieldId} defaultValue={value} />
-                    </div>
-                  );
-                })}
+                {dimensionFields.map(([label], index) => (
+                  <InputArtwork
+                    key={label}
+                    id={`${popoverId}-dimension-${index}`}
+                    label={label}
+                    value={dimensionValues[index]}
+                    onChange={(event) => setDimensionValues((current) => current.map((value, position) => (
+                      position === index ? event.target.value : value
+                    )))}
+                  />
+                ))}
               </div>
             </div>
           </div>

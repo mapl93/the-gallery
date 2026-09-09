@@ -277,3 +277,12 @@ Corrige selección desincronizada en Studio e indicador de Tabs recortado por sc
 Pasan 296 mediciones de geometría/tipo, teclado, FAQ y seis capturas con verificación
 de píxeles del indicador; cambios de pintado y fallback forzado explícitos. Ver
 `2026-09-09-accordion-tabs-checkpoint.md`; continúan Breadcrumb/Popover.
+
+ADR 0331 completa Breadcrumb/Popover con 16 tokens nuevos y 19/26 roles públicos.
+Se preserva la geometría canónica LTR en 168 mediciones de ocho matrices y se
+corrige la orientación de flecha RTL. Studio deja de ocultar los límites de ancho
+y compone Input real; Exhibit/migración Popup reservan su altura. Tokens, reset,
+foco natural, Escape/cierre exterior, RTL estrecho y herencia de Input pasan.
+Fuente/adapters/CLI validados; sin certificación integral ni entrega remota.
+Detalle: `2026-09-09-breadcrumb-popover-checkpoint.md`. Continúan Dropdown Menu y
+Context Menu dentro del punto 5; no se declaran cerrados los nueve puntos.

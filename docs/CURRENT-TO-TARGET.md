@@ -419,3 +419,13 @@ Tabs Studio synchronizes its Details-selected control; its formerly clipped
 indicator is verified by rendered pixels with token-driven widths in light/dark
 and forced colors. Geometry, keyboard, native disclosure and FAQ inheritance pass:
 `docs/reports/2026-09-09-accordion-tabs-checkpoint.md`. Continue Breadcrumb/Popover.
+
+## Breadcrumb and Popover visual values (ADR 0331)
+
+Sixteen source tokens complete 19/26 public roles with preserved canonical LTR
+geometry and responsive factors. Popover's RTL arrow strokes are corrected;
+Studio/Exhibit respect intrinsic bounds, reserve content height and compose
+complete Input anatomy. Keyboard/reset, narrow RTL, forced/reduced, CLI and
+source/adapters checks pass. Both remain pilot; remote Shopify follows Web.
+Evidence: `docs/reports/2026-09-09-breadcrumb-popover-checkpoint.md`.
+Continue Dropdown Menu and Context Menu.

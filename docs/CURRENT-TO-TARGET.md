@@ -602,3 +602,13 @@ now matches the contract using existing transition/transform categories.
 Evidence: `docs/reports/2026-09-09-artist-checkpoint.md`. Both remain pilot;
 artist target data and remote Shopify are separate. Browsers/processes are
 closed. Continue Process Timeline and Collection Story.
+
+## Process Timeline and Collection Story visual values (ADR 0349)
+
+Nineteen source roles complete 33/34 public values. 536 initial comparisons,
+derived connector geometry, native keyboard overflow, RTL, focus, relative
+spacing, stacked-width scope and Studio/Exhibit pass. Studio Tour inherits the
+existing Process Timeline roles. Both remain pilot; Collection Story's Button
+action composition stays an explicit consumer choice. Evidence:
+`docs/reports/2026-09-09-narrative-checkpoint.md`. Test browser and processes
+are closed. Continue Certificate and Masonry Gallery.

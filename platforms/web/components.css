@@ -10053,10 +10053,10 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 /* ── F2. PROCESS TIMELINE ── */
 .process-timeline {
   padding-block: var(--space-layout-section-gap);
-  padding-inline: min(var(--space-layout-container), 8%);
+  padding-inline: min(var(--space-layout-container), calc(100% * var(--ratio-process-timeline-inline-padding-cap)));
 }
 .process-timeline .process-timeline__title {
-  margin: 0 0 var(--space-layout-section-gap);
+  margin: 0 0 calc(var(--space-layout-section-gap) * var(--ratio-process-timeline-title-gap));
   padding: 0;
   border: 0;
   font: var(--tg-typography-h2-weight) var(--typo-h2-size)/var(--typo-h2-line-height) var(--font-family-heading);
@@ -10067,10 +10067,10 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 .process-timeline__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(min(11rem, 100%), 1fr);
+  grid-auto-columns: minmax(min(var(--space-process-timeline-step-min-width), 100%), 1fr);
   gap: var(--space-layout-grid-gap);
   margin: 0;
-  padding: 0 0 var(--space-layout-element-gap);
+  padding: 0 0 calc(var(--space-layout-element-gap) * var(--ratio-process-timeline-track-padding));
   list-style: none;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -10078,8 +10078,8 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
   overscroll-behavior-inline: contain;
 }
 .process-timeline__track:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: var(--border-process-timeline-focus-width) solid var(--color-border-focus);
+  outline-offset: var(--space-process-timeline-focus-offset);
 }
 .process-step {
   min-width: 0;
@@ -10088,24 +10088,24 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-layout-element-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-process-timeline-step-gap));
   position: relative;
 }
 .process-step:not(:last-child)::after {
   content: "";
   position: absolute;
-  top: 17px;
+  top: calc((var(--space-process-timeline-marker-size) - var(--border-process-timeline-connector-width)) / 2);
   inset-inline-end: calc(var(--space-layout-grid-gap) * -1);
   width: var(--space-layout-grid-gap);
-  height: 2px;
+  height: var(--border-process-timeline-connector-width);
   background: var(--color-border-decorative);
 }
 .process-step__number {
   display: grid;
   place-items: center;
   flex: none;
-  width: 36px;
-  height: 36px;
+  width: var(--space-process-timeline-marker-size);
+  height: var(--space-process-timeline-marker-size);
   border-radius: var(--radius-full);
   background: var(--color-surface-statement);
   color: var(--color-text-primary);
@@ -10113,7 +10113,7 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 }
 .process-step__image {
   width: 100%;
-  aspect-ratio: 4/3;
+  aspect-ratio: var(--ratio-process-timeline-media);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -10286,14 +10286,10 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 
 /* ── F4. COLLECTION STORY ── */
 .collection-story {
-  --_story-content-measure: 42rem;
-  --_story-label-tracking: 0.1em;
-  --_story-quote-rule: 3px;
-
   container: collection-story / inline-size;
   width: 100%;
   padding-block: var(--space-layout-section-gap);
-  padding-inline: min(var(--space-layout-container), 8%);
+  padding-inline: min(var(--space-layout-container), calc(100% * var(--ratio-collection-story-inline-padding-cap)));
   background: var(--color-surface-primary);
   color: var(--color-text-secondary);
   font-family: var(--font-family-body);
@@ -10322,7 +10318,7 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
   min-width: 0;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: var(--ratio-collection-story-media);
 }
 .collection-story__media img {
   width: 100%;
@@ -10332,7 +10328,7 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 .collection-story__content {
   display: grid;
   gap: var(--space-layout-element-gap);
-  width: min(100%, var(--_story-content-measure));
+  width: min(100%, var(--space-collection-story-content-width));
   margin-inline: auto;
   min-width: 0;
 }
@@ -10340,8 +10336,8 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
   margin: 0;
   font: var(--tg-typography-body-caption-weight) var(--typo-caption-size)/var(--typo-caption-line-height) var(--font-family-body);
   text-transform: uppercase;
-  letter-spacing: var(--_story-label-tracking);
-  color: color-mix(in srgb, var(--color-text-accent) 70%, var(--color-text-primary));
+  letter-spacing: var(--typo-collection-story-label-tracking);
+  color: color-mix(in srgb, var(--color-text-accent) calc(var(--ratio-collection-story-accent) * 100%), var(--color-text-primary));
 }
 .collection-story .collection-story__title {
   margin: 0;
@@ -10352,7 +10348,7 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 }
 .collection-story__text {
   display: grid;
-  gap: 1em;
+  gap: var(--space-collection-story-body-gap);
   font: var(--tg-typography-article-body-weight) var(--typo-article-size)/var(--typo-article-line-height) var(--font-family-body);
   color: var(--color-text-secondary);
   overflow-wrap: anywhere;
@@ -10362,17 +10358,17 @@ dialog.size-chart__overlay::backdrop { background: transparent; }
 }
 .collection-story__inspiration {
   margin: 0;
-  padding-inline-start: var(--space-layout-element-gap);
-  border-inline-start: var(--_story-quote-rule) solid var(--color-border-decorative);
+  padding-inline-start: calc(var(--space-layout-element-gap) * var(--ratio-collection-story-quote-inset));
+  border-inline-start: var(--border-collection-story-quote-width) solid var(--color-border-decorative);
   font: var(--tg-font-weight-medium) var(--typo-h4-size)/var(--typo-h4-line-height) var(--font-family-accent);
   font-style: italic;
-  color: color-mix(in srgb, var(--color-text-accent) 70%, var(--color-text-primary));
+  color: color-mix(in srgb, var(--color-text-accent) calc(var(--ratio-collection-story-accent) * 100%), var(--color-text-primary));
   overflow-wrap: anywhere;
 }
 .collection-story__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-layout-element-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-collection-story-actions-gap));
 }
 @media (forced-colors: active) {
   .collection-story__inspiration {

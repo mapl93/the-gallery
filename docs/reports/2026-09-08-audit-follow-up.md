@@ -401,3 +401,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   de Artist Card con categorías existentes. Evidencia: `2026-09-09-artist-checkpoint.md`.
   Continúan Process Timeline y Collection Story; ambos siguen pilot y el
   navegador quedó cerrado, también verificado por procesos.
+- ADR 0349 completa Process Timeline/Collection Story con 19 roles y 33/34
+  valores públicos. Pasan 536 comparaciones, centrado derivado, carril nativo,
+  RTL/foco, ancho apilado, unidades relativas y Studio/Exhibit; Studio Tour
+  hereda los tokens de su dependencia. Evidencia: `2026-09-09-narrative-checkpoint.md`.
+  Continúan Certificate y Masonry Gallery; navegador cerrado y procesos limpios.

@@ -395,3 +395,11 @@ composition roles. This resolves the local underline exception recorded in ADR
 and omission semantics pass: `docs/reports/2026-09-09-collection-promo-checkpoint.md`.
 Shopify data/schema/insertion/editor validation remains separate; E6 stays pilot.
 Continue Modal and Drawer.
+
+## Modal and Drawer visual values (ADR 0328)
+
+Modal/Drawer expose meaningful geometry and shared backdrop tint, preserving
+responsive spacing factors. Studio/Exhibit stop masking source widths. Default
+parity, long-content scroll, RTL, keyboard and composed sections pass:
+`docs/reports/2026-09-09-modal-drawer-checkpoint.md`. True target modality remains
+separate; both stay pilot. Continue Toast and Tooltip.

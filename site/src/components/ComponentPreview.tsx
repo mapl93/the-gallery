@@ -157,9 +157,8 @@ const previewHostCss = `${previewBundleCss}
 .tg-preview-drawer-layer {
   position: absolute !important;
   top: 0 !important;
-  right: 0 !important;
   bottom: 0 !important;
-  width: min(400px, 100%) !important;
+  width: min(var(--space-drawer-width), calc(100% - var(--space-layout-element-gap) * var(--ratio-drawer-viewport-gap))) !important;
   height: auto !important;
 }
 

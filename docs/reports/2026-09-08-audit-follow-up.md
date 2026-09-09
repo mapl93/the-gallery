@@ -261,3 +261,8 @@ ADR 0327 resuelve Collection Promo, incluida la excepción de subrayado de Link:
 13 tokens nuevos y 32 roles públicos, con factores que conservan las relaciones
 responsive. Pasan 232 mediciones, compact preview, Grid Span 2, omisiones y Link.
 Ver `2026-09-09-collection-promo-checkpoint.md`; continúa Modal/Drawer.
+
+ADR 0328 completa Modal/Drawer con 17 tokens nuevos y 25/23 roles públicos. Studio
+refleja los anchos de fuente; pasan 176 mediciones, scroll, RTL, edición, teclado
+y herencia en Size Chart/Cart Drawer. Ver `2026-09-09-modal-drawer-checkpoint.md`.
+La modalidad de página completa sigue siendo del target; continúan Toast/Tooltip.

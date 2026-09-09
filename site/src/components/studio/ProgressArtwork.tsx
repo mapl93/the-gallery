@@ -64,9 +64,9 @@ export default function ProgressArtwork({
   if (circle) {
     return (
       <div className={['progress-circle', className].filter(Boolean).join(' ')} {...common}>
-        <svg viewBox="0 0 36 36" aria-hidden="true">
-          <circle className="progress-circle__bg" cx="18" cy="18" r="15.9" />
-          <circle className="progress-circle__fill" cx="18" cy="18" r="15.9" strokeDasharray={`${percent} ${100 - percent}`} />
+        <svg aria-hidden="true">
+          <circle className="progress-circle__bg" cx="50%" cy="50%" pathLength="100" />
+          <circle className="progress-circle__fill" cx="50%" cy="50%" pathLength="100" strokeDasharray={`${percent} ${100 - percent}`} style={percent === 0 ? { visibility: 'hidden' } : undefined} />
         </svg>
         {visibleValue && <span className="progress-circle__text">{visibleValue}</span>}
       </div>

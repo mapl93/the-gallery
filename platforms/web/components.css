@@ -2536,14 +2536,14 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
 
 /* ── A22. PROGRESS BAR ── */
 .progress {
-  --_progress-h: 6px;
+  --_progress-h: var(--space-progress-track-height);
   --_progress-bg: var(--color-surface-secondary);
   --_progress-fill: var(--color-button-primary-bg-default);
   --_progress-radius: var(--radius-full);
 
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-progress-label-gap);
   min-width: 0;
   max-width: 100%;
 }
@@ -2552,14 +2552,14 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 4px 12px;
+  gap: var(--space-progress-label-row-gap) var(--space-progress-label-column-gap);
   min-width: 0;
   font-size: var(--typo-body-sm-size);
   line-height: var(--typo-body-sm-line-height);
   color: var(--color-text-primary);
 }
 .progress__label-text {
-  flex: 1 1 12rem;
+  flex: 1 1 var(--space-progress-label-min-width);
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -2571,9 +2571,10 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   overflow-wrap: anywhere;
   text-align: end;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: var(--tg-font-weight-semibold);
 }
 .progress__track {
+  container-type: inline-size;
   width: 100%;
   height: var(--_progress-h);
   background: var(--_progress-bg);
@@ -2588,18 +2589,18 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
 }
 /* Indeterminate */
 .progress--indeterminate .progress__bar {
-  width: 30%;
-  animation: progress-indeterminate 1.5s ease-in-out infinite;
+  width: var(--space-progress-indeterminate-width);
+  animation: progress-indeterminate var(--transition-progress-indeterminate-duration) var(--easing-progress-indeterminate) infinite;
 }
 @keyframes progress-indeterminate {
   0% { transform: translateX(-100%); }
-  100% { transform: translateX(400%); }
+  100% { transform: translateX(120cqw); }
 }
 
 /* Circle variant */
 .progress-circle {
-  --_pc-size: 48px;
-  --_pc-stroke: 4px;
+  --_pc-size: var(--space-progress-circle-size);
+  --_pc-stroke: var(--border-progress-circle-width);
   --_pc-color: var(--color-button-primary-bg-default);
   --_pc-bg: var(--color-surface-secondary);
 
@@ -2608,15 +2609,24 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   height: var(--_pc-size);
 }
 .progress-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+/* Current SVG has no viewBox: its geometry and stroke both use CSS pixels.
+   Legacy viewBox markup retains its authored radius; adopt current markup for
+   radius fitting and exact pathLength-normalized percentages. */
+.progress-circle svg:not([viewBox]) .progress-circle__bg,
+.progress-circle svg:not([viewBox]) .progress-circle__fill {
+  r: max(0px, calc((var(--_pc-size) - var(--_pc-stroke)) / 2));
+}
 .progress-circle__bg {
   fill: none;
   stroke: var(--_pc-bg);
   stroke-width: var(--_pc-stroke);
+  vector-effect: non-scaling-stroke;
 }
 .progress-circle__fill {
   fill: none;
   stroke: var(--_pc-color);
   stroke-width: var(--_pc-stroke);
+  vector-effect: non-scaling-stroke;
   stroke-linecap: round;
   transition: stroke-dashoffset var(--transition-base) var(--easing-out);
 }
@@ -2628,7 +2638,7 @@ fieldset:has(> .radio .radio__input:required) > legend:first-of-type::after,
   justify-content: center;
   font-size: var(--typo-caption-size);
   line-height: var(--typo-caption-line-height);
-  font-weight: 600;
+  font-weight: var(--tg-font-weight-semibold);
   color: var(--color-text-primary);
 }
 

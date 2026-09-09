@@ -351,3 +351,12 @@ shared roles and documented color derivations are preserved. Studio identifies
 Alert fallbacks and offers an optional Stat group fixture. See
 `docs/reports/2026-09-09-feedback-values-checkpoint.md`.
 Continue Progress with owner-approved independent circle diameter/stroke pixels.
+
+## Progress pixel geometry (ADR 0323)
+
+Progress exposes independent circle diameter/stroke pixels and public Bar layout
+and indeterminate motion controls. Existing apparent stroke is preserved; the
+small radius correction and copied-SVG adoption are explicit. Range, endpoints,
+accessible text, Studio and Free Shipping Bar evidence pass. See
+`docs/reports/2026-09-09-progress-checkpoint.md`.
+Continue the remaining primitives without changing pilot maturity or target scope.

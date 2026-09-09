@@ -233,3 +233,9 @@ responsive y reset pasan. Los fallbacks de Alert dejan de presentarse como contr
 activos de severidad. Ver `docs/reports/2026-09-09-feedback-values-checkpoint.md`.
 Progress circular sigue con la decisión del propietario: diámetro y grosor
 independientes en píxeles. No cambia la madurez ni se sube un tema Shopify.
+
+ADR 0323 implementa Progress con diámetro/grosor independientes por decisión del
+propietario: diez tokens nuevos y 21 roles públicos. Conserva grosor visible,
+registra la corrección mínima de radio y verifica porcentajes, rango, movimiento
+y controles aplicables en Studio. Ver `2026-09-09-progress-checkpoint.md`.
+Continúa el punto 5 sin promoción de madurez ni subida remota de Shopify.

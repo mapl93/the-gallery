@@ -2,13 +2,13 @@
 
 Determinate bar or circle that represents a known value, plus an indeterminate bar for unknown completion.
 
-<Preview html={'<div class="progress tg-preview-frame tg-preview-frame--md" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65 percent complete"><div class="progress__label"><span class="progress__label-text">Uploading</span><span class="progress__value">65%</span></div><div class="progress__track"><div class="progress__bar tg-preview-w-70"></div></div></div>'} label="Progress" />
+<Preview html={'<div class="progress tg-preview-frame tg-preview-frame--md" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65 percent complete"><div class="progress__label"><span class="progress__label-text">Uploading</span><span class="progress__value">65%</span></div><div class="progress__track"><div class="progress__bar" style="width:65%"></div></div></div>'} label="Progress" />
 
 ## Presentation
 
 Bar and Circle are structural variants. Indeterminate is an orthogonal boolean state available only for Bar and omits `aria-valuenow`.
 
-<Preview html={'<div class="progress-circle" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65 percent complete"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="progress-circle__bg" cx="18" cy="18" r="15.9"/><circle class="progress-circle__fill" cx="18" cy="18" r="15.9" stroke-dasharray="65 35"/></svg><span class="progress-circle__text">65%</span></div>'} label="Circular progress" />
+<Preview html={'<div class="progress-circle" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" aria-valuetext="65 percent complete"><svg aria-hidden="true"><circle class="progress-circle__bg" cx="50%" cy="50%" pathLength="100"/><circle class="progress-circle__fill" cx="50%" cy="50%" pathLength="100" stroke-dasharray="65 35"/></svg><span class="progress-circle__text">65%</span></div>'} label="Circular progress" />
 
 ## Usage Guidelines
 
@@ -18,7 +18,7 @@ Targets own calculations and localized value content. The component owns present
 
 Targets must keep `max` greater than `min` and clamp the current value into that range. Studio repairs an invalid edited range atomically so its preview never retains a stale fill. Enabling Indeterminate selects Bar; selecting Circle clears Indeterminate.
 
-`displayValue` is optional, visible, and intentionally compact for either Bar or the fixed-size Circle. `valueText` is independently optional and maps only to `aria-valuetext`, so it can carry a complete localized description. Neither falls back to, copies, truncates, scales, or derives from the other.
+`displayValue` is optional, visible, and intentionally compact for either Bar or the token-sized Circle. `valueText` is independently optional and maps only to `aria-valuetext`, so it can carry a complete localized description. Neither falls back to, copies, truncates, scales, or derives from the other.
 
 ## Accessibility
 
@@ -26,6 +26,14 @@ Targets must keep `max` greater than `min` and clamp the current value into that
 - Omit `aria-valuenow`, `aria-valuetext`, and visible value text while indeterminate; do not announce every small update.
 - Use `aria-valuetext` when a localized phrase is clearer than the raw number.
 - Neutral web removes transitions and indeterminate animation under reduced motion.
+
+## Visual Customization
+
+Studio and Exhibit expose 21 public roles. Bar track height, label gaps/preferred width and the moving segment use source tokens. The track is an inline-size container so indeterminate travel follows its own width when the segment width changes; it is not a new responsive mode. Duration/easing preserve 1500ms and the original CSS ease-in-out curve.
+
+Circle diameter and visible ring width are independent pixel tokens. Defaults preserve 48px and the former visible 16/3px ring (4 SVG units at 48/36 scale). Current markup removes the scaled viewBox, derives the radius from diameter minus stroke and normalizes pathLength to 100. The legacy approximate radius grows by about 0.13px when fitted to the same 48px box; value percentages no longer depend on a circumference rounded to 100. At zero, the renderer hides the round-capped fill to avoid a dot suggesting progress.
+
+Adopt the updated SVG markup together with CSS/tokens in copied consumers: centered percentage coordinates, no viewBox, and pathLength=100 on the circles. Old viewBox markup retains its authored radius and receives a non-scaling stroke, but does not gain radius fitting or percentage normalization until migrated. Keep stroke smaller than diameter and choose compact visible value text for the remaining interior; these tokens do not alter min/max/value or the accessible description.
 
 ## References
 

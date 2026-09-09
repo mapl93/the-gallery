@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.4.1",
+  "contractVersion": "0.5.0",
   "slug": "field-wrapper",
   "name": "Field Wrapper",
   "registryId": "H10",
@@ -37,7 +37,7 @@
       "className": ".field__label--required",
       "required": false,
       "generated": true,
-      "description": "Decorative asterisk optically centered beside the visible label, inheriting the label color without becoming part of its accessible name."
+      "description": "Decorative centered asterisk using the shared public required-marker color; native required or aria-required remains the semantic authority."
     },
     {
       "name": "control",
@@ -96,9 +96,24 @@
       "default": true,
       "description": "Default field wrapper."
     },
-    { "name": "error", "className": ".field--error", "default": false, "description": "Field wrapper associated with invalid input." },
-    { "name": "success", "className": ".field--success", "default": false, "description": "Field wrapper associated with validated input." },
-    { "name": "warning", "className": ".field--warning", "default": false, "description": "Field wrapper associated with input that needs attention." }
+    {
+      "name": "error",
+      "className": ".field--error",
+      "default": false,
+      "description": "Field wrapper associated with invalid input."
+    },
+    {
+      "name": "success",
+      "className": ".field--success",
+      "default": false,
+      "description": "Field wrapper associated with validated input."
+    },
+    {
+      "name": "warning",
+      "className": ".field--warning",
+      "default": false,
+      "description": "Field wrapper associated with input that needs attention."
+    }
   ],
   "sizes": [
     {
@@ -111,74 +126,212 @@
   "states": [
     {
       "name": "default",
-      "selectors": [".field"],
+      "selectors": [
+        ".field"
+      ],
       "description": "Label and canonical control are present with no current feedback."
     },
     {
       "name": "required",
-      "selectors": [".field__label--required::after"],
+      "selectors": [
+        ".field__label--required::after"
+      ],
       "description": "Visible required indicator state."
     },
     {
       "name": "withDescription",
-      "selectors": [".field__description"],
+      "selectors": [
+        ".field__description"
+      ],
       "description": "Optional helper text is present and referenced by the composed control."
     },
     {
       "name": "withFeedback",
-      "selectors": [".field__feedback"],
+      "selectors": [
+        ".field__feedback"
+      ],
       "description": "One current feedback message is present and referenced by the composed control."
     },
     {
       "name": "error",
-      "selectors": [".field__error"],
+      "selectors": [
+        ".field__error"
+      ],
       "description": "Error message is present."
     },
     {
       "name": "success",
-      "selectors": [".field__success"],
+      "selectors": [
+        ".field__success"
+      ],
       "description": "Success message is present."
     },
     {
       "name": "warning",
-      "selectors": [".field__warning"],
+      "selectors": [
+        ".field__warning"
+      ],
       "description": "Warning message is present without marking the control invalid."
     }
   ],
   "behavior": [
     {
       "name": "labelAssociation",
-      "selectors": [".field__label"],
-      "attributes": ["for", "id", "aria-label", "aria-labelledby"],
+      "selectors": [
+        ".field__label"
+      ],
+      "attributes": [
+        "for",
+        "id",
+        "aria-label",
+        "aria-labelledby"
+      ],
       "description": "Every field wrapper should provide a visible label associated with its control or an equivalent accessible name."
     },
     {
       "name": "messageAssociation",
-      "selectors": [".field__description", ".field__feedback", ".field__error", ".field__success", ".field__warning"],
-      "attributes": ["aria-describedby", "aria-invalid", "aria-live"],
+      "selectors": [
+        ".field__description",
+        ".field__feedback",
+        ".field__error",
+        ".field__success",
+        ".field__warning"
+      ],
+      "attributes": [
+        "aria-describedby",
+        "aria-invalid",
+        "aria-live"
+      ],
       "description": "Helper text and the one current feedback message are programmatically associated with the composed control when present."
     },
     {
       "name": "requiredState",
-      "selectors": [".field__label--required::after"],
-      "attributes": ["required", "aria-required=\"true\""],
+      "selectors": [
+        ".field__label--required::after"
+      ],
+      "attributes": [
+        "required",
+        "aria-required=\"true\""
+      ],
       "description": "Required visuals must stay synchronized with native or ARIA required state."
     },
     {
       "name": "controlOwnership",
-      "selectors": [".field__control"],
-      "attributes": ["id", "name", "value", "required", "disabled", "aria-invalid", "aria-describedby"],
-      "events": ["input", "change", "invalid", "reset"],
+      "selectors": [
+        ".field__control"
+      ],
+      "attributes": [
+        "id",
+        "name",
+        "value",
+        "required",
+        "disabled",
+        "aria-invalid",
+        "aria-describedby"
+      ],
+      "events": [
+        "input",
+        "change",
+        "invalid",
+        "reset"
+      ],
       "description": "The composed canonical control owns value, validity, events, disabled state, reset, and controlled/uncontrolled strategy; the wrapper owns only composition."
     }
   ],
   "properties": [
-    { "name": "label", "type": "string", "required": true, "description": "Visible field label text.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__label" }] } },
-    { "name": "control", "type": "slot", "required": true, "description": "One canonical form-control root whose value and behavior remain independently owned.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".field__control", "classNames": [".field__control"] }] } },
-    { "name": "description", "type": "string", "required": false, "description": "Optional helper text placed after the control.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__description" }] } },
-    { "name": "variant", "type": "enum", "required": false, "valuesFrom": "variants", "description": "Feedback family used by the label and composed message.", "targetMappings": { "web": [{ "kind": "optionClass", "selector": ".field", "source": "variants" }] } },
-    { "name": "feedback", "type": "string", "required": false, "description": "One current feedback message; the selected variant determines its Error, Success, or Warning presentation.", "targetMappings": { "web": [{ "kind": "content", "selector": ".field__feedback" }] } },
-    { "name": "required", "type": "boolean", "required": false, "defaultValue": false, "description": "Shows the standardized decorative marker beside the visible label; the composed control's native required or aria-required state remains the semantic authority and must stay synchronized.", "targetMappings": { "web": [{ "kind": "class", "selector": ".field__label", "classNames": [".field__label--required"] }] } }
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "Visible field label text.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".field__label"
+          }
+        ]
+      }
+    },
+    {
+      "name": "control",
+      "type": "slot",
+      "required": true,
+      "description": "One canonical form-control root whose value and behavior remain independently owned.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".field__control",
+            "classNames": [
+              ".field__control"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "Optional helper text placed after the control.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".field__description"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "valuesFrom": "variants",
+      "description": "Feedback family used by the label and composed message.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".field",
+            "source": "variants"
+          }
+        ]
+      }
+    },
+    {
+      "name": "feedback",
+      "type": "string",
+      "required": false,
+      "description": "One current feedback message; the selected variant determines its Error, Success, or Warning presentation.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".field__feedback"
+          }
+        ]
+      }
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Shows the standardized decorative marker beside the visible label; the composed control's native required or aria-required state remains the semantic authority and must stay synchronized.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "class",
+            "selector": ".field__label",
+            "classNames": [
+              ".field__label--required"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
@@ -192,12 +345,18 @@
       ],
       "typography": [
         "--font-family-body",
-        "--typo-body-sm-line-height"
+        "--typo-body-sm-line-height",
+        "--typo-input-label-weight",
+        "--typo-body-weight"
       ],
       "spacing": [
         "--space-input-label-size",
         "--space-input-message-size",
-        "--space-input-margin-bottom"
+        "--space-field-feedback-icon-gap",
+        "--space-field-feedback-icon-size",
+        "--space-field-feedback-icon-offset",
+        "--space-input-label-gap",
+        "--space-input-message-gap"
       ]
     }
   },

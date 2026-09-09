@@ -2,13 +2,14 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Mail } from 'lucide-react';
 import InputArtwork from '../components/studio/InputArtwork';
+import FieldWrapperArtwork from '../components/studio/FieldWrapperArtwork';
 import TextareaArtwork from '../components/studio/TextareaArtwork';
 import CheckboxArtwork from '../components/studio/CheckboxArtwork';
 import RadioArtwork from '../components/studio/RadioArtwork';
 import SwitchArtwork from '../components/studio/SwitchArtwork';
 
 // This composition owns its content and validation flow. Native fields own data;
-// the web adapter owns Select enhancement and all four controls' appearance.
+// the web adapter owns Select enhancement and all composed components' appearance.
 export default function ContactComposition() {
   const formRef = useRef<HTMLFormElement>(null);
   const [name, setName] = useState('');
@@ -43,7 +44,7 @@ export default function ContactComposition() {
     const form = event.currentTarget;
     const invalid = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[name]'))
       .filter((field) => !field.validity.valid);
-    setErrors(invalid.map((field) => field.name));
+    setErrors([...new Set(invalid.map((field) => field.name))]);
     setResult('');
     if (invalid.length) {
       const first = invalid[0];
@@ -64,13 +65,31 @@ export default function ContactComposition() {
     <h1>Contact form composition</h1>
     <p>Complete the fields and choose how you would like to hear from the studio. Preview a request, or submit an empty form to review validation.</p>
     <form ref={formRef} className="form docs-contact-composition" noValidate onSubmit={submit} onReset={reset} aria-label="Contact the studio">
+      {errors.length > 0 && <div className="form__error-summary" tabIndex={-1} aria-labelledby="contact-errors-title">
+        <h2 className="form__error-summary-title" id="contact-errors-title">Review these fields</h2>
+        <ul className="form__error-summary-list">{errors.map((field) => {
+          const targetId = field === 'replyMethod' ? 'contact-reply-email' : `contact-${field}`;
+          const label = { name: 'Name', email: 'Email', topic: 'Subject', message: 'Message', replyMethod: 'Preferred reply' }[field] || field;
+          return <li key={field}><a href={`#${targetId}`} onClick={(event) => {
+            const target = field === 'topic' ? formRef.current?.querySelector<HTMLElement>('.select__trigger') || document.getElementById(targetId) : document.getElementById(targetId);
+            if (target) { event.preventDefault(); target.focus(); }
+          }}>{label}</a></li>;
+        })}</ul>
+      </div>}
       <section className="form__section" aria-labelledby="contact-details-title">
         <h2 className="form__section-title" id="contact-details-title">Contact the studio</h2>
         <div className="form__row" data-columns="two">
-          <InputArtwork id="contact-name" name="name" label="Name" value={name} autoComplete="name" required
-            onChange={(event) => setName(event.target.value)}
+          <FieldWrapperArtwork controlId="contact-name" label="Name" required
+            description="The name we should use when replying."
             variant={errors.includes('name') ? 'error' : 'default'}
-            message={errors.includes('name') ? 'Enter your name.' : 'The name we should use when replying.'} />
+            feedback={errors.includes('name') ? 'Enter your name.' : ''}>
+            <div className={`input field__control${errors.includes('name') ? ' input--error' : ''}`}>
+              <input className="input__field" id="contact-name" name="name" autoComplete="name" value={name} required
+                aria-invalid={errors.includes('name') || undefined}
+                aria-describedby={`contact-name-help${errors.includes('name') ? ' contact-name-feedback' : ''}`}
+                onChange={(event) => setName(event.target.value)} />
+            </div>
+          </FieldWrapperArtwork>
           <InputArtwork id="contact-email" name="email" type="email" label="Email" value={email} autoComplete="email" required
             onChange={(event) => setEmail(event.target.value)}
             leadingIcon={<Mail className="input__icon input__icon--leading" aria-hidden="true" />}
@@ -93,20 +112,20 @@ export default function ContactComposition() {
           onChange={(event) => setMessage(event.target.value)}
           variant={errors.includes('message') ? 'error' : 'default'}
             message={errors.includes('message') ? 'Add at least 10 characters about your request.' : 'Include any dimensions, timing or delivery details that matter.'} />
-        <fieldset className="fieldset">
+        <fieldset className="fieldset" aria-describedby={`contact-reply-help${errors.includes('replyMethod') ? ' contact-reply-message' : ''}`}>
           <legend className="fieldset__legend">Preferred reply</legend>
+          <p className="fieldset__description" id="contact-reply-help">We will use your email to coordinate either option.</p>
           <div className="fieldset__content">
             {[
               ['email', 'Reply by email'],
               ['call', 'Arrange a studio call'],
             ].map(([value, label]) => <RadioArtwork key={value} name="replyMethod" value={value} label={label}
-              checked={replyMethod === value} required describedBy="contact-reply-message"
+              id={`contact-reply-${value}`} checked={replyMethod === value} required
+              describedBy={`contact-reply-help${errors.includes('replyMethod') ? ' contact-reply-message' : ''}`}
               variant={errors.includes('replyMethod') ? 'error' : 'default'}
               onCheckedChange={(checked) => { if (checked) setReplyMethod(value); }} />)}
+            {errors.includes('replyMethod') && <span id="contact-reply-message" className="field__feedback field__error">Choose a reply preference.</span>}
           </div>
-          <span id="contact-reply-message" className={errors.includes('replyMethod') ? 'field__error' : 'field__description'}>
-            {errors.includes('replyMethod') ? 'Choose a reply preference.' : 'We will use your email to coordinate either option.'}
-          </span>
         </fieldset>
         <CheckboxArtwork label="Include care instructions in the reply" name="careNotes" value="include"
           checked={careNotes} onChange={(event) => setCareNotes(event.target.checked)} />
@@ -123,6 +142,6 @@ export default function ContactComposition() {
       </div>
       <p role="status" aria-atomic="true">{result || (errors.length ? 'Review the highlighted fields before continuing.' : 'No request sent.')}</p>
     </form>
-    <p>Customize <Link to="/components/button">Button</Link>, <Link to="/components/input">Input</Link>, <Link to="/components/select">Select</Link>, <Link to="/components/textarea">Textarea</Link>, <Link to="/components/checkbox">Checkbox</Link>, <Link to="/components/radio">Radio</Link> and <Link to="/components/switch">Switch</Link>. The <Link to="/foundations/control-pilot">control matrix</Link> retains side-by-side alignment and state checks.</p>
+    <p>Customize <Link to="/components/button">Button</Link>, <Link to="/components/input">Input</Link>, <Link to="/components/select">Select</Link>, <Link to="/components/textarea">Textarea</Link>, <Link to="/components/checkbox">Checkbox</Link>, <Link to="/components/radio">Radio</Link>, <Link to="/components/switch">Switch</Link>, <Link to="/components/field-wrapper">Field Wrapper</Link>, <Link to="/components/fieldset">Fieldset</Link> and <Link to="/components/form">Form</Link>. The <Link to="/foundations/control-pilot">control matrix</Link> retains side-by-side alignment and state checks.</p>
   </>;
 }

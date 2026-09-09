@@ -191,5 +191,14 @@ not certify that their visual customization surface is complete.
 Checkbox, Radio and Switch expose 17 additional source decisions, shared focus
 dimensions and label typography through contracts and Exhibit/Studio. The contact
 composition now covers their different immediate/deferred behaviors. Continue
-with Field Wrapper, Fieldset and Form after this bounded checkpoint; do not infer
+with subsequent form families after this bounded checkpoint; do not infer
 complete catalogue coverage or stable status from structural validation.
+
+## Form infrastructure customization (ADR 0305)
+
+Field Wrapper, Fieldset and Form now expose 30 additional source decisions and
+shared visual controls in Studio/Exhibit. Wrapper spacing, neutral feedback, Form
+preview width and contact heading isolation are corrected. Native form ownership
+and contract maturity remain unchanged. See
+`docs/reports/2026-09-09-form-infrastructure-checkpoint.md` for browser evidence,
+copy-and-own compatibility and remaining scope.

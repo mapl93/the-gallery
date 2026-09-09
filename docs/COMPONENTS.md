@@ -4083,3 +4083,14 @@ All `--typo-*`, `--space-layout-*`, `--grid-*`, `--space-input-*` tokens are use
 
 ### Primitives (static, always available)
 `--font-family-{body,heading,accent,mono}`, `--radius-{none,sm,md,lg,full}`, `--opacity-{disabled,overlay}`, `--transition-{fast,base,slow}`, `--easing-{default,in,out}`, `--z-{dropdown,sticky,overlay,modal,toast}`
+
+## Form infrastructure customization checkpoint
+
+ADR 0305 exposes Field Wrapper, Fieldset and Form layout and type decisions in
+the existing public token API. Field Wrapper composes a `.field__control` root
+without its exterior margin and reuses separate Input label/message gaps; Form
+and Fieldset preserve native grouping, validation and responsive order. Their
+MDX pages and Studio definitions provide the complete shared control inventory.
+The wrapper no longer uses `--space-input-margin-bottom` as a uniform gap; copied
+consumers must migrate wrapper-specific overrides to the two gap tokens when
+adopting this checkpoint. No contract maturity is promoted.

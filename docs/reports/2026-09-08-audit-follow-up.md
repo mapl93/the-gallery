@@ -143,3 +143,7 @@ interacción pendientes de Drawer, Slider, Link y Mega Menu, añade un consumido
 HTML independiente del CLI y amplía la personalización de Checkbox/Radio/Switch.
 La captura oscura detectó y permitió corregir un indicador Checkbox invisible.
 ADR 0303 retira Figma de los contratos planificados y requisitos de entrega.
+
+El siguiente bloque del punto 5 está registrado en
+`docs/reports/2026-09-09-form-infrastructure-checkpoint.md`: Field Wrapper,
+Fieldset y Form, con 30 decisiones de fuente y evidencia de composición real.

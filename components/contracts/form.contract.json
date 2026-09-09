@@ -1,13 +1,16 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.1",
+  "contractVersion": "0.4.0",
   "slug": "form",
   "name": "Form",
   "registryId": "H15",
   "category": "forms",
   "status": "pilot",
   "summary": "Native form composition with container-responsive rows, canonical Field Wrapper and Button children, optional actions and linked error summary, and target-owned submission policy.",
-  "dependencies": ["field-wrapper", "button"],
+  "dependencies": [
+    "field-wrapper",
+    "button"
+  ],
   "source": {
     "registry": "registry.json#/components/form",
     "css": {
@@ -119,80 +122,258 @@
   "states": [
     {
       "name": "default",
-      "selectors": [".form"],
+      "selectors": [
+        ".form"
+      ],
       "description": "Default form layout state."
     },
     {
       "name": "twoColumn",
-      "selectors": [".form__row--2col", ".form__row[data-columns=\"two\"]"],
+      "selectors": [
+        ".form__row--2col",
+        ".form__row[data-columns=\"two\"]"
+      ],
       "description": "Two-column intent is present and activates only with sufficient form-container capacity."
     },
     {
       "name": "threeColumn",
-      "selectors": [".form__row--3col", ".form__row[data-columns=\"three\"]"],
+      "selectors": [
+        ".form__row--3col",
+        ".form__row[data-columns=\"three\"]"
+      ],
       "description": "Three-column intent is present and activates only with sufficient form-container capacity."
     },
     {
       "name": "withActions",
-      "selectors": [".form__actions"],
+      "selectors": [
+        ".form__actions"
+      ],
       "description": "Action row is present."
     },
     {
       "name": "withErrorSummary",
-      "selectors": [".form__error-summary"],
+      "selectors": [
+        ".form__error-summary"
+      ],
       "description": "Top-level validation summary is present."
     },
     {
       "name": "errorSummaryFocus",
-      "selectors": [".form__error-summary:focus-visible"],
+      "selectors": [
+        ".form__error-summary:focus-visible"
+      ],
       "description": "Programmatically focusable summary has a visible focus treatment when the target moves focus after failed submission."
     }
   ],
   "behavior": [
     {
       "name": "nativeSubmission",
-      "selectors": [".form"],
-      "attributes": ["<form>", "action", "method", "novalidate", "autocomplete"],
-      "events": ["submit", "reset", "formdata", "invalid", "constraint validation"],
+      "selectors": [
+        ".form"
+      ],
+      "attributes": [
+        "<form>",
+        "action",
+        "method",
+        "novalidate",
+        "autocomplete"
+      ],
+      "events": [
+        "submit",
+        "reset",
+        "formdata",
+        "invalid",
+        "constraint validation"
+      ],
       "description": "Web uses a real form so named controls, activated submitter, validation, entry-list construction, submit, and reset remain native unless the target explicitly owns persistence."
     },
     {
       "name": "fieldComposition",
-      "selectors": [".form__section", ".form__row"],
+      "selectors": [
+        ".form__section",
+        ".form__row"
+      ],
       "description": "Forms compose Field Wrapper and input controls while preserving a logical reading and tab order."
     },
     {
       "name": "responsiveRows",
-      "selectors": [".form__row--2col", ".form__row--3col"],
+      "selectors": [
+        ".form__row--2col",
+        ".form__row--3col"
+      ],
       "description": "Container-responsive row modifiers change only grid columns and never source, reading, or keyboard order."
     },
     {
       "name": "actionSemantics",
-      "selectors": [".form__actions"],
-      "attributes": ["type=\"submit\"", "type=\"reset\"", "type=\"button\"", "disabled", "aria-disabled"],
+      "selectors": [
+        ".form__actions"
+      ],
+      "attributes": [
+        "type=\"submit\"",
+        "type=\"reset\"",
+        "type=\"button\"",
+        "disabled",
+        "aria-disabled"
+      ],
       "description": "Canonical Button children use explicit action types; pending or disabled submission policy remains target-owned."
     },
     {
       "name": "errorSummary",
-      "selectors": [".form__error-summary", ".form__error-summary-list", ".form__error-summary-list a"],
-      "attributes": ["aria-labelledby", "tabindex=\"-1\"", "href", "optional role and aria-live chosen by target timing"],
+      "selectors": [
+        ".form__error-summary",
+        ".form__error-summary-list",
+        ".form__error-summary-list a"
+      ],
+      "attributes": [
+        "aria-labelledby",
+        "tabindex=\"-1\"",
+        "href",
+        "optional role and aria-live chosen by target timing"
+      ],
       "description": "A text summary links to invalid fields. The target owns insertion, announcement, and whether focus moves to the summary or first invalid control."
     },
     {
       "name": "valueOwnership",
-      "selectors": [".form"],
-      "attributes": ["named native controls", "activated submitter", "FormData"],
-      "events": ["input and change on composed controls", "submit", "reset", "formdata"],
+      "selectors": [
+        ".form"
+      ],
+      "attributes": [
+        "named native controls",
+        "activated submitter",
+        "FormData"
+      ],
+      "events": [
+        "input and change on composed controls",
+        "submit",
+        "reset",
+        "formdata"
+      ],
       "description": "Form does not mirror a controlled value object; each canonical control remains the owner of its own native current and default value."
     }
   ],
   "properties": [
-    { "name": "columns", "type": "enum", "required": false, "values": ["one", "two", "three"], "defaultValue": "one", "description": "Responsive field count for a composed form row.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form__row", "attribute": "data-columns", "values": { "one": "one", "two": "two", "three": "three" } }] } },
-    { "name": "content", "type": "slot", "required": true, "description": "Canonical named controls and optional sections/rows in logical source order.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form", "classNames": [".form__section", ".form__row", ".field"] }] } },
-    { "name": "errorSummary", "type": "slot", "required": false, "description": "Optional top-level summary that links validation errors to their fields.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form__error-summary", "classNames": [".form__error-summary"] }] } },
-    { "name": "actions", "type": "slot", "required": false, "description": "Optional explicit submit and secondary action row.", "targetMappings": { "web": [{ "kind": "slot", "selector": ".form__actions", "classNames": [".form__actions"] }] } },
-    { "name": "noValidate", "type": "boolean", "required": false, "defaultValue": false, "description": "Disables native browser validation when the target owns a complete accessible validation flow.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form", "attribute": "novalidate", "values": { "true": "", "false": null }, "elements": ["form"] }] } },
-    { "name": "autocomplete", "type": "string", "required": false, "defaultValue": "on", "description": "Native form autocomplete policy.", "targetMappings": { "web": [{ "kind": "attribute", "selector": ".form", "attribute": "autocomplete", "valueFrom": "property", "elements": ["form"] }] } }
+    {
+      "name": "columns",
+      "type": "enum",
+      "required": false,
+      "values": [
+        "one",
+        "two",
+        "three"
+      ],
+      "defaultValue": "one",
+      "description": "Responsive field count for a composed form row.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".form__row",
+            "attribute": "data-columns",
+            "values": {
+              "one": "one",
+              "two": "two",
+              "three": "three"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "content",
+      "type": "slot",
+      "required": true,
+      "description": "Canonical named controls and optional sections/rows in logical source order.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".form",
+            "classNames": [
+              ".form__section",
+              ".form__row",
+              ".field"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "errorSummary",
+      "type": "slot",
+      "required": false,
+      "description": "Optional top-level summary that links validation errors to their fields.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".form__error-summary",
+            "classNames": [
+              ".form__error-summary"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "actions",
+      "type": "slot",
+      "required": false,
+      "description": "Optional explicit submit and secondary action row.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".form__actions",
+            "classNames": [
+              ".form__actions"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "noValidate",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": false,
+      "description": "Disables native browser validation when the target owns a complete accessible validation flow.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".form",
+            "attribute": "novalidate",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "form"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "autocomplete",
+      "type": "string",
+      "required": false,
+      "defaultValue": "on",
+      "description": "Native form autocomplete policy.",
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".form",
+            "attribute": "autocomplete",
+            "valueFrom": "property",
+            "elements": [
+              "form"
+            ]
+          }
+        ]
+      }
+    }
   ],
   "tokens": {
     "public": {
@@ -209,7 +390,35 @@
         "--typo-h4-size",
         "--typo-body-size",
         "--typo-body-sm-size",
-        "--typo-body-sm-line-height"
+        "--typo-body-sm-line-height",
+        "--typo-form-title-weight",
+        "--typo-form-section-title-line-height",
+        "--typo-form-summary-title-line-height",
+        "--typo-body-weight"
+      ],
+      "spacing": [
+        "--space-form-gap",
+        "--space-form-section-gap",
+        "--space-form-row-gap",
+        "--space-form-action-gap",
+        "--space-form-section-title-padding",
+        "--space-form-actions-padding",
+        "--space-form-summary-padding-x",
+        "--space-form-summary-padding-y",
+        "--space-form-summary-title-gap",
+        "--space-form-summary-list-inset",
+        "--space-form-summary-item-padding",
+        "--space-form-summary-underline-offset"
+      ],
+      "border": [
+        "--border-form-divider-width",
+        "--border-form-summary-width",
+        "--border-form-summary-underline-width",
+        "--border-input-focus-ring-width",
+        "--border-input-focus-ring-offset"
+      ],
+      "opacity": [
+        "--opacity-form-summary-background"
       ]
     }
   },

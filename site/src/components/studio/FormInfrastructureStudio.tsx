@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactElement } from 'react';
 import { CircleAlert } from 'lucide-react';
+import FieldWrapperArtwork from './FieldWrapperArtwork';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import StudioInspector, {
@@ -51,10 +52,6 @@ function resolveTokens(control: StudioControl, contract: ComponentContract): str
   return category.filter((token) => pattern.test(token));
 }
 
-function variantClass(contract: ComponentContract, value: StudioPropertyValue): string | null {
-  return contract.variants.find((variant) => variant.name === value)?.className?.replace(/^\./, '') ?? null;
-}
-
 export default function FormInfrastructureStudio({ contract, definition }: FormInfrastructureStudioProps) {
   const initialValues = useMemo<StudioPropertyValues>(() => ({
     ...Object.fromEntries((contract.properties ?? []).map((property) => [property.name, defaultValue(contract, property)])),
@@ -104,22 +101,20 @@ export default function FormInfrastructureStudio({ contract, definition }: FormI
 
   function renderFieldWrapper() {
     const variant = String(values.variant || 'default');
-    const message = variant === 'default' ? '' : String(values.feedback || feedbackMessages[variant] || '');
-    const rootClass = ['field', variantClass(contract, values.variant)].filter(Boolean).join(' ');
+    const message = String(values.feedback || '');
     const inputClass = ['input', 'field__control', variant === 'default' ? null : `input--${variant}`].filter(Boolean).join(' ');
-    const messageClass = variant === 'error' ? 'field__error' : variant === 'success' ? 'field__success' : 'field__warning';
     const description = String(values.description || '');
     const describedBy = [description ? 'field-email-help' : '', message ? 'field-email-feedback' : ''].filter(Boolean).join(' ') || undefined;
     return (
       <div className="docs-studio__field-fixture">
-        <div className={rootClass}>
-          <label className={`field__label${values.required === true ? ' field__label--required' : ''}`} htmlFor="field-email">{String(values.label || '')}</label>
+        <FieldWrapperArtwork controlId="field-email" label={String(values.label || '')}
+          required={values.required === true} variant={variant as 'default' | 'error' | 'success' | 'warning'}
+          description={description} feedback={message}
+          feedbackIcon={variant === 'error' ? <CircleAlert className="field__error-icon" aria-hidden="true" focusable="false" /> : undefined}>
           <div className={inputClass}>
             <input className="input__field" id="field-email" name="email" type="email" defaultValue="studio@example.com" required={values.required === true} aria-invalid={variant === 'error' || undefined} aria-describedby={describedBy} />
           </div>
-          {description && <span className="field__description" id="field-email-help">{description}</span>}
-          {message && <span className={`field__feedback ${messageClass}`} id="field-email-feedback">{message}</span>}
-        </div>
+        </FieldWrapperArtwork>
       </div>
     );
   }
@@ -171,17 +166,17 @@ export default function FormInfrastructureStudio({ contract, definition }: FormI
           <div className="form__row" data-columns={columns}>
             <div className="field">
               <label className="field__label" htmlFor="form-demo-name">Name</label>
-              <div className="input"><input className="input__field" id="form-demo-name" name="name" type="text" defaultValue="Avery Stone" autoComplete="name" /></div>
+              <div className="input field__control"><input className="input__field" id="form-demo-name" name="name" type="text" defaultValue="Avery Stone" autoComplete="name" /></div>
             </div>
             <div className={`field${hasErrors ? ' field--error' : ''}`}>
               <label className="field__label" htmlFor="form-demo-email">Email</label>
-              <div className={`input${hasErrors ? ' input--error' : ''}`}><input className="input__field" id="form-demo-email" name="email" type="email" defaultValue={hasErrors ? 'avery' : 'avery@example.com'} autoComplete="email" required aria-invalid={hasErrors || undefined} aria-describedby={hasErrors ? 'form-demo-email-error' : undefined} key={hasErrors ? 'invalid' : 'valid'} /></div>
+              <div className={`input field__control${hasErrors ? ' input--error' : ''}`}><input className="input__field" id="form-demo-email" name="email" type="email" defaultValue={hasErrors ? 'avery' : 'avery@example.com'} autoComplete="email" required aria-invalid={hasErrors || undefined} aria-describedby={hasErrors ? 'form-demo-email-error' : undefined} key={hasErrors ? 'invalid' : 'valid'} /></div>
               {hasErrors && <span className="field__feedback field__error" id="form-demo-email-error">Enter a valid email address.</span>}
             </div>
             {columns === 'three' && (
               <div className="field">
                 <label className="field__label" htmlFor="form-demo-phone">Phone</label>
-                <div className="input"><input className="input__field" id="form-demo-phone" name="phone" type="tel" defaultValue="+54 11 5555 0101" autoComplete="tel" /></div>
+                <div className="input field__control"><input className="input__field" id="form-demo-phone" name="phone" type="tel" defaultValue="+54 11 5555 0101" autoComplete="tel" /></div>
               </div>
             )}
           </div>
@@ -213,7 +208,7 @@ export default function FormInfrastructureStudio({ contract, definition }: FormI
       <h1 className="docs-studio__title">{contract.name}</h1>
       <div className="docs-studio__workspace">
         <StudioInspector definition={definition} contract={contract} values={values} slotIconValues={emptySlotIcons} stateValue="default" tokenValues={tokenValues} activeTokens={activeTokens} onPropertiesChange={changeProperties} onSlotIconChange={() => undefined} onStateChange={() => undefined} onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))} onReset={reset} />
-        <section className="docs-studio__stage" aria-label={`${contract.name} preview`} style={tokenOverrides as CSSProperties}>
+        <section className={`docs-studio__stage${contract.slug === 'form' ? ' docs-studio__stage--form' : ''}`} aria-label={`${contract.name} preview`} style={tokenOverrides as CSSProperties}>
           <div className="docs-studio__stage-inner">{renderers[contract.slug]()}</div>
         </section>
       </div>

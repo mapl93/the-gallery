@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { changedTokenDeclarations, tokenDeclarationMap } from './lib/responsive-token-declarations.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceBuildDir = path.join(repoRoot, 'tokens', 'source', 'build', 'css');
@@ -457,11 +458,18 @@ function mediaBlock(media, content) {
 }
 
 function buildThemeBlocks(theme, selectors, mediaPrefix = '') {
-  return viewports.map(({ name, media }) => {
-    const declarations = [
+  let previous;
+  return viewports.flatMap(({ name, media }) => {
+    const label = `${theme}.${name}.css`;
+    const current = tokenDeclarationMap([
       ...extractDeclarations(readCss(theme, name), `${theme}.${name}.css`),
       ...publicAliasDeclarations()
-    ];
+    ], label);
+    // Each theme scope keeps its complete base, including aliases. Responsive
+    // blocks contain only changes from the preceding viewport in that scope.
+    const declarations = changedTokenDeclarations(current, previous, label);
+    previous = current;
+    if (!declarations.length) return [];
     const block = declarationBlock(selectors, declarations, media ? 1 : 0);
 
     if (!media && mediaPrefix) {

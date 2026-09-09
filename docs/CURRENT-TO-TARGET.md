@@ -241,3 +241,13 @@ measurements and `docs/reports/2026-09-09-target-performance-checkpoint.md` for 
 new policy. Component batches can continue; token-output deduplication remains
 a proposed optimization with equivalence acceptance, not a condition imposed by
 an arbitrary byte budget.
+
+## Responsive token output (ADR 0311)
+
+Web and Shopify retain complete theme bases and emit only changed expressions
+at their existing viewport breakpoints. Local gzip token output decreases by
+about 73.1%; canonical values, aliases and component contracts remain unchanged.
+The 1,008-case Chromium comparison and Studio/Contact checks are recorded in
+`docs/reports/2026-09-09-responsive-token-checkpoint.md`. This supersedes the
+pending output-optimization proposal above. Component batches can continue;
+copy-and-own consumers and the hosted Shopify theme are not updated automatically.

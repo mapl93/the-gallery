@@ -86,7 +86,8 @@ explicit-Dark scope. The Input label gap resolves to 4 px and appears twelve
 times, while H1 genuinely changes by viewport. This concerns generated output,
 not duplicated canonical token definitions or twelve conceptual theme modes.
 
-Output deduplication remains a proposed optimization. Its acceptance is measured
+The output deduplication proposal below was subsequently implemented in ADR 0311.
+At this policy checkpoint it remained a proposed optimization. Its acceptance is measured
 size reduction plus unchanged computed values, aliases, theme islands, responsive
 boundaries and consumer overrides. No 64 KiB or 21 KiB target is imposed, and no
 generator, token, component, target asset or hosted Shopify change belongs to this

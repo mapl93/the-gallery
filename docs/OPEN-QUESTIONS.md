@@ -288,9 +288,9 @@ results are dated snapshots under an earlier policy, not current certification.
 
 Follow-up optimization questions:
 
-- Can responsive token output omit unchanged declarations while preserving all
-  aliases, theme scopes, overrides and computed values? This needs an equivalence
-  pilot before changing the generator; no arbitrary byte target is acceptance.
+- Resolved by ADR 0311: responsive output now omits unchanged expressions within
+  each theme scope. The checkpoint records equivalent computed values, aliases,
+  nested themes and overrides in Chromium, with measured size reduction.
 - If target page evidence identifies family CSS as a material cost, should it
   remain family-copied or gain deterministic component extraction?
 - Which real consumer pages and target conditions should provide load and

@@ -25,7 +25,10 @@ Replacing those names immediately would create unnecessary migration risk. The f
 
 ## Decision
 
-`platforms/web/tokens.css` emits two layers in every theme/viewport block:
+ADR 0311 refines the emission policy: complete bases per theme scope, then only
+changed expressions at each viewport. The two namespaces remain:
+
+`platforms/web/tokens.css` exposes:
 
 1. Canonical source-derived variables in the `--tg-*` namespace.
 2. Public compatibility aliases for the current component CSS API.

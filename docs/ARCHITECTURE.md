@@ -117,6 +117,12 @@ npm run validate:tokens:web-components
 
 The web target emits canonical source-derived `--tg-*` variables plus compatibility aliases for the current public component CSS API. The aliases cover names already used in `components/css/`, including `--color-*`, `--typo-*`, `--space-*`, `--radius-*`, `--shadow-*`, transition, easing, opacity, and z-index tokens. They are generated output policy, not canonical source.
 
+ADR 0311 keeps one complete token/alias base per theme scope and emits only
+expression changes in its 768px, 1024px and 1440px media queries. Theme scope,
+source matrices and compatibility names remain unchanged. Compare authored
+expressions rather than resolved values to preserve consumer customization;
+`npm run validate:tokens:responsive` covers the delta-selection rules.
+
 `npm run validate:tokens:web-components` scans `components/css/`, ignores component-private `--_` variables, and verifies that every public CSS custom property reference is defined in `platforms/web/tokens.css`.
 
 Motion is now a first-class source family. Primitive timing and curves live in `tokens/source/primitives/motion.tokens.json`; semantic adapter-facing roles live in `tokens/source/semantics/motion.tokens.json`. The source exposes `motion.duration.*`, `motion.curve.*`, `motion.transition.*`, and `motion.opacity.*`; neutral web emits both canonical `--tg-motion-*` variables and public `--motion-*` aliases. Existing `--transition-*`, `--easing-*`, and opacity aliases remain compatibility output. See `docs/decisions/0033-motion-token-architecture.md`.

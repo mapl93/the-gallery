@@ -18,6 +18,7 @@ Read these files before making non-trivial changes:
 - `docs/decisions/0001-repo-is-design-system-source-of-truth.md` for the accepted source-of-truth decision.
 - `docs/decisions/0002-layered-source-contract-adapter-architecture.md` for the accepted layered architecture.
 - `docs/adapters/README.md` and `docs/adapters/shopify.md` for target-native adapter implementation rules.
+- `docs/decisions/0311-responsive-token-output-deltas.md` for complete theme bases, expression-preserving responsive deltas, and their equivalence evidence.
 - `docs/decisions/0310-target-specific-performance-evidence.md` for target-specific sourced limits, advisory tool guidance, and retirement of internal numeric ceilings. A successful asset inventory is not target performance certification.
 - `docs/COMPONENT-CERTIFICATION.md`, `docs/decisions/0034-web-component-certification-and-docs-dogfooding.md`, and `docs/decisions/0035-button-semantic-properties-and-loading-placement.md` for web-first maturity gates, semantic Studio property ownership, the Button property-schema pilot, and docs-site adapter consumption.
 - `docs/decisions/0274-variant-state-orthogonality.md` for the global rule that variants and states remain independent contract and Studio axes; combined CSS selectors are implementation evidence, not additional states.

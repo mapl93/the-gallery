@@ -19,7 +19,7 @@ Neutral Web copy-and-own outputs
 | --- | --- | ---: | ---: | --- | --- |
 | Complete neutral component CSS compatibility bundle | — | 554131 | 74810 | None | observed |
 | Complete progressive-enhancement compatibility runtime | — | 117896 | 22837 | None | observed |
-| Neutral web token target | — | 731093 | 89489 | None | observed |
+| Neutral web token target | — | 191987 | 24066 | None | observed |
 | Selective runtime loader | — | 2399 | 747 | None | observed |
 | Shared modular runtime core | — | 1678 | 707 | None | observed |
 | Largest individual progressive-enhancement module | date-picker | 14351 | 3381 | None | observed |
@@ -49,8 +49,8 @@ Shopify Online Store theme; not a theme app extension or Theme Store submission
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Shopify theme token asset | — | 731253 | 89537 | None | observed |
-| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 731253 | 89537 | 100000 rawBytes; advisory | advisory-overage |
+| Shopify theme token asset | — | 192147 | 24115 | None | observed |
+| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 192147 | 24115 | 100000 rawBytes; advisory | advisory-overage |
 | Largest Shopify local JS asset (inventory, including compatibility files) | theme.js | 117896 | 22837 | 10000 rawBytes; advisory | advisory-overage |
 
 Unverified by this report:
@@ -72,7 +72,7 @@ Upstream main inspected on checkedOn; configurable and disabled by default for t
 
 Assets above this reference:
 
-- `platforms/shopify/assets/tokens.css`: 731253 raw bytes, 89537 gzip bytes.
+- `platforms/shopify/assets/tokens.css`: 192147 raw bytes, 24115 gzip bytes.
 
 ### shopify-js-asset-maximum
 

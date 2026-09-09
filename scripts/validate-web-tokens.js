@@ -58,6 +58,6 @@ includes('--typo-input-message-size: var(--tg-typography-body-caption-size);');
 includes('--typo-input-message-line-height: var(--tg-typography-body-caption-line-height);');
 
 const primitiveOccurrences = css.match(/--tg-color-gray-0:/g) ?? [];
-assert(primitiveOccurrences.length === 12, `Expected 12 token declaration blocks, found ${primitiveOccurrences.length}`);
+assert(primitiveOccurrences.length === 3, `Expected a complete primitive base for each of 3 theme scopes, found ${primitiveOccurrences.length}`);
 
 console.log('Validated neutral web token target: platforms/web/tokens.css.');

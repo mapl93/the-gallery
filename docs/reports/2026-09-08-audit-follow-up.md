@@ -342,3 +342,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   reproducía flex en lugar de grid. Pruebas conjuntas/incrementales/add-all,
   los 20 escenarios de protección y evidencia Chromium pasan. Las copias
   existentes adoptan el orden explícitamente. Ver `2026-09-09-cli-css-order-checkpoint.md`.
+
+- ADR 0339 completa Product Info/Slider con 15 roles nuevos y 23/28 valores
+  públicos. Conserva 1440 comparaciones y consultas de contenedor sin nuevos
+  modos. Editor/reset, RTL, contenido rico y navegación/foco con distintas
+  densidades pasan. Ambos siguen pilot; Shopify remoto permanece separado.
+  Evidencia: `2026-09-09-product-info-slider-checkpoint.md`.
+  Continúan Variant Selector y Product Form dentro del punto 5.

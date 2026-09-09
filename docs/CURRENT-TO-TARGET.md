@@ -511,3 +511,13 @@ Product Info followed by Slider previously loaded Carousel after its specialized
 grid. Integration tests and Chromium reproduce flex before/grid after; all 20
 copy-protection scenarios pass. Existing consumers must adopt import order
 explicitly. Evidence: `docs/reports/2026-09-09-cli-css-order-checkpoint.md`.
+
+## Product Info and Product Slider visual values (ADR 0339)
+
+Fifteen source roles complete 23/28 public values and retain 1440 default element
+comparisons. Info exposes typography/spacing/metadata geometry; Slider shares one
+responsive item-width formula with token-driven counts at existing thresholds.
+Native rich content, RTL, editor/reset, finite navigation/focus and changed overflow
+bounds pass. No JS changes or new source modes. Both remain pilot. Evidence:
+`docs/reports/2026-09-09-product-info-slider-checkpoint.md`.
+Continue Variant Selector and Product Form; remote Shopify follows Web.

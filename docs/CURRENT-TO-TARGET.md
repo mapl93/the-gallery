@@ -343,3 +343,11 @@ placement and target-owned action/visibility policy. Studio now preserves its
 offsets in the contained preview. See
 `docs/reports/2026-09-09-toggle-fab-checkpoint.md`.
 Continue Alert, Progress, Spinner and Stat without changing pilot maturity.
+
+## Feedback value customization (ADR 0322)
+
+Alert, Spinner and Stat expose their meaningful geometry/motion/weight choices;
+shared roles and documented color derivations are preserved. Studio identifies
+Alert fallbacks and offers an optional Stat group fixture. See
+`docs/reports/2026-09-09-feedback-values-checkpoint.md`.
+Continue Progress with owner-approved independent circle diameter/stroke pixels.

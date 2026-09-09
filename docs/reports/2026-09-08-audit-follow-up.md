@@ -226,3 +226,10 @@ reducido; Comment Section hereda el espaciado de Toggle. Studio conserva los off
 canónicos dentro de su marco local. Ver
 `docs/reports/2026-09-09-toggle-fab-checkpoint.md`. Continúan pilot; siguiente lote:
 Alert, Progress, Spinner y Stat.
+
+ADR 0322 continúa Alert, Spinner y Stat con 18 tokens nuevos y reutilización de
+pesos/easing. Paridad de 280 mediciones, anuncios explícitos, ring/motion, grupo
+responsive y reset pasan. Los fallbacks de Alert dejan de presentarse como controles
+activos de severidad. Ver `docs/reports/2026-09-09-feedback-values-checkpoint.md`.
+Progress circular sigue con la decisión del propietario: diámetro y grosor
+independientes en píxeles. No cambia la madurez ni se sube un tema Shopify.

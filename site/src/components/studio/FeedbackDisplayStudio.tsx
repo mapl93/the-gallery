@@ -10,6 +10,7 @@ import { getStudioLucideIcon } from './lucideCatalogue';
 import AlertArtwork, { type AlertArtworkVariant } from './AlertArtwork';
 import ProgressArtwork from './ProgressArtwork';
 import StatArtwork from './StatArtwork';
+import CheckboxArtwork from './CheckboxArtwork';
 
 interface FeedbackDisplayStudioProps {
   contract: ComponentContract;
@@ -110,7 +111,7 @@ function mergeValues(
 
 function activeTokens(slug: string, values: StudioPropertyValues): Record<string, string | null> {
   if (slug === 'alert') {
-    return { feedback: `--color-feedback-${String(values.variant || 'info')}-default` };
+    return { feedback: `--color-feedback-${String(values.variant || 'info')}-default`, surface: null, 'default-border': null };
   }
   if (slug === 'stat') {
     return {
@@ -135,6 +136,7 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
   const [baseTokenValues, setBaseTokenValues] = useState<Record<string, string>>({});
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [dismissed, setDismissed] = useState(false);
+  const [showStatGroup, setShowStatGroup] = useState(false);
 
   useEffect(() => {
     const read = () => {
@@ -158,6 +160,7 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
     setSlotIconValues({ ...initialIcons });
     setTokenOverrides({});
     setDismissed(false);
+    setShowStatGroup(false);
   }
 
   function renderPreview() {
@@ -219,7 +222,7 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
     }
 
     const direction = String(values.changeDirection || 'neutral') as 'neutral' | 'up' | 'down';
-    return (
+    const stat = (
       <StatArtwork
         value={String(values.value || '')}
         label={String(values.label || '')}
@@ -232,6 +235,13 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
         className="docs-studio__preview-stat"
       />
     );
+    return showStatGroup ? (
+      <div className="stat-group docs-studio__preview-stat-group">
+        {stat}
+        <StatArtwork value="3.1%" label="Returns" change="Down 0.4%" changeDirection="down" />
+        <StatArtwork value="82" label="Products" />
+      </div>
+    ) : stat;
   }
 
   return (
@@ -246,6 +256,10 @@ export default function FeedbackDisplayStudio({ contract, definition }: Feedback
           stateValue={contract.states[0]?.name ?? 'default'}
           tokenValues={tokenValues}
           activeTokens={activeTokens(contract.slug, values)}
+          fixtureControlsByGroup={contract.slug === 'stat' ? { content: (
+            <CheckboxArtwork label="Group preview" checked={showStatGroup}
+              onChange={(event) => setShowStatGroup(event.target.checked)} />
+          ) } : undefined}
           onPropertiesChange={(next) => { setValues((current) => mergeValues(contract.slug, current, next)); setDismissed(false); }}
           onSlotIconChange={(slot, iconName) => setSlotIconValues((current) => ({ ...current, [slot]: iconName }))}
           onStateChange={() => undefined}

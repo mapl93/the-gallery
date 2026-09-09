@@ -4,6 +4,7 @@ import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import { getStudioLucideIcon, studioLucideIcons } from './lucideCatalogue';
 import SegmentedControlArtwork from './SegmentedControlArtwork';
+import { parseStudioColor, serializeStudioColor } from '../../lib/studioColor';
 
 export type StudioPropertyValue = string | string[] | boolean | number | null;
 export type StudioPropertyValues = Record<string, StudioPropertyValue>;
@@ -269,23 +270,25 @@ function serializeShadowValue(value: StudioShadowValue): string {
   ].filter(Boolean).join(' ');
 }
 
-interface StudioShadowNumberInputProps {
+interface StudioBoundedNumberInputProps {
   id: string;
   label: string;
   value: string;
   minimum?: number;
   maximum?: number;
+  disabled?: boolean;
   onChange: (value: string) => void;
 }
 
-function StudioShadowNumberInput({
+function StudioBoundedNumberInput({
   id,
   label,
   value,
   minimum,
   maximum,
+  disabled = false,
   onChange,
-}: StudioShadowNumberInputProps) {
+}: StudioBoundedNumberInputProps) {
   const [draft, setDraft] = useState(value);
 
   useEffect(() => setDraft(value), [value]);
@@ -309,6 +312,7 @@ function StudioShadowNumberInput({
       id={id}
       type="text"
       inputMode="decimal"
+      disabled={disabled}
       aria-label={label}
       value={draft}
       onChange={(event) => {
@@ -434,7 +438,7 @@ function StudioShadowEditor({ id, label, token, value, shadow, onChange }: Studi
       {lengthFields.map((field) => (
         <label className="docs-studio__shadow-field" key={field.name} htmlFor={`${id}-${field.name}`}>
           <span className="docs-studio__shadow-field-label">{field.label}</span>
-          <StudioShadowNumberInput
+          <StudioBoundedNumberInput
             id={`${id}-${field.name}`}
             label={`${label} ${field.label}`}
             value={shadow[field.name].number}
@@ -455,7 +459,7 @@ function StudioShadowEditor({ id, label, token, value, shadow, onChange }: Studi
       </div>
       <label className="docs-studio__shadow-field" htmlFor={`${id}-opacity`}>
         <span className="docs-studio__shadow-field-label">Opacity</span>
-        <StudioShadowNumberInput
+        <StudioBoundedNumberInput
           id={`${id}-opacity`}
           label={`${label} opacity`}
           value={shadow.opacity}
@@ -845,21 +849,56 @@ export default function StudioInspector({
         ? activeTokens[control.id]
         : tokens.length === 1 ? tokens[0] : null;
       const value = token ? tokenValues[token] ?? '' : 'transparent';
-      const transparent = value.trim() === 'transparent' || !token;
+      const color = parseStudioColor(value);
+      if (token && !color) {
+        return (
+          <label className="docs-studio__token-field docs-studio__color-expression" htmlFor={id}>
+            <span className="docs-studio__color-chip" aria-hidden="true">
+              <span className="docs-studio__color-sample" style={{ backgroundColor: value }} />
+            </span>
+            <StudioTokenInput id={id} label={`${control.label} color`} token={token} value={value}
+              onChange={(nextValue) => onTokenChange(token, nextValue)} />
+            <span className="docs-studio__token-name" title={token}>{formatTokenName(token)}</span>
+          </label>
+        );
+      }
+      const opacity = Number(((color?.alpha ?? 0) * 100).toFixed(6));
       return (
-        <div className="docs-studio__swatch-field" data-transparent={transparent || undefined}>
-          <input
-            id={id}
-            type="color"
-            value={toColorInputValue(value)}
-            aria-label={`Change ${control.label.toLowerCase()} color`}
-            disabled={!token}
-            onInput={(event) => {
-              if (token) onTokenChange(token, event.currentTarget.value);
-            }}
-          />
+        <div className="docs-studio__swatch-field">
+          <span className="docs-studio__color-chip">
+            <span className="docs-studio__color-sample" aria-hidden="true" style={{ backgroundColor: value }} />
+            <input
+              id={id}
+              type="color"
+              value={color?.hex ?? '#000000'}
+              aria-label={`Change ${control.label.toLowerCase()} color`}
+              disabled={!token}
+              onInput={(event) => {
+                const next = parseStudioColor(event.currentTarget.value);
+                if (token && color && next) {
+                  onTokenChange(token, serializeStudioColor({ ...next, alpha: color.alpha }));
+                }
+              }}
+            />
+          </span>
           <span className="docs-studio__token-name" title={token ?? 'No public token for this combination'}>
             {token ? formatTokenName(token) : 'transparent'}
+          </span>
+          <span className="docs-studio__color-opacity">
+            <StudioBoundedNumberInput
+              id={`${id}-opacity`}
+              label={`${control.label} opacity`}
+              value={String(opacity)}
+              minimum={0}
+              maximum={100}
+              disabled={!token}
+              onChange={(nextOpacity) => {
+                if (token && color && Number(nextOpacity) !== opacity) {
+                  onTokenChange(token, serializeStudioColor({ ...color, alpha: Number(nextOpacity) / 100 }));
+                }
+              }}
+            />
+            <span className="docs-studio__token-unit">%</span>
           </span>
         </div>
       );

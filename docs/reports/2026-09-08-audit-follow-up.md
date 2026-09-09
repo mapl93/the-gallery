@@ -200,3 +200,8 @@ ADR 0317 amplía Empty State/Divider con seis decisiones y 17/4 roles públicos.
 Corrige la validación en ejecución del encabezado contextual de Empty State.
 Cuarenta y ocho presentaciones y quince mediciones pasan, incluyendo Cart Empty,
 Empty Collection, textos largos y RTL. Véase `2026-09-09-empty-divider-checkpoint.md`.
+
+ADR 0318 corrige un problema transversal del punto 5: Studio perdía alfa al editar
+RGBA y mostraba negro para expresiones como el color-mix de Empty State. El editor
+conserva transparencia, muestra su resultado y mantiene completas las expresiones
+no interpretadas. Evidencia en `2026-09-09-studio-color-checkpoint.md`.

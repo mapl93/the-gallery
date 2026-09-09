@@ -307,3 +307,11 @@ parent-owned spacing or Purpose. Evidence covers 48 presentations, fifteen Studi
 measurements, RTL/narrow containment and Cart Empty/Empty Collection composition:
 `docs/reports/2026-09-09-empty-divider-checkpoint.md`. Avatar's paired-scale
 clarification is independent; continue other base component coverage meanwhile.
+
+## Studio color editing (ADR 0318)
+
+The shared token swatch editor preserves RGB/alpha independently, displays real
+transparency, and retains unsupported color expressions in a complete text editor.
+Empty State color-mix, authored RGBA, Button transparent border and Slider shadow
+regression pass: `docs/reports/2026-09-09-studio-color-checkpoint.md`. Site-only;
+no source values, component maturity or target outputs change.

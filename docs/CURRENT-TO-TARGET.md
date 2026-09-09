@@ -360,3 +360,12 @@ small radius correction and copied-SVG adoption are explicit. Range, endpoints,
 accessible text, Studio and Free Shipping Bar evidence pass. See
 `docs/reports/2026-09-09-progress-checkpoint.md`.
 Continue the remaining primitives without changing pilot maturity or target scope.
+
+## Table and Data List customization (ADR 0324)
+
+Eighteen source roles expose tabular density, borders, sortable-trigger geometry
+and description-list spacing. Responsive layouts use the existing container query
+and token values; configuration aliases leave the state inventory. Default parity,
+native sorting/scroll/focus, Studio and Size Chart composition pass:
+`docs/reports/2026-09-09-tabular-checkpoint.md`.
+Continue Timeline and Link without changing pilot maturity or target scope.

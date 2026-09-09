@@ -239,3 +239,9 @@ propietario: diez tokens nuevos y 21 roles públicos. Conserva grosor visible,
 registra la corrección mínima de radio y verifica porcentajes, rango, movimiento
 y controles aplicables en Studio. Ver `2026-09-09-progress-checkpoint.md`.
 Continúa el punto 5 sin promoción de madurez ni subida remota de Shopify.
+
+ADR 0324 completa Table/Data List con 18 tokens y 24/12 roles públicos; 480
+mediciones conservan defaults. Ordenación nativa, foco, scroll, gaps por container
+query y composición Size Chart pasan. Elimina dos presentaciones repetidas como
+estados conforme a ADR 0274. Ver `2026-09-09-tabular-checkpoint.md`.
+Continúa Timeline/Link sin promoción de madurez ni subida de tema.

@@ -65,6 +65,8 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
   const trackRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<Array<HTMLElement | null>>([]);
   const carouselFrameRef = useRef<number | null>(null);
+  const previousRef = useRef<HTMLButtonElement | null>(null);
+  const nextRef = useRef<HTMLButtonElement | null>(null);
   const carouselTrackId = useId();
 
   useEffect(() => {
@@ -80,11 +82,6 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
     return () => observer.disconnect();
   }, [studioTokens]);
 
-  useEffect(() => {
-    if (contract.slug !== 'carousel') return;
-    setSlideIndex(values.current === true ? 0 : 1);
-  }, [contract.slug, values.current]);
-
   useEffect(() => () => {
     if (carouselFrameRef.current !== null) cancelAnimationFrame(carouselFrameRef.current);
   }, []);
@@ -92,6 +89,7 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
 
   function reset() {
+    if (contract.slug === 'carousel') selectSlide(0, true);
     setValues({ ...initialValues });
     setSlideIndex(0);
     setTokenOverrides({});
@@ -109,14 +107,22 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
     );
   }
 
-  function selectSlide(next: number) {
+  function updateSlide(next: number) {
+    if ((next === 0 && document.activeElement === previousRef.current)
+      || (next === slidesFixture.length - 1 && document.activeElement === nextRef.current)) {
+      trackRef.current?.focus({ preventScroll: true });
+    }
+    setSlideIndex(next);
+    setValues((current) => ({ ...current, current: next === 0, disabled: next === 0 }));
+  }
+
+  function selectSlide(next: number, instant = false) {
     const normalized = Math.max(0, Math.min(slidesFixture.length - 1, next));
-    setSlideIndex(normalized);
-    setValues((current) => ({ ...current, current: normalized === 0, disabled: normalized === 0 }));
+    updateSlide(normalized);
     slideRefs.current[normalized]?.scrollIntoView({
       block: 'nearest',
       inline: 'start',
-      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      behavior: instant ? 'instant' : matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     });
   }
 
@@ -135,8 +141,7 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
         return distance < closest.distance ? { index, distance } : closest;
       }, { index: 0, distance: Number.POSITIVE_INFINITY }).index;
       if (next !== slideIndex) {
-        setSlideIndex(next);
-        setValues((current) => ({ ...current, current: next === 0, disabled: next === 0 }));
+        updateSlide(next);
       }
     });
   }
@@ -159,12 +164,12 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
           ))}
         </div>
         <div className="carousel__nav carousel__nav--prev">
-          <button className="icon-btn icon-btn--round carousel__nav-btn" type="button" aria-label="Previous slide" aria-controls={carouselTrackId} disabled={values.disabled === true || slideIndex === 0} onClick={() => selectSlide(slideIndex - 1)}>
+          <button ref={previousRef} className="icon-btn icon-btn--round carousel__nav-btn" type="button" aria-label="Previous slide" aria-controls={carouselTrackId} disabled={values.disabled === true || slideIndex === 0} onClick={() => selectSlide(slideIndex - 1)}>
             <ArrowLeft className="icon-btn__icon" aria-hidden="true" />
           </button>
         </div>
         <div className="carousel__nav carousel__nav--next">
-          <button className="icon-btn icon-btn--round carousel__nav-btn" type="button" aria-label="Next slide" aria-controls={carouselTrackId} disabled={slideIndex === slidesFixture.length - 1} onClick={() => selectSlide(slideIndex + 1)}>
+          <button ref={nextRef} className="icon-btn icon-btn--round carousel__nav-btn" type="button" aria-label="Next slide" aria-controls={carouselTrackId} disabled={slideIndex === slidesFixture.length - 1} onClick={() => selectSlide(slideIndex + 1)}>
             <ArrowRight className="icon-btn__icon" aria-hidden="true" />
           </button>
         </div>
@@ -247,7 +252,12 @@ export default function SequenceViewportStudio({ contract, definition }: Sequenc
           stateValue="default"
           tokenValues={tokenValues}
           activeTokens={activeTokens}
-          onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))}
+          onPropertiesChange={(next) => {
+            setValues((current) => ({ ...current, ...next }));
+            if (contract.slug === 'carousel' && 'current' in next) {
+              selectSlide(next.current === true ? 0 : slideIndex === 0 ? 1 : slideIndex);
+            }
+          }}
           onSlotIconChange={() => undefined}
           onStateChange={() => undefined}
           onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))}

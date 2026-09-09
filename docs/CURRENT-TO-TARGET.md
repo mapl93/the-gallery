@@ -450,3 +450,14 @@ while retaining its parent-owned narrow layout. Both remain pilot. Source,
 adapters, CLI and local evidence pass; no remote target certification.
 Evidence: `docs/reports/2026-09-09-command-palette-steps-checkpoint.md`.
 Continue Carousel and Scroll Area.
+
+## Carousel and Scroll Area visual values (ADR 0334)
+
+Thirteen source roles complete 26/8 public tokens and retain 192 measured default
+element comparisons. Carousel synchronizes actual Studio scroll/selection/reset,
+preserves focus at bounds and resolves nested direction. Scroll Area distinguishes
+standard native styling from WebKit-only fallback controls and restores coarse
+auto sizing. Product Slider inherits shared control/focus values. Both remain
+pilot; no remote target certification. Evidence:
+`docs/reports/2026-09-09-carousel-scroll-area-checkpoint.md`.
+Continue Lightbox and dependent compositions.

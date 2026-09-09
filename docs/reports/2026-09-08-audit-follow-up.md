@@ -302,3 +302,10 @@ Se separa orientación de estados y se conserva done como alias de completed.
 Fuente/adapters/CLI y evidencia local pasan, sin promoción ni entrega remota.
 Detalle: `2026-09-09-command-palette-steps-checkpoint.md`. Continúan Carousel y
 Scroll Area; los nueve puntos no se declaran cerrados.
+
+- ADR 0334 completa Carousel/Scroll Area con 13 valores fuente y 26/8 roles
+  públicos. 192 comparaciones conservan valores iniciales. Carousel corrige
+  tercera diapositiva, Reset, inspector y dirección anidada; Scroll Area distingue
+  límites nativos de fallback y respeta auto coarse. Puntos 5/7 continúan sin
+  promoción automática ni Shopify remoto. Evidencia:
+  `docs/reports/2026-09-09-carousel-scroll-area-checkpoint.md`.

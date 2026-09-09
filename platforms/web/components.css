@@ -4398,9 +4398,9 @@ th[aria-sort]:not([aria-sort="none"]) .table__sort-icon { opacity: 1; }
 
 /* ── B15. CAROUSEL / SLIDER ── */
 .carousel {
-  --_carousel-gap: var(--space-layout-element-gap);
-  --_carousel-control-inset: calc(var(--space-layout-element-gap) * 0.25);
-  --_carousel-dot-size: 8px;
+  --_carousel-gap: calc(var(--space-layout-element-gap) * var(--ratio-carousel-gap));
+  --_carousel-control-inset: calc(var(--space-layout-element-gap) * var(--ratio-carousel-control-inset));
+  --_carousel-dot-size: var(--space-carousel-dot-size);
 
   position: relative;
   overflow: hidden;
@@ -4417,8 +4417,8 @@ th[aria-sort]:not([aria-sort="none"]) .table__sort-icon { opacity: 1; }
 }
 .carousel__track::-webkit-scrollbar { display: none; }
 .carousel__track:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -2px;
+  outline: var(--border-carousel-focus-width) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-carousel-track-focus-inset));
 }
 .carousel__slide {
   flex: 0 0 auto;
@@ -4448,8 +4448,8 @@ th[aria-sort]:not([aria-sort="none"]) .table__sort-icon { opacity: 1; }
 .carousel__dots {
   display: flex;
   justify-content: center;
-  gap: calc(var(--space-layout-element-gap) * 0.125);
-  margin-block-start: calc(var(--space-layout-element-gap) * 0.25);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-carousel-dot-gap));
+  margin-block-start: calc(var(--space-layout-element-gap) * var(--ratio-carousel-dots-offset));
 }
 .carousel__dot {
   display: grid;
@@ -4471,18 +4471,18 @@ th[aria-sort]:not([aria-sort="none"]) .table__sort-icon { opacity: 1; }
               transform var(--transition-fast) var(--easing-default);
 }
 .carousel__dot:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -4px;
+  outline: var(--border-carousel-focus-width) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-carousel-dot-focus-inset));
   border-radius: var(--radius-full);
 }
 .carousel__dot--active::before,
 .carousel__dot[aria-current="true"]::before {
-  transform: scale(1.25);
+  transform: scale(var(--scale-carousel-active-dot-scale));
   background: var(--color-text-primary);
 }
 .carousel__status { pointer-events: none; }
 
-[dir="rtl"] .carousel__nav-btn svg { transform: rotate(180deg); }
+.carousel__nav-btn:dir(rtl) svg { transform: rotate(180deg); }
 
 @media (prefers-reduced-motion: reduce) {
   .carousel__track { scroll-behavior: auto; }
@@ -4500,14 +4500,15 @@ th[aria-sort]:not([aria-sort="none"]) .table__sort-icon { opacity: 1; }
 .scroll-area {
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border-subtle) transparent;
+  scrollbar-color: var(--color-border-subtle) var(--color-scroll-area-track);
 }
 .scroll-area:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -2px;
+  outline: var(--border-scroll-area-focus-width) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-scroll-area-focus-inset));
 }
-.scroll-area::-webkit-scrollbar { width: 6px; height: 6px; }
-.scroll-area::-webkit-scrollbar-track { background: transparent; }
+/* Non-standard fallback; ignored when standard scrollbar styling applies. */
+.scroll-area::-webkit-scrollbar { width: var(--space-scroll-area-fallback-thickness); height: var(--space-scroll-area-fallback-thickness); }
+.scroll-area::-webkit-scrollbar-track { background: var(--color-scroll-area-track); }
 .scroll-area::-webkit-scrollbar-thumb {
   background: var(--color-border-subtle);
   border-radius: var(--radius-full);
@@ -4516,7 +4517,7 @@ th[aria-sort]:not([aria-sort="none"]) .table__sort-icon { opacity: 1; }
 
 @media (pointer: coarse) {
   .scroll-area { scrollbar-width: auto; }
-  .scroll-area::-webkit-scrollbar { width: 12px; height: 12px; }
+  .scroll-area::-webkit-scrollbar { width: auto; height: auto; }
 }
 
 @media (forced-colors: active) {

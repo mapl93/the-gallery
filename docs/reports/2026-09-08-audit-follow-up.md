@@ -212,3 +212,10 @@ por tokens, conservando las parejas como defaults. Cuatro decisiones nuevas y lo
 roles tipográficos existentes completan trece controles. Pasan 56 raíces y cuatro
 parejas independientes en CLI/Studio, con Author Card y Comment Section como
 consumidores. Véase `2026-09-09-avatar-checkpoint.md`.
+
+ADR 0320 continúa el punto 5 con Button Group, Icon Button y Close Button:
+21/13/2 roles públicos respectivamente para Icon/Close/Group, dieciséis tokens
+nuevos y unión derivada del borde de Button. Paridad en ocho matrices, consumidor
+CLI, Studio/Exhibit, teclado, movimiento reducido y composición Lightbox probados.
+Ver `docs/reports/2026-09-09-compact-actions-checkpoint.md`. Continúan en pilot;
+Web/Shopify regenerados sin subida de tema. Siguiente lote: Toggle y FAB.

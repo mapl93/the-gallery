@@ -174,7 +174,7 @@ function activeTokensFor(
         ? '--color-border-subtle'
         : filled || state === 'hover'
           ? '--color-surface-secondary'
-          : null,
+          : '--color-icon-button-background',
       text: filled || state === 'hover' ? '--color-text-primary' : '--color-text-secondary',
       focus: '--color-border-focus',
     };
@@ -182,7 +182,7 @@ function activeTokensFor(
 
   if (slug === 'close-button') {
     return {
-      background: state === 'hover' ? '--color-surface-secondary' : null,
+      background: state === 'hover' ? '--color-surface-secondary' : '--color-close-button-background',
       text: state === 'hover' ? '--color-text-primary' : '--color-text-secondary',
       focus: '--color-border-focus',
     };
@@ -211,11 +211,11 @@ function activeTokensFor(
   return {};
 }
 
-function focusStyle(state: string): CSSProperties | undefined {
+function focusStyle(state: string, slug?: string): CSSProperties | undefined {
   if (state !== 'focusVisible') return undefined;
   return {
-    outline: '2px solid var(--color-border-focus)',
-    outlineOffset: 2,
+    outline: slug ? `var(--border-${slug}-focus-ring-width) solid var(--color-border-focus)` : '2px solid var(--color-border-focus)',
+    outlineOffset: slug ? `var(--border-${slug}-focus-ring-offset)` : 2,
   };
 }
 
@@ -323,7 +323,7 @@ export default function PrimitiveActionStudio({
         ...(previewState === 'hover'
           ? { background: values.variant === 'filled' ? 'var(--color-border-subtle)' : 'var(--color-surface-secondary)', color: 'var(--color-text-primary)' }
           : {}),
-        ...focusStyle(previewState),
+        ...focusStyle(previewState, contract.slug),
       };
       return (
         <button
@@ -349,7 +349,7 @@ export default function PrimitiveActionStudio({
         ...(previewState === 'hover'
           ? { background: 'var(--color-surface-secondary)', color: 'var(--color-text-primary)' }
           : {}),
-        ...focusStyle(previewState),
+        ...focusStyle(previewState, contract.slug),
       };
       return (
         <button

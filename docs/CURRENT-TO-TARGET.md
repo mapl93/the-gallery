@@ -325,3 +325,12 @@ semantic type roles expose all thirteen visual controls, with unchanged defaults
 Evidence covers 56 roots, four independent pairs, CLI, Studio, Exhibit, Author Card,
 Comment Section and image/naming boundaries: `docs/reports/2026-09-09-avatar-checkpoint.md`.
 Continue Button Group, Icon Button and Close Button; Avatar remains pilot.
+
+## Compact action customization (ADR 0320)
+
+Button Group, Icon Button and Close Button now expose their meaningful visual
+choices through public tokens. Group joining follows the existing Button border
+width; size/icon and focus controls preserve defaults and native semantics.
+Eight matrices and Lightbox composition pass; see
+`docs/reports/2026-09-09-compact-actions-checkpoint.md`.
+Continue Toggle and FAB without changing target priorities or pilot maturity.

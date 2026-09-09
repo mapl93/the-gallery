@@ -383,7 +383,7 @@ export default function PrimitiveActionStudio({
                 disabled={disabled}
                 style={{
                   ...(simulateHover ? { background: 'var(--color-surface-secondary)' } : {}),
-                  ...(simulateFocus ? focusStyle('focusVisible') : {}),
+                  ...(simulateFocus ? focusStyle('focusVisible', 'toggle') : {}),
                 }}
                 onClick={() => setSelectedToggle(index)}
                 key={label}
@@ -399,7 +399,7 @@ export default function PrimitiveActionStudio({
     const visible = values.visible === true;
     const style: CSSProperties = {
       ...(previewState === 'hover' ? { background: 'var(--color-surface-secondary)' } : {}),
-      ...focusStyle(previewState),
+      ...focusStyle(previewState, contract.slug),
     };
     return (
       <div className="docs-studio__fab-stage">

@@ -334,3 +334,12 @@ width; size/icon and focus controls preserve defaults and native semantics.
 Eight matrices and Lightbox composition pass; see
 `docs/reports/2026-09-09-compact-actions-checkpoint.md`.
 Continue Toggle and FAB without changing target priorities or pilot maturity.
+
+## Toggle and FAB customization (ADR 0321)
+
+Both expose 21 public roles with token-driven spacing, dimensions and focus.
+Installed-consumer parity and native behavior pass; FAB keeps physical bottom-right
+placement and target-owned action/visibility policy. Studio now preserves its
+offsets in the contained preview. See
+`docs/reports/2026-09-09-toggle-fab-checkpoint.md`.
+Continue Alert, Progress, Spinner and Stat without changing pilot maturity.

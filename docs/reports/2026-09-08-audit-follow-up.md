@@ -219,3 +219,10 @@ nuevos y unión derivada del borde de Button. Paridad en ocho matrices, consumid
 CLI, Studio/Exhibit, teclado, movimiento reducido y composición Lightbox probados.
 Ver `docs/reports/2026-09-09-compact-actions-checkpoint.md`. Continúan en pilot;
 Web/Shopify regenerados sin subida de tema. Siguiente lote: Toggle y FAB.
+
+ADR 0321 amplía Toggle y FAB a 21 roles públicos cada uno, con 17 tokens nuevos.
+Se verifican paridad, selección nativa, offsets físicos, foco oculto y movimiento
+reducido; Comment Section hereda el espaciado de Toggle. Studio conserva los offsets
+canónicos dentro de su marco local. Ver
+`docs/reports/2026-09-09-toggle-fab-checkpoint.md`. Continúan pilot; siguiente lote:
+Alert, Progress, Spinner y Stat.

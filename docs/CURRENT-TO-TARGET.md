@@ -259,6 +259,15 @@ their complete reviewed public inventories in Studio/Exhibit. Native HTML remain
 the selection/form owner. Studio retains third/fourth choices, Segmented Control's
 legend gap now applies, and forced-color swatch selection has a real boundary.
 The 96-case CSS comparison, 58 Studio measurements and native/composed checks are
-recorded in `docs/reports/2026-09-09-native-choice-checkpoint.md`. Both remain pilot;
-Slider is the next small customization batch. Full Shopify integration follows
-completion of the base Web system.
+recorded in `docs/reports/2026-09-09-native-choice-checkpoint.md`. Both remain pilot.
+
+## Slider customization and runtime parity (ADR 0313)
+
+Slider exposes six source decisions and 31 public controls. Studio uses the
+canonical range enhancer; native default bounds and track focus are corrected.
+Separate engine selector lists restore forced-color and reduced-motion rules.
+The checkpoint records 32 default comparisons, 24 Studio measurements, native
+form behavior and Before / After composition, including actual Chromium thumb
+styles: `docs/reports/2026-09-09-slider-checkpoint.md`. Slider remains pilot.
+Continue the remaining base Web customization batches; full Shopify integration
+follows completion of the base Web system.

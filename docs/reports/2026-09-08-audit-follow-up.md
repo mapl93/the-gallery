@@ -173,3 +173,9 @@ ADR 0312 continúa el punto 5 con Color Picker y Segmented Control: 23 decisione
 gap de leyenda efectivo y contorno seleccionado en colores forzados. Véase
 `docs/reports/2026-09-09-native-choice-checkpoint.md` para comparaciones, pruebas
 nativas y composiciones. Ambos conservan `pilot`; Slider es el siguiente batch.
+
+ADR 0313 continúa con Slider: seis decisiones y 31 controles visuales, estados
+separados de modo/validación, inicialización real en Studio, límites nativos,
+foco al activar la pista y reglas de colores forzados/movimiento reducido por
+motor. Véase `docs/reports/2026-09-09-slider-checkpoint.md`. Mantiene `pilot` y
+continúa la cobertura de la base Web, con Shopify como destino posterior.

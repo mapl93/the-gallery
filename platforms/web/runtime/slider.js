@@ -3,7 +3,9 @@ import { enhanceMatches, expose, register } from './core.js';
 
 /* ---- Slider / range ---- */
 function sliderNumber(field, attribute, fallback) {
-  const parsed = Number(field.getAttribute(attribute));
+  const authored = field.getAttribute(attribute);
+  if (authored === null || authored.trim() === '') return fallback;
+  const parsed = Number(authored);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
@@ -92,6 +94,8 @@ function enhanceRangeSlider(root) {
     if (!target || lower.disabled || upper.disabled) return;
     const bounds = root.getBoundingClientRect();
     if (bounds.width <= 0) return;
+    // The track's default pointer action would blur the native owner focused below.
+    event.preventDefault();
     const rtl = getComputedStyle(root).direction === 'rtl';
     const position = Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width));
     const ratio = rtl ? 1 - position : position;

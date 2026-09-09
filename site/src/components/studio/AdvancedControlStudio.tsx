@@ -143,6 +143,13 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
   const tagsInputFieldRef = useRef<HTMLInputElement | null>(null);
   const tagsInputRootRef = useRef<HTMLDivElement | null>(null);
   const tagsInputId = useId();
+  const sliderRootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (contract.slug === 'slider' && sliderRootRef.current) {
+      window.TheGallery?.enhanceSliders(sliderRootRef.current);
+    }
+  }, [contract.slug, values]);
 
   useEffect(() => {
     const read = () => {
@@ -283,23 +290,23 @@ export default function AdvancedControlStudio({ contract, definition }: Advanced
         '--_slider-range-end': `${((upper - min) / span) * 100}%`,
       } as CSSProperties;
       return (
-        <div className="slider docs-studio__preview-slider" data-slider-enhanced="true" data-validation={variant === 'default' ? undefined : variant}>
+        <div key="range" ref={sliderRootRef} className="slider docs-studio__preview-slider" data-validation={variant === 'default' ? undefined : variant}>
           <div className="slider__label"><span>{String(values.label || '')}</span><span className="slider__value">{lower}–{upper}</span></div>
-          <div className="range-slider" data-range-slider-enhanced="true" data-validation={variant === 'default' ? undefined : variant} style={rangeStyle}>
+          <div className="range-slider" data-validation={variant === 'default' ? undefined : variant} style={rangeStyle}>
             <div className="range-slider__track" />
             <div className="range-slider__fill" />
-            <input className="range-slider__input" data-range-lower type="range" min={min} max={max} step={step} value={lower} name={String(values.name || '') || undefined} disabled={values.disabled === true} aria-label={`Minimum ${String(values.label || 'value')}`} aria-invalid={invalid || undefined} aria-describedby={describedBy} onChange={(event) => setValues((current) => ({ ...current, value: Math.min(Number(event.target.value), Number(current.upperValue ?? max)) }))} />
-            <input className="range-slider__input" data-range-upper type="range" min={min} max={max} step={step} value={upper} name={String(values.upperName || '') || undefined} disabled={values.disabled === true} aria-label={`Maximum ${String(values.label || 'value')}`} aria-invalid={invalid || undefined} aria-describedby={describedBy} onChange={(event) => setValues((current) => ({ ...current, upperValue: Math.max(Number(event.target.value), Number(current.value ?? min)) }))} />
+            <input className="range-slider__input" data-range-lower type="range" min={min} max={max} step={step} value={lower} name={String(values.name || '') || undefined} disabled={values.disabled === true} aria-label={`Minimum ${String(values.label || 'value')}`} aria-invalid={invalid || undefined} aria-describedby={describedBy} onInput={(event) => { const nextValue = event.currentTarget.valueAsNumber; setValues((current) => ({ ...current, value: nextValue })); }} />
+            <input className="range-slider__input" data-range-upper type="range" min={min} max={max} step={step} value={upper} name={String(values.upperName || '') || undefined} disabled={values.disabled === true} aria-label={`Maximum ${String(values.label || 'value')}`} aria-invalid={invalid || undefined} aria-describedby={describedBy} onInput={(event) => { const nextValue = event.currentTarget.valueAsNumber; setValues((current) => ({ ...current, upperValue: nextValue })); }} />
           </div>
           {feedback()}
         </div>
       );
     }
     return (
-      <div className="slider docs-studio__preview-slider" data-slider-enhanced="true" data-validation={variant === 'default' ? undefined : variant} style={singleStyle}>
+      <div key="single" ref={sliderRootRef} className="slider docs-studio__preview-slider" data-validation={variant === 'default' ? undefined : variant} style={singleStyle}>
         <label className="slider__label" htmlFor="studio-slider"><span>{String(values.label || '')}</span><span className="slider__value">{value}</span></label>
         <div className="slider__track">
-          <input id="studio-slider" className="slider__input" type="range" min={min} max={max} step={step} value={value} name={String(values.name || '') || undefined} disabled={values.disabled === true} aria-invalid={invalid || undefined} aria-describedby={describedBy} onChange={(event) => setValues((current) => ({ ...current, value: Number(event.target.value) }))} />
+          <input id="studio-slider" className="slider__input" type="range" min={min} max={max} step={step} value={value} name={String(values.name || '') || undefined} disabled={values.disabled === true} aria-invalid={invalid || undefined} aria-describedby={describedBy} onInput={(event) => { const nextValue = event.currentTarget.valueAsNumber; setValues((current) => ({ ...current, value: nextValue })); }} />
         </div>
         {feedback()}
       </div>

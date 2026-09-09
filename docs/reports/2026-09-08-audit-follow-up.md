@@ -266,3 +266,8 @@ ADR 0328 completa Modal/Drawer con 17 tokens nuevos y 25/23 roles públicos. Stu
 refleja los anchos de fuente; pasan 176 mediciones, scroll, RTL, edición, teclado
 y herencia en Size Chart/Cart Drawer. Ver `2026-09-09-modal-drawer-checkpoint.md`.
 La modalidad de página completa sigue siendo del target; continúan Toast/Tooltip.
+
+ADR 0329 completa Toast/Tooltip con 14 tokens nuevos y 24/16 roles públicos. Pasan
+344 mediciones, RTL, acción responsive, puente de puntero, teclado y herencia
+pasiva en Social Proof. Studio reserva la altura real de Tooltip más el gap de
+tokens. Ver `2026-09-09-toast-tooltip-checkpoint.md`; continúan Accordion/Tabs.

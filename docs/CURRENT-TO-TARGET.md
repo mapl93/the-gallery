@@ -403,3 +403,11 @@ responsive spacing factors. Studio/Exhibit stop masking source widths. Default
 parity, long-content scroll, RTL, keyboard and composed sections pass:
 `docs/reports/2026-09-09-modal-drawer-checkpoint.md`. True target modality remains
 separate; both stay pilot. Continue Toast and Tooltip.
+
+## Toast and Tooltip visual values (ADR 0329)
+
+Toast/Tooltip expose their meaningful geometry and keep target-owned lifecycle
+and positioning separate. Tooltip corrects RTL centering and its Studio reserves
+measured content height plus the token-driven gap. Default parity, pointer bridge,
+keyboard, narrow action placement and Social Proof inheritance pass:
+`docs/reports/2026-09-09-toast-tooltip-checkpoint.md`. Continue Accordion and Tabs.

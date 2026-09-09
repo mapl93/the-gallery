@@ -167,7 +167,7 @@ const previewHostCss = `${previewBundleCss}
   top: 24px !important;
   right: 16px !important;
   bottom: auto !important;
-  width: min(380px, calc(100% - 32px));
+  width: min(var(--space-toast-max-width), calc(100% - 32px));
 }
 
 .tg-preview-bottom-layer {

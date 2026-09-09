@@ -248,8 +248,8 @@
   --_toast-text: var(--color-text-primary);
   --_toast-icon: var(--color-feedback-info-default);
 
-  --_toast-gap: calc(var(--space-layout-element-gap) * 0.5);
-  --_toast-padding: calc(var(--space-layout-element-gap) * 0.75);
+  --_toast-gap: calc(var(--space-layout-element-gap) * var(--ratio-toast-gap));
+  --_toast-padding: calc(var(--space-layout-element-gap) * var(--ratio-toast-padding));
 
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
@@ -258,13 +258,13 @@
   gap: var(--_toast-gap);
   box-sizing: border-box;
   width: 100%;
-  max-width: 380px;
+  max-width: var(--space-toast-max-width);
   padding: var(--_toast-padding);
   background: var(--_toast-bg);
-  border: 1px solid var(--_toast-border);
+  border: var(--border-toast-width) solid var(--_toast-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  transform: translateY(16px);
+  transform: translateY(var(--space-toast-enter-offset));
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -288,18 +288,18 @@
 .toast--warning { --_toast-border: var(--color-feedback-warning-default); --_toast-icon: var(--color-feedback-warning-default); }
 .toast__icon {
   grid-column: 1;
-  width: 20px;
-  height: 20px;
+  width: var(--space-toast-icon-size);
+  height: var(--space-toast-icon-size);
   color: var(--_toast-icon);
-  margin-top: 2px;
+  margin-top: var(--space-toast-icon-offset);
 }
 .toast__content { grid-column: 2; min-width: 0; }
 .toast__title {
-  margin: 0 0 4px;
+  margin: 0 0 var(--space-toast-title-gap);
   color: var(--_toast-text);
   font-size: var(--typo-body-sm-size);
   line-height: var(--typo-body-sm-line-height);
-  font-weight: 600;
+  font-weight: var(--tg-font-weight-semibold);
   overflow-wrap: anywhere;
 }
 .toast__message {
@@ -354,9 +354,9 @@
 
 /* ── B5. TOOLTIP ── */
 .tooltip {
-  --_tooltip-offset: calc(var(--space-layout-element-gap) * 0.5);
-  --_tooltip-arrow-size: 5px;
-  --_tooltip-max-inline-size: 18rem;
+  --_tooltip-offset: calc(var(--space-layout-element-gap) * var(--ratio-tooltip-offset));
+  --_tooltip-arrow-size: var(--space-tooltip-arrow-depth);
+  --_tooltip-max-inline-size: var(--space-tooltip-max-width);
   position: relative;
   display: inline-flex;
   min-inline-size: 0;
@@ -365,15 +365,15 @@
 .tooltip__content {
   position: absolute;
   inset-block-end: calc(100% + var(--_tooltip-offset));
-  inset-inline-start: 50%;
+  left: 50%;
   z-index: var(--z-dropdown);
   inline-size: max-content;
   max-inline-size: min(
     var(--_tooltip-max-inline-size),
-    calc(100vw - (var(--space-layout-element-gap) * 2))
+    calc(100vw - (var(--space-layout-element-gap) * var(--ratio-tooltip-viewport-gutter)))
   );
-  padding: calc(var(--space-layout-element-gap) * 0.25)
-    calc(var(--space-layout-element-gap) * 0.625);
+  padding: calc(var(--space-layout-element-gap) * var(--ratio-tooltip-padding-block))
+    calc(var(--space-layout-element-gap) * var(--ratio-tooltip-padding-inline));
   background: var(--color-surface-statement);
   color: var(--color-text-primary);
   font-family: var(--font-family-body);
@@ -399,7 +399,7 @@
   content: "";
   position: absolute;
   inset-block-start: 100%;
-  inset-inline-start: 50%;
+  left: 50%;
   border: var(--_tooltip-arrow-size) solid transparent;
   border-block-start-color: var(--color-surface-statement);
   transform: translateX(-50%);

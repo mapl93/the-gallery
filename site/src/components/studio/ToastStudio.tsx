@@ -119,7 +119,7 @@ export default function ToastStudio({ contract, definition }: ToastStudioProps) 
           tokenValues={tokenValues}
           activeTokens={{
             surface: '--color-surface-primary',
-            'default-border': '--color-border-default',
+            'default-border': null,
             'title-color': '--color-text-primary',
             'message-color': '--color-text-secondary',
             feedback: `--color-feedback-${variant}-default`,

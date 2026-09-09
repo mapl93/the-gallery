@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type { ComponentContract, ContractProperty } from '../../lib/contracts';
 import type { StudioControl, StudioDefinition } from '../../lib/studio';
 import AccordionArtwork from './AccordionArtwork';
@@ -87,6 +87,23 @@ export default function DisclosureNavigationStudio({
   const [activeTab, setActiveTab] = useState(1);
   const [rovingTab, setRovingTab] = useState(1);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const tooltipContentRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    const content = tooltipContentRef.current;
+    const root = content?.parentElement;
+    if (contract.slug !== 'tooltip' || !content || !root) return undefined;
+    const measure = () => root.style.setProperty(
+      '--_studio-tooltip-content-height', `${content.getBoundingClientRect().height}px`,
+    );
+    const observer = new ResizeObserver(measure);
+    observer.observe(content);
+    measure();
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--_studio-tooltip-content-height');
+    };
+  }, [contract.slug]);
 
   useEffect(() => {
     const read = () => {
@@ -226,7 +243,7 @@ export default function DisclosureNavigationStudio({
           >
             Material details
           </button>
-          <span className="tooltip__content" id={contentId} role="tooltip">
+          <span ref={tooltipContentRef} className="tooltip__content" id={contentId} role="tooltip">
             {String(values.content || '')}
           </span>
         </span>

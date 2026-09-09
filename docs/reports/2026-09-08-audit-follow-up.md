@@ -329,3 +329,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   y composición Lightbox verificadas localmente. Sin certificar reproducción/3D
   ni Shopify remoto. Evidencia: `docs/reports/2026-09-09-product-gallery-checkpoint.md`.
   Continúa Product Card dentro del punto 5; los nueve puntos no se declaran cerrados.
+
+- ADR 0338 completa Product Card con 13 roles fuente y 30 valores públicos.
+  Conserva 336 comparaciones iniciales y la alineación aprobada; reutiliza Card
+  y corrige zoom por hover bajo movimiento reducido. Studio/reset, RTL e herencia
+  en Product Slider pasan. Mantiene madurez previa sin nueva aprobación humana.
+  Evidencia: `docs/reports/2026-09-09-product-card-checkpoint.md`.
+  Continúan Product Info y Product Slider dentro del punto 5.

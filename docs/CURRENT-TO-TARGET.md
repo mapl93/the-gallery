@@ -492,3 +492,13 @@ without shrinking. Nested direction, Studio/reset, explicit media activation and
 Lightbox composition pass. Native playback/model engines and remote Shopify are
 not certified. Evidence: `docs/reports/2026-09-09-product-gallery-checkpoint.md`.
 Continue Product Card; the contract remains pilot.
+
+## Product Card visual values (ADR 0338)
+
+Thirteen source roles complete 30 public values, preserving 336 resting element
+comparisons and the approved shared inset/hierarchy. Product Card reuses Card
+surface, border, radius and media scale; reduced motion also suppresses hover
+zoom. Local typography, RTL alignment, Studio/reset and Product Slider inheritance
+pass. Existing stable status is retained without new human approval claims.
+Evidence: `docs/reports/2026-09-09-product-card-checkpoint.md`.
+Continue Product Info and Product Slider; remote Shopify remains separate.

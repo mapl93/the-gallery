@@ -369,3 +369,12 @@ and token values; configuration aliases leave the state inventory. Default parit
 native sorting/scroll/focus, Studio and Size Chart composition pass:
 `docs/reports/2026-09-09-tabular-checkpoint.md`.
 Continue Timeline and Link without changing pilot maturity or target scope.
+
+## Timeline and Link customization (ADR 0325)
+
+Timeline derives marker/content/connector alignment from public dimensions; Link
+exposes decoration/focus geometry and preserves underline thickness across variants.
+Visible default parity, states, RTL, native navigation and Studio pass:
+`docs/reports/2026-09-09-timeline-link-checkpoint.md`.
+Continue component/composition coverage. Collection Promo retains local underline
+offset/hover literals despite inheriting Link focus; reconcile in its own batch.

@@ -245,3 +245,9 @@ mediciones conservan defaults. Ordenación nativa, foco, scroll, gaps por contai
 query y composición Size Chart pasan. Elimina dos presentaciones repetidas como
 estados conforme a ADR 0274. Ver `2026-09-09-tabular-checkpoint.md`.
 Continúa Timeline/Link sin promoción de madurez ni subida de tema.
+
+ADR 0325 completa Timeline/Link con 17 tokens y 27/12 roles públicos. El rail de
+Timeline deriva de sus dimensiones y Link conserva el grosor del subrayado entre
+variantes. Paridad visible, estados, RTL, navegación y Studio pasan. Ver
+`2026-09-09-timeline-link-checkpoint.md`. Collection Promo hereda foco pero mantiene
+subrayado local; esa excepción requiere el lote de la composición, sin bloqueo.

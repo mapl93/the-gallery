@@ -91,16 +91,11 @@ export default function LinkStudio({ contract, definition }: LinkStudioProps) {
   }, [studioTokens]);
 
   const tokenValues = { ...baseTokenValues, ...tokenOverrides };
-  const variant = typeof values.variant === 'string' ? values.variant : 'default';
   const classes = [
     'link',
     optionClass(contract.variants, values.variant),
   ].filter(Boolean).join(' ');
-  const activeTextToken = variant === 'subtle'
-    ? '--color-text-secondary'
-    : variant === 'nav'
-      ? '--color-text-primary'
-      : '--color-text-accent';
+
 
   function reset() {
     setValues({ ...initialValues });
@@ -119,7 +114,9 @@ export default function LinkStudio({ contract, definition }: LinkStudioProps) {
           stateValue="default"
           tokenValues={tokenValues}
           activeTokens={{
-            'text-color': activeTextToken,
+            'accent-input': '--color-text-accent',
+            'primary-input': '--color-text-primary',
+            'subtle-input': '--color-text-secondary',
             'focus-color': '--color-border-focus',
             'transition-duration': '--transition-fast',
             'transition-easing': '--easing-default',

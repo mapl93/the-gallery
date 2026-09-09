@@ -482,3 +482,13 @@ there is no new global media family. Hover preserves control foreground.
 forced colors and Product Gallery composition pass. This resolves ADR 0335's
 palette question; Lightbox remains pilot. Evidence:
 `docs/reports/2026-09-09-lightbox-palette-checkpoint.md`.
+
+## Product Gallery visual values (ADR 0337)
+
+Twenty-two source roles complete 46 public tokens and retain 304 resting element
+comparisons across compact/wide layouts and both themes. Selection focus stays
+inside the overflowing rail; larger thumbnails fit and compact dot targets wrap
+without shrinking. Nested direction, Studio/reset, explicit media activation and
+Lightbox composition pass. Native playback/model engines and remote Shopify are
+not certified. Evidence: `docs/reports/2026-09-09-product-gallery-checkpoint.md`.
+Continue Product Card; the contract remains pilot.

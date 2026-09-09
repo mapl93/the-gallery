@@ -184,19 +184,19 @@
 .product-gallery__layout {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-product-gallery-layout-gap));
 }
 @container product-gallery (min-width: 48rem) {
   .product-gallery__layout {
     flex-direction: row-reverse;
-    gap: var(--space-layout-element-gap);
+    gap: calc(var(--space-layout-element-gap) * var(--ratio-product-gallery-wide-layout-gap));
   }
 }
 .product-gallery__main {
   position: relative;
   flex: 1;
   min-inline-size: 0;
-  aspect-ratio: 1;
+  aspect-ratio: var(--ratio-product-gallery-media-ratio);
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--color-surface-secondary);
@@ -241,8 +241,8 @@
   cursor: zoom-in;
 }
 .product-gallery__image-action:focus-visible {
-  outline: 4px solid var(--color-border-focus);
-  outline-offset: -4px;
+  outline: var(--border-product-gallery-focus-width) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-product-gallery-image-focus-inset));
 }
 .product-gallery__poster { position: relative; }
 .product-gallery__activate {
@@ -252,14 +252,14 @@
   transform: translate(-50%, -50%);
   white-space: nowrap;
 }
-[dir="rtl"] .product-gallery__activate { transform: translate(50%, -50%); }
+.product-gallery__activate:dir(rtl) { transform: translate(50%, -50%); }
 .product-gallery__ar {
   position: absolute;
   inset-inline-start: 50%;
-  inset-block-end: var(--space-layout-element-gap);
+  inset-block-end: calc(var(--space-layout-element-gap) * var(--ratio-product-gallery-ar-inset));
   transform: translateX(-50%);
 }
-[dir="rtl"] .product-gallery__ar { transform: translateX(50%); }
+.product-gallery__ar:dir(rtl) { transform: translateX(50%); }
 .product-gallery__nav {
   --_icon-btn-bg: var(--color-surface-primary);
   --_icon-btn-text: var(--color-text-primary);
@@ -270,52 +270,52 @@
   transform: translateY(-50%);
   box-shadow: var(--shadow-sm);
 }
-.product-gallery__nav--prev { inset-inline-start: calc(var(--space-layout-element-gap) * 0.5); }
-.product-gallery__nav--next { inset-inline-end: calc(var(--space-layout-element-gap) * 0.5); }
+.product-gallery__nav--prev { inset-inline-start: calc(var(--space-layout-element-gap) * var(--ratio-product-gallery-nav-inset)); }
+.product-gallery__nav--next { inset-inline-end: calc(var(--space-layout-element-gap) * var(--ratio-product-gallery-nav-inset)); }
 .product-gallery__nav:disabled { cursor: not-allowed; }
-[dir="rtl"] .product-gallery__nav svg { transform: rotate(180deg); }
+.product-gallery__nav:dir(rtl) svg { transform: rotate(180deg); }
 .product-gallery__thumbs {
   display: flex;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-product-gallery-thumbnail-gap));
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 @container product-gallery (min-width: 48rem) {
   .product-gallery__thumbs {
     flex-direction: column;
-    inline-size: 80px;
+    inline-size: max(var(--space-product-gallery-rail-min-width), var(--space-product-gallery-thumbnail-size));
     overflow-y: auto;
     overflow-x: hidden;
-    max-block-size: 500px;
+    max-block-size: var(--space-product-gallery-rail-max-height);
   }
 }
 .product-gallery__thumb {
   position: relative;
-  inline-size: 64px;
-  block-size: 64px;
+  inline-size: var(--space-product-gallery-thumbnail-size);
+  block-size: var(--space-product-gallery-thumbnail-size);
   flex-shrink: 0;
   padding: 0;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 2px solid transparent;
+  border: var(--border-product-gallery-thumbnail-width) solid transparent;
   background: transparent;
   cursor: pointer;
   touch-action: manipulation;
-  opacity: 0.6;
+  opacity: var(--opacity-product-gallery-thumbnail);
   transition: opacity var(--transition-fast) var(--easing-default),
               border-color var(--transition-fast) var(--easing-default);
 }
 @media (hover: hover) and (pointer: fine) {
-  .product-gallery__thumb:hover { opacity: 0.8; }
+  .product-gallery__thumb:hover { opacity: var(--opacity-product-gallery-thumbnail-hover); }
 }
 .product-gallery__thumb[aria-current="true"] {
   border-color: var(--color-border-focus);
-  opacity: 1;
+  opacity: var(--opacity-product-gallery-thumbnail-current);
 }
 .product-gallery__thumb:focus-visible,
 .product-gallery__dot:focus-visible {
-  outline: 4px solid var(--color-border-focus);
-  outline-offset: 0;
+  outline: var(--border-product-gallery-focus-width) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-product-gallery-selection-focus-inset));
 }
 .product-gallery__thumb img {
   display: block;
@@ -325,27 +325,30 @@
 }
 .product-gallery__media-badge {
   position: absolute;
-  inset-inline-end: 2px;
-  inset-block-end: 2px;
-  max-inline-size: calc(100% - 4px);
-  padding: 1px 4px;
+  inset-inline-end: var(--space-product-gallery-badge-inset);
+  inset-block-end: var(--space-product-gallery-badge-inset);
+  max-inline-size: calc(100% - 2 * var(--space-product-gallery-badge-inset));
+  padding: var(--space-product-gallery-badge-padding-block) var(--space-product-gallery-badge-padding-inline);
   overflow: hidden;
   border-radius: var(--radius-sm);
   background: var(--color-surface-primary);
   color: var(--color-text-primary);
   font-size: var(--typo-caption-size);
-  line-height: 1.2;
+  line-height: var(--typo-product-gallery-badge-line-height);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .product-gallery__dots {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-product-gallery-dot-gap);
   justify-content: center;
 }
 @container product-gallery (min-width: 48rem) { .product-gallery__dots { display: none; } }
 .product-gallery__dot {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   inline-size: var(--space-layout-touch-target);
   block-size: var(--space-layout-touch-target);
@@ -358,8 +361,8 @@
 }
 .product-gallery__dot::before {
   content: "";
-  inline-size: 8px;
-  block-size: 8px;
+  inline-size: var(--space-product-gallery-dot-size);
+  block-size: var(--space-product-gallery-dot-size);
   border-radius: inherit;
   background: var(--color-border-subtle);
 }

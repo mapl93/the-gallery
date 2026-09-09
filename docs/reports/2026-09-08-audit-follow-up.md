@@ -322,3 +322,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   públicos; 120 comparaciones iniciales y propagación de aliases/Studio/hover
   verificadas. El punto 5 sigue abierto para el resto del sistema. Evidencia:
   `docs/reports/2026-09-09-lightbox-palette-checkpoint.md`.
+
+- ADR 0337 completa Product Gallery con 22 roles nuevos y 46 tokens públicos.
+  Conserva 304 comparaciones de reposo; corrige foco recortado, encogimiento de
+  targets de indicadores y dirección anidada. Edición/reset, activación explícita
+  y composición Lightbox verificadas localmente. Sin certificar reproducción/3D
+  ni Shopify remoto. Evidencia: `docs/reports/2026-09-09-product-gallery-checkpoint.md`.
+  Continúa Product Card dentro del punto 5; los nueve puntos no se declaran cerrados.

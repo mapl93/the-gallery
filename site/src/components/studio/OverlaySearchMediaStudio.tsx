@@ -111,7 +111,10 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   }, [contract.slug, highlightedCommand, visibleCommands]);
 
   useEffect(() => {
-    if (contract.slug !== 'command-palette' || !open) return undefined;
+    if (contract.slug !== 'command-palette') return undefined;
+    composingRef.current = false;
+    if (!open) return undefined;
+    setCommittedQuery(String(values.query || ''));
     const active = document.activeElement as HTMLElement | null;
     if (active && active !== document.body && !commandDialogRef.current?.contains(active)) {
       commandPreviousFocusRef.current = active;
@@ -123,6 +126,7 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   useEffect(() => {
     if (contract.slug !== 'command-palette') return undefined;
     const toggleShortcut = (event: globalThis.KeyboardEvent) => {
+      if (composingRef.current || event.isComposing || event.keyCode === 229) return;
       if (event.key.toLocaleLowerCase() !== 'k' || (!event.metaKey && !event.ctrlKey) || event.altKey) return;
       const target = event.target as HTMLElement | null;
       const editable = target?.matches('input, textarea, select, [contenteditable="true"]');
@@ -141,6 +145,7 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   }
 
   function reset() {
+    composingRef.current = false;
     setValues({ ...initialValues });
     setHighlightedCommand(0);
     setCommittedQuery(String(initialValues.query || ''));
@@ -171,6 +176,7 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   }
 
   function commandKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (composingRef.current || event.nativeEvent.isComposing || event.keyCode === 229) return;
     const enabled = visibleCommands.map((command, index) => ({ command, index })).filter(({ command }) => !command.disabled);
     if (!enabled.length) return;
     const currentEnabledIndex = Math.max(0, enabled.findIndex(({ index }) => index === highlightedCommand));
@@ -190,6 +196,7 @@ export default function OverlaySearchMediaStudio({ contract, definition }: Overl
   }
 
   function commandDialogKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (composingRef.current || event.nativeEvent.isComposing || event.keyCode === 229) return;
     if (event.key === 'Escape') {
       event.preventDefault();
       closeCommandPalette();

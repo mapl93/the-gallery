@@ -439,3 +439,14 @@ permits internal scrolling and preserves invocation coordinates while re-clampin
 after token edits. Source/adapters/CLI and local behavior checks pass; both remain
 pilot. Evidence: `docs/reports/2026-09-09-action-menu-checkpoint.md`.
 Continue Command Palette and Steps, keeping Shopify remote delivery after Web.
+
+## Command Palette and Steps visual values (ADR 0333)
+
+Thirty-nine source roles complete 57/25 public tokens and retain 592 measured
+element comparisons. Command inherits relevant Modal controls, shows forced-color
+search focus and preserves IME in Studio. Steps exposes independent geometry and
+keeps passive state/orientation boundaries; Checkout Progress inherits indicators
+while retaining its parent-owned narrow layout. Both remain pilot. Source,
+adapters, CLI and local evidence pass; no remote target certification.
+Evidence: `docs/reports/2026-09-09-command-palette-steps-checkpoint.md`.
+Continue Carousel and Scroll Area.

@@ -294,3 +294,11 @@ indebido por scroll interno de Context Studio. Cuatrocientas comparaciones de de
 interacciones, coordenadas, reclamp por tokens, adapters y CLI pasan. Sin promoción
 de madurez ni subida remota. Detalle: `2026-09-09-action-menu-checkpoint.md`.
 Continúan Command Palette y Steps; los nueve puntos no se declaran cerrados.
+
+ADR 0333 completa Command Palette/Steps con 39 tokens nuevos y 57/25 roles públicos.
+Hay 592 comparaciones de defaults, foco visible en colores forzados, protección IME
+de Studio, geometría independiente de Steps y herencia en Checkout Progress.
+Se separa orientación de estados y se conserva done como alias de completed.
+Fuente/adapters/CLI y evidencia local pasan, sin promoción ni entrega remota.
+Detalle: `2026-09-09-command-palette-steps-checkpoint.md`. Continúan Carousel y
+Scroll Area; los nueve puntos no se declaran cerrados.

@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { studioRendererNames, staticSwatchBindingError } from './lib/studio-token-bindings.js';
 
 const rootDir = process.cwd();
 const studioDir = path.join(rootDir, 'site', 'src', 'content', 'studio');
@@ -9,6 +10,8 @@ const schemaPath = path.join(studioDir, 'studio.schema.json');
 const iconCatalogueSchemaPath = path.join(iconCataloguesDir, 'icon-catalogue.schema.json');
 const sitePackagePath = path.join(rootDir, 'site', 'package.json');
 const siteLockPath = path.join(rootDir, 'site', 'package-lock.json');
+
+const studioRenderers = studioRendererNames(fs.readFileSync(path.join(rootDir, 'site/src/components/studio/index.ts'), 'utf8'));
 
 const propertyKinds = new Set(['text', 'collection', 'number', 'select', 'segmented', 'state', 'icon', 'slot-composition', 'toggle']);
 const tokenKinds = new Set(['token', 'token-pair', 'token-swatch']);
@@ -444,6 +447,8 @@ function validateStudioDefinition(filePath, iconCatalogues) {
         if ('optionLabels' in control) errors.push(`${controlLabel}.optionLabels requires an enum or state control`);
 
         const resolvedTokens = resolveTokens(errors, control, contract, controlLabel);
+        const bindingError = staticSwatchBindingError(studioRenderers.get(definition.slug), control.kind, resolvedTokens);
+        if (bindingError) errors.push(`${controlLabel} ${bindingError}`);
         if (control.kind === 'token' && resolvedTokens.length !== 1) {
           errors.push(`${controlLabel} token controls must resolve exactly one public token`);
         }

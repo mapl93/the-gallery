@@ -2085,3 +2085,11 @@ Questions:
 The owner chose full available width for steps without media. Only media steps
 split and alternate; their existing text-share token and semantic source order
 remain intact. No additional mode, property or token is needed for child presence.
+
+### Firing Schedule axis typography (ADR 0359)
+
+Should the SVG axes retain the on-screen size defined by the typography token,
+or continue scaling with the chart? Local measurements show a 12px caption
+projecting to nominal 10.3664/18.0996px at tested viewport widths 720/1200.
+Both are possible design choices. Current scaling is preserved while awaiting
+the owner; a fixed-size option needs implementation and layout validation.

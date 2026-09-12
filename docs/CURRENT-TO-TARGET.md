@@ -687,3 +687,12 @@ comparisons preserve defaults; visual/annotation geometry, row share, isolated
 type weights, native unit switching, omission/reset, RTL and Exhibit pass.
 Evidence: `docs/reports/2026-09-12-dimensions-checkpoint.md`. Both target outputs
 updated, pilot status retained and resources closed. Continue Firing Schedule.
+
+## Firing Schedule controls (ADR 0359)
+
+Eighteen roles expand the profile to 39 public values. 536 installed-consumer
+comparisons preserve defaults; spacing, strokes, dashes, minima, focus, native
+series/unit switching, missing-observation fallback and Exhibit pass. Evidence:
+`docs/reports/2026-09-12-firing-schedule-checkpoint.md`. Both target outputs
+updated, pilot retained and resources closed. Axis text scaling remains a
+separate owner choice; current behavior is preserved pending that answer.

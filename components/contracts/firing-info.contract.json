@@ -1,13 +1,15 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.1",
+  "contractVersion": "0.3.2",
   "slug": "firing-info",
   "name": "Firing Schedule",
   "registryId": "R6",
   "category": "ceramics",
   "status": "pilot",
   "summary": "Controlled firing-program visualization with one real-time planned model, required ramp chart and canonical Data Table, optional observed series, and no kiln-control behavior.",
-  "dependencies": ["data-table"],
+  "dependencies": [
+    "data-table"
+  ],
   "source": {
     "registry": "registry.json#/components/firing-info",
     "css": {
@@ -107,73 +109,120 @@
   "states": [
     {
       "name": "planned",
-      "selectors": [".firing-schedule[data-view=\"planned\"]"],
+      "selectors": [
+        ".firing-schedule[data-view=\"planned\"]"
+      ],
       "description": "Shows the required derived planned curve and planned segment columns."
     },
     {
       "name": "actual",
-      "selectors": [".firing-schedule[data-view=\"actual\"]"],
+      "selectors": [
+        ".firing-schedule[data-view=\"actual\"]"
+      ],
       "description": "Shows the controlled observed curve while the required table continues to identify each planned segment and may add correlated observed summaries."
     },
     {
       "name": "both",
-      "selectors": [".firing-schedule[data-view=\"both\"]"],
+      "selectors": [
+        ".firing-schedule[data-view=\"both\"]"
+      ],
       "description": "Compares planned and observed curves with distinct labels and line treatments."
     },
     {
       "name": "collecting",
-      "selectors": [".firing-schedule[data-actual-status=\"collecting\"]"],
+      "selectors": [
+        ".firing-schedule[data-actual-status=\"collecting\"]"
+      ],
       "description": "Truthfully labels a partial target-controlled observed series without announcing every sample."
     },
     {
       "name": "complete",
-      "selectors": [".firing-schedule[data-actual-status=\"complete\"]"],
+      "selectors": [
+        ".firing-schedule[data-actual-status=\"complete\"]"
+      ],
       "description": "Labels the supplied observed series as complete."
     }
   ],
   "behavior": [
     {
       "name": "singlePlannedSource",
-      "selectors": [".firing-schedule__plot", ".firing-schedule__data-table"],
+      "selectors": [
+        ".firing-schedule__plot",
+        ".firing-schedule__data-table"
+      ],
       "description": "Neutral source validates one starting Celsius temperature and ordered stable segment records, then derives accumulated real time, planned chart points and table durations from that one program."
     },
     {
       "name": "fullRateEstimate",
-      "selectors": [".firing-schedule__data-table"],
+      "selectors": [
+        ".firing-schedule__data-table"
+      ],
       "description": "A full-rate segment requires a positive target-reviewed estimated ramp duration and is visibly labelled estimated; otherwise the complete schedule is invalid and omitted."
     },
     {
       "name": "controlledView",
-      "selectors": [".firing-schedule"],
-      "attributes": ["data-view=planned|actual|both"],
+      "selectors": [
+        ".firing-schedule"
+      ],
+      "attributes": [
+        "data-view=planned|actual|both"
+      ],
       "description": "The target controls the visible series. Both is the inferred default when valid observed data exists, otherwise planned; actual is unavailable without observed samples."
     },
     {
       "name": "normalizedUnitConversion",
-      "selectors": [".firing-schedule", ".firing-schedule__plot", ".firing-schedule__data-table"],
-      "attributes": ["data-display-unit=celsius|fahrenheit"],
+      "selectors": [
+        ".firing-schedule",
+        ".firing-schedule__plot",
+        ".firing-schedule__data-table"
+      ],
+      "attributes": [
+        "data-display-unit=celsius|fahrenheit"
+      ],
       "description": "One normalized Celsius/seconds source drives every table, axis, legend and summary value. Fahrenheit display converts from that source and never consumes a duplicate dataset."
     },
     {
       "name": "controlledObservedSeries",
-      "selectors": [".firing-schedule[data-actual-status]", ".firing-schedule__series--actual"],
-      "attributes": ["data-actual-status=collecting|complete"],
+      "selectors": [
+        ".firing-schedule[data-actual-status]",
+        ".firing-schedule__series--actual"
+      ],
+      "attributes": [
+        "data-actual-status=collecting|complete"
+      ],
       "description": "Targets replace timestamped observed samples at a bounded cadence. Neutral source never connects to a controller or sensor and never announces each sample."
     },
     {
       "name": "accessibleVisualization",
-      "selectors": [".firing-schedule__plot", ".firing-schedule__legend", ".firing-schedule__data-table"],
-      "attributes": ["role=img", "<title>", "<desc>", "<figcaption>", "<table>", "<caption>", "scope"],
+      "selectors": [
+        ".firing-schedule__plot",
+        ".firing-schedule__legend",
+        ".firing-schedule__data-table"
+      ],
+      "attributes": [
+        "role=img",
+        "<title>",
+        "<desc>",
+        "<figcaption>",
+        "<table>",
+        "<caption>",
+        "scope"
+      ],
       "description": "The informative SVG has a complete localized name and summary, the legend distinguishes series beyond color, and the canonical Data Table is the primary detailed representation. Raw samples add no sequential focus stops."
     },
     {
       "name": "canonicalDataTable",
-      "selectors": [".firing-schedule__table", ".firing-schedule__data-table"],
+      "selectors": [
+        ".firing-schedule__table",
+        ".firing-schedule__data-table"
+      ],
       "description": "One canonical Data Table row maps to each planned segment. Actual duration, reached temperature and deviation are optional summaries correlated by stable segmentId; raw samples never become table rows."
     },
     {
       "name": "informativeSafetyBoundary",
-      "selectors": [".firing-schedule"],
+      "selectors": [
+        ".firing-schedule"
+      ],
       "description": "R6 visualizes target-reviewed information only. It never programs, starts, controls, validates or certifies a kiln, material, firing schedule or safety procedure."
     }
   ],
@@ -184,7 +233,12 @@
       "required": false,
       "description": "Optional visible contextual heading; a non-empty value selects named native-section semantics while heading rank remains target-owned.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".firing-schedule__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".firing-schedule__title"
+          }
+        ]
       }
     },
     {
@@ -193,7 +247,14 @@
       "required": true,
       "description": "Finite normalized program start in degrees Celsius; display conversion never mutates this source value.",
       "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-starting-temperature-celsius", "valueFrom": "property" }]
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".firing-schedule",
+            "attribute": "data-starting-temperature-celsius",
+            "valueFrom": "property"
+          }
+        ]
       }
     },
     {
@@ -202,7 +263,17 @@
       "required": true,
       "description": "Required non-empty ordered records with stable segmentId, positive rate or full-rate estimate, target Celsius temperature and non-negative hold seconds.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".firing-schedule", "classNames": [".firing-schedule__plot", ".firing-schedule__table", ".firing-schedule__data-table"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".firing-schedule",
+            "classNames": [
+              ".firing-schedule__plot",
+              ".firing-schedule__table",
+              ".firing-schedule__data-table"
+            ]
+          }
+        ]
       }
     },
     {
@@ -211,7 +282,16 @@
       "required": false,
       "description": "Optional strictly increasing elapsed-second/Celsius observations used only to draw the controlled actual curve; samples are not focusable and do not become table rows.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".firing-schedule__plot", "classNames": [".firing-schedule__series--actual", ".firing-schedule__actual-point"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".firing-schedule__plot",
+            "classNames": [
+              ".firing-schedule__series--actual",
+              ".firing-schedule__actual-point"
+            ]
+          }
+        ]
       }
     },
     {
@@ -220,18 +300,41 @@
       "required": false,
       "description": "Optional target-reviewed duration, reached-temperature and deviation records correlated to planned rows by stable segmentId.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".firing-schedule__data-table", "classNames": [".firing-schedule__data-table"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".firing-schedule__data-table",
+            "classNames": [
+              ".firing-schedule__data-table"
+            ]
+          }
+        ]
       }
     },
     {
       "name": "view",
       "type": "enum",
       "required": false,
-      "values": ["planned", "actual", "both"],
+      "values": [
+        "planned",
+        "actual",
+        "both"
+      ],
       "unsetBehavior": "Defaults to both when valid actual samples exist and otherwise planned; actual falls back to planned when no observed series is available.",
       "description": "Controlled visible-series projection without duplicating the normalized source data.",
       "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-view", "values": { "planned": "planned", "actual": "actual", "both": "both" } }]
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".firing-schedule",
+            "attribute": "data-view",
+            "values": {
+              "planned": "planned",
+              "actual": "actual",
+              "both": "both"
+            }
+          }
+        ]
       }
     },
     {
@@ -239,10 +342,23 @@
       "type": "enum",
       "required": false,
       "defaultValue": "celsius",
-      "values": ["celsius", "fahrenheit"],
+      "values": [
+        "celsius",
+        "fahrenheit"
+      ],
       "description": "Formats table, axes, legend and summaries from normalized Celsius values without a duplicate target dataset.",
       "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-display-unit", "values": { "celsius": "celsius", "fahrenheit": "fahrenheit" } }]
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".firing-schedule",
+            "attribute": "data-display-unit",
+            "values": {
+              "celsius": "celsius",
+              "fahrenheit": "fahrenheit"
+            }
+          }
+        ]
       }
     },
     {
@@ -250,10 +366,23 @@
       "type": "enum",
       "required": false,
       "defaultValue": "complete",
-      "values": ["collecting", "complete"],
+      "values": [
+        "collecting",
+        "complete"
+      ],
       "description": "Truthful lifecycle label for a supplied observed series; ignored when no valid actual samples exist.",
       "targetMappings": {
-        "web": [{ "kind": "attribute", "selector": ".firing-schedule", "attribute": "data-actual-status", "values": { "collecting": "collecting", "complete": "complete" } }]
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".firing-schedule",
+            "attribute": "data-actual-status",
+            "values": {
+              "collecting": "collecting",
+              "complete": "complete"
+            }
+          }
+        ]
       }
     }
   ],
@@ -281,8 +410,33 @@
         "--typo-h4-line-height",
         "--typo-h4-size"
       ],
-      "radius": ["--radius-lg", "--radius-md"],
-      "spacing": ["--space-layout-element-gap"]
+      "radius": [
+        "--radius-lg",
+        "--radius-md",
+        "--radius-firing-actual-point"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-firing-chart-min-width",
+        "--space-firing-table-min-width",
+        "--ratio-firing-padding",
+        "--ratio-firing-header-padding",
+        "--ratio-firing-chart-gap",
+        "--ratio-firing-legend-row-gap",
+        "--ratio-firing-legend-column-gap",
+        "--ratio-firing-legend-item-gap",
+        "--space-firing-legend-line-width",
+        "--space-firing-focus-offset",
+        "--space-firing-planned-dash",
+        "--space-firing-planned-dash-gap"
+      ],
+      "border": [
+        "--border-firing-series-width",
+        "--border-firing-grid-width",
+        "--border-firing-chart-width",
+        "--border-firing-header-width",
+        "--border-firing-focus-width"
+      ]
     }
   },
   "accessibility": [
@@ -305,8 +459,17 @@
       "kind": "liquid-css-data",
       "notes": "Requires approved normalized schedule/observation records, validation, provenance, safety/editor rules and a first consumer before Liquid/schema."
     },
-    "react": { "status": "planned", "kind": "component" },
-    "swiftui": { "status": "planned", "kind": "native-chart-table" },
-    "compose": { "status": "planned", "kind": "composable-chart-table" }
+    "react": {
+      "status": "planned",
+      "kind": "component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-chart-table"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "composable-chart-table"
+    }
   }
 }

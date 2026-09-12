@@ -1,6 +1,7 @@
 # Hero dark on-media contrast decision
 
-Date: 2026-09-12. Status: owner choice pending.
+Date: 2026-09-12. Status: resolved — owner selected A. ADR 0383 and the Hero palette checkpoint
+record implementation; the diagnostic below describes the prior baseline.
 
 ## Confirmed error and consequence
 

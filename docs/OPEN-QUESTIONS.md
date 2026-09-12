@@ -2119,12 +2119,10 @@ Actual Lora glyphs, compact/wide metrics, normal/italic weights, brand override,
 Exhibit parity and blocked-request fallback pass the checkpoint samples. The
 native Shopify font picker and loader remain; hosted verification is separate.
 
-### Hero dark on-media palette (2026-09-12)
+### Hero dark on-media palette (resolved 2026-09-12)
 
-The existing G1 Hero pairs dark inverse text with a black/.6 scrim in Dark.
-Its regular description cannot reach 4.5:1 with this pairing. ADR 0382 preserves
-defaults while exposing visual values. Choose fixed white on-media text and
-black scrim in both themes (A, recommended, matching Article Hero), or invert
-the scrim to white in Dark alongside inverse text (B). Actual rendering,
-contrast bounds and side-by-side examples:
-`docs/reports/2026-09-12-hero-media-contrast-decision.md`.
+The owner selected A. ADR 0383 gives media-backed non-split Hero a dedicated
+on-media color role anchored to neutral white in both themes. The existing
+black scrim remains. Split, text-only, absent media and canonical child controls
+retain their own colors. Consumer, Studio, Exhibit and deprecated forwarding
+checks pass; see `docs/reports/2026-09-12-hero-palette-checkpoint.md`.

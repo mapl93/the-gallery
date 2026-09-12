@@ -1389,6 +1389,7 @@ function publicAliasDeclarations() {
     '--size-hero-controls-max-height: var(--tg-component-hero-controls-max-height);',
     '--scale-hero-control-inset: var(--tg-component-hero-control-inset);',
     '--color-hero-overlay: var(--tg-component-hero-overlay-color);',
+    '--color-hero-on-media: var(--tg-component-hero-on-media);',
     '--scale-hero-content-gap: var(--tg-component-hero-content-gap);',
     '--scale-hero-action-gap: var(--tg-component-hero-action-gap);',
     '--scale-hero-block-inset-min: var(--tg-component-hero-block-inset-min);',

@@ -826,3 +826,11 @@ five widths and two themes preserve defaults. Featured share reserves content
 minimum; focus, ratios, RTL, Studio/excerpt/local navigation/reset/Exhibit pass.
 The current compact title leading is documented and retained, not an invented
 blocker. Continue Article Hero and remaining editorial components.
+
+## Article Hero visual values (ADR 0374)
+
+20 source roles and 40 public values. 600 default element/background comparisons
+cover all variants and no-media fallbacks; inherited values, forced colors,
+Studio media omission/reset and Exhibit pass. Image-content/text-outer measures
+have distinct names without default changes. Narrow desktop embeddings still
+use viewport Display typography; geometry alone is not editorial readability.

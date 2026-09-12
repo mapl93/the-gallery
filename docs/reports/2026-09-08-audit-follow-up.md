@@ -535,3 +535,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   proporción Featured respeta el mínimo de contenido. Se conserva el
   interlineado compacto actual: la alternativa de +2px es opcional, no un
   defecto ni un bloqueo. Foco, RTL y controles/acciones locales pasan.
+
+- ADR 0374 expone 20 roles y 40 valores en Article Hero. 600 comparaciones
+  conservan variantes y fallbacks; colores forzados, controles, omisión de
+  imagen y reset pasan. El máximo de contenido y el máximo exterior tienen
+  nombres distintos. En un contenedor estrecho de escritorio la tipografía
+  Display todavía puede partir palabras; no se certifica legibilidad solo
+  porque la caja no desborde. Sin despliegue; recursos cerrados.

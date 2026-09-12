@@ -1,5 +1,9 @@
 # Article Hero Web Refinement Audit
 
+Visual-value boundary refined by ADR 0374 (2026-09-12): media color/opacity,
+measures, ratios and gap factors are now public. Earlier private-value evidence
+below describes its historical refinement baseline, not the current inventory.
+
 Status: Human-review-ready; remains `pilot`
 
 Date: 2026-08-10

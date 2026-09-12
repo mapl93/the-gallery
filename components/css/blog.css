@@ -201,15 +201,17 @@
 
 /* ── L2. ARTICLE HERO ── */
 .article-hero {
-  --_article-hero-padding-block: var(--tg-space-stack-lg);
-  --_article-hero-padding-inline: var(--tg-space-stack-md);
-  --_article-hero-padding-inline: clamp(var(--tg-space-stack-md), 10cqi, var(--space-layout-container));
-  --_article-hero-split-padding-inline: var(--tg-space-stack-md);
-  --_article-hero-split-padding-inline: clamp(var(--tg-space-stack-md), 5cqi, var(--space-layout-container));
-  --_article-hero-content-max: 45rem;
-  --_article-hero-image-min-block: 22.5rem;
-  --_article-hero-on-image: var(--tg-color-gray-0);
-  --_article-hero-overlay: rgb(0 0 0 / 68%);
+  font-family: var(--font-family-body);
+  font-weight: var(--typo-body-weight);
+  --_article-hero-padding-block: calc(var(--tg-space-stack-lg) * var(--ratio-article-hero-block-padding));
+  --_article-hero-padding-inline: calc(var(--tg-space-stack-md) * var(--ratio-article-hero-minimum-inset));
+  --_article-hero-padding-inline: clamp(calc(var(--tg-space-stack-md) * var(--ratio-article-hero-minimum-inset)), calc(100cqi * var(--ratio-article-hero-inline-share)), calc(var(--space-layout-container) * var(--ratio-article-hero-maximum-inset)));
+  --_article-hero-split-padding-inline: calc(var(--tg-space-stack-md) * var(--ratio-article-hero-minimum-inset));
+  --_article-hero-split-padding-inline: clamp(calc(var(--tg-space-stack-md) * var(--ratio-article-hero-minimum-inset)), calc(100cqi * var(--ratio-article-hero-split-inline-share)), calc(var(--space-layout-container) * var(--ratio-article-hero-maximum-inset)));
+  --_article-hero-content-max: var(--size-article-hero-image-content-max);
+  --_article-hero-image-min-block: var(--size-article-hero-image-min-height);
+  --_article-hero-on-image: var(--color-article-hero-on-image);
+  --_article-hero-overlay: color-mix(in srgb, var(--color-article-hero-overlay) calc(var(--opacity-article-hero-overlay) * 100%), transparent);
 
   container: article-hero / inline-size;
   position: relative;
@@ -270,7 +272,7 @@
 }
 
 .article-hero--split .article-hero__media {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: var(--ratio-article-hero-split-media);
   overflow: hidden;
 }
 
@@ -291,7 +293,7 @@
 /* Text-only variant */
 .article-hero--text .article-hero__layout {
   text-align: center;
-  max-inline-size: var(--_article-hero-content-max);
+  max-inline-size: var(--size-article-hero-text-outer-max);
   margin-inline: auto;
   padding-block: var(--_article-hero-padding-block);
   padding-inline: var(--_article-hero-padding-inline);
@@ -302,18 +304,18 @@
   max-inline-size: 100%;
   min-inline-size: 0;
   flex-direction: column;
-  gap: var(--tg-space-stack-md);
+  gap: calc(var(--tg-space-stack-md) * var(--ratio-article-hero-content-gap));
 }
 
 .article-hero__category {
   max-inline-size: 100%;
   min-inline-size: 0;
   margin: 0;
-  color: color-mix(in srgb, var(--color-text-accent) 70%, var(--color-text-primary));
+  color: color-mix(in srgb, var(--color-text-accent) calc(var(--ratio-article-hero-category-accent) * 100%), var(--color-text-primary));
   font-size: var(--typo-body-sm-size);
   font-weight: var(--tg-font-weight-semibold);
   line-height: var(--typo-body-sm-line-height);
-  letter-spacing: 0.15em;
+  letter-spacing: var(--typo-article-hero-category-tracking);
   text-transform: uppercase;
 }
 
@@ -343,7 +345,7 @@
   min-inline-size: 0;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--tg-space-stack-xs) var(--tg-space-stack-md);
+  gap: calc(var(--tg-space-stack-xs) * var(--ratio-article-hero-meta-row-gap)) calc(var(--tg-space-stack-md) * var(--ratio-article-hero-meta-column-gap));
   color: var(--color-text-secondary);
   font-size: var(--typo-body-size);
   line-height: var(--typo-body-line-height);
@@ -374,15 +376,15 @@
 
 @container article-hero (min-width: 40rem) {
   .article-hero__layout {
-    --_article-hero-padding-block: var(--space-layout-section-gap);
+    --_article-hero-padding-block: calc(var(--space-layout-section-gap) * var(--ratio-article-hero-wide-block-padding));
   }
 
   .article-hero--image:not(.article-hero--without-media) .article-hero__layout {
-    min-block-size: 30rem;
+    min-block-size: var(--size-article-hero-wide-image-min-height);
   }
 
   .article-hero--split:not(.article-hero--without-media) .article-hero__layout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, calc(100% * clamp(0, var(--ratio-article-hero-split-media-share), 1))) minmax(0, 1fr);
   }
 
   .article-hero--split:not(.article-hero--without-media) .article-hero__media {

@@ -622,3 +622,13 @@ not promise every column is occupied. Evidence:
 `docs/reports/2026-09-12-record-gallery-checkpoint.md`. Both remain pilot;
 record trust and artwork activation stay target-owned. Owned browser/server
 and test processes are closed. Continue Artist Index and Artist Statement.
+
+## Artist Index and Statement visual values (ADR 0351)
+
+Twenty-four roles complete 39/36 public values. 936 baseline comparisons,
+count bands, relative units, filter visual hooks, portrait split, quote rule,
+sticky scroll, omission, RTL and Studio/Exhibit pass. Studio's fixed Statement
+padding override is removed. Index retains its target-owned filter lifecycle
+and optional Artist Card composition. Evidence:
+`docs/reports/2026-09-12-artist-layout-checkpoint.md`. Both remain pilot;
+browser/server and processes are closed. Continue Exhibition Page.

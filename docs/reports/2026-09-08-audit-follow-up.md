@@ -412,3 +412,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   distingue máximo de columnas de ocupación efectiva. Evidencia:
   `2026-09-12-record-gallery-checkpoint.md`. Continúan Artist Index y Artist
   Statement; navegador/servidor cerrados y procesos limpios, sin promoción a stable.
+- ADR 0351 completa Artist Index/Statement con 24 roles y 39/36 valores
+  públicos. Pasan 936 comparaciones, densidades, unidades, proporciones,
+  borde, sticky, RTL/foco y Studio/Exhibit. Se retira el padding fijo de Studio
+  que anulaba los tokens de Statement. Evidencia:
+  `2026-09-12-artist-layout-checkpoint.md`. Continúa Exhibition Page;
+  recursos de prueba cerrados, sin inventar filtrado ni promover madurez.

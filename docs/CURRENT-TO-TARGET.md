@@ -793,3 +793,12 @@ content plus outer spacing, Studio bypasses are removed and inherited controls
 work in source consumers. 368 default element comparisons preserve other visual
 values. Nested parents can select smaller padding factors. Continue Account
 Dashboard/Order History; provider integration and certification remain separate.
+
+## Account overview / order visual values (ADR 0370)
+
+Dashboard, Order History and Order Detail expose 22 source roles and 28/17/20
+public values. 890 default element comparisons plus inherited customization,
+RTL, read-only line/tracking semantics and Studio navigation/reset pass.
+Canonical fill sizing fixes contained flex roots; Account feedback is below
+artwork. Continue Address Book/Form, Wishlist and Settings; hosted target proof
+remains separate.

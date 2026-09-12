@@ -511,3 +511,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   368 comparaciones conservan los demás valores; móvil, personalización,
   composición estrecha con padding explícito, RTL y acciones locales verificados.
   Web/Shopify regenerados, sin despliegue ni certificación del proveedor.
+
+- ADR 0370 completa Dashboard, Order History y Order Detail: 22 roles y perfiles
+  de 28/17/20 valores públicos. 890 comparaciones de apariencia por defecto,
+  personalización, RTL y acciones locales verificadas. También corrige la
+  contracción de contenedores dentro de flex y sitúa el feedback de Account
+  debajo del artwork. Recursos cerrados; sin despliegue ni promoción.

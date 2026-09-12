@@ -935,6 +935,8 @@ function publicAliasDeclarations() {
     '--ratio-exhibition-artist-gap: var(--tg-component-exhibition-page-artist-gap-scale);',
     '--space-exhibition-artist-avatar-size: var(--tg-component-exhibition-page-artist-avatar-size);',
     '--space-exhibition-artist-caption-gap: var(--tg-component-exhibition-page-artist-caption-gap);',
+    '--color-exhibition-media-text: var(--tg-component-exhibition-page-media-text);',
+    '--color-exhibition-scrim: var(--tg-component-exhibition-page-scrim-color);',
     '--space-tag-padding-x: var(--tg-component-tag-padding-x);',
     '--space-tag-padding-y: var(--tg-component-tag-padding-y);',
     '--space-tag-gap: var(--tg-component-tag-gap);',

@@ -1,6 +1,6 @@
 # 0352. Exhibition Page Geometry And Optional Information
 
-Status: Accepted for geometry; media palette awaiting owner choice
+Status: Accepted for geometry; subsequent palette choice resolved by ADR 0353
 
 Date: 2026-09-12
 

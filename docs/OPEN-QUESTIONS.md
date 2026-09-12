@@ -1107,9 +1107,11 @@ until exhibition, work and artist data/editor ownership is accepted.
 
 Questions:
 
-- Approve or revise the private `24rem`/`42rem` hero bounds, `70cqi` scale,
-  `120cqi`/`180cqi` narrow-container caps, target-owned cover crop, scrim
-  treatment and `20ch` title measure.
+- ADRs 0352–0353 expose hero geometry and resolve the palette: the owner chose
+  darkened media and white text in both themes. Broader review still covers the
+  `24rem`/`42rem` bounds, `0.7` container scale, `1.2` narrow minimum cap,
+  target-owned cover crop and `20ch` title measure. The redundant `180cqi` cap
+  was removed with equivalence evidence.
 - Approve or revise the statement-surface no-media hero, information `2:1`
   wide ratio, private `44rem` information threshold, section inset/rhythm and
   `11rem` work-grid minimum.
@@ -1127,7 +1129,8 @@ Questions:
   neutral API intentionally keeps target-formatted date text and media slots.
 - Confirm that hero dimensions, crop, focal point, scrim, title measure,
   columns, thresholds, density, record anatomy, destinations, actions, events,
-  image URLs and CMS data remain absent from the v1 neutral API.
+  image URLs and CMS data remain absent from semantic properties. Public visual
+  tokens now own the geometry and palette controls under ADRs 0293/0352/0353.
 
 ### Artist Statement Human Review
 

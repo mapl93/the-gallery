@@ -633,14 +633,17 @@ and optional Artist Card composition. Evidence:
 `docs/reports/2026-09-12-artist-layout-checkpoint.md`. Both remain pilot;
 browser/server and processes are closed. Continue Exhibition Page.
 
-## Exhibition Page geometry; media palette pending (ADR 0352)
+## Exhibition Page geometry and media palette (ADRs 0352–0353)
 
 Twenty-three roles expand the profile to 56 values. 712 baseline comparisons
 and thirteen height-curve samples pass; optional information now occupies a
 full column, and Studio/Exhibit expose geometry. Evidence:
 `docs/reports/2026-09-12-exhibition-geometry-checkpoint.md`.
-This is a partial checkpoint. The actual dark media hero pairs dark text with
-a black scrim and fails contrast. The owner must choose darkened media/white
-text in both themes or lightened media/dark text in dark theme. Browser-only
-samples exist; no palette choice was implemented. Close this issue through
-public tokens before claiming Exhibition Page complete. Owned resources closed.
+ADR 0353 resolves the palette blocker with the owner-selected darkened media
+and white text in both themes. Two system-anchored color roles expand the public
+profile to 57 values. A fresh installed consumer passes 712 geometry comparisons;
+actual Studio image contrast is at least 5.74:1 in both themes. Studio color and
+opacity editing, reset, Exhibit and forced colors pass. Evidence:
+`docs/reports/2026-09-12-exhibition-palette-checkpoint.md`. Both generated targets
+are updated; Shopify template/data/editor work remains pending. Component remains
+pilot. Owned browser/server and processes closed.

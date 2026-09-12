@@ -424,3 +424,11 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   oscuro presenta un defecto real de contraste; se espera la elección de
   paleta del propietario entre dos muestras antes de corregirla con tokens.
   Evidencia: `2026-09-12-exhibition-geometry-checkpoint.md`. Recursos cerrados.
+
+- ADR 0353 cierra la decisión de paleta de Exhibition: opción A del propietario,
+  foto oscurecida y texto blanco en ambos temas, mediante dos colores anclados
+  al sistema. Perfil de 57 valores; 712 comparaciones geométricas y contraste
+  mínimo 5,74:1 en la fotografía de Studio en ambos temas. Edición, reset,
+  Exhibit y colores forzados verificados. Evidencia en
+  `2026-09-12-exhibition-palette-checkpoint.md`; recursos cerrados. Sigue pilot;
+  generar CSS de Shopify no entrega su plantilla ni certifica el target.

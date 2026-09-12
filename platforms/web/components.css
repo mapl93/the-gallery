@@ -16158,8 +16158,7 @@ button.artist-card:disabled {
 
 /* ── R3. TECHNIQUE EXPLAINER ── */
 .technique-explainer {
-  --_technique-step-padding: var(--space-layout-grid-gap);
-  --_technique-small-gap: calc(var(--space-layout-element-gap) * 0.5);
+  --_technique-step-padding: calc(var(--space-layout-grid-gap) * var(--ratio-technique-step-padding));
   container: technique-explainer / inline-size;
   min-inline-size: 0;
   padding-block: var(--space-layout-section-gap);
@@ -16189,20 +16188,20 @@ button.artist-card:disabled {
   align-items: center;
   min-inline-size: 0;
   padding-block: var(--_technique-step-padding);
-  border-block-end: 1px solid var(--color-border-subtle);
+  border-block-end: var(--border-technique-step-width) solid var(--color-border-subtle);
 }
 .technique-step__content {
   min-inline-size: 0;
 }
 .technique-step__number {
   display: block;
-  margin-block-end: var(--_technique-small-gap);
+  margin-block-end: calc(var(--space-layout-element-gap) * var(--ratio-technique-number-gap));
   color: var(--color-text-secondary);
   font: var(--tg-typography-h1-weight) var(--typo-h1-size)/var(--typo-h1-line-height) var(--font-family-heading);
   font-variant-numeric: tabular-nums;
 }
 .technique-step__name {
-  margin: 0 0 var(--_technique-small-gap);
+  margin: 0 0 calc(var(--space-layout-element-gap) * var(--ratio-technique-name-gap));
   color: var(--color-text-primary);
   font: var(--tg-typography-h3-weight) var(--typo-h3-size)/var(--typo-h3-line-height) var(--font-family-heading);
   overflow-wrap: anywhere;
@@ -16216,7 +16215,7 @@ button.artist-card:disabled {
 }
 .technique-step__details {
   min-inline-size: 0;
-  margin-block-start: var(--_technique-small-gap);
+  margin-block-start: calc(var(--space-layout-element-gap) * var(--ratio-technique-details-gap));
   color: var(--color-text-secondary);
   font: var(--tg-typography-body-default-weight) var(--typo-body-size)/var(--typo-body-line-height) var(--font-family-body);
   overflow-wrap: anywhere;
@@ -16237,7 +16236,12 @@ button.artist-card:disabled {
 
 @container technique-explainer (min-width: 30rem) {
   .technique-step {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    --_technique-text-track: calc((100% - var(--space-layout-grid-gap)) * clamp(0, var(--ratio-technique-text-share), 1));
+    grid-template-columns: minmax(0, var(--_technique-text-track)) minmax(0, 1fr);
+  }
+
+  .technique-step:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--_technique-text-track));
   }
 
   .technique-step:nth-child(even) .technique-step__media {
@@ -16254,19 +16258,18 @@ button.artist-card:disabled {
 
 /* ── R4. CARE INSTRUCTIONS ── */
 .care-instructions {
-  --_care-icon-size: 2.25rem;
-  --_care-small-gap: calc(var(--space-layout-element-gap) * 0.5);
+  --_care-icon-size: var(--space-care-icon-size);
   container: care-instructions / inline-size;
   min-inline-size: 0;
-  padding: var(--space-layout-grid-gap);
-  border: 1px solid var(--color-border-subtle);
+  padding: calc(var(--space-layout-grid-gap) * var(--ratio-care-padding));
+  border: var(--border-care-width) solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
 }
 .care-instructions__header {
   min-inline-size: 0;
-  margin-block-end: var(--space-layout-element-gap);
-  padding-block-end: var(--_care-small-gap);
-  border-block-end: 1px solid var(--color-border-subtle);
+  margin-block-end: calc(var(--space-layout-element-gap) * var(--ratio-care-header-gap));
+  padding-block-end: calc(var(--space-layout-element-gap) * var(--ratio-care-header-padding));
+  border-block-end: var(--border-care-header-width) solid var(--color-border-subtle);
 }
 .care-instructions__title {
   margin: 0;
@@ -16277,7 +16280,7 @@ button.artist-card:disabled {
 .care-instructions__list,
 .care-instructions__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(8.75rem, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--space-care-item-min-width), 100%), 1fr));
   gap: var(--space-layout-grid-gap);
   min-inline-size: 0;
   margin: 0;
@@ -16292,7 +16295,7 @@ button.artist-card:disabled {
   align-content: start;
   min-inline-size: 0;
   text-align: center;
-  gap: var(--_care-small-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-care-item-gap));
 }
 .care-item__icon {
   display: block;

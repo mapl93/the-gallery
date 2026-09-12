@@ -2079,3 +2079,12 @@ Questions:
 - Which npm packages should exist for web, React, Angular, and CLI consumption?
 - Should Shopify templates ship as GitHub release zips, npm package assets, Theme Store submissions, or all of these?
 - When native targets arrive, should Swift ship as a Swift Package and Kotlin as Maven/Gradle artifacts?
+
+### Technique text-only layout follow-up (ADR 0356)
+
+The visual-controls checkpoint preserves existing defaults. At wide widths,
+steps without optional media retain half-width text alternating left/right.
+Should those steps instead use the full available track? The owner was asked
+after reviewing browser-only samples. Both are viable editorial choices; do
+not silently choose a new layout or classify the current one as invalid.
+Keep media-step composition and semantic source order intact in either case.

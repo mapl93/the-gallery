@@ -445,3 +445,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Los colores de cada esmalte son contenido, no tokens de marca. Evidencia:
   `2026-09-12-reference-checkpoint.md`. Recursos cerrados; Shopify datos/editor
   y estabilidad continúan pendientes.
+
+- ADR 0356 entrega catorce roles en Technique Explainer/Care Instructions
+  (28/27 valores públicos); 744 comparaciones preservan defaults. Controles,
+  unidades, omisiones/reset y Exhibit verificados. Recursos cerrados. Falta
+  elegir si los pasos de Technique sin imagen conservan media columna alternada
+  o usan todo el ancho; hay muestras de ambas, sin cambio silencioso de diseño.
+  Evidencia: `2026-09-12-guidance-checkpoint.md`.

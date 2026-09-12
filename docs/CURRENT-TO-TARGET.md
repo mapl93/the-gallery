@@ -667,3 +667,15 @@ pass. Glaze focus hooks remain explicitly reserved; neutral samples stay passive
 Evidence: `docs/reports/2026-09-12-reference-checkpoint.md`. Both generated
 targets updated, components remain pilot, target records/editor mapping pending.
 Resources closed. Continue Technique Explainer and Care Instructions.
+
+## Technique/Care controls; text-only Technique choice pending (ADR 0356)
+
+Fourteen roles expand Technique Explainer/Care Instructions to 28/27 public
+values. Defaults pass 744 installed-consumer comparisons; independent geometry,
+spacing, units, omission/reset and Exhibit inventory pass. Evidence:
+`docs/reports/2026-09-12-guidance-checkpoint.md`. Both generated targets updated
+and remain pilot. Technique retains its existing alternating half-column for
+steps without media while the owner chooses that layout versus full-width text.
+Browser-only alternatives are ready; no option was silently implemented.
+Owned resources closed. This visual decision blocks closing Technique's review,
+not the already validated controls or Care checkpoint.

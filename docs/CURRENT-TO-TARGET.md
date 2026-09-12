@@ -612,3 +612,13 @@ existing Process Timeline roles. Both remain pilot; Collection Story's Button
 action composition stays an explicit consumer choice. Evidence:
 `docs/reports/2026-09-09-narrative-checkpoint.md`. Test browser and processes
 are closed. Continue Certificate and Masonry Gallery.
+
+## Certificate and Masonry Gallery visual values (ADR 0350)
+
+Twenty-nine source roles complete 45/29 public values. 888 default comparisons,
+container counts, relative units, spacing, native/passive/disabled boundaries,
+RTL, focus, reduced motion and Studio/Exhibit pass. Masonry maximum count does
+not promise every column is occupied. Evidence:
+`docs/reports/2026-09-12-record-gallery-checkpoint.md`. Both remain pilot;
+record trust and artwork activation stay target-owned. Owned browser/server
+and test processes are closed. Continue Artist Index and Artist Statement.

@@ -406,3 +406,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   RTL/foco, ancho apilado, unidades relativas y Studio/Exhibit; Studio Tour
   hereda los tokens de su dependencia. Evidencia: `2026-09-09-narrative-checkpoint.md`.
   Continúan Certificate y Masonry Gallery; navegador cerrado y procesos limpios.
+- ADR 0350 completa Certificate/Masonry con 29 roles y 45/29 valores públicos.
+  Pasan 888 comparaciones, columnas, unidades, ritmo, foco/RTL, movimiento
+  reducido y Studio/Exhibit. Se corrige el hover de piezas deshabilitadas y se
+  distingue máximo de columnas de ocupación efectiva. Evidencia:
+  `2026-09-12-record-gallery-checkpoint.md`. Continúan Artist Index y Artist
+  Statement; navegador/servidor cerrados y procesos limpios, sin promoción a stable.

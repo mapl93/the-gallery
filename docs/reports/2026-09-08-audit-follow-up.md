@@ -517,3 +517,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   personalización, RTL y acciones locales verificadas. También corrige la
   contracción de contenedores dentro de flex y sitúa el feedback de Account
   debajo del artwork. Recursos cerrados; sin despliegue ni promoción.
+
+- ADR 0371 completa Address Book/Form: 14 roles y 27/5 valores públicos. 540
+  comparaciones conservan los defaults; personalización, RTL, FormData y las
+  acciones locales Cancel/Save/reset pasan. El máximo del formulario conserva
+  su unidad rem. Sin servicio de direcciones ni despliegue; recursos cerrados.

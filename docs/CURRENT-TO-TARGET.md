@@ -802,3 +802,10 @@ RTL, read-only line/tracking semantics and Studio navigation/reset pass.
 Canonical fill sizing fixes contained flex roots; Account feedback is below
 artwork. Continue Address Book/Form, Wishlist and Settings; hosted target proof
 remains separate.
+
+## Address Book / Form visual values (ADR 0371)
+
+14 source roles expose measures, logical padding, border, postal-line and other
+independent gaps. Profiles 27/5; 540 default comparisons, inherited controls,
+RTL, native FormData and Studio Cancel/Save/reset/Exhibit pass. Continue Wishlist
+and Account Settings; hosted persistence remains separate.

@@ -711,3 +711,13 @@ no longer overrides Commission's measure or either profile's grid-gap token.
 Evidence: `docs/reports/2026-09-12-workshop-commission-checkpoint.md`. Both
 generated targets updated, pilot maturity retained and owned resources closed.
 Continue Ceramics Glossary, Studio Tour and Care FAQ.
+
+## Ceramics context controls (ADR 0362)
+
+Twenty-nine roles expand Glossary/Tour/FAQ to 25/22/24 public values. 920 default
+comparisons, independent geometry, inherited Studio tokens, native disclosures,
+image aspect and valid Tour media pass. Care Instructions' mobile padding now
+honors its existing public factor. Evidence:
+`docs/reports/2026-09-12-ceramics-context-checkpoint.md`. Both targets generated,
+pilot maturity retained and resources closed. Glossary heading typography remains
+pending the owner's choice; geometry does not close that remaining type gap.

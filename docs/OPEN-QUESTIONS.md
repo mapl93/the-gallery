@@ -2091,3 +2091,12 @@ remain intact. No additional mode, property or token is needed for child presenc
 The owner chose option A: keep axis text at its token-defined size. The shared
 enhancer compensates SVG scaling and reserves space for measured labels using
 the public axis gap. Native chart/table fallback remains available without JS.
+
+### Ceramics Glossary heading typography (ADR 0362)
+
+Should title/letter headings use the system heading roles or preserve their
+current stronger weight? The consumer currently computes weight 700 from native
+headings and inherits a 24px body line height in the tested density; Care FAQ
+explicitly uses weight 600 and a 40px heading line height there. Geometry tokens
+are implemented, but this typography decision remains pending. A browser-only
+system-heading comparison is saved with the checkpoint evidence.

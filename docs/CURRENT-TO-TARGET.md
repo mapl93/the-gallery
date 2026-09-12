@@ -766,3 +766,12 @@ track share, independent gaps, RTL, reduced motion, modal close/reopen, external
 form submission and hidden inertness pass. Evidence:
 `docs/reports/2026-09-12-quick-sticky-checkpoint.md`. Both targets generated,
 resources closed, pilot retained. Continue Cart Note and Gift Wrap.
+
+## Cart Note / Gift Wrap visual values (ADR 0368)
+
+Ten roles expand profiles to 9/13 public values. 120 initial comparisons,
+independent spacing/type/border, native value/checkedness/form reset, RTL and
+Studio/Exhibit pass. Evidence:
+`docs/reports/2026-09-12-cart-note-wrap-checkpoint.md`. Both targets generated,
+pilot retained, resources closed. This completes the Cart-family visual-value
+pass, not its live commerce certification. Continue Auth Forms and Password Reset.

@@ -492,3 +492,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   públicos. 376 comparaciones preservan defaults; ancho, proporción, espaciados,
   modal, formulario asociado e inertness básica pasan. Recursos cerrados.
   La seguridad de la barra en el target real sigue pendiente. Continúan Note/Gift Wrap.
+
+- ADR 0368 cierra el pase de valores visuales de Cart con Note/Gift Wrap:
+  diez roles nuevos, 9/13 valores públicos y 120 comparaciones iniciales.
+  Valores/formulario/reset nativos y Studio/Exhibit pasan. Cart Empty conserva
+  la composición de Empty State sin tokens artificiales. No se certifica el
+  ciclo comercial completo. Recursos cerrados; siguen Auth y Password Reset.

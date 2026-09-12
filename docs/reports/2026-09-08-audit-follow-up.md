@@ -432,3 +432,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Exhibit y colores forzados verificados. Evidencia en
   `2026-09-12-exhibition-palette-checkpoint.md`; recursos cerrados. Sigue pilot;
   generar CSS de Shopify no entrega su plantilla ni certifica el target.
+
+- ADR 0354 añade doce roles en Maker's Mark y Edition / Numbering, perfiles de
+  22/20 valores públicos. Las 184 comparaciones preservan el aspecto inicial;
+  medidas independientes, unidades, Link canónico, omisiones, reset y Exhibit
+  verificados. Ambos siguen pilot; datos/editor de Shopify siguen pendientes.
+  Evidencia: `2026-09-12-attribution-checkpoint.md`. Recursos cerrados.

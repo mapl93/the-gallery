@@ -1498,7 +1498,8 @@ renderer/fixture and zero R9 neutral runtime. ADR 0209 records that boundary.
   metafields or a maker-profile metaobject? How are editor validation, missing
   media, localization and product relationships handled?
 - Is the quiet bordered measure, stamp size/shape, wide/narrow alignment,
-  hierarchy and density approved, and where is R9-specific Figma evidence?
+  hierarchy and density approved? ADR 0354 exposes these values for review;
+  Figma evidence is outside the owner-approved scope (ADR 0303).
 - Perform explicit human stability review; automated completion cannot promote
   R9 from `pilot` to `stable`.
 
@@ -1525,9 +1526,9 @@ separate from canonical Badge. ADR 0210 records that boundary.
   as external target composition without adding an R10 mode or feedback meaning.
 - Which Shopify consumer comes first, and which approved metafield/metaobject
   definitions, validations, editor states and product relationships supply it?
-- Is the compact statement surface, radius, uppercase tracking, serif number
-  hierarchy, spacing and wrap behavior approved, and where is R10-specific
-  Figma evidence for partial/extreme content and modes?
+- Is the compact statement surface, radius, uppercase tracking, number
+  hierarchy, spacing and wrap behavior approved? ADR 0354 exposes these values;
+  Figma evidence is outside the owner-approved scope (ADR 0303).
 - Perform explicit human stability review; automated completion cannot promote
   R10 from `pilot` to `stable`.
 

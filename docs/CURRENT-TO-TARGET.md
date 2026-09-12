@@ -647,3 +647,13 @@ opacity editing, reset, Exhibit and forced colors pass. Evidence:
 `docs/reports/2026-09-12-exhibition-palette-checkpoint.md`. Both generated targets
 are updated; Shopify template/data/editor work remains pending. Component remains
 pilot. Owned browser/server and processes closed.
+
+## Attribution controls (ADR 0354)
+
+Maker's Mark and Edition / Numbering expose twelve additional source roles,
+with 22/20 public values. Installed-consumer defaults pass 184 comparisons;
+independent spacing, rem/em controls, native Link, omission/reset, RTL, forced
+colors and Exhibit inventory pass. Both generated targets updated. Evidence:
+`docs/reports/2026-09-12-attribution-checkpoint.md`. Both remain pilot and target
+records/data/editor mapping remain outside this visual checkpoint. Resources
+closed. Continue Material Library and Glaze Guide.

@@ -632,3 +632,15 @@ padding override is removed. Index retains its target-owned filter lifecycle
 and optional Artist Card composition. Evidence:
 `docs/reports/2026-09-12-artist-layout-checkpoint.md`. Both remain pilot;
 browser/server and processes are closed. Continue Exhibition Page.
+
+## Exhibition Page geometry; media palette pending (ADR 0352)
+
+Twenty-three roles expand the profile to 56 values. 712 baseline comparisons
+and thirteen height-curve samples pass; optional information now occupies a
+full column, and Studio/Exhibit expose geometry. Evidence:
+`docs/reports/2026-09-12-exhibition-geometry-checkpoint.md`.
+This is a partial checkpoint. The actual dark media hero pairs dark text with
+a black scrim and fails contrast. The owner must choose darkened media/white
+text in both themes or lightened media/dark text in dark theme. Browser-only
+samples exist; no palette choice was implemented. Close this issue through
+public tokens before claiming Exhibition Page complete. Owned resources closed.

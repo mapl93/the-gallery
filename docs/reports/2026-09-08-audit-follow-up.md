@@ -418,3 +418,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   que anulaba los tokens de Statement. Evidencia:
   `2026-09-12-artist-layout-checkpoint.md`. Continúa Exhibition Page;
   recursos de prueba cerrados, sin inventar filtrado ni promover madurez.
+- ADR 0352 entrega un checkpoint parcial de Exhibition Page: 23 roles nuevos,
+  56 valores públicos, 712 comparaciones y trece muestras de curva de altura.
+  Se corrige la columna vacía cuando solo hay descripción o metadata. El hero
+  oscuro presenta un defecto real de contraste; se espera la elección de
+  paleta del propietario entre dos muestras antes de corregirla con tokens.
+  Evidencia: `2026-09-12-exhibition-geometry-checkpoint.md`. Recursos cerrados.

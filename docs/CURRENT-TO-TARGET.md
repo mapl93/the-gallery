@@ -849,3 +849,10 @@ validation. 20 browser cases preserve typography/radii while repairing flow,
 quote/callout priority and authored list markers. Token inheritance, canonical
 islands, local overflow/keyboard, narrow RTL and Studio/Exhibit pass. Continue
 Reading Progress, TOC and the remaining editorial catalogue; live Shopify is separate.
+
+## Reading / TOC / Author visual values (ADR 0377)
+
+21 roles across three components; 50 default browser cases plus native
+fragment navigation, installed controlled runtime, Studio automatic reading,
+independent controls/reset, narrow RTL and Exhibit pass. Private reading state
+and target sticky integration remain separate. Continue remaining Blog values.

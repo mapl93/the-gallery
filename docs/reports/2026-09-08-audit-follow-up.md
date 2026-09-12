@@ -558,3 +558,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   conserva tipografía, radios y el espacio actual de atribución. 20 casos,
   controles, aislamiento de Product Card y teclado pasan. El validador traza
   Foundations sin duplicar Prose. Sin despliegue; recursos cerrados.
+
+- ADR 0377 completa Reading Progress, TOC y Author Card con 21 roles. Conserva
+  sus valores iniciales en 50 casos; lectura automática, anclas nativas,
+  densidades, RTL y personalización pasan. El porcentaje sigue siendo estado,
+  no un token. Salidas generadas sin despliegue; recursos cerrados.

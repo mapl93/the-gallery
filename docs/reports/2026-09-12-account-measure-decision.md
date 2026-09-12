@@ -1,8 +1,10 @@
-# Account form measure: pending owner decision
+# Account form measure: historical decision evidence
 
 Date: 2026-09-12. Source head: `fede5ab`.
 
-Status: diagnosis and browser-only proposals. Auth Forms and Password Reset
+Status: historical diagnosis, resolved by owner selection A and ADR 0369.
+Implementation evidence: `docs/reports/2026-09-12-auth-form-values-checkpoint.md`.
+At the diagnostic head below, these were browser-only proposals. Auth Forms and Password Reset
 canonical CSS, contracts, tokens and Studio metadata are unchanged.
 
 ## Confirmed issue

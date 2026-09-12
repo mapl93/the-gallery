@@ -504,3 +504,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Studio anula ese padding y oculta la diferencia. Se prepararon dos opciones
   medidas, pendientes de decidir si 440px es ancho útil o total. No se cambiaron
   esos componentes. Evidencia: `2026-09-12-account-measure-decision.md`.
+
+- ADR 0369 resuelve el bloqueo anterior con la opción A del propietario: Auth y
+  Password Reset usan 440px útiles más el espacio exterior. 21 roles nuevos,
+  inventarios públicos de 29/25 y controles efectivos en Studio/Exhibit.
+  368 comparaciones conservan los demás valores; móvil, personalización,
+  composición estrecha con padding explícito, RTL y acciones locales verificados.
+  Web/Shopify regenerados, sin despliegue ni certificación del proveedor.

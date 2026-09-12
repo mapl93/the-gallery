@@ -2098,13 +2098,9 @@ The owner chose option A after reviewing the two screenshots: title and letter
 headings use the existing H2/H3 weight and line-height roles, including their
 responsive values. Native heading weight is no longer the visual default.
 
-### Account form useful versus outer measure (2026-09-12)
+### Account form useful versus outer measure (resolved by ADR 0369)
 
-Auth Forms and Password Reset currently put page margins inside their 440px
-border-box maximum. Installed source leaves only 120px useful width at XL while
-Studio removes padding and shows 440px. The owner must choose whether 440px
-means useful form width with outer spacing separate (A, recommended), or total
-outer width with the smaller system inset (B). Browser-only alternatives are
-measured and captured; canonical account components remain unchanged.
-
-Evidence and acceptance: `docs/reports/2026-09-12-account-measure-decision.md`.
+The owner chose A: 440px useful form width with outer spacing additional.
+Auth and Password Reset now expose useful maximum and independent padding/gap
+controls. Studio consumes the same source; narrow embeddings choose appropriate
+padding through tokens. See `docs/decisions/0369-account-form-useful-measure-and-visual-values.md`.

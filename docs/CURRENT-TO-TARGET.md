@@ -784,3 +784,12 @@ width at XL, compared with Studio's 440px after it removes padding. Two bounded
 browser-only options are prepared; owner selection of useful versus outer
 measure is pending. Canonical account components are unchanged. Evidence:
 `docs/reports/2026-09-12-account-measure-decision.md`. All owned resources closed.
+
+## Account form useful measure and visual values (ADR 0369)
+
+The pending A/B choice above is resolved: the owner selected A. Auth/Password
+Reset expose 21 source roles and 29/25 public values. 440px now means useful
+content plus outer spacing, Studio bypasses are removed and inherited controls
+work in source consumers. 368 default element comparisons preserve other visual
+values. Nested parents can select smaller padding factors. Continue Account
+Dashboard/Order History; provider integration and certification remain separate.

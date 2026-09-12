@@ -2080,11 +2080,8 @@ Questions:
 - Should Shopify templates ship as GitHub release zips, npm package assets, Theme Store submissions, or all of these?
 - When native targets arrive, should Swift ship as a Swift Package and Kotlin as Maven/Gradle artifacts?
 
-### Technique text-only layout follow-up (ADR 0356)
+### Technique text-only layout resolved (ADR 0357)
 
-The visual-controls checkpoint preserves existing defaults. At wide widths,
-steps without optional media retain half-width text alternating left/right.
-Should those steps instead use the full available track? The owner was asked
-after reviewing browser-only samples. Both are viable editorial choices; do
-not silently choose a new layout or classify the current one as invalid.
-Keep media-step composition and semantic source order intact in either case.
+The owner chose full available width for steps without media. Only media steps
+split and alternate; their existing text-share token and semantic source order
+remain intact. No additional mode, property or token is needed for child presence.

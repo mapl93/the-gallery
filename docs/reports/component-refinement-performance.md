@@ -17,7 +17,7 @@ Neutral Web copy-and-own outputs
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Complete neutral component CSS compatibility bundle | — | 585077 | 78606 | None | observed |
+| Complete neutral component CSS compatibility bundle | — | 585197 | 78618 | None | observed |
 | Complete progressive-enhancement compatibility runtime | — | 118114 | 22912 | None | observed |
 | Neutral web token target | — | 474990 | 58116 | None | observed |
 | Selective runtime loader | — | 2399 | 747 | None | observed |
@@ -35,7 +35,7 @@ Neutral Web copy-and-own outputs
 | Largest dependency-closed Account install slice | address-form | 230616 | 32488 | None | observed |
 | Largest dependency-closed Blog install slice | article-body | 235730 | 33707 | None | observed |
 | Largest dependency-closed Sections install slice | featured-collection | 259648 | 36714 | None | observed |
-| Largest dependency-closed Ceramics install slice | commission-form | 247042 | 33915 | None | observed |
+| Largest dependency-closed Ceramics install slice | commission-form | 247162 | 33928 | None | observed |
 | Largest dependency-closed Reviews install slice | review-form | 238457 | 33883 | None | observed |
 | Largest dependency-closed Pages install slice | page-404 | 127436 | 19018 | None | observed |
 

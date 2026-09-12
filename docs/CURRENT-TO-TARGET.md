@@ -668,14 +668,14 @@ Evidence: `docs/reports/2026-09-12-reference-checkpoint.md`. Both generated
 targets updated, components remain pilot, target records/editor mapping pending.
 Resources closed. Continue Technique Explainer and Care Instructions.
 
-## Technique/Care controls; text-only Technique choice pending (ADR 0356)
+## Technique/Care controls and text-only layout (ADRs 0356–0357)
 
 Fourteen roles expand Technique Explainer/Care Instructions to 28/27 public
 values. Defaults pass 744 installed-consumer comparisons; independent geometry,
 spacing, units, omission/reset and Exhibit inventory pass. Evidence:
 `docs/reports/2026-09-12-guidance-checkpoint.md`. Both generated targets updated
-and remain pilot. Technique retains its existing alternating half-column for
-steps without media while the owner chooses that layout versus full-width text.
-Browser-only alternatives are ready; no option was silently implemented.
-Owned resources closed. This visual decision blocks closing Technique's review,
-not the already validated controls or Care checkpoint.
+and remain pilot. ADR 0357 resolves the owner choice: steps without images use
+full width; only media steps split and alternate. 160 media comparisons and 24
+missing-media combinations pass, including mixed RTL with custom text share.
+Evidence: `docs/reports/2026-09-12-technique-full-width-checkpoint.md`.
+Owned resources closed. Continue Dimensions and Firing Info.

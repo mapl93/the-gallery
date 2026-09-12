@@ -1,6 +1,6 @@
 # 0356. Technique And Care Visual Values
 
-Status: Accepted for visual controls; Technique text-only layout awaiting owner choice
+Status: Accepted for visual controls; subsequent text-only layout choice resolved by ADR 0357
 
 Date: 2026-09-12
 

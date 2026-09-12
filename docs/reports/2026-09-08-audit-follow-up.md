@@ -452,3 +452,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   elegir si los pasos de Technique sin imagen conservan media columna alternada
   o usan todo el ancho; hay muestras de ambas, sin cambio silencioso de diseño.
   Evidencia: `2026-09-12-guidance-checkpoint.md`.
+
+- ADR 0357 cierra la decisión de Technique: el propietario eligió todo el ancho
+  para pasos sin imagen. Los pasos con imagen conservan alternancia/proporción
+  mediante el token existente. Pasan 160 comparaciones y 24 casos de omisión,
+  incluyendo mezcla y RTL. Evidencia: `2026-09-12-technique-full-width-checkpoint.md`.
+  Recursos cerrados, ambos targets regenerados, sin promoción de estabilidad.

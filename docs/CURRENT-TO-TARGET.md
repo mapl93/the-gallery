@@ -809,3 +809,12 @@ remains separate.
 independent gaps. Profiles 27/5; 540 default comparisons, inherited controls,
 RTL, native FormData and Studio Cancel/Save/reset/Exhibit pass. Continue Wishlist
 and Account Settings; hosted persistence remains separate.
+
+## Wishlist / Settings visual values (ADR 0372)
+
+15 source roles and public inventories 24/22 complete the Account visual-value
+pass. 710 default comparisons plus container-relative inset, independent gaps,
+RTL, Studio native Switch/local actions/reset and Exhibit pass. Across Account,
+ADRs 0369–0372 add 72 roles to nine components, preserve unapproved defaults and
+fix the owner-selected useful measure. Live account/commerce certification and
+copy adoption remain separate. Continue remaining catalogue visual coverage.

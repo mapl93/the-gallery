@@ -522,3 +522,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   comparaciones conservan los defaults; personalización, RTL, FormData y las
   acciones locales Cancel/Save/reset pasan. El máximo del formulario conserva
   su unidad rem. Sin servicio de direcciones ni despliegue; recursos cerrados.
+
+- ADR 0372 completa Wishlist/Settings con 15 roles y perfiles 24/22. 710
+  comparaciones preservan defaults; inset relativo al contenedor, separaciones,
+  RTL, Switch inmediato y acciones locales pasan. Account suma 72 roles en
+  nueve componentes y 2508 comparaciones de elementos (ADRs 0369–0372).
+  La cobertura visual no certifica persistencia ni cuentas alojadas. Recursos
+  cerrados y salidas Web/Shopify regeneradas, sin despliegue.

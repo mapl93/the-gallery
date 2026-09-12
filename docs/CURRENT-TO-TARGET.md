@@ -657,3 +657,13 @@ colors and Exhibit inventory pass. Both generated targets updated. Evidence:
 `docs/reports/2026-09-12-attribution-checkpoint.md`. Both remain pilot and target
 records/data/editor mapping remain outside this visual checkpoint. Resources
 closed. Continue Material Library and Glaze Guide.
+
+## Material and glaze controls (ADR 0355)
+
+Material Library/Glaze Guide expose 23 additional source roles and 32/41 public
+values. Defaults pass 608 installed-consumer comparisons; independent spacing,
+media/aspect, intrinsic tracks, omission/reset, RTL and shared Exhibit inventory
+pass. Glaze focus hooks remain explicitly reserved; neutral samples stay passive.
+Evidence: `docs/reports/2026-09-12-reference-checkpoint.md`. Both generated
+targets updated, components remain pilot, target records/editor mapping pending.
+Resources closed. Continue Technique Explainer and Care Instructions.

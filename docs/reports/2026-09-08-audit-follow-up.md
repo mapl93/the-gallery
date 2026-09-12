@@ -438,3 +438,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   medidas independientes, unidades, Link canónico, omisiones, reset y Exhibit
   verificados. Ambos siguen pilot; datos/editor de Shopify siguen pendientes.
   Evidencia: `2026-09-12-attribution-checkpoint.md`. Recursos cerrados.
+
+- ADR 0355 entrega 23 roles en Material Library/Glaze Guide (32/41 valores
+  públicos); 608 comparaciones de defaults y controles independientes verificados.
+  Los hooks de foco quedan reservados y las muestras siguen siendo pasivas.
+  Los colores de cada esmalte son contenido, no tokens de marca. Evidencia:
+  `2026-09-12-reference-checkpoint.md`. Recursos cerrados; Shopify datos/editor
+  y estabilidad continúan pendientes.

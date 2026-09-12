@@ -749,3 +749,12 @@ and shared grid rows preserve alignment. Evidence:
 `docs/reports/2026-09-12-cart-summary-discount-checkpoint.md`. Both targets
 regenerated, resources closed, pilot retained. Continue Free Shipping Bar and
 Cart Upsell; target discount/payment truth remains separate.
+
+## Shipping / Upsell visual values (ADR 0366)
+
+Nineteen roles expand profiles to 12/26 public values. 136 default comparisons,
+independent spacing/media/type, RTL/omission, native Link, canonical Progress,
+local Add status, Studio/reset and Exhibit pass. Evidence:
+`docs/reports/2026-09-12-shipping-upsell-checkpoint.md`. Both targets generated,
+resources closed, pilot retained. Continue Quick View and Sticky ATC; Cart Empty
+owns structural composition only and continues to delegate values to Empty State.

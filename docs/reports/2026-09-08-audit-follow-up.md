@@ -482,3 +482,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   con error, usando el patrón subgrid existente y los espacios de Input.
   Controles y ciclo local de códigos pasan; Shopify real sigue sin certificar.
   Recursos cerrados. Continúan Free Shipping Bar y Cart Upsell.
+
+- ADR 0366 amplía Shipping/Upsell con 19 roles (12/26 valores públicos).
+  136 comparaciones preservan defaults; controles, RTL, omisión, semántica
+  básica de Progress y acción local pasan. Recursos cerrados, sin entrega de
+  elegibilidad o motor de recomendaciones Shopify. Continúan Quick View y Sticky ATC.

@@ -1659,6 +1659,13 @@ Questions:
 
 ### Coming Soon Human Review
 
+Current palette decision (2026-09-12): dark media resolves inverse text to
+#171717 over a fixed black scrim. Choose fixed white on-media text in both themes
+(A, matching Hero) or a white scrim paired with Dark's dark text (B). The source
+remains unchanged pending owner choice; screenshots, compositing bounds and
+acceptance criteria are in
+`docs/reports/2026-09-12-coming-soon-palette-decision.md`.
+
 ADR 0144 separates public X1 Coming Soon from target-native password access,
 composes canonical Input, Button and Link, requires a non-empty visible heading,
 and keeps Countdown outside the contract. The component remains `pilot`.

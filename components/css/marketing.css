@@ -9,12 +9,12 @@
 
 /* ── G1. HERO ── */
 .hero {
-  --_hero-content-measure: 40rem;
-  --_hero-wide-content-measure: 46rem;
-  --_hero-min-block-size: clamp(26rem, 70cqi, 48rem);
-  --_hero-split-min-block-size: clamp(34rem, 62cqi, 52rem);
-  --_hero-split-media-block-size: clamp(18rem, 68cqi, 32rem);
-  --_hero-control-inset: var(--space-layout-element-gap);
+  --_hero-content-measure: var(--size-hero-content-max);
+  --_hero-wide-content-measure: var(--size-hero-text-content-max);
+  --_hero-min-block-size: clamp(var(--size-hero-min-height), calc(100cqi * var(--scale-hero-height-share)), var(--size-hero-max-height));
+  --_hero-split-min-block-size: clamp(var(--size-hero-split-min-height), calc(100cqi * var(--scale-hero-split-height-share)), var(--size-hero-split-max-height));
+  --_hero-split-media-block-size: clamp(var(--size-hero-split-media-min-height), calc(100cqi * var(--scale-hero-split-media-height-share)), var(--size-hero-split-media-max-height));
+  --_hero-control-inset: calc(var(--space-layout-element-gap) * var(--scale-hero-control-inset));
   --_hero-interval: 6000ms;
 
   position: relative;
@@ -78,7 +78,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: rgb(0 0 0 / var(--opacity-overlay));
+  background: color-mix(in srgb, var(--color-hero-overlay) calc(var(--opacity-overlay) * 100%), transparent);
 }
 
 .hero__content {
@@ -87,17 +87,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-layout-element-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-hero-content-gap));
   inline-size: min(100%, var(--_hero-content-measure));
   min-inline-size: 0;
-  padding: clamp(var(--space-layout-element-gap), 10cqi, var(--space-layout-section-gap)) var(--space-layout-container);
+  padding: clamp(calc(var(--space-layout-element-gap) * var(--scale-hero-block-inset-min)), calc(100cqi * var(--scale-hero-block-inset-share)), calc(var(--space-layout-section-gap) * var(--scale-hero-block-inset-max))) calc(var(--space-layout-container) * var(--scale-hero-inline-inset));
   text-align: center;
 }
 
 .hero__label {
   margin: 0;
   font: var(--tg-font-weight-semibold) var(--typo-caption-size) / var(--typo-caption-line-height) var(--font-family-body);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--typo-hero-label-tracking);
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
@@ -121,7 +121,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-layout-element-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-hero-action-gap));
 }
 
 .hero--split {
@@ -130,7 +130,7 @@
 
 .hero--split .hero__inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, calc(var(--scale-hero-split-media-share) * 100%)) minmax(0, 1fr);
   min-block-size: var(--_hero-split-min-block-size);
 }
 
@@ -161,7 +161,7 @@
 }
 
 .hero--text-only .hero__inner {
-  min-block-size: clamp(20rem, 42cqi, 34rem);
+  min-block-size: clamp(var(--size-hero-text-min-height), calc(100cqi * var(--scale-hero-text-height-share)), var(--size-hero-text-max-height));
 }
 
 .hero--text-only .hero__media,
@@ -232,9 +232,9 @@
   inset-inline: 0;
   inset-block-end: 0;
   z-index: 4;
-  block-size: calc(var(--space-layout-element-gap) * 0.125);
+  block-size: calc(var(--space-layout-element-gap) * var(--scale-hero-progress-height));
   overflow: hidden;
-  background: color-mix(in srgb, var(--color-surface-primary) 36%, transparent);
+  background: color-mix(in srgb, var(--color-surface-primary) calc(var(--scale-hero-progress-track-share) * 100%), transparent);
 }
 
 .hero__progress-value {
@@ -271,8 +271,8 @@
 
 @supports (animation-timeline: view()) {
   .hero[data-media-behavior="parallax"] .hero__media-item {
-    block-size: 112%;
-    transform: translateY(-6%);
+    block-size: calc(100% * var(--scale-hero-parallax-media-scale));
+    transform: translateY(calc(-100% * var(--scale-hero-parallax-travel)));
     animation: tg-hero-parallax linear both;
     animation-timeline: view(block);
     animation-range: entry 0% exit 100%;
@@ -280,7 +280,7 @@
 }
 
 @keyframes tg-hero-parallax {
-  to { transform: translateY(6%); }
+  to { transform: translateY(calc(100% * var(--scale-hero-parallax-travel))); }
 }
 
 @container hero (max-width: 48rem) {
@@ -300,31 +300,31 @@
 
 @container hero (max-width: 32rem) {
   .hero:not(.hero--text-only):has(.hero__controls) .hero__inner {
-    min-block-size: clamp(34rem, 160cqi, 40rem);
+    min-block-size: clamp(var(--size-hero-controls-min-height), calc(100cqi * var(--scale-hero-controls-height-share)), var(--size-hero-controls-max-height));
   }
 
   .hero__content {
-    padding-inline: var(--space-layout-element-gap);
+    padding-inline: calc(var(--space-layout-element-gap) * var(--scale-hero-compact-inline-inset));
   }
 
   .hero:has(.hero__controls) .hero__content {
-    padding-block-end: calc(var(--space-layout-touch-target) + (var(--space-layout-element-gap) * 2));
+    padding-block-end: calc(var(--space-layout-touch-target) + calc(var(--space-layout-element-gap) * var(--scale-hero-controls-content-gap)));
   }
 
   .hero .hero__title {
-    font-size: clamp(var(--typo-h3-size), 10cqi, var(--typo-h1-size));
+    font-size: clamp(var(--typo-h3-size), calc(100cqi * var(--scale-hero-compact-title-share)), var(--typo-h1-size));
     line-height: var(--typo-h3-line-height);
     overflow-wrap: break-word;
     text-wrap: balance;
   }
 
   .hero__controls {
-    inset: auto 0 calc(var(--space-layout-element-gap) * 0.125);
+    inset: auto 0 calc(var(--space-layout-element-gap) * var(--scale-hero-progress-height));
     display: flex;
     align-items: center;
     justify-content: center;
     min-block-size: var(--space-layout-touch-target);
-    padding-inline: calc(var(--space-layout-element-gap) * 0.5);
+    padding-inline: calc(var(--space-layout-element-gap) * var(--scale-hero-controls-inline-inset));
   }
 
   .hero__previous,

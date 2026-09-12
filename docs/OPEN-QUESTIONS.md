@@ -2110,3 +2110,12 @@ padding through tokens. See `docs/decisions/0369-account-form-useful-measure-and
 The owner selected A: existing H2 size/leading below the current 40rem component
 threshold and Display above. Family, weight, tracking and heading semantics
 remain unchanged. Contract/Studio expose both pairs; 130 browser samples pass.
+
+### Editorial font identity versus delivered fallback (2026-09-12)
+
+Lora is first in the canonical serif role, but Studio renders Georgia because
+Lora is not loaded. Confirmed with actual platform-font glyph evidence. Owner
+choice pending: fulfill the declared Lora through target font loading, or
+formalize the current system serif fallback. The same-metrics comparison and
+acceptance are in `docs/reports/2026-09-12-editorial-font-delivery-decision.md`.
+No font preference or loader change has been applied.

@@ -877,3 +877,14 @@ reply inset, native local interactions, Studio and Exhibit pass. Blog public
 visual-value coverage now includes all eleven registry components (Article Card/
 Hero from preceding checkpoints). Legacy article-nav remains outside v1. Font
 delivery and remaining catalogue/target work require their own verification.
+
+## Editorial font delivery decision
+
+Actual browser font evidence found Lora-first tokens rendering Georgia in
+Studio Article Hero/Body. A source-only family check did not catch missing Lora
+loading. Concrete A/B comparison is ready; font preference/delivery remains
+unchanged pending owner choice. See the 2026-09-12 editorial font decision report.
+This continuation completed six implementation checkpoints, ten components,
+103 source roles and 280 browser cases; all Blog registry components now have
+a public visual-value pass. This is not completion of all catalogue or Shopify
+work, nor blanket accessibility/font/target certification.

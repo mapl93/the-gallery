@@ -579,3 +579,11 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   formulario local, reset y Exhibit pasan. No se publicó ningún comentario.
   Blog queda cubierto en sus once componentes registrados; article-nav es
   legado fuera de v1. Validar CSS no certifica fuentes ni entrega Shopify real.
+
+- Diagnóstico adicional confirmado: la pila editorial declara Lora, pero
+  Article Hero y Article Body dibujan Georgia en Studio. La comprobación usa
+  nombres de fuentes y glifos reales de Chromium, no solo font-family. Se
+  preparó comparación con Lora oficial y la reserva actual; decisión pendiente
+  antes de cambiar la identidad/carga. Las pruebas previas de CSS y paridad
+  visual no certificaban la entrega de Lora. Detalle:
+  `docs/reports/2026-09-12-editorial-font-delivery-decision.md`.

@@ -476,3 +476,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   464 comparaciones preservan defaults; controles, reflujo, colocación básica
   y Studio/Exhibit verificados. Continúan Summary y Discount Field.
   No se certifica la mutación comercial ni el editor Shopify. Recursos cerrados.
+
+- ADR 0365 añade 22 roles en Cart Summary/Discount (26/25 valores públicos).
+  248 comparaciones preservan defaults. Apply queda alineado al campo también
+  con error, usando el patrón subgrid existente y los espacios de Input.
+  Controles y ciclo local de códigos pasan; Shopify real sigue sin certificar.
+  Recursos cerrados. Continúan Free Shipping Bar y Cart Upsell.

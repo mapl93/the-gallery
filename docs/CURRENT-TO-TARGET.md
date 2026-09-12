@@ -739,3 +739,13 @@ quantity/reset and Exhibit pass. Studio shows the actual wide page and lets its
 summary fill the token-authored track. Evidence:
 `docs/reports/2026-09-12-cart-page-line-checkpoint.md`. Both targets generated,
 pilot retained, resources closed. Continue Cart Summary and Discount Field.
+
+## Cart Summary / Discount visual values (ADR 0365)
+
+Twenty-two source roles expand profiles to 26/25 values. 248 initial comparisons,
+independent spacing/borders/type, native disclosure and local code lifecycle pass.
+Discount's message no longer shifts Apply below the field: canonical Input gaps
+and shared grid rows preserve alignment. Evidence:
+`docs/reports/2026-09-12-cart-summary-discount-checkpoint.md`. Both targets
+regenerated, resources closed, pilot retained. Continue Free Shipping Bar and
+Cart Upsell; target discount/payment truth remains separate.

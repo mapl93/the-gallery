@@ -529,3 +529,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   nueve componentes y 2508 comparaciones de elementos (ADRs 0369–0372).
   La cobertura visual no certifica persistencia ni cuentas alojadas. Recursos
   cerrados y salidas Web/Shopify regeneradas, sin despliegue.
+
+- ADR 0373 incorpora 22 roles y 44 valores públicos en Article Card. 800
+  comparaciones verifican cinco variantes, cinco anchos y ambos temas. La
+  proporción Featured respeta el mínimo de contenido. Se conserva el
+  interlineado compacto actual: la alternativa de +2px es opcional, no un
+  defecto ni un bloqueo. Foco, RTL y controles/acciones locales pasan.

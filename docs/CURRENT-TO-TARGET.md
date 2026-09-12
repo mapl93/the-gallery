@@ -818,3 +818,11 @@ RTL, Studio native Switch/local actions/reset and Exhibit pass. Across Account,
 ADRs 0369–0372 add 72 roles to nine components, preserve unapproved defaults and
 fix the owner-selected useful measure. Live account/commerce certification and
 copy adoption remain separate. Continue remaining catalogue visual coverage.
+
+## Article Card visual values (ADR 0373)
+
+22 source roles and 44 public values; 800 element comparisons over five variants,
+five widths and two themes preserve defaults. Featured share reserves content
+minimum; focus, ratios, RTL, Studio/excerpt/local navigation/reset/Exhibit pass.
+The current compact title leading is documented and retained, not an invented
+blocker. Continue Article Hero and remaining editorial components.

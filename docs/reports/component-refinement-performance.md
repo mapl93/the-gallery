@@ -17,9 +17,9 @@ Neutral Web copy-and-own outputs
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Complete neutral component CSS compatibility bundle | — | 595766 | 80090 | None | observed |
+| Complete neutral component CSS compatibility bundle | — | 596897 | 80210 | None | observed |
 | Complete progressive-enhancement compatibility runtime | — | 123453 | 24470 | None | observed |
-| Neutral web token target | — | 578417 | 70903 | None | observed |
+| Neutral web token target | — | 588597 | 71877 | None | observed |
 | Selective runtime loader | — | 2498 | 770 | None | observed |
 | Shared modular runtime core | — | 1678 | 707 | None | observed |
 | Largest individual progressive-enhancement module | date-picker | 14351 | 3381 | None | observed |
@@ -33,7 +33,7 @@ Neutral Web copy-and-own outputs
 | Largest dependency-closed Marketing install slice | announcement-extended | 240741 | 37571 | None | observed |
 | Largest dependency-closed Cart install slice | quick-view | 244252 | 35819 | None | observed |
 | Largest dependency-closed Account install slice | address-form | 234343 | 32864 | None | observed |
-| Largest dependency-closed Blog install slice | article-body | 235730 | 33707 | None | observed |
+| Largest dependency-closed Blog install slice | article-body | 236861 | 33854 | None | observed |
 | Largest dependency-closed Sections install slice | featured-collection | 259648 | 36714 | None | observed |
 | Largest dependency-closed Ceramics install slice | commission-form | 250461 | 34316 | None | observed |
 | Largest dependency-closed Reviews install slice | review-form | 238457 | 33883 | None | observed |
@@ -49,8 +49,8 @@ Shopify Online Store theme; not a theme app extension or Theme Store submission
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Shopify theme token asset | — | 578577 | 70951 | None | observed |
-| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 578577 | 70951 | 100000 rawBytes; advisory | advisory-overage |
+| Shopify theme token asset | — | 588757 | 71925 | None | observed |
+| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 588757 | 71925 | 100000 rawBytes; advisory | advisory-overage |
 | Largest Shopify local JS asset (inventory, including compatibility files) | theme.js | 123453 | 24470 | 10000 rawBytes; advisory | advisory-overage |
 
 Unverified by this report:
@@ -72,7 +72,7 @@ Upstream main inspected on checkedOn; configurable and disabled by default for t
 
 Assets above this reference:
 
-- `platforms/shopify/assets/tokens.css`: 578577 raw bytes, 70951 gzip bytes.
+- `platforms/shopify/assets/tokens.css`: 588757 raw bytes, 71925 gzip bytes.
 
 ### shopify-js-asset-maximum
 

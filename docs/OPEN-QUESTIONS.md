@@ -2105,10 +2105,8 @@ Auth and Password Reset now expose useful maximum and independent padding/gap
 controls. Studio consumes the same source; narrow embeddings choose appropriate
 padding through tokens. See `docs/decisions/0369-account-form-useful-measure-and-visual-values.md`.
 
-### Article Hero typography in narrow containers (2026-09-12)
+### Article Hero typography in narrow containers (resolved by ADR 0375)
 
-At desktop viewport, a 300px Hero uses 64/72px Display metrics and breaks words.
-Owner choice pending: A uses existing H2 size/leading below the component's
-40rem layout threshold and retains Display above it; B keeps Display throughout.
-Font family/weight remain unchanged in both. Concrete comparison and acceptance:
-`docs/reports/2026-09-12-article-hero-type-decision.md`.
+The owner selected A: existing H2 size/leading below the current 40rem component
+threshold and Display above. Family, weight, tracking and heading semantics
+remain unchanged. Contract/Studio expose both pairs; 130 browser samples pass.

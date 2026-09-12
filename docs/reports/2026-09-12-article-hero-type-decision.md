@@ -2,8 +2,9 @@
 
 Date: 2026-09-12. Source head: `74681b5`.
 
-Status: owner choice pending. This report and the local A/B comparison do not
-change canonical typography, contracts, tokens, Studio or Shopify output.
+Status: historical comparison; the owner subsequently selected A, implemented
+and verified by ADR 0375 and `2026-09-12-article-hero-type-checkpoint.md`.
+The observations below describe the pre-change source.
 
 ## Observed behavior
 

@@ -543,8 +543,12 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Display todavía puede partir palabras; no se certifica legibilidad solo
   porque la caja no desborde. Sin despliegue; recursos cerrados.
 
-- Decisión pendiente posterior: Article Hero en contenedor de 300px mantiene
+- Comparación histórica, resuelta después por ADR 0375: Article Hero en contenedor de 300px mantiene
   Display 64/72px y parte palabras. Comparación A/B preparada: A usa H2 38/46px
   en ese ancho y conserva Display cuando hay espacio; B mantiene lo actual.
   Fuente y peso no cambian. No se aplicó el cambio estético. Detalle y evidencia:
   `docs/reports/2026-09-12-article-hero-type-decision.md`.
+
+- ADR 0375 aplica A: H2 en contenedores estrechos y Display desde 40rem.
+  130 casos pasan; herencia, RTL, edición/reset y Exhibit verificados. No se
+  añaden tokens ni modos. Web/Shopify regenerados, sin despliegue ni promoción.

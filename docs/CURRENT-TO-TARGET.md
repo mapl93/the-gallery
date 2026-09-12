@@ -835,11 +835,9 @@ Studio media omission/reset and Exhibit pass. Image-content/text-outer measures
 have distinct names without default changes. Narrow desktop embeddings still
 use viewport Display typography; geometry alone is not editorial readability.
 
-## Article Hero narrow typography: owner decision
+## Article Hero narrow typography (ADR 0375)
 
-The next visual decision is measured, not implemented: at 300px inside desktop,
-current 64/72px Display type breaks words. A proposes existing H2 metrics below
-the current 40rem component threshold, preserving Display for wider Heroes;
-B keeps current behavior. See `docs/reports/2026-09-12-article-hero-type-decision.md`.
-The six completed implementation checkpoints remain pushed; 11 components,
-114 source roles and 3908 default element comparisons in this continuation.
+Owner option A is implemented: compact H2 metrics and wide Display metrics at
+the existing 40rem component threshold. Public inventory 42, no new source
+roles/modes. 130 browser samples plus inherited overrides, RTL, Studio/reset
+and Exhibit pass. Continue Article Body and remaining editorial coverage.

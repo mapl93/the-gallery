@@ -458,3 +458,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   mediante el token existente. Pasan 160 comparaciones y 24 casos de omisión,
   incluyendo mezcla y RTL. Evidencia: `2026-09-12-technique-full-width-checkpoint.md`.
   Recursos cerrados, ambos targets regenerados, sin promoción de estabilidad.
+
+- ADR 0358 entrega diecinueve roles en Dimensions (36 valores públicos), con
+  424 comparaciones y controles/unidades/omisión/reset verificados. El peso de
+  las etiquetas deja de depender de Button, conservando semibold. Evidencia:
+  `2026-09-12-dimensions-checkpoint.md`. Ambos targets regenerados; recursos
+  cerrados, sin promoción de estabilidad ni entrega de datos/editor Shopify.

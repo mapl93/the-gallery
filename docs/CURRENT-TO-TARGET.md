@@ -679,3 +679,11 @@ full width; only media steps split and alternate. 160 media comparisons and 24
 missing-media combinations pass, including mixed RTL with custom text share.
 Evidence: `docs/reports/2026-09-12-technique-full-width-checkpoint.md`.
 Owned resources closed. Continue Dimensions and Firing Info.
+
+## Dimensions controls (ADR 0358)
+
+Nineteen roles expand Dimensions to 36 public values. 424 installed-consumer
+comparisons preserve defaults; visual/annotation geometry, row share, isolated
+type weights, native unit switching, omission/reset, RTL and Exhibit pass.
+Evidence: `docs/reports/2026-09-12-dimensions-checkpoint.md`. Both target outputs
+updated, pilot status retained and resources closed. Continue Firing Schedule.

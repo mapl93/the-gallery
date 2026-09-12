@@ -730,3 +730,12 @@ consumer width/theme samples, independent overrides, RTL, Studio/reset and
 Exhibit pass. Evidence: `docs/reports/2026-09-12-glossary-type-checkpoint.md`.
 Both generated targets updated; owned resources closed. Continue Cart Page and
 Cart Line Item visual customization; target commerce lifecycle remains separate.
+
+## Cart Page / Line visual values (ADR 0364)
+
+Twenty-four roles expand profiles to 22/31 values. 464 default comparisons,
+independent geometry, narrow RTL/omission, sticky/flow/short fallback, Studio
+quantity/reset and Exhibit pass. Studio shows the actual wide page and lets its
+summary fill the token-authored track. Evidence:
+`docs/reports/2026-09-12-cart-page-line-checkpoint.md`. Both targets generated,
+pilot retained, resources closed. Continue Cart Summary and Discount Field.

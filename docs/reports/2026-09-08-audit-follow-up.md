@@ -471,3 +471,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Glossary option A: existing H2/H3 weights and line heights, four public
   controls, eight responsive/theme samples and Studio/Exhibit checks. These
   advance findings 3/5 without claiming full component or Shopify certification.
+
+- ADR 0364 amplía Cart Page/Line Item con 24 roles (22/31 valores públicos).
+  464 comparaciones preservan defaults; controles, reflujo, colocación básica
+  y Studio/Exhibit verificados. Continúan Summary y Discount Field.
+  No se certifica la mutación comercial ni el editor Shopify. Recursos cerrados.

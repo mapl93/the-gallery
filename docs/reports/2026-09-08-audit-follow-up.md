@@ -568,3 +568,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   valores salvo el gap de legend recuperado (4px del token compartido). Estados
   nativos, historial de filtros, anclas, RTL y personalización pasan; sin
   despliegue ni recursos de prueba abiertos.
+
+- ADR 0379 añade seis roles en Share Actions y Related Articles. 40 casos
+  conservan valores; los tokens cambian separación/columnas sin duplicar Button
+  ni Article Card. Studio, omisión por título, reset y Exhibit pasan. Sin
+  proveedores invocados, despliegue ni recursos de prueba abiertos.

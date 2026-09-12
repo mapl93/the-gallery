@@ -863,3 +863,9 @@ and target sticky integration remain separate. Continue remaining Blog values.
 legend gap now real in Multiple mode. Native choices, query/Back, separate
 spacing/borders, narrow RTL and Studio/Exhibit pass. Continue Share Actions,
 Related Articles and Comments; target integration remains separate.
+
+## Share / Related Articles layout values (ADR 0379)
+
+Six roles, inventories 2/14; 40 cases preserve defaults. Group/child isolation,
+container-driven columns, narrow RTL, native fixture activation, Studio and
+Exhibit pass. No sharing provider is invoked. Continue Comment Section.

@@ -21,3 +21,10 @@ test('preserves state-aware color selection and actual paired controls', () => {
   assert.equal(staticSwatchBindingError('ButtonStudio', 'token-swatch', ['--default', '--hover']), null);
   assert.equal(staticSwatchBindingError('MarketingStudio', 'token-pair', ['--x', '--y']), null);
 });
+
+test('Blog static groups must expose all color roles and use matching editors', () => {
+  assert.match(staticSwatchBindingError('BlogStudio', 'token-swatch', ['--primary', '--secondary'], 'color'), /first swatch token/);
+  assert.match(staticSwatchBindingError('BlogStudio', 'token-swatch', ['--space'], 'spacing'), /require color/);
+  assert.equal(staticSwatchBindingError('BlogStudio', 'token', ['--space'], 'spacing'), null);
+  assert.equal(staticSwatchBindingError('BlogStudio', 'token-swatch', ['--secondary'], 'color'), null);
+});

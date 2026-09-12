@@ -6,9 +6,11 @@ export function studioRendererNames(source) {
     .map((match) => [match[1] ?? match[2], match[3]]));
 }
 
-// MarketingStudio's activeTokens mapping is static: it selects tokens[0].
+// Reviewed static renderers select tokens[0] in their activeTokens mapping.
 // State-aware renderers (e.g. Button) may deliberately select among many roles.
-export function staticSwatchBindingError(renderer, kind, tokens) {
-  if (renderer !== 'MarketingStudio' || kind !== 'token-swatch' || tokens.length === 1) return null;
-  return 'MarketingStudio selects only the first swatch token; use separate one-token controls so every listed role is editable';
+export function staticSwatchBindingError(renderer, kind, tokens, category) {
+  if (!['MarketingStudio', 'BlogStudio'].includes(renderer) || kind !== 'token-swatch') return null;
+  if (category && category !== 'color') return 'static swatch controls require color tokens; use numeric or text token controls for other categories';
+  if (tokens.length === 1) return null;
+  return `${renderer} selects only the first swatch token; use separate one-token controls so every listed role is editable`;
 }

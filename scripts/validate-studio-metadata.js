@@ -447,7 +447,7 @@ function validateStudioDefinition(filePath, iconCatalogues) {
         if ('optionLabels' in control) errors.push(`${controlLabel}.optionLabels requires an enum or state control`);
 
         const resolvedTokens = resolveTokens(errors, control, contract, controlLabel);
-        const bindingError = staticSwatchBindingError(studioRenderers.get(definition.slug), control.kind, resolvedTokens);
+        const bindingError = staticSwatchBindingError(studioRenderers.get(definition.slug), control.kind, resolvedTokens, control.tokens?.category);
         if (bindingError) errors.push(`${controlLabel} ${bindingError}`);
         if (control.kind === 'token' && resolvedTokens.length !== 1) {
           errors.push(`${controlLabel} token controls must resolve exactly one public token`);

@@ -719,5 +719,14 @@ comparisons, independent geometry, inherited Studio tokens, native disclosures,
 image aspect and valid Tour media pass. Care Instructions' mobile padding now
 honors its existing public factor. Evidence:
 `docs/reports/2026-09-12-ceramics-context-checkpoint.md`. Both targets generated,
-pilot maturity retained and resources closed. Glossary heading typography remains
-pending the owner's choice; geometry does not close that remaining type gap.
+pilot maturity retained and resources closed. ADR 0363 subsequently resolves
+the typography choice with owner-approved system H2/H3 roles.
+
+## Glossary heading roles (ADR 0363)
+
+Owner-approved option A connects existing H2/H3 weights and line heights to the
+title and group letters, with four public controls (29 total). Eight installed
+consumer width/theme samples, independent overrides, RTL, Studio/reset and
+Exhibit pass. Evidence: `docs/reports/2026-09-12-glossary-type-checkpoint.md`.
+Both generated targets updated; owned resources closed. Continue Cart Page and
+Cart Line Item visual customization; target commerce lifecycle remains separate.

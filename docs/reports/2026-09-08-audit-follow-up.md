@@ -464,3 +464,10 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   las etiquetas deja de depender de Button, conservando semibold. Evidencia:
   `2026-09-12-dimensions-checkpoint.md`. Ambos targets regenerados; recursos
   cerrados, sin promoción de estabilidad ni entrega de datos/editor Shopify.
+
+- ADRs 0359–0362 extend the public-value pass through Firing Schedule, Workshop,
+  Commission, Glossary, Tour and Care FAQ, with per-checkpoint reports in
+  `docs/reports/`. ADR 0360 resolves constant SVG axis type. ADR 0363 resolves
+  Glossary option A: existing H2/H3 weights and line heights, four public
+  controls, eight responsive/theme samples and Studio/Exhibit checks. These
+  advance findings 3/5 without claiming full component or Shopify certification.

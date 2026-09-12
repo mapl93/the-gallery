@@ -775,3 +775,12 @@ Studio/Exhibit pass. Evidence:
 `docs/reports/2026-09-12-cart-note-wrap-checkpoint.md`. Both targets generated,
 pilot retained, resources closed. This completes the Cart-family visual-value
 pass, not its live commerce certification. Continue Auth Forms and Password Reset.
+
+## Account measure decision checkpoint
+
+Before Auth/Password Reset visual-token work, installed-source evidence found
+page margin padding consuming their 440px border-box maximum: 120px useful form
+width at XL, compared with Studio's 440px after it removes padding. Two bounded
+browser-only options are prepared; owner selection of useful versus outer
+measure is pending. Canonical account components are unchanged. Evidence:
+`docs/reports/2026-09-12-account-measure-decision.md`. All owned resources closed.

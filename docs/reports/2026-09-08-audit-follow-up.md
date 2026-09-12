@@ -498,3 +498,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   Valores/formulario/reset nativos y Studio/Exhibit pasan. Cart Empty conserva
   la composición de Empty State sin tokens artificiales. No se certifica el
   ciclo comercial completo. Recursos cerrados; siguen Auth y Password Reset.
+
+- Diagnóstico posterior a Cart: Auth/Password Reset descuentan el margen de
+  página de un máximo exterior de 440px, dejando solo 120px útiles en XL;
+  Studio anula ese padding y oculta la diferencia. Se prepararon dos opciones
+  medidas, pendientes de decidir si 440px es ancho útil o total. No se cambiaron
+  esos componentes. Evidencia: `2026-09-12-account-measure-decision.md`.

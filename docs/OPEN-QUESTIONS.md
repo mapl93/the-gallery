@@ -2097,3 +2097,14 @@ the public axis gap. Native chart/table fallback remains available without JS.
 The owner chose option A after reviewing the two screenshots: title and letter
 headings use the existing H2/H3 weight and line-height roles, including their
 responsive values. Native heading weight is no longer the visual default.
+
+### Account form useful versus outer measure (2026-09-12)
+
+Auth Forms and Password Reset currently put page margins inside their 440px
+border-box maximum. Installed source leaves only 120px useful width at XL while
+Studio removes padding and shows 440px. The owner must choose whether 440px
+means useful form width with outer spacing separate (A, recommended), or total
+outer width with the smaller system inset (B). Browser-only alternatives are
+measured and captured; canonical account components remain unchanged.
+
+Evidence and acceptance: `docs/reports/2026-09-12-account-measure-decision.md`.

@@ -869,3 +869,11 @@ Related Articles and Comments; target integration remains separate.
 Six roles, inventories 2/14; 40 cases preserve defaults. Group/child isolation,
 container-driven columns, narrow RTL, native fixture activation, Studio and
 Exhibit pass. No sharing provider is invoked. Continue Comment Section.
+
+## Comment Section visual values (ADR 0380)
+
+21 roles, 41 public values; ten default browser cases plus container-relative
+reply inset, native local interactions, Studio and Exhibit pass. Blog public
+visual-value coverage now includes all eleven registry components (Article Card/
+Hero from preceding checkpoints). Legacy article-nav remains outside v1. Font
+delivery and remaining catalogue/target work require their own verification.

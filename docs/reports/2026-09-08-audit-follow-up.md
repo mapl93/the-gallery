@@ -573,3 +573,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   conservan valores; los tokens cambian separación/columnas sin duplicar Button
   ni Article Card. Studio, omisión por título, reset y Exhibit pasan. Sin
   proveedores invocados, despliegue ni recursos de prueba abiertos.
+
+- ADR 0380 completa Comment Section con 21 roles y 41 valores públicos.
+  Conserva valores en diez casos; sangría por contenedor, reacciones, orden,
+  formulario local, reset y Exhibit pasan. No se publicó ningún comentario.
+  Blog queda cubierto en sus once componentes registrados; article-nav es
+  legado fuera de v1. Validar CSS no certifica fuentes ni entrega Shopify real.

@@ -28,3 +28,8 @@ test('Blog static groups must expose all color roles and use matching editors', 
   assert.equal(staticSwatchBindingError('BlogStudio', 'token', ['--space'], 'spacing'), null);
   assert.equal(staticSwatchBindingError('BlogStudio', 'token-swatch', ['--secondary'], 'color'), null);
 });
+
+test('Storytelling selected filter border and text cannot hide behind its surface', () => {
+  assert.match(staticSwatchBindingError('StorytellingStudio', 'token-swatch', ['--bg', '--border', '--text'], 'color'), /first swatch token/);
+  assert.equal(staticSwatchBindingError('StorytellingStudio', 'token-swatch', ['--border'], 'color'), null);
+});

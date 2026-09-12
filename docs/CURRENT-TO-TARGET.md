@@ -701,3 +701,13 @@ SVG scale and measures label space with one additional public axis-gap role
 fallback, shadow lifecycle and Studio pass. Evidence:
 `docs/reports/2026-09-12-firing-axis-type-checkpoint.md`. Resources closed;
 Shopify schedule records/schema remain pending. Continue Workshop Listing.
+
+## Workshop and Commission controls (ADR 0361)
+
+Fourteen roles expand Workshop Listing/Commission Form to 23/18 public values.
+376 installed-consumer comparisons preserve defaults; independent geometry and
+spacing, native composition/form preview/reset, RTL and Exhibit pass. Studio
+no longer overrides Commission's measure or either profile's grid-gap token.
+Evidence: `docs/reports/2026-09-12-workshop-commission-checkpoint.md`. Both
+generated targets updated, pilot maturity retained and owned resources closed.
+Continue Ceramics Glossary, Studio Tour and Care FAQ.

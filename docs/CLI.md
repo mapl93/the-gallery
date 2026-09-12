@@ -20,6 +20,18 @@ in their listed order. Load `scripts/the-gallery/runtime.js` with
 overrides in a separate stylesheet after tokens; this makes upstream token
 updates easier to review. Direct edits are still supported and protected.
 
+Font-family tokens declare a preference; they do not download fonts. The host
+application must load its chosen fonts and required weights/styles. The Gallery
+site loads Inter for the interface, Lora (normal and italic, weights 400–700)
+for editorial content, and JetBrains Mono for code. The CLI copies no font files
+or remote font stylesheet. An application retaining Lora can use its own font
+assets or an explicit [Google Fonts CSS request](https://developers.google.com/fonts/docs/css2),
+as shown in `site/index.html`. Verify the rendered face after fonts load and
+with the request unavailable: the serif token retains Georgia, Times New Roman
+and the generic serif fallback. Changing the token to another family also
+requires arranging that family's delivery. Existing consumer copies are not
+updated by the docs site's loader change.
+
 Commit `tg.config.json`, `tg.install.json` and your copied files together in your
 project. The install record stores the upstream hash, source path and package
 version for each file. Keep it when editing a copied file: changing the record

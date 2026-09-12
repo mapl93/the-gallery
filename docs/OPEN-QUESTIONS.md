@@ -2111,11 +2111,10 @@ The owner selected A: existing H2 size/leading below the current 40rem component
 threshold and Display above. Family, weight, tracking and heading semantics
 remain unchanged. Contract/Studio expose both pairs; 130 browser samples pass.
 
-### Editorial font identity versus delivered fallback (2026-09-12)
+### Editorial font identity versus delivered fallback (resolved 2026-09-12)
 
-Lora is first in the canonical serif role, but Studio renders Georgia because
-Lora is not loaded. Confirmed with actual platform-font glyph evidence. Owner
-choice pending: fulfill the declared Lora through target font loading, or
-formalize the current system serif fallback. The same-metrics comparison and
-acceptance are in `docs/reports/2026-09-12-editorial-font-delivery-decision.md`.
-No font preference or loader change has been applied.
+The owner selected A: load Lora to fulfill the canonical editorial family.
+ADR 0381 adds Web host loading and documents consumer-owned font delivery.
+Actual Lora glyphs, compact/wide metrics, normal/italic weights, brand override,
+Exhibit parity and blocked-request fallback pass the checkpoint samples. The
+native Shopify font picker and loader remain; hosted verification is separate.

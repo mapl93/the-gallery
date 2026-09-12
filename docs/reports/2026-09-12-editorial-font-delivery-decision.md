@@ -2,7 +2,9 @@
 
 Date: 2026-09-12. Source head: `172a474`.
 
-Status: owner choice pending. This diagnostic changes no canonical token,
+Status: resolved — the owner selected A (load Lora). See ADR 0381 and the
+editorial-font-delivery checkpoint report for implementation evidence.
+This original diagnostic changes no canonical token,
 component, font loader, Shopify setting, package model or installed font.
 
 ## Finding: confirmed declaration/delivery mismatch

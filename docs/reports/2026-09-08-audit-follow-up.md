@@ -563,3 +563,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   sus valores iniciales en 50 casos; lectura automática, anclas nativas,
   densidades, RTL y personalización pasan. El porcentaje sigue siendo estado,
   no un token. Salidas generadas sin despliegue; recursos cerrados.
+
+- ADR 0378 expone 13 roles en Filter Bar y Blog Sidebar. 30 casos conservan
+  valores salvo el gap de legend recuperado (4px del token compartido). Estados
+  nativos, historial de filtros, anclas, RTL y personalización pasan; sin
+  despliegue ni recursos de prueba abiertos.

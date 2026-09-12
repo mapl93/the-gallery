@@ -856,3 +856,10 @@ Reading Progress, TOC and the remaining editorial catalogue; live Shopify is sep
 fragment navigation, installed controlled runtime, Studio automatic reading,
 independent controls/reset, narrow RTL and Exhibit pass. Private reading state
 and target sticky integration remain separate. Continue remaining Blog values.
+
+## Filter Bar / Blog Sidebar visual values (ADR 0378)
+
+13 roles, inventories 17/26; 30 browser cases pass with the existing 4px field
+legend gap now real in Multiple mode. Native choices, query/Back, separate
+spacing/borders, narrow RTL and Studio/Exhibit pass. Continue Share Actions,
+Related Articles and Comments; target integration remains separate.

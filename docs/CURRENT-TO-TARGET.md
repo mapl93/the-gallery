@@ -758,3 +758,11 @@ local Add status, Studio/reset and Exhibit pass. Evidence:
 `docs/reports/2026-09-12-shipping-upsell-checkpoint.md`. Both targets generated,
 resources closed, pilot retained. Continue Quick View and Sticky ATC; Cart Empty
 owns structural composition only and continues to delegate values to Empty State.
+
+## Quick View / Sticky visual values (ADR 0367)
+
+Eleven roles expose 9/20 public values. 376 initial comparisons, custom measure,
+track share, independent gaps, RTL, reduced motion, modal close/reopen, external
+form submission and hidden inertness pass. Evidence:
+`docs/reports/2026-09-12-quick-sticky-checkpoint.md`. Both targets generated,
+resources closed, pilot retained. Continue Cart Note and Gift Wrap.

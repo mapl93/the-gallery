@@ -487,3 +487,8 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   136 comparaciones preservan defaults; controles, RTL, omisión, semántica
   básica de Progress y acción local pasan. Recursos cerrados, sin entrega de
   elegibilidad o motor de recomendaciones Shopify. Continúan Quick View y Sticky ATC.
+
+- ADR 0367 expone Quick View/Sticky ATC: once roles nuevos y 9/20 valores
+  públicos. 376 comparaciones preservan defaults; ancho, proporción, espaciados,
+  modal, formulario asociado e inertness básica pasan. Recursos cerrados.
+  La seguridad de la barra en el target real sigue pendiente. Continúan Note/Gift Wrap.

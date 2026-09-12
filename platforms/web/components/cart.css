@@ -463,9 +463,9 @@
 
 /* ── K8. QUICK VIEW (MODAL) ── */
 .quick-view {
-  --_quick-view-gap: var(--space-layout-element-gap);
+  --_quick-view-gap: calc(var(--space-layout-element-gap) * var(--ratio-quick-view-gap));
   container: quick-view / inline-size;
-  max-inline-size: 52rem;
+  max-inline-size: var(--space-quick-view-max-width);
 }
 .quick-view-overlay { overscroll-behavior: contain; }
 .quick-view .modal__header,
@@ -479,14 +479,17 @@
   gap: var(--_quick-view-gap);
 }
 @container quick-view (min-width: 42rem) {
-  .quick-view__layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quick-view__layout {
+    --_quick-view-gallery-track: calc((100% - var(--_quick-view-gap)) * clamp(0, var(--ratio-quick-view-gallery-share), 1));
+    grid-template-columns: minmax(0, var(--_quick-view-gallery-track)) minmax(0, 1fr);
+  }
 }
 .quick-view__gallery,
 .quick-view__info { min-inline-size: 0; }
 .quick-view__info {
   display: grid;
   align-content: start;
-  gap: calc(var(--_quick-view-gap) * 0.75);
+  gap: calc(var(--_quick-view-gap) * var(--ratio-quick-view-info-gap));
 }
 .quick-view__vendor,
 .quick-view__description {
@@ -506,16 +509,16 @@
 
 /* ── K9. STICKY ATC BAR ── */
 .sticky-atc {
-  --_sticky-gap: calc(var(--space-layout-element-gap) * 0.75);
+  --_sticky-gap: calc(var(--space-layout-element-gap) * var(--ratio-sticky-atc-inner-gap));
   position: fixed;
   inset-block-end: 0;
   inset-inline: 0;
   z-index: var(--z-sticky);
   container: sticky-atc / inline-size;
   background: var(--color-surface-primary);
-  border-block-start: 1px solid var(--color-border-subtle);
+  border-block-start: var(--border-sticky-atc-width) solid var(--color-border-subtle);
   box-shadow: var(--shadow-lg);
-  padding: calc(var(--space-layout-element-gap) * 0.5) var(--space-layout-element-gap);
+  padding: calc(var(--space-layout-element-gap) * var(--ratio-sticky-atc-block-padding)) calc(var(--space-layout-element-gap) * var(--ratio-sticky-atc-inline-padding));
   transform: translateY(100%);
   transition: transform var(--transition-base) var(--easing-out);
 }
@@ -537,13 +540,13 @@
 .sticky-atc__info {
   display: flex;
   align-items: center;
-  gap: var(--_sticky-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--ratio-sticky-atc-info-gap));
   min-inline-size: 0;
 }
 .sticky-atc__image {
-  flex: 0 0 var(--space-layout-touch-target);
-  inline-size: var(--space-layout-touch-target);
-  block-size: var(--space-layout-touch-target);
+  flex: 0 0 var(--space-sticky-atc-media-size);
+  inline-size: var(--space-sticky-atc-media-size);
+  block-size: var(--space-sticky-atc-media-size);
   object-fit: cover;
   border-radius: var(--radius-sm);
 }
@@ -551,7 +554,7 @@
   flex: 1 1 auto;
   min-inline-size: 0;
   color: var(--color-text-primary);
-  font: var(--tg-font-weight-semibold) var(--typo-body-size) / var(--typo-body-line-height) var(--font-family-body);
+  font: var(--typo-sticky-atc-title-weight) var(--typo-body-size) / var(--typo-body-line-height) var(--font-family-body);
   overflow-wrap: anywhere;
 }
 .sticky-atc__price {

@@ -33,3 +33,10 @@ test('Storytelling selected filter border and text cannot hide behind its surfac
   assert.match(staticSwatchBindingError('StorytellingStudio', 'token-swatch', ['--bg', '--border', '--text'], 'color'), /first swatch token/);
   assert.equal(staticSwatchBindingError('StorytellingStudio', 'token-swatch', ['--border'], 'color'), null);
 });
+
+test('Pages, Reviews and Cart static swatches expose each role', () => {
+  for (const renderer of ['PagesStudio', 'ReviewsStudio', 'CartStudio']) {
+    assert.match(staticSwatchBindingError(renderer, 'token-swatch', ['--primary', '--secondary'], 'color'), /first swatch token/);
+    assert.equal(staticSwatchBindingError(renderer, 'token-swatch', ['--primary'], 'color'), null);
+  }
+});

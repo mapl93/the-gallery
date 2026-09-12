@@ -841,3 +841,11 @@ Owner option A is implemented: compact H2 metrics and wide Display metrics at
 the existing 40rem component threshold. Public inventory 42, no new source
 roles/modes. 130 browser samples plus inherited overrides, RTL, Studio/reset
 and Exhibit pass. Continue Article Body and remaining editorial coverage.
+
+## Prose / Article Body visual values (ADR 0376)
+
+42 roles, 80 public values; existing foundational composition now traced by
+validation. 20 browser cases preserve typography/radii while repairing flow,
+quote/callout priority and authored list markers. Token inheritance, canonical
+islands, local overflow/keyboard, narrow RTL and Studio/Exhibit pass. Continue
+Reading Progress, TOC and the remaining editorial catalogue; live Shopify is separate.

@@ -4102,3 +4102,13 @@ through source tokens and shared Studio/Exhibit controls. Password visibility
 keeps the same native field; Number Input keeps native stepping and empty edits;
 Inline Error keeps announcement separate from appearance. Their MDX references
 record shared roles, contrast derivations and geometry constraints.
+
+### Prose visual customization
+
+Foundations owns `.prose`; Article Body remains its explicit consumer (ADRs
+0269/0376). Public `--*-prose-*` values work on standalone prose; Article Body's
+contract/Studio/Exhibit expose them alongside `--*-article-body-*` extensions.
+Spacing factors use shared stack roles, and native ul/ol retain markers.
+Keep canonical child components in `.prose-excluded`; CSS cannot sanitize CMS
+content or infer heading ranks. The composition validator follows required
+`.prose` anatomy into its bounded source rather than duplicating that CSS.

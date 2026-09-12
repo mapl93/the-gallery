@@ -552,3 +552,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
 - ADR 0375 aplica A: H2 en contenedores estrechos y Display desde 40rem.
   130 casos pasan; herencia, RTL, edición/reset y Exhibit verificados. No se
   añaden tokens ni modos. Web/Shopify regenerados, sin despliegue ni promoción.
+
+- ADR 0376 incorpora 42 roles y 80 valores públicos en Prose/Article Body.
+  Corrige márgenes anulados, prioridad de citas/avisos y listas sin marcadores;
+  conserva tipografía, radios y el espacio actual de atribución. 20 casos,
+  controles, aislamiento de Product Card y teclado pasan. El validador traza
+  Foundations sin duplicar Prose. Sin despliegue; recursos cerrados.

@@ -68,6 +68,11 @@ The owner selected direction L3-B.
 
 ## Not Approved
 
+The visual-control restriction below is superseded by ADR 0376 under the
+owner's later broad token-customization requirement (ADR 0293). Ownership,
+semantics and the other boundaries remain.
+
+
 This decision does not approve:
 
 - a separate Prose registry component or a second `.prose` implementation;

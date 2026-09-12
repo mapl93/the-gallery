@@ -2104,3 +2104,11 @@ The owner chose A: 440px useful form width with outer spacing additional.
 Auth and Password Reset now expose useful maximum and independent padding/gap
 controls. Studio consumes the same source; narrow embeddings choose appropriate
 padding through tokens. See `docs/decisions/0369-account-form-useful-measure-and-visual-values.md`.
+
+### Article Hero typography in narrow containers (2026-09-12)
+
+At desktop viewport, a 300px Hero uses 64/72px Display metrics and breaks words.
+Owner choice pending: A uses existing H2 size/leading below the component's
+40rem layout threshold and retains Display above it; B keeps Display throughout.
+Font family/weight remain unchanged in both. Concrete comparison and acceptance:
+`docs/reports/2026-09-12-article-hero-type-decision.md`.

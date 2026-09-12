@@ -834,3 +834,12 @@ cover all variants and no-media fallbacks; inherited values, forced colors,
 Studio media omission/reset and Exhibit pass. Image-content/text-outer measures
 have distinct names without default changes. Narrow desktop embeddings still
 use viewport Display typography; geometry alone is not editorial readability.
+
+## Article Hero narrow typography: owner decision
+
+The next visual decision is measured, not implemented: at 300px inside desktop,
+current 64/72px Display type breaks words. A proposes existing H2 metrics below
+the current 40rem component threshold, preserving Display for wider Heroes;
+B keeps current behavior. See `docs/reports/2026-09-12-article-hero-type-decision.md`.
+The six completed implementation checkpoints remain pushed; 11 components,
+114 source roles and 3908 default element comparisons in this continuation.

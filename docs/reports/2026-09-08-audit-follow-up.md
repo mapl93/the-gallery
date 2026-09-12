@@ -542,3 +542,9 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   nombres distintos. En un contenedor estrecho de escritorio la tipografía
   Display todavía puede partir palabras; no se certifica legibilidad solo
   porque la caja no desborde. Sin despliegue; recursos cerrados.
+
+- Decisión pendiente posterior: Article Hero en contenedor de 300px mantiene
+  Display 64/72px y parte palabras. Comparación A/B preparada: A usa H2 38/46px
+  en ese ancho y conserva Display cuando hay espacio; B mantiene lo actual.
+  Fuente y peso no cambian. No se aplicó el cambio estético. Detalle y evidencia:
+  `docs/reports/2026-09-12-article-hero-type-decision.md`.

@@ -17,20 +17,20 @@ Neutral Web copy-and-own outputs
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Complete neutral component CSS compatibility bundle | — | 603870 | 81098 | None | observed |
+| Complete neutral component CSS compatibility bundle | — | 605060 | 81253 | None | observed |
 | Complete progressive-enhancement compatibility runtime | — | 123453 | 24470 | None | observed |
-| Neutral web token target | — | 651462 | 79446 | None | observed |
+| Neutral web token target | — | 662238 | 80786 | None | observed |
 | Selective runtime loader | — | 2498 | 770 | None | observed |
 | Shared modular runtime core | — | 1678 | 707 | None | observed |
 | Largest individual progressive-enhancement module | date-picker | 14351 | 3381 | None | observed |
 | Largest dependency-closed Primitives install slice | select | 123825 | 20073 | None | observed |
 | Largest dependency-closed Layout install slice | modal | 165836 | 23737 | None | observed |
 | Largest dependency-closed Forms install slice | date-picker | 218970 | 31002 | None | observed |
-| Largest dependency-closed Global install slice | announcement-bar | 243100 | 37854 | None | observed |
+| Largest dependency-closed Global install slice | announcement-bar | 244290 | 38012 | None | observed |
 | Largest dependency-closed Product install slice | size-chart | 297330 | 39382 | None | observed |
 | Largest dependency-closed Collection install slice | collection-grid | 219473 | 31093 | None | observed |
 | Largest dependency-closed Storytelling install slice | artist-card | 202432 | 28201 | None | observed |
-| Largest dependency-closed Marketing install slice | announcement-extended | 243100 | 37854 | None | observed |
+| Largest dependency-closed Marketing install slice | announcement-extended | 244290 | 38012 | None | observed |
 | Largest dependency-closed Cart install slice | quick-view | 245222 | 35959 | None | observed |
 | Largest dependency-closed Account install slice | address-form | 235313 | 33000 | None | observed |
 | Largest dependency-closed Blog install slice | article-body | 242445 | 34444 | None | observed |
@@ -49,8 +49,8 @@ Shopify Online Store theme; not a theme app extension or Theme Store submission
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Shopify theme token asset | — | 651622 | 79492 | None | observed |
-| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 651622 | 79492 | 100000 rawBytes; advisory | advisory-overage |
+| Shopify theme token asset | — | 662398 | 80833 | None | observed |
+| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 662398 | 80833 | 100000 rawBytes; advisory | advisory-overage |
 | Largest Shopify local JS asset (inventory, including compatibility files) | theme.js | 123453 | 24470 | 10000 rawBytes; advisory | advisory-overage |
 
 Unverified by this report:
@@ -72,7 +72,7 @@ Upstream main inspected on checkedOn; configurable and disabled by default for t
 
 Assets above this reference:
 
-- `platforms/shopify/assets/tokens.css`: 651622 raw bytes, 79492 gzip bytes.
+- `platforms/shopify/assets/tokens.css`: 662398 raw bytes, 80833 gzip bytes.
 
 ### shopify-js-asset-maximum
 

@@ -127,6 +127,14 @@ register({
     return `expose({ enhanceFilterPanels, destroyFilterPanels });
 register({ id: 'filter-panel', enhance: enhanceFilterPanels, cleanup: cleanupFilterPanels });`;
   }
+  if (id === 'firing-schedule-axes') {
+    return `expose({ enhanceFiringSchedules, destroyFiringSchedules });
+register({
+  id: 'firing-schedule-axes',
+  enhance: enhanceFiringSchedules,
+  cleanup: cleanupFiringSchedules,
+});`;
+  }
   throw new Error(`runtime module ${id}: unknown bootstrap`);
 }
 

@@ -694,5 +694,10 @@ Eighteen roles expand the profile to 39 public values. 536 installed-consumer
 comparisons preserve defaults; spacing, strokes, dashes, minima, focus, native
 series/unit switching, missing-observation fallback and Exhibit pass. Evidence:
 `docs/reports/2026-09-12-firing-schedule-checkpoint.md`. Both target outputs
-updated, pilot retained and resources closed. Axis text scaling remains a
-separate owner choice; current behavior is preserved pending that answer.
+updated, pilot retained and resources closed. ADR 0360 resolves the axis choice:
+the owner selected constant token-defined type. The shared enhancer compensates
+SVG scale and measures label space with one additional public axis-gap role
+(40 values). Installed-consumer resizing, token changes, settling, native
+fallback, shadow lifecycle and Studio pass. Evidence:
+`docs/reports/2026-09-12-firing-axis-type-checkpoint.md`. Resources closed;
+Shopify schedule records/schema remain pending. Continue Workshop Listing.

@@ -17,10 +17,10 @@ Neutral Web copy-and-own outputs
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Complete neutral component CSS compatibility bundle | — | 586723 | 78845 | None | observed |
-| Complete progressive-enhancement compatibility runtime | — | 118114 | 22912 | None | observed |
-| Neutral web token target | — | 491659 | 60262 | None | observed |
-| Selective runtime loader | — | 2399 | 747 | None | observed |
+| Complete neutral component CSS compatibility bundle | — | 586867 | 78889 | None | observed |
+| Complete progressive-enhancement compatibility runtime | — | 123453 | 24470 | None | observed |
+| Neutral web token target | — | 492134 | 60322 | None | observed |
+| Selective runtime loader | — | 2498 | 770 | None | observed |
 | Shared modular runtime core | — | 1678 | 707 | None | observed |
 | Largest individual progressive-enhancement module | date-picker | 14351 | 3381 | None | observed |
 | Largest dependency-closed Primitives install slice | select | 122855 | 19940 | None | observed |
@@ -35,7 +35,7 @@ Neutral Web copy-and-own outputs
 | Largest dependency-closed Account install slice | address-form | 230616 | 32488 | None | observed |
 | Largest dependency-closed Blog install slice | article-body | 235730 | 33707 | None | observed |
 | Largest dependency-closed Sections install slice | featured-collection | 259648 | 36714 | None | observed |
-| Largest dependency-closed Ceramics install slice | commission-form | 248688 | 34111 | None | observed |
+| Largest dependency-closed Ceramics install slice | commission-form | 248832 | 34157 | None | observed |
 | Largest dependency-closed Reviews install slice | review-form | 238457 | 33883 | None | observed |
 | Largest dependency-closed Pages install slice | page-404 | 127436 | 19018 | None | observed |
 
@@ -49,9 +49,9 @@ Shopify Online Store theme; not a theme app extension or Theme Store submission
 
 | Surface | Largest component/asset | Raw bytes | Gzip bytes | Target rule | Result |
 | --- | --- | ---: | ---: | --- | --- |
-| Shopify theme token asset | — | 491819 | 60306 | None | observed |
-| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 491819 | 60306 | 100000 rawBytes; advisory | advisory-overage |
-| Largest Shopify local JS asset (inventory, including compatibility files) | theme.js | 118114 | 22912 | 10000 rawBytes; advisory | advisory-overage |
+| Shopify theme token asset | — | 492294 | 60369 | None | observed |
+| Largest Shopify local CSS asset (inventory, including compatibility files) | tokens.css | 492294 | 60369 | 100000 rawBytes; advisory | advisory-overage |
+| Largest Shopify local JS asset (inventory, including compatibility files) | theme.js | 123453 | 24470 | 10000 rawBytes; advisory | advisory-overage |
 
 Unverified by this report:
 
@@ -72,7 +72,7 @@ Upstream main inspected on checkedOn; configurable and disabled by default for t
 
 Assets above this reference:
 
-- `platforms/shopify/assets/tokens.css`: 491819 raw bytes, 60306 gzip bytes.
+- `platforms/shopify/assets/tokens.css`: 492294 raw bytes, 60369 gzip bytes.
 
 ### shopify-js-asset-maximum
 
@@ -88,7 +88,7 @@ Upstream main inspected on checkedOn; configurable and disabled by default for t
 
 Assets above this reference:
 
-- `platforms/shopify/assets/theme.js`: 118114 raw bytes, 22912 gzip bytes.
+- `platforms/shopify/assets/theme.js`: 123453 raw bytes, 24470 gzip bytes.
 - `platforms/shopify/assets/tg-runtime-date-picker.js`: 14362 raw bytes, 3389 gzip bytes.
 - `platforms/shopify/assets/tg-runtime-product-gallery.js`: 13332 raw bytes, 3028 gzip bytes.
 - `platforms/shopify/assets/tg-runtime-carousel-rotation.js`: 12679 raw bytes, 3308 gzip bytes.

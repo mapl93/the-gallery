@@ -2086,10 +2086,8 @@ The owner chose full available width for steps without media. Only media steps
 split and alternate; their existing text-share token and semantic source order
 remain intact. No additional mode, property or token is needed for child presence.
 
-### Firing Schedule axis typography (ADR 0359)
+### Firing Schedule axis typography resolved (ADR 0360)
 
-Should the SVG axes retain the on-screen size defined by the typography token,
-or continue scaling with the chart? Local measurements show a 12px caption
-projecting to nominal 10.3664/18.0996px at tested viewport widths 720/1200.
-Both are possible design choices. Current scaling is preserved while awaiting
-the owner; a fixed-size option needs implementation and layout validation.
+The owner chose option A: keep axis text at its token-defined size. The shared
+enhancer compensates SVG scaling and reserves space for measured labels using
+the public axis gap. Native chart/table fallback remains available without JS.

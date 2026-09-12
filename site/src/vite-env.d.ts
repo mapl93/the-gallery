@@ -21,6 +21,8 @@ interface Window {
     enhanceReadingProgress: (root?: ParentNode) => void;
     enhanceFileUploads: (root?: ParentNode) => void;
     enhanceFilterPanels: (root?: ParentNode) => void;
+    enhanceFiringSchedules: (root?: ParentNode) => void;
+    destroyFiringSchedules: (root?: ParentNode) => void;
     destroyFilterPanels: (root?: ParentNode) => void;
   };
 }

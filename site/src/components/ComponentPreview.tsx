@@ -552,6 +552,7 @@ export default function ComponentPreview({
     window.TheGallery?.enhanceMarquees(rootEl);
     window.TheGallery?.enhanceFileUploads(rootEl);
     window.TheGallery?.enhanceFilterPanels(rootEl);
+    window.TheGallery?.enhanceFiringSchedules(rootEl);
 
     const currentInteraction = getDomInteraction(rootEl) ?? interaction;
     resolvedInteractionRef.current = currentInteraction;
@@ -660,6 +661,7 @@ export default function ComponentPreview({
 
     return () => {
       window.TheGallery?.destroyFilterPanels(rootEl);
+      window.TheGallery?.destroyFiringSchedules(rootEl);
       triggerEls.forEach((el) => el.removeEventListener('click', handleTriggerClick));
       closeEls.forEach((el) => el.removeEventListener('click', handleCloseClick));
       rootEl.removeEventListener('click', handlePreviewClick);

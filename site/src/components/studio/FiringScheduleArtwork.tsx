@@ -1,4 +1,4 @@
-import type { ElementType } from 'react';
+import { useLayoutEffect, useRef, type ElementType } from 'react';
 import {
   convertFiringRate,
   convertFiringTemperature,
@@ -175,6 +175,15 @@ export default function FiringScheduleArtwork({
     actualSummaries,
   });
 
+  const plotRef = useRef<SVGSVGElement>(null);
+  const available = Boolean(rootId && model);
+  useLayoutEffect(() => {
+    const plot = plotRef.current;
+    if (!plot) return;
+    window.TheGallery?.enhanceFiringSchedules(plot);
+    return () => window.TheGallery?.destroyFiringSchedules(plot);
+  }, [available]);
+
   if (!rootId || !model) return null;
 
   const hasActual = model.actualPoints.length > 0;
@@ -229,6 +238,7 @@ export default function FiringScheduleArtwork({
       <figure className="firing-schedule__chart">
         <div className="firing-schedule__chart-scroll" tabIndex={0} aria-label="Firing schedule chart scroll area">
           <svg
+            ref={plotRef}
             className="firing-schedule__plot"
             viewBox={`0 0 ${geometry.width} ${geometry.height}`}
             role="img"

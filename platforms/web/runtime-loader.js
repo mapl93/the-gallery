@@ -109,6 +109,12 @@ const modules = [
     "selectors": [
       "[data-filter-panel]"
     ]
+  },
+  {
+    "id": "firing-schedule-axes",
+    "selectors": [
+      ".firing-schedule__plot"
+    ]
   }
 ];
 const pending = new Map();

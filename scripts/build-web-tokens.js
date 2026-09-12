@@ -1023,6 +1023,7 @@ function publicAliasDeclarations() {
     '--space-firing-planned-dash: var(--tg-component-firing-schedule-planned-dash-length);',
     '--space-firing-planned-dash-gap: var(--tg-component-firing-schedule-planned-dash-gap);',
     '--radius-firing-actual-point: var(--tg-component-firing-schedule-actual-point-radius);',
+    '--space-firing-axis-label-gap: var(--tg-component-firing-schedule-axis-label-gap);',
     '--space-tag-padding-x: var(--tg-component-tag-padding-x);',
     '--space-tag-padding-y: var(--tg-component-tag-padding-y);',
     '--space-tag-gap: var(--tg-component-tag-gap);',

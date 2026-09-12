@@ -30,6 +30,7 @@ regenerated, with explicit copy-and-own adoption and pilot maturity retained.
 Axis text currently scales with the SVG. Whether it should instead retain the
 token's on-screen size is a separate pending owner choice; this checkpoint
 preserves the baseline and does not claim to resolve that typography decision.
+Follow-up: ADR 0360 records the owner's option A and its verified implementation.
 
 ## Evidence
 

@@ -198,7 +198,7 @@ function MarketingMedia({
 
   return (
     <img
-      className={`${className} docs-studio__marketing-media docs-studio__marketing-media--${kind}`}
+      className={className}
       src={source}
       alt={alt}
     />

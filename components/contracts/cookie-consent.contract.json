@@ -1,13 +1,18 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.1",
+  "contractVersion": "0.3.2",
   "slug": "cookie-consent",
   "name": "Consent Manager",
   "registryId": "G9",
   "category": "marketing",
   "status": "pilot",
   "summary": "Controlled consent-decision composition with an in-flow first layer, explicit accept/reject/customize requests, canonical Modal preferences, and target-owned policy, state, persistence, processing, provider, and audit behavior.",
-  "dependencies": ["button", "link", "modal", "checkbox"],
+  "dependencies": [
+    "button",
+    "link",
+    "modal",
+    "checkbox"
+  ],
   "source": {
     "registry": "registry.json#/components/cookie-consent",
     "css": {
@@ -128,50 +133,95 @@
   "states": [
     {
       "name": "closed",
-      "selectors": [".consent-manager[hidden]"],
+      "selectors": [
+        ".consent-manager[hidden]"
+      ],
       "description": "Authoritative target state omits or natively hides both the first layer and preferences from interaction."
     },
     {
       "name": "open",
-      "selectors": [".consent-manager"],
+      "selectors": [
+        ".consent-manager"
+      ],
       "description": "Valid named first layer is present in normal document flow."
     },
     {
       "name": "busy",
-      "selectors": [".consent-manager[aria-busy=\"true\"]"],
+      "selectors": [
+        ".consent-manager[aria-busy=\"true\"]"
+      ],
       "description": "Target mutation is pending; request actions are unavailable and target feedback may explain progress."
     },
     {
       "name": "preferencesOpen",
-      "selectors": [".consent-manager__preferences.modal"],
+      "selectors": [
+        ".consent-manager__preferences.modal"
+      ],
       "description": "Canonical Modal is open with target-owned current category values."
     }
   ],
   "behavior": [
     {
       "name": "controlledVisibility",
-      "selectors": [".consent-manager", ".consent-manager__preferences.modal"],
-      "attributes": ["hidden", "aria-busy", "aria-hidden"],
+      "selectors": [
+        ".consent-manager",
+        ".consent-manager__preferences.modal"
+      ],
+      "attributes": [
+        "hidden",
+        "aria-busy",
+        "aria-hidden"
+      ],
       "description": "Open, preferences-open, and busy state are controlled target projections. Closed content is omitted or natively hidden, never translated offscreen."
     },
     {
       "name": "explicitDecisionRequests",
-      "selectors": [".consent-manager__action--accept", ".consent-manager__action--reject", ".consent-manager__action--customize"],
-      "elements": ["button"],
-      "attributes": ["type=\"button\"", "disabled"],
-      "events": ["accept request", "reject request", "customize request"],
+      "selectors": [
+        ".consent-manager__action--accept",
+        ".consent-manager__action--reject",
+        ".consent-manager__action--customize"
+      ],
+      "elements": [
+        "button"
+      ],
+      "attributes": [
+        "type=\"button\"",
+        "disabled"
+      ],
+      "events": [
+        "accept request",
+        "reject request",
+        "customize request"
+      ],
       "description": "Three explicit native Button activations request target action. No dismissal, inactivity, scrolling, or page continuation is interpreted as consent."
     },
     {
       "name": "preferenceComposition",
-      "selectors": [".consent-manager__preferences.modal", ".consent-manager__preferences-list", ".consent-manager__save"],
-      "events": ["open", "Tab", "Shift+Tab", "Escape", "close", "save request", "restore focus"],
+      "selectors": [
+        ".consent-manager__preferences.modal",
+        ".consent-manager__preferences-list",
+        ".consent-manager__save"
+      ],
+      "events": [
+        "open",
+        "Tab",
+        "Shift+Tab",
+        "Escape",
+        "close",
+        "save request",
+        "restore focus"
+      ],
       "description": "Detailed preferences consume canonical Modal and canonical choice controls. Modal owns its complete focus/dismissal lifecycle; the target owns supplied categories, values, validation, save, and results."
     },
     {
       "name": "providerBoundary",
-      "selectors": [".consent-manager"],
-      "events": ["target reconciliation", "target reopen or withdrawal"],
+      "selectors": [
+        ".consent-manager"
+      ],
+      "events": [
+        "target reconciliation",
+        "target reopen or withdrawal"
+      ],
       "description": "The neutral component performs no jurisdiction lookup, cookie/storage access, resource blocking, provider call, persistence, analytics, or compliance claim."
     }
   ],
@@ -181,56 +231,117 @@
       "type": "string",
       "required": true,
       "description": "Visible localized first-layer title and accessible name.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__title" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__title"
+          }
+        ]
+      }
     },
     {
       "name": "description",
       "type": "string",
       "required": true,
       "description": "Target-approved localized decision explanation.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__description" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__description"
+          }
+        ]
+      }
     },
     {
       "name": "policyLabel",
       "type": "string",
       "required": true,
       "description": "Localized visible label for the canonical policy Link.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__policy" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__policy"
+          }
+        ]
+      }
     },
     {
       "name": "policyHref",
       "type": "string",
       "required": true,
       "description": "Real target-owned policy destination; placeholder-only links are invalid.",
-      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager__policy", "attribute": "href", "valueFrom": "property", "elements": ["a"] }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager__policy",
+            "attribute": "href",
+            "valueFrom": "property",
+            "elements": [
+              "a"
+            ]
+          }
+        ]
+      }
     },
     {
       "name": "acceptLabel",
       "type": "string",
       "required": true,
       "description": "Localized label for the explicit accept request.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__action--accept" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__action--accept"
+          }
+        ]
+      }
     },
     {
       "name": "rejectLabel",
       "type": "string",
       "required": true,
       "description": "Localized label for the explicit reject request.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__action--reject" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__action--reject"
+          }
+        ]
+      }
     },
     {
       "name": "customizeLabel",
       "type": "string",
       "required": true,
       "description": "Localized label for the preferences Modal trigger.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__action--customize" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__action--customize"
+          }
+        ]
+      }
     },
     {
       "name": "preferencesTitle",
       "type": "string",
       "required": true,
       "description": "Visible localized title and accessible name for the canonical preferences Modal.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__preferences .modal__title" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__preferences .modal__title"
+          }
+        ]
+      }
     },
     {
       "name": "preferencesDescription",
@@ -238,35 +349,81 @@
       "required": false,
       "unsetBehavior": "Omit the introductory paragraph; category labels and descriptions remain target-owned.",
       "description": "Optional localized introduction above the target category controls.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__preferences-description" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__preferences-description"
+          }
+        ]
+      }
     },
     {
       "name": "preferences",
       "type": "slot",
       "required": true,
       "description": "Target-supplied current categories and values composed from canonical choice controls.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".consent-manager__preferences-list", "classNames": [".consent-manager__preferences-list"] }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".consent-manager__preferences-list",
+            "classNames": [
+              ".consent-manager__preferences-list"
+            ]
+          }
+        ]
+      }
     },
     {
       "name": "closePreferencesLabel",
       "type": "string",
       "required": true,
       "description": "Contextual accessible label for the canonical Close Button.",
-      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager__preferences .modal__close", "attribute": "aria-label", "valueFrom": "property", "elements": ["button"] }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager__preferences .modal__close",
+            "attribute": "aria-label",
+            "valueFrom": "property",
+            "elements": [
+              "button"
+            ]
+          }
+        ]
+      }
     },
     {
       "name": "saveLabel",
       "type": "string",
       "required": true,
       "description": "Localized label for the explicit save-preferences request.",
-      "targetMappings": { "web": [{ "kind": "content", "selector": ".consent-manager__save" }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".consent-manager__save"
+          }
+        ]
+      }
     },
     {
       "name": "feedback",
       "type": "slot",
       "required": false,
       "description": "Optional target-owned pending, result, error, or retry composition; its semantics and copy depend on the actual result.",
-      "targetMappings": { "web": [{ "kind": "slot", "selector": ".consent-manager__feedback", "classNames": [".consent-manager__feedback"] }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".consent-manager__feedback",
+            "classNames": [
+              ".consent-manager__feedback"
+            ]
+          }
+        ]
+      }
     },
     {
       "name": "open",
@@ -274,7 +431,19 @@
       "required": false,
       "defaultValue": false,
       "description": "Controls whether the valid first layer and any preferences surface are present; the target derives this from authoritative policy/provider state.",
-      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager", "attribute": "hidden", "values": { "true": null, "false": "" } }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager",
+            "attribute": "hidden",
+            "values": {
+              "true": null,
+              "false": ""
+            }
+          }
+        ]
+      }
     },
     {
       "name": "preferencesOpen",
@@ -282,7 +451,19 @@
       "required": false,
       "defaultValue": false,
       "description": "Controls the canonical preferences Modal; customize and close actions emit requests for the target to reconcile.",
-      "targetMappings": { "web": [{ "kind": "attribute", "selector": ".consent-manager__preferences.modal", "attribute": "aria-hidden", "values": { "true": "false", "false": "true" } }] }
+      "targetMappings": {
+        "web": [
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager__preferences.modal",
+            "attribute": "aria-hidden",
+            "values": {
+              "true": "false",
+              "false": "true"
+            }
+          }
+        ]
+      }
     },
     {
       "name": "busy",
@@ -292,19 +473,86 @@
       "description": "Projects a target-owned pending mutation and disables further decision/save requests without inventing a result model.",
       "targetMappings": {
         "web": [
-          { "kind": "attribute", "selector": ".consent-manager", "attribute": "aria-busy", "values": { "true": "true", "false": null } },
-          { "kind": "attribute", "selector": ".consent-manager__action", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] },
-          { "kind": "attribute", "selector": ".consent-manager__save", "attribute": "disabled", "values": { "true": "", "false": null }, "elements": ["button"] }
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager",
+            "attribute": "aria-busy",
+            "values": {
+              "true": "true",
+              "false": null
+            }
+          },
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager__action",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "button"
+            ]
+          },
+          {
+            "kind": "attribute",
+            "selector": ".consent-manager__save",
+            "attribute": "disabled",
+            "values": {
+              "true": "",
+              "false": null
+            },
+            "elements": [
+              "button"
+            ]
+          }
         ]
       }
     }
   ],
   "tokens": {
     "public": {
-      "color": ["--color-surface-primary", "--color-border-subtle", "--color-text-primary", "--color-text-secondary"],
-      "radius": ["--radius-lg"],
-      "spacing": ["--space-layout-element-gap", "--space-input-icon-size", "--space-input-icon-gap"],
-      "typography": ["--font-family-body", "--font-family-heading", "--tg-typography-h3-weight", "--typo-h3-size", "--typo-h3-line-height", "--typo-body-size", "--typo-body-line-height", "--typo-caption-size", "--typo-caption-line-height"]
+      "color": [
+        "--color-surface-primary",
+        "--color-border-subtle",
+        "--color-text-primary",
+        "--color-text-secondary"
+      ],
+      "radius": [
+        "--radius-lg"
+      ],
+      "spacing": [
+        "--space-layout-element-gap",
+        "--space-input-icon-size",
+        "--space-input-icon-gap",
+        "--scale-consent-main-gap",
+        "--scale-consent-padding",
+        "--size-consent-action-min",
+        "--size-consent-content-basis",
+        "--size-consent-actions-basis",
+        "--size-consent-content-min",
+        "--scale-consent-content-gap",
+        "--scale-consent-actions-gap",
+        "--size-consent-preferences-max",
+        "--scale-consent-preferences-description-gap",
+        "--scale-consent-preference-gap",
+        "--scale-consent-preference-padding"
+      ],
+      "typography": [
+        "--font-family-body",
+        "--font-family-heading",
+        "--tg-typography-h3-weight",
+        "--typo-h3-size",
+        "--typo-h3-line-height",
+        "--typo-body-size",
+        "--typo-body-line-height",
+        "--typo-caption-size",
+        "--typo-caption-line-height"
+      ],
+      "border": [
+        "--border-consent-width",
+        "--border-consent-preference-width"
+      ]
     }
   },
   "accessibility": [
@@ -328,8 +576,17 @@
       "kind": "customer-privacy-liquid-js",
       "notes": "A future target adapter must project Shopify Customer Privacy state and mutations into this contract; copied CSS is not provider readiness."
     },
-    "react": { "status": "planned", "kind": "controlled-component" },
-    "swiftui": { "status": "planned", "kind": "native-composition" },
-    "compose": { "status": "planned", "kind": "native-composition" }
+    "react": {
+      "status": "planned",
+      "kind": "controlled-component"
+    },
+    "swiftui": {
+      "status": "planned",
+      "kind": "native-composition"
+    },
+    "compose": {
+      "status": "planned",
+      "kind": "native-composition"
+    }
   }
 }

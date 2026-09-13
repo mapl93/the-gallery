@@ -605,3 +605,49 @@ Image with Text presenta ahora una decisión equivalente aún no aprobada: texto
 oscuro en Dark sobre scrim negro. Las opciones están documentadas sin cambiar su
 fuente. Ninguno de estos checkpoints constituye certificación Shopify alojada,
 actualización automática de consumidores ni conformidad DTCG estricta.
+
+## Continuación comprobada — 2026-09-13, ADRs 0398–0410
+
+El propietario aprobó texto blanco sobre el scrim negro existente de Image with
+Text en ambos temas; ADR 0398 resuelve la decisión pendiente del apartado anterior.
+El recorrido de valores públicos cubre ahora los componentes activos restantes de
+Sections, Reviews y Pages. Los 28 componentes de esta continuación tienen evidencia
+por checkpoint en los informes del 13 de septiembre. ADR 0410 corrige además reglas
+antiguas de Studio que tapaban los tokens de Star Input/File Upload o anticipaban
+el apilado de Review Toolbar. En esta última composición, Select y Button quedan
+alineados a 46px, aplicando el criterio previo del propietario.
+
+El punto 5 queda cubierto al nivel de este recorrido de fuente y personalización:
+contratos, Studio/Exhibit y salidas generadas. No significa que todo literal CSS
+deba convertirse en token ni que toda combinación o composición esté certificada.
+Se revisaron también los diez componentes activos sin archivo de tokens homónimo:
+siete composiciones usan decisiones existentes y tres usan archivos con otro nombre.
+No se añadieron familias duplicadas para satisfacer una cuenta de archivos.
+
+Comprobación final de integración: 20 escenarios copy-and-own del CLI; controles
+de marca Shopify con 10 enlaces de color, 40 comparaciones de defaults, 2 selectores
+de fuentes, 3 layouts y 2 locales; inventarios de contratos/Studio y adaptadores.
+El inventario de rendimiento tiene 24 superficies, cero fallos de medición o límites
+obligatorios, y dos excesos frente a recomendaciones de herramientas Shopify.
+El mayor CSS mide 836197 bytes crudos y el mayor JS 123453 bytes crudos: son
+observaciones y advertencias, no límites universales ni certificación de velocidad.
+
+El punto 2 sigue abierto fuera del piloto: integración Shopify nativa, editor y
+validación alojada. El adaptador computa 93 entradas target-ready estructuralmente,
+pero faltan 57 implementaciones Liquid dedicadas y no registra theme blocks.
+Las reseñas requieren concretar su fuente y modelo de datos antes de conectar
+valoraciones, verificación de compra o envíos reales. La pregunta ya figura en
+`docs/OPEN-QUESTIONS.md`; las muestras de Studio no son datos productivos.
+
+Los puntos 1, 3, 4, 7, 8 y 9 conservan los alcances de corrección delimitados arriba;
+6 continúa pospuesto y Figma fuera del plan. No se cambió la política de versiones,
+no se promovió ningún piloto a stable, no se reconstruyó site/dist y no se publicó
+ni desplegó el tema con esta continuación. Las copias de consumidores requieren
+adopción explícita; cada checkpoint se guarda y sube en la rama de trabajo.
+
+Aclaración posterior del propietario: todavía no usa una app de reseñas. Shopify
+sí recoge reseñas en Shop; la vía documentada para mostrarlas en la tienda web
+usa una app compatible. Se contrastó con el Centro de ayuda oficial el 13 de
+septiembre y se registró en OPEN-QUESTIONS. La selección condiciona conectar
+reseñas reales, no finalizar los componentes neutros ni otras tareas Shopify.
+No se instaló ni eligió un proveedor.

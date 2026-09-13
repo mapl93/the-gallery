@@ -2138,3 +2138,16 @@ The owner selected A. ADR 0398 gives Overlay white on-media text and the existin
 black scrim in both themes. Fifteen public visual roles, normal/overlay palette
 separation, Button independence and forced colors are covered by the checkpoint.
 See `docs/reports/2026-09-13-image-text-values-checkpoint.md`.
+
+### Review data integration clarification — 2026-09-13
+
+The owner has no review app/source selected. Shopify's own Shop channel collects
+reviews from eligible purchasers in Shop, including online-store purchases.
+The documented path for showing Shop-collected reviews in an online storefront
+uses a supported partner app. This does not require choosing an app to finish the
+neutral components or unrelated Shopify delivery; it conditions real review data,
+verification and submission integration only. No app was installed or selected.
+
+Official sources checked 2026-09-13:
+- [Shop product reviews](https://help.shopify.com/en/manual/online-sales-channels/shop/product-reviews)
+- [Syncing Shop reviews with partner apps](https://help.shopify.com/en/manual/online-sales-channels/shop/product-reviews/sync-partner-apps)

@@ -911,3 +911,22 @@ and generated Web/Shopify agree, with default-preservation and actual-control
 browser evidence per checkpoint. Deprecated Hero Section remains a migration
 record. Continue Reviews and remaining Pages; structural success is not hosted
 Shopify certification, arbitrary-brand accessibility or copy adoption.
+
+### Reviews and Pages visual values complete — 2026-09-13
+
+ADRs 0405–0409 complete this source visual-value pass for active Reviews and Pages;
+ADR 0410 removes concrete Reviews Studio overrides that masked canonical tokens
+and responsive behavior. This is source/customization coverage with bounded browser
+evidence, not comprehensive accessibility, stable maturity or hosted certification.
+
+The ten active components without a same-name token file were checked separately:
+Textarea, Product Form, Button Group, Cart Empty, View Toggle, Empty Collection and
+Review Pagination compose existing public decisions; Timeline Primitive uses
+`timeline.tokens.json`, Field Wrapper uses `field.tokens.json`, and Firing Info
+shares `firing-schedule.tokens.json`. File-name matching is not a token coverage gate.
+
+Next: Shopify target-native integration and its unresolved data/provider contracts.
+The current adapter's computed 93 target-ready entries are structural evidence;
+57 dedicated Liquid implementations are still absent and no theme-block adapter is
+inventoried. The review-provider/data-model question remains open; do not invent
+verification, aggregate, moderation or submission truth from Studio fixture data.

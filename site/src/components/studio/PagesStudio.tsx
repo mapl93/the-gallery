@@ -22,6 +22,7 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import { editorialMedia } from './editorialMedia';
+import CheckboxArtwork from './CheckboxArtwork';
 import StepsArtwork, { type StepsArtworkItem } from './StepsArtwork';
 
 interface PagesStudioProps {
@@ -183,6 +184,7 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
   const [searchFeedback, setSearchFeedback] = useState('');
   const [giftFeedback, setGiftFeedback] = useState('');
   const [copyFeedback, setCopyFeedback] = useState('');
+  const [extendedPolicyPreview, setExtendedPolicyPreview] = useState(false);
 
   useEffect(() => {
     const read = () => {
@@ -209,6 +211,7 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
     setSearchFeedback('');
     setGiftFeedback('');
     setCopyFeedback('');
+    setExtendedPolicyPreview(false);
   }
 
   function submitComingSoon(event: FormEvent<HTMLFormElement>) {
@@ -658,10 +661,22 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
           >
             <h3 className="policy-page__section-title" id={`returns-title-${generatedId}`}>Returns</h3>
             <p>
-              <a className="link" href="/components/contact-section">Contact the gallery</a>{' '}
+              <a href="/components/contact-section">Contact the gallery</a>{' '}
               before returning a work so its condition and return route can be documented.
             </p>
           </section>
+          {extendedPolicyPreview && (
+            <section className="policy-page__section" aria-labelledby={`reference-title-${generatedId}`}>
+              <h3 className="policy-page__section-title" id={`reference-title-${generatedId}`}>Reference formatting</h3>
+              <p>This illustrative content tests document formatting; it does not define a policy.</p>
+              <pre><code>REFERENCE-EXAMPLE</code></pre>
+              <table>
+                <caption>Illustrative record fields</caption>
+                <thead><tr><th scope="col">Field</th><th scope="col">Example</th></tr></thead>
+                <tbody><tr><th scope="row">Reference</th><td><code>ORDER-EXAMPLE</code></td></tr></tbody>
+              </table>
+            </section>
+          )}
         </div>
       </article>
     );
@@ -706,6 +721,13 @@ export default function PagesStudio({ contract, definition }: PagesStudioProps) 
           onSlotIconChange={() => undefined}
           onStateChange={() => undefined}
           onTokenChange={(token, value) => setTokenOverrides((current) => ({ ...current, [token]: value }))}
+          fixtureControlsByGroup={contract.slug === 'policy-page' ? {
+            composition: <CheckboxArtwork
+              label="Preview extended document styles"
+              checked={extendedPolicyPreview}
+              onChange={(event) => setExtendedPolicyPreview(event.target.checked)}
+            />,
+          } : undefined}
           onReset={reset}
         />
         <section

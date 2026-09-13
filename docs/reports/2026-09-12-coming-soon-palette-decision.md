@@ -1,6 +1,6 @@
 # Coming Soon dark-media palette decision
 
-Date: 2026-09-12. Source baseline: `0892a21`. Status: awaiting owner choice.
+Date: 2026-09-12. Source baseline: `0892a21`. Status: resolved; owner selected A. Implemented in ADR 0392.
 
 ## Confirmed problem
 
@@ -52,6 +52,6 @@ diagnostic proposals, not the planned authoring API.
 - No promotion to stable or hosted Shopify certification from these checks.
 
 All owned browser/server resources were closed; the final resource gate passed.
-The owner choice is pending. Source-value coverage for remaining components,
+The owner selected A; see the accepted checkpoint report. Source-value coverage for remaining components,
 paired-control labels and target delivery remain separate backlog; resolving
 static swatches does not close all nine original audit areas.

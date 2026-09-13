@@ -2159,7 +2159,11 @@ Official sources checked 2026-09-13:
 
 The owner selected Judge.me. ADR 0411 records the accepted consumer-specific
 provider and the remaining API, verified-submission, presentation and hosted
-integration checks. Shopify Admin confirms that the app is not installed at
-this checkpoint. Automatic approval review stopped the install action before
-any access grant. Provider choice is closed; installation and capability mapping
-are pending. Shop syndication is not a dependency for this Argentina/ARS store.
+integration checks. After the initial installation action was stopped by automatic
+approval review, the owner completed installation. The follow-up verified Free Plan
+and disabled automatic requests for domestic, international and POS orders;
+request history displayed no entries. Provider selection and installation are
+closed; capability mapping and hosted integration remain pending. The active
+theme editor's enabled embed conflicts with Judge.me's disabled detection, so
+runtime activation is not yet verified. See the 2026-09-13 installation checkpoint.
+Shop syndication is not a dependency for this Argentina/ARS store.

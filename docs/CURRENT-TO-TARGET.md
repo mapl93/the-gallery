@@ -929,6 +929,8 @@ Next: Shopify target-native integration and its unresolved data/provider contrac
 The current adapter's computed 93 target-ready entries are structural evidence;
 57 dedicated Liquid implementations are still absent and no theme-block adapter is
 inventoried. Judge.me is now the selected review provider for the first store
-(ADR 0411); installation, data mapping and submission integration remain pending.
+(ADR 0411); Free Plan installation is verified and automatic review requests are
+disabled. Data mapping, submission integration and hosted embed behavior remain
+pending; see `docs/reports/2026-09-13-judge-me-installation-checkpoint.md`.
 Do not invent verification, aggregate, moderation or submission truth from
 Studio fixture data.

@@ -666,3 +666,17 @@ no sustituye los componentes de Gallery por widgets ni certifica equivalencia.
 La revisión automática bloqueó el clic de instalación por el posible acceso a
 datos y cargos. No se otorgaron permisos, contrataron planes, enviaron correos
 ni modificaron archivos del tema. Este checkpoint cambia solo documentación.
+
+### Instalación de Judge.me — 2026-09-13
+
+Después de la selección, el propietario completó la instalación. Se verificó el
+plan gratuito y se desactivaron las solicitudes automáticas nacionales,
+internacionales y POS. El panel confirmó solicitudes desactivadas y el historial
+mostró su estado vacío. No se enviaron correos ni se inició un plan de pago.
+
+La integración sigue pendiente: el editor existente corresponde al tema activo
+y muestra el embed activado, mientras Judge.me sigue indicando Embed disabled.
+No se modificó ese tema. El siguiente ensayo requiere un tema sin publicar y
+comprobar el comportamiento real del proveedor. Véase
+`2026-09-13-judge-me-installation-checkpoint.md`; instalar la app no cierra la
+validación alojada del punto 2.

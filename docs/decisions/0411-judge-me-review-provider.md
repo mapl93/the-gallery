@@ -1,6 +1,6 @@
 # ADR 0411: Judge.me Review Provider
 
-Status: Accepted (provider selection only; integration pending)
+Status: Accepted (provider selected and free installation verified; integration pending)
 
 Date: 2026-09-13
 
@@ -28,7 +28,8 @@ this decision. Those are separate implementation/configuration steps.
   depending on Shop syndication.
 - A schema-validated read-only Shopify Admin query using
   `appByHandle(handle: "judgeme")` returned `Judge.me Reviews` with
-  `installation: null`. Judge.me is not installed as of this checkpoint.
+  `installation: null` at the initial selection checkpoint. The owner subsequently
+  completed installation; the follow-up below supersedes that installation status.
 - `platforms/shopify/sections/main-product.liquid` already declares `@app` and
   renders app blocks. That is a possible host, not proof of Judge.me compatibility:
   variant changes replace product content and require app lifecycle verification.
@@ -53,12 +54,36 @@ or subscription by assumption. API/plan eligibility and final presentation remai
 unverified. Do not activate customer invitations or import historical orders for
 email campaigns without owner authorization for that communication.
 
+## Installation follow-up — 2026-09-13
+
+After the owner reported completion, the existing Shopify Admin browser session
+showed Judge.me installed on **Free Plan**, with a paid trial offered but not
+started. The initial automatic-approval installation gate is no longer pending.
+
+Automatic email requests were enabled when inspected. To honor the approved
+no-customer-email setup, requests for **domestic**, **international** and **POS**
+orders were each disabled and saved. Re-reading each setting showed it unchecked;
+the aggregate email setting and refreshed home status showed requests disabled.
+SMS and push notifications were also displayed as off and were left unchanged.
+The request history showed its empty state, and the home counter showed zero
+requests sent over the last 30 days. This is observed UI evidence, not an audit of
+all delivery infrastructure. No requests, imports or test reviews were submitted.
+
+The owner's existing theme editor showed theme `184841142579`, **The Gallery**,
+as **Active**, with the Judge.me embed enabled and Save disabled. Judge.me's
+refreshed home still reported **Embed disabled** and setup 0/2. The discrepancy
+is unresolved; neither the editor toggle nor installation certifies storefront
+rendering. No theme changes were made or saved by the agent in this follow-up.
+The next integration evidence must use an unpublished theme, not assume this
+previously referenced theme is still an unpublished pilot.
+
+See `docs/reports/2026-09-13-judge-me-installation-checkpoint.md` for the bounded
+evidence and remaining checks.
+
 ## Next checkpoint
 
-1. Complete Judge.me installation with the merchant's review of its requested
-   access. The installation action was stopped by automatic approval review;
-   no permissions were granted and no subscription was started.
-2. Inspect the installed app's available plan, collection settings and APIs.
+1. Inspect the installed app's available APIs and supported collection path.
+2. Resolve embed detection and runtime loading in an unpublished theme.
 3. Prepare one unpublished product-page integration and a capability mapping
    against the existing Gallery components. Resolve a genuine unsupported
    capability with the owner before changing the experience.

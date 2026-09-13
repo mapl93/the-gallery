@@ -401,23 +401,23 @@
   list-style: none;
 }
 .mobile-nav__item { min-width: 0; }
-.mobile-nav__item + .mobile-nav__item { border-top: 1px solid var(--color-border-subtle); }
+.mobile-nav__item + .mobile-nav__item { border-top: var(--border-mobile-nav-separator) solid var(--color-border-subtle); }
 .mobile-nav__link {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-layout-element-gap);
-  padding: 12px 4px;
+  padding: var(--space-mobile-nav-block-padding) var(--space-mobile-nav-inline-padding);
   color: var(--color-text-primary);
   font-size: var(--typo-body-size);
-  font-weight: 500;
+  font-weight: var(--typo-mobile-nav-link-weight);
   line-height: var(--typo-body-line-height);
   min-block-size: var(--space-layout-touch-target);
   min-width: 0;
   border-radius: var(--radius-sm);
   text-decoration: underline;
   text-decoration-color: transparent;
-  text-underline-offset: 4px;
+  text-underline-offset: var(--space-mobile-nav-underline-offset);
   overflow-wrap: anywhere;
   transition: color var(--transition-fast) var(--easing-default),
               background var(--transition-fast) var(--easing-default),
@@ -428,8 +428,8 @@
   text-decoration-color: var(--color-text-accent);
 }
 .mobile-nav__link:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -2px;
+  outline: var(--border-mobile-nav-focus) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-mobile-nav-focus-inset));
 }
 @media (hover: hover) and (pointer: fine) {
   .mobile-nav__link:hover { background: var(--color-surface-secondary); }
@@ -438,19 +438,19 @@
 
 /* ── C5. SEARCH OVERLAY ── */
 .search-overlay {
-  --_search-panel-max: 40rem;
-  --_search-result-media: 3rem;
+  --_search-panel-max: var(--size-search-panel-max);
+  --_search-result-media: var(--size-search-result-media);
 
   position: fixed;
   inset: 0;
   z-index: var(--z-overlay);
-  background: rgba(0, 0, 0, var(--opacity-overlay));
+  background: color-mix(in srgb, var(--color-search-overlay-scrim) calc(var(--opacity-overlay) * 100%), transparent);
   display: flex;
   align-items: flex-start;
   justify-content: center;
   overflow: auto;
   overscroll-behavior: contain;
-  padding: clamp(var(--space-layout-element-gap), 8dvh, 5rem) var(--space-layout-element-gap) var(--space-layout-element-gap);
+  padding: clamp(var(--space-layout-element-gap), calc(var(--ratio-search-overlay-top) * 100dvh), var(--space-search-overlay-top-max)) var(--space-layout-element-gap) var(--space-layout-element-gap);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -469,14 +469,14 @@
   background: var(--color-surface-primary);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-2xl);
-  padding: var(--space-layout-element-gap);
+  padding: calc(var(--space-layout-element-gap) * var(--scale-search-panel-padding));
 }
 .search-box__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-layout-element-gap);
-  margin-block-end: 12px;
+  gap: calc(var(--space-layout-element-gap) * var(--scale-search-header-gap));
+  margin-block-end: var(--space-search-header-margin);
 }
 .search-box__title {
   min-width: 0;
@@ -493,8 +493,8 @@
   width: 100%;
   min-block-size: var(--space-layout-touch-target);
   min-width: 0;
-  padding: 12px 16px;
-  border: 2px solid var(--color-border-focus);
+  padding: var(--space-search-input-block-padding) var(--space-search-input-inline-padding);
+  border: var(--border-search-input-width) solid var(--color-border-focus);
   border-radius: var(--radius-md);
   font-size: var(--typo-h4-size);
   line-height: var(--typo-h4-line-height);
@@ -503,12 +503,12 @@
   color: var(--color-text-primary);
 }
 .search-box__input:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: var(--border-search-input-focus-width) solid var(--color-border-focus);
+  outline-offset: var(--space-search-input-focus-offset);
 }
 .search-results {
   min-height: 0;
-  margin: 16px 0 0;
+  margin: var(--space-search-results-margin) 0 0;
   padding: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -517,8 +517,8 @@
 .search-results__item { min-width: 0; }
 .search-result {
   display: flex;
-  gap: 12px;
-  padding: 12px;
+  gap: var(--space-search-result-gap);
+  padding: var(--space-search-result-padding);
   border-radius: var(--radius-sm);
   text-decoration: none;
   color: var(--color-text-primary);
@@ -527,8 +527,8 @@
 }
 .search-result:hover { background: var(--color-surface-secondary); }
 .search-result:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: -2px;
+  outline: var(--border-search-result-focus-width) solid var(--color-border-focus);
+  outline-offset: calc(-1 * var(--space-search-result-focus-inset));
 }
 .search-result__image {
   width: var(--_search-result-media);
@@ -540,7 +540,7 @@
 .search-result__content { display: block; min-width: 0; }
 .search-result__title,
 .search-result__price { display: block; overflow-wrap: anywhere; }
-.search-result__title { font-weight: 500; }
+.search-result__title { font-weight: var(--typo-search-result-title-weight); }
 .search-result__price {
   color: var(--color-text-secondary);
   font-size: var(--typo-body-sm-size);
@@ -572,7 +572,7 @@
 .cart-drawer__summary {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-cart-drawer-summary-gap));
   min-width: 0;
   margin: 0;
   font-family: var(--font-family-body);
@@ -584,7 +584,7 @@
   font-size: var(--typo-body-size);
   line-height: var(--typo-body-line-height);
   color: var(--color-text-secondary);
-  gap: var(--space-layout-element-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-cart-drawer-row-gap));
   min-width: 0;
 }
 .cart-drawer__summary-row dt,
@@ -597,7 +597,7 @@
 .cart-drawer__summary-total {
   font-size: var(--typo-h4-size);
   line-height: var(--typo-h4-line-height);
-  font-weight: 600;
+  font-weight: var(--typo-cart-drawer-total-weight);
   color: var(--color-text-primary);
 }
 

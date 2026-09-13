@@ -21,6 +21,7 @@ import StudioInspector, {
   type StudioSlotIconValues,
 } from './StudioInspector';
 import AccordionArtwork from './AccordionArtwork';
+import CheckboxArtwork from './CheckboxArtwork';
 import BeforeAfterArtwork, { beforeAfterFixtureMedia } from './BeforeAfterArtwork';
 import ComparisonTableArtwork, {
   buildComparisonTableFixture,
@@ -273,6 +274,7 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
   const [tokenOverrides, setTokenOverrides] = useState<Record<string, string>>({});
   const [stateValue, setStateValue] = useState(contract.states[0]?.name ?? 'default');
   const [openFaq, setOpenFaq] = useState(0);
+  const [graphicSignaturePreview, setGraphicSignaturePreview] = useState(false);
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -293,6 +295,7 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
     setTokenOverrides({});
     setStateValue(contract.states[0]?.name ?? 'default');
     setOpenFaq(0);
+    setGraphicSignaturePreview(false);
     setEmail('');
     setMessage('');
     setFeedback('');
@@ -522,7 +525,15 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
             <p>We work with independent makers whose practices value material intelligence, restraint, and lasting use.</p>
             <p>The gallery gives those objects enough room to be seen closely.</p>
           </div>
-          {values.signature === true && <footer className="brand-story__signature">The Gallery</footer>}
+          {values.signature === true && (
+            <footer className="brand-story__signature">
+              {graphicSignaturePreview ? (
+                <svg viewBox="0 0 300 72" width="300" height="72" role="img" aria-label="Illustrative studio signature">
+                  <text x="12" y="48" fontSize="32" fontStyle="italic" fill="currentColor">The Gallery</text>
+                </svg>
+              ) : 'The Gallery'}
+            </footer>
+          )}
         </div>
       </section>
     );
@@ -930,6 +941,15 @@ export default function SectionsStudio({ contract, definition }: SectionsStudioP
           stateValue={stateValue}
           tokenValues={{ ...baseTokenValues, ...tokenOverrides }}
           activeTokens={activeTokens}
+          fixtureControlsByGroup={contract.slug === 'brand-story' ? {
+            composition: values.signature === true ? (
+              <CheckboxArtwork
+                label="Preview graphic signature"
+                checked={graphicSignaturePreview}
+                onChange={(event) => setGraphicSignaturePreview(event.target.checked)}
+              />
+            ) : null,
+          } : undefined}
           onPropertiesChange={(next) => setValues((current) => ({ ...current, ...next }))}
           onSlotIconChange={() => undefined}
           onStateChange={setStateValue}

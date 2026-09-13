@@ -10,8 +10,8 @@
 
 /* ── S2. FEATURED COLLECTION ── */
 .featured-collection {
-  --_featured-header-gap: calc(var(--space-layout-element-gap) * 0.75);
-  --_featured-carousel-card: min(18rem, 82cqi);
+  --_featured-header-gap: calc(var(--space-layout-element-gap) * var(--scale-featured-header-gap));
+  --_featured-carousel-card: min(var(--size-featured-carousel-card-max), calc(var(--ratio-featured-carousel-card) * 100cqi));
 
   container-name: featured-collection;
   container-type: inline-size;
@@ -25,11 +25,11 @@
   align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: calc(var(--_featured-header-gap) * 0.5) var(--_featured-header-gap);
+  gap: calc(var(--_featured-header-gap) * var(--scale-featured-header-row-gap)) var(--_featured-header-gap);
   margin-block-end: var(--_featured-header-gap);
 }
 .featured-collection__title {
-  max-inline-size: 24ch;
+  max-inline-size: var(--size-featured-title-max);
   margin: 0;
   font-family: var(--font-family-heading);
   font-size: var(--typo-h2-size);
@@ -61,23 +61,25 @@
 /* Featured Collection — Spotlight (emphasized first composition) */
 .featured-collection--spotlight .featured-collection__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(max(1, var(--grid-featured-spotlight-compact-columns)), minmax(0, 1fr));
   gap: var(--space-layout-grid-gap);
 }
 
 @container featured-collection (min-width: 48rem) {
   .featured-collection--spotlight .featured-collection__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    --_featured-spotlight-columns: max(1, var(--grid-featured-spotlight-medium-columns));
+    grid-template-columns: repeat(max(1, var(--grid-featured-spotlight-medium-columns)), minmax(0, 1fr));
   }
 
   .featured-collection--spotlight .featured-collection__item:first-child {
-    grid-column: span 2;
+    grid-column: span min(max(1, var(--grid-featured-spotlight-first-span)), var(--_featured-spotlight-columns));
   }
 }
 
 @container featured-collection (min-width: 64rem) {
   .featured-collection--spotlight .featured-collection__grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    --_featured-spotlight-columns: max(1, var(--grid-featured-spotlight-wide-columns));
+    grid-template-columns: repeat(max(1, var(--grid-featured-spotlight-wide-columns)), minmax(0, 1fr));
   }
 }
 

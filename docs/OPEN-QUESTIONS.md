@@ -2131,3 +2131,11 @@ on-media color role anchored to neutral white in both themes. The existing
 black scrim remains. Split, text-only, absent media and canonical child controls
 retain their own colors. Consumer, Studio, Exhibit and deprecated forwarding
 checks pass; see `docs/reports/2026-09-12-hero-palette-checkpoint.md`.
+
+### Image with Text on-media palette (pending 2026-09-12)
+
+Studio confirms that Overlay uses white text in Light but rgb(23,23,23) in Dark
+while keeping a black scrim. Should it keep white on-media text in both themes
+(A, like the accepted Hero/Coming Soon treatment), or use dark text on a white
+scrim in Dark (B)? Source is unchanged; concrete browser-only alternatives and
+limits are recorded in `docs/reports/2026-09-12-image-text-overlay-palette-decision.md`.

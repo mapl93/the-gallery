@@ -878,13 +878,27 @@ visual-value coverage now includes all eleven registry components (Article Card/
 Hero from preceding checkpoints). Legacy article-nav remains outside v1. Font
 delivery and remaining catalogue/target work require their own verification.
 
-## Editorial font delivery decision
+## Editorial font delivery (resolved by ADR 0381)
 
-Actual browser font evidence found Lora-first tokens rendering Georgia in
-Studio Article Hero/Body. A source-only family check did not catch missing Lora
-loading. Concrete A/B comparison is ready; font preference/delivery remains
-unchanged pending owner choice. See the 2026-09-12 editorial font decision report.
-This continuation completed six implementation checkpoints, ten components,
-103 source roles and 280 browser cases; all Blog registry components now have
-a public visual-value pass. This is not completion of all catalogue or Shopify
-work, nor blanket accessibility/font/target certification.
+The owner selected loading the already-declared Lora. The docs host now delivers
+normal/italic weights 400–700; actual browser glyph evidence verifies Studio and
+Exhibit. CLI hosts still own font delivery; Shopify retains native font pickers.
+See `docs/reports/2026-09-12-editorial-font-delivery-checkpoint.md`.
+
+## Public customization follow-through (ADRs 0382–0397)
+
+Hero, Newsletter, Testimonials, Trust Badges, Payment Icons, Countdown, Urgency,
+Coming Soon, Consent Manager, Social Proof and the active Global family now have
+visual-value follow-through. Featured Collection is the next Section completed.
+Deprecated aliases remain historical composition entries, not duplicated sources.
+The same source roles reach generated Web/Shopify and shared Studio/Exhibit.
+
+ADRs 0386–0391 correct static Studio controls that grouped multiple tokens into a
+single unusable swatch. Reachability is distinct from complete visual-role
+coverage: remaining Sections, Reviews and Pages still need their source passes.
+
+Image with Text has a confirmed Dark on-media palette issue: dark inverse text
+remains over a black scrim. Its concrete A/B examples await the owner before a
+palette change; see the 2026-09-12 Image with Text palette decision report.
+This work advances original audit finding 5; it does not close all nine findings,
+certify arbitrary brand/media accessibility or complete hosted Shopify delivery.

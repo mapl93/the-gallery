@@ -587,3 +587,21 @@ Scroll Area; los nueve puntos no se declaran cerrados.
   antes de cambiar la identidad/carga. Las pruebas previas de CSS y paridad
   visual no certificaban la entrega de Lora. Detalle:
   `docs/reports/2026-09-12-editorial-font-delivery-decision.md`.
+
+
+## Continuación comprobada — 2026-09-12, ADRs 0381–0397
+
+El punto 5 sigue en ejecución: controles estáticos reparados (ADRs 0386–0391),
+valores públicos de Marketing y Global ampliados, y Featured Collection revisada.
+Los últimos seis checkpoints (ADRs 0392–0397) incluyen pruebas de apariencia,
+controles reales y salidas Web/Shopify; sus informes delimitan la evidencia.
+Faltan otros componentes de Sections, Reviews y Pages; no se declara cobertura
+completa por tener todos los contratos o todas las páginas con controles.
+
+La decisión tipográfica pendiente descrita arriba se resolvió con ADR 0381:
+cargar Lora, con comprobación de glifos reales. Hero y Coming Soon conservan texto
+blanco sobre imagen en ambos temas, según decisiones específicas del propietario.
+Image with Text presenta ahora una decisión equivalente aún no aprobada: texto
+oscuro en Dark sobre scrim negro. Las opciones están documentadas sin cambiar su
+fuente. Ninguno de estos checkpoints constituye certificación Shopify alojada,
+actualización automática de consumidores ni conformidad DTCG estricta.

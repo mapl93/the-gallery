@@ -1779,8 +1779,9 @@ Questions:
   selected/current projection express the desired Gallery identity?
 - Should the v1 shared fixture remain passive, or should an accepted target
   promote navigation or selection into a separate semantic component?
-- Which provider and data model supplies reviews, and who owns identity,
-  verified-purchase truth, moderation, abuse, edits, deletion, and replies?
+- Judge.me is selected for the first Shopify store (ADR 0411). Which supported
+  integration path supplies identity, verified-purchase truth, moderation,
+  abuse, edits, deletion, and replies to the Gallery components?
 - Which layer computes aggregate values, scales, rounding, buckets, and missing
   values, including normalization of half stars and non-five-point systems?
 - Which sort and filter options exist, what do Review Highlights activate, and
@@ -2141,7 +2142,9 @@ See `docs/reports/2026-09-13-image-text-values-checkpoint.md`.
 
 ### Review data integration clarification — 2026-09-13
 
-The owner has no review app/source selected. Shopify's own Shop channel collects
+At the time of this clarification, the owner had no review app/source selected.
+Provider selection is subsequently resolved by ADR 0411 below.
+Shopify's own Shop channel collects
 reviews from eligible purchasers in Shop, including online-store purchases.
 The documented path for showing Shop-collected reviews in an online storefront
 uses a supported partner app. This does not require choosing an app to finish the
@@ -2151,3 +2154,12 @@ verification and submission integration only. No app was installed or selected.
 Official sources checked 2026-09-13:
 - [Shop product reviews](https://help.shopify.com/en/manual/online-sales-channels/shop/product-reviews)
 - [Syncing Shop reviews with partner apps](https://help.shopify.com/en/manual/online-sales-channels/shop/product-reviews/sync-partner-apps)
+
+### Judge.me provider selected — 2026-09-13
+
+The owner selected Judge.me. ADR 0411 records the accepted consumer-specific
+provider and the remaining API, verified-submission, presentation and hosted
+integration checks. Shopify Admin confirms that the app is not installed at
+this checkpoint. Automatic approval review stopped the install action before
+any access grant. Provider choice is closed; installation and capability mapping
+are pending. Shop syndication is not a dependency for this Argentina/ARS store.

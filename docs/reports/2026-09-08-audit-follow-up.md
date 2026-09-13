@@ -650,4 +650,19 @@ sí recoge reseñas en Shop; la vía documentada para mostrarlas en la tienda we
 usa una app compatible. Se contrastó con el Centro de ayuda oficial el 13 de
 septiembre y se registró en OPEN-QUESTIONS. La selección condiciona conectar
 reseñas reales, no finalizar los componentes neutros ni otras tareas Shopify.
-No se instaló ni eligió un proveedor.
+En ese momento no se instaló ni eligió un proveedor.
+
+### Selección de Judge.me — 2026-09-13
+
+El propietario eligió Judge.me para su primera tienda (ADR 0411). La consulta de
+solo lectura, validada contra el esquema de Shopify, confirmó que todavía no
+está instalado. La tienda conectada opera desde Argentina en ARS; la integración
+usará la recopilación propia de Judge.me y no dependerá de Shop.
+
+Se registraron los límites documentados de la API y los criterios del siguiente
+checkpoint: datos publicados, compra verificada, formulario, fotos, respuestas,
+paginación, exportación y comportamiento en un tema sin publicar. La selección
+no sustituye los componentes de Gallery por widgets ni certifica equivalencia.
+La revisión automática bloqueó el clic de instalación por el posible acceso a
+datos y cargos. No se otorgaron permisos, contrataron planes, enviaron correos
+ni modificaron archivos del tema. Este checkpoint cambia solo documentación.

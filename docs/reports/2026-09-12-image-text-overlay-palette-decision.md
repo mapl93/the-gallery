@@ -30,3 +30,7 @@ shared global inverse role must not be changed for unrelated consumers.
 Pending owner choice before changing Image with Text's media palette. No source,
 Shopify or token changes implement either alternative. Both alternatives were
 captured with temporary DOM custom-property overrides. Browser and server closed.
+
+Resolved on 2026-09-13: owner selected A; implemented and verified in ADR 0398
+and `2026-09-13-image-text-values-checkpoint.md`. The alternatives above remain
+the historical decision evidence.

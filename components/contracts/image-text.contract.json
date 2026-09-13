@@ -1,6 +1,6 @@
 {
   "$schema": "./contract.schema.json",
-  "contractVersion": "0.3.1",
+  "contractVersion": "0.3.2",
   "slug": "image-text",
   "name": "Image with Text",
   "registryId": "S3",
@@ -92,7 +92,7 @@
       "name": "overlay",
       "className": ".image-text--overlay",
       "default": false,
-      "description": "Content overlays bounded media with an invariant scrim and explicit inverse semantic foregrounds."
+      "description": "Content overlays bounded media with an configurable scrim and dedicated on-media foregrounds."
     },
     {
       "name": "offset",
@@ -106,7 +106,7 @@
       "name": "default",
       "className": null,
       "default": true,
-      "description": "Single intrinsic size whose crop, measure, threshold, padding curve, overlay block size, and scrim geometry remain private composition."
+      "description": "Single intrinsic size with token-controlled crop, measure, padding curve, overlay minimum height and scrim; responsive thresholds remain structural."
     }
   ],
   "states": [
@@ -202,9 +202,15 @@
       "required": false,
       "defaultValue": "default",
       "valuesFrom": "variants",
-      "description": "Default, visually Reversed, always Stacked, Overlay, or contained Offset presentation; responsive geometry remains private.",
+      "description": "Default, visually Reversed, always Stacked, Overlay, or contained Offset presentation; visual values are controlled by public tokens.",
       "targetMappings": {
-        "web": [{ "kind": "optionClass", "selector": ".image-text", "source": "variants" }]
+        "web": [
+          {
+            "kind": "optionClass",
+            "selector": ".image-text",
+            "source": "variants"
+          }
+        ]
       }
     },
     {
@@ -214,7 +220,15 @@
       "unsetBehavior": "Omit the entire section when target-owned native media is unavailable.",
       "description": "Required target-owned native media with explicit alternative, intrinsic dimensions, responsive sources, loading, and focal-point policy.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".image-text__media", "classNames": [".image-text__media"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".image-text__media",
+            "classNames": [
+              ".image-text__media"
+            ]
+          }
+        ]
       }
     },
     {
@@ -224,7 +238,12 @@
       "unsetBehavior": "Omit the eyebrow without leaving empty rhythm.",
       "description": "Optional short context above the required heading; it never names the section by itself.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".image-text__eyebrow" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".image-text__eyebrow"
+          }
+        ]
       }
     },
     {
@@ -234,7 +253,12 @@
       "unsetBehavior": "Omit the entire section when the trimmed visible heading is empty.",
       "description": "Required non-empty visible contextual heading; targets choose the appropriate native heading rank.",
       "targetMappings": {
-        "web": [{ "kind": "content", "selector": ".image-text__title" }]
+        "web": [
+          {
+            "kind": "content",
+            "selector": ".image-text__title"
+          }
+        ]
       }
     },
     {
@@ -244,7 +268,15 @@
       "unsetBehavior": "Omit the entire section when narrative rich content is empty.",
       "description": "Required non-empty target-owned narrative rich content; targets own sanitization and native markup.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".image-text__body", "classNames": [".image-text__body"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".image-text__body",
+            "classNames": [
+              ".image-text__body"
+            ]
+          }
+        ]
       }
     },
     {
@@ -254,7 +286,15 @@
       "unsetBehavior": "Omit the action unless the target can supply a complete valid Button composition.",
       "description": "Optional complete Button-composed navigation or command; target owns destination/result, analytics, disabled, and busy lifecycle.",
       "targetMappings": {
-        "web": [{ "kind": "slot", "selector": ".image-text__cta", "classNames": [".image-text__cta"] }]
+        "web": [
+          {
+            "kind": "slot",
+            "selector": ".image-text__cta",
+            "classNames": [
+              ".image-text__cta"
+            ]
+          }
+        ]
       }
     }
   ],
@@ -264,9 +304,10 @@
         "--color-surface-primary",
         "--color-surface-secondary",
         "--color-surface-statement",
-        "--color-text-inverse",
         "--color-text-primary",
-        "--color-text-secondary"
+        "--color-text-secondary",
+        "--color-image-text-scrim",
+        "--color-image-text-on-media"
       ],
       "typography": [
         "--font-family-body",
@@ -279,7 +320,8 @@
         "--typo-caption-size",
         "--typo-caption-line-height",
         "--typo-h2-size",
-        "--typo-h2-line-height"
+        "--typo-h2-line-height",
+        "--typo-image-text-eyebrow-tracking"
       ],
       "radius": [
         "--radius-lg"
@@ -288,7 +330,19 @@
         "--space-layout-container",
         "--space-layout-element-gap",
         "--space-layout-grid-gap",
-        "--space-layout-section-gap"
+        "--space-layout-section-gap",
+        "--size-image-text-content-max",
+        "--ratio-image-text-media",
+        "--size-image-text-overlay-min",
+        "--ratio-image-text-overlay-height",
+        "--size-image-text-overlay-max",
+        "--size-image-text-column-min",
+        "--scale-image-text-content-gap",
+        "--scale-image-text-block-padding-min",
+        "--scale-image-text-block-padding-max",
+        "--ratio-image-text-scrim-stop",
+        "--ratio-image-text-block-padding",
+        "--ratio-image-text-inline-padding"
       ],
       "opacity": [
         "--opacity-overlay"
@@ -299,7 +353,7 @@
     "Require non-empty media, title, and body; associate the thematic section with the visible contextual heading through aria-labelledby.",
     "Give informative media a useful alternative and intrinsic dimensions; use an empty alt for decorative imagery without duplicating adjacent narrative.",
     "Preserve media then narrative in DOM/source order for every variant; Reversed changes only wide visual placement.",
-    "Ensure Overlay applies an invariant scrim, explicit inverse child colors, and a readable forced-colors fallback for every supplied media frame.",
+    "Ensure Overlay applies its configured scrim and dedicated on-media child colors, and a readable forced-colors fallback for every supplied media frame.",
     "Render the optional action only as a complete canonical Button composition with truthful native navigation or command semantics and visible focus.",
     "Add no section focus model, Arrow-key behavior, live region, autoplay, timeout, authored motion, or neutral runtime.",
     "Omit incomplete content and leave heading rank, rich-text sanitization, media loading/art direction, action results, analytics, and update announcements with the owning target."

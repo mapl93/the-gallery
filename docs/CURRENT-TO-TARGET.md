@@ -897,8 +897,8 @@ ADRs 0386–0391 correct static Studio controls that grouped multiple tokens int
 single unusable swatch. Reachability is distinct from complete visual-role
 coverage: remaining Sections, Reviews and Pages still need their source passes.
 
-Image with Text has a confirmed Dark on-media palette issue: dark inverse text
-remains over a black scrim. Its concrete A/B examples await the owner before a
-palette change; see the 2026-09-12 Image with Text palette decision report.
+Image with Text's Dark on-media palette is resolved by owner choice A (ADR 0398):
+white text and the existing black scrim in both themes. Its fifteen public roles
+and five variants pass the 2026-09-13 checkpoint.
 This work advances original audit finding 5; it does not close all nine findings,
 certify arbitrary brand/media accessibility or complete hosted Shopify delivery.

@@ -86,17 +86,17 @@
 
 /* ── S3. IMAGE WITH TEXT ── */
 .image-text {
-  --_image-text-content-measure: 40rem;
-  --_image-text-media-ratio: 4 / 3;
-  --_image-text-overlay-min-block-size: clamp(24rem, 58cqi, 42rem);
-  --_image-text-eyebrow-tracking: 0.1em;
-  --_image-text-scrim: rgb(0 0 0 / var(--opacity-overlay));
+  --_image-text-content-measure: var(--size-image-text-content-max);
+  --_image-text-media-ratio: var(--ratio-image-text-media);
+  --_image-text-overlay-min-block-size: clamp(var(--size-image-text-overlay-min), calc(var(--ratio-image-text-overlay-height) * 100cqi), var(--size-image-text-overlay-max));
+  --_image-text-eyebrow-tracking: var(--typo-image-text-eyebrow-tracking);
+  --_image-text-scrim: color-mix(in srgb, var(--color-image-text-scrim) calc(var(--opacity-overlay) * 100%), transparent);
 
   container-name: image-text;
   display: grid;
   grid-template-columns: repeat(
     auto-fit,
-    minmax(min(100%, 24rem), 1fr)
+    minmax(min(100%, var(--size-image-text-column-min)), 1fr)
   );
   align-items: stretch;
   background: var(--color-surface-primary);
@@ -123,15 +123,15 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: var(--space-layout-element-gap);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-image-text-content-gap));
   padding-block: clamp(
-    calc(var(--space-layout-element-gap) * 1.5),
-    8cqi,
-    calc(var(--space-layout-section-gap) * 0.75)
+    calc(var(--space-layout-element-gap) * var(--scale-image-text-block-padding-min)),
+    calc(var(--ratio-image-text-block-padding) * 100cqi),
+    calc(var(--space-layout-section-gap) * var(--scale-image-text-block-padding-max))
   );
   padding-inline: clamp(
     var(--space-layout-element-gap),
-    8cqi,
+    calc(var(--ratio-image-text-inline-padding) * 100cqi),
     var(--space-layout-container)
   );
 }
@@ -204,11 +204,11 @@
   z-index: 1;
   inline-size: min(100%, var(--_image-text-content-measure));
   min-block-size: inherit;
-  color: var(--color-text-inverse);
+  color: var(--color-image-text-on-media);
   background: linear-gradient(
     90deg,
     var(--_image-text-scrim) 0%,
-    var(--_image-text-scrim) 62%,
+    var(--_image-text-scrim) calc(var(--ratio-image-text-scrim-stop) * 100%),
     transparent 100%
   );
 }
@@ -218,7 +218,7 @@
   .image-text__title,
   .image-text__body
 ) {
-  color: var(--color-text-inverse);
+  color: var(--color-image-text-on-media);
 }
 
 /* Image+Text — contained offset */

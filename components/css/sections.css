@@ -941,20 +941,20 @@
 
 /* ── S17 · Before / After Image Slider ───────────────────── */
 .before-after {
-  --_before-after-divider: 3px;
-  --_before-after-thumb: min(2.5rem, var(--space-layout-touch-target));
+  --_before-after-divider: var(--border-before-after-divider);
+  --_before-after-thumb: min(var(--size-before-after-thumb), var(--space-layout-touch-target));
   --_before-after-clip-start: 0%;
   --_before-after-clip-end: calc(100% - var(--_slider-progress));
   --_before-after-divider-shift: -50%;
 
   inline-size: 100%;
-  max-inline-size: 50rem;
+  max-inline-size: var(--size-before-after-content-max);
   margin: 0 auto;
   color: var(--color-text-primary);
 }
 .before-after.slider {
   display: grid;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-before-after-content-gap));
 }
 .before-after.slider:has(.before-after__input:disabled) {
   opacity: 1;
@@ -969,7 +969,7 @@
   display: block;
   block-size: auto;
   min-inline-size: 0;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: var(--ratio-before-after-media);
   user-select: none;
 }
 .before-after__media-frame {
@@ -1048,25 +1048,25 @@
 .before-after__label {
   position: absolute;
   z-index: 3;
-  inset-block-end: calc(var(--space-layout-element-gap) * 0.5);
-  max-inline-size: calc(50% - var(--space-layout-element-gap));
-  padding: calc(var(--space-layout-element-gap) * 0.25)
-    calc(var(--space-layout-element-gap) * 0.5);
-  color: var(--color-text-inverse);
-  background: color-mix(in srgb, var(--color-text-primary) 72%, transparent);
+  inset-block-end: calc(var(--space-layout-element-gap) * var(--scale-before-after-label-inset));
+  max-inline-size: calc(50% - var(--space-layout-element-gap) * var(--scale-before-after-label-clearance));
+  padding: calc(var(--space-layout-element-gap) * var(--scale-before-after-label-padding-block))
+    calc(var(--space-layout-element-gap) * var(--scale-before-after-label-padding-inline));
+  color: var(--color-before-after-label-text);
+  background: color-mix(in srgb, var(--color-before-after-label-tint) calc(var(--ratio-before-after-label-tint) * 100%), transparent);
   border-radius: var(--radius-sm);
   font: var(--tg-typography-body-caption-weight) var(--typo-caption-size) / var(--typo-caption-line-height) var(--font-family-body);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--space-before-after-label-tracking);
   overflow-wrap: anywhere;
 }
 .before-after__label--before {
   z-index: 1;
-  inset-inline-end: calc(var(--space-layout-element-gap) * 0.5);
+  inset-inline-end: calc(var(--space-layout-element-gap) * var(--scale-before-after-label-inset));
   text-align: end;
 }
 .before-after__label--after {
-  inset-inline-start: calc(var(--space-layout-element-gap) * 0.5);
+  inset-inline-start: calc(var(--space-layout-element-gap) * var(--scale-before-after-label-inset));
 }
 .before-after__description {
   margin: 0;
@@ -1089,15 +1089,15 @@
 
 /* ── S18 · Scrolling Text Marquee ────────────────────────── */
 .marquee {
-  --_marquee-item-gap: var(--space-layout-element-gap);
-  --_marquee-group-gap: var(--space-layout-element-gap);
+  --_marquee-item-gap: calc(var(--space-layout-element-gap) * var(--scale-marquee-item-gap));
+  --_marquee-group-gap: calc(var(--space-layout-element-gap) * var(--scale-marquee-group-gap));
   --_marquee-duration: 20s;
 
   display: grid;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-marquee-content-gap));
   padding-block: var(--space-layout-element-gap);
-  border-top: 1px solid var(--color-border-subtle);
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-top: var(--border-marquee-width) solid var(--color-border-subtle);
+  border-bottom: var(--border-marquee-width) solid var(--color-border-subtle);
   color: var(--color-text-primary);
 }
 .marquee__label {
@@ -1123,7 +1123,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--_marquee-item-gap) * 0.5) var(--_marquee-item-gap);
+  gap: calc(var(--_marquee-item-gap) * var(--scale-marquee-row-gap)) var(--_marquee-item-gap);
   inline-size: 100%;
   min-inline-size: 0;
   margin: 0;
@@ -1137,12 +1137,12 @@
 .marquee__item {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--space-layout-element-gap) * 0.5);
+  gap: calc(var(--space-layout-element-gap) * var(--scale-marquee-separator-gap));
   min-inline-size: 0;
   color: var(--color-text-primary);
   font-family: var(--font-family-heading);
-  font-size: clamp(1.125rem, 2.5cqi, 1.75rem);
-  line-height: 1.2;
+  font-size: clamp(var(--size-marquee-type-min), calc(var(--ratio-marquee-type) * 100cqi), var(--size-marquee-type-max));
+  line-height: var(--type-marquee-line-height);
 }
 .marquee__item:not(:last-child)::after {
   content: "/";
@@ -1250,11 +1250,11 @@
 
 /* ── S19 · Collage Section ───────────────────────────────── */
 .collage-section {
-  --_row-size: clamp(9rem, 22cqi, 18rem);
-  max-inline-size: 80rem;
+  --_row-size: clamp(var(--size-collage-row-min), calc(var(--ratio-collage-row) * 100cqi), var(--size-collage-row-max));
+  max-inline-size: var(--size-collage-content-max);
   margin-inline: auto;
   padding-block: var(--space-layout-section-gap);
-  padding-inline: min(var(--space-layout-container), 8%);
+  padding-inline: min(var(--space-layout-container), calc(var(--ratio-collage-inset) * 100%));
 }
 .collage-section__header {
   text-align: center;
@@ -1267,7 +1267,8 @@
 }
 .collage-section__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  --_collage-columns: max(1, var(--grid-collage-wide-columns));
+  grid-template-columns: repeat(var(--_collage-columns), minmax(0, 1fr));
   grid-auto-rows: var(--_row-size);
   gap: var(--space-layout-grid-gap);
   margin: 0;
@@ -1296,17 +1297,17 @@
   object-fit: cover;
 }
 .collage-section__item--feature {
-  grid-column: span 2;
-  grid-row: span 2;
+  grid-column: span min(max(1, var(--grid-collage-feature-columns)), var(--_collage-columns));
+  grid-row: span max(1, var(--grid-collage-feature-rows));
 }
 .collage-section__caption {
   position: absolute;
   inset-block-end: 0;
   inset-inline: 0;
   margin: 0;
-  padding: .75em 1em;
-  background: color-mix(in srgb, var(--color-text-primary) 78%, transparent);
-  color: var(--color-text-inverse);
+  padding: var(--space-collage-caption-block) var(--space-collage-caption-inline);
+  background: color-mix(in srgb, var(--color-collage-caption-tint) calc(var(--ratio-collage-caption-tint) * 100%), transparent);
+  color: var(--color-collage-caption-text);
   font: var(--tg-typography-body-small-weight) var(--typo-body-sm-size)/var(--typo-body-sm-line-height) var(--font-family-body);
 }
 
@@ -1483,23 +1484,24 @@
   outline-offset: 2px;
 }
 .collage-section__link:focus-visible {
-  outline-offset: -3px;
+  outline-width: var(--border-collage-focus-width);
+  outline-offset: calc(var(--space-collage-focus-inset) * -1);
 }
 
 @container (max-width: 767px) {
   .collage-section__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    --_collage-columns: max(1, var(--grid-collage-medium-columns));
   }
 }
 
 @container (max-width: 439px) {
   .collage-section__grid {
-    grid-template-columns: 1fr;
+    --_collage-columns: max(1, var(--grid-collage-compact-columns));
   }
 
   .collage-section__item--feature {
-    grid-column: span 1;
-    grid-row: span 1;
+    grid-column: span min(max(1, var(--grid-collage-compact-feature-columns)), var(--_collage-columns));
+    grid-row: span max(1, var(--grid-collage-compact-feature-rows));
   }
 }
 

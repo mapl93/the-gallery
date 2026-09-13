@@ -902,3 +902,12 @@ white text and the existing black scrim in both themes. Its fifteen public roles
 and five variants pass the 2026-09-13 checkpoint.
 This work advances original audit finding 5; it does not close all nine findings,
 certify arbitrary brand/media accessibility or complete hosted Shopify delivery.
+
+### Sections visual values complete — 2026-09-13
+
+ADRs 0398–0404 resolve the approved Image with Text media palette and complete the
+active Sections visual-value pass. Source tokens, public contracts, Studio/Exhibit
+and generated Web/Shopify agree, with default-preservation and actual-control
+browser evidence per checkpoint. Deprecated Hero Section remains a migration
+record. Continue Reviews and remaining Pages; structural success is not hosted
+Shopify certification, arbitrary-brand accessibility or copy adoption.

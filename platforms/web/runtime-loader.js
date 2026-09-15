@@ -32,7 +32,7 @@ const modules = [
   {
     "id": "quantity",
     "selectors": [
-      ".quantity-selector",
+      ".qty",
       ".number-input"
     ]
   },

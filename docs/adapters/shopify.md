@@ -39,6 +39,7 @@ selection alone is never an inventory reservation.
 | --- | --- | --- |
 | `layout/*.liquid` | Page shell, global asset loading, head/body scaffolding, section groups | Target source |
 | `sections/*.liquid` | Merchant-editable sections with `{% schema %}` | Target source |
+| `sections/*.json` | Header and footer section-group composition | Target source |
 | `blocks/*.liquid` | Reusable merchant-editable theme blocks | Future target source |
 | `snippets/*.liquid` | Reusable Liquid partials rendered by sections/templates | Target source |
 | `templates/*.json` | Page composition of sections and default settings | Target source |
@@ -47,7 +48,9 @@ selection alone is never an inventory reservation.
 | `locales/*.json` | Merchant-facing strings and translations | Target source |
 | `assets/tokens.css` | Generated token wrapper from neutral web target | Generated output |
 | `assets/base.css` | Generated reset/foundations/utilities bundle | Generated output |
-| `assets/*.css` | Copied component CSS assets from `components/css/` | Generated/copied output |
+| `assets/storefront.css` | Shopify-only page composition and shell adjustments using Gallery tokens | Target source |
+| `assets/storefront.js` | Shopify-only overlay coordinator for global storefront surfaces | Target source |
+| Other `assets/*.css` | Copied component CSS assets from `components/css/` | Generated/copied output |
 | `assets/runtime-loader.js` | Detects rendered component roots and imports only matching behavior modules | Generated output; primary layout runtime |
 | `assets/tg-runtime-*.js` | Shared core plus component-owned progressive-enhancement modules | Generated output from canonical runtime boundaries |
 | `assets/theme.js` | Complete copied progressive-enhancement runtime | Generated/copied compatibility and diagnostic output; not loaded by layouts |
@@ -149,7 +152,7 @@ Use theme blocks for reusable merchant-editable content units, nested content sy
 
 ### Template Adapter
 
-Use JSON templates to compose sections into Shopify page types.
+Use JSON templates to compose sections into Shopify page types, and section-group JSON files to compose the editable header and footer regions rendered by layouts.
 
 Examples:
 
@@ -922,7 +925,7 @@ Under this model:
 - `Snippet Adapter` target-ready does not require schema, but requires a stable render API.
 - `Embedded Class Contract` target-ready requires CSS and contract class usage only.
 - Components that map Shopify objects need data mapping validation.
-- Section adapters must be reachable through a JSON template, a layout `{% section %}` call, or a section preset.
+- Section adapters must be reachable through a JSON template, a section-group JSON file, a layout `{% section %}` call, or a section preset.
 - Editor-preview readiness checks that schema controls are wired into rendered Liquid instead of becoming dead controls.
 
 The current generated inventory records:

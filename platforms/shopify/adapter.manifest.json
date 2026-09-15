@@ -24,6 +24,7 @@
       "platforms/shopify/templates"
     ],
     "templates": "platforms/shopify/templates/*.json",
+    "sectionGroups": "platforms/shopify/sections/*.json",
     "config": "platforms/shopify/config",
     "locales": "platforms/shopify/locales"
   },
@@ -53,6 +54,8 @@
       "platforms/shopify/assets/tg-runtime-filter-panel.js",
       "platforms/shopify/assets/tg-runtime-firing-schedule-axes.js"
     ],
+    "storefrontCss": "platforms/shopify/assets/storefront.css",
+    "storefrontJavascript": "platforms/shopify/assets/storefront.js",
     "manifest": "platforms/shopify/adapter.manifest.json",
     "summary": "platforms/shopify/adapter.summary.json",
     "cssAssets": [
@@ -93,7 +96,8 @@
       "ceramics.css",
       "coming-soon.css",
       "reviews.css",
-      "pages.css"
+      "pages.css",
+      "storefront.css"
     ],
     "password": [
       "tokens.css",
@@ -107,6 +111,7 @@
     "tokenOwnership": "tokens.css is generated from platforms/web/tokens.css and should not be edited directly.",
     "baseOwnership": "base.css is generated from reset, foundations, and utilities source CSS; it must not define token values.",
     "componentCssOwnership": "Component CSS assets are copied from components/css and should be regenerated from source.",
+    "storefrontOwnership": "storefront.css and storefront.js are Shopify target source for page composition and overlay coordination; they do not define a parallel public component API.",
     "runtimeDelivery": "runtime-loader.js imports only the progressive-enhancement modules matched by rendered Liquid; theme.js remains a compatibility and diagnostic aggregate.",
     "liquidOwnership": "Liquid files are Shopify adapter source and may map Shopify objects/settings into component contracts.",
     "maturityOwnership": "Shopify maturity is computed from contract status, CSS output, Liquid evidence, section/block schema, data mapping, template composition, editor-preview readiness, and behavior requirements. Class-level contracts do not require dedicated Liquid roots.",
@@ -137,7 +142,7 @@
       "schema": "Required for section and theme-block adapters; validates that target-native editor settings exist in Liquid schema.",
       "data": "Required for dedicated Shopify adapters; tracks Shopify objects, settings, render calls, section calls, and snippet render parameters.",
       "behavior": "Required when the contract defines behavior; accepted only when the Shopify adapter status is implemented.",
-      "templateComposition": "Required for section adapters; satisfied by JSON templates, layout section calls, or addable section presets.",
+      "templateComposition": "Required for section adapters; satisfied by JSON templates, section groups, layout section calls, or addable section presets.",
       "editorPreview": "Required for section and theme-block adapters; checks that schema controls are wired into rendered Liquid instead of becoming dead editor controls."
     }
   },
@@ -236,6 +241,11 @@
       "source": "components/css/pages.css",
       "output": "platforms/shopify/assets/pages.css",
       "role": "pages"
+    },
+    {
+      "source": "platforms/shopify/assets/storefront.css",
+      "output": "platforms/shopify/assets/storefront.css",
+      "role": "shopify-storefront-composition"
     }
   ],
   "shopifyInventory": {
@@ -285,6 +295,7 @@
         "classes": [
           "endif",
           "if",
+          "no-js",
           "skip-link",
           "template-"
         ],
@@ -324,10 +335,6 @@
             "parameters": []
           },
           {
-            "name": "mobile-menu",
-            "parameters": []
-          },
-          {
             "name": "search-overlay",
             "parameters": []
           },
@@ -337,10 +344,7 @@
           }
         ],
         "sectionCalls": [
-          "announcement-bar",
-          "coming-soon",
-          "footer",
-          "header"
+          "coming-soon"
         ],
         "designMode": false
       },
@@ -1140,6 +1144,7 @@
         "kind": "section",
         "name": "footer",
         "classes": [
+          "btn",
           "footer",
           "footer__bottom",
           "footer__brand",
@@ -1150,7 +1155,18 @@
           "footer__link",
           "footer__links",
           "footer__meta",
-          "footer__meta-link"
+          "footer__meta-link",
+          "input",
+          "input__field",
+          "input__label",
+          "rte",
+          "storefront-footer",
+          "storefront-footer__newsletter-form",
+          "storefront-footer__newsletter-row",
+          "storefront-footer__policies",
+          "storefront-footer__social",
+          "storefront-footer__wordmark",
+          "visually-hidden"
         ],
         "schema": {
           "required": true,
@@ -1159,15 +1175,23 @@
           "name": "Footer",
           "settingIds": [
             "footer_text",
+            "logo_variant",
+            "show_payment_icons",
             "social_instagram",
             "social_pinterest"
           ],
           "blockTypes": [
-            "menu"
+            "contact",
+            "menu",
+            "newsletter"
           ],
           "blockSettingIds": [
+            "contact.heading",
+            "contact.text",
             "menu.heading",
-            "menu.menu"
+            "menu.menu",
+            "newsletter.heading",
+            "newsletter.text"
           ],
           "hasPresets": false,
           "presetNames": [],
@@ -1176,19 +1200,31 @@
         "settingsReferences": {
           "section": [
             "footer_text",
+            "logo_variant",
+            "show_payment_icons",
             "social_instagram",
             "social_pinterest"
           ],
           "block": [
             "heading",
-            "menu"
+            "menu",
+            "text"
           ],
           "global": []
         },
         "dataReferences": [
+          "routes",
           "shop"
         ],
         "renderCalls": [
+          {
+            "name": "logo",
+            "parameters": [
+              "loading",
+              "variant",
+              "width"
+            ]
+          },
           {
             "name": "icon",
             "parameters": [
@@ -1200,6 +1236,10 @@
             "parameters": [
               "name"
             ]
+          },
+          {
+            "name": "payment-icons",
+            "parameters": []
           }
         ],
         "sectionCalls": [],
@@ -1264,9 +1304,7 @@
         "kind": "section",
         "name": "header",
         "classes": [
-          "btn",
-          "btn--icon-only",
-          "btn--outline",
+          "endunless",
           "header",
           "header__action",
           "header__actions",
@@ -1274,7 +1312,14 @@
           "header__hamburger",
           "header__logo",
           "header__nav",
-          "header__nav-link"
+          "header__nav-link",
+          "icon-btn",
+          "icon-btn--round",
+          "storefront-account",
+          "storefront-account__avatar",
+          "storefront-header",
+          "storefront-header--static",
+          "unless"
         ],
         "schema": {
           "required": true,
@@ -1282,8 +1327,13 @@
           "status": "ready",
           "name": "Header",
           "settingIds": [
+            "cart_behavior",
+            "customer_account_menu",
             "logo_variant",
-            "menu"
+            "menu",
+            "show_account",
+            "show_search",
+            "sticky"
           ],
           "blockTypes": [],
           "blockSettingIds": [],
@@ -1293,15 +1343,19 @@
         },
         "settingsReferences": {
           "section": [
+            "cart_behavior",
+            "customer_account_menu",
             "logo_variant",
-            "menu"
+            "menu",
+            "show_account",
+            "show_search",
+            "sticky"
           ],
           "block": [],
           "global": []
         },
         "dataReferences": [
           "cart",
-          "linklists",
           "routes",
           "shop"
         ],
@@ -1330,6 +1384,18 @@
             "name": "icon",
             "parameters": [
               "name"
+            ]
+          },
+          {
+            "name": "icon",
+            "parameters": [
+              "name"
+            ]
+          },
+          {
+            "name": "mobile-menu",
+            "parameters": [
+              "menu"
             ]
           }
         ],
@@ -1595,6 +1661,78 @@
         "designMode": false
       },
       {
+        "path": "platforms/shopify/sections/landing-gateway.liquid",
+        "kind": "section",
+        "name": "landing-gateway",
+        "classes": [
+          "landing-gateway",
+          "landing-gateway__identity",
+          "landing-gateway__media",
+          "landing-gateway__navigation",
+          "landing-gateway__note",
+          "landing-gateway__portal-link",
+          "landing-gateway__portals",
+          "landing-gateway__wordmark",
+          "rte",
+          "visually-hidden"
+        ],
+        "schema": {
+          "required": true,
+          "count": 1,
+          "status": "ready",
+          "name": "Editorial gateway",
+          "settingIds": [
+            "image",
+            "image_alt",
+            "logo_variant",
+            "navigation_label",
+            "note"
+          ],
+          "blockTypes": [
+            "portal"
+          ],
+          "blockSettingIds": [
+            "portal.label",
+            "portal.url"
+          ],
+          "hasPresets": true,
+          "presetNames": [
+            "Editorial gateway"
+          ],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [
+            "image",
+            "image_alt",
+            "logo_variant",
+            "navigation_label",
+            "note"
+          ],
+          "block": [
+            "label",
+            "url"
+          ],
+          "global": []
+        },
+        "dataReferences": [
+          "routes",
+          "shop"
+        ],
+        "renderCalls": [
+          {
+            "name": "logo",
+            "parameters": [
+              "loading",
+              "variant",
+              "width"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": false
+      },
+      {
         "path": "platforms/shopify/sections/lookbook.liquid",
         "kind": "section",
         "name": "lookbook",
@@ -1749,7 +1887,8 @@
           "endif",
           "if",
           "main-cart__discount",
-          "section"
+          "section",
+          "storefront-cart"
         ],
         "schema": {
           "required": true,
@@ -1961,13 +2100,187 @@
         "designMode": false
       },
       {
+        "path": "platforms/shopify/sections/main-journal-article.liquid",
+        "kind": "section",
+        "name": "main-journal-article",
+        "classes": [
+          "storefront-article",
+          "storefront-article__content"
+        ],
+        "schema": {
+          "required": true,
+          "count": 1,
+          "status": "ready",
+          "name": "Journal article",
+          "settingIds": [
+            "drop_cap",
+            "hero_variant",
+            "show_author_card",
+            "show_author_in_hero",
+            "show_date",
+            "show_image"
+          ],
+          "blockTypes": [],
+          "blockSettingIds": [],
+          "hasPresets": false,
+          "presetNames": [],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [
+            "drop_cap",
+            "hero_variant",
+            "show_author_card",
+            "show_author_in_hero",
+            "show_date",
+            "show_image"
+          ],
+          "block": [],
+          "global": []
+        },
+        "dataReferences": [
+          "article",
+          "blog"
+        ],
+        "renderCalls": [
+          {
+            "name": "article-hero",
+            "parameters": [
+              "article",
+              "blog_label",
+              "heading_level",
+              "image_loading",
+              "image_sizes",
+              "show_author",
+              "show_date",
+              "show_image",
+              "variant"
+            ]
+          },
+          {
+            "name": "article-body",
+            "parameters": [
+              "article",
+              "drop_cap"
+            ]
+          },
+          {
+            "name": "author-card",
+            "parameters": [
+              "article",
+              "show_bio",
+              "show_email",
+              "show_homepage",
+              "show_image",
+              "variant"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": false
+      },
+      {
+        "path": "platforms/shopify/sections/main-journal.liquid",
+        "kind": "section",
+        "name": "main-journal",
+        "classes": [
+          "rte",
+          "storefront-journal",
+          "storefront-journal__eyebrow",
+          "storefront-journal__grid",
+          "storefront-journal__header",
+          "storefront-journal__intro",
+          "storefront-journal__title",
+          "storefront-journal__topics"
+        ],
+        "schema": {
+          "required": true,
+          "count": 1,
+          "status": "ready",
+          "name": "Journal index",
+          "settingIds": [
+            "articles_per_page",
+            "card_variant",
+            "columns",
+            "excerpt_lines",
+            "intro",
+            "show_author",
+            "show_date",
+            "show_excerpt",
+            "show_image",
+            "show_tags"
+          ],
+          "blockTypes": [],
+          "blockSettingIds": [],
+          "hasPresets": false,
+          "presetNames": [],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [
+            "articles_per_page",
+            "card_variant",
+            "columns",
+            "excerpt_lines",
+            "intro",
+            "show_author",
+            "show_date",
+            "show_excerpt",
+            "show_image",
+            "show_tags"
+          ],
+          "block": [],
+          "global": []
+        },
+        "dataReferences": [
+          "blog"
+        ],
+        "renderCalls": [
+          {
+            "name": "article-card",
+            "parameters": [
+              "article",
+              "blog_label",
+              "excerpt_lines",
+              "heading_level",
+              "show_author",
+              "show_date",
+              "show_excerpt",
+              "show_image",
+              "surface",
+              "variant"
+            ]
+          },
+          {
+            "name": "pagination",
+            "parameters": [
+              "paginate"
+            ]
+          },
+          {
+            "name": "empty-state",
+            "parameters": [
+              "heading_tag",
+              "message",
+              "title"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": false
+      },
+      {
         "path": "platforms/shopify/sections/main-page.liquid",
         "kind": "section",
         "name": "main-page",
         "classes": [
           "container",
           "page-content",
-          "section"
+          "rte",
+          "section",
+          "storefront-page",
+          "storefront-page__container",
+          "storefront-page__title"
         ],
         "schema": {
           "required": true,
@@ -2004,6 +2317,7 @@
           "product-layout__gallery",
           "product-layout__info",
           "section",
+          "storefront-product",
           "visually-hidden"
         ],
         "schema": {
@@ -2095,6 +2409,215 @@
             "name": "certificate-of-authenticity",
             "parameters": [
               "product"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": false
+      },
+      {
+        "path": "platforms/shopify/sections/main-search.liquid",
+        "kind": "section",
+        "name": "main-search",
+        "classes": [
+          "btn",
+          "input",
+          "input__field",
+          "input__label",
+          "storefront-search-card",
+          "storefront-search-card__excerpt",
+          "storefront-search-card__image",
+          "storefront-search-card__title",
+          "storefront-search-card__type",
+          "storefront-search-page",
+          "storefront-search-page__form",
+          "storefront-search-page__grid",
+          "storefront-search-page__header",
+          "storefront-search-page__title"
+        ],
+        "schema": {
+          "required": true,
+          "count": 1,
+          "status": "ready",
+          "name": "Search results",
+          "settingIds": [
+            "columns",
+            "media_ratio",
+            "results_per_page",
+            "show_second_image",
+            "show_vendor"
+          ],
+          "blockTypes": [],
+          "blockSettingIds": [],
+          "hasPresets": false,
+          "presetNames": [],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [
+            "columns",
+            "media_ratio",
+            "results_per_page",
+            "show_second_image",
+            "show_vendor"
+          ],
+          "block": [],
+          "global": []
+        },
+        "dataReferences": [
+          "routes",
+          "search"
+        ],
+        "renderCalls": [
+          {
+            "name": "storefront-product-tile",
+            "parameters": [
+              "heading_tag",
+              "media_ratio",
+              "product",
+              "show_badges",
+              "show_description",
+              "show_second_image",
+              "show_vendor"
+            ]
+          },
+          {
+            "name": "pagination",
+            "parameters": [
+              "paginate"
+            ]
+          },
+          {
+            "name": "empty-state",
+            "parameters": [
+              "heading_tag",
+              "message",
+              "title"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": false
+      },
+      {
+        "path": "platforms/shopify/sections/main-storefront-collection.liquid",
+        "kind": "section",
+        "name": "main-storefront-collection",
+        "classes": [
+          "btn",
+          "btn--outline",
+          "checkbox",
+          "checkbox__input",
+          "checkbox__label",
+          "input",
+          "input__field",
+          "input__label",
+          "rte",
+          "select",
+          "select__field",
+          "select__label",
+          "storefront-collection",
+          "storefront-collection__actions",
+          "storefront-collection__active-filters",
+          "storefront-collection__categories",
+          "storefront-collection__category-link",
+          "storefront-collection__description",
+          "storefront-collection__filters",
+          "storefront-collection__form",
+          "storefront-collection__grid",
+          "storefront-collection__header",
+          "storefront-collection__sort",
+          "storefront-collection__title",
+          "storefront-collection__toolbar",
+          "storefront-filter",
+          "storefront-filter__options",
+          "storefront-filter__price",
+          "storefront-filter__summary",
+          "tag",
+          "tag__label",
+          "tag__remove"
+        ],
+        "schema": {
+          "required": true,
+          "count": 1,
+          "status": "ready",
+          "name": "Storefront collection",
+          "settingIds": [
+            "category_label",
+            "category_menu",
+            "columns",
+            "enable_filtering",
+            "enable_sorting",
+            "media_ratio",
+            "products_per_page",
+            "show_badges",
+            "show_categories",
+            "show_description",
+            "show_second_image",
+            "show_vendor"
+          ],
+          "blockTypes": [],
+          "blockSettingIds": [],
+          "hasPresets": false,
+          "presetNames": [],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [
+            "category_label",
+            "category_menu",
+            "columns",
+            "enable_filtering",
+            "enable_sorting",
+            "media_ratio",
+            "products_per_page",
+            "show_badges",
+            "show_categories",
+            "show_description",
+            "show_second_image",
+            "show_vendor"
+          ],
+          "block": [],
+          "global": []
+        },
+        "dataReferences": [
+          "collection"
+        ],
+        "renderCalls": [
+          {
+            "name": "storefront-product-tile",
+            "parameters": [
+              "heading_tag",
+              "media_ratio",
+              "product",
+              "show_badges",
+              "show_description",
+              "show_second_image",
+              "show_vendor"
+            ]
+          },
+          {
+            "name": "pagination",
+            "parameters": [
+              "paginate"
+            ]
+          },
+          {
+            "name": "empty-state",
+            "parameters": [
+              "cta_text",
+              "cta_url",
+              "heading_tag",
+              "message",
+              "title"
+            ]
+          },
+          {
+            "name": "empty-state",
+            "parameters": [
+              "heading_tag",
+              "message",
+              "title"
             ]
           }
         ],
@@ -2800,6 +3323,115 @@
         "designMode": false
       },
       {
+        "path": "platforms/shopify/sections/work-index.liquid",
+        "kind": "section",
+        "name": "work-index",
+        "classes": [
+          "endif",
+          "if",
+          "rte",
+          "storefront-work",
+          "storefront-work-card",
+          "storefront-work-card--portrait",
+          "storefront-work-card__content",
+          "storefront-work-card__description",
+          "storefront-work-card__eyebrow",
+          "storefront-work-card__media",
+          "storefront-work-card__title",
+          "storefront-work__grid",
+          "storefront-work__header",
+          "storefront-work__intro",
+          "storefront-work__item",
+          "storefront-work__item--",
+          "storefront-work__navigation",
+          "storefront-work__title"
+        ],
+        "schema": {
+          "required": true,
+          "count": 1,
+          "status": "ready",
+          "name": "Work index",
+          "settingIds": [
+            "heading",
+            "intro",
+            "navigation",
+            "navigation_label"
+          ],
+          "blockTypes": [
+            "collection",
+            "editorial",
+            "product"
+          ],
+          "blockSettingIds": [
+            "collection.collection",
+            "collection.description",
+            "collection.eyebrow",
+            "collection.image",
+            "collection.portrait",
+            "collection.span",
+            "collection.title",
+            "collection.url",
+            "editorial.description",
+            "editorial.eyebrow",
+            "editorial.image",
+            "editorial.portrait",
+            "editorial.span",
+            "editorial.title",
+            "editorial.url",
+            "product.description",
+            "product.eyebrow",
+            "product.image",
+            "product.portrait",
+            "product.product",
+            "product.show_price",
+            "product.span",
+            "product.title",
+            "product.url"
+          ],
+          "hasPresets": true,
+          "presetNames": [
+            "Work index"
+          ],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [
+            "heading",
+            "intro",
+            "navigation",
+            "navigation_label"
+          ],
+          "block": [
+            "collection",
+            "description",
+            "eyebrow",
+            "image",
+            "portrait",
+            "product",
+            "show_price",
+            "span",
+            "title",
+            "url"
+          ],
+          "global": []
+        },
+        "dataReferences": [
+          "collection",
+          "product",
+          "request"
+        ],
+        "renderCalls": [
+          {
+            "name": "price",
+            "parameters": [
+              "product"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": true
+      },
+      {
         "path": "platforms/shopify/snippets/article-body.liquid",
         "kind": "snippet",
         "name": "article-body",
@@ -3080,14 +3712,15 @@
           "cart-drawer__summary-total",
           "cart-lines",
           "close-btn",
-          "close-btn__icon",
           "drawer",
           "drawer-overlay",
           "drawer__body",
           "drawer__close",
           "drawer__footer",
           "drawer__header",
-          "drawer__title"
+          "drawer__title",
+          "storefront-cart-drawer",
+          "storefront-cart-drawer__form"
         ],
         "schema": {
           "required": false,
@@ -3103,10 +3736,7 @@
         "settingsReferences": {
           "section": [],
           "block": [],
-          "global": [
-            "gift_wrap_enabled",
-            "gift_wrap_product"
-          ]
+          "global": []
         },
         "dataReferences": [
           "cart",
@@ -3133,21 +3763,7 @@
           {
             "name": "cart-line-item",
             "parameters": [
-              "item",
-              "show_quantity"
-            ]
-          },
-          {
-            "name": "cart-line-item",
-            "parameters": [
               "item"
-            ]
-          },
-          {
-            "name": "gift-wrap",
-            "parameters": [
-              "gift_wrap_id",
-              "gift_wrap_product"
             ]
           }
         ],
@@ -3669,7 +4285,8 @@
           "drawer__title",
           "mobile-nav",
           "mobile-nav__item",
-          "mobile-nav__link"
+          "mobile-nav__link",
+          "storefront-mobile-drawer"
         ],
         "schema": {
           "required": false,
@@ -4361,15 +4978,17 @@
         "kind": "snippet",
         "name": "search-overlay",
         "classes": [
+          "btn",
           "close-btn",
           "search-box",
           "search-box__close",
           "search-box__header",
           "search-box__input",
           "search-box__label",
+          "search-box__submit",
           "search-box__title",
           "search-overlay",
-          "search-results",
+          "storefront-search-overlay",
           "visually-hidden"
         ],
         "schema": {
@@ -4389,7 +5008,8 @@
           "global": []
         },
         "dataReferences": [
-          "routes"
+          "routes",
+          "search"
         ],
         "renderCalls": [
           {
@@ -4481,6 +5101,56 @@
           "sticky-atc__price",
           "sticky-atc__title",
           "visible"
+        ],
+        "schema": {
+          "required": false,
+          "count": 0,
+          "status": "not-required",
+          "settingIds": [],
+          "blockTypes": [],
+          "blockSettingIds": [],
+          "hasPresets": false,
+          "presetNames": [],
+          "errors": []
+        },
+        "settingsReferences": {
+          "section": [],
+          "block": [],
+          "global": []
+        },
+        "dataReferences": [
+          "product"
+        ],
+        "renderCalls": [
+          {
+            "name": "price",
+            "parameters": [
+              "product"
+            ]
+          }
+        ],
+        "sectionCalls": [],
+        "designMode": false
+      },
+      {
+        "path": "platforms/shopify/snippets/storefront-product-tile.liquid",
+        "kind": "snippet",
+        "name": "storefront-product-tile",
+        "classes": [
+          "badge",
+          "storefront-product-tile",
+          "storefront-product-tile__badges",
+          "storefront-product-tile__content",
+          "storefront-product-tile__description",
+          "storefront-product-tile__identity",
+          "storefront-product-tile__image",
+          "storefront-product-tile__image--alternate",
+          "storefront-product-tile__image--primary",
+          "storefront-product-tile__link",
+          "storefront-product-tile__media",
+          "storefront-product-tile__price",
+          "storefront-product-tile__title",
+          "storefront-product-tile__vendor"
         ],
         "schema": {
           "required": false,
@@ -4715,6 +5385,24 @@
         "errors": []
       },
       {
+        "path": "platforms/shopify/templates/article.json",
+        "status": "ready",
+        "sectionTypes": [
+          "comments",
+          "main-journal-article",
+          "related-articles"
+        ],
+        "errors": []
+      },
+      {
+        "path": "platforms/shopify/templates/blog.json",
+        "status": "ready",
+        "sectionTypes": [
+          "main-journal"
+        ],
+        "errors": []
+      },
+      {
         "path": "platforms/shopify/templates/cart.json",
         "status": "ready",
         "sectionTypes": [
@@ -4726,8 +5414,7 @@
         "path": "platforms/shopify/templates/collection.json",
         "status": "ready",
         "sectionTypes": [
-          "collection-hero",
-          "main-collection"
+          "main-storefront-collection"
         ],
         "errors": []
       },
@@ -4735,11 +5422,7 @@
         "path": "platforms/shopify/templates/index.json",
         "status": "ready",
         "sectionTypes": [
-          "artist-profile",
-          "hero",
-          "newsletter",
-          "process-timeline",
-          "testimonials"
+          "landing-gateway"
         ],
         "errors": []
       },
@@ -4752,6 +5435,14 @@
         "errors": []
       },
       {
+        "path": "platforms/shopify/templates/page.work.json",
+        "status": "ready",
+        "sectionTypes": [
+          "work-index"
+        ],
+        "errors": []
+      },
+      {
         "path": "platforms/shopify/templates/product.json",
         "status": "ready",
         "sectionTypes": [
@@ -4759,17 +5450,42 @@
           "related-products"
         ],
         "errors": []
+      },
+      {
+        "path": "platforms/shopify/templates/search.json",
+        "status": "ready",
+        "sectionTypes": [
+          "main-search"
+        ],
+        "errors": []
+      }
+    ],
+    "sectionGroups": [
+      {
+        "path": "platforms/shopify/sections/footer-group.json",
+        "type": "footer",
+        "status": "ready",
+        "sectionTypes": [
+          "footer"
+        ],
+        "errors": []
+      },
+      {
+        "path": "platforms/shopify/sections/header-group.json",
+        "type": "header",
+        "status": "ready",
+        "sectionTypes": [
+          "header"
+        ],
+        "errors": []
       }
     ],
     "composition": {
       "templates": {
-        "artist-profile": [
-          "platforms/shopify/templates/index.json"
+        "comments": [
+          "platforms/shopify/templates/article.json"
         ],
-        "collection-hero": [
-          "platforms/shopify/templates/collection.json"
-        ],
-        "hero": [
+        "landing-gateway": [
           "platforms/shopify/templates/index.json"
         ],
         "main-404": [
@@ -4778,8 +5494,11 @@
         "main-cart": [
           "platforms/shopify/templates/cart.json"
         ],
-        "main-collection": [
-          "platforms/shopify/templates/collection.json"
+        "main-journal": [
+          "platforms/shopify/templates/blog.json"
+        ],
+        "main-journal-article": [
+          "platforms/shopify/templates/article.json"
         ],
         "main-page": [
           "platforms/shopify/templates/page.json"
@@ -4787,30 +5506,32 @@
         "main-product": [
           "platforms/shopify/templates/product.json"
         ],
-        "newsletter": [
-          "platforms/shopify/templates/index.json"
+        "main-search": [
+          "platforms/shopify/templates/search.json"
         ],
-        "process-timeline": [
-          "platforms/shopify/templates/index.json"
+        "main-storefront-collection": [
+          "platforms/shopify/templates/collection.json"
+        ],
+        "related-articles": [
+          "platforms/shopify/templates/article.json"
         ],
         "related-products": [
           "platforms/shopify/templates/product.json"
         ],
-        "testimonials": [
-          "platforms/shopify/templates/index.json"
+        "work-index": [
+          "platforms/shopify/templates/page.work.json"
+        ]
+      },
+      "sectionGroups": {
+        "footer": [
+          "platforms/shopify/sections/footer-group.json"
+        ],
+        "header": [
+          "platforms/shopify/sections/header-group.json"
         ]
       },
       "layoutSections": {
-        "announcement-bar": [
-          "platforms/shopify/layout/theme.liquid"
-        ],
         "coming-soon": [
-          "platforms/shopify/layout/theme.liquid"
-        ],
-        "footer": [
-          "platforms/shopify/layout/theme.liquid"
-        ],
-        "header": [
           "platforms/shopify/layout/theme.liquid"
         ],
         "password-content": [
@@ -4819,8 +5540,13 @@
       }
     },
     "renderApis": {
+      "article-body": [
+        "article",
+        "drop_cap"
+      ],
       "article-card": [
         "article",
+        "blog_label",
         "excerpt_lines",
         "heading_level",
         "show_author",
@@ -4828,6 +5554,25 @@
         "show_excerpt",
         "show_image",
         "surface",
+        "variant"
+      ],
+      "article-hero": [
+        "article",
+        "blog_label",
+        "heading_level",
+        "image_loading",
+        "image_sizes",
+        "show_author",
+        "show_date",
+        "show_image",
+        "variant"
+      ],
+      "author-card": [
+        "article",
+        "show_bio",
+        "show_email",
+        "show_homepage",
+        "show_image",
         "variant"
       ],
       "breadcrumb": [
@@ -4904,12 +5649,15 @@
         "variant",
         "width"
       ],
-      "mobile-menu": [],
+      "mobile-menu": [
+        "menu"
+      ],
       "pagination": [
         "anchor",
         "class_name",
         "paginate"
       ],
+      "payment-icons": [],
       "price": [
         "current_price_label",
         "line_item",
@@ -4957,6 +5705,15 @@
         "product",
         "size_chart_id"
       ],
+      "storefront-product-tile": [
+        "heading_tag",
+        "media_ratio",
+        "product",
+        "show_badges",
+        "show_description",
+        "show_second_image",
+        "show_vendor"
+      ],
       "theme-brand-settings": [],
       "variant-selector": [
         "product",
@@ -4986,12 +5743,17 @@
     "platforms/shopify/sections/hero.liquid",
     "platforms/shopify/sections/image-text.liquid",
     "platforms/shopify/sections/instagram-feed.liquid",
+    "platforms/shopify/sections/landing-gateway.liquid",
     "platforms/shopify/sections/lookbook.liquid",
     "platforms/shopify/sections/main-404.liquid",
     "platforms/shopify/sections/main-cart.liquid",
     "platforms/shopify/sections/main-collection.liquid",
+    "platforms/shopify/sections/main-journal-article.liquid",
+    "platforms/shopify/sections/main-journal.liquid",
     "platforms/shopify/sections/main-page.liquid",
     "platforms/shopify/sections/main-product.liquid",
+    "platforms/shopify/sections/main-search.liquid",
+    "platforms/shopify/sections/main-storefront-collection.liquid",
     "platforms/shopify/sections/masonry-gallery.liquid",
     "platforms/shopify/sections/multicolumn.liquid",
     "platforms/shopify/sections/newsletter.liquid",
@@ -5004,6 +5766,7 @@
     "platforms/shopify/sections/stats-section.liquid",
     "platforms/shopify/sections/testimonials.liquid",
     "platforms/shopify/sections/trust-badges.liquid",
+    "platforms/shopify/sections/work-index.liquid",
     "platforms/shopify/snippets/article-body.liquid",
     "platforms/shopify/snippets/article-card.liquid",
     "platforms/shopify/snippets/article-hero.liquid",
@@ -5038,6 +5801,7 @@
     "platforms/shopify/snippets/search-overlay.liquid",
     "platforms/shopify/snippets/size-chart.liquid",
     "platforms/shopify/snippets/sticky-atc.liquid",
+    "platforms/shopify/snippets/storefront-product-tile.liquid",
     "platforms/shopify/snippets/theme-brand-settings.liquid",
     "platforms/shopify/snippets/variant-selector.liquid",
     "platforms/shopify/templates/gift_card.liquid",
@@ -5045,17 +5809,25 @@
   ],
   "templateJsonFiles": [
     "platforms/shopify/templates/404.json",
+    "platforms/shopify/templates/article.json",
+    "platforms/shopify/templates/blog.json",
     "platforms/shopify/templates/cart.json",
     "platforms/shopify/templates/collection.json",
     "platforms/shopify/templates/index.json",
     "platforms/shopify/templates/page.json",
-    "platforms/shopify/templates/product.json"
+    "platforms/shopify/templates/page.work.json",
+    "platforms/shopify/templates/product.json",
+    "platforms/shopify/templates/search.json"
+  ],
+  "sectionGroupJsonFiles": [
+    "platforms/shopify/sections/footer-group.json",
+    "platforms/shopify/sections/header-group.json"
   ],
   "stats": {
     "components": 182,
     "contractImplemented": 93,
     "contractPlanned": 85,
-    "targetReady": 93,
+    "targetReady": 89,
     "cssReady": 182,
     "classLevelComponents": 62,
     "dedicatedTemplateComponents": 120,
@@ -5072,7 +5844,7 @@
     "dataReady": 63,
     "dataMissing": 57,
     "templateCompositionRequired": 35,
-    "templateCompositionReady": 35,
+    "templateCompositionReady": 30,
     "editorPreviewRequired": 35,
     "editorPreviewReady": 35,
     "behaviorRequired": 182,
@@ -5080,12 +5852,13 @@
     "liquidMatched": 92,
     "plannedWithLiquid": 12,
     "implementedMissingRequiredLiquid": 0,
-    "cssAssets": 17,
+    "cssAssets": 18,
     "runtimeModules": 18,
-    "liquidFiles": 76,
-    "templateJsonFiles": 6
+    "liquidFiles": 83,
+    "templateJsonFiles": 10,
+    "sectionGroupJsonFiles": 2
   },
-  "warningCount": 12,
+  "warningCount": 17,
   "warnings": [
     {
       "type": "planned-contract-with-liquid-template",
@@ -5146,6 +5919,31 @@
       "type": "planned-contract-with-liquid-template",
       "slug": "gift-wrap",
       "message": "A dedicated Shopify adapter exists, but the contract still marks Shopify as planned."
+    },
+    {
+      "type": "template-composition-not-ready",
+      "slug": "announcement-bar",
+      "message": "The Shopify section adapter is not referenced by a JSON template, section group, layout section call, or addable preset."
+    },
+    {
+      "type": "template-composition-not-ready",
+      "slug": "collection-hero",
+      "message": "The Shopify section adapter is not referenced by a JSON template, section group, layout section call, or addable preset."
+    },
+    {
+      "type": "template-composition-not-ready",
+      "slug": "collection-grid",
+      "message": "The Shopify section adapter is not referenced by a JSON template, section group, layout section call, or addable preset."
+    },
+    {
+      "type": "template-composition-not-ready",
+      "slug": "filter-panel",
+      "message": "The Shopify section adapter is not referenced by a JSON template, section group, layout section call, or addable preset."
+    },
+    {
+      "type": "template-composition-not-ready",
+      "slug": "announcement-extended",
+      "message": "The Shopify section adapter is not referenced by a JSON template, section group, layout section call, or addable preset."
     }
   ],
   "components": [
@@ -5270,12 +6068,14 @@
               "platforms/shopify/sections/coming-soon.liquid",
               "platforms/shopify/sections/comments.liquid",
               "platforms/shopify/sections/contact-section.liquid",
-              "platforms/shopify/sections/header.liquid",
+              "platforms/shopify/sections/footer.liquid",
               "platforms/shopify/sections/hero.liquid",
               "platforms/shopify/sections/instagram-feed.liquid",
               "platforms/shopify/sections/main-404.liquid",
               "platforms/shopify/sections/main-cart.liquid",
               "platforms/shopify/sections/main-collection.liquid",
+              "platforms/shopify/sections/main-search.liquid",
+              "platforms/shopify/sections/main-storefront-collection.liquid",
               "platforms/shopify/sections/newsletter.liquid",
               "platforms/shopify/sections/password-content.liquid",
               "platforms/shopify/snippets/cart-drawer.liquid",
@@ -5287,6 +6087,7 @@
               "platforms/shopify/snippets/product-card.liquid",
               "platforms/shopify/snippets/product-form.liquid",
               "platforms/shopify/snippets/product-gallery.liquid",
+              "platforms/shopify/snippets/search-overlay.liquid",
               "platforms/shopify/snippets/size-chart.liquid",
               "platforms/shopify/snippets/sticky-atc.liquid",
               "platforms/shopify/templates/gift_card.liquid"
@@ -5314,11 +6115,11 @@
               "collection",
               "customer",
               "gift_card",
-              "linklists",
               "page",
               "product",
               "request",
               "routes",
+              "search",
               "shop"
             ],
             "settingRefs": {
@@ -5331,6 +6132,8 @@
                 "bio",
                 "body",
                 "cart_note_expanded",
+                "category_label",
+                "category_menu",
                 "columns",
                 "comments_per_page",
                 "contact_email",
@@ -5342,7 +6145,10 @@
                 "cta_url",
                 "description",
                 "email",
+                "enable_filtering",
+                "enable_sorting",
                 "filter_commit_mode",
+                "footer_text",
                 "form_heading",
                 "form_label",
                 "form_subtext",
@@ -5362,7 +6168,6 @@
                 "loop",
                 "media_behavior",
                 "media_ratio",
-                "menu",
                 "name",
                 "navigation",
                 "note",
@@ -5372,14 +6177,23 @@
                 "portrait_decorative",
                 "products_per_page",
                 "quote",
+                "results_per_page",
                 "reverse",
+                "show_badges",
                 "show_cart_note",
+                "show_categories",
                 "show_code",
                 "show_composer",
+                "show_description",
                 "show_name",
                 "show_newsletter",
+                "show_payment_icons",
                 "show_phone",
                 "show_search",
+                "show_second_image",
+                "show_vendor",
+                "social_instagram",
+                "social_pinterest",
                 "subtitle",
                 "summary_placement",
                 "text",
@@ -5389,9 +6203,12 @@
               "block": [
                 "caption",
                 "destination",
+                "heading",
                 "image",
                 "image_alt",
-                "image_decorative"
+                "image_decorative",
+                "menu",
+                "text"
               ],
               "global": [
                 "favicon",
@@ -5410,9 +6227,11 @@
               "icon",
               "logo",
               "pagination",
+              "payment-icons",
               "price",
               "product-card",
               "quantity-selector",
+              "storefront-product-tile",
               "theme-brand-settings",
               "variant-selector"
             ],
@@ -5471,9 +6290,8 @@
               {
                 "name": "artist-profile",
                 "file": "platforms/shopify/sections/artist-profile.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -5482,6 +6300,7 @@
                 "name": "collection-story",
                 "file": "platforms/shopify/sections/collection-story.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -5490,6 +6309,7 @@
                 "name": "coming-soon",
                 "file": "platforms/shopify/sections/coming-soon.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/layout/theme.liquid"
                 ],
@@ -5499,7 +6319,10 @@
               {
                 "name": "comments",
                 "file": "platforms/shopify/sections/comments.liquid",
-                "templates": [],
+                "templates": [
+                  "platforms/shopify/templates/article.json"
+                ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -5508,26 +6331,27 @@
                 "name": "contact-section",
                 "file": "platforms/shopify/sections/contact-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
               },
               {
-                "name": "header",
-                "file": "platforms/shopify/sections/header.liquid",
+                "name": "footer",
+                "file": "platforms/shopify/sections/footer.liquid",
                 "templates": [],
-                "layouts": [
-                  "platforms/shopify/layout/theme.liquid"
+                "sectionGroups": [
+                  "platforms/shopify/sections/footer-group.json"
                 ],
+                "layouts": [],
                 "addableByPreset": false,
                 "ready": true
               },
               {
                 "name": "hero",
                 "file": "platforms/shopify/sections/hero.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -5536,6 +6360,7 @@
                 "name": "instagram-feed",
                 "file": "platforms/shopify/sections/instagram-feed.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -5546,6 +6371,7 @@
                 "templates": [
                   "platforms/shopify/templates/404.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -5556,6 +6382,7 @@
                 "templates": [
                   "platforms/shopify/templates/cart.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -5563,9 +6390,30 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
+                "templates": [],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": false
+              },
+              {
+                "name": "main-search",
+                "file": "platforms/shopify/sections/main-search.liquid",
+                "templates": [
+                  "platforms/shopify/templates/search.json"
+                ],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": true
+              },
+              {
+                "name": "main-storefront-collection",
+                "file": "platforms/shopify/sections/main-storefront-collection.liquid",
                 "templates": [
                   "platforms/shopify/templates/collection.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -5573,9 +6421,8 @@
               {
                 "name": "newsletter",
                 "file": "platforms/shopify/sections/newsletter.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -5584,6 +6431,7 @@
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -5608,12 +6456,14 @@
           "platforms/shopify/sections/coming-soon.liquid",
           "platforms/shopify/sections/comments.liquid",
           "platforms/shopify/sections/contact-section.liquid",
-          "platforms/shopify/sections/header.liquid",
+          "platforms/shopify/sections/footer.liquid",
           "platforms/shopify/sections/hero.liquid",
           "platforms/shopify/sections/instagram-feed.liquid",
           "platforms/shopify/sections/main-404.liquid",
           "platforms/shopify/sections/main-cart.liquid",
           "platforms/shopify/sections/main-collection.liquid",
+          "platforms/shopify/sections/main-search.liquid",
+          "platforms/shopify/sections/main-storefront-collection.liquid",
           "platforms/shopify/sections/newsletter.liquid",
           "platforms/shopify/sections/password-content.liquid",
           "platforms/shopify/snippets/cart-drawer.liquid",
@@ -5625,6 +6475,7 @@
           "platforms/shopify/snippets/product-card.liquid",
           "platforms/shopify/snippets/product-form.liquid",
           "platforms/shopify/snippets/product-gallery.liquid",
+          "platforms/shopify/snippets/search-overlay.liquid",
           "platforms/shopify/snippets/size-chart.liquid",
           "platforms/shopify/snippets/sticky-atc.liquid",
           "platforms/shopify/templates/gift_card.liquid"
@@ -5896,35 +6747,54 @@
             "designMode": false
           },
           {
-            "path": "platforms/shopify/sections/header.liquid",
+            "path": "platforms/shopify/sections/footer.liquid",
             "kind": "section",
-            "name": "header",
+            "name": "footer",
             "schema": {
               "required": true,
               "count": 1,
               "status": "ready",
-              "name": "Header",
+              "name": "Footer",
               "settingIds": [
+                "footer_text",
                 "logo_variant",
-                "menu"
+                "show_payment_icons",
+                "social_instagram",
+                "social_pinterest"
               ],
-              "blockTypes": [],
-              "blockSettingIds": [],
+              "blockTypes": [
+                "contact",
+                "menu",
+                "newsletter"
+              ],
+              "blockSettingIds": [
+                "contact.heading",
+                "contact.text",
+                "menu.heading",
+                "menu.menu",
+                "newsletter.heading",
+                "newsletter.text"
+              ],
               "hasPresets": false,
               "presetNames": [],
               "errors": []
             },
             "settingsReferences": {
               "section": [
+                "footer_text",
                 "logo_variant",
-                "menu"
+                "show_payment_icons",
+                "social_instagram",
+                "social_pinterest"
               ],
-              "block": [],
+              "block": [
+                "heading",
+                "menu",
+                "text"
+              ],
               "global": []
             },
             "dataReferences": [
-              "cart",
-              "linklists",
               "routes",
               "shop"
             ],
@@ -5950,10 +6820,8 @@
                 ]
               },
               {
-                "name": "icon",
-                "parameters": [
-                  "name"
-                ]
+                "name": "payment-icons",
+                "parameters": []
               }
             ],
             "sectionCalls": [],
@@ -6296,6 +7164,165 @@
             "designMode": false
           },
           {
+            "path": "platforms/shopify/sections/main-search.liquid",
+            "kind": "section",
+            "name": "main-search",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Search results",
+              "settingIds": [
+                "columns",
+                "media_ratio",
+                "results_per_page",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "columns",
+                "media_ratio",
+                "results_per_page",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "routes",
+              "search"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
+            "path": "platforms/shopify/sections/main-storefront-collection.liquid",
+            "kind": "section",
+            "name": "main-storefront-collection",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Storefront collection",
+              "settingIds": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "collection"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "cta_text",
+                  "cta_url",
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
             "path": "platforms/shopify/sections/newsletter.liquid",
             "kind": "section",
             "name": "newsletter",
@@ -6397,10 +7424,7 @@
             "settingsReferences": {
               "section": [],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "dataReferences": [
               "cart",
@@ -6427,21 +7451,7 @@
               {
                 "name": "cart-line-item",
                 "parameters": [
-                  "item",
-                  "show_quantity"
-                ]
-              },
-              {
-                "name": "cart-line-item",
-                "parameters": [
                   "item"
-                ]
-              },
-              {
-                "name": "gift-wrap",
-                "parameters": [
-                  "gift_wrap_id",
-                  "gift_wrap_product"
                 ]
               }
             ],
@@ -6782,6 +7792,41 @@
             "designMode": false
           },
           {
+            "path": "platforms/shopify/snippets/search-overlay.liquid",
+            "kind": "snippet",
+            "name": "search-overlay",
+            "schema": {
+              "required": false,
+              "count": 0,
+              "status": "not-required",
+              "settingIds": [],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "routes",
+              "search"
+            ],
+            "renderCalls": [
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
             "path": "platforms/shopify/snippets/size-chart.liquid",
             "kind": "snippet",
             "name": "size-chart",
@@ -7006,8 +8051,11 @@
               "platforms/shopify/sections/coming-soon.liquid",
               "platforms/shopify/sections/comments.liquid",
               "platforms/shopify/sections/contact-section.liquid",
+              "platforms/shopify/sections/footer.liquid",
               "platforms/shopify/sections/main-404.liquid",
               "platforms/shopify/sections/main-collection.liquid",
+              "platforms/shopify/sections/main-search.liquid",
+              "platforms/shopify/sections/main-storefront-collection.liquid",
               "platforms/shopify/sections/newsletter.liquid",
               "platforms/shopify/sections/password-content.liquid",
               "platforms/shopify/snippets/cart-note.liquid",
@@ -7037,12 +8085,15 @@
               "customer",
               "page",
               "routes",
+              "search",
               "shop"
             ],
             "settingRefs": {
               "section": [
                 "background_image",
                 "body",
+                "category_label",
+                "category_menu",
                 "columns",
                 "comments_per_page",
                 "contact_email",
@@ -7050,7 +8101,10 @@
                 "contact_phone",
                 "description",
                 "email",
+                "enable_filtering",
+                "enable_sorting",
                 "filter_commit_mode",
+                "footer_text",
                 "form_heading",
                 "form_label",
                 "form_subtext",
@@ -7061,16 +8115,29 @@
                 "media_ratio",
                 "note",
                 "products_per_page",
+                "results_per_page",
+                "show_badges",
+                "show_categories",
                 "show_code",
                 "show_composer",
+                "show_description",
                 "show_name",
                 "show_newsletter",
+                "show_payment_icons",
                 "show_phone",
                 "show_search",
+                "show_second_image",
+                "show_vendor",
+                "social_instagram",
+                "social_pinterest",
                 "subtitle",
                 "title"
               ],
-              "block": [],
+              "block": [
+                "heading",
+                "menu",
+                "text"
+              ],
               "global": []
             },
             "renderCalls": [
@@ -7078,7 +8145,9 @@
               "icon",
               "logo",
               "pagination",
-              "product-card"
+              "payment-icons",
+              "product-card",
+              "storefront-product-tile"
             ],
             "sectionCalls": [],
             "renderParameters": [
@@ -7101,6 +8170,7 @@
                 "name": "coming-soon",
                 "file": "platforms/shopify/sections/coming-soon.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/layout/theme.liquid"
                 ],
@@ -7110,7 +8180,10 @@
               {
                 "name": "comments",
                 "file": "platforms/shopify/sections/comments.liquid",
-                "templates": [],
+                "templates": [
+                  "platforms/shopify/templates/article.json"
+                ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -7119,8 +8192,20 @@
                 "name": "contact-section",
                 "file": "platforms/shopify/sections/contact-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
+                "ready": true
+              },
+              {
+                "name": "footer",
+                "file": "platforms/shopify/sections/footer.liquid",
+                "templates": [],
+                "sectionGroups": [
+                  "platforms/shopify/sections/footer-group.json"
+                ],
+                "layouts": [],
+                "addableByPreset": false,
                 "ready": true
               },
               {
@@ -7129,6 +8214,7 @@
                 "templates": [
                   "platforms/shopify/templates/404.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -7136,9 +8222,30 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
+                "templates": [],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": false
+              },
+              {
+                "name": "main-search",
+                "file": "platforms/shopify/sections/main-search.liquid",
+                "templates": [
+                  "platforms/shopify/templates/search.json"
+                ],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": true
+              },
+              {
+                "name": "main-storefront-collection",
+                "file": "platforms/shopify/sections/main-storefront-collection.liquid",
                 "templates": [
                   "platforms/shopify/templates/collection.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -7146,9 +8253,8 @@
               {
                 "name": "newsletter",
                 "file": "platforms/shopify/sections/newsletter.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -7157,6 +8263,7 @@
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -7179,8 +8286,11 @@
           "platforms/shopify/sections/coming-soon.liquid",
           "platforms/shopify/sections/comments.liquid",
           "platforms/shopify/sections/contact-section.liquid",
+          "platforms/shopify/sections/footer.liquid",
           "platforms/shopify/sections/main-404.liquid",
           "platforms/shopify/sections/main-collection.liquid",
+          "platforms/shopify/sections/main-search.liquid",
+          "platforms/shopify/sections/main-storefront-collection.liquid",
           "platforms/shopify/sections/newsletter.liquid",
           "platforms/shopify/sections/password-content.liquid",
           "platforms/shopify/snippets/cart-note.liquid",
@@ -7357,6 +8467,87 @@
             "designMode": false
           },
           {
+            "path": "platforms/shopify/sections/footer.liquid",
+            "kind": "section",
+            "name": "footer",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Footer",
+              "settingIds": [
+                "footer_text",
+                "logo_variant",
+                "show_payment_icons",
+                "social_instagram",
+                "social_pinterest"
+              ],
+              "blockTypes": [
+                "contact",
+                "menu",
+                "newsletter"
+              ],
+              "blockSettingIds": [
+                "contact.heading",
+                "contact.text",
+                "menu.heading",
+                "menu.menu",
+                "newsletter.heading",
+                "newsletter.text"
+              ],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "footer_text",
+                "logo_variant",
+                "show_payment_icons",
+                "social_instagram",
+                "social_pinterest"
+              ],
+              "block": [
+                "heading",
+                "menu",
+                "text"
+              ],
+              "global": []
+            },
+            "dataReferences": [
+              "routes",
+              "shop"
+            ],
+            "renderCalls": [
+              {
+                "name": "logo",
+                "parameters": [
+                  "loading",
+                  "variant",
+                  "width"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "payment-icons",
+                "parameters": []
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
             "path": "platforms/shopify/sections/main-404.liquid",
             "kind": "section",
             "name": "main-404",
@@ -7466,6 +8657,165 @@
                 "name": "pagination",
                 "parameters": [
                   "paginate"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
+            "path": "platforms/shopify/sections/main-search.liquid",
+            "kind": "section",
+            "name": "main-search",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Search results",
+              "settingIds": [
+                "columns",
+                "media_ratio",
+                "results_per_page",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "columns",
+                "media_ratio",
+                "results_per_page",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "routes",
+              "search"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
+            "path": "platforms/shopify/sections/main-storefront-collection.liquid",
+            "kind": "section",
+            "name": "main-storefront-collection",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Storefront collection",
+              "settingIds": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "collection"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "cta_text",
+                  "cta_url",
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
                 ]
               }
             ],
@@ -7736,7 +9086,8 @@
             "required": false,
             "status": "not-required",
             "files": [
-              "platforms/shopify/sections/main-collection.liquid"
+              "platforms/shopify/sections/main-collection.liquid",
+              "platforms/shopify/sections/main-storefront-collection.liquid"
             ]
           },
           "schema": {
@@ -7760,18 +9111,29 @@
             ],
             "settingRefs": {
               "section": [
+                "category_label",
+                "category_menu",
                 "columns",
+                "enable_filtering",
+                "enable_sorting",
                 "filter_commit_mode",
                 "media_ratio",
-                "products_per_page"
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
               ],
               "block": [],
               "global": []
             },
             "renderCalls": [
+              "empty-state",
               "icon",
               "pagination",
-              "product-card"
+              "product-card",
+              "storefront-product-tile"
             ],
             "sectionCalls": [],
             "renderParameters": []
@@ -7789,9 +9151,19 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
+                "templates": [],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": false
+              },
+              {
+                "name": "main-storefront-collection",
+                "file": "platforms/shopify/sections/main-storefront-collection.liquid",
                 "templates": [
                   "platforms/shopify/templates/collection.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -7809,7 +9181,8 @@
       "liquid": {
         "status": "present",
         "files": [
-          "platforms/shopify/sections/main-collection.liquid"
+          "platforms/shopify/sections/main-collection.liquid",
+          "platforms/shopify/sections/main-storefront-collection.liquid"
         ],
         "entries": [
           {
@@ -7872,6 +9245,97 @@
                 "name": "pagination",
                 "parameters": [
                   "paginate"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
+            "path": "platforms/shopify/sections/main-storefront-collection.liquid",
+            "kind": "section",
+            "name": "main-storefront-collection",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Storefront collection",
+              "settingIds": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "collection"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "cta_text",
+                  "cta_url",
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
                 ]
               }
             ],
@@ -8052,7 +9516,10 @@
               {
                 "name": "comments",
                 "file": "platforms/shopify/sections/comments.liquid",
-                "templates": [],
+                "templates": [
+                  "platforms/shopify/templates/article.json"
+                ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -8061,6 +9528,7 @@
                 "name": "contact-section",
                 "file": "platforms/shopify/sections/contact-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -8304,6 +9772,7 @@
             "status": "not-required",
             "files": [
               "platforms/shopify/sections/main-collection.liquid",
+              "platforms/shopify/sections/main-storefront-collection.liquid",
               "platforms/shopify/snippets/gift-wrap.liquid"
             ]
           },
@@ -8329,19 +9798,30 @@
             ],
             "settingRefs": {
               "section": [
+                "category_label",
+                "category_menu",
                 "columns",
+                "enable_filtering",
+                "enable_sorting",
                 "filter_commit_mode",
                 "media_ratio",
-                "products_per_page"
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
               ],
               "block": [],
               "global": []
             },
             "renderCalls": [
+              "empty-state",
               "icon",
               "pagination",
               "price",
-              "product-card"
+              "product-card",
+              "storefront-product-tile"
             ],
             "sectionCalls": [],
             "renderParameters": [
@@ -8362,9 +9842,19 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
+                "templates": [],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": false
+              },
+              {
+                "name": "main-storefront-collection",
+                "file": "platforms/shopify/sections/main-storefront-collection.liquid",
                 "templates": [
                   "platforms/shopify/templates/collection.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -8383,6 +9873,7 @@
         "status": "present",
         "files": [
           "platforms/shopify/sections/main-collection.liquid",
+          "platforms/shopify/sections/main-storefront-collection.liquid",
           "platforms/shopify/snippets/gift-wrap.liquid"
         ],
         "entries": [
@@ -8446,6 +9937,97 @@
                 "name": "pagination",
                 "parameters": [
                   "paginate"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
+            "path": "platforms/shopify/sections/main-storefront-collection.liquid",
+            "kind": "section",
+            "name": "main-storefront-collection",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Storefront collection",
+              "settingIds": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "collection"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "cta_text",
+                  "cta_url",
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
                 ]
               }
             ],
@@ -8690,7 +10272,8 @@
             "files": [
               "platforms/shopify/snippets/article-card.liquid",
               "platforms/shopify/snippets/product-card.liquid",
-              "platforms/shopify/snippets/product-gallery.liquid"
+              "platforms/shopify/snippets/product-gallery.liquid",
+              "platforms/shopify/snippets/storefront-product-tile.liquid"
             ]
           },
           "schema": {
@@ -8725,16 +10308,22 @@
             "sectionCalls": [],
             "renderParameters": [
               "article",
+              "blog_label",
               "excerpt_lines",
               "heading_level",
+              "heading_tag",
               "image_detail",
               "loop",
               "media_ratio",
               "product",
               "show_author",
+              "show_badges",
               "show_date",
+              "show_description",
               "show_excerpt",
               "show_image",
+              "show_second_image",
+              "show_vendor",
               "surface",
               "variant"
             ]
@@ -8763,7 +10352,8 @@
         "files": [
           "platforms/shopify/snippets/article-card.liquid",
           "platforms/shopify/snippets/product-card.liquid",
-          "platforms/shopify/snippets/product-gallery.liquid"
+          "platforms/shopify/snippets/product-gallery.liquid",
+          "platforms/shopify/snippets/storefront-product-tile.liquid"
         ],
         "entries": [
           {
@@ -8924,6 +10514,40 @@
             ],
             "sectionCalls": [],
             "designMode": false
+          },
+          {
+            "path": "platforms/shopify/snippets/storefront-product-tile.liquid",
+            "kind": "snippet",
+            "name": "storefront-product-tile",
+            "schema": {
+              "required": false,
+              "count": 0,
+              "status": "not-required",
+              "settingIds": [],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "product"
+            ],
+            "renderCalls": [
+              {
+                "name": "price",
+                "parameters": [
+                  "product"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
           }
         ]
       }
@@ -8997,7 +10621,8 @@
             "required": false,
             "status": "not-required",
             "files": [
-              "platforms/shopify/sections/main-collection.liquid"
+              "platforms/shopify/sections/main-collection.liquid",
+              "platforms/shopify/sections/main-storefront-collection.liquid"
             ]
           },
           "schema": {
@@ -9021,18 +10646,29 @@
             ],
             "settingRefs": {
               "section": [
+                "category_label",
+                "category_menu",
                 "columns",
+                "enable_filtering",
+                "enable_sorting",
                 "filter_commit_mode",
                 "media_ratio",
-                "products_per_page"
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
               ],
               "block": [],
               "global": []
             },
             "renderCalls": [
+              "empty-state",
               "icon",
               "pagination",
-              "product-card"
+              "product-card",
+              "storefront-product-tile"
             ],
             "sectionCalls": [],
             "renderParameters": []
@@ -9050,9 +10686,19 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
+                "templates": [],
+                "sectionGroups": [],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": false
+              },
+              {
+                "name": "main-storefront-collection",
+                "file": "platforms/shopify/sections/main-storefront-collection.liquid",
                 "templates": [
                   "platforms/shopify/templates/collection.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -9070,7 +10716,8 @@
       "liquid": {
         "status": "present",
         "files": [
-          "platforms/shopify/sections/main-collection.liquid"
+          "platforms/shopify/sections/main-collection.liquid",
+          "platforms/shopify/sections/main-storefront-collection.liquid"
         ],
         "entries": [
           {
@@ -9133,6 +10780,97 @@
                 "name": "pagination",
                 "parameters": [
                   "paginate"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
+          {
+            "path": "platforms/shopify/sections/main-storefront-collection.liquid",
+            "kind": "section",
+            "name": "main-storefront-collection",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Storefront collection",
+              "settingIds": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "category_label",
+                "category_menu",
+                "columns",
+                "enable_filtering",
+                "enable_sorting",
+                "media_ratio",
+                "products_per_page",
+                "show_badges",
+                "show_categories",
+                "show_description",
+                "show_second_image",
+                "show_vendor"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "collection"
+            ],
+            "renderCalls": [
+              {
+                "name": "storefront-product-tile",
+                "parameters": [
+                  "heading_tag",
+                  "media_ratio",
+                  "product",
+                  "show_badges",
+                  "show_description",
+                  "show_second_image",
+                  "show_vendor"
+                ]
+              },
+              {
+                "name": "pagination",
+                "parameters": [
+                  "paginate"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "cta_text",
+                  "cta_url",
+                  "heading_tag",
+                  "message",
+                  "title"
+                ]
+              },
+              {
+                "name": "empty-state",
+                "parameters": [
+                  "heading_tag",
+                  "message",
+                  "title"
                 ]
               }
             ],
@@ -10144,7 +11882,14 @@
             },
             "renderCalls": [],
             "sectionCalls": [],
-            "renderParameters": []
+            "renderParameters": [
+              "article",
+              "show_bio",
+              "show_email",
+              "show_homepage",
+              "show_image",
+              "variant"
+            ]
           },
           "behavior": {
             "required": true,
@@ -10159,9 +11904,8 @@
               {
                 "name": "testimonials",
                 "file": "platforms/shopify/sections/testimonials.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -10356,13 +12100,17 @@
             "sectionCalls": [],
             "renderParameters": [
               "article",
+              "blog_label",
               "excerpt_lines",
               "heading_level",
               "media_ratio",
               "product",
               "show_author",
+              "show_bio",
               "show_date",
+              "show_email",
               "show_excerpt",
+              "show_homepage",
               "show_image",
               "surface",
               "variant"
@@ -10631,6 +12379,7 @@
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -11010,21 +12759,19 @@
                 "products_per_page"
               ],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "renderCalls": [
               "cart-line-item",
               "empty-state",
-              "gift-wrap",
               "icon",
               "pagination",
               "product-card"
             ],
             "sectionCalls": [],
-            "renderParameters": []
+            "renderParameters": [
+              "menu"
+            ]
           },
           "behavior": {
             "required": true,
@@ -11039,12 +12786,11 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
-                "templates": [
-                  "platforms/shopify/templates/collection.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               }
             ]
           },
@@ -11148,10 +12894,7 @@
             "settingsReferences": {
               "section": [],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "dataReferences": [
               "cart",
@@ -11178,21 +12921,7 @@
               {
                 "name": "cart-line-item",
                 "parameters": [
-                  "item",
-                  "show_quantity"
-                ]
-              },
-              {
-                "name": "cart-line-item",
-                "parameters": [
                   "item"
-                ]
-              },
-              {
-                "name": "gift-wrap",
-                "parameters": [
-                  "gift_wrap_id",
-                  "gift_wrap_product"
                 ]
               }
             ],
@@ -11610,6 +13339,7 @@
                 "name": "faq-section",
                 "file": "platforms/shopify/sections/faq-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -12063,8 +13793,13 @@
                 "status": "ready",
                 "count": 1,
                 "settingIds": [
+                  "cart_behavior",
+                  "customer_account_menu",
                   "logo_variant",
-                  "menu"
+                  "menu",
+                  "show_account",
+                  "show_search",
+                  "sticky"
                 ],
                 "blockTypes": [],
                 "blockSettingIds": [],
@@ -12074,8 +13809,13 @@
               }
             ],
             "settingIds": [
+              "cart_behavior",
+              "customer_account_menu",
               "logo_variant",
-              "menu"
+              "menu",
+              "show_account",
+              "show_search",
+              "sticky"
             ],
             "blockTypes": [],
             "blockSettingIds": [],
@@ -12090,21 +13830,26 @@
             "status": "ready",
             "dataObjects": [
               "cart",
-              "linklists",
               "routes",
               "shop"
             ],
             "settingRefs": {
               "section": [
+                "cart_behavior",
+                "customer_account_menu",
                 "logo_variant",
-                "menu"
+                "menu",
+                "show_account",
+                "show_search",
+                "sticky"
               ],
               "block": [],
               "global": []
             },
             "renderCalls": [
               "icon",
-              "logo"
+              "logo",
+              "mobile-menu"
             ],
             "sectionCalls": [],
             "renderParameters": []
@@ -12123,9 +13868,10 @@
                 "name": "header",
                 "file": "platforms/shopify/sections/header.liquid",
                 "templates": [],
-                "layouts": [
-                  "platforms/shopify/layout/theme.liquid"
+                "sectionGroups": [
+                  "platforms/shopify/sections/header-group.json"
                 ],
+                "layouts": [],
                 "addableByPreset": false,
                 "ready": true
               }
@@ -12156,8 +13902,13 @@
               "status": "ready",
               "name": "Header",
               "settingIds": [
+                "cart_behavior",
+                "customer_account_menu",
                 "logo_variant",
-                "menu"
+                "menu",
+                "show_account",
+                "show_search",
+                "sticky"
               ],
               "blockTypes": [],
               "blockSettingIds": [],
@@ -12167,15 +13918,19 @@
             },
             "settingsReferences": {
               "section": [
+                "cart_behavior",
+                "customer_account_menu",
                 "logo_variant",
-                "menu"
+                "menu",
+                "show_account",
+                "show_search",
+                "sticky"
               ],
               "block": [],
               "global": []
             },
             "dataReferences": [
               "cart",
-              "linklists",
               "routes",
               "shop"
             ],
@@ -12204,6 +13959,18 @@
                 "name": "icon",
                 "parameters": [
                   "name"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "mobile-menu",
+                "parameters": [
+                  "menu"
                 ]
               }
             ],
@@ -12285,8 +14052,8 @@
       },
       "maturity": {
         "model": "shopify-maturity-v1",
-        "level": "implemented",
-        "ready": true,
+        "level": "editor-ready",
+        "ready": false,
         "strategy": "section-adapter",
         "layers": {
           "css": {
@@ -12356,17 +14123,16 @@
           },
           "templateComposition": {
             "required": true,
-            "status": "ready",
+            "status": "missing",
             "sections": [
               {
                 "name": "announcement-bar",
                 "file": "platforms/shopify/sections/announcement-bar.liquid",
                 "templates": [],
-                "layouts": [
-                  "platforms/shopify/layout/theme.liquid"
-                ],
+                "sectionGroups": [],
+                "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               }
             ]
           },
@@ -12516,15 +14282,23 @@
                 "count": 1,
                 "settingIds": [
                   "footer_text",
+                  "logo_variant",
+                  "show_payment_icons",
                   "social_instagram",
                   "social_pinterest"
                 ],
                 "blockTypes": [
-                  "menu"
+                  "contact",
+                  "menu",
+                  "newsletter"
                 ],
                 "blockSettingIds": [
+                  "contact.heading",
+                  "contact.text",
                   "menu.heading",
-                  "menu.menu"
+                  "menu.menu",
+                  "newsletter.heading",
+                  "newsletter.text"
                 ],
                 "hasPresets": false,
                 "presetNames": [],
@@ -12533,15 +14307,23 @@
             ],
             "settingIds": [
               "footer_text",
+              "logo_variant",
+              "show_payment_icons",
               "social_instagram",
               "social_pinterest"
             ],
             "blockTypes": [
-              "menu"
+              "contact",
+              "menu",
+              "newsletter"
             ],
             "blockSettingIds": [
+              "contact.heading",
+              "contact.text",
               "menu.heading",
-              "menu.menu"
+              "menu.menu",
+              "newsletter.heading",
+              "newsletter.text"
             ],
             "hasPresets": false,
             "presetNames": [],
@@ -12553,22 +14335,28 @@
             "required": true,
             "status": "ready",
             "dataObjects": [
+              "routes",
               "shop"
             ],
             "settingRefs": {
               "section": [
                 "footer_text",
+                "logo_variant",
+                "show_payment_icons",
                 "social_instagram",
                 "social_pinterest"
               ],
               "block": [
                 "heading",
-                "menu"
+                "menu",
+                "text"
               ],
               "global": []
             },
             "renderCalls": [
-              "icon"
+              "icon",
+              "logo",
+              "payment-icons"
             ],
             "sectionCalls": [],
             "renderParameters": []
@@ -12587,9 +14375,10 @@
                 "name": "footer",
                 "file": "platforms/shopify/sections/footer.liquid",
                 "templates": [],
-                "layouts": [
-                  "platforms/shopify/layout/theme.liquid"
+                "sectionGroups": [
+                  "platforms/shopify/sections/footer-group.json"
                 ],
+                "layouts": [],
                 "addableByPreset": false,
                 "ready": true
               }
@@ -12621,15 +14410,23 @@
               "name": "Footer",
               "settingIds": [
                 "footer_text",
+                "logo_variant",
+                "show_payment_icons",
                 "social_instagram",
                 "social_pinterest"
               ],
               "blockTypes": [
-                "menu"
+                "contact",
+                "menu",
+                "newsletter"
               ],
               "blockSettingIds": [
+                "contact.heading",
+                "contact.text",
                 "menu.heading",
-                "menu.menu"
+                "menu.menu",
+                "newsletter.heading",
+                "newsletter.text"
               ],
               "hasPresets": false,
               "presetNames": [],
@@ -12638,19 +14435,31 @@
             "settingsReferences": {
               "section": [
                 "footer_text",
+                "logo_variant",
+                "show_payment_icons",
                 "social_instagram",
                 "social_pinterest"
               ],
               "block": [
                 "heading",
-                "menu"
+                "menu",
+                "text"
               ],
               "global": []
             },
             "dataReferences": [
+              "routes",
               "shop"
             ],
             "renderCalls": [
+              {
+                "name": "logo",
+                "parameters": [
+                  "loading",
+                  "variant",
+                  "width"
+                ]
+              },
               {
                 "name": "icon",
                 "parameters": [
@@ -12662,6 +14471,10 @@
                 "parameters": [
                   "name"
                 ]
+              },
+              {
+                "name": "payment-icons",
+                "parameters": []
               }
             ],
             "sectionCalls": [],
@@ -12779,7 +14592,9 @@
               "icon"
             ],
             "sectionCalls": [],
-            "renderParameters": []
+            "renderParameters": [
+              "menu"
+            ]
           },
           "behavior": {
             "required": true,
@@ -12956,7 +14771,8 @@
             "required": true,
             "status": "ready",
             "dataObjects": [
-              "routes"
+              "routes",
+              "search"
             ],
             "settingRefs": {
               "section": [],
@@ -13015,7 +14831,8 @@
               "global": []
             },
             "dataReferences": [
-              "routes"
+              "routes",
+              "search"
             ],
             "renderCalls": [
               {
@@ -13132,15 +14949,11 @@
             "settingRefs": {
               "section": [],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "renderCalls": [
               "cart-line-item",
               "empty-state",
-              "gift-wrap",
               "icon"
             ],
             "sectionCalls": [],
@@ -13189,10 +15002,7 @@
             "settingsReferences": {
               "section": [],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "dataReferences": [
               "cart",
@@ -13219,21 +15029,7 @@
               {
                 "name": "cart-line-item",
                 "parameters": [
-                  "item",
-                  "show_quantity"
-                ]
-              },
-              {
-                "name": "cart-line-item",
-                "parameters": [
                   "item"
-                ]
-              },
-              {
-                "name": "gift-wrap",
-                "parameters": [
-                  "gift_wrap_id",
-                  "gift_wrap_product"
                 ]
               }
             ],
@@ -14406,6 +16202,7 @@
                 "templates": [
                   "platforms/shopify/templates/product.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -14548,8 +16345,8 @@
       },
       "maturity": {
         "model": "shopify-maturity-v1",
-        "level": "implemented",
-        "ready": true,
+        "level": "editor-ready",
+        "ready": false,
         "strategy": "section-adapter",
         "layers": {
           "css": {
@@ -14627,17 +16424,16 @@
           },
           "templateComposition": {
             "required": true,
-            "status": "ready",
+            "status": "missing",
             "sections": [
               {
                 "name": "collection-hero",
                 "file": "platforms/shopify/sections/collection-hero.liquid",
-                "templates": [
-                  "platforms/shopify/templates/collection.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               }
             ]
           },
@@ -14747,8 +16543,8 @@
       },
       "maturity": {
         "model": "shopify-maturity-v1",
-        "level": "implemented",
-        "ready": true,
+        "level": "editor-ready",
+        "ready": false,
         "strategy": "section-adapter",
         "layers": {
           "css": {
@@ -14868,12 +16664,13 @@
           },
           "templateComposition": {
             "required": true,
-            "status": "ready",
+            "status": "missing",
             "sections": [
               {
                 "name": "featured-collection",
                 "file": "platforms/shopify/sections/featured-collection.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -14881,12 +16678,11 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
-                "templates": [
-                  "platforms/shopify/templates/collection.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               }
             ]
           },
@@ -15099,8 +16895,8 @@
       },
       "maturity": {
         "model": "shopify-maturity-v1",
-        "level": "implemented",
-        "ready": true,
+        "level": "editor-ready",
+        "ready": false,
         "strategy": "section-adapter",
         "layers": {
           "css": {
@@ -15185,17 +16981,16 @@
           },
           "templateComposition": {
             "required": true,
-            "status": "ready",
+            "status": "missing",
             "sections": [
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
-                "templates": [
-                  "platforms/shopify/templates/collection.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               }
             ]
           },
@@ -15630,9 +17425,8 @@
               {
                 "name": "artist-profile",
                 "file": "platforms/shopify/sections/artist-profile.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -15872,9 +17666,8 @@
               {
                 "name": "process-timeline",
                 "file": "platforms/shopify/sections/process-timeline.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -16299,6 +18092,7 @@
                 "name": "collection-story",
                 "file": "platforms/shopify/sections/collection-story.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -16535,6 +18329,7 @@
                 "name": "masonry-gallery",
                 "file": "platforms/shopify/sections/masonry-gallery.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -16852,9 +18647,8 @@
               {
                 "name": "hero",
                 "file": "platforms/shopify/sections/hero.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -17107,9 +18901,8 @@
               {
                 "name": "newsletter",
                 "file": "platforms/shopify/sections/newsletter.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -17347,9 +19140,8 @@
               {
                 "name": "testimonials",
                 "file": "platforms/shopify/sections/testimonials.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -17560,6 +19352,7 @@
                 "name": "coming-soon",
                 "file": "platforms/shopify/sections/coming-soon.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/layout/theme.liquid"
                 ],
@@ -17570,6 +19363,7 @@
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -17881,6 +19675,7 @@
             "required": false,
             "status": "not-required",
             "files": [
+              "platforms/shopify/sections/header.liquid",
               "platforms/shopify/sections/hero.liquid",
               "platforms/shopify/sections/related-products.liquid",
               "platforms/shopify/snippets/product-gallery.liquid"
@@ -17903,18 +19698,22 @@
             "required": false,
             "status": "not-required",
             "dataObjects": [
+              "cart",
               "product",
               "recommendations",
-              "routes"
+              "routes",
+              "shop"
             ],
             "settingRefs": {
               "section": [
                 "autoplay",
                 "autoplay_interval",
+                "cart_behavior",
                 "cta2_text",
                 "cta2_url",
                 "cta_text",
                 "cta_url",
+                "customer_account_menu",
                 "description",
                 "heading",
                 "height",
@@ -17922,12 +19721,17 @@
                 "image_alt",
                 "label",
                 "layout",
+                "logo_variant",
                 "loop",
                 "media_behavior",
                 "media_ratio",
+                "menu",
                 "navigation",
                 "overlay",
                 "products_to_show",
+                "show_account",
+                "show_search",
+                "sticky",
                 "title",
                 "video"
               ],
@@ -17939,6 +19743,8 @@
             },
             "renderCalls": [
               "icon",
+              "logo",
+              "mobile-menu",
               "product-card"
             ],
             "sectionCalls": [],
@@ -17959,11 +19765,21 @@
             "status": "not-required",
             "sections": [
               {
+                "name": "header",
+                "file": "platforms/shopify/sections/header.liquid",
+                "templates": [],
+                "sectionGroups": [
+                  "platforms/shopify/sections/header-group.json"
+                ],
+                "layouts": [],
+                "addableByPreset": false,
+                "ready": true
+              },
+              {
                 "name": "hero",
                 "file": "platforms/shopify/sections/hero.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -17974,6 +19790,7 @@
                 "templates": [
                   "platforms/shopify/templates/product.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -17991,11 +19808,97 @@
       "liquid": {
         "status": "present",
         "files": [
+          "platforms/shopify/sections/header.liquid",
           "platforms/shopify/sections/hero.liquid",
           "platforms/shopify/sections/related-products.liquid",
           "platforms/shopify/snippets/product-gallery.liquid"
         ],
         "entries": [
+          {
+            "path": "platforms/shopify/sections/header.liquid",
+            "kind": "section",
+            "name": "header",
+            "schema": {
+              "required": true,
+              "count": 1,
+              "status": "ready",
+              "name": "Header",
+              "settingIds": [
+                "cart_behavior",
+                "customer_account_menu",
+                "logo_variant",
+                "menu",
+                "show_account",
+                "show_search",
+                "sticky"
+              ],
+              "blockTypes": [],
+              "blockSettingIds": [],
+              "hasPresets": false,
+              "presetNames": [],
+              "errors": []
+            },
+            "settingsReferences": {
+              "section": [
+                "cart_behavior",
+                "customer_account_menu",
+                "logo_variant",
+                "menu",
+                "show_account",
+                "show_search",
+                "sticky"
+              ],
+              "block": [],
+              "global": []
+            },
+            "dataReferences": [
+              "cart",
+              "routes",
+              "shop"
+            ],
+            "renderCalls": [
+              {
+                "name": "logo",
+                "parameters": [
+                  "loading",
+                  "variant",
+                  "width"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "icon",
+                "parameters": [
+                  "name"
+                ]
+              },
+              {
+                "name": "mobile-menu",
+                "parameters": [
+                  "menu"
+                ]
+              }
+            ],
+            "sectionCalls": [],
+            "designMode": false
+          },
           {
             "path": "platforms/shopify/sections/hero.liquid",
             "kind": "section",
@@ -18324,6 +20227,7 @@
               "linklists",
               "product",
               "routes",
+              "search",
               "shop"
             ],
             "settingRefs": {
@@ -18338,15 +20242,11 @@
                 "products_per_page"
               ],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "renderCalls": [
               "cart-line-item",
               "empty-state",
-              "gift-wrap",
               "icon",
               "logo",
               "pagination",
@@ -18359,6 +20259,7 @@
             "renderParameters": [
               "image_detail",
               "loop",
+              "menu",
               "product",
               "size_chart_id"
             ]
@@ -18376,17 +20277,17 @@
               {
                 "name": "main-collection",
                 "file": "platforms/shopify/sections/main-collection.liquid",
-                "templates": [
-                  "platforms/shopify/templates/collection.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               },
               {
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -18548,10 +20449,7 @@
             "settingsReferences": {
               "section": [],
               "block": [],
-              "global": [
-                "gift_wrap_enabled",
-                "gift_wrap_product"
-              ]
+              "global": []
             },
             "dataReferences": [
               "cart",
@@ -18578,21 +20476,7 @@
               {
                 "name": "cart-line-item",
                 "parameters": [
-                  "item",
-                  "show_quantity"
-                ]
-              },
-              {
-                "name": "cart-line-item",
-                "parameters": [
                   "item"
-                ]
-              },
-              {
-                "name": "gift-wrap",
-                "parameters": [
-                  "gift_wrap_id",
-                  "gift_wrap_product"
                 ]
               }
             ],
@@ -18809,7 +20693,8 @@
               "global": []
             },
             "dataReferences": [
-              "routes"
+              "routes",
+              "search"
             ],
             "renderCalls": [
               {
@@ -19607,6 +21492,7 @@
                 "name": "stats-section",
                 "file": "platforms/shopify/sections/stats-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -20205,8 +22091,14 @@
             "sectionCalls": [],
             "renderParameters": [
               "anchor",
+              "article",
               "class_name",
-              "paginate"
+              "paginate",
+              "show_bio",
+              "show_email",
+              "show_homepage",
+              "show_image",
+              "variant"
             ]
           },
           "behavior": {
@@ -20223,6 +22115,7 @@
                 "name": "coming-soon",
                 "file": "platforms/shopify/sections/coming-soon.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/layout/theme.liquid"
                 ],
@@ -20233,6 +22126,7 @@
                 "name": "featured-collection",
                 "file": "platforms/shopify/sections/featured-collection.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -20241,6 +22135,7 @@
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -21453,6 +23348,7 @@
                 "name": "featured-collection",
                 "file": "platforms/shopify/sections/featured-collection.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -21460,9 +23356,8 @@
               {
                 "name": "hero",
                 "file": "platforms/shopify/sections/hero.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -21473,6 +23368,7 @@
                 "templates": [
                   "platforms/shopify/templates/product.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -24295,6 +26191,7 @@
                 "name": "password-content",
                 "file": "platforms/shopify/sections/password-content.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [
                   "platforms/shopify/templates/password.liquid"
                 ],
@@ -24638,6 +26535,7 @@
                 "name": "trust-badges",
                 "file": "platforms/shopify/sections/trust-badges.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -25486,17 +27384,16 @@
           },
           "templateComposition": {
             "required": true,
-            "status": "ready",
+            "status": "missing",
             "sections": [
               {
                 "name": "announcement-bar",
                 "file": "platforms/shopify/sections/announcement-bar.liquid",
                 "templates": [],
-                "layouts": [
-                  "platforms/shopify/layout/theme.liquid"
-                ],
+                "sectionGroups": [],
+                "layouts": [],
                 "addableByPreset": false,
-                "ready": true
+                "ready": false
               }
             ]
           },
@@ -25715,6 +27612,7 @@
                 "templates": [
                   "platforms/shopify/templates/cart.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true
@@ -28858,6 +30756,7 @@
             "sectionCalls": [],
             "renderParameters": [
               "article",
+              "blog_label",
               "excerpt_lines",
               "heading_level",
               "show_author",
@@ -29043,7 +30942,17 @@
             },
             "renderCalls": [],
             "sectionCalls": [],
-            "renderParameters": []
+            "renderParameters": [
+              "article",
+              "blog_label",
+              "heading_level",
+              "image_loading",
+              "image_sizes",
+              "show_author",
+              "show_date",
+              "show_image",
+              "variant"
+            ]
           },
           "behavior": {
             "required": true,
@@ -29269,7 +31178,10 @@
             },
             "renderCalls": [],
             "sectionCalls": [],
-            "renderParameters": []
+            "renderParameters": [
+              "article",
+              "drop_cap"
+            ]
           },
           "behavior": {
             "required": true,
@@ -29677,7 +31589,14 @@
             },
             "renderCalls": [],
             "sectionCalls": [],
-            "renderParameters": []
+            "renderParameters": [
+              "article",
+              "show_bio",
+              "show_email",
+              "show_homepage",
+              "show_image",
+              "variant"
+            ]
           },
           "behavior": {
             "required": true,
@@ -30301,7 +32220,10 @@
               {
                 "name": "related-articles",
                 "file": "platforms/shopify/sections/related-articles.liquid",
-                "templates": [],
+                "templates": [
+                  "platforms/shopify/templates/article.json"
+                ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -30587,7 +32509,10 @@
               {
                 "name": "comments",
                 "file": "platforms/shopify/sections/comments.liquid",
-                "templates": [],
+                "templates": [
+                  "platforms/shopify/templates/article.json"
+                ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -30878,9 +32803,8 @@
               {
                 "name": "hero",
                 "file": "platforms/shopify/sections/hero.liquid",
-                "templates": [
-                  "platforms/shopify/templates/index.json"
-                ],
+                "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -31149,6 +33073,7 @@
                 "name": "featured-collection",
                 "file": "platforms/shopify/sections/featured-collection.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -31422,6 +33347,7 @@
                 "name": "image-text",
                 "file": "platforms/shopify/sections/image-text.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -31698,6 +33624,7 @@
                 "name": "multicolumn",
                 "file": "platforms/shopify/sections/multicolumn.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -31920,6 +33847,7 @@
                 "name": "gallery-grid",
                 "file": "platforms/shopify/sections/gallery-grid.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -32168,6 +34096,7 @@
                 "name": "lookbook",
                 "file": "platforms/shopify/sections/lookbook.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -32533,6 +34462,7 @@
                 "name": "brand-story",
                 "file": "platforms/shopify/sections/brand-story.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -32790,6 +34720,7 @@
                 "name": "faq-section",
                 "file": "platforms/shopify/sections/faq-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -33028,6 +34959,7 @@
                 "name": "contact-section",
                 "file": "platforms/shopify/sections/contact-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -33245,6 +35177,7 @@
                 "name": "stats-section",
                 "file": "platforms/shopify/sections/stats-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -33724,6 +35657,7 @@
                 "name": "shipping-info",
                 "file": "platforms/shopify/sections/shipping-info.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -33928,6 +35862,7 @@
                 "name": "rich-text-section",
                 "file": "platforms/shopify/sections/rich-text-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -37329,6 +39264,7 @@
                 "name": "artist-statement",
                 "file": "platforms/shopify/sections/artist-statement.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -38758,6 +40694,7 @@
                 "name": "instagram-feed",
                 "file": "platforms/shopify/sections/instagram-feed.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -39276,6 +41213,7 @@
                 "name": "collage-section",
                 "file": "platforms/shopify/sections/collage-section.liquid",
                 "templates": [],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": true,
                 "ready": true
@@ -39899,6 +41837,7 @@
                 "templates": [
                   "platforms/shopify/templates/404.json"
                 ],
+                "sectionGroups": [],
                 "layouts": [],
                 "addableByPreset": false,
                 "ready": true

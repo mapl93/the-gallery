@@ -1,0 +1,213 @@
+{%- paginate collection.products by section.settings.products_per_page -%}
+  {%- liquid
+    assign active_filter_count = 0
+    assign current_sort = collection.sort_by | default: collection.default_sort_by
+    for filter in collection.filters
+      assign active_filter_count = active_filter_count | plus: filter.active_values.size
+      if filter.type == 'price_range'
+        if filter.min_value.value != nil or filter.max_value.value != nil
+          assign active_filter_count = active_filter_count | plus: 1
+        endif
+      endif
+    endfor
+  -%}
+
+  <section class="storefront-collection" aria-labelledby="StorefrontCollectionTitle-{{ section.id }}">
+    <header class="storefront-collection__header">
+      <h1 class="storefront-collection__title" id="StorefrontCollectionTitle-{{ section.id }}">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="storefront-collection__description rte">{{ collection.description }}</div>
+      {%- endif -%}
+      <p>{{ 'collections.product_count' | t: count: collection.products_count }}</p>
+    </header>
+
+    {%- if section.settings.show_categories and section.settings.category_menu != blank -%}
+      <nav aria-label="{{ section.settings.category_label | escape }}">
+        <ul class="storefront-collection__categories">
+          {%- for link in section.settings.category_menu.links -%}
+            <li>
+              <a class="storefront-collection__category-link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
+                {{ link.title }}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
+      <form class="storefront-collection__form" action="{{ collection.url }}" method="get">
+        <div class="storefront-collection__toolbar">
+          {%- if section.settings.enable_filtering -%}
+            <p>{{ 'collections.filters' | t }}{% if active_filter_count > 0 %} ({{ active_filter_count }}){% endif %}</p>
+          {%- endif -%}
+
+          {%- if section.settings.enable_sorting -%}
+            <div class="select storefront-collection__sort">
+              <label class="select__label" for="StorefrontSort-{{ section.id }}">{{ 'collections.sort_by' | t }}</label>
+              <select class="select__field" id="StorefrontSort-{{ section.id }}" name="sort_by">
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value }}"{% if option.value == current_sort %} selected{% endif %}>{{ option.name }}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.enable_filtering and collection.filters.size > 0 -%}
+          <div class="storefront-collection__filters">
+            {%- for filter in collection.filters -%}
+              <details class="storefront-filter">
+                <summary class="storefront-filter__summary">{{ filter.label }}</summary>
+                <div class="storefront-filter__options">
+                  {%- case filter.type -%}
+                    {%- when 'boolean', 'list' -%}
+                      {%- for value in filter.values -%}
+                        {%- assign input_id = 'StorefrontFilter-' | append: section.id | append: '-' | append: filter.param_name | handle | append: '-' | append: forloop.index -%}
+                        <label class="checkbox" for="{{ input_id }}">
+                          <input
+                            class="checkbox__input"
+                            id="{{ input_id }}"
+                            type="checkbox"
+                            name="{{ value.param_name }}"
+                            value="{{ value.value | escape }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                          >
+                          <span class="checkbox__label">{{ value.label }} ({{ value.count }})</span>
+                        </label>
+                      {%- endfor -%}
+                    {%- when 'price_range' -%}
+                      <div class="storefront-filter__price">
+                        <div class="input">
+                          <label class="input__label" for="StorefrontPriceMin-{{ section.id }}">{{ 'collections.price_min' | t }}</label>
+                          <input
+                            class="input__field"
+                            id="StorefrontPriceMin-{{ section.id }}"
+                            type="number"
+                            name="{{ filter.min_value.param_name }}"
+                            min="0"
+                            max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                            value="{% if filter.min_value.value != nil %}{{ filter.min_value.value | money_without_currency | replace: ',', '' }}{% endif %}"
+                          >
+                        </div>
+                        <div class="input">
+                          <label class="input__label" for="StorefrontPriceMax-{{ section.id }}">{{ 'collections.price_max' | t }}</label>
+                          <input
+                            class="input__field"
+                            id="StorefrontPriceMax-{{ section.id }}"
+                            type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            min="0"
+                            max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                            value="{% if filter.max_value.value != nil %}{{ filter.max_value.value | money_without_currency | replace: ',', '' }}{% endif %}"
+                          >
+                        </div>
+                      </div>
+                  {%- endcase -%}
+                </div>
+              </details>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if active_filter_count > 0 -%}
+          <ul class="storefront-collection__active-filters" aria-label="{{ 'collections.active_filters' | t }}">
+            {%- for filter in collection.filters -%}
+              {%- for value in filter.active_values -%}
+                <li>
+                  <a class="tag" href="{{ value.url_to_remove }}">
+                    <span class="tag__label">{{ value.label }}</span>
+                    <span class="tag__remove" aria-hidden="true"></span>
+                  </a>
+                </li>
+              {%- endfor -%}
+              {%- if filter.type == 'price_range' -%}
+                {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                  <li>
+                    <a class="tag" href="{{ filter.url_to_remove }}">
+                      <span class="tag__label">{{ filter.label }}</span>
+                      <span class="tag__remove" aria-hidden="true"></span>
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        <div class="storefront-collection__actions">
+          <button class="btn" type="submit">{{ 'collections.apply_filters' | t }}</button>
+          {%- if active_filter_count > 0 -%}
+            <a class="btn btn--outline" href="{{ collection.url }}{% if section.settings.enable_sorting %}?sort_by={{ current_sort | url_encode }}{% endif %}">
+              {{ 'collections.clear_filters' | t }}
+            </a>
+          {%- endif -%}
+        </div>
+      </form>
+    {%- endif -%}
+
+    {%- if collection.products.size > 0 -%}
+      <ul class="storefront-collection__grid" style="--storefront-grid-columns: {{ section.settings.columns }}">
+        {%- for product in collection.products -%}
+          <li>
+            {% render 'storefront-product-tile',
+              product: product,
+              media_ratio: section.settings.media_ratio,
+              show_vendor: section.settings.show_vendor,
+              show_description: section.settings.show_description,
+              show_badges: section.settings.show_badges,
+              show_second_image: section.settings.show_second_image,
+              heading_tag: 'h2'
+            %}
+          </li>
+        {%- endfor -%}
+      </ul>
+      {% render 'pagination', paginate: paginate %}
+    {%- elsif active_filter_count > 0 -%}
+      {% render 'empty-state',
+        heading_tag: 'h2',
+        title: 'collections.no_results_title' | t,
+        message: 'collections.no_results_message' | t,
+        cta_text: 'collections.clear_filters' | t,
+        cta_url: collection.url
+      %}
+    {%- else -%}
+      {% render 'empty-state',
+        heading_tag: 'h2',
+        title: 'collections.empty_title' | t,
+        message: 'collections.empty_message' | t
+      %}
+    {%- endif -%}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Storefront collection",
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 8, "max": 24, "step": 4, "default": 12 },
+    { "type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 4, "step": 1, "default": 3 },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Image ratio",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "landscape", "label": "Landscape" }
+      ],
+      "default": "portrait"
+    },
+    { "type": "checkbox", "id": "show_categories", "label": "Show category navigation", "default": false },
+    { "type": "text", "id": "category_label", "label": "Category navigation label", "default": "Shop categories" },
+    { "type": "link_list", "id": "category_menu", "label": "Category menu" },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Enable storefront filters", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Enable sorting", "default": true },
+    { "type": "checkbox", "id": "show_vendor", "label": "Show maker or vendor", "default": false },
+    { "type": "checkbox", "id": "show_description", "label": "Show description", "default": false },
+    { "type": "checkbox", "id": "show_badges", "label": "Show status badges", "default": true },
+    { "type": "checkbox", "id": "show_second_image", "label": "Show second image on hover", "default": true }
+  ]
+}
+{% endschema %}

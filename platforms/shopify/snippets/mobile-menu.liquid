@@ -1,36 +1,48 @@
-{%- comment -%}
-  Snippet: mobile-menu
-  Usage: {% render 'mobile-menu', menu: linklists['main-menu'] %}
-{%- endcomment -%}
+{% doc %}
+  Target-owned mobile navigation overlay.
+
+  @param {linklist} menu - Shopify link list selected by the header section.
+{% enddoc %}
 
 {%- assign mobile_menu = menu | default: linklists['main-menu'] -%}
-<div class="drawer-overlay" data-mobile-menu-overlay aria-hidden="true"></div>
-<aside class="drawer drawer--left"
-       id="mobile-menu"
-       role="dialog"
-       aria-modal="true"
-       aria-hidden="true"
-       aria-labelledby="mobile-menu-title"
-       data-mobile-menu>
+<div
+  class="drawer-overlay"
+  data-storefront-scrim="mobile-menu"
+  aria-hidden="true"
+  hidden
+></div>
+<aside
+  class="drawer drawer--left storefront-mobile-drawer"
+  id="StorefrontMobileMenu"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  aria-labelledby="StorefrontMobileMenuTitle"
+  data-storefront-panel="mobile-menu"
+  tabindex="-1"
+  inert
+  hidden
+>
   <div class="drawer__header">
-    <h2 class="drawer__title" id="mobile-menu-title">{{ 'accessibility.menu' | t }}</h2>
-    <button class="close-btn drawer__close"
-            type="button"
-            aria-label="{{ 'accessibility.close' | t }} {{ 'accessibility.menu' | t | downcase }}"
-            data-mobile-menu-close>
+    <h2 class="drawer__title" id="StorefrontMobileMenuTitle">{{ 'accessibility.menu' | t }}</h2>
+    <button
+      class="close-btn drawer__close"
+      type="button"
+      aria-label="{{ 'accessibility.close' | t }}"
+      data-storefront-close
+    >
       {% render 'icon', name: 'x' %}
     </button>
   </div>
   <nav class="drawer__body" aria-label="{{ 'accessibility.navigation' | t }}">
     <ul class="mobile-nav">
-      {% for link in mobile_menu.links %}
+      {%- for link in mobile_menu.links -%}
         <li class="mobile-nav__item">
-          <a class="mobile-nav__link" href="{{ link.url }}"
-             {% if link.active %}aria-current="page"{% endif %}>
+          <a class="mobile-nav__link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
             {{ link.title }}
           </a>
         </li>
-      {% endfor %}
+      {%- endfor -%}
     </ul>
   </nav>
 </aside>

@@ -1,0 +1,96 @@
+{%- paginate search.results by section.settings.results_per_page -%}
+  <section class="storefront-search-page" aria-labelledby="StorefrontSearchPageTitle-{{ section.id }}">
+    <header class="storefront-search-page__header">
+      <h1 class="storefront-search-page__title" id="StorefrontSearchPageTitle-{{ section.id }}">{{ 'search.title' | t }}</h1>
+      <form class="storefront-search-page__form" role="search" action="{{ routes.search_url }}" method="get">
+        <div class="input">
+          <label class="input__label" for="StorefrontSearchPageQuery-{{ section.id }}">{{ 'search.label' | t }}</label>
+          <input
+            class="input__field"
+            id="StorefrontSearchPageQuery-{{ section.id }}"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ 'search.placeholder' | t }}"
+          >
+        </div>
+        <button class="btn" type="submit">{{ 'search.submit' | t }}</button>
+      </form>
+      {%- if search.performed -%}
+        <p role="status">{{ 'search.results_count' | t: count: search.results_count, terms: search.terms }}</p>
+      {%- endif -%}
+    </header>
+
+    {%- if search.performed and search.results_count > 0 -%}
+      <ul class="storefront-search-page__grid" style="--storefront-grid-columns: {{ section.settings.columns }}">
+        {%- for item in search.results -%}
+          <li>
+            {%- if item.object_type == 'product' -%}
+              {% render 'storefront-product-tile',
+                product: item,
+                media_ratio: section.settings.media_ratio,
+                show_vendor: section.settings.show_vendor,
+                show_description: false,
+                show_badges: true,
+                show_second_image: section.settings.show_second_image,
+                heading_tag: 'h2'
+              %}
+            {%- else -%}
+              {%- assign result_type_label = item.object_type -%}
+              {%- if item.object_type == 'article' -%}
+                {%- assign result_type_label = 'search.result_type.article' | t -%}
+              {%- elsif item.object_type == 'page' -%}
+                {%- assign result_type_label = 'search.result_type.page' | t -%}
+              {%- endif -%}
+              <a class="storefront-search-card" href="{{ item.url }}">
+                {%- if item.image != blank -%}
+                  {{ item.image
+                    | image_url: width: 1200
+                    | image_tag:
+                      class: 'storefront-search-card__image',
+                      widths: '320, 480, 640, 800, 960, 1200',
+                      sizes: '(min-width: 768px) 33vw, 50vw',
+                      loading: 'lazy',
+                      alt: item.image.alt | default: item.title
+                  }}
+                {%- endif -%}
+                <span class="storefront-search-card__type">{{ result_type_label }}</span>
+                <h2 class="storefront-search-card__title">{{ item.title }}</h2>
+                {%- if item.content != blank -%}
+                  <p class="storefront-search-card__excerpt">{{ item.content | strip_html | truncatewords: 24 }}</p>
+                {%- endif -%}
+              </a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+      {% render 'pagination', paginate: paginate %}
+    {%- elsif search.performed -%}
+      {% render 'empty-state',
+        heading_tag: 'h2',
+        title: 'search.no_results' | t,
+        message: 'search.no_results_message' | t
+      %}
+    {%- endif -%}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Search results",
+  "settings": [
+    { "type": "range", "id": "results_per_page", "label": "Results per page", "min": 8, "max": 24, "step": 4, "default": 12 },
+    { "type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 4, "step": 1, "default": 3 },
+    {
+      "type": "select", "id": "media_ratio", "label": "Product image ratio", "default": "portrait",
+      "options": [
+        { "value": "square", "label": "Square" },
+        { "value": "portrait", "label": "Portrait" },
+        { "value": "landscape", "label": "Landscape" }
+      ]
+    },
+    { "type": "checkbox", "id": "show_vendor", "label": "Show maker or vendor", "default": false },
+    { "type": "checkbox", "id": "show_second_image", "label": "Show second product image on hover", "default": true }
+  ]
+}
+{% endschema %}

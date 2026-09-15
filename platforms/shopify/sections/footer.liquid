@@ -1,49 +1,111 @@
-<footer class="footer">
+<footer class="footer storefront-footer">
   <div class="footer__grid">
-    {%- comment -%} Brand Column {%- endcomment -%}
     <div class="footer__brand">
-      <h2 class="footer__heading" id="footer-brand-{{ section.id }}">{{ shop.name }}</h2>
+      <a class="storefront-footer__wordmark" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+        {% render 'logo', variant: section.settings.logo_variant, width: 640, loading: 'lazy' %}
+      </a>
       {%- if section.settings.footer_text != blank -%}
-        <p class="footer__copy">
-          {{ section.settings.footer_text }}
-        </p>
+        <p class="footer__copy">{{ section.settings.footer_text }}</p>
       {%- endif -%}
     </div>
 
-    {%- comment -%} Navigation Columns {%- endcomment -%}
     {%- for block in section.blocks -%}
       {%- case block.type -%}
         {%- when 'menu' -%}
           {%- assign group_heading = block.settings.heading | default: block.settings.menu.title -%}
-          <nav class="footer__group" aria-labelledby="footer-group-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
-            <h2 class="footer__heading" id="footer-group-{{ section.id }}-{{ block.id }}">{{ group_heading }}</h2>
-            {%- if block.settings.menu != blank -%}
+          {%- if group_heading != blank and block.settings.menu != blank -%}
+            <nav class="footer__group" aria-labelledby="FooterGroup-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
+              <h2 class="footer__heading" id="FooterGroup-{{ section.id }}-{{ block.id }}">{{ group_heading }}</h2>
               <ul class="footer__links">
                 {%- for link in block.settings.menu.links -%}
                   <li><a class="footer__link" href="{{ link.url }}">{{ link.title }}</a></li>
                 {%- endfor -%}
               </ul>
+            </nav>
+          {%- endif -%}
+
+        {%- when 'contact' -%}
+          {%- if block.settings.heading != blank or block.settings.text != blank -%}
+            <div class="footer__group" {{ block.shopify_attributes }}>
+              {%- if block.settings.heading != blank -%}
+                <h2 class="footer__heading">{{ block.settings.heading }}</h2>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <div class="footer__copy rte">{{ block.settings.text }}</div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+        {%- when 'newsletter' -%}
+          {%- assign newsletter_heading = block.settings.heading -%}
+          {%- if newsletter_heading == blank -%}
+            {%- assign newsletter_heading = 'footer.newsletter_title' | t -%}
+          {%- endif -%}
+          <div class="footer__group" {{ block.shopify_attributes }}>
+            <h2 class="footer__heading">{{ newsletter_heading }}</h2>
+            {%- if block.settings.text != blank -%}
+              <div class="footer__copy rte">{{ block.settings.text }}</div>
             {%- endif -%}
-          </nav>
+            {%- assign newsletter_form_id = 'FooterNewsletter-' | append: section.id | append: '-' | append: block.id -%}
+            {% form 'customer', id: newsletter_form_id, class: 'storefront-footer__newsletter-form' %}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <div class="storefront-footer__newsletter-row">
+                <div class="input">
+                  <label class="visually-hidden input__label" for="FooterEmail-{{ section.id }}-{{ block.id }}">
+                    {{ 'newsletter.email_label' | t }}
+                  </label>
+                  <input
+                    class="input__field"
+                    id="FooterEmail-{{ section.id }}-{{ block.id }}"
+                    type="email"
+                    name="contact[email]"
+                    value="{{ form.email | escape }}"
+                    autocomplete="email"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder="{{ 'footer.newsletter_placeholder' | t }}"
+                    required
+                  >
+                </div>
+                <button class="btn" type="submit">{{ 'footer.newsletter_submit' | t }}</button>
+              </div>
+              {%- if form.posted_successfully? -%}
+                <p role="status">{{ 'newsletter.success' | t }}</p>
+              {%- endif -%}
+              {%- if form.errors -%}
+                <div role="alert">{{ form.errors | default_errors }}</div>
+              {%- endif -%}
+            {% endform %}
+          </div>
       {%- endcase -%}
     {%- endfor -%}
   </div>
 
   <div class="footer__bottom">
     <p class="footer__meta">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}</p>
-    {%- if section.settings.social_instagram != blank -%}
-      <span class="footer__meta">
-        <a class="footer__meta-link" href="{{ section.settings.social_instagram }}" aria-label="Instagram" target="_blank" rel="noopener">
-          {% render 'icon', name: 'instagram' %}
-        </a>
-      </span>
+
+    {%- if shop.privacy_policy != blank or shop.refund_policy != blank or shop.shipping_policy != blank or shop.terms_of_service != blank -%}
+      <ul class="footer__meta storefront-footer__policies">
+        {%- if shop.privacy_policy != blank -%}<li><a class="footer__meta-link" href="{{ shop.privacy_policy.url }}">{{ shop.privacy_policy.title }}</a></li>{%- endif -%}
+        {%- if shop.refund_policy != blank -%}<li><a class="footer__meta-link" href="{{ shop.refund_policy.url }}">{{ shop.refund_policy.title }}</a></li>{%- endif -%}
+        {%- if shop.shipping_policy != blank -%}<li><a class="footer__meta-link" href="{{ shop.shipping_policy.url }}">{{ shop.shipping_policy.title }}</a></li>{%- endif -%}
+        {%- if shop.terms_of_service != blank -%}<li><a class="footer__meta-link" href="{{ shop.terms_of_service.url }}">{{ shop.terms_of_service.title }}</a></li>{%- endif -%}
+      </ul>
     {%- endif -%}
-    {%- if section.settings.social_pinterest != blank -%}
-      <span class="footer__meta">
-        <a class="footer__meta-link" href="{{ section.settings.social_pinterest }}" aria-label="Pinterest" target="_blank" rel="noopener">
-          {% render 'icon', name: 'pinterest' %}
-        </a>
-      </span>
+
+    {%- if section.settings.social_instagram != blank or section.settings.social_pinterest != blank -%}
+      <ul class="footer__meta storefront-footer__social" aria-label="{{ 'footer.social_links' | t }}">
+        {%- if section.settings.social_instagram != blank -%}
+          <li><a href="{{ section.settings.social_instagram }}" aria-label="Instagram" target="_blank" rel="noopener">{% render 'icon', name: 'instagram' %}</a></li>
+        {%- endif -%}
+        {%- if section.settings.social_pinterest != blank -%}
+          <li><a href="{{ section.settings.social_pinterest }}" aria-label="Pinterest" target="_blank" rel="noopener">{% render 'icon', name: 'pinterest' %}</a></li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if section.settings.show_payment_icons -%}
+      {% render 'payment-icons' %}
     {%- endif -%}
   </div>
 </footer>
@@ -53,24 +115,54 @@
   "name": "Footer",
   "settings": [
     {
+      "type": "select",
+      "id": "logo_variant",
+      "label": "Logo variant",
+      "options": [
+        { "value": "short", "label": "Short" },
+        { "value": "long", "label": "Long" },
+        { "value": "wordmark", "label": "Wordmark" },
+        { "value": "easter_egg", "label": "Easter egg" }
+      ],
+      "default": "wordmark"
+    },
+    {
       "type": "textarea",
       "id": "footer_text",
       "label": "Brand description",
-      "default": "Handcrafted art ceramics. Each piece tells a story of fire, earth, and intention."
+      "default": "Art, objects, and editions shaped through material practice."
     },
     { "type": "url", "id": "social_instagram", "label": "Instagram URL" },
-    { "type": "url", "id": "social_pinterest", "label": "Pinterest URL" }
+    { "type": "url", "id": "social_pinterest", "label": "Pinterest URL" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": false }
   ],
   "blocks": [
     {
       "type": "menu",
       "name": "Menu column",
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Explore" },
         { "type": "link_list", "id": "menu", "label": "Menu" }
+      ]
+    },
+    {
+      "type": "contact",
+      "name": "Contact",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Studio" },
+        { "type": "richtext", "id": "text", "label": "Contact details" }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "From the studio" },
+        { "type": "richtext", "id": "text", "label": "Supporting text" }
       ]
     }
   ],
-  "max_blocks": 3
+  "max_blocks": 5
 }
 {% endschema %}

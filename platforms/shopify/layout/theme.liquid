@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}" data-theme="light">
+<html class="no-js" lang="{{ request.locale.iso_code }}" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,13 +47,14 @@
   {{ 'coming-soon.css' | asset_url | stylesheet_tag }}
   {{ 'reviews.css' | asset_url | stylesheet_tag }}
   {{ 'pages.css' | asset_url | stylesheet_tag }}
+  {{ 'storefront.css' | asset_url | stylesheet_tag }}
 
   {% render 'theme-brand-settings' %}
 
   {{ content_for_header }}
 
   <script>
-    // Detect saved theme preference
+    document.documentElement.classList.remove('no-js');
     (function() {
       var saved = localStorage.getItem('tg-theme');
       if (saved === 'dark') {
@@ -73,11 +74,8 @@
       {% section 'coming-soon' %}
     </main>
   {%- else -%}
-    {% section 'announcement-bar' %}
-    {% section 'header' %}
+    {% sections 'header-group' %}
 
-    {%- comment -%} Global overlays {%- endcomment -%}
-    {% render 'mobile-menu' %}
     {% render 'search-overlay' %}
     {% render 'cart-drawer' %}
 
@@ -85,7 +83,7 @@
       {{ content_for_layout }}
     </main>
 
-    {% section 'footer' %}
+    {% sections 'footer-group' %}
   {%- endif -%}
 
   {%- comment -%} Minimal JS — progressive enhancement {%- endcomment -%}
@@ -93,5 +91,6 @@
     <script src="{{ 'gift-wrap.js' | asset_url }}" defer></script>
   {%- endif -%}
   <script type="module" src="{{ 'runtime-loader.js' | asset_url }}"></script>
+  <script type="module" src="{{ 'storefront.js' | asset_url }}"></script>
 </body>
 </html>

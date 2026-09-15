@@ -17,6 +17,8 @@ const outputPaths = {
   javascript: path.join(assetsDir, 'theme.js'),
   runtimeLoader: path.join(assetsDir, 'runtime-loader.js'),
   runtimeCore: path.join(assetsDir, 'tg-runtime-core.js'),
+  storefrontCss: path.join(assetsDir, 'storefront.css'),
+  storefrontJavascript: path.join(assetsDir, 'storefront.js'),
   manifest: path.join(shopifyDir, 'adapter.manifest.json'),
   summary: path.join(shopifyDir, 'adapter.summary.json')
 };
@@ -60,7 +62,8 @@ const themeLayoutCss = [
   'ceramics.css',
   'coming-soon.css',
   'reviews.css',
-  'pages.css'
+  'pages.css',
+  'storefront.css'
 ];
 
 const passwordLayoutCss = [
@@ -170,6 +173,16 @@ function templateJsonFiles() {
   }
 
   return walkFiles(templatesDir, (filePath) => filePath.endsWith('.json'));
+}
+
+function sectionGroupJsonFiles() {
+  const sectionsDir = path.join(shopifyDir, 'sections');
+
+  if (!fs.existsSync(sectionsDir)) {
+    return [];
+  }
+
+  return walkFiles(sectionsDir, (filePath) => filePath.endsWith('.json'));
 }
 
 function liquidKindForPath(filePath) {
@@ -414,7 +427,46 @@ function buildTemplateInventory() {
   };
 }
 
-function buildCompositionInventory(liquidInventory, templateInventory) {
+function buildSectionGroupInventory() {
+  const groups = [];
+  const sectionTypeReferences = new Map();
+
+  for (const filePath of sectionGroupJsonFiles()) {
+    const groupPath = relative(filePath);
+
+    try {
+      const group = readJson(filePath);
+      const sectionTypes = uniqueSorted(Object.values(group.sections ?? {}).map((section) => section?.type));
+
+      for (const sectionType of sectionTypes) {
+        addToMapSet(sectionTypeReferences, sectionType, groupPath);
+      }
+
+      groups.push({
+        path: groupPath,
+        type: group.type ?? null,
+        status: 'ready',
+        sectionTypes,
+        errors: []
+      });
+    } catch (error) {
+      groups.push({
+        path: groupPath,
+        type: null,
+        status: 'invalid',
+        sectionTypes: [],
+        errors: [error instanceof Error ? error.message : String(error)]
+      });
+    }
+  }
+
+  return {
+    files: groups,
+    sectionTypeReferences: objectFromSetMap(sectionTypeReferences)
+  };
+}
+
+function buildCompositionInventory(liquidInventory, templateInventory, sectionGroupInventory) {
   const layoutSectionReferences = new Map();
 
   for (const file of liquidInventory) {
@@ -429,6 +481,7 @@ function buildCompositionInventory(liquidInventory, templateInventory) {
 
   return {
     templates: templateInventory.sectionTypeReferences,
+    sectionGroups: sectionGroupInventory.sectionTypeReferences,
     layoutSections: objectFromSetMap(layoutSectionReferences)
   };
 }
@@ -631,6 +684,7 @@ function buildTemplateCompositionLayer(strategy, liquidHits, compositionInventor
   const sectionHits = liquidHits.filter((file) => file.kind === 'section');
   const sections = sectionHits.map((file) => {
     const templates = compositionInventory.templates[file.name] ?? [];
+    const sectionGroups = compositionInventory.sectionGroups[file.name] ?? [];
     const layouts = compositionInventory.layoutSections[file.name] ?? [];
     const addableByPreset = file.schema.hasPresets;
 
@@ -638,9 +692,10 @@ function buildTemplateCompositionLayer(strategy, liquidHits, compositionInventor
       name: file.name,
       file: file.path,
       templates,
+      sectionGroups,
       layouts,
       addableByPreset,
-      ready: templates.length > 0 || layouts.length > 0 || addableByPreset
+      ready: templates.length > 0 || sectionGroups.length > 0 || layouts.length > 0 || addableByPreset
     };
   });
 
@@ -890,7 +945,8 @@ function installDescriptor(registry, runtimeConfig, slug) {
 function buildManifest(registry, contracts, runtime) {
   const liquidInventory = buildLiquidInventory();
   const templateInventory = buildTemplateInventory();
-  const compositionInventory = buildCompositionInventory(liquidInventory, templateInventory);
+  const sectionGroupInventory = buildSectionGroupInventory();
+  const compositionInventory = buildCompositionInventory(liquidInventory, templateInventory, sectionGroupInventory);
   const renderApis = renderApiInventory(liquidInventory);
   const components = [];
   let contractImplemented = 0;
@@ -1057,6 +1113,8 @@ function buildManifest(registry, contracts, runtime) {
     runtimeLoader: relative(outputPaths.runtimeLoader),
     runtimeCore: relative(outputPaths.runtimeCore),
     runtimeModules: [...runtime.modules.keys()].map((fileName) => `platforms/shopify/assets/${fileName}`),
+    storefrontCss: relative(outputPaths.storefrontCss),
+    storefrontJavascript: relative(outputPaths.storefrontJavascript),
     manifest: relative(outputPaths.manifest),
     summary: relative(outputPaths.summary),
     cssAssets: componentCssAssets.map((asset) => `platforms/shopify/assets/${asset.output}`)
@@ -1072,7 +1130,12 @@ function buildManifest(registry, contracts, runtime) {
       source: `components/css/${asset.source}`,
       output: `platforms/shopify/assets/${asset.output}`,
       role: asset.source.replace(/\.css$/, '')
-    }))
+    })),
+    {
+      source: relative(outputPaths.storefrontCss),
+      output: relative(outputPaths.storefrontCss),
+      role: 'shopify-storefront-composition'
+    }
   ];
 
   const stats = {
@@ -1104,10 +1167,11 @@ function buildManifest(registry, contracts, runtime) {
     liquidMatched,
     plannedWithLiquid,
     implementedMissingRequiredLiquid,
-    cssAssets: componentCssAssets.length + 1,
+    cssAssets: componentCssAssets.length + 2,
     runtimeModules: runtime.modules.size,
     liquidFiles: liquidInventory.length,
-    templateJsonFiles: templateInventory.files.length
+    templateJsonFiles: templateInventory.files.length,
+    sectionGroupJsonFiles: sectionGroupInventory.files.length
   };
 
   const categoryCoverage = Object.entries(
@@ -1175,7 +1239,7 @@ function buildManifest(registry, contracts, runtime) {
       .map((component) => ({
         type: 'template-composition-not-ready',
         slug: component.slug,
-        message: 'The Shopify section adapter is not referenced by a JSON template, layout section call, or addable preset.'
+        message: 'The Shopify section adapter is not referenced by a JSON template, section group, layout section call, or addable preset.'
       })),
     ...components
       .filter((component) => component.maturity.layers.editorPreview.required && component.maturity.layers.editorPreview.status !== 'ready')
@@ -1212,6 +1276,7 @@ function buildManifest(registry, contracts, runtime) {
         'platforms/shopify/templates'
       ],
       templates: 'platforms/shopify/templates/*.json',
+      sectionGroups: 'platforms/shopify/sections/*.json',
       config: 'platforms/shopify/config',
       locales: 'platforms/shopify/locales'
     },
@@ -1224,6 +1289,7 @@ function buildManifest(registry, contracts, runtime) {
       tokenOwnership: 'tokens.css is generated from platforms/web/tokens.css and should not be edited directly.',
       baseOwnership: 'base.css is generated from reset, foundations, and utilities source CSS; it must not define token values.',
       componentCssOwnership: 'Component CSS assets are copied from components/css and should be regenerated from source.',
+      storefrontOwnership: 'storefront.css and storefront.js are Shopify target source for page composition and overlay coordination; they do not define a parallel public component API.',
       runtimeDelivery: 'runtime-loader.js imports only the progressive-enhancement modules matched by rendered Liquid; theme.js remains a compatibility and diagnostic aggregate.',
       liquidOwnership: 'Liquid files are Shopify adapter source and may map Shopify objects/settings into component contracts.',
       maturityOwnership: 'Shopify maturity is computed from contract status, CSS output, Liquid evidence, section/block schema, data mapping, template composition, editor-preview readiness, and behavior requirements. Class-level contracts do not require dedicated Liquid roots.',
@@ -1247,7 +1313,7 @@ function buildManifest(registry, contracts, runtime) {
         schema: 'Required for section and theme-block adapters; validates that target-native editor settings exist in Liquid schema.',
         data: 'Required for dedicated Shopify adapters; tracks Shopify objects, settings, render calls, section calls, and snippet render parameters.',
         behavior: 'Required when the contract defines behavior; accepted only when the Shopify adapter status is implemented.',
-        templateComposition: 'Required for section adapters; satisfied by JSON templates, layout section calls, or addable section presets.',
+        templateComposition: 'Required for section adapters; satisfied by JSON templates, section groups, layout section calls, or addable section presets.',
         editorPreview: 'Required for section and theme-block adapters; checks that schema controls are wired into rendered Liquid instead of becoming dead editor controls.'
       }
     },
@@ -1255,11 +1321,13 @@ function buildManifest(registry, contracts, runtime) {
     shopifyInventory: {
       liquidFiles: liquidInventory,
       templates: templateInventory.files,
+      sectionGroups: sectionGroupInventory.files,
       composition: compositionInventory,
       renderApis
     },
     liquidFiles: liquidInventory.map((file) => file.path),
     templateJsonFiles: templateInventory.files.map((file) => file.path),
+    sectionGroupJsonFiles: sectionGroupInventory.files.map((file) => file.path),
     stats,
     warningCount: warnings.length,
     warnings,
@@ -1291,6 +1359,7 @@ function buildManifest(registry, contracts, runtime) {
         sectionCalls: file.sectionCalls
       })),
       templates: templateInventory.files,
+      sectionGroups: sectionGroupInventory.files,
       composition: compositionInventory
     },
     stats,

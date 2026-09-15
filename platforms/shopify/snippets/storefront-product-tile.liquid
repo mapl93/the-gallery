@@ -1,0 +1,81 @@
+{% doc %}
+  Shopify storefront product tile. This is a target composition, not the
+  canonical Gallery Product Card.
+
+  @param {product} product - Product to present.
+  @param {string} [media_ratio] - Square, portrait, or landscape media ratio.
+  @param {boolean} [show_vendor] - Show the Shopify product vendor.
+  @param {boolean} [show_description] - Show a short plain-text description.
+  @param {boolean} [show_badges] - Show sale or sold-out status.
+  @param {boolean} [show_second_image] - Reveal a second product image on hover.
+  @param {string} [heading_tag] - h2, h3, or h4.
+{% enddoc %}
+
+{%- liquid
+  assign resolved_ratio = media_ratio | default: 'portrait'
+  assign resolved_heading_tag = heading_tag | default: 'h2'
+  unless resolved_heading_tag == 'h2' or resolved_heading_tag == 'h3' or resolved_heading_tag == 'h4'
+    assign resolved_heading_tag = 'h2'
+  endunless
+
+  assign product_url = product.url
+  if collection != blank
+    assign product_url = product.url | within: collection
+  endif
+-%}
+
+<article class="storefront-product-tile" data-media-ratio="{{ resolved_ratio }}">
+  <a class="storefront-product-tile__link" href="{{ product_url }}">
+    <div class="storefront-product-tile__media">
+      {%- if product.featured_media != blank -%}
+        {{ product.featured_media
+          | image_url: width: 1200
+          | image_tag:
+            class: 'storefront-product-tile__image storefront-product-tile__image--primary',
+            widths: '320, 480, 640, 800, 960, 1200',
+            sizes: '(min-width: 990px) 25vw, 50vw',
+            loading: 'lazy',
+            alt: product.featured_media.alt | default: product.title
+        }}
+        {%- if show_second_image and product.media[1] != blank -%}
+          {{ product.media[1]
+            | image_url: width: 1200
+            | image_tag:
+              class: 'storefront-product-tile__image storefront-product-tile__image--alternate',
+              widths: '320, 480, 640, 800, 960, 1200',
+              sizes: '(min-width: 990px) 25vw, 50vw',
+              loading: 'lazy',
+              alt: product.media[1].alt | default: product.title
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'storefront-product-tile__image placeholder-svg' }}
+      {%- endif -%}
+
+      {%- if show_badges -%}
+        <div class="storefront-product-tile__badges">
+          {%- unless product.available -%}
+            <span class="badge">{{ 'products.sold_out' | t }}</span>
+          {%- elsif product.compare_at_price > product.price -%}
+            <span class="badge">{{ 'products.on_sale' | t }}</span>
+          {%- endunless -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="storefront-product-tile__content">
+      <div class="storefront-product-tile__identity">
+        {%- if show_vendor and product.vendor != blank -%}
+          <span class="storefront-product-tile__vendor">{{ product.vendor }}</span>
+        {%- endif -%}
+        <{{ resolved_heading_tag }} class="storefront-product-tile__title">{{ product.title }}</{{ resolved_heading_tag }}>
+      </div>
+      <div class="storefront-product-tile__price">
+        {% render 'price', product: product %}
+      </div>
+      {%- if show_description and product.description != blank -%}
+        <p class="storefront-product-tile__description">{{ product.description | strip_html | truncatewords: 24 }}</p>
+      {%- endif -%}
+    </div>
+  </a>
+</article>

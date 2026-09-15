@@ -1,0 +1,54 @@
+<article class="storefront-article">
+  {% render 'article-hero',
+    article: article,
+    variant: section.settings.hero_variant,
+    heading_level: 1,
+    show_image: section.settings.show_image,
+    show_date: section.settings.show_date,
+    show_author: section.settings.show_author_in_hero,
+    blog_label: blog.title,
+    image_loading: 'eager',
+    image_sizes: '100vw'
+  %}
+
+  <div class="storefront-article__content">
+    {% render 'article-body', article: article, drop_cap: section.settings.drop_cap %}
+
+    {%- if section.settings.show_author_card -%}
+      {% render 'author-card',
+        article: article,
+        variant: 'full',
+        show_image: true,
+        show_bio: true,
+        show_homepage: false,
+        show_email: false
+      %}
+    {%- endif -%}
+  </div>
+
+  <script type="application/ld+json">
+    {{ article | structured_data }}
+  </script>
+</article>
+
+{% schema %}
+{
+  "name": "Journal article",
+  "enabled_on": { "templates": ["article"] },
+  "settings": [
+    {
+      "type": "select", "id": "hero_variant", "label": "Hero layout", "default": "split",
+      "options": [
+        { "value": "full", "label": "Full image" },
+        { "value": "split", "label": "Split" },
+        { "value": "text-only", "label": "Text only" }
+      ]
+    },
+    { "type": "checkbox", "id": "show_image", "label": "Show hero image", "default": true },
+    { "type": "checkbox", "id": "show_date", "label": "Show publication date", "default": true },
+    { "type": "checkbox", "id": "show_author_in_hero", "label": "Show author in hero", "default": false },
+    { "type": "checkbox", "id": "drop_cap", "label": "Use opening drop cap", "default": true },
+    { "type": "checkbox", "id": "show_author_card", "label": "Show author card", "default": false }
+  ]
+}
+{% endschema %}

@@ -13,6 +13,8 @@ const summaryPath = path.join(shopifyDir, 'adapter.summary.json');
 const sourceThemeJsPath = path.join(repoRoot, 'components', 'js', 'theme.js');
 const runtimeLoaderPath = path.join(assetsDir, 'runtime-loader.js');
 const runtimeCorePath = path.join(assetsDir, 'tg-runtime-core.js');
+const storefrontCssPath = path.join(assetsDir, 'storefront.css');
+const storefrontJavascriptPath = path.join(assetsDir, 'storefront.js');
 const maturityModel = 'shopify-maturity-v1';
 const maturityLevels = ['css-ready', 'template-detected', 'schema-ready', 'editor-ready', 'implemented', 'planned'];
 const maturityStrategies = [
@@ -174,6 +176,20 @@ function validateModularRuntime(errors, manifest) {
   }
   assert(errors, JSON.stringify(manifest.outputs?.runtimeModules) === JSON.stringify(expectedPaths), 'manifest.outputs.runtimeModules must list every generated Shopify runtime module');
   return expected.config;
+}
+
+function validateStorefrontAssets(errors, manifest) {
+  pathExists(errors, storefrontCssPath);
+  pathExists(errors, storefrontJavascriptPath);
+  assert(errors, manifest.outputs?.storefrontCss === relative(storefrontCssPath), `manifest.outputs.storefrontCss must be ${relative(storefrontCssPath)}`);
+  assert(errors, manifest.outputs?.storefrontJavascript === relative(storefrontJavascriptPath), `manifest.outputs.storefrontJavascript must be ${relative(storefrontJavascriptPath)}`);
+
+  const themeLayoutPath = path.join(shopifyDir, 'layout', 'theme.liquid');
+  if (fs.existsSync(themeLayoutPath)) {
+    const themeLayout = read(themeLayoutPath);
+    assert(errors, themeLayout.includes("{{ 'storefront.css' | asset_url | stylesheet_tag }}"), 'theme.liquid must load storefront.css');
+    assert(errors, themeLayout.includes("<script type=\"module\" src=\"{{ 'storefront.js' | asset_url }}\"></script>"), 'theme.liquid must load storefront.js as a module');
+  }
 }
 
 function resolveComponentDependencies(registry, slug, resolved = new Set(), order = []) {
@@ -375,6 +391,7 @@ function main() {
   const manifest = readJson(manifestPath);
 
   const runtimeConfig = validateModularRuntime(errors, manifest);
+  validateStorefrontAssets(errors, manifest);
 
   for (const layoutName of ['theme.liquid', 'password.liquid']) {
     const layoutPath = path.join(shopifyDir, 'layout', layoutName);

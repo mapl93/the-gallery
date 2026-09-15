@@ -1,76 +1,75 @@
-{%- comment -%}
-  Snippet: cart-drawer
-  Usage: {% render 'cart-drawer' %}
+{% doc %}
+  Native Shopify cart drawer. It deliberately avoids an Ajax dependency: the
+  cart page remains the authoritative fallback and checkout is a native cart
+  form submission.
+{% enddoc %}
 
-  Canonical Drawer owns modal structure. This Shopify target maps cart records,
-  native quantity form ownership, removal requests, formatted totals, empty
-  content, and checkout. A target controller must still own open/close focus,
-  inertness, scroll lock, Ajax/section refresh, pending/error, and status policy.
-{%- endcomment -%}
-
-<div class="drawer-overlay" data-cart-overlay aria-hidden="true"></div>
+<div class="drawer-overlay" data-storefront-scrim="cart" aria-hidden="true" hidden></div>
 <aside
-  class="drawer"
-  id="CartDrawer"
-  data-cart-drawer
+  class="drawer storefront-cart-drawer"
+  id="StorefrontCartDrawer"
   role="dialog"
   aria-modal="true"
-  aria-labelledby="CartDrawerTitle"
+  aria-labelledby="StorefrontCartDrawerTitle"
   aria-hidden="true"
+  data-storefront-panel="cart"
+  tabindex="-1"
+  inert
+  hidden
 >
   <div class="drawer__header">
-    <h2 class="drawer__title" id="CartDrawerTitle">
+    <h2 class="drawer__title" id="StorefrontCartDrawerTitle">
       {{ 'cart.title' | t }} ({{ cart.item_count }})
     </h2>
-    <button class="close-btn drawer__close" type="button"
-            aria-label="{{ 'cart.close' | t | escape }}" data-cart-close>
-      <span class="close-btn__icon">{% render 'icon', name: 'x' %}</span>
+    <button
+      class="close-btn drawer__close"
+      type="button"
+      aria-label="{{ 'accessibility.close' | t }}"
+      data-storefront-close
+    >
+      {% render 'icon', name: 'x' %}
     </button>
   </div>
 
-  <form class="drawer__body" action="{{ routes.cart_url }}" method="post">
-    {% if cart.item_count == 0 %}
-      {% render 'empty-state', heading_tag: 'h3', icon: 'shopping-bag',
-         title: 'cart.empty' | t,
-         message: 'cart.empty_message' | t,
-         cta_text: 'cart.continue_shopping' | t,
-         cta_url: routes.all_products_collection_url %}
-    {% else %}
-      <ul class="cart-lines">
-        {% for item in cart.items %}
-          {%- if settings.gift_wrap_enabled and settings.gift_wrap_product != blank and item.product_id == settings.gift_wrap_product.id -%}
-            {% render 'cart-line-item', item: item, show_quantity: false %}
-          {%- else -%}
+  {% form 'cart', cart, class: 'storefront-cart-drawer__form' %}
+    <div class="drawer__body">
+      {%- if cart.item_count == 0 -%}
+        {% render 'empty-state',
+          heading_tag: 'h3',
+          icon: 'shopping-bag',
+          title: 'cart.empty' | t,
+          message: 'cart.empty_message' | t,
+          cta_text: 'cart.continue_shopping' | t,
+          cta_url: routes.all_products_collection_url
+        %}
+      {%- else -%}
+        <ul class="cart-lines">
+          {%- for item in cart.items -%}
             {% render 'cart-line-item', item: item %}
-          {%- endif -%}
-        {% endfor %}
-      </ul>
-      {%- if settings.gift_wrap_enabled and settings.gift_wrap_product != blank -%}
-        {% render 'gift-wrap',
-           gift_wrap_product: settings.gift_wrap_product,
-           gift_wrap_id: 'CartDrawerGiftWrap' %}
+          {%- endfor -%}
+        </ul>
       {%- endif -%}
-      <button type="submit" name="update" class="btn btn--outline btn--full">
-        {{ 'cart.update' | t }}
-      </button>
-    {% endif %}
-  </form>
-
-  {% if cart.item_count > 0 %}
-    <div class="drawer__footer">
-      <dl class="cart-drawer__summary">
-        <div class="cart-drawer__summary-row cart-drawer__summary-total">
-          <dt>{{ 'cart.total' | t }}</dt>
-          <dd><bdi>{{ cart.total_price | money }}</bdi></dd>
-        </div>
-      </dl>
-      <p>{{ 'cart.shipping_note' | t }}</p>
-      <a href="{{ routes.cart_url }}" class="btn btn--outline btn--full">
-        {{ 'cart.title' | t }}
-      </a>
-      <a href="/checkout" class="btn btn--primary btn--full">
-        {{ 'cart.checkout' | t }}
-      </a>
     </div>
-  {% endif %}
+
+    {%- if cart.item_count > 0 -%}
+      <div class="drawer__footer">
+        <dl class="cart-drawer__summary">
+          <div class="cart-drawer__summary-row cart-drawer__summary-total">
+            <dt>{{ 'cart.total' | t }}</dt>
+            <dd><bdi>{{ cart.total_price | money }}</bdi></dd>
+          </div>
+        </dl>
+        <p>{{ 'cart.shipping_note' | t }}</p>
+        <button type="submit" name="update" class="btn btn--outline btn--full">
+          {{ 'cart.update' | t }}
+        </button>
+        <a href="{{ routes.cart_url }}" class="btn btn--outline btn--full">
+          {{ 'cart.view_cart' | t }}
+        </a>
+        <button type="submit" name="checkout" class="btn btn--primary btn--full">
+          {{ 'cart.checkout' | t }}
+        </button>
+      </div>
+    {%- endif -%}
+  {% endform %}
 </aside>

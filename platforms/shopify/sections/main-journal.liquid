@@ -1,0 +1,88 @@
+{%- paginate blog.articles by section.settings.articles_per_page -%}
+  <section class="storefront-journal" aria-labelledby="StorefrontJournalTitle-{{ section.id }}">
+    <header class="storefront-journal__header">
+      <p class="storefront-journal__eyebrow">{{ 'journal.eyebrow' | t }}</p>
+      <h1 class="storefront-journal__title" id="StorefrontJournalTitle-{{ section.id }}">{{ blog.title }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <div class="storefront-journal__intro rte">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </header>
+
+    {%- if section.settings.show_tags and blog.all_tags.size > 0 -%}
+      <nav aria-label="{{ 'journal.topics' | t }}">
+        <ul class="storefront-journal__topics">
+          <li><a href="{{ blog.url }}"{% if current_tags == blank %} aria-current="page"{% endif %}>{{ 'journal.all_topics' | t }}</a></li>
+          {%- for tag in blog.all_tags -%}
+            {%- assign tag_handle = tag | handle -%}
+            <li>
+              <a href="{{ blog.url }}/tagged/{{ tag_handle }}"{% if current_tags contains tag %} aria-current="page"{% endif %}>{{ tag }}</a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    {%- if blog.articles.size > 0 -%}
+      <ul class="storefront-journal__grid" style="--storefront-grid-columns: {{ section.settings.columns }}">
+        {%- for article in blog.articles -%}
+          <li>
+            {% render 'article-card',
+              article: article,
+              variant: section.settings.card_variant,
+              surface: 'flat',
+              excerpt_lines: section.settings.excerpt_lines,
+              heading_level: 2,
+              blog_label: blog.title,
+              show_image: section.settings.show_image,
+              show_date: section.settings.show_date,
+              show_excerpt: section.settings.show_excerpt,
+              show_author: section.settings.show_author
+            %}
+          </li>
+        {%- endfor -%}
+      </ul>
+      {% render 'pagination', paginate: paginate %}
+    {%- else -%}
+      {% render 'empty-state',
+        heading_tag: 'h2',
+        title: 'journal.empty_title' | t,
+        message: 'journal.empty_message' | t
+      %}
+    {%- endif -%}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Journal index",
+  "enabled_on": { "templates": ["blog"] },
+  "settings": [
+    { "type": "richtext", "id": "intro", "label": "Introduction" },
+    { "type": "range", "id": "articles_per_page", "label": "Articles per page", "min": 6, "max": 24, "step": 3, "default": 12 },
+    { "type": "range", "id": "columns", "label": "Desktop columns", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "checkbox", "id": "show_tags", "label": "Show topic navigation", "default": true },
+    {
+      "type": "select", "id": "card_variant", "label": "Card layout", "default": "editorial",
+      "options": [
+        { "value": "standard", "label": "Standard" },
+        { "value": "minimal", "label": "Minimal" },
+        { "value": "editorial", "label": "Editorial" }
+      ]
+    },
+    { "type": "checkbox", "id": "show_image", "label": "Show image", "default": true },
+    { "type": "checkbox", "id": "show_date", "label": "Show publication date", "default": true },
+    { "type": "checkbox", "id": "show_excerpt", "label": "Show excerpt", "default": true },
+    {
+      "type": "select", "id": "excerpt_lines", "label": "Excerpt lines", "default": "3",
+      "visible_if": "{{ section.settings.show_excerpt }}",
+      "options": [
+        { "value": "2", "label": "2 lines" },
+        { "value": "3", "label": "3 lines" },
+        { "value": "4", "label": "4 lines" },
+        { "value": "none", "label": "No visual limit" }
+      ]
+    },
+    { "type": "checkbox", "id": "show_author", "label": "Show author", "default": false }
+  ]
+}
+{% endschema %}

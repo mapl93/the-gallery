@@ -2,6 +2,11 @@
   {%- liquid
     assign active_filter_count = 0
     assign current_sort = collection.sort_by | default: collection.default_sort_by
+    assign no_results_title = 'collections.no_results_title' | t
+    assign no_results_message = 'collections.no_results_message' | t
+    assign clear_filters_label = 'collections.clear_filters' | t
+    assign empty_collection_title = 'collections.empty_title' | t
+    assign empty_collection_message = 'collections.empty_message' | t
     for filter in collection.filters
       assign active_filter_count = active_filter_count | plus: filter.active_values.size
       if filter.type == 'price_range'
@@ -167,16 +172,16 @@
     {%- elsif active_filter_count > 0 -%}
       {% render 'empty-state',
         heading_tag: 'h2',
-        title: 'collections.no_results_title' | t,
-        message: 'collections.no_results_message' | t,
-        cta_text: 'collections.clear_filters' | t,
+        title: no_results_title,
+        message: no_results_message,
+        cta_text: clear_filters_label,
         cta_url: collection.url
       %}
     {%- else -%}
       {% render 'empty-state',
         heading_tag: 'h2',
-        title: 'collections.empty_title' | t,
-        message: 'collections.empty_message' | t
+        title: empty_collection_title,
+        message: empty_collection_message
       %}
     {%- endif -%}
   </section>

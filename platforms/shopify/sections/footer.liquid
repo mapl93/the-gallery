@@ -1,111 +1,165 @@
-<footer class="footer storefront-footer">
-  <div class="footer__grid">
-    <div class="footer__brand">
-      <a class="storefront-footer__wordmark" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
-        {% render 'logo', variant: section.settings.logo_variant, width: 640, loading: 'lazy' %}
-      </a>
-      {%- if section.settings.footer_text != blank -%}
-        <p class="footer__copy">{{ section.settings.footer_text }}</p>
-      {%- endif -%}
-    </div>
+{%- assign current_year = 'now' | date: '%Y' -%}
 
-    {%- for block in section.blocks -%}
-      {%- case block.type -%}
-        {%- when 'menu' -%}
-          {%- assign group_heading = block.settings.heading | default: block.settings.menu.title -%}
-          {%- if group_heading != blank and block.settings.menu != blank -%}
-            <nav class="footer__group" aria-labelledby="FooterGroup-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
-              <h2 class="footer__heading" id="FooterGroup-{{ section.id }}-{{ block.id }}">{{ group_heading }}</h2>
+<footer class="footer storefront-footer" id="footer-contact">
+  <div class="storefront-footer__eyes">
+    {% render 'brand-eyes', tone: 'light' %}
+  </div>
+
+  <div class="storefront-footer__content">
+    <div class="footer__grid">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'info' -%}
+            {%- liquid
+              assign faq_url = block.settings.faq_url
+              if faq_url == blank
+                assign faq_url = routes.root_url | append: '#faqs'
+              endif
+
+              assign terms_url = block.settings.terms_url
+              if terms_url == blank and shop.terms_of_service != blank
+                assign terms_url = shop.terms_of_service.url
+              elsif terms_url == blank
+                assign terms_url = routes.root_url | append: '#terms'
+              endif
+
+              assign privacy_url = block.settings.privacy_url
+              if privacy_url == blank and shop.privacy_policy != blank
+                assign privacy_url = shop.privacy_policy.url
+              elsif privacy_url == blank
+                assign privacy_url = routes.root_url | append: '#privacy'
+              endif
+
+              assign returns_url = block.settings.returns_url
+              if returns_url == blank and shop.refund_policy != blank
+                assign returns_url = shop.refund_policy.url
+              elsif returns_url == blank
+                assign returns_url = routes.root_url | append: '#returns'
+              endif
+            -%}
+            <nav class="footer__group" aria-labelledby="FooterInfo-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
+              <h2 class="footer__heading" id="FooterInfo-{{ section.id }}-{{ block.id }}">{{ block.settings.heading }}</h2>
               <ul class="footer__links">
-                {%- for link in block.settings.menu.links -%}
-                  <li><a class="footer__link" href="{{ link.url }}">{{ link.title }}</a></li>
-                {%- endfor -%}
+                <li><a class="footer__link" href="{{ faq_url }}">{{ block.settings.faq_label }}</a></li>
+                <li><a class="footer__link" href="{{ terms_url }}">{{ block.settings.terms_label }}</a></li>
+                <li><a class="footer__link" href="{{ privacy_url }}">{{ block.settings.privacy_label }}</a></li>
+                <li><a class="footer__link" href="{{ returns_url }}">{{ block.settings.returns_label }}</a></li>
               </ul>
             </nav>
-          {%- endif -%}
 
-        {%- when 'contact' -%}
-          {%- if block.settings.heading != blank or block.settings.text != blank -%}
+          {%- when 'contact' -%}
+            {%- assign whatsapp_url = block.settings.whatsapp_url | default: 'https://wa.me/5491155851744' -%}
             <div class="footer__group" {{ block.shopify_attributes }}>
-              {%- if block.settings.heading != blank -%}
-                <h2 class="footer__heading">{{ block.settings.heading }}</h2>
-              {%- endif -%}
+              <h2 class="footer__heading">{{ block.settings.heading }}</h2>
+              <ul class="footer__links storefront-footer__contact-list">
+                <li>
+                  <a class="footer__link storefront-footer__icon-link" href="mailto:{{ block.settings.email | escape }}">
+                    <img src="{{ 'gallery-mail.svg' | asset_url }}" alt="" width="16" height="16">
+                    <span>{{ block.settings.email }}</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="footer__link storefront-footer__icon-link" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+                    <img src="{{ 'gallery-whatsapp.svg' | asset_url }}" alt="" width="16" height="16">
+                    <span>{{ block.settings.phone }}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+          {%- when 'social' -%}
+            <div class="footer__group" {{ block.shopify_attributes }}>
+              <h2 class="footer__heading">{{ block.settings.heading }}</h2>
+              <ul class="footer__links storefront-footer__social-list" aria-label="{{ 'footer.social_links' | t }}">
+                {% render 'footer-social-link', url: block.settings.facebook_url, label: 'Facebook', icon_asset: 'gallery-facebook.svg' %}
+                {% render 'footer-social-link', url: block.settings.instagram_url, label: 'Instagram', icon_asset: 'gallery-instagram.svg' %}
+                {% render 'footer-social-link', url: block.settings.youtube_url, label: 'YouTube', icon_asset: 'gallery-youtube.svg' %}
+                {% render 'footer-social-link', url: block.settings.tiktok_url, label: 'TikTok', icon_asset: 'gallery-tiktok.svg' %}
+                {% render 'footer-social-link', url: block.settings.pinterest_url, label: 'Pinterest', icon_asset: 'gallery-pinterest.svg' %}
+              </ul>
+            </div>
+
+          {%- when 'newsletter' -%}
+            <div class="footer__group storefront-footer__newsletter" {{ block.shopify_attributes }}>
+              <h2 class="footer__heading">{{ block.settings.heading }}</h2>
               {%- if block.settings.text != blank -%}
                 <div class="footer__copy rte">{{ block.settings.text }}</div>
               {%- endif -%}
-            </div>
-          {%- endif -%}
-
-        {%- when 'newsletter' -%}
-          {%- assign newsletter_heading = block.settings.heading -%}
-          {%- if newsletter_heading == blank -%}
-            {%- assign newsletter_heading = 'footer.newsletter_title' | t -%}
-          {%- endif -%}
-          <div class="footer__group" {{ block.shopify_attributes }}>
-            <h2 class="footer__heading">{{ newsletter_heading }}</h2>
-            {%- if block.settings.text != blank -%}
-              <div class="footer__copy rte">{{ block.settings.text }}</div>
-            {%- endif -%}
-            {%- assign newsletter_form_id = 'FooterNewsletter-' | append: section.id | append: '-' | append: block.id -%}
-            {% form 'customer', id: newsletter_form_id, class: 'storefront-footer__newsletter-form' %}
-              <input type="hidden" name="contact[tags]" value="newsletter">
-              <div class="storefront-footer__newsletter-row">
-                <div class="input">
-                  <label class="visually-hidden input__label" for="FooterEmail-{{ section.id }}-{{ block.id }}">
-                    {{ 'newsletter.email_label' | t }}
-                  </label>
-                  <input
-                    class="input__field"
-                    id="FooterEmail-{{ section.id }}-{{ block.id }}"
-                    type="email"
-                    name="contact[email]"
-                    value="{{ form.email | escape }}"
-                    autocomplete="email"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    placeholder="{{ 'footer.newsletter_placeholder' | t }}"
-                    required
-                  >
+              {%- assign newsletter_form_id = 'FooterNewsletter-' | append: section.id | append: '-' | append: block.id -%}
+              {% form 'customer', id: newsletter_form_id, class: 'storefront-footer__newsletter-form' %}
+                <input type="hidden" name="contact[tags]" value="newsletter">
+                <div class="storefront-footer__newsletter-row">
+                  <div class="input">
+                    <label class="visually-hidden input__label" for="FooterEmail-{{ section.id }}-{{ block.id }}">
+                      {{ 'newsletter.email_label' | t }}
+                    </label>
+                    <input
+                      class="input__field"
+                      id="FooterEmail-{{ section.id }}-{{ block.id }}"
+                      type="email"
+                      name="contact[email]"
+                      value="{{ form.email | escape }}"
+                      autocomplete="email"
+                      autocapitalize="off"
+                      spellcheck="false"
+                      placeholder="{{ 'footer.newsletter_placeholder' | t }}"
+                      required
+                    >
+                  </div>
+                  <button class="btn" type="submit">{{ 'footer.newsletter_submit' | t }}</button>
                 </div>
-                <button class="btn" type="submit">{{ 'footer.newsletter_submit' | t }}</button>
-              </div>
-              {%- if form.posted_successfully? -%}
-                <p role="status">{{ 'newsletter.success' | t }}</p>
-              {%- endif -%}
-              {%- if form.errors -%}
-                <div role="alert">{{ form.errors | default_errors }}</div>
-              {%- endif -%}
-            {% endform %}
-          </div>
-      {%- endcase -%}
-    {%- endfor -%}
-  </div>
+                {%- if form.posted_successfully? -%}
+                  <p role="status">{{ 'newsletter.success' | t }}</p>
+                {%- endif -%}
+                {%- if form.errors -%}
+                  <div role="alert">{{ form.errors | default_errors }}</div>
+                {%- endif -%}
+              {% endform %}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
 
-  <div class="footer__bottom">
-    <p class="footer__meta">&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ 'footer.rights' | t }}</p>
+    {% form 'localization', id: 'FooterLocalizationForm', class: 'storefront-footer__localization' %}
+      <label class="storefront-footer__localization-group" for="FooterLanguage-{{ section.id }}">
+        <span class="storefront-footer__localization-label">{{ 'footer.language' | t }}</span>
+        <span class="storefront-footer__select-wrap">
+          <select id="FooterLanguage-{{ section.id }}" name="locale_code" onchange="this.form.submit()">
+            {%- for language in localization.available_languages -%}
+              <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}"{% if language.iso_code == localization.language.iso_code %} selected{% endif %}>
+                {{ language.endonym_name | capitalize }}
+              </option>
+            {%- endfor -%}
+          </select>
+          <img src="{{ 'gallery-chevron.svg' | asset_url }}" alt="" width="16" height="16">
+        </span>
+      </label>
 
-    {%- if shop.privacy_policy != blank or shop.refund_policy != blank or shop.shipping_policy != blank or shop.terms_of_service != blank -%}
-      <ul class="footer__meta storefront-footer__policies">
-        {%- if shop.privacy_policy != blank -%}<li><a class="footer__meta-link" href="{{ shop.privacy_policy.url }}">{{ shop.privacy_policy.title }}</a></li>{%- endif -%}
-        {%- if shop.refund_policy != blank -%}<li><a class="footer__meta-link" href="{{ shop.refund_policy.url }}">{{ shop.refund_policy.title }}</a></li>{%- endif -%}
-        {%- if shop.shipping_policy != blank -%}<li><a class="footer__meta-link" href="{{ shop.shipping_policy.url }}">{{ shop.shipping_policy.title }}</a></li>{%- endif -%}
-        {%- if shop.terms_of_service != blank -%}<li><a class="footer__meta-link" href="{{ shop.terms_of_service.url }}">{{ shop.terms_of_service.title }}</a></li>{%- endif -%}
-      </ul>
-    {%- endif -%}
+      <label class="storefront-footer__localization-group" for="FooterCountry-{{ section.id }}">
+        <span class="storefront-footer__localization-label">{{ 'footer.currency' | t }}</span>
+        <span class="storefront-footer__select-wrap">
+          <select id="FooterCountry-{{ section.id }}" name="country_code" onchange="this.form.submit()">
+            {%- for country in localization.available_countries -%}
+              <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>
+                {{ country.name }} ({{ country.currency.iso_code }})
+              </option>
+            {%- endfor -%}
+          </select>
+          <img src="{{ 'gallery-chevron.svg' | asset_url }}" alt="" width="16" height="16">
+        </span>
+      </label>
+      <button class="visually-hidden" type="submit">{{ 'footer.update_localization' | t }}</button>
+    {% endform %}
 
-    {%- if section.settings.social_instagram != blank or section.settings.social_pinterest != blank -%}
-      <ul class="footer__meta storefront-footer__social" aria-label="{{ 'footer.social_links' | t }}">
-        {%- if section.settings.social_instagram != blank -%}
-          <li><a href="{{ section.settings.social_instagram }}" aria-label="Instagram" target="_blank" rel="noopener">{% render 'icon', name: 'instagram' %}</a></li>
-        {%- endif -%}
-        {%- if section.settings.social_pinterest != blank -%}
-          <li><a href="{{ section.settings.social_pinterest }}" aria-label="Pinterest" target="_blank" rel="noopener">{% render 'icon', name: 'pinterest' %}</a></li>
-        {%- endif -%}
-      </ul>
-    {%- endif -%}
+    <div class="storefront-footer__legal">
+      <p>{{ 'footer.copyright' | t: year: current_year, owner: section.settings.copyright_owner }}</p>
+      {%- if section.settings.legal_disclaimer != blank -%}
+        <p>{{ section.settings.legal_disclaimer }}</p>
+      {%- endif -%}
+    </div>
 
-    {%- if section.settings.show_payment_icons -%}
-      {% render 'payment-icons' %}
+    {%- if section.settings.show_powered_by -%}
+      <p class="storefront-footer__powered">{{ powered_by_link }}</p>
     {%- endif -%}
   </div>
 </footer>
@@ -114,43 +168,54 @@
 {
   "name": "Footer",
   "settings": [
-    {
-      "type": "select",
-      "id": "logo_variant",
-      "label": "Logo variant",
-      "options": [
-        { "value": "short", "label": "Short" },
-        { "value": "long", "label": "Long" },
-        { "value": "wordmark", "label": "Wordmark" },
-        { "value": "easter_egg", "label": "Easter egg" }
-      ],
-      "default": "wordmark"
-    },
+    { "type": "text", "id": "copyright_owner", "label": "Copyright owner", "default": "Manuel Pacheco" },
     {
       "type": "textarea",
-      "id": "footer_text",
-      "label": "Brand description",
-      "default": "Art, objects, and editions shaped through material practice."
+      "id": "legal_disclaimer",
+      "label": "Legal disclaimer",
+      "default": "Other product names, logos, brands, trademarks and registered trademarks are property of their respective owners."
     },
-    { "type": "url", "id": "social_instagram", "label": "Instagram URL" },
-    { "type": "url", "id": "social_pinterest", "label": "Pinterest URL" },
-    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": false }
+    { "type": "checkbox", "id": "show_powered_by", "label": "Show Powered by Shopify", "default": true }
   ],
   "blocks": [
     {
-      "type": "menu",
-      "name": "Menu column",
+      "type": "info",
+      "name": "Info",
+      "limit": 1,
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Explore" },
-        { "type": "link_list", "id": "menu", "label": "Menu" }
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Info" },
+        { "type": "text", "id": "faq_label", "label": "FAQ label", "default": "FAQs" },
+        { "type": "url", "id": "faq_url", "label": "FAQ link" },
+        { "type": "text", "id": "terms_label", "label": "Terms label", "default": "Terms & Conditions" },
+        { "type": "url", "id": "terms_url", "label": "Terms link" },
+        { "type": "text", "id": "privacy_label", "label": "Privacy label", "default": "Privacy Policy" },
+        { "type": "url", "id": "privacy_url", "label": "Privacy link" },
+        { "type": "text", "id": "returns_label", "label": "Returns label", "default": "Returns & Refunds" },
+        { "type": "url", "id": "returns_url", "label": "Returns link" }
       ]
     },
     {
       "type": "contact",
       "name": "Contact",
+      "limit": 1,
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "Studio" },
-        { "type": "richtext", "id": "text", "label": "Contact details" }
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Contact me" },
+        { "type": "text", "id": "email", "label": "Email", "default": "info@manuelpacheco.com" },
+        { "type": "text", "id": "phone", "label": "Phone", "default": "+54 9 11 5585 1744" },
+        { "type": "url", "id": "whatsapp_url", "label": "WhatsApp link" }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social links",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Follow me" },
+        { "type": "url", "id": "facebook_url", "label": "Facebook URL" },
+        { "type": "url", "id": "instagram_url", "label": "Instagram URL" },
+        { "type": "url", "id": "youtube_url", "label": "YouTube URL" },
+        { "type": "url", "id": "tiktok_url", "label": "TikTok URL" },
+        { "type": "url", "id": "pinterest_url", "label": "Pinterest URL" }
       ]
     },
     {
@@ -158,11 +223,16 @@
       "name": "Newsletter",
       "limit": 1,
       "settings": [
-        { "type": "text", "id": "heading", "label": "Heading", "default": "From the studio" },
-        { "type": "richtext", "id": "text", "label": "Supporting text" }
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Newsletter" },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Supporting text",
+          "default": "<p>Stay up to date with the new collections, products and exclusive offers.</p>"
+        }
       ]
     }
   ],
-  "max_blocks": 5
+  "max_blocks": 4
 }
 {% endschema %}

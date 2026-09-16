@@ -1,15 +1,14 @@
 {%- comment -%}
-  Target-owned editorial gateway inspired by the approved Figma layout. All
-  typography, color, spacing, and motion values remain owned by The Gallery.
+  Target-owned Shopify composition based on the approved Figma landing frame.
+  The section remains merchant-editable without promoting its fixture content
+  into the target-agnostic component contract.
 {%- endcomment -%}
 
 <div class="landing-gateway">
   <h1 class="visually-hidden">{{ shop.name }}</h1>
 
-  <div class="landing-gateway__identity" aria-hidden="true">
-    <div class="landing-gateway__wordmark">
-      {% render 'logo', variant: section.settings.logo_variant, width: 1280, loading: 'eager' %}
-    </div>
+  <div class="landing-gateway__eyes">
+    {% render 'brand-eyes', tone: 'dark' %}
   </div>
 
   <nav class="landing-gateway__navigation" aria-label="{{ section.settings.navigation_label | escape }}">
@@ -26,22 +25,26 @@
     </ul>
   </nav>
 
-  {%- if section.settings.image != blank -%}
-    <div class="landing-gateway__media">
+  <div class="landing-gateway__media" aria-hidden="{% if section.settings.image_alt == blank %}true{% else %}false{% endif %}">
+    {%- if section.settings.image != blank -%}
       {{ section.settings.image
         | image_url: width: 900
         | image_tag:
-          widths: '240, 360, 540, 720, 900',
-          sizes: '(min-width: 990px) 12rem, 22vw',
+          widths: '239, 478, 717, 900',
+          sizes: '239px',
           loading: 'eager',
           alt: section.settings.image_alt
       }}
-    </div>
-  {%- endif -%}
-
-  {%- if section.settings.note != blank -%}
-    <div class="landing-gateway__note rte">{{ section.settings.note }}</div>
-  {%- endif -%}
+    {%- else -%}
+      <img
+        src="{{ 'gallery-studio-process.jpg' | asset_url }}"
+        alt="{{ section.settings.image_alt | escape }}"
+        width="1330"
+        height="2364"
+        loading="eager"
+      >
+    {%- endif -%}
+  </div>
 </div>
 
 {% schema %}
@@ -51,32 +54,24 @@
   "class": "shopify-section--landing-gateway",
   "settings": [
     {
-      "type": "select",
-      "id": "logo_variant",
-      "label": "Logo variant",
-      "options": [
-        { "value": "short", "label": "Short" },
-        { "value": "long", "label": "Long" },
-        { "value": "wordmark", "label": "Wordmark" },
-        { "value": "easter_egg", "label": "Easter egg" }
-      ],
-      "default": "wordmark"
-    },
-    {
       "type": "text",
       "id": "navigation_label",
       "label": "Navigation label",
       "default": "Explore"
     },
-    { "type": "image_picker", "id": "image", "label": "Reference image" },
-    { "type": "text", "id": "image_alt", "label": "Image alternative text" },
-    { "type": "richtext", "id": "note", "label": "Editorial note" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Studio image",
+      "info": "Uses the reference studio image until you choose one."
+    },
+    { "type": "text", "id": "image_alt", "label": "Image alternative text" }
   ],
   "blocks": [
     {
       "type": "portal",
       "name": "Portal link",
-      "limit": 6,
+      "limit": 4,
       "settings": [
         { "type": "text", "id": "label", "label": "Label", "default": "Shop" },
         { "type": "url", "id": "url", "label": "Link" }
@@ -90,7 +85,7 @@
         { "type": "portal", "settings": { "label": "Work" } },
         { "type": "portal", "settings": { "label": "Shop" } },
         { "type": "portal", "settings": { "label": "Journal" } },
-        { "type": "portal", "settings": { "label": "About" } }
+        { "type": "portal", "settings": { "label": "About me" } }
       ]
     }
   ]

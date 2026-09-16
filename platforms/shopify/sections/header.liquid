@@ -1,49 +1,45 @@
 {%- liquid
-  assign header_menu = section.settings.menu
-  assign account_menu_handle = section.settings.customer_account_menu.handle | default: 'customer-account-main-menu'
   assign cart_label = 'accessibility.cart_count' | t: count: cart.item_count
+  assign account_url = routes.account_login_url
+  if customer
+    assign account_url = routes.account_url
+  endif
 -%}
 
 <header class="header storefront-header{% unless section.settings.sticky %} storefront-header--static{% endunless %}">
   <a class="header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
-    {%- render 'logo', variant: section.settings.logo_variant, width: 360, loading: 'eager' -%}
+    <img
+      src="{{ 'gallery-wordmark.svg' | asset_url }}"
+      alt="{{ shop.name | escape }}"
+      width="110"
+      height="16"
+      loading="eager"
+    >
   </a>
-
-  {%- if header_menu != blank -%}
-    <nav class="header__nav" aria-label="{{ 'accessibility.navigation' | t }}">
-      {%- for link in header_menu.links -%}
-        <a class="header__nav-link" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>
-          {{ link.title }}
-        </a>
-      {%- endfor -%}
-    </nav>
-  {%- endif -%}
 
   <div class="header__actions">
     {%- if section.settings.show_search -%}
       <a
-        class="icon-btn icon-btn--round header__action"
+        class="header__action"
         href="{{ routes.search_url }}"
         aria-label="{{ 'accessibility.search' | t }}"
         aria-controls="StorefrontSearch"
         aria-expanded="false"
         data-storefront-open="search"
       >
-        {% render 'icon', name: 'search' %}
+        <img src="{{ 'gallery-search.svg' | asset_url }}" alt="" width="24" height="24">
       </a>
     {%- endif -%}
 
-    {%- if section.settings.show_account and shop.customer_accounts_enabled -%}
-      <shopify-account class="storefront-account header__action" menu="{{ account_menu_handle }}">
-        <span class="storefront-account__avatar" slot="signed-out-avatar" aria-hidden="true">
-          {% render 'icon', name: 'account' %}
-        </span>
-      </shopify-account>
+    {%- if section.settings.show_account -%}
+      <a class="header__action" href="{{ account_url }}" aria-label="{{ 'accessibility.account' | t }}">
+        <img src="{{ 'gallery-account.svg' | asset_url }}" alt="" width="24" height="24">
+      </a>
     {%- endif -%}
 
     <a
       href="{{ routes.cart_url }}"
-      class="icon-btn icon-btn--round header__action"
+      class="header__action"
       aria-label="{{ cart_label | escape }}"
       {% if section.settings.cart_behavior == 'drawer' %}
         aria-controls="StorefrontCartDrawer"
@@ -51,58 +47,21 @@
         data-storefront-open="cart"
       {% endif %}
     >
-      {% render 'icon', name: 'shopping-bag' %}
+      <img src="{{ 'gallery-bag.svg' | asset_url }}" alt="" width="24" height="24">
       {%- if cart.item_count > 0 -%}
         <span class="header__cart-count" aria-hidden="true">{{ cart.item_count }}</span>
       {%- endif -%}
     </a>
-
-    {%- if header_menu != blank -%}
-      <button
-        class="icon-btn icon-btn--round header__action header__hamburger"
-        type="button"
-        aria-label="{{ 'accessibility.menu' | t }}"
-        aria-controls="StorefrontMobileMenu"
-        aria-expanded="false"
-        data-storefront-open="mobile-menu"
-      >
-        {% render 'icon', name: 'menu' %}
-      </button>
-    {%- endif -%}
   </div>
 </header>
-
-{%- if header_menu != blank -%}
-  {% render 'mobile-menu', menu: header_menu %}
-{%- endif -%}
 
 {% schema %}
 {
   "name": "Header",
   "settings": [
-    {
-      "type": "select",
-      "id": "logo_variant",
-      "label": "Logo variant",
-      "info": "Logos are configured in Theme settings > Logo.",
-      "options": [
-        { "value": "short", "label": "Short" },
-        { "value": "long", "label": "Long" },
-        { "value": "wordmark", "label": "Wordmark" },
-        { "value": "easter_egg", "label": "Easter egg" }
-      ],
-      "default": "wordmark"
-    },
-    { "type": "link_list", "id": "menu", "label": "Primary menu", "default": "main-menu" },
-    { "type": "checkbox", "id": "sticky", "label": "Sticky header", "default": true },
+    { "type": "checkbox", "id": "sticky", "label": "Sticky header", "default": false },
     { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
     { "type": "checkbox", "id": "show_account", "label": "Show customer account", "default": true },
-    {
-      "type": "link_list",
-      "id": "customer_account_menu",
-      "label": "Customer account menu",
-      "default": "customer-account-main-menu"
-    },
     {
       "type": "select",
       "id": "cart_behavior",

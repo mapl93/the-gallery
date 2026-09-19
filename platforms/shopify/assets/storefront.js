@@ -88,12 +88,20 @@ function enhanceTrackingEyes(eyes) {
     const sharedOffsetX = horizontalProgress * 15;
     const verticalReference = deltaY < 0
       ? Math.max(1, eyesCenterY - activationBounds.top)
-      : Math.max(1, navigationRect.bottom - eyesCenterY);
+      : Math.max(1, navigationRect.top - eyesCenterY);
     const verticalProgress = Math.max(-1, Math.min(1, deltaY / verticalReference));
     const verticalTravel = verticalProgress < 0 ? 3.5 : 8;
     const sharedOffsetY = verticalProgress * verticalTravel;
     const convergenceRadius = eyesRect.width * 0.75;
-    const convergence = Math.max(0, Math.min(1, 1 - distance / convergenceRadius));
+    const radialConvergence = Math.max(0, Math.min(1, 1 - distance / convergenceRadius));
+    const horizontalConvergence = Math.max(
+      0,
+      Math.min(1, 1 - Math.abs(deltaX) / convergenceRadius)
+    );
+    const lowerDistance = Math.max(0, deltaY);
+    const verticalDecay = 1 - Math.min(1, lowerDistance / (verticalReference * 1.5)) * 0.45;
+    const corridorConvergence = horizontalConvergence * verticalDecay * 0.75;
+    const convergence = Math.max(radialConvergence, corridorConvergence);
 
     pupils.forEach((pupil) => {
       const eye = pupil.closest('.brand-eye');

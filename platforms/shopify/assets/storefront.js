@@ -230,6 +230,7 @@ function enhanceTrackingEyes(eyes) {
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('resize', measureActivationBounds, { passive: true });
   window.addEventListener('blur', handlePointerLeave);
+  document.addEventListener('storefront:footer-snap', handleScroll);
   document.documentElement.addEventListener('pointerleave', handlePointerLeave);
   finePointer.addEventListener('change', handlePreferenceChange);
   reducedMotion.addEventListener('change', handlePreferenceChange);
@@ -242,6 +243,7 @@ function enhanceTrackingEyes(eyes) {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', measureActivationBounds);
       window.removeEventListener('blur', handlePointerLeave);
+      document.removeEventListener('storefront:footer-snap', handleScroll);
       document.documentElement.removeEventListener('pointerleave', handlePointerLeave);
       finePointer.removeEventListener('change', handlePreferenceChange);
       reducedMotion.removeEventListener('change', handlePreferenceChange);
@@ -264,6 +266,244 @@ function destroyTrackingEyesWithin(scope) {
       trackingEyes.delete(eyes);
     }
   });
+}
+
+let footerSnapController = null;
+
+function enhanceFooterSnap() {
+  if (footerSnapController || !document.body.classList.contains('template-index')) return;
+
+  const root = document.documentElement;
+  const footer = document.querySelector('.storefront-footer');
+  const gateway = document.querySelector('.landing-gateway');
+  const desktop = window.matchMedia('(min-width: 48rem)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!(footer instanceof HTMLElement) || !(gateway instanceof HTMLElement)) return;
+
+  const originalFooterAriaHidden = footer.getAttribute('aria-hidden');
+  const footerWasInert = footer.inert;
+  const gatewayWasInert = gateway.inert;
+  let enabled = false;
+  let open = false;
+  let lastTrigger = null;
+  let wheelDirection = 0;
+  let wheelDistance = 0;
+  let wheelTriggered = false;
+  let wheelEndTimer = 0;
+  let motionEndTimer = 0;
+  let touchStartY = null;
+
+  function dispatchSnapEvent() {
+    document.dispatchEvent(new CustomEvent('storefront:footer-snap', {
+      detail: { open }
+    }));
+  }
+
+  function finishMotion() {
+    window.clearTimeout(motionEndTimer);
+    root.classList.remove('storefront-footer-snap-moving');
+    dispatchSnapEvent();
+  }
+
+  function removeFooterHash() {
+    if (window.location.hash !== '#footer-contact') return;
+    const nextUrl = `${window.location.pathname}${window.location.search}`;
+    window.history.replaceState(window.history.state, '', nextUrl);
+  }
+
+  function setOpen(nextOpen, {
+    animate = true,
+    trigger = null,
+    updateHistory = false
+  } = {}) {
+    if (!enabled || open === nextOpen) return;
+
+    open = nextOpen;
+    if (trigger instanceof HTMLElement) lastTrigger = trigger;
+
+    const shouldAnimate = animate && !reducedMotion.matches;
+    root.classList.toggle('storefront-footer-snap-immediate', !shouldAnimate);
+    root.classList.toggle('storefront-footer-snap-open', open);
+    root.classList.toggle('storefront-footer-snap-moving', shouldAnimate);
+    footer.inert = !open;
+    footer.setAttribute('aria-hidden', String(!open));
+    gateway.inert = open;
+
+    if (open && updateHistory && window.location.hash !== '#footer-contact') {
+      window.history.pushState(window.history.state, '', '#footer-contact');
+    } else if (!open) {
+      removeFooterHash();
+    }
+
+    if (!open && footer.contains(document.activeElement)) {
+      const fallbackTrigger = document.querySelector('a[href$="#footer-contact"]');
+      const focusTarget = lastTrigger?.isConnected ? lastTrigger : fallbackTrigger;
+      focusTarget?.focus({ preventScroll: true });
+    }
+
+    window.clearTimeout(motionEndTimer);
+    dispatchSnapEvent();
+
+    if (shouldAnimate) {
+      motionEndTimer = window.setTimeout(finishMotion, 900);
+    } else {
+      root.classList.remove('storefront-footer-snap-moving');
+      footer.getBoundingClientRect();
+      window.requestAnimationFrame(() => {
+        root.classList.remove('storefront-footer-snap-immediate');
+        dispatchSnapEvent();
+      });
+    }
+  }
+
+  function resetWheelGesture() {
+    wheelDirection = 0;
+    wheelDistance = 0;
+    wheelTriggered = false;
+  }
+
+  function handleWheel(event) {
+    if (!enabled || state.panel || event.ctrlKey) return;
+    if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+
+    event.preventDefault();
+    const direction = Math.sign(event.deltaY);
+    if (!direction) return;
+
+    if (wheelDirection && wheelDirection !== direction) resetWheelGesture();
+    wheelDirection = direction;
+    wheelDistance += event.deltaY;
+    window.clearTimeout(wheelEndTimer);
+    wheelEndTimer = window.setTimeout(resetWheelGesture, 180);
+
+    if (wheelTriggered || Math.abs(wheelDistance) < 1) return;
+    wheelTriggered = true;
+    setOpen(direction > 0);
+  }
+
+  function handleTouchStart(event) {
+    if (!enabled || state.panel || event.touches.length !== 1) return;
+    touchStartY = event.touches[0].clientY;
+  }
+
+  function handleTouchMove(event) {
+    if (!enabled || state.panel || touchStartY === null) return;
+    event.preventDefault();
+  }
+
+  function handleTouchEnd(event) {
+    if (!enabled || state.panel || touchStartY === null) return;
+    const endY = event.changedTouches[0]?.clientY;
+    const distance = typeof endY === 'number' ? touchStartY - endY : 0;
+    touchStartY = null;
+    if (Math.abs(distance) >= 32) setOpen(distance > 0);
+  }
+
+  function handleKeydown(event) {
+    if (!enabled || state.panel || event.defaultPrevented) return;
+    if (event.target instanceof Element
+        && event.target.closest('a, button, input, select, textarea, [contenteditable="true"]')) return;
+
+    const openKeys = ['ArrowDown', 'PageDown', 'End'];
+    const closeKeys = ['ArrowUp', 'PageUp', 'Home'];
+    const isSpace = event.key === ' ';
+    if (!openKeys.includes(event.key) && !closeKeys.includes(event.key) && !isSpace) return;
+
+    event.preventDefault();
+    setOpen(isSpace ? !event.shiftKey : openKeys.includes(event.key), { animate: false });
+  }
+
+  function handleAnchorClick(event) {
+    if (!enabled || event.defaultPrevented || !(event.target instanceof Element)) return;
+    const link = event.target.closest('a[href]');
+    if (!(link instanceof HTMLAnchorElement)) return;
+
+    const target = new URL(link.href, window.location.href);
+    if (target.origin !== window.location.origin || target.hash !== '#footer-contact') return;
+    if (target.pathname !== window.location.pathname) return;
+
+    event.preventDefault();
+    setOpen(true, { trigger: link, updateHistory: true });
+  }
+
+  function handleHistoryChange() {
+    if (!enabled) return;
+    setOpen(window.location.hash === '#footer-contact');
+  }
+
+  function enable() {
+    if (enabled) return;
+    const initiallyOpen = window.location.hash === '#footer-contact'
+      || window.scrollY >= window.innerHeight / 2;
+    enabled = true;
+    open = !initiallyOpen;
+    root.classList.add('storefront-footer-snap');
+    window.scrollTo(0, 0);
+    setOpen(initiallyOpen, { animate: false });
+  }
+
+  function disable() {
+    if (!enabled) return;
+    const wasOpen = open;
+    enabled = false;
+    window.clearTimeout(wheelEndTimer);
+    window.clearTimeout(motionEndTimer);
+    resetWheelGesture();
+    root.classList.remove(
+      'storefront-footer-snap',
+      'storefront-footer-snap-open',
+      'storefront-footer-snap-moving',
+      'storefront-footer-snap-immediate'
+    );
+    footer.inert = footerWasInert;
+    gateway.inert = gatewayWasInert;
+    if (originalFooterAriaHidden === null) footer.removeAttribute('aria-hidden');
+    else footer.setAttribute('aria-hidden', originalFooterAriaHidden);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (wasOpen) footer.scrollIntoView({ block: 'start' });
+        else window.scrollTo(0, 0);
+        dispatchSnapEvent();
+      });
+    });
+  }
+
+  function handleBreakpointChange() {
+    if (desktop.matches) enable();
+    else disable();
+  }
+
+  window.addEventListener('wheel', handleWheel, { passive: false });
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('touchend', handleTouchEnd, { passive: true });
+  window.addEventListener('popstate', handleHistoryChange);
+  window.addEventListener('hashchange', handleHistoryChange);
+  document.addEventListener('click', handleAnchorClick);
+  document.addEventListener('keydown', handleKeydown);
+  desktop.addEventListener('change', handleBreakpointChange);
+  reducedMotion.addEventListener('change', finishMotion);
+  handleBreakpointChange();
+
+  footerSnapController = {
+    contains(scope) {
+      return scope === footer || scope === gateway || scope.contains?.(footer) || scope.contains?.(gateway);
+    },
+    destroy() {
+      disable();
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('popstate', handleHistoryChange);
+      window.removeEventListener('hashchange', handleHistoryChange);
+      document.removeEventListener('click', handleAnchorClick);
+      document.removeEventListener('keydown', handleKeydown);
+      desktop.removeEventListener('change', handleBreakpointChange);
+      reducedMotion.removeEventListener('change', finishMotion);
+      footerSnapController = null;
+    }
+  };
 }
 
 function visibleFocusableElements(panel) {
@@ -436,6 +676,7 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('shopify:section:unload', (event) => {
   destroyTrackingEyesWithin(event.target);
+  if (footerSnapController?.contains(event.target)) footerSnapController.destroy();
   if (state.panel && (event.target.contains(state.panel) || !state.panel.isConnected)) {
     closeOverlay({ restoreFocus: false });
   }
@@ -443,6 +684,8 @@ document.addEventListener('shopify:section:unload', (event) => {
 
 document.addEventListener('shopify:section:load', (event) => {
   enhanceTrackingEyesWithin(event.target);
+  enhanceFooterSnap();
 });
 
 enhanceTrackingEyesWithin(document);
+enhanceFooterSnap();

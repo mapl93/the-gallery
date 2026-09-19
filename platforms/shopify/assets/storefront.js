@@ -15,6 +15,140 @@ const state = {
   inertElements: []
 };
 
+const trackingEyes = new Map();
+
+function resetTrackingEyes(eyes) {
+  eyes.classList.remove('is-tracking');
+  eyes.querySelectorAll('[data-brand-eye-pupil]').forEach((pupil) => {
+    pupil.style.removeProperty('transform');
+  });
+}
+
+function enhanceTrackingEyes(eyes) {
+  if (!(eyes instanceof HTMLElement) || trackingEyes.has(eyes)) return;
+
+  const gateway = eyes.closest('.landing-gateway');
+  const navigation = gateway?.querySelector('.landing-gateway__navigation');
+  const pupils = [...eyes.querySelectorAll('[data-brand-eye-pupil]')];
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!(gateway instanceof HTMLElement)
+      || !(navigation instanceof HTMLElement)
+      || pupils.length === 0) return;
+
+  let frame = 0;
+  let pointer = null;
+  let activationBounds = null;
+
+  function measureActivationBounds() {
+    const eyesRect = eyes.getBoundingClientRect();
+    const navigationRect = navigation.getBoundingClientRect();
+    const horizontalPadding = Math.min(96, window.innerWidth * 0.06);
+    const verticalPadding = 72;
+    activationBounds = {
+      left: Math.min(eyesRect.left, navigationRect.left) - horizontalPadding,
+      right: Math.max(eyesRect.right, navigationRect.right) + horizontalPadding,
+      top: Math.min(eyesRect.top, navigationRect.top) - verticalPadding,
+      bottom: Math.max(eyesRect.bottom, navigationRect.bottom) + verticalPadding
+    };
+  }
+
+  function render() {
+    frame = 0;
+    if (!pointer || !activationBounds || !finePointer.matches || reducedMotion.matches) {
+      resetTrackingEyes(eyes);
+      return;
+    }
+
+    const isNear = pointer.x >= activationBounds.left
+      && pointer.x <= activationBounds.right
+      && pointer.y >= activationBounds.top
+      && pointer.y <= activationBounds.bottom;
+    if (!isNear) {
+      resetTrackingEyes(eyes);
+      return;
+    }
+
+    eyes.classList.add('is-tracking');
+    pupils.forEach((pupil) => {
+      const eye = pupil.closest('.brand-eye');
+      if (!(eye instanceof SVGElement)) return;
+      const rect = eye.getBoundingClientRect();
+      const deltaX = pointer.x - (rect.left + rect.width / 2);
+      const deltaY = pointer.y - (rect.top + rect.height / 2);
+      const distance = Math.hypot(deltaX, deltaY);
+      const directionX = distance > 0 ? deltaX / distance : 0;
+      const directionY = distance > 0 ? deltaY / distance : 0;
+      const offsetX = (directionX + 1) * 4;
+      const offsetY = directionY * 3.5;
+      pupil.style.transform = `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px)`;
+    });
+  }
+
+  function scheduleRender() {
+    if (!frame) frame = window.requestAnimationFrame(render);
+  }
+
+  function handlePointerMove(event) {
+    pointer = { x: event.clientX, y: event.clientY };
+    scheduleRender();
+  }
+
+  function handlePointerLeave() {
+    pointer = null;
+    scheduleRender();
+  }
+
+  function handlePreferenceChange() {
+    measureActivationBounds();
+    scheduleRender();
+  }
+
+  const resizeObserver = typeof ResizeObserver === 'undefined'
+    ? null
+    : new ResizeObserver(measureActivationBounds);
+  resizeObserver?.observe(eyes);
+  resizeObserver?.observe(navigation);
+  measureActivationBounds();
+
+  window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  window.addEventListener('resize', measureActivationBounds, { passive: true });
+  window.addEventListener('blur', handlePointerLeave);
+  document.documentElement.addEventListener('pointerleave', handlePointerLeave);
+  finePointer.addEventListener('change', handlePreferenceChange);
+  reducedMotion.addEventListener('change', handlePreferenceChange);
+
+  trackingEyes.set(eyes, {
+    destroy() {
+      window.cancelAnimationFrame(frame);
+      resizeObserver?.disconnect();
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('resize', measureActivationBounds);
+      window.removeEventListener('blur', handlePointerLeave);
+      document.documentElement.removeEventListener('pointerleave', handlePointerLeave);
+      finePointer.removeEventListener('change', handlePreferenceChange);
+      reducedMotion.removeEventListener('change', handlePreferenceChange);
+      resetTrackingEyes(eyes);
+    }
+  });
+}
+
+function enhanceTrackingEyesWithin(scope = document) {
+  if (scope instanceof Element && scope.matches('[data-brand-eyes-track]')) {
+    enhanceTrackingEyes(scope);
+  }
+  scope.querySelectorAll?.('[data-brand-eyes-track]').forEach(enhanceTrackingEyes);
+}
+
+function destroyTrackingEyesWithin(scope) {
+  trackingEyes.forEach((entry, eyes) => {
+    if (scope === eyes || scope.contains?.(eyes)) {
+      entry.destroy();
+      trackingEyes.delete(eyes);
+    }
+  });
+}
+
 function visibleFocusableElements(panel) {
   return [...panel.querySelectorAll(FOCUSABLE_SELECTOR)].filter((element) => {
     return !element.hidden && element.getClientRects().length > 0;
@@ -184,7 +318,14 @@ document.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('shopify:section:unload', (event) => {
+  destroyTrackingEyesWithin(event.target);
   if (state.panel && (event.target.contains(state.panel) || !state.panel.isConnected)) {
     closeOverlay({ restoreFocus: false });
   }
 });
+
+document.addEventListener('shopify:section:load', (event) => {
+  enhanceTrackingEyesWithin(event.target);
+});
+
+enhanceTrackingEyesWithin(document);

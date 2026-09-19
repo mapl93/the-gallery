@@ -1,8 +1,12 @@
-{%- comment -%}
-  Brand eyes exported from the approved landing-page reference.
-  Params:
-    tone – "dark" | "light" (default: "dark")
-{%- endcomment -%}
+{% doc %}
+  Renders the brand eyes from inline SVG assets.
+
+  @param {string} [tone] - "dark" or "light".
+  @param {boolean} [track_pointer] - Enables bounded pointer tracking for the pupils.
+
+  @example
+  {% render 'brand-eyes', tone: 'light', track_pointer: true %}
+{% enddoc %}
 
 {%- liquid
   assign eye_tone = tone | default: 'dark'
@@ -14,7 +18,11 @@
   endif
 -%}
 
-<span class="brand-eyes brand-eyes--{{ eye_tone }}" aria-hidden="true">
-  <img src="{{ left_asset | asset_url }}" alt="" width="39" height="32">
-  <img src="{{ right_asset | asset_url }}" alt="" width="39" height="32">
+<span
+  class="brand-eyes brand-eyes--{{ eye_tone }}"
+  aria-hidden="true"
+  {% if track_pointer %}data-brand-eyes-track{% endif %}
+>
+  {{ left_asset | inline_asset_content }}
+  {{ right_asset | inline_asset_content }}
 </span>

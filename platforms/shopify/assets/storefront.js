@@ -91,7 +91,6 @@ function enhanceTrackingEyes(eyes) {
       : Math.max(1, navigationRect.top - eyesCenterY);
     const verticalProgress = Math.max(-1, Math.min(1, deltaY / verticalReference));
     const verticalTravel = verticalProgress < 0 ? 3.5 : 8;
-    const sharedOffsetY = verticalProgress * verticalTravel;
     const convergenceRadius = eyesRect.width * 0.75;
     const radialConvergence = Math.max(0, Math.min(1, 1 - distance / convergenceRadius));
     const horizontalConvergence = Math.max(
@@ -103,13 +102,27 @@ function enhanceTrackingEyes(eyes) {
     const corridorConvergence = horizontalConvergence * verticalDecay * 0.75;
     const convergence = Math.max(radialConvergence, corridorConvergence);
 
-    pupils.forEach((pupil) => {
+    const eyeVectors = pupils.map((pupil) => {
       const eye = pupil.closest('.brand-eye');
-      if (!(eye instanceof SVGElement)) return;
+      if (!(eye instanceof SVGElement)) return null;
       const eyeRect = eye.getBoundingClientRect();
       const localDeltaX = pointer.x - (eyeRect.left + eyeRect.width / 2);
       const localDeltaY = pointer.y - (eyeRect.top + eyeRect.height / 2);
       const localDistance = Math.hypot(localDeltaX, localDeltaY);
+      return { pupil, localDeltaX, localDeltaY, localDistance };
+    }).filter(Boolean);
+    if (eyeVectors.length === 0) return;
+
+    const angularVerticalDirection = eyeVectors.reduce((sum, vector) => (
+      sum + (vector.localDistance > 0 ? vector.localDeltaY / vector.localDistance : 0)
+    ), 0) / eyeVectors.length;
+    const distanceOffsetY = verticalProgress * verticalTravel;
+    const angularOffsetY = angularVerticalDirection * verticalTravel;
+    const sharedOffsetY = verticalProgress < 0
+      ? Math.min(distanceOffsetY, angularOffsetY)
+      : Math.max(distanceOffsetY, angularOffsetY);
+
+    eyeVectors.forEach(({ pupil, localDeltaX, localDistance }) => {
       const localDirectionX = localDistance > 0 ? localDeltaX / localDistance : 0;
       const localOffsetX = ((localDirectionX + 1) / 2) * 15;
       const offsetX = sharedOffsetX + (localOffsetX - sharedOffsetX) * convergence;

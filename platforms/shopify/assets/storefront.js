@@ -46,13 +46,31 @@ function enhanceTrackingEyes(eyes) {
   function measureActivationBounds() {
     const eyesRect = eyes.getBoundingClientRect();
     const navigationRect = navigation.getBoundingClientRect();
-    const horizontalPadding = Math.min(96, window.innerWidth * 0.06);
-    const verticalPadding = 72;
+    if (eyesRect.width === 0 || navigationRect.width === 0) {
+      activationBounds = null;
+      return;
+    }
+
+    const viewportWidth = document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight;
+    const viewportInset = 16;
+    const horizontalPadding = Math.max(48, Math.min(160, viewportWidth * 0.08));
+    const topPadding = Math.max(48, Math.min(72, viewportHeight * 0.065));
+    const bottomPadding = Math.max(24, Math.min(48, viewportHeight * 0.035));
     activationBounds = {
-      left: Math.min(eyesRect.left, navigationRect.left) - horizontalPadding,
-      right: Math.max(eyesRect.right, navigationRect.right) + horizontalPadding,
-      top: Math.min(eyesRect.top, navigationRect.top) - verticalPadding,
-      bottom: Math.max(eyesRect.bottom, navigationRect.bottom) + verticalPadding
+      left: Math.max(
+        viewportInset,
+        Math.min(eyesRect.left, navigationRect.left) - horizontalPadding
+      ),
+      right: Math.min(
+        viewportWidth - viewportInset,
+        Math.max(eyesRect.right, navigationRect.right) + horizontalPadding
+      ),
+      top: Math.max(0, Math.min(eyesRect.top, navigationRect.top) - topPadding),
+      bottom: Math.min(
+        viewportHeight,
+        Math.max(eyesRect.bottom, navigationRect.bottom) + bottomPadding
+      )
     };
   }
 

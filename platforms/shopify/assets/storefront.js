@@ -70,19 +70,18 @@ function enhanceTrackingEyes(eyes) {
     }
 
     eyes.classList.add('is-tracking');
+    const eyesRect = eyes.getBoundingClientRect();
+    const deltaX = pointer.x - (eyesRect.left + eyesRect.width / 2);
+    const deltaY = pointer.y - (eyesRect.top + eyesRect.height / 2);
+    const distance = Math.hypot(deltaX, deltaY);
+    const directionX = distance > 0 ? deltaX / distance : 0;
+    const directionY = distance > 0 ? deltaY / distance : 0;
+    const horizontalProgress = (directionX + 1) / 2;
+    const offsetX = horizontalProgress * 15;
+    const verticalTravel = directionY < 0 ? 3.5 : 8;
+    const offsetY = directionY * verticalTravel;
+
     pupils.forEach((pupil) => {
-      const eye = pupil.closest('.brand-eye');
-      if (!(eye instanceof SVGElement)) return;
-      const rect = eye.getBoundingClientRect();
-      const deltaX = pointer.x - (rect.left + rect.width / 2);
-      const deltaY = pointer.y - (rect.top + rect.height / 2);
-      const distance = Math.hypot(deltaX, deltaY);
-      const directionX = distance > 0 ? deltaX / distance : 0;
-      const directionY = distance > 0 ? deltaY / distance : 0;
-      const horizontalProgress = (directionX + 1) / 2;
-      const offsetX = horizontalProgress * 15;
-      const verticalTravel = directionY < 0 ? 3.5 : 8;
-      const offsetY = directionY * verticalTravel;
       pupil.style.transform = `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px)`;
     });
   }

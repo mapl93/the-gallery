@@ -71,18 +71,35 @@ function enhanceTrackingEyes(eyes) {
 
     eyes.classList.add('is-tracking');
     const eyesRect = eyes.getBoundingClientRect();
-    const deltaX = pointer.x - (eyesRect.left + eyesRect.width / 2);
-    const deltaY = pointer.y - (eyesRect.top + eyesRect.height / 2);
+    const navigationRect = navigation.getBoundingClientRect();
+    const eyesCenterX = eyesRect.left + eyesRect.width / 2;
+    const eyesCenterY = eyesRect.top + eyesRect.height / 2;
+    const deltaX = pointer.x - eyesCenterX;
+    const deltaY = pointer.y - eyesCenterY;
     const distance = Math.hypot(deltaX, deltaY);
     const directionX = distance > 0 ? deltaX / distance : 0;
-    const directionY = distance > 0 ? deltaY / distance : 0;
     const horizontalProgress = (directionX + 1) / 2;
-    const offsetX = horizontalProgress * 15;
-    const verticalTravel = directionY < 0 ? 3.5 : 8;
-    const offsetY = directionY * verticalTravel;
+    const sharedOffsetX = horizontalProgress * 15;
+    const verticalReference = deltaY < 0
+      ? Math.max(1, eyesCenterY - activationBounds.top)
+      : Math.max(1, navigationRect.bottom - eyesCenterY);
+    const verticalProgress = Math.max(-1, Math.min(1, deltaY / verticalReference));
+    const verticalTravel = verticalProgress < 0 ? 3.5 : 8;
+    const sharedOffsetY = verticalProgress * verticalTravel;
+    const convergenceRadius = eyesRect.width * 0.75;
+    const convergence = Math.max(0, Math.min(1, 1 - distance / convergenceRadius));
 
     pupils.forEach((pupil) => {
-      pupil.style.transform = `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px)`;
+      const eye = pupil.closest('.brand-eye');
+      if (!(eye instanceof SVGElement)) return;
+      const eyeRect = eye.getBoundingClientRect();
+      const localDeltaX = pointer.x - (eyeRect.left + eyeRect.width / 2);
+      const localDeltaY = pointer.y - (eyeRect.top + eyeRect.height / 2);
+      const localDistance = Math.hypot(localDeltaX, localDeltaY);
+      const localDirectionX = localDistance > 0 ? localDeltaX / localDistance : 0;
+      const localOffsetX = ((localDirectionX + 1) / 2) * 15;
+      const offsetX = sharedOffsetX + (localOffsetX - sharedOffsetX) * convergence;
+      pupil.style.transform = `translate(${offsetX.toFixed(2)}px, ${sharedOffsetY.toFixed(2)}px)`;
     });
   }
 

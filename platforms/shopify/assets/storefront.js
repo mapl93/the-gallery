@@ -32,62 +32,103 @@ function enhanceTrackingEyes(eyes) {
 
   const gateway = eyes.closest('.landing-gateway');
   const navigation = gateway?.querySelector('.landing-gateway__navigation');
+  const footerZone = document.querySelector('[data-brand-eyes-zone="footer"]');
+  const primaryTarget = navigation instanceof HTMLElement ? navigation : footerZone;
   const pupils = [...eyes.querySelectorAll('[data-brand-eye-pupil]')];
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (!(gateway instanceof HTMLElement)
-      || !(navigation instanceof HTMLElement)
+  if (!(primaryTarget instanceof HTMLElement)
       || pupils.length === 0) return;
 
   let frame = 0;
   let pointer = null;
-  let activationBounds = null;
+  let activationBounds = [];
 
   function measureActivationBounds() {
     const eyesRect = eyes.getBoundingClientRect();
-    const navigationRect = navigation.getBoundingClientRect();
-    if (eyesRect.width === 0 || navigationRect.width === 0) {
-      activationBounds = null;
+    if (eyesRect.width === 0) {
+      activationBounds = [];
       return;
     }
 
     const viewportWidth = document.documentElement.clientWidth;
     const viewportHeight = window.innerHeight;
     const viewportInset = 16;
-    const horizontalPadding = Math.max(48, Math.min(160, viewportWidth * 0.08));
-    const topPadding = Math.max(48, Math.min(72, viewportHeight * 0.065));
-    const bottomPadding = Math.max(24, Math.min(48, viewportHeight * 0.035));
-    activationBounds = {
-      left: Math.max(
-        viewportInset,
-        Math.min(eyesRect.left, navigationRect.left) - horizontalPadding
-      ),
-      right: Math.min(
-        viewportWidth - viewportInset,
-        Math.max(eyesRect.right, navigationRect.right) + horizontalPadding
-      ),
-      top: Math.max(0, Math.min(eyesRect.top, navigationRect.top) - topPadding),
-      bottom: Math.min(
-        viewportHeight,
-        Math.max(eyesRect.bottom, navigationRect.bottom) + bottomPadding
-      )
-    };
+    const nextBounds = [];
+
+    if (navigation instanceof HTMLElement) {
+      const navigationRect = navigation.getBoundingClientRect();
+      if (navigationRect.width > 0) {
+        const horizontalPadding = Math.max(48, Math.min(160, viewportWidth * 0.08));
+        const topPadding = Math.max(48, Math.min(72, viewportHeight * 0.065));
+        const bottomPadding = Math.max(24, Math.min(48, viewportHeight * 0.035));
+        nextBounds.push({
+          left: Math.max(
+            viewportInset,
+            Math.min(eyesRect.left, navigationRect.left) - horizontalPadding
+          ),
+          right: Math.min(
+            viewportWidth - viewportInset,
+            Math.max(eyesRect.right, navigationRect.right) + horizontalPadding
+          ),
+          top: Math.max(0, Math.min(eyesRect.top, navigationRect.top) - topPadding),
+          bottom: Math.min(
+            viewportHeight,
+            Math.max(eyesRect.bottom, navigationRect.bottom) + bottomPadding
+          ),
+          target: navigation
+        });
+      }
+    } else {
+      const eyeHorizontalPadding = Math.max(64, Math.min(160, viewportWidth * 0.08));
+      const eyeVerticalPadding = Math.max(72, Math.min(96, viewportHeight * 0.08));
+      nextBounds.push({
+        left: Math.max(viewportInset, eyesRect.left - eyeHorizontalPadding),
+        right: Math.min(viewportWidth - viewportInset, eyesRect.right + eyeHorizontalPadding),
+        top: Math.max(0, eyesRect.top - eyeVerticalPadding),
+        bottom: Math.min(viewportHeight, eyesRect.bottom + eyeVerticalPadding),
+        target: eyes
+      });
+    }
+
+    if (footerZone instanceof HTMLElement) {
+      const footerRect = footerZone.getBoundingClientRect();
+      const footerIsVisible = footerRect.width > 0
+        && footerRect.height > 0
+        && footerRect.bottom > 0
+        && footerRect.top < viewportHeight;
+      if (footerIsVisible) {
+        const footerHorizontalPadding = Math.max(64, Math.min(160, viewportWidth * 0.08));
+        const footerVerticalPadding = Math.max(96, Math.min(128, viewportHeight * 0.1));
+        nextBounds.push({
+          left: Math.max(viewportInset, footerRect.left - footerHorizontalPadding),
+          right: Math.min(viewportWidth - viewportInset, footerRect.right + footerHorizontalPadding),
+          top: Math.max(0, footerRect.top - footerVerticalPadding),
+          bottom: Math.min(viewportHeight, footerRect.bottom + footerVerticalPadding),
+          target: footerZone
+        });
+      }
+    }
+
+    activationBounds = nextBounds;
   }
 
   function render() {
     frame = 0;
-    if (!pointer || !activationBounds || !finePointer.matches || reducedMotion.matches) {
+    if (!pointer || activationBounds.length === 0 || !finePointer.matches || reducedMotion.matches) {
       resetTrackingEyes(eyes, {
         animate: finePointer.matches && !reducedMotion.matches
       });
       return;
     }
 
-    const isNear = pointer.x >= activationBounds.left
-      && pointer.x <= activationBounds.right
-      && pointer.y >= activationBounds.top
-      && pointer.y <= activationBounds.bottom;
-    if (!isNear) {
+    const activeBounds = activationBounds.find((bounds) => (
+      pointer.x >= bounds.left
+      && pointer.x <= bounds.right
+      && pointer.y >= bounds.top
+      && pointer.y <= bounds.bottom
+    ));
+    if (!activeBounds) {
       resetTrackingEyes(eyes);
       return;
     }
@@ -95,7 +136,6 @@ function enhanceTrackingEyes(eyes) {
     eyes.classList.remove('is-returning');
     eyes.classList.add('is-tracking');
     const eyesRect = eyes.getBoundingClientRect();
-    const navigationRect = navigation.getBoundingClientRect();
     const eyesCenterX = eyesRect.left + eyesRect.width / 2;
     const eyesCenterY = eyesRect.top + eyesRect.height / 2;
     const deltaX = pointer.x - eyesCenterX;
@@ -104,9 +144,15 @@ function enhanceTrackingEyes(eyes) {
     const directionX = distance > 0 ? deltaX / distance : 0;
     const horizontalProgress = (directionX + 1) / 2;
     const sharedOffsetX = horizontalProgress * 15;
+    const targetRect = activeBounds.target.getBoundingClientRect();
     const verticalReference = deltaY < 0
-      ? Math.max(1, eyesCenterY - activationBounds.top)
-      : Math.max(1, navigationRect.top - eyesCenterY);
+      ? Math.max(1, eyesCenterY - activeBounds.top)
+      : Math.max(
+          1,
+          activeBounds.target === eyes
+            ? activeBounds.bottom - eyesCenterY
+            : targetRect.top - eyesCenterY
+        );
     const verticalProgress = Math.max(-1, Math.min(1, deltaY / verticalReference));
     const verticalTravel = verticalProgress < 0 ? 3.5 : 8;
     const convergenceRadius = eyesRect.width * 0.75;
@@ -157,6 +203,11 @@ function enhanceTrackingEyes(eyes) {
     scheduleRender();
   }
 
+  function handleScroll() {
+    measureActivationBounds();
+    scheduleRender();
+  }
+
   function handlePointerLeave() {
     pointer = null;
     scheduleRender();
@@ -171,10 +222,12 @@ function enhanceTrackingEyes(eyes) {
     ? null
     : new ResizeObserver(measureActivationBounds);
   resizeObserver?.observe(eyes);
-  resizeObserver?.observe(navigation);
+  if (navigation instanceof HTMLElement) resizeObserver?.observe(navigation);
+  if (footerZone instanceof HTMLElement) resizeObserver?.observe(footerZone);
   measureActivationBounds();
 
   window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('resize', measureActivationBounds, { passive: true });
   window.addEventListener('blur', handlePointerLeave);
   document.documentElement.addEventListener('pointerleave', handlePointerLeave);
@@ -186,6 +239,7 @@ function enhanceTrackingEyes(eyes) {
       window.cancelAnimationFrame(frame);
       resizeObserver?.disconnect();
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', measureActivationBounds);
       window.removeEventListener('blur', handlePointerLeave);
       document.documentElement.removeEventListener('pointerleave', handlePointerLeave);

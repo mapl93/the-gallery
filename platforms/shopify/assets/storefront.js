@@ -81,7 +81,8 @@ function enhanceTrackingEyes(eyes) {
       const directionY = distance > 0 ? deltaY / distance : 0;
       const horizontalProgress = (directionX + 1) / 2;
       const offsetX = horizontalProgress * 15;
-      const offsetY = directionY * 3.5;
+      const verticalTravel = directionY < 0 ? 3.5 : 8;
+      const offsetY = directionY * verticalTravel;
       pupil.style.transform = `translate(${offsetX.toFixed(2)}px, ${offsetY.toFixed(2)}px)`;
     });
   }

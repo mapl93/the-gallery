@@ -11,10 +11,25 @@
     {% render 'brand-eyes', tone: 'light' %}
   </div>
 
-  <nav class="landing-gateway__navigation" aria-label="{{ section.settings.navigation_label | escape }}">
+  {%- liquid
+    assign navigation_label = section.settings.navigation_label
+    if navigation_label == blank or navigation_label == 'Explore'
+      assign navigation_label = 'gateway.navigation_label' | t
+    endif
+  -%}
+
+  <nav class="landing-gateway__navigation" aria-label="{{ navigation_label | escape }}">
     <ul class="landing-gateway__portals">
       {%- for block in section.blocks -%}
-        {%- if block.settings.label != blank -%}
+        {%- liquid
+          assign portal_label = block.settings.label
+
+          if block.settings.label_key != blank and block.settings.label_key != 'custom'
+            assign portal_translation_key = 'gateway.links.' | append: block.settings.label_key
+            assign portal_label = portal_translation_key | t
+          endif
+        -%}
+        {%- if portal_label != blank -%}
           {%- liquid
             assign preview_image = block.settings.image
             assign preview_asset = blank
@@ -36,7 +51,7 @@
           -%}
           <li class="landing-gateway__portal" {{ block.shopify_attributes }}>
             <a class="landing-gateway__portal-link" href="{{ block.settings.url | default: routes.root_url }}">
-              {{ block.settings.label }}
+              {{ portal_label }}
             </a>
 
             {%- if preview_image != blank or preview_asset != blank -%}
@@ -88,6 +103,19 @@
       "limit": 4,
       "settings": [
         { "type": "text", "id": "label", "label": "Label", "default": "Shop" },
+        {
+          "type": "select",
+          "id": "label_key",
+          "label": "Localized label",
+          "options": [
+            { "value": "custom", "label": "Use custom label" },
+            { "value": "shop", "label": "Shop" },
+            { "value": "firings", "label": "Firings" },
+            { "value": "journal", "label": "Journal" },
+            { "value": "about", "label": "About me" }
+          ],
+          "default": "custom"
+        },
         { "type": "url", "id": "url", "label": "Link" },
         { "type": "image_picker", "id": "image", "label": "Hover image" },
         {
@@ -109,10 +137,10 @@
     {
       "name": "Editorial gateway",
       "blocks": [
-        { "type": "portal", "settings": { "label": "Work", "fallback_source": "studio_reference" } },
-        { "type": "portal", "settings": { "label": "Shop", "fallback_source": "first_product" } },
-        { "type": "portal", "settings": { "label": "Journal", "fallback_source": "latest_article" } },
-        { "type": "portal", "settings": { "label": "About me", "fallback_source": "studio_reference" } }
+        { "type": "portal", "settings": { "label": "Shop", "label_key": "shop", "fallback_source": "first_product" } },
+        { "type": "portal", "settings": { "label": "Firings", "label_key": "firings", "fallback_source": "studio_reference" } },
+        { "type": "portal", "settings": { "label": "Journal", "label_key": "journal", "fallback_source": "latest_article" } },
+        { "type": "portal", "settings": { "label": "About me", "label_key": "about", "fallback_source": "studio_reference" } }
       ]
     }
   ]

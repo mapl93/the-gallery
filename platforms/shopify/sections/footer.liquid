@@ -13,6 +13,20 @@
         {%- case block.type -%}
           {%- when 'info' -%}
             {%- liquid
+              if block.settings.copy_mode == 'custom'
+                assign info_heading = block.settings.heading
+                assign faq_label = block.settings.faq_label
+                assign terms_label = block.settings.terms_label
+                assign privacy_label = block.settings.privacy_label
+                assign returns_label = block.settings.returns_label
+              else
+                assign info_heading = 'footer.info_heading' | t
+                assign faq_label = 'footer.faq' | t
+                assign terms_label = 'footer.terms' | t
+                assign privacy_label = 'footer.privacy' | t
+                assign returns_label = 'footer.returns' | t
+              endif
+
               assign faq_url = block.settings.faq_url
               if faq_url == blank
                 assign faq_url = routes.root_url | append: '#faqs'
@@ -40,19 +54,26 @@
               endif
             -%}
             <nav class="footer__group" aria-labelledby="FooterInfo-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
-              <h2 class="footer__heading" id="FooterInfo-{{ section.id }}-{{ block.id }}">{{ block.settings.heading }}</h2>
+              <h2 class="footer__heading" id="FooterInfo-{{ section.id }}-{{ block.id }}">{{ info_heading }}</h2>
               <ul class="footer__links">
-                <li><a class="footer__link" href="{{ faq_url }}">{{ block.settings.faq_label }}</a></li>
-                <li><a class="footer__link" href="{{ terms_url }}">{{ block.settings.terms_label }}</a></li>
-                <li><a class="footer__link" href="{{ privacy_url }}">{{ block.settings.privacy_label }}</a></li>
-                <li><a class="footer__link" href="{{ returns_url }}">{{ block.settings.returns_label }}</a></li>
+                <li><a class="footer__link" href="{{ faq_url }}">{{ faq_label }}</a></li>
+                <li><a class="footer__link" href="{{ terms_url }}">{{ terms_label }}</a></li>
+                <li><a class="footer__link" href="{{ privacy_url }}">{{ privacy_label }}</a></li>
+                <li><a class="footer__link" href="{{ returns_url }}">{{ returns_label }}</a></li>
               </ul>
             </nav>
 
           {%- when 'contact' -%}
-            {%- assign whatsapp_url = block.settings.whatsapp_url | default: 'https://wa.me/5491155851744' -%}
+            {%- liquid
+              assign whatsapp_url = block.settings.whatsapp_url | default: 'https://wa.me/5491155851744'
+              if block.settings.copy_mode == 'custom'
+                assign contact_heading = block.settings.heading
+              else
+                assign contact_heading = 'footer.contact_heading' | t
+              endif
+            -%}
             <div class="footer__group" {{ block.shopify_attributes }}>
-              <h2 class="footer__heading">{{ block.settings.heading }}</h2>
+              <h2 class="footer__heading">{{ contact_heading }}</h2>
               <ul class="footer__links storefront-footer__contact-list">
                 <li>
                   <a class="footer__link storefront-footer__icon-link" href="mailto:{{ block.settings.email | escape }}">
@@ -70,8 +91,15 @@
             </div>
 
           {%- when 'social' -%}
+            {%- liquid
+              if block.settings.copy_mode == 'custom'
+                assign social_heading = block.settings.heading
+              else
+                assign social_heading = 'footer.social_heading' | t
+              endif
+            -%}
             <div class="footer__group" {{ block.shopify_attributes }}>
-              <h2 class="footer__heading">{{ block.settings.heading }}</h2>
+              <h2 class="footer__heading">{{ social_heading }}</h2>
               <ul class="footer__links storefront-footer__social-list" aria-label="{{ 'footer.social_links' | t }}">
                 {% render 'footer-social-link', url: block.settings.facebook_url, label: 'Facebook', icon_asset: 'gallery-facebook.svg' %}
                 {% render 'footer-social-link', url: block.settings.instagram_url, label: 'Instagram', icon_asset: 'gallery-instagram.svg' %}
@@ -82,10 +110,25 @@
             </div>
 
           {%- when 'newsletter' -%}
+            {%- liquid
+              if block.settings.copy_mode == 'custom'
+                assign newsletter_heading = block.settings.heading
+                assign newsletter_text = block.settings.text
+              else
+                assign newsletter_heading = 'footer.newsletter_heading' | t
+                assign newsletter_text = 'footer.newsletter_copy' | t
+              endif
+            -%}
             <div class="footer__group storefront-footer__newsletter" {{ block.shopify_attributes }}>
-              <h2 class="footer__heading">{{ block.settings.heading }}</h2>
-              {%- if block.settings.text != blank -%}
-                <div class="footer__copy rte">{{ block.settings.text }}</div>
+              <h2 class="footer__heading">{{ newsletter_heading }}</h2>
+              {%- if newsletter_text != blank -%}
+                <div class="footer__copy rte">
+                  {%- if block.settings.copy_mode == 'custom' -%}
+                    {{ newsletter_text }}
+                  {%- else -%}
+                    <p>{{ newsletter_text }}</p>
+                  {%- endif -%}
+                </div>
               {%- endif -%}
               {%- assign newsletter_form_id = 'FooterNewsletter-' | append: section.id | append: '-' | append: block.id -%}
               {% form 'customer', id: newsletter_form_id, class: 'storefront-footer__newsletter-form' %}
@@ -155,8 +198,15 @@
 
     <div class="storefront-footer__legal">
       <p>{{ 'footer.copyright' | t: year: current_year, owner: section.settings.copyright_owner }}</p>
-      {%- if section.settings.legal_disclaimer != blank -%}
-        <p>{{ section.settings.legal_disclaimer }}</p>
+      {%- liquid
+        if section.settings.legal_copy_mode == 'custom'
+          assign legal_disclaimer = section.settings.legal_disclaimer
+        else
+          assign legal_disclaimer = 'footer.legal_disclaimer' | t
+        endif
+      -%}
+      {%- if legal_disclaimer != blank -%}
+        <p>{{ legal_disclaimer }}</p>
       {%- endif -%}
     </div>
 
@@ -172,6 +222,16 @@
   "settings": [
     { "type": "text", "id": "copyright_owner", "label": "Copyright owner", "default": "Manuel Pacheco" },
     {
+      "type": "select",
+      "id": "legal_copy_mode",
+      "label": "Legal copy",
+      "options": [
+        { "value": "localized", "label": "Use theme translations" },
+        { "value": "custom", "label": "Use custom text" }
+      ],
+      "default": "localized"
+    },
+    {
       "type": "textarea",
       "id": "legal_disclaimer",
       "label": "Legal disclaimer",
@@ -185,6 +245,16 @@
       "name": "Info",
       "limit": 1,
       "settings": [
+        {
+          "type": "select",
+          "id": "copy_mode",
+          "label": "Copy",
+          "options": [
+            { "value": "localized", "label": "Use theme translations" },
+            { "value": "custom", "label": "Use custom text" }
+          ],
+          "default": "localized"
+        },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Info" },
         { "type": "text", "id": "faq_label", "label": "FAQ label", "default": "FAQs" },
         { "type": "url", "id": "faq_url", "label": "FAQ link" },
@@ -201,6 +271,16 @@
       "name": "Contact",
       "limit": 1,
       "settings": [
+        {
+          "type": "select",
+          "id": "copy_mode",
+          "label": "Copy",
+          "options": [
+            { "value": "localized", "label": "Use theme translations" },
+            { "value": "custom", "label": "Use custom text" }
+          ],
+          "default": "localized"
+        },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Contact me" },
         { "type": "text", "id": "email", "label": "Email", "default": "info@manuelpacheco.com" },
         { "type": "text", "id": "phone", "label": "Phone", "default": "+54 9 11 5585 1744" },
@@ -212,6 +292,16 @@
       "name": "Social links",
       "limit": 1,
       "settings": [
+        {
+          "type": "select",
+          "id": "copy_mode",
+          "label": "Copy",
+          "options": [
+            { "value": "localized", "label": "Use theme translations" },
+            { "value": "custom", "label": "Use custom text" }
+          ],
+          "default": "localized"
+        },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Follow me" },
         { "type": "url", "id": "facebook_url", "label": "Facebook URL" },
         { "type": "url", "id": "instagram_url", "label": "Instagram URL" },
@@ -225,6 +315,16 @@
       "name": "Newsletter",
       "limit": 1,
       "settings": [
+        {
+          "type": "select",
+          "id": "copy_mode",
+          "label": "Copy",
+          "options": [
+            { "value": "localized", "label": "Use theme translations" },
+            { "value": "custom", "label": "Use custom text" }
+          ],
+          "default": "localized"
+        },
         { "type": "text", "id": "heading", "label": "Heading", "default": "Newsletter" },
         {
           "type": "richtext",

@@ -17,8 +17,11 @@ const state = {
 
 const trackingEyes = new Map();
 
-function resetTrackingEyes(eyes) {
+function resetTrackingEyes(eyes, { animate = true } = {}) {
+  const wasTracking = eyes.classList.contains('is-tracking');
   eyes.classList.remove('is-tracking');
+  if (animate && wasTracking) eyes.classList.add('is-returning');
+  if (!animate) eyes.classList.remove('is-returning');
   eyes.querySelectorAll('[data-brand-eye-pupil]').forEach((pupil) => {
     pupil.style.removeProperty('transform');
   });
@@ -56,7 +59,9 @@ function enhanceTrackingEyes(eyes) {
   function render() {
     frame = 0;
     if (!pointer || !activationBounds || !finePointer.matches || reducedMotion.matches) {
-      resetTrackingEyes(eyes);
+      resetTrackingEyes(eyes, {
+        animate: finePointer.matches && !reducedMotion.matches
+      });
       return;
     }
 
@@ -69,6 +74,7 @@ function enhanceTrackingEyes(eyes) {
       return;
     }
 
+    eyes.classList.remove('is-returning');
     eyes.classList.add('is-tracking');
     const eyesRect = eyes.getBoundingClientRect();
     const navigationRect = navigation.getBoundingClientRect();
@@ -146,7 +152,7 @@ function enhanceTrackingEyes(eyes) {
       document.documentElement.removeEventListener('pointerleave', handlePointerLeave);
       finePointer.removeEventListener('change', handlePreferenceChange);
       reducedMotion.removeEventListener('change', handlePreferenceChange);
-      resetTrackingEyes(eyes);
+      resetTrackingEyes(eyes, { animate: false });
     }
   });
 }

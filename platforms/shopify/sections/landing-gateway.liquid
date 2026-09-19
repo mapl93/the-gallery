@@ -8,43 +8,64 @@
   <h1 class="visually-hidden">{{ shop.name }}</h1>
 
   <div class="landing-gateway__eyes">
-    {% render 'brand-eyes', tone: 'dark' %}
+    {% render 'brand-eyes', tone: 'light' %}
   </div>
 
   <nav class="landing-gateway__navigation" aria-label="{{ section.settings.navigation_label | escape }}">
     <ul class="landing-gateway__portals">
       {%- for block in section.blocks -%}
         {%- if block.settings.label != blank -%}
-          <li {{ block.shopify_attributes }}>
+          {%- liquid
+            assign preview_image = block.settings.image
+            assign preview_asset = blank
+
+            if preview_image == blank
+              case block.settings.fallback_source
+                when 'studio_reference'
+                  assign preview_asset = 'gallery-studio-process.jpg'
+                when 'first_product'
+                  assign preview_image = collections.all.products.first.featured_image
+                when 'latest_article'
+                  assign preview_image = blogs.journal.articles.first.image
+              endcase
+
+              if preview_image == blank and block.settings.fallback_source != 'none'
+                assign preview_asset = 'gallery-studio-process.jpg'
+              endif
+            endif
+          -%}
+          <li class="landing-gateway__portal" {{ block.shopify_attributes }}>
             <a class="landing-gateway__portal-link" href="{{ block.settings.url | default: routes.root_url }}">
               {{ block.settings.label }}
             </a>
+
+            {%- if preview_image != blank or preview_asset != blank -%}
+              <div class="landing-gateway__media" aria-hidden="true">
+                {%- if preview_image != blank -%}
+                  {{ preview_image
+                    | image_url: width: 900
+                    | image_tag:
+                      widths: '239, 478, 717, 900',
+                      sizes: '(max-width: 47.99rem) 160px, 239px',
+                      loading: 'lazy',
+                      alt: ''
+                  }}
+                {%- else -%}
+                  <img
+                    src="{{ preview_asset | asset_url }}"
+                    alt=""
+                    width="1330"
+                    height="2364"
+                    loading="lazy"
+                  >
+                {%- endif -%}
+              </div>
+            {%- endif -%}
           </li>
         {%- endif -%}
       {%- endfor -%}
     </ul>
   </nav>
-
-  <div class="landing-gateway__media" aria-hidden="{% if section.settings.image_alt == blank %}true{% else %}false{% endif %}">
-    {%- if section.settings.image != blank -%}
-      {{ section.settings.image
-        | image_url: width: 900
-        | image_tag:
-          widths: '239, 478, 717, 900',
-          sizes: '239px',
-          loading: 'eager',
-          alt: section.settings.image_alt
-      }}
-    {%- else -%}
-      <img
-        src="{{ 'gallery-studio-process.jpg' | asset_url }}"
-        alt="{{ section.settings.image_alt | escape }}"
-        width="1330"
-        height="2364"
-        loading="eager"
-      >
-    {%- endif -%}
-  </div>
 </div>
 
 {% schema %}
@@ -58,14 +79,7 @@
       "id": "navigation_label",
       "label": "Navigation label",
       "default": "Explore"
-    },
-    {
-      "type": "image_picker",
-      "id": "image",
-      "label": "Studio image",
-      "info": "Uses the reference studio image until you choose one."
-    },
-    { "type": "text", "id": "image_alt", "label": "Image alternative text" }
+    }
   ],
   "blocks": [
     {
@@ -74,7 +88,20 @@
       "limit": 4,
       "settings": [
         { "type": "text", "id": "label", "label": "Label", "default": "Shop" },
-        { "type": "url", "id": "url", "label": "Link" }
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Hover image" },
+        {
+          "type": "select",
+          "id": "fallback_source",
+          "label": "Fallback image",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "studio_reference", "label": "Studio reference" },
+            { "value": "first_product", "label": "First product" },
+            { "value": "latest_article", "label": "Latest Journal article" }
+          ],
+          "default": "none"
+        }
       ]
     }
   ],
@@ -82,10 +109,10 @@
     {
       "name": "Editorial gateway",
       "blocks": [
-        { "type": "portal", "settings": { "label": "Work" } },
-        { "type": "portal", "settings": { "label": "Shop" } },
-        { "type": "portal", "settings": { "label": "Journal" } },
-        { "type": "portal", "settings": { "label": "About me" } }
+        { "type": "portal", "settings": { "label": "Work", "fallback_source": "studio_reference" } },
+        { "type": "portal", "settings": { "label": "Shop", "fallback_source": "first_product" } },
+        { "type": "portal", "settings": { "label": "Journal", "fallback_source": "latest_article" } },
+        { "type": "portal", "settings": { "label": "About me", "fallback_source": "studio_reference" } }
       ]
     }
   ]

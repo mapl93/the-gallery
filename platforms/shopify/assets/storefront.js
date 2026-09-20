@@ -288,8 +288,10 @@ function enhanceInternalHeader(header) {
     const nextScrollY = Math.max(0, window.scrollY);
     const delta = nextScrollY - lastScrollY;
     lastScrollY = nextScrollY;
+    const isRaised = nextScrollY > headerRevealOffset();
+    header.classList.toggle('is-scroll-raised', isRaised);
 
-    if (nextScrollY <= headerRevealOffset() || state.panel) {
+    if (!isRaised || state.panel) {
       lastDirection = 0;
       accumulatedDistance = 0;
       setHidden(false);
@@ -334,7 +336,7 @@ function enhanceInternalHeader(header) {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('scroll', handleScroll);
       header.removeEventListener('focusin', handleFocusIn);
-      header.classList.remove('is-scroll-hidden');
+      header.classList.remove('is-scroll-hidden', 'is-scroll-raised');
     }
   });
 }

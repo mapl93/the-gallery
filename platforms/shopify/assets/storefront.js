@@ -17,6 +17,7 @@ const state = {
 
 const trackingEyes = new Map();
 const workIndexes = new Map();
+const internalHeaders = new Map();
 
 function resetTrackingEyes(eyes, { animate = true } = {}) {
   const wasTracking = eyes.classList.contains('is-tracking');
@@ -265,6 +266,91 @@ function destroyTrackingEyesWithin(scope) {
     if (scope === eyes || scope.contains?.(eyes)) {
       entry.destroy();
       trackingEyes.delete(eyes);
+    }
+  });
+}
+
+function enhanceInternalHeader(header) {
+  if (!(header instanceof HTMLElement) || internalHeaders.has(header)) return;
+
+  let frame = 0;
+  let lastScrollY = Math.max(0, window.scrollY);
+  let lastDirection = 0;
+  let accumulatedDistance = 0;
+
+  function setHidden(hidden) {
+    const containsFocus = header.contains(document.activeElement);
+    header.classList.toggle('is-scroll-hidden', hidden && !containsFocus && !state.panel);
+  }
+
+  function render() {
+    frame = 0;
+    const nextScrollY = Math.max(0, window.scrollY);
+    const delta = nextScrollY - lastScrollY;
+    lastScrollY = nextScrollY;
+
+    if (nextScrollY <= headerRevealOffset() || state.panel) {
+      lastDirection = 0;
+      accumulatedDistance = 0;
+      setHidden(false);
+      return;
+    }
+
+    if (Math.abs(delta) < 2) return;
+    const direction = Math.sign(delta);
+    if (direction !== lastDirection) {
+      lastDirection = direction;
+      accumulatedDistance = 0;
+    }
+    accumulatedDistance += Math.abs(delta);
+
+    if (direction > 0 && accumulatedDistance >= 24) {
+      setHidden(true);
+      accumulatedDistance = 0;
+    } else if (direction < 0 && accumulatedDistance >= 12) {
+      setHidden(false);
+      accumulatedDistance = 0;
+    }
+  }
+
+  function headerRevealOffset() {
+    return Math.max(16, header.offsetHeight);
+  }
+
+  function handleScroll() {
+    if (!frame) frame = window.requestAnimationFrame(render);
+  }
+
+  function handleFocusIn() {
+    setHidden(false);
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  header.addEventListener('focusin', handleFocusIn);
+  render();
+
+  internalHeaders.set(header, {
+    destroy() {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', handleScroll);
+      header.removeEventListener('focusin', handleFocusIn);
+      header.classList.remove('is-scroll-hidden');
+    }
+  });
+}
+
+function enhanceInternalHeadersWithin(scope = document) {
+  if (scope instanceof Element && scope.matches('[data-storefront-header]')) {
+    enhanceInternalHeader(scope);
+  }
+  scope.querySelectorAll?.('[data-storefront-header]').forEach(enhanceInternalHeader);
+}
+
+function destroyInternalHeadersWithin(scope) {
+  internalHeaders.forEach((entry, header) => {
+    if (scope === header || scope.contains?.(header)) {
+      entry.destroy();
+      internalHeaders.delete(header);
     }
   });
 }
@@ -904,6 +990,7 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('shopify:section:unload', (event) => {
   destroyTrackingEyesWithin(event.target);
   destroyWorkIndexesWithin(event.target);
+  destroyInternalHeadersWithin(event.target);
   if (footerSnapController?.contains(event.target)) footerSnapController.destroy();
   if (state.panel && (event.target.contains(state.panel) || !state.panel.isConnected)) {
     closeOverlay({ restoreFocus: false });
@@ -913,9 +1000,11 @@ document.addEventListener('shopify:section:unload', (event) => {
 document.addEventListener('shopify:section:load', (event) => {
   enhanceTrackingEyesWithin(event.target);
   enhanceWorkIndexesWithin(event.target);
+  enhanceInternalHeadersWithin(event.target);
   enhanceFooterSnap();
 });
 
 enhanceTrackingEyesWithin(document);
 enhanceWorkIndexesWithin(document);
+enhanceInternalHeadersWithin(document);
 enhanceFooterSnap();

@@ -274,13 +274,36 @@ function enhanceInternalHeader(header) {
   if (!(header instanceof HTMLElement) || internalHeaders.has(header)) return;
 
   let frame = 0;
+  let visibilityTimer = 0;
+  let scheduledHidden = null;
   let lastScrollY = Math.max(0, window.scrollY);
   let lastDirection = 0;
   let accumulatedDistance = 0;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function cancelScheduledVisibility() {
+    window.clearTimeout(visibilityTimer);
+    visibilityTimer = 0;
+    scheduledHidden = null;
+  }
 
   function setHidden(hidden) {
     const containsFocus = header.contains(document.activeElement);
     header.classList.toggle('is-scroll-hidden', hidden && !containsFocus && !state.panel);
+  }
+
+  function scheduleHidden(hidden) {
+    const isHidden = header.classList.contains('is-scroll-hidden');
+    if (scheduledHidden === hidden || (scheduledHidden === null && isHidden === hidden)) return;
+
+    cancelScheduledVisibility();
+    scheduledHidden = hidden;
+    const delay = reducedMotion.matches ? 0 : hidden ? 180 : 70;
+    visibilityTimer = window.setTimeout(() => {
+      visibilityTimer = 0;
+      scheduledHidden = null;
+      setHidden(hidden);
+    }, delay);
   }
 
   function render() {
@@ -292,6 +315,7 @@ function enhanceInternalHeader(header) {
     header.classList.toggle('is-scroll-raised', isRaised);
 
     if (!isRaised || state.panel) {
+      cancelScheduledVisibility();
       lastDirection = 0;
       accumulatedDistance = 0;
       setHidden(false);
@@ -301,16 +325,17 @@ function enhanceInternalHeader(header) {
     if (Math.abs(delta) < 2) return;
     const direction = Math.sign(delta);
     if (direction !== lastDirection) {
+      cancelScheduledVisibility();
       lastDirection = direction;
       accumulatedDistance = 0;
     }
     accumulatedDistance += Math.abs(delta);
 
     if (direction > 0 && accumulatedDistance >= 24) {
-      setHidden(true);
+      scheduleHidden(true);
       accumulatedDistance = 0;
     } else if (direction < 0 && accumulatedDistance >= 12) {
-      setHidden(false);
+      scheduleHidden(false);
       accumulatedDistance = 0;
     }
   }
@@ -324,6 +349,7 @@ function enhanceInternalHeader(header) {
   }
 
   function handleFocusIn() {
+    cancelScheduledVisibility();
     setHidden(false);
   }
 
@@ -334,6 +360,7 @@ function enhanceInternalHeader(header) {
   internalHeaders.set(header, {
     destroy() {
       window.cancelAnimationFrame(frame);
+      cancelScheduledVisibility();
       window.removeEventListener('scroll', handleScroll);
       header.removeEventListener('focusin', handleFocusIn);
       header.classList.remove('is-scroll-hidden', 'is-scroll-raised');

@@ -89,6 +89,7 @@ function enhanceBlinkingEyes(eyes) {
 
   const apertures = [...eyes.querySelectorAll('[data-brand-eye-blink-aperture]')];
   const uppers = [...eyes.querySelectorAll('[data-brand-eye-blink-upper]')];
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (apertures.length === 0 || uppers.length === 0) return;
 
@@ -125,7 +126,7 @@ function enhanceBlinkingEyes(eyes) {
   }
 
   function runBlink() {
-    if (!canBlink() || animationFrame) return;
+    if (!canBlink() || animationFrame) return false;
     eyes.classList.add('is-blinking');
     const startedAt = performance.now();
 
@@ -148,6 +149,7 @@ function enhanceBlinkingEyes(eyes) {
     }
 
     animationFrame = window.requestAnimationFrame(renderFrame);
+    return true;
   }
 
   function scheduleNext() {
@@ -156,11 +158,17 @@ function enhanceBlinkingEyes(eyes) {
     hasStarted = true;
     after(delay, () => {
       if (!canBlink()) return;
-      const blinkCount = randomUnit() < 0.5 ? 1 : 2;
       runBlink();
-      if (blinkCount === 2) after(420, runBlink);
-      after(blinkCount === 2 ? 760 : 340, scheduleNext);
+      after(340, scheduleNext);
     });
+  }
+
+  function handlePointerEnter() {
+    if (!finePointer.matches || !canBlink()) return;
+    clearTimers();
+    runBlink();
+    after(420, runBlink);
+    after(760, scheduleNext);
   }
 
   function restart() {
@@ -185,6 +193,7 @@ function enhanceBlinkingEyes(eyes) {
     }, { threshold: 0.01 });
 
   observer?.observe(eyes);
+  eyes.addEventListener('pointerenter', handlePointerEnter);
   document.addEventListener('visibilitychange', handleVisibilityChange);
   reducedMotion.addEventListener('change', handlePreferenceChange);
   scheduleNext();
@@ -194,6 +203,7 @@ function enhanceBlinkingEyes(eyes) {
       clearTimers();
       stopBlink();
       observer?.disconnect();
+      eyes.removeEventListener('pointerenter', handlePointerEnter);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       reducedMotion.removeEventListener('change', handlePreferenceChange);
     }

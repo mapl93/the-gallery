@@ -6,7 +6,7 @@
   endif
 -%}
 
-<header class="header storefront-header{% unless section.settings.sticky %} storefront-header--static{% endunless %}">
+<header class="header storefront-header{% unless request.page_type == 'index' %} storefront-header--internal{% endunless %}{% unless section.settings.sticky %} storefront-header--static{% endunless %}">
   <a class="header__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
     <img
       class="header__wordmark"
@@ -16,9 +16,11 @@
       height="16"
       loading="eager"
     >
-    <span class="header__mobile-eyes">
-      {% render 'brand-eyes', tone: 'dark' %}
-    </span>
+    {%- if request.page_type == 'index' -%}
+      <span class="header__mobile-eyes">
+        {% render 'brand-eyes', tone: 'dark' %}
+      </span>
+    {%- endif -%}
   </a>
 
   {%- unless request.page_type == 'index' -%}
@@ -70,7 +72,7 @@
   "name": "Header",
   "settings": [
     { "type": "checkbox", "id": "sticky", "label": "Sticky header", "default": false },
-    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": false },
     { "type": "checkbox", "id": "show_account", "label": "Show customer account", "default": true },
     {
       "type": "select",

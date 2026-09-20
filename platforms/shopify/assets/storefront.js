@@ -16,8 +16,127 @@ const state = {
 };
 
 const trackingEyes = new Map();
+const blinkingEyes = new Map();
 const workIndexes = new Map();
 const internalHeaders = new Map();
+
+function randomUnit() {
+  if (globalThis.crypto?.getRandomValues) {
+    const value = new Uint32Array(1);
+    globalThis.crypto.getRandomValues(value);
+    return value[0] / 4294967296;
+  }
+  return Math.random();
+}
+
+function randomBetween(min, max) {
+  return min + randomUnit() * (max - min);
+}
+
+function enhanceBlinkingEyes(eyes) {
+  if (!(eyes instanceof HTMLElement) || blinkingEyes.has(eyes)) return;
+
+  const animations = [...eyes.querySelectorAll('[data-brand-eye-blink-animation]')];
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (animations.length === 0) return;
+
+  const timers = new Set();
+  let isVisible = true;
+  let hasStarted = false;
+
+  function clearTimers() {
+    timers.forEach((timer) => window.clearTimeout(timer));
+    timers.clear();
+  }
+
+  function after(delay, callback) {
+    const timer = window.setTimeout(() => {
+      timers.delete(timer);
+      callback();
+    }, delay);
+    timers.add(timer);
+  }
+
+  function canBlink() {
+    return isVisible && !document.hidden && !reducedMotion.matches;
+  }
+
+  function stopBlink() {
+    eyes.classList.remove('is-blinking');
+  }
+
+  function runBlink() {
+    if (!canBlink()) return;
+    eyes.classList.add('is-blinking');
+    animations.forEach((animation) => animation.beginElement?.());
+    after(300, () => eyes.classList.remove('is-blinking'));
+  }
+
+  function scheduleNext() {
+    if (!canBlink()) return;
+    const delay = hasStarted ? randomBetween(3400, 7800) : randomBetween(1800, 4200);
+    hasStarted = true;
+    after(delay, () => {
+      if (!canBlink()) return;
+      const blinkCount = randomUnit() < 0.5 ? 1 : 2;
+      runBlink();
+      if (blinkCount === 2) after(420, runBlink);
+      after(blinkCount === 2 ? 760 : 340, scheduleNext);
+    });
+  }
+
+  function restart() {
+    clearTimers();
+    stopBlink();
+    scheduleNext();
+  }
+
+  function handleVisibilityChange() {
+    restart();
+  }
+
+  function handlePreferenceChange() {
+    restart();
+  }
+
+  const observer = typeof IntersectionObserver === 'undefined'
+    ? null
+    : new IntersectionObserver(([entry]) => {
+      isVisible = entry?.isIntersecting ?? false;
+      restart();
+    }, { threshold: 0.01 });
+
+  observer?.observe(eyes);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  reducedMotion.addEventListener('change', handlePreferenceChange);
+  scheduleNext();
+
+  blinkingEyes.set(eyes, {
+    destroy() {
+      clearTimers();
+      stopBlink();
+      observer?.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      reducedMotion.removeEventListener('change', handlePreferenceChange);
+    }
+  });
+}
+
+function enhanceBlinkingEyesWithin(scope = document) {
+  if (scope instanceof Element && scope.matches('[data-brand-eyes-blink]')) {
+    enhanceBlinkingEyes(scope);
+  }
+  scope.querySelectorAll?.('[data-brand-eyes-blink]').forEach(enhanceBlinkingEyes);
+}
+
+function destroyBlinkingEyesWithin(scope) {
+  blinkingEyes.forEach((entry, eyes) => {
+    if (scope === eyes || scope.contains?.(eyes)) {
+      entry.destroy();
+      blinkingEyes.delete(eyes);
+    }
+  });
+}
 
 function resetTrackingEyes(eyes, { animate = true } = {}) {
   const wasTracking = eyes.classList.contains('is-tracking');
@@ -1018,6 +1137,7 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('shopify:section:unload', (event) => {
   destroyTrackingEyesWithin(event.target);
+  destroyBlinkingEyesWithin(event.target);
   destroyWorkIndexesWithin(event.target);
   destroyInternalHeadersWithin(event.target);
   if (footerSnapController?.contains(event.target)) footerSnapController.destroy();
@@ -1028,12 +1148,14 @@ document.addEventListener('shopify:section:unload', (event) => {
 
 document.addEventListener('shopify:section:load', (event) => {
   enhanceTrackingEyesWithin(event.target);
+  enhanceBlinkingEyesWithin(event.target);
   enhanceWorkIndexesWithin(event.target);
   enhanceInternalHeadersWithin(event.target);
   enhanceFooterSnap();
 });
 
 enhanceTrackingEyesWithin(document);
+enhanceBlinkingEyesWithin(document);
 enhanceWorkIndexesWithin(document);
 enhanceInternalHeadersWithin(document);
 enhanceFooterSnap();

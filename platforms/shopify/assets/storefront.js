@@ -33,16 +33,69 @@ function randomBetween(min, max) {
   return min + randomUnit() * (max - min);
 }
 
+const BLINK_DURATION = 280;
+const BLINK_PATH_STATES = {
+  aperture: {
+    open: [12, 8, 6, 6, 6, 8, 12],
+    flat: [17, 17, 17, 17, 17, 17, 17],
+    closed: [24, 27, 29, 29, 29, 27, 24]
+  },
+  upper: {
+    open: [10.5, 4.5, 2.8, 2.8, 2.8, 4.5, 10.5],
+    flat: [17, 17, 17, 17, 17, 17, 17],
+    closed: [23, 26.5, 28, 28, 28, 26.5, 23]
+  }
+};
+
+function easeBlink(value) {
+  return value * value * (3 - (2 * value));
+}
+
+function interpolateBlinkPath(from, to, progress) {
+  const eased = easeBlink(progress);
+  return from.map((value, index) => value + ((to[index] - value) * eased));
+}
+
+function blinkStateAt(progress, states) {
+  if (progress < 0.24) {
+    return interpolateBlinkPath(states.open, states.flat, progress / 0.24);
+  }
+  if (progress < 0.42) {
+    return interpolateBlinkPath(states.flat, states.closed, (progress - 0.24) / 0.18);
+  }
+  if (progress < 0.58) return states.closed;
+  if (progress < 0.76) {
+    return interpolateBlinkPath(states.closed, states.flat, (progress - 0.58) / 0.18);
+  }
+  return interpolateBlinkPath(states.flat, states.open, (progress - 0.76) / 0.24);
+}
+
+function formatBlinkValue(value) {
+  return Number(value.toFixed(3));
+}
+
+function apertureBlinkPath(values) {
+  const value = values.map(formatBlinkValue);
+  return `M0 ${value[0]}C6 ${value[1]} 12 ${value[2]} 19.5 ${value[3]}C27 ${value[4]} 33 ${value[5]} 39 ${value[6]}L39 32L0 32Z`;
+}
+
+function upperBlinkPath(values) {
+  const value = values.map(formatBlinkValue);
+  return `M2.6 ${value[0]}C7.5 ${value[1]} 13.4 ${value[2]} 19.5 ${value[3]}C25.6 ${value[4]} 31.5 ${value[5]} 36.4 ${value[6]}`;
+}
+
 function enhanceBlinkingEyes(eyes) {
   if (!(eyes instanceof HTMLElement) || blinkingEyes.has(eyes)) return;
 
-  const animations = [...eyes.querySelectorAll('[data-brand-eye-blink-animation]')];
+  const apertures = [...eyes.querySelectorAll('[data-brand-eye-blink-aperture]')];
+  const uppers = [...eyes.querySelectorAll('[data-brand-eye-blink-upper]')];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (animations.length === 0) return;
+  if (apertures.length === 0 || uppers.length === 0) return;
 
   const timers = new Set();
   let isVisible = true;
   let hasStarted = false;
+  let animationFrame = 0;
 
   function clearTimers() {
     timers.forEach((timer) => window.clearTimeout(timer));
@@ -62,14 +115,39 @@ function enhanceBlinkingEyes(eyes) {
   }
 
   function stopBlink() {
+    if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    animationFrame = 0;
     eyes.classList.remove('is-blinking');
+    const apertureOpen = apertureBlinkPath(BLINK_PATH_STATES.aperture.open);
+    const upperOpen = upperBlinkPath(BLINK_PATH_STATES.upper.open);
+    apertures.forEach((path) => path.setAttribute('d', apertureOpen));
+    uppers.forEach((path) => path.setAttribute('d', upperOpen));
   }
 
   function runBlink() {
-    if (!canBlink()) return;
+    if (!canBlink() || animationFrame) return;
     eyes.classList.add('is-blinking');
-    animations.forEach((animation) => animation.beginElement?.());
-    after(300, () => eyes.classList.remove('is-blinking'));
+    const startedAt = performance.now();
+
+    function renderFrame(now) {
+      const progress = Math.min((now - startedAt) / BLINK_DURATION, 1);
+      const aperture = apertureBlinkPath(
+        blinkStateAt(progress, BLINK_PATH_STATES.aperture)
+      );
+      const upper = upperBlinkPath(blinkStateAt(progress, BLINK_PATH_STATES.upper));
+      apertures.forEach((path) => path.setAttribute('d', aperture));
+      uppers.forEach((path) => path.setAttribute('d', upper));
+
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(renderFrame);
+        return;
+      }
+
+      animationFrame = 0;
+      eyes.classList.remove('is-blinking');
+    }
+
+    animationFrame = window.requestAnimationFrame(renderFrame);
   }
 
   function scheduleNext() {

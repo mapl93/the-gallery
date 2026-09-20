@@ -125,7 +125,13 @@
           assign card_kind = block.settings.kind
           assign card_filter_kind = card_kind
           assign card_type_label = 'work.types.collection' | t
+          assign card_width = block.settings.card_width | default: 'one-third'
+          assign card_sizes = '(min-width: 768px) 33vw, 100vw'
           assign image_loading = 'lazy'
+
+          if card_width == 'two-thirds'
+            assign card_sizes = '(min-width: 768px) 66vw, 100vw'
+          endif
 
           if forloop.index <= 3
             assign image_loading = 'eager'
@@ -139,6 +145,13 @@
             assign card_type_label = 'work.types.individual_piece' | t
           elsif card_kind == 'service'
             assign card_type_label = 'work.types.service' | t
+            if card_title == blank
+              if block.settings.service_type == 'firings'
+                assign card_title = 'work.services.firings' | t
+              elsif block.settings.service_type == 'custom-production'
+                assign card_title = 'work.services.custom_production' | t
+              endif
+            endif
           endif
 
           if selected_collection != blank
@@ -166,6 +179,7 @@
         <li
           class="storefront-work__item"
           data-work-item
+          data-work-width="{{ card_width }}"
           data-work-kind="{{ card_filter_kind }}"
           data-work-edition="{% if block.settings.limited %}limited{% else %}permanent{% endif %}"
           data-work-featured="{{ block.settings.featured }}"
@@ -184,7 +198,7 @@
                     | image_url: width: 1800
                     | image_tag:
                       widths: '480, 720, 960, 1200, 1500, 1800',
-                      sizes: '(min-width: 768px) 33vw, 100vw',
+                      sizes: card_sizes,
                       loading: image_loading,
                       class: 'storefront-work-card__image storefront-work-card__image--primary',
                       alt: card_image.alt | default: card_title
@@ -210,7 +224,7 @@
                     | image_url: width: 1800
                     | image_tag:
                       widths: '480, 720, 960, 1200, 1500, 1800',
-                      sizes: '(min-width: 768px) 33vw, 100vw',
+                      sizes: card_sizes,
                       loading: 'lazy',
                       class: 'storefront-work-card__image storefront-work-card__image--hover',
                       alt: ''
@@ -277,6 +291,27 @@
             { "value": "piece-index", "label": "Individual pieces index" },
             { "value": "piece", "label": "Individual piece" },
             { "value": "service", "label": "Service" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "service_type",
+          "label": "Translated service title",
+          "default": "custom",
+          "options": [
+            { "value": "custom", "label": "Custom title" },
+            { "value": "firings", "label": "Firings" },
+            { "value": "custom-production", "label": "Custom production" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "card_width",
+          "label": "Card width",
+          "default": "one-third",
+          "options": [
+            { "value": "one-third", "label": "One third" },
+            { "value": "two-thirds", "label": "Two thirds" }
           ]
         },
         { "type": "collection", "id": "collection", "label": "Shopify collection source" },

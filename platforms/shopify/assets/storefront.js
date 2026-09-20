@@ -269,24 +269,14 @@ function destroyTrackingEyesWithin(scope) {
   });
 }
 
-function normalizeWorkText(value) {
-  return String(value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLocaleLowerCase()
-    .trim();
-}
-
 function enhanceWorkIndex(root) {
   if (!(root instanceof HTMLElement) || workIndexes.has(root)) return;
 
   const form = root.querySelector('[data-work-controls]');
   const grid = root.querySelector('[data-work-grid]');
   const empty = root.querySelector('[data-work-empty]');
-  const clear = root.querySelector('[data-work-clear]');
   const resultCount = root.querySelector('[data-work-result-count]');
-  const search = root.querySelector('[data-work-search]');
-  const sort = root.querySelector('[data-work-sort]');
+  const selectors = [...root.querySelectorAll('[data-work-selector]')];
   const filters = [...root.querySelectorAll('[data-work-filter]')];
   const items = [...root.querySelectorAll('[data-work-item]')];
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
@@ -321,26 +311,21 @@ function enhanceWorkIndex(root) {
     return (aDate - bDate) * direction;
   }
 
+  function activeSortMode() {
+    const selected = root.querySelector('[data-work-sort]:checked');
+    return selected instanceof HTMLInputElement ? selected.value : 'default';
+  }
+
   function compareItems(a, b) {
-    const mode = sort instanceof HTMLSelectElement ? sort.value : 'default';
+    const mode = activeSortMode();
     if (mode === 'date-desc') return compareDates(a, b, -1);
     if (mode === 'date-asc') return compareDates(a, b, 1);
     if (mode === 'title') {
       return (a.dataset.workTitle ?? '').localeCompare(b.dataset.workTitle ?? '');
     }
-    if (mode === 'availability') {
-      const difference = rank(a.dataset.workAvailability, ['available', 'coming-soon', 'unavailable', 'unspecified'])
-        - rank(b.dataset.workAvailability, ['available', 'coming-soon', 'unavailable', 'unspecified']);
-      return difference || compareDates(a, b, -1);
-    }
     if (mode === 'kind') {
       const difference = rank(a.dataset.workKind, ['collection', 'piece', 'service'])
         - rank(b.dataset.workKind, ['collection', 'piece', 'service']);
-      return difference || compareDates(a, b, -1);
-    }
-    if (mode === 'offer') {
-      const difference = rank(a.dataset.workOffer, ['product', 'service'])
-        - rank(b.dataset.workOffer, ['product', 'service']);
       return difference || compareDates(a, b, -1);
     }
 
@@ -364,22 +349,52 @@ function enhanceWorkIndex(root) {
     element.querySelectorAll?.('[data-work-hover-video]').forEach(stopVideo);
   }
 
+  function syncSelector(selector) {
+    const selected = selector.querySelector('input:checked');
+    const value = selector.querySelector('[data-work-selector-value]');
+    if (!(selected instanceof HTMLInputElement) || !(value instanceof HTMLElement)) return;
+    value.textContent = selected.dataset.workOptionLabel ?? '';
+  }
+
+  function closeSelectors(except = null) {
+    selectors.forEach((selector) => {
+      if (selector instanceof HTMLDetailsElement && selector !== except) selector.open = false;
+    });
+  }
+
+  function handleSelectorToggle(event) {
+    const selector = event.currentTarget;
+    if (selector instanceof HTMLDetailsElement && selector.open) closeSelectors(selector);
+  }
+
+  function handleDocumentPointerDown(event) {
+    if (!(event.target instanceof Node)) return;
+    if (!selectors.some((selector) => selector.contains(event.target))) closeSelectors();
+  }
+
+  function handleRootKeydown(event) {
+    if (event.key !== 'Escape') return;
+    const openSelector = selectors.find((selector) => selector instanceof HTMLDetailsElement && selector.open);
+    if (!(openSelector instanceof HTMLDetailsElement)) return;
+    openSelector.open = false;
+    openSelector.querySelector('summary')?.focus();
+  }
+
   function update() {
-    const query = normalizeWorkText(search instanceof HTMLInputElement ? search.value : '');
-    const activeFilters = Object.fromEntries(filters.map((filter) => [
-      filter.dataset.workFilter,
-      filter instanceof HTMLSelectElement ? filter.value : ''
-    ]));
+    const activeFilters = {};
+    filters.forEach((filter) => {
+      if (!(filter instanceof HTMLInputElement) || !filter.checked) return;
+      activeFilters[filter.dataset.workFilter] = filter.value;
+    });
 
     items.sort(compareItems).forEach((item) => grid.append(item));
 
     let visibleCount = 0;
     items.forEach((item) => {
-      const matchesSearch = !query || normalizeWorkText(item.dataset.workSearch).includes(query);
       const matchesFilters = Object.entries(activeFilters).every(([name, value]) => (
         !value || item.dataset[`work${name[0].toUpperCase()}${name.slice(1)}`] === value
       ));
-      const visible = matchesSearch && matchesFilters;
+      const visible = matchesFilters;
       item.hidden = !visible;
       if (visible) visibleCount += 1;
       else stopVideosWithin(item);
@@ -392,18 +407,16 @@ function enhanceWorkIndex(root) {
     }
   }
 
-  function handleInput() {
+  function handleChange(event) {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    if (!event.target.matches('[data-work-filter], [data-work-sort]')) return;
+    const selector = event.target.closest('[data-work-selector]');
+    if (selector instanceof HTMLDetailsElement) {
+      syncSelector(selector);
+      selector.open = false;
+      selector.querySelector('summary')?.focus();
+    }
     update();
-  }
-
-  function handleReset() {
-    window.requestAnimationFrame(update);
-  }
-
-  function clearControls() {
-    if (form instanceof HTMLFormElement) form.reset();
-    update();
-    if (search instanceof HTMLInputElement) search.focus();
   }
 
   function activeCardFromEvent(event) {
@@ -433,11 +446,14 @@ function enhanceWorkIndex(root) {
 
   if (form instanceof HTMLFormElement) {
     form.hidden = false;
-    form.addEventListener('input', handleInput);
-    form.addEventListener('change', handleInput);
-    form.addEventListener('reset', handleReset);
+    form.addEventListener('change', handleChange);
   }
-  clear?.addEventListener('click', clearControls);
+  selectors.forEach((selector) => {
+    syncSelector(selector);
+    selector.addEventListener('toggle', handleSelectorToggle);
+  });
+  document.addEventListener('pointerdown', handleDocumentPointerDown);
+  root.addEventListener('keydown', handleRootKeydown);
   root.addEventListener('pointerover', playHoverVideo);
   root.addEventListener('pointerout', stopHoverVideo);
   root.addEventListener('focusin', playHoverVideo);
@@ -449,10 +465,10 @@ function enhanceWorkIndex(root) {
   workIndexes.set(root, {
     destroy() {
       stopVideosWithin(root);
-      form?.removeEventListener('input', handleInput);
-      form?.removeEventListener('change', handleInput);
-      form?.removeEventListener('reset', handleReset);
-      clear?.removeEventListener('click', clearControls);
+      form?.removeEventListener('change', handleChange);
+      selectors.forEach((selector) => selector.removeEventListener('toggle', handleSelectorToggle));
+      document.removeEventListener('pointerdown', handleDocumentPointerDown);
+      root.removeEventListener('keydown', handleRootKeydown);
       root.removeEventListener('pointerover', playHoverVideo);
       root.removeEventListener('pointerout', stopHoverVideo);
       root.removeEventListener('focusin', playHoverVideo);

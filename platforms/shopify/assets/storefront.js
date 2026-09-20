@@ -16,6 +16,7 @@ const state = {
 };
 
 const trackingEyes = new Map();
+const workIndexes = new Map();
 
 function resetTrackingEyes(eyes, { animate = true } = {}) {
   const wasTracking = eyes.classList.contains('is-tracking');
@@ -264,6 +265,216 @@ function destroyTrackingEyesWithin(scope) {
     if (scope === eyes || scope.contains?.(eyes)) {
       entry.destroy();
       trackingEyes.delete(eyes);
+    }
+  });
+}
+
+function normalizeWorkText(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .trim();
+}
+
+function enhanceWorkIndex(root) {
+  if (!(root instanceof HTMLElement) || workIndexes.has(root)) return;
+
+  const form = root.querySelector('[data-work-controls]');
+  const grid = root.querySelector('[data-work-grid]');
+  const empty = root.querySelector('[data-work-empty]');
+  const clear = root.querySelector('[data-work-clear]');
+  const resultCount = root.querySelector('[data-work-result-count]');
+  const search = root.querySelector('[data-work-search]');
+  const sort = root.querySelector('[data-work-sort]');
+  const filters = [...root.querySelectorAll('[data-work-filter]')];
+  const items = [...root.querySelectorAll('[data-work-item]')];
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (!(grid instanceof HTMLElement) || items.length === 0) return;
+
+  items.forEach((item, index) => {
+    item.dataset.workOriginalIndex = String(index);
+  });
+
+  function originalIndex(item) {
+    return Number(item.dataset.workOriginalIndex ?? 0);
+  }
+
+  function rank(value, order) {
+    const index = order.indexOf(value);
+    return index === -1 ? order.length : index;
+  }
+
+  function parsedDate(item) {
+    const value = Date.parse(item.dataset.workDate ?? '');
+    return Number.isNaN(value) ? null : value;
+  }
+
+  function compareDates(a, b, direction) {
+    const aDate = parsedDate(a);
+    const bDate = parsedDate(b);
+    if (aDate === null && bDate === null) return originalIndex(a) - originalIndex(b);
+    if (aDate === null) return 1;
+    if (bDate === null) return -1;
+    return (aDate - bDate) * direction;
+  }
+
+  function compareItems(a, b) {
+    const mode = sort instanceof HTMLSelectElement ? sort.value : 'default';
+    if (mode === 'date-desc') return compareDates(a, b, -1);
+    if (mode === 'date-asc') return compareDates(a, b, 1);
+    if (mode === 'title') {
+      return (a.dataset.workTitle ?? '').localeCompare(b.dataset.workTitle ?? '');
+    }
+    if (mode === 'availability') {
+      const difference = rank(a.dataset.workAvailability, ['available', 'coming-soon', 'unavailable', 'unspecified'])
+        - rank(b.dataset.workAvailability, ['available', 'coming-soon', 'unavailable', 'unspecified']);
+      return difference || compareDates(a, b, -1);
+    }
+    if (mode === 'kind') {
+      const difference = rank(a.dataset.workKind, ['collection', 'piece', 'service'])
+        - rank(b.dataset.workKind, ['collection', 'piece', 'service']);
+      return difference || compareDates(a, b, -1);
+    }
+    if (mode === 'offer') {
+      const difference = rank(a.dataset.workOffer, ['product', 'service'])
+        - rank(b.dataset.workOffer, ['product', 'service']);
+      return difference || compareDates(a, b, -1);
+    }
+
+    const featuredDifference = Number(b.dataset.workFeatured === 'true')
+      - Number(a.dataset.workFeatured === 'true');
+    if (featuredDifference) return featuredDifference;
+    const kindDifference = rank(a.dataset.workKind, ['collection', 'piece', 'service'])
+      - rank(b.dataset.workKind, ['collection', 'piece', 'service']);
+    return kindDifference || compareDates(a, b, -1);
+  }
+
+  function stopVideo(video) {
+    if (!(video instanceof HTMLVideoElement)) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {}
+  }
+
+  function stopVideosWithin(element) {
+    element.querySelectorAll?.('[data-work-hover-video]').forEach(stopVideo);
+  }
+
+  function update() {
+    const query = normalizeWorkText(search instanceof HTMLInputElement ? search.value : '');
+    const activeFilters = Object.fromEntries(filters.map((filter) => [
+      filter.dataset.workFilter,
+      filter instanceof HTMLSelectElement ? filter.value : ''
+    ]));
+
+    items.sort(compareItems).forEach((item) => grid.append(item));
+
+    let visibleCount = 0;
+    items.forEach((item) => {
+      const matchesSearch = !query || normalizeWorkText(item.dataset.workSearch).includes(query);
+      const matchesFilters = Object.entries(activeFilters).every(([name, value]) => (
+        !value || item.dataset[`work${name[0].toUpperCase()}${name.slice(1)}`] === value
+      ));
+      const visible = matchesSearch && matchesFilters;
+      item.hidden = !visible;
+      if (visible) visibleCount += 1;
+      else stopVideosWithin(item);
+    });
+
+    if (empty instanceof HTMLElement) empty.hidden = visibleCount !== 0;
+    if (resultCount instanceof HTMLElement) {
+      const noun = visibleCount === 1 ? root.dataset.resultSingular : root.dataset.resultPlural;
+      resultCount.textContent = `${visibleCount} ${noun ?? ''}`.trim();
+    }
+  }
+
+  function handleInput() {
+    update();
+  }
+
+  function handleReset() {
+    window.requestAnimationFrame(update);
+  }
+
+  function clearControls() {
+    if (form instanceof HTMLFormElement) form.reset();
+    update();
+    if (search instanceof HTMLInputElement) search.focus();
+  }
+
+  function activeCardFromEvent(event) {
+    const card = event.target instanceof Element ? event.target.closest('.storefront-work-card') : null;
+    return card instanceof HTMLElement && root.contains(card) ? card : null;
+  }
+
+  function playHoverVideo(event) {
+    if (!finePointer.matches || reducedMotion.matches) return;
+    const card = activeCardFromEvent(event);
+    if (!card) return;
+    const video = card.querySelector('[data-work-hover-video]');
+    if (!(video instanceof HTMLVideoElement)) return;
+    const playPromise = video.play();
+    playPromise?.catch(() => {});
+  }
+
+  function stopHoverVideo(event) {
+    const card = activeCardFromEvent(event);
+    if (!card || (event.relatedTarget instanceof Node && card.contains(event.relatedTarget))) return;
+    stopVideosWithin(card);
+  }
+
+  function handlePreferenceChange() {
+    if (!finePointer.matches || reducedMotion.matches) stopVideosWithin(root);
+  }
+
+  if (form instanceof HTMLFormElement) {
+    form.hidden = false;
+    form.addEventListener('input', handleInput);
+    form.addEventListener('change', handleInput);
+    form.addEventListener('reset', handleReset);
+  }
+  clear?.addEventListener('click', clearControls);
+  root.addEventListener('pointerover', playHoverVideo);
+  root.addEventListener('pointerout', stopHoverVideo);
+  root.addEventListener('focusin', playHoverVideo);
+  root.addEventListener('focusout', stopHoverVideo);
+  finePointer.addEventListener('change', handlePreferenceChange);
+  reducedMotion.addEventListener('change', handlePreferenceChange);
+  update();
+
+  workIndexes.set(root, {
+    destroy() {
+      stopVideosWithin(root);
+      form?.removeEventListener('input', handleInput);
+      form?.removeEventListener('change', handleInput);
+      form?.removeEventListener('reset', handleReset);
+      clear?.removeEventListener('click', clearControls);
+      root.removeEventListener('pointerover', playHoverVideo);
+      root.removeEventListener('pointerout', stopHoverVideo);
+      root.removeEventListener('focusin', playHoverVideo);
+      root.removeEventListener('focusout', stopHoverVideo);
+      finePointer.removeEventListener('change', handlePreferenceChange);
+      reducedMotion.removeEventListener('change', handlePreferenceChange);
+    }
+  });
+}
+
+function enhanceWorkIndexesWithin(scope = document) {
+  if (scope instanceof Element && scope.matches('[data-storefront-work]')) {
+    enhanceWorkIndex(scope);
+  }
+  scope.querySelectorAll?.('[data-storefront-work]').forEach(enhanceWorkIndex);
+}
+
+function destroyWorkIndexesWithin(scope) {
+  workIndexes.forEach((entry, root) => {
+    if (scope === root || scope.contains?.(root)) {
+      entry.destroy();
+      workIndexes.delete(root);
     }
   });
 }
@@ -676,6 +887,7 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('shopify:section:unload', (event) => {
   destroyTrackingEyesWithin(event.target);
+  destroyWorkIndexesWithin(event.target);
   if (footerSnapController?.contains(event.target)) footerSnapController.destroy();
   if (state.panel && (event.target.contains(state.panel) || !state.panel.isConnected)) {
     closeOverlay({ restoreFocus: false });
@@ -684,8 +896,10 @@ document.addEventListener('shopify:section:unload', (event) => {
 
 document.addEventListener('shopify:section:load', (event) => {
   enhanceTrackingEyesWithin(event.target);
+  enhanceWorkIndexesWithin(event.target);
   enhanceFooterSnap();
 });
 
 enhanceTrackingEyesWithin(document);
+enhanceWorkIndexesWithin(document);
 enhanceFooterSnap();

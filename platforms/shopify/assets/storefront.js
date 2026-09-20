@@ -521,6 +521,14 @@ function enhanceInternalHeader(header) {
     const isRaised = nextScrollY > headerRevealOffset();
     header.classList.toggle('is-scroll-raised', isRaised);
 
+    if (document.documentElement.classList.contains('storefront-footer-snap-open')) {
+      cancelScheduledVisibility();
+      lastDirection = 0;
+      accumulatedDistance = 0;
+      setHidden(false);
+      return;
+    }
+
     if (!isRaised || state.panel) {
       cancelScheduledVisibility();
       lastDirection = 0;
@@ -560,8 +568,17 @@ function enhanceInternalHeader(header) {
     setHidden(false);
   }
 
+  function handleFooterSnap(event) {
+    if (!event.detail?.open) return;
+    cancelScheduledVisibility();
+    lastDirection = 0;
+    accumulatedDistance = 0;
+    setHidden(false);
+  }
+
   window.addEventListener('scroll', handleScroll, { passive: true });
   header.addEventListener('focusin', handleFocusIn);
+  document.addEventListener('storefront:footer-snap', handleFooterSnap);
   render();
 
   internalHeaders.set(header, {
@@ -570,6 +587,7 @@ function enhanceInternalHeader(header) {
       cancelScheduledVisibility();
       window.removeEventListener('scroll', handleScroll);
       header.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('storefront:footer-snap', handleFooterSnap);
       header.classList.remove('is-scroll-hidden', 'is-scroll-raised');
     }
   });
@@ -820,18 +838,21 @@ function destroyWorkIndexesWithin(scope) {
 let footerSnapController = null;
 
 function enhanceFooterSnap() {
-  if (footerSnapController || !document.body.classList.contains('template-index')) return;
+  if (footerSnapController) return;
 
   const root = document.documentElement;
   const footer = document.querySelector('.storefront-footer');
   const gateway = document.querySelector('.landing-gateway');
+  const main = document.querySelector('#main-content');
+  const pageSurface = gateway ?? main;
+  const isHome = document.body.classList.contains('template-index');
   const desktop = window.matchMedia('(min-width: 48rem)');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (!(footer instanceof HTMLElement) || !(gateway instanceof HTMLElement)) return;
+  if (!(footer instanceof HTMLElement) || !(pageSurface instanceof HTMLElement)) return;
 
   const originalFooterAriaHidden = footer.getAttribute('aria-hidden');
   const footerWasInert = footer.inert;
-  const gatewayWasInert = gateway.inert;
+  const pageSurfaceWasInert = pageSurface.inert;
   let enabled = false;
   let open = false;
   let lastTrigger = null;
@@ -841,6 +862,10 @@ function enhanceFooterSnap() {
   let wheelEndTimer = 0;
   let motionEndTimer = 0;
   let touchStartY = null;
+
+  function isAtPageEnd() {
+    return window.scrollY + window.innerHeight >= root.scrollHeight - 2;
+  }
 
   function dispatchSnapEvent() {
     document.dispatchEvent(new CustomEvent('storefront:footer-snap', {
@@ -876,7 +901,7 @@ function enhanceFooterSnap() {
     root.classList.toggle('storefront-footer-snap-moving', shouldAnimate);
     footer.inert = !open;
     footer.setAttribute('aria-hidden', String(!open));
-    gateway.inert = open;
+    pageSurface.inert = open;
 
     if (open && updateHistory && window.location.hash !== '#footer-contact') {
       window.history.pushState(window.history.state, '', '#footer-contact');
@@ -914,10 +939,17 @@ function enhanceFooterSnap() {
   function handleWheel(event) {
     if (!enabled || state.panel || event.ctrlKey) return;
     if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-
-    event.preventDefault();
     const direction = Math.sign(event.deltaY);
     if (!direction) return;
+
+    const canOpen = !open && direction > 0 && (isHome || isAtPageEnd());
+    const canClose = open && direction < 0;
+    if (!canOpen && !canClose) {
+      resetWheelGesture();
+      return;
+    }
+
+    event.preventDefault();
 
     if (wheelDirection && wheelDirection !== direction) resetWheelGesture();
     wheelDirection = direction;
@@ -925,7 +957,8 @@ function enhanceFooterSnap() {
     window.clearTimeout(wheelEndTimer);
     wheelEndTimer = window.setTimeout(resetWheelGesture, 180);
 
-    if (wheelTriggered || Math.abs(wheelDistance) < 1) return;
+    const triggerDistance = isHome ? 1 : 24;
+    if (wheelTriggered || Math.abs(wheelDistance) < triggerDistance) return;
     wheelTriggered = true;
     setOpen(direction > 0);
   }
@@ -937,7 +970,11 @@ function enhanceFooterSnap() {
 
   function handleTouchMove(event) {
     if (!enabled || state.panel || touchStartY === null) return;
-    event.preventDefault();
+    const currentY = event.touches[0]?.clientY;
+    const distance = typeof currentY === 'number' ? touchStartY - currentY : 0;
+    const canOpen = !open && distance > 0 && (isHome || isAtPageEnd());
+    const canClose = open && distance < 0;
+    if (canOpen || canClose) event.preventDefault();
   }
 
   function handleTouchEnd(event) {
@@ -945,7 +982,9 @@ function enhanceFooterSnap() {
     const endY = event.changedTouches[0]?.clientY;
     const distance = typeof endY === 'number' ? touchStartY - endY : 0;
     touchStartY = null;
-    if (Math.abs(distance) >= 32) setOpen(distance > 0);
+    const canOpen = !open && distance > 0 && (isHome || isAtPageEnd());
+    const canClose = open && distance < 0;
+    if (Math.abs(distance) >= 32 && (canOpen || canClose)) setOpen(distance > 0);
   }
 
   function handleKeydown(event) {
@@ -958,8 +997,12 @@ function enhanceFooterSnap() {
     const isSpace = event.key === ' ';
     if (!openKeys.includes(event.key) && !closeKeys.includes(event.key) && !isSpace) return;
 
+    const nextOpen = isSpace ? !event.shiftKey : openKeys.includes(event.key);
+    if (!open && nextOpen && !isHome && !isAtPageEnd()) return;
+    if (open === nextOpen) return;
+
     event.preventDefault();
-    setOpen(isSpace ? !event.shiftKey : openKeys.includes(event.key), { animate: false });
+    setOpen(nextOpen, { animate: false });
   }
 
   function handleAnchorClick(event) {
@@ -983,11 +1026,11 @@ function enhanceFooterSnap() {
   function enable() {
     if (enabled) return;
     const initiallyOpen = window.location.hash === '#footer-contact'
-      || window.scrollY >= window.innerHeight / 2;
+      || (isHome && window.scrollY >= window.innerHeight / 2);
     enabled = true;
     open = !initiallyOpen;
     root.classList.add('storefront-footer-snap');
-    window.scrollTo(0, 0);
+    if (isHome) window.scrollTo(0, 0);
     setOpen(initiallyOpen, { animate: false });
   }
 
@@ -1005,16 +1048,20 @@ function enhanceFooterSnap() {
       'storefront-footer-snap-immediate'
     );
     footer.inert = footerWasInert;
-    gateway.inert = gatewayWasInert;
+    pageSurface.inert = pageSurfaceWasInert;
     if (originalFooterAriaHidden === null) footer.removeAttribute('aria-hidden');
     else footer.setAttribute('aria-hidden', originalFooterAriaHidden);
-    window.requestAnimationFrame(() => {
+    if (isHome) {
       window.requestAnimationFrame(() => {
-        if (wasOpen) footer.scrollIntoView({ block: 'start' });
-        else window.scrollTo(0, 0);
-        dispatchSnapEvent();
+        window.requestAnimationFrame(() => {
+          if (wasOpen) footer.scrollIntoView({ block: 'start' });
+          else window.scrollTo(0, 0);
+          dispatchSnapEvent();
+        });
       });
-    });
+    } else {
+      dispatchSnapEvent();
+    }
   }
 
   function handleBreakpointChange() {
@@ -1036,7 +1083,7 @@ function enhanceFooterSnap() {
 
   footerSnapController = {
     contains(scope) {
-      return scope === footer || scope === gateway || scope.contains?.(footer) || scope.contains?.(gateway);
+      return scope === footer || scope === pageSurface || scope.contains?.(footer) || scope.contains?.(pageSurface);
     },
     destroy() {
       disable();

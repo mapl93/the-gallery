@@ -143,12 +143,13 @@
           elsif card_kind == 'piece'
             assign card_filter_kind = 'piece'
             assign card_type_label = 'work.types.individual_piece' | t
-          elsif card_kind == 'service'
+          elsif card_kind == 'service' or card_kind == 'service-firings' or card_kind == 'service-custom-production'
+            assign card_filter_kind = 'service'
             assign card_type_label = 'work.types.service' | t
             if card_title == blank
-              if block.settings.service_type == 'firings'
+              if card_kind == 'service-firings'
                 assign card_title = 'work.services.firings' | t
-              elsif block.settings.service_type == 'custom-production'
+              elsif card_kind == 'service-custom-production'
                 assign card_title = 'work.services.custom_production' | t
               endif
             endif
@@ -290,18 +291,9 @@
             { "value": "collection", "label": "Collection" },
             { "value": "piece-index", "label": "Individual pieces index" },
             { "value": "piece", "label": "Individual piece" },
-            { "value": "service", "label": "Service" }
-          ]
-        },
-        {
-          "type": "select",
-          "id": "service_type",
-          "label": "Translated service title",
-          "default": "custom",
-          "options": [
-            { "value": "custom", "label": "Custom title" },
-            { "value": "firings", "label": "Firings" },
-            { "value": "custom-production", "label": "Custom production" }
+            { "value": "service", "label": "Service with custom title" },
+            { "value": "service-firings", "label": "Firings service" },
+            { "value": "service-custom-production", "label": "Custom production service" }
           ]
         },
         {

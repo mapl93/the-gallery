@@ -2656,11 +2656,13 @@
       syncLightbox(panel.dataset.galleryMediaId);
       lightbox.hidden = false;
       lightbox.setAttribute('aria-hidden', 'false');
+      lightbox.classList.add('lightbox--open');
       lightbox.querySelector('[data-gallery-lightbox-close]')?.focus();
     }
 
     function closeLightbox() {
       if (!(lightbox instanceof HTMLElement)) return;
+      lightbox.classList.remove('lightbox--open');
       lightbox.setAttribute('aria-hidden', 'true');
       lightbox.hidden = true;
       setZoom(1);
@@ -2758,7 +2760,11 @@
 
     const initial = currentId();
     select(initial, false);
-    if (lightbox instanceof HTMLElement) lightbox.hidden = true;
+    if (lightbox instanceof HTMLElement) {
+      lightbox.classList.remove('lightbox--open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      lightbox.hidden = true;
+    }
 
     root.dataset.productGalleryEnhanced = 'true';
   }

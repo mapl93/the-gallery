@@ -125,6 +125,7 @@
           assign card_kind = block.settings.kind
           assign card_filter_kind = card_kind
           assign card_type_label = 'work.types.collection' | t
+          assign card_edition = 'permanent'
           assign card_width = block.settings.card_width | default: 'one-third'
           assign card_sizes = '(min-width: 768px) 33vw, 100vw'
           assign image_loading = 'lazy'
@@ -139,7 +140,8 @@
 
           if card_kind == 'piece-index'
             assign card_filter_kind = 'piece'
-            assign card_type_label = 'work.types.individual_pieces' | t
+            assign card_type_label = 'work.editions.limited_plural' | t
+            assign card_edition = 'limited'
           elsif card_kind == 'piece'
             assign card_filter_kind = 'piece'
             assign card_type_label = 'work.types.individual_piece' | t
@@ -153,6 +155,10 @@
                 assign card_title = 'work.services.custom_production' | t
               endif
             endif
+          endif
+
+          if block.settings.limited
+            assign card_edition = 'limited'
           endif
 
           if selected_collection != blank
@@ -182,7 +188,7 @@
           data-work-item
           data-work-width="{{ card_width }}"
           data-work-kind="{{ card_filter_kind }}"
-          data-work-edition="{% if block.settings.limited %}limited{% else %}permanent{% endif %}"
+          data-work-edition="{{ card_edition }}"
           data-work-featured="{{ block.settings.featured }}"
           data-work-date="{{ block.settings.publication_date | escape }}"
           data-work-title="{{ card_title | downcase | escape }}"

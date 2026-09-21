@@ -863,10 +863,12 @@ function enhanceFooterSnap() {
   let wheelDirection = 0;
   let wheelDistance = 0;
   let wheelTriggered = false;
+  let wheelStartedAtPageEnd = false;
   let wheelEndTimer = 0;
   let motionEndTimer = 0;
   let headerCoverFrame = 0;
   let touchStartY = null;
+  let touchStartedAtPageEnd = false;
 
   function isAtPageEnd() {
     return window.scrollY + window.innerHeight >= root.scrollHeight - 2;
@@ -973,6 +975,7 @@ function enhanceFooterSnap() {
     wheelDirection = 0;
     wheelDistance = 0;
     wheelTriggered = false;
+    wheelStartedAtPageEnd = false;
   }
 
   function handleWheel(event) {
@@ -981,20 +984,25 @@ function enhanceFooterSnap() {
     const direction = Math.sign(event.deltaY);
     if (!direction) return;
 
-    const canOpen = !open && direction > 0 && (isHome || isAtPageEnd());
-    const canClose = open && direction < 0;
-    if (!canOpen && !canClose) {
-      resetWheelGesture();
-      return;
+    const atPageEnd = isAtPageEnd();
+    if (wheelDirection && wheelDirection !== direction) resetWheelGesture();
+    if (!wheelDirection) {
+      wheelDirection = direction;
+      wheelStartedAtPageEnd = atPageEnd;
     }
+
+    window.clearTimeout(wheelEndTimer);
+    wheelEndTimer = window.setTimeout(resetWheelGesture, 180);
+
+    const canOpen = !open
+      && direction > 0
+      && (isHome || (wheelStartedAtPageEnd && atPageEnd));
+    const canClose = open && direction < 0;
+    if (!canOpen && !canClose) return;
 
     event.preventDefault();
 
-    if (wheelDirection && wheelDirection !== direction) resetWheelGesture();
-    wheelDirection = direction;
     wheelDistance += event.deltaY;
-    window.clearTimeout(wheelEndTimer);
-    wheelEndTimer = window.setTimeout(resetWheelGesture, 180);
 
     const triggerDistance = isHome ? 1 : 24;
     if (wheelTriggered || Math.abs(wheelDistance) < triggerDistance) return;
@@ -1005,13 +1013,16 @@ function enhanceFooterSnap() {
   function handleTouchStart(event) {
     if (!enabled || state.panel || event.touches.length !== 1) return;
     touchStartY = event.touches[0].clientY;
+    touchStartedAtPageEnd = isAtPageEnd();
   }
 
   function handleTouchMove(event) {
     if (!enabled || state.panel || touchStartY === null) return;
     const currentY = event.touches[0]?.clientY;
     const distance = typeof currentY === 'number' ? touchStartY - currentY : 0;
-    const canOpen = !open && distance > 0 && (isHome || isAtPageEnd());
+    const canOpen = !open
+      && distance > 0
+      && (isHome || (touchStartedAtPageEnd && isAtPageEnd()));
     const canClose = open && distance < 0;
     if (canOpen || canClose) event.preventDefault();
   }
@@ -1021,8 +1032,11 @@ function enhanceFooterSnap() {
     const endY = event.changedTouches[0]?.clientY;
     const distance = typeof endY === 'number' ? touchStartY - endY : 0;
     touchStartY = null;
-    const canOpen = !open && distance > 0 && (isHome || isAtPageEnd());
+    const canOpen = !open
+      && distance > 0
+      && (isHome || (touchStartedAtPageEnd && isAtPageEnd()));
     const canClose = open && distance < 0;
+    touchStartedAtPageEnd = false;
     if (Math.abs(distance) >= 32 && (canOpen || canClose)) setOpen(distance > 0);
   }
 

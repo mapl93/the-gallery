@@ -18,6 +18,7 @@ const state = {
 const trackingEyes = new Map();
 const blinkingEyes = new Map();
 const workIndexes = new Map();
+const shopCollections = new Map();
 const internalHeaders = new Map();
 
 function randomUnit() {
@@ -835,6 +836,140 @@ function destroyWorkIndexesWithin(scope) {
   });
 }
 
+function enhanceShopCollection(root) {
+  if (!(root instanceof HTMLElement) || shopCollections.has(root)) return;
+
+  const form = root.querySelector('[data-shop-controls]');
+  const grid = root.querySelector('[data-shop-grid]');
+  const selectors = [...root.querySelectorAll('[data-shop-selector]')];
+  const items = [...root.querySelectorAll('[data-shop-item]')];
+
+  if (!(grid instanceof HTMLElement) || items.length === 0) return;
+
+  items.forEach((item, index) => {
+    item.dataset.shopOriginalIndex = String(index);
+  });
+
+  function selectedValue(selectorName, fallback) {
+    const selected = root.querySelector(`[data-shop-${selectorName}]:checked`);
+    return selected instanceof HTMLInputElement ? selected.value : fallback;
+  }
+
+  function textValue(item, key) {
+    return item.dataset[key] ?? '';
+  }
+
+  function numericValue(item, key) {
+    const value = Number(item.dataset[key] ?? 0);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function compareItems(a, b) {
+    const criterion = selectedValue('criterion', 'collection');
+    const direction = selectedValue('direction', 'ascending') === 'descending' ? -1 : 1;
+    let difference = 0;
+
+    if (criterion === 'price') {
+      difference = numericValue(a, 'shopPrice') - numericValue(b, 'shopPrice');
+    } else if (criterion === 'availability') {
+      difference = numericValue(a, 'shopAvailability') - numericValue(b, 'shopAvailability');
+    } else {
+      difference = textValue(a, 'shopCollection').localeCompare(textValue(b, 'shopCollection'));
+    }
+
+    if (difference) return difference * direction;
+
+    const titleDifference = textValue(a, 'shopTitle').localeCompare(textValue(b, 'shopTitle'));
+    if (titleDifference) return titleDifference * direction;
+
+    return Number(a.dataset.shopOriginalIndex ?? 0) - Number(b.dataset.shopOriginalIndex ?? 0);
+  }
+
+  function syncSelector(selector) {
+    const selected = selector.querySelector('input:checked');
+    const value = selector.querySelector('[data-shop-selector-value]');
+    if (!(selected instanceof HTMLInputElement) || !(value instanceof HTMLElement)) return;
+    value.textContent = selected.dataset.shopOptionLabel ?? '';
+  }
+
+  function closeSelectors(except = null) {
+    selectors.forEach((selector) => {
+      if (selector instanceof HTMLDetailsElement && selector !== except) selector.open = false;
+    });
+  }
+
+  function update() {
+    items.sort(compareItems).forEach((item) => grid.append(item));
+  }
+
+  function handleChange(event) {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    if (!event.target.matches('[data-shop-criterion], [data-shop-direction]')) return;
+    const selector = event.target.closest('[data-shop-selector]');
+    if (selector instanceof HTMLDetailsElement) {
+      syncSelector(selector);
+      selector.open = false;
+      selector.querySelector('summary')?.focus();
+    }
+    update();
+  }
+
+  function handleSelectorToggle(event) {
+    const selector = event.currentTarget;
+    if (selector instanceof HTMLDetailsElement && selector.open) closeSelectors(selector);
+  }
+
+  function handleDocumentPointerDown(event) {
+    if (!(event.target instanceof Node)) return;
+    if (!selectors.some((selector) => selector.contains(event.target))) closeSelectors();
+  }
+
+  function handleRootKeydown(event) {
+    if (event.key !== 'Escape') return;
+    const openSelector = selectors.find((selector) => selector instanceof HTMLDetailsElement && selector.open);
+    if (!(openSelector instanceof HTMLDetailsElement)) return;
+    openSelector.open = false;
+    openSelector.querySelector('summary')?.focus();
+  }
+
+  if (form instanceof HTMLFormElement) {
+    form.hidden = false;
+    form.addEventListener('change', handleChange);
+  }
+  selectors.forEach((selector) => {
+    syncSelector(selector);
+    selector.addEventListener('toggle', handleSelectorToggle);
+  });
+  document.addEventListener('pointerdown', handleDocumentPointerDown);
+  root.addEventListener('keydown', handleRootKeydown);
+  update();
+
+  shopCollections.set(root, {
+    destroy() {
+      form?.removeEventListener('change', handleChange);
+      selectors.forEach((selector) => selector.removeEventListener('toggle', handleSelectorToggle));
+      document.removeEventListener('pointerdown', handleDocumentPointerDown);
+      root.removeEventListener('keydown', handleRootKeydown);
+    }
+  });
+}
+
+function enhanceShopCollectionsWithin(scope = document) {
+  if (scope instanceof Element && scope.matches('[data-storefront-shop]')) {
+    enhanceShopCollection(scope);
+  }
+  scope.querySelectorAll?.('[data-storefront-shop]').forEach(enhanceShopCollection);
+}
+
+function destroyShopCollectionsWithin(scope) {
+  shopCollections.forEach((entry, root) => {
+    if (scope === root || scope.contains?.(root)) {
+      entry.destroy();
+      shopCollections.delete(root);
+    }
+  });
+}
+
 let footerSnapController = null;
 
 function enhanceFooterSnap() {
@@ -1334,6 +1469,7 @@ document.addEventListener('shopify:section:unload', (event) => {
   destroyTrackingEyesWithin(event.target);
   destroyBlinkingEyesWithin(event.target);
   destroyWorkIndexesWithin(event.target);
+  destroyShopCollectionsWithin(event.target);
   destroyInternalHeadersWithin(event.target);
   if (footerSnapController?.contains(event.target)) footerSnapController.destroy();
   if (state.panel && (event.target.contains(state.panel) || !state.panel.isConnected)) {
@@ -1345,6 +1481,7 @@ document.addEventListener('shopify:section:load', (event) => {
   enhanceTrackingEyesWithin(event.target);
   enhanceBlinkingEyesWithin(event.target);
   enhanceWorkIndexesWithin(event.target);
+  enhanceShopCollectionsWithin(event.target);
   enhanceInternalHeadersWithin(event.target);
   enhanceFooterSnap();
 });
@@ -1352,5 +1489,6 @@ document.addEventListener('shopify:section:load', (event) => {
 enhanceTrackingEyesWithin(document);
 enhanceBlinkingEyesWithin(document);
 enhanceWorkIndexesWithin(document);
+enhanceShopCollectionsWithin(document);
 enhanceInternalHeadersWithin(document);
 enhanceFooterSnap();

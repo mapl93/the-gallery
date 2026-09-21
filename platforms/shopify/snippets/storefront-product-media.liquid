@@ -10,6 +10,13 @@ viewports it becomes a native horizontal scroll-snap gallery.
 {% enddoc %}
 
 {%- if product != blank and product.media.size > 0 -%}
+  {%- liquid
+    assign lightbox_images = product.media | where: 'media_type', 'image'
+    assign lightbox_initial = lightbox_images.first
+    assign lightbox_id = 'storefront-product-lightbox-' | append: section.id
+    assign lightbox_title_id = lightbox_id | append: '-title'
+    assign lightbox_caption_id = lightbox_id | append: '-caption'
+  -%}
   <div
     class="storefront-product-media"
     data-editorial-media
@@ -35,16 +42,24 @@ viewports it becomes a native horizontal scroll-snap gallery.
         >
           {%- case media.media_type -%}
             {%- when 'image' -%}
-              {{ media.preview_image
-                | image_url: width: 2400
-                | image_tag:
-                  class: 'storefront-product-media__image',
-                  alt: media_alt,
-                  loading: media_loading,
-                  fetchpriority: media_fetch_priority,
-                  widths: '480,720,960,1200,1600,2000,2400',
-                  sizes: '(min-width: 768px) 66vw, 100vw'
-              }}
+              <button
+                class="storefront-product-media__open"
+                type="button"
+                aria-label="{{ 'products.media.open_detail' | t: title: media_alt | escape }}"
+                data-editorial-lightbox-open
+                data-editorial-lightbox-caption="{{ media_alt | escape }}"
+              >
+                {{ media.preview_image
+                  | image_url: width: 2400
+                  | image_tag:
+                    class: 'storefront-product-media__image',
+                    alt: media_alt,
+                    loading: media_loading,
+                    fetchpriority: media_fetch_priority,
+                    widths: '480,720,960,1200,1600,2000,2400',
+                    sizes: '(min-width: 768px) 66vw, 100vw'
+                }}
+              </button>
 
             {%- when 'video' -%}
               {{ media | video_tag:
@@ -84,6 +99,58 @@ viewports it becomes a native horizontal scroll-snap gallery.
             <span></span>
           </button>
         {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if lightbox_initial != blank -%}
+      <div class="modal-overlay lightbox storefront-product-lightbox" aria-hidden="true" data-editorial-lightbox hidden>
+        <div
+          class="modal lightbox__dialog"
+          id="{{ lightbox_id }}"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="{{ lightbox_title_id }}"
+          aria-describedby="{{ lightbox_caption_id }}"
+          tabindex="-1"
+        >
+          <div class="modal__header lightbox__header">
+            <h2 class="modal__title lightbox__title visually-hidden" id="{{ lightbox_title_id }}">{{ 'products.media.detail_title' | t }}</h2>
+            <button
+              class="close-btn modal__close lightbox__close"
+              type="button"
+              aria-label="{{ 'products.media.close_detail' | t }}"
+              data-editorial-lightbox-close
+            >
+              {% render 'icon', name: 'close', size: 20 %}
+            </button>
+          </div>
+
+          <div class="modal__body lightbox__body">
+            <figure class="lightbox__content">
+              <div class="lightbox__viewport">
+                {{ lightbox_initial.preview_image
+                  | image_url: width: 2400
+                  | image_tag:
+                    class: 'lightbox__image',
+                    alt: lightbox_initial.alt,
+                    loading: 'eager',
+                    widths: '720,960,1200,1600,2000,2400',
+                    sizes: '100vw',
+                    data-editorial-lightbox-image: ''
+                }}
+              </div>
+              <div class="lightbox__counter" dir="ltr" aria-hidden="true" data-editorial-lightbox-counter>1 / {{ lightbox_images.size }}</div>
+              <figcaption class="lightbox__caption" id="{{ lightbox_caption_id }}" data-editorial-lightbox-caption>{{ lightbox_initial.alt | default: product.title | escape }}</figcaption>
+            </figure>
+
+            {%- if lightbox_images.size > 1 -%}
+              <button class="lightbox__nav lightbox__nav--prev icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.previous_image' | t }}" data-editorial-lightbox-action="previous">{% render 'icon', name: 'chevron-left' %}</button>
+              <button class="lightbox__nav lightbox__nav--next icon-btn icon-btn--round" type="button" aria-label="{{ 'products.media.next_image' | t }}" data-editorial-lightbox-action="next">{% render 'icon', name: 'chevron-right' %}</button>
+            {%- endif -%}
+
+            <p class="lightbox__status visually-hidden" role="status" aria-live="polite" aria-atomic="true" data-editorial-lightbox-status></p>
+          </div>
+        </div>
       </div>
     {%- endif -%}
   </div>

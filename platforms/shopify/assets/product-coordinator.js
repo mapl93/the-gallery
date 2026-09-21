@@ -100,6 +100,9 @@
     let requestSequence = 0;
     let mediaTrack = null;
     let mediaScrollFrame = 0;
+    let mediaLightbox = null;
+    let mediaLightboxTrigger = null;
+    let mediaLightboxIndex = 0;
 
     function syncMediaPagination() {
       mediaScrollFrame = 0;
@@ -128,6 +131,65 @@
       mediaScrollFrame = window.requestAnimationFrame(syncMediaPagination);
     }
 
+    function editorialLightboxTriggers() {
+      return Array.from(root.querySelectorAll('[data-editorial-lightbox-open]')).filter((trigger) => (
+        trigger instanceof HTMLButtonElement
+      ));
+    }
+
+    function syncEditorialLightbox(index) {
+      if (!(mediaLightbox instanceof HTMLElement)) return;
+      const triggers = editorialLightboxTriggers();
+      if (triggers.length === 0) return;
+      mediaLightboxIndex = (index + triggers.length) % triggers.length;
+      const trigger = triggers[mediaLightboxIndex];
+      const source = trigger.querySelector('img');
+      const image = mediaLightbox.querySelector('[data-editorial-lightbox-image]');
+      if (!(source instanceof HTMLImageElement) || !(image instanceof HTMLImageElement)) return;
+
+      image.src = source.src;
+      image.srcset = source.srcset;
+      image.sizes = '100vw';
+      image.alt = source.alt;
+      const captionText = trigger.dataset.editorialLightboxCaption || source.alt;
+      const counter = mediaLightbox.querySelector('[data-editorial-lightbox-counter]');
+      const caption = mediaLightbox.querySelector('[data-editorial-lightbox-caption]');
+      const lightboxStatus = mediaLightbox.querySelector('[data-editorial-lightbox-status]');
+      if (counter) counter.textContent = `${mediaLightboxIndex + 1} / ${triggers.length}`;
+      if (caption) caption.textContent = captionText;
+      if (lightboxStatus) lightboxStatus.textContent = `${mediaLightboxIndex + 1} / ${triggers.length}: ${captionText}`;
+    }
+
+    function openEditorialLightbox(trigger) {
+      if (!(mediaLightbox instanceof HTMLElement) || !(trigger instanceof HTMLButtonElement)) return;
+      const triggers = editorialLightboxTriggers();
+      const index = triggers.indexOf(trigger);
+      if (index < 0) return;
+      mediaLightboxTrigger = trigger;
+      syncEditorialLightbox(index);
+      mediaLightbox.hidden = false;
+      mediaLightbox.setAttribute('aria-hidden', 'false');
+      mediaLightbox.classList.add('lightbox--open');
+      document.body.classList.add('storefront-overlay-open');
+      mediaLightbox.querySelector('[data-editorial-lightbox-close]')?.focus();
+    }
+
+    function closeEditorialLightbox(restoreFocus = true) {
+      if (!(mediaLightbox instanceof HTMLElement)) return;
+      mediaLightbox.classList.remove('lightbox--open');
+      mediaLightbox.setAttribute('aria-hidden', 'true');
+      mediaLightbox.hidden = true;
+      document.body.classList.remove('storefront-overlay-open');
+      if (restoreFocus && mediaLightboxTrigger instanceof HTMLElement && mediaLightboxTrigger.isConnected) {
+        mediaLightboxTrigger.focus();
+      }
+      mediaLightboxTrigger = null;
+    }
+
+    function moveEditorialLightbox(direction) {
+      syncEditorialLightbox(mediaLightboxIndex + direction);
+    }
+
     function enhanceRender(scope) {
       window.TheGallery?.enhanceQuantities?.(scope);
       const nextTrack = scope.querySelector('[data-editorial-media-track]');
@@ -135,6 +197,12 @@
         mediaTrack?.removeEventListener('scroll', handleMediaScroll);
         mediaTrack = nextTrack instanceof HTMLElement ? nextTrack : null;
         mediaTrack?.addEventListener('scroll', handleMediaScroll, { passive: true });
+      }
+      mediaLightbox = scope.querySelector('[data-editorial-lightbox]');
+      if (mediaLightbox instanceof HTMLElement) {
+        mediaLightbox.classList.remove('lightbox--open');
+        mediaLightbox.setAttribute('aria-hidden', 'true');
+        mediaLightbox.hidden = true;
       }
       scope.querySelectorAll('[data-product-form] [data-qty-input]').forEach(updateProductTotal);
       syncMediaPagination();
@@ -182,6 +250,7 @@
         }
         if (!root.isConnected || sequence !== requestSequence) return;
 
+        closeEditorialLightbox(false);
         currentRender.replaceWith(incomingRender);
         root.dataset.currentVariantId = incomingRoot.dataset.currentVariantId || '';
         root.dataset.currentMarketId = incomingRoot.dataset.currentMarketId || root.dataset.currentMarketId || '';
@@ -261,6 +330,29 @@
 
     function handleClick(event) {
       const target = event.target instanceof Element ? event.target : null;
+      const lightboxClose = target?.closest('[data-editorial-lightbox-close]');
+      if (lightboxClose && root.contains(lightboxClose)) {
+        closeEditorialLightbox();
+        return;
+      }
+
+      const lightboxAction = target?.closest('[data-editorial-lightbox-action]');
+      if (lightboxAction instanceof HTMLButtonElement && root.contains(lightboxAction)) {
+        moveEditorialLightbox(lightboxAction.dataset.editorialLightboxAction === 'previous' ? -1 : 1);
+        return;
+      }
+
+      if (target?.matches('[data-editorial-lightbox], .lightbox__body, .lightbox__viewport')) {
+        closeEditorialLightbox();
+        return;
+      }
+
+      const lightboxOpen = target?.closest('[data-editorial-lightbox-open]');
+      if (lightboxOpen instanceof HTMLButtonElement && root.contains(lightboxOpen)) {
+        openEditorialLightbox(lightboxOpen);
+        return;
+      }
+
       const detailTab = target?.closest('[data-product-detail-tab]');
       if (detailTab instanceof HTMLButtonElement && root.contains(detailTab)) {
         selectDetail(root, detailTab.dataset.productDetailTab, false);
@@ -285,6 +377,33 @@
     }
 
     function handleKeydown(event) {
+      if (mediaLightbox instanceof HTMLElement && !mediaLightbox.hidden) {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          closeEditorialLightbox();
+          return;
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+          event.preventDefault();
+          const rtl = getComputedStyle(root).direction === 'rtl';
+          const direction = event.key === 'ArrowLeft' ? -1 : 1;
+          moveEditorialLightbox(rtl ? -direction : direction);
+          return;
+        }
+        if (event.key === 'Tab') {
+          const focusable = Array.from(mediaLightbox.querySelectorAll('button:not(:disabled), [href], [tabindex]:not([tabindex="-1"])'));
+          const current = focusable.indexOf(document.activeElement);
+          if (event.shiftKey && current <= 0) {
+            event.preventDefault();
+            focusable[focusable.length - 1]?.focus();
+          } else if (!event.shiftKey && current === focusable.length - 1) {
+            event.preventDefault();
+            focusable[0]?.focus();
+          }
+          return;
+        }
+      }
+
       const tab = event.target instanceof Element
         ? event.target.closest('[data-product-detail-tab]')
         : null;
@@ -316,6 +435,7 @@
     entries.set(root, {
       cleanup() {
         controller?.abort();
+        closeEditorialLightbox(false);
         if (mediaScrollFrame) window.cancelAnimationFrame(mediaScrollFrame);
         mediaTrack?.removeEventListener('scroll', handleMediaScroll);
         root.removeEventListener('change', handleChange);

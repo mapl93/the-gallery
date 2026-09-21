@@ -1,0 +1,89 @@
+{% doc %}
+Renders the storefront editorial product-media sequence. On wide viewports the
+media stack scrolls vertically beside sticky purchase information. On small
+viewports it becomes a native horizontal scroll-snap gallery.
+
+@param {product} product - Product whose media is rendered.
+
+@example
+{% render 'storefront-product-media', product: product %}
+{% enddoc %}
+
+{%- if product != blank and product.media.size > 0 -%}
+  <div
+    class="storefront-product-media"
+    data-editorial-media
+    aria-label="{{ 'products.media.views' | t | escape }}"
+  >
+    <div class="storefront-product-media__track" data-editorial-media-track>
+      {%- for media in product.media -%}
+        {%- liquid
+          assign media_alt = media.alt | default: product.title
+          assign media_loading = 'lazy'
+          assign media_fetch_priority = 'auto'
+          if forloop.first
+            assign media_loading = 'eager'
+            assign media_fetch_priority = 'high'
+          endif
+        -%}
+        <figure
+          class="storefront-product-media__item storefront-product-media__item--{{ media.media_type | replace: '_', '-' }}"
+          id="product-media-{{ section.id }}-{{ forloop.index }}"
+          data-editorial-media-item
+          data-media-index="{{ forloop.index0 }}"
+        >
+          {%- case media.media_type -%}
+            {%- when 'image' -%}
+              {{ media.preview_image
+                | image_url: width: 2400
+                | image_tag:
+                  class: 'storefront-product-media__image',
+                  alt: media_alt,
+                  loading: media_loading,
+                  fetchpriority: media_fetch_priority,
+                  widths: '480,720,960,1200,1600,2000,2400',
+                  sizes: '(min-width: 768px) 66vw, 100vw'
+              }}
+
+            {%- when 'video' -%}
+              {{ media | video_tag:
+                class: 'storefront-product-media__interactive',
+                controls: true,
+                preload: 'metadata',
+                image_size: '2000x'
+              }}
+
+            {%- when 'external_video' -%}
+              {{ media | external_video_tag:
+                class: 'storefront-product-media__interactive'
+              }}
+
+            {%- when 'model' -%}
+              {{ media | model_viewer_tag:
+                class: 'storefront-product-media__interactive',
+                image_size: '2000x',
+                toggleable: true
+              }}
+          {%- endcase -%}
+        </figure>
+      {%- endfor -%}
+    </div>
+
+    {%- if product.media.size > 1 -%}
+      <div class="storefront-product-media__pagination" role="group" aria-label="{{ 'products.media.pages' | t | escape }}">
+        {%- for media in product.media -%}
+          {%- assign media_alt = media.alt | default: product.title -%}
+          <button
+            class="storefront-product-media__dot"
+            type="button"
+            aria-label="{{ 'products.media.view' | t: index: forloop.index, total: product.media.size, title: media_alt | escape }}"
+            {% if forloop.first %}aria-current="true"{% endif %}
+            data-editorial-media-dot="{{ forloop.index0 }}"
+          >
+            <span></span>
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}

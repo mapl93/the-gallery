@@ -32,20 +32,39 @@ availability, pending state, and result feedback synchronized.
   assign quantity_min = current_variant.quantity_rule.min | default: 1
   assign quantity_step = current_variant.quantity_rule.increment | default: 1
   assign quantity_max = current_variant.quantity_rule.max
+  assign current_price = current_variant.price | default: 0
+  assign initial_total = current_price | times: quantity_min
+  assign quantity_label = 'products.quantity' | t
+  assign decrement_label = 'products.decrease_quantity' | t: title: product.title
+  assign increment_label = 'products.increase_quantity' | t: title: product.title
 -%}
 
-{% form 'product', product, id: product_form_id, class: product_form_class, data-product-form: '' %}
+{% form 'product', product,
+  id: product_form_id,
+  class: product_form_class,
+  data-product-form: '',
+  data-unit-price-cents: current_price,
+  data-currency: localization.country.currency.iso_code,
+  data-locale: request.locale.iso_code,
+  data-money-format: shop.money_format
+%}
   {% unless product.has_only_default_variant %}
     {% render 'variant-selector', product: product, product_form_id: product_form_id, selector_id: product_form_id %}
   {% endunless %}
 
   {% if should_show_quantity %}
-    {% render 'quantity-selector',
-      value: quantity_min,
-      min: quantity_min,
-      max: quantity_max,
-      step: quantity_step
-    %}
+    <div class="product-form__quantity-row">
+      <span class="product-form__quantity-label">{{ 'products.quantity' | t }}</span>
+      {% render 'quantity-selector',
+        value: quantity_min,
+        min: quantity_min,
+        max: quantity_max,
+        step: quantity_step,
+        accessible_label: quantity_label,
+        decrement_label: decrement_label,
+        increment_label: increment_label
+      %}
+    </div>
   {% endif %}
 
   <input type="hidden" name="id"
@@ -66,7 +85,8 @@ availability, pending state, and result feedback synchronized.
             value="add"
             {% unless current_variant.available %}disabled{% endunless %}>
       {% if current_variant.available %}
-        {{ 'products.add_to_cart' | t }}
+        <span>{{ 'products.add_to_cart' | t }}</span>
+        <span class="product-form__total" data-product-total>{{ initial_total | money }}</span>
       {% else %}
         {{ 'products.sold_out' | t }}
       {% endif %}

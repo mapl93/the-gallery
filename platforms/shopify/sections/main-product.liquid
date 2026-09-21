@@ -1,9 +1,10 @@
 {%- comment -%}
   Section: Main Product
 
-  One target coordinator owns option resolution and atomically re-renders the
-  Product Gallery, Product Info, Variant Selector, Product Form, URL and
-  structured data. Product Info itself remains passive.
+  Editorial product page: a large media sequence occupies two thirds of the
+  desktop viewport while the purchase panel remains sticky in the final third.
+  The target coordinator owns option resolution, totals and accessible detail
+  tabs inside one atomic render boundary.
 {%- endcomment -%}
 
 <script src="{{ 'product-coordinator.js' | asset_url }}" defer></script>
@@ -11,6 +12,21 @@
 
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
+  assign short_description = product.metafields.custom.short_description.value
+  if short_description == blank
+    assign short_description = product.description | strip_html | truncatewords: 27
+  endif
+  assign dimensions_metric = product.metafields.custom.dimensions_metric.value
+  if dimensions_metric == blank
+    assign dimensions_metric = product.metafields.custom.dimensions.value
+  endif
+  if dimensions_metric == blank
+    assign dimensions_metric = 'products.details.dimensions_metric_fallback' | t
+  endif
+  assign dimensions_imperial = product.metafields.custom.dimensions_imperial.value
+  if dimensions_imperial == blank
+    assign dimensions_imperial = 'products.details.dimensions_imperial_fallback' | t
+  endif
   assign update_message = 'products.variant.unavailable_combination' | t
   if current_variant
     assign update_message = 'products.variant.updated' | t: title: current_variant.title
@@ -27,25 +43,30 @@
   data-product-update-message="{{ update_message | escape }}"
   data-product-update-error="{{ 'products.variant.update_error' | t | escape }}"
 >
-  <div class="container" data-product-render>
-    <div class="product-layout">
-      <div class="product-layout__gallery">
-        {% render 'product-gallery',
-          product: product,
-          image_detail: section.settings.gallery_image_detail,
-          loop: section.settings.gallery_loop
-        %}
+  <div class="storefront-product__render" data-product-render>
+    <div class="storefront-product__layout">
+      <div class="storefront-product__media-column">
+        {% render 'storefront-product-media', product: product %}
       </div>
 
-      <div class="product-layout__info">
+      <aside class="storefront-product__purchase" aria-label="{{ product.title | escape }}">
+        <div class="storefront-product__purchase-inner">
         {% for block in section.blocks %}
-          <div class="product-layout__block" {{ block.shopify_attributes }}>
+          <div class="storefront-product__block" {{ block.shopify_attributes }}>
             {% case block.type %}
               {% when 'breadcrumb' %}
                 {% render 'breadcrumb', product: product, collection: collection %}
 
               {% when 'product_info' %}
-                {% render 'product-info', product: product, variant: current_variant %}
+                <header class="storefront-product__summary">
+                  <h1 class="storefront-product__title" dir="auto">{{ product.title | escape }}</h1>
+                  <div class="storefront-product__unit-price">
+                    {% render 'price', product: product, variant: current_variant %}
+                  </div>
+                  {% if short_description != blank %}
+                    <p class="storefront-product__excerpt" dir="auto">{{ short_description | escape }}</p>
+                  {% endif %}
+                </header>
 
               {% when 'rating' %}
                 {% if product.metafields.reviews.rating %}
@@ -75,8 +96,91 @@
             {% endcase %}
           </div>
         {% endfor %}
-      </div>
+        </div>
+      </aside>
     </div>
+
+    <section class="storefront-product-details" data-product-details aria-labelledby="product-details-title-{{ section.id }}">
+      <h2 class="visually-hidden" id="product-details-title-{{ section.id }}">{{ 'products.details.heading' | t }}</h2>
+
+      <div class="storefront-product-details__tabs" role="tablist" aria-label="{{ 'products.details.heading' | t | escape }}">
+        {%- assign detail_tabs = 'description,dimensions,care,shipping' | split: ',' -%}
+        {%- for detail_tab in detail_tabs -%}
+          <button
+            class="storefront-product-details__tab"
+            id="product-detail-tab-{{ section.id }}-{{ detail_tab }}"
+            type="button"
+            role="tab"
+            aria-controls="product-detail-panel-{{ section.id }}-{{ detail_tab }}"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+            data-product-detail-tab="{{ detail_tab }}"
+          >
+            {{- 'products.details.' | append: detail_tab | t -}}
+          </button>
+        {%- endfor -%}
+      </div>
+
+      <div class="storefront-product-details__panels">
+        <div
+          class="storefront-product-details__panel storefront-product-details__panel--description"
+          id="product-detail-panel-{{ section.id }}-description"
+          role="tabpanel"
+          aria-labelledby="product-detail-tab-{{ section.id }}-description"
+          data-product-detail-panel="description"
+        >
+          <div class="storefront-product-details__richtext">{{ product.description }}</div>
+        </div>
+
+        <div
+          class="storefront-product-details__panel"
+          id="product-detail-panel-{{ section.id }}-dimensions"
+          role="tabpanel"
+          aria-labelledby="product-detail-tab-{{ section.id }}-dimensions"
+          data-product-detail-panel="dimensions"
+          hidden
+        >
+          <div class="storefront-product-details__measurement" data-product-measurement>
+            <div class="storefront-product-details__unit-toggle" role="group" aria-label="{{ 'products.details.units' | t | escape }}">
+              <button type="button" aria-pressed="true" data-product-unit="metric">{{ 'products.details.metric' | t }}</button>
+              <button type="button" aria-pressed="false" data-product-unit="imperial">{{ 'products.details.imperial' | t }}</button>
+            </div>
+            <p class="storefront-product-details__dimension" data-product-unit-panel="metric">{{ dimensions_metric | escape }}</p>
+            <p class="storefront-product-details__dimension" data-product-unit-panel="imperial" hidden>{{ dimensions_imperial | escape }}</p>
+          </div>
+        </div>
+
+        <div
+          class="storefront-product-details__panel"
+          id="product-detail-panel-{{ section.id }}-care"
+          role="tabpanel"
+          aria-labelledby="product-detail-tab-{{ section.id }}-care"
+          data-product-detail-panel="care"
+          hidden
+        >
+          {%- if product.metafields.custom.care_instructions != blank -%}
+            {{ product.metafields.custom.care_instructions | metafield_tag }}
+          {%- else -%}
+            <p>{{ 'products.details.care_fallback' | t }}</p>
+          {%- endif -%}
+        </div>
+
+        <div
+          class="storefront-product-details__panel"
+          id="product-detail-panel-{{ section.id }}-shipping"
+          role="tabpanel"
+          aria-labelledby="product-detail-tab-{{ section.id }}-shipping"
+          data-product-detail-panel="shipping"
+          hidden
+        >
+          {%- if product.metafields.custom.shipping_information != blank -%}
+            {{ product.metafields.custom.shipping_information | metafield_tag }}
+          {%- else -%}
+            <p>{{ 'products.details.shipping_fallback' | t }}</p>
+          {%- endif -%}
+        </div>
+      </div>
+    </section>
 
     <script type="application/ld+json" data-product-structured-data>
       {{ product | structured_data }}
@@ -89,24 +193,7 @@
 {% schema %}
 {
   "name": "Product Page",
-  "settings": [
-    {
-      "type": "select",
-      "id": "gallery_image_detail",
-      "label": "Image detail",
-      "default": "lightbox",
-      "options": [
-        { "value": "lightbox", "label": "Lightbox" },
-        { "value": "none", "label": "None" }
-      ]
-    },
-    {
-      "type": "checkbox",
-      "id": "gallery_loop",
-      "label": "Loop product media",
-      "default": false
-    }
-  ],
+  "settings": [],
   "blocks": [
     { "type": "breadcrumb", "name": "Breadcrumb", "limit": 1 },
     { "type": "product_info", "name": "Product information", "limit": 1 },

@@ -1413,6 +1413,13 @@ function openOverlay(name, trigger) {
   return true;
 }
 
+document.addEventListener('tg:storefront-open-overlay', (event) => {
+  if (!(event instanceof CustomEvent)) return;
+  const name = String(event.detail?.name || '').trim();
+  const trigger = event.detail?.trigger instanceof HTMLElement ? event.detail.trigger : null;
+  if (name) openOverlay(name, trigger);
+});
+
 document.addEventListener('click', (event) => {
   const opener = event.target.closest('[data-storefront-open]');
   if (opener) {

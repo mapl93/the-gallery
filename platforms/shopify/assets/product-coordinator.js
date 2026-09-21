@@ -97,6 +97,7 @@
     if (!sectionId || !String(root.dataset.productUrl || '').trim() || !(status instanceof HTMLElement)) return;
 
     let controller = null;
+    let cartController = null;
     let requestSequence = 0;
     let mediaTrack = null;
     let mediaScrollFrame = 0;
@@ -328,6 +329,90 @@
       }
     }
 
+    async function refreshCartSurfaces() {
+      const refreshUrl = new URL(window.location.href);
+      refreshUrl.searchParams.set('_cart_refresh', String(Date.now()));
+      const response = await fetch(refreshUrl, {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        signal: cartController?.signal,
+      });
+      if (!response.ok) throw new Error(`Cart surface request failed: ${response.status}`);
+
+      const responseDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+      const incomingPanel = responseDocument.querySelector('[data-storefront-panel="cart"]');
+      const incomingScrim = responseDocument.querySelector('[data-storefront-scrim="cart"]');
+      const currentPanel = document.querySelector('[data-storefront-panel="cart"]');
+      const currentScrim = document.querySelector('[data-storefront-scrim="cart"]');
+      if (!(incomingPanel instanceof HTMLElement)
+          || !(incomingScrim instanceof HTMLElement)
+          || !(currentPanel instanceof HTMLElement)
+          || !(currentScrim instanceof HTMLElement)) {
+        throw new Error('Cart refresh response is missing its canonical drawer surfaces.');
+      }
+
+      currentScrim.replaceWith(incomingScrim);
+      currentPanel.replaceWith(incomingPanel);
+      window.TheGallery?.enhanceQuantities?.(incomingPanel);
+
+      const incomingCartTrigger = responseDocument.querySelector('[data-storefront-open="cart"]');
+      const currentCartTrigger = document.querySelector('[data-storefront-open="cart"]');
+      if (incomingCartTrigger instanceof HTMLElement && currentCartTrigger instanceof HTMLElement) {
+        currentCartTrigger.replaceWith(incomingCartTrigger);
+      }
+    }
+
+    async function handleSubmit(event) {
+      const form = event.target instanceof HTMLFormElement && event.target.matches('[data-product-form]')
+        ? event.target
+        : null;
+      if (!(form instanceof HTMLFormElement) || !root.contains(form)) return;
+
+      event.preventDefault();
+      cartController?.abort();
+      cartController = new AbortController();
+      const submitter = event.submitter instanceof HTMLButtonElement
+        ? event.submitter
+        : form.querySelector('[type="submit"]');
+      const cartAddUrl = String(form.dataset.cartAddUrl || '').trim();
+      if (!cartAddUrl) {
+        form.submit();
+        return;
+      }
+
+      form.setAttribute('aria-busy', 'true');
+      if (submitter instanceof HTMLButtonElement) submitter.disabled = true;
+      status.textContent = '';
+
+      try {
+        const response = await fetch(`${cartAddUrl}.js`, {
+          method: 'POST',
+          body: new FormData(form),
+          credentials: 'same-origin',
+          headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          signal: cartController.signal,
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.description || result.message || `Cart request failed: ${response.status}`);
+
+        await refreshCartSurfaces();
+        document.dispatchEvent(new CustomEvent('tg:storefront-open-overlay', {
+          detail: { name: 'cart', trigger: submitter },
+        }));
+      } catch (error) {
+        if (error?.name !== 'AbortError') {
+          status.textContent = error?.message || root.dataset.productUpdateError || 'The product could not be added to the cart.';
+        }
+      } finally {
+        if (form.isConnected) form.removeAttribute('aria-busy');
+        if (submitter instanceof HTMLButtonElement && submitter.isConnected) submitter.disabled = false;
+      }
+    }
+
     function handleClick(event) {
       const target = event.target instanceof Element ? event.target : null;
       const lightboxClose = target?.closest('[data-editorial-lightbox-close]');
@@ -429,17 +514,20 @@
     enhanceRender(root);
     root.addEventListener('change', handleChange);
     root.addEventListener('input', handleInput);
+    root.addEventListener('submit', handleSubmit);
     root.addEventListener('click', handleClick);
     root.addEventListener('keydown', handleKeydown);
     window.addEventListener('popstate', handlePopState);
     entries.set(root, {
       cleanup() {
         controller?.abort();
+        cartController?.abort();
         closeEditorialLightbox(false);
         if (mediaScrollFrame) window.cancelAnimationFrame(mediaScrollFrame);
         mediaTrack?.removeEventListener('scroll', handleMediaScroll);
         root.removeEventListener('change', handleChange);
         root.removeEventListener('input', handleInput);
+        root.removeEventListener('submit', handleSubmit);
         root.removeEventListener('click', handleClick);
         root.removeEventListener('keydown', handleKeydown);
         window.removeEventListener('popstate', handlePopState);

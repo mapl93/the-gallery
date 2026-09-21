@@ -854,16 +854,18 @@ function enhanceFooterSnap() {
   const originalFooterAriaHidden = footer.getAttribute('aria-hidden');
   const footerWasInert = footer.inert;
   const pageSurfaceWasInert = pageSurface.inert;
-  const internalHeaderWasInert = internalHeader instanceof HTMLElement ? internalHeader.inert : false;
+  const headerSurfaces = internalHeader instanceof HTMLElement
+    ? [...internalHeader.querySelectorAll('.header__logo, .header__internal-eyes, .header__actions')]
+    : [];
   let enabled = false;
   let open = false;
-  let overlayHeader = null;
   let lastTrigger = null;
   let wheelDirection = 0;
   let wheelDistance = 0;
   let wheelTriggered = false;
   let wheelEndTimer = 0;
   let motionEndTimer = 0;
+  let headerCoverFrame = 0;
   let touchStartY = null;
 
   function isAtPageEnd() {
@@ -876,52 +878,42 @@ function enhanceFooterSnap() {
     }));
   }
 
-  function createOverlayHeader() {
-    if (!(internalHeader instanceof HTMLElement) || overlayHeader instanceof HTMLElement) return;
+  function updateHeaderCover() {
+    if (headerSurfaces.length === 0) return;
+    const footerTop = footer.getBoundingClientRect().top;
 
-    overlayHeader = internalHeader.cloneNode(true);
-    overlayHeader.removeAttribute('data-storefront-header');
-    overlayHeader.classList.remove('is-scroll-hidden', 'is-scroll-raised', 'storefront-header--static');
-    overlayHeader.classList.add('storefront-footer__overlay-header');
-    overlayHeader.querySelector('.header__internal-eyes')?.remove();
-    overlayHeader.inert = true;
-    footer.prepend(overlayHeader);
-    footer.classList.add('storefront-footer--header-overlay');
+    headerSurfaces.forEach((surface) => {
+      const bounds = surface.getBoundingClientRect();
+      const coveredHeight = Math.min(bounds.height, Math.max(0, bounds.bottom - footerTop));
+      surface.style.setProperty('--_footer-cover-inset', `${coveredHeight}px`);
+    });
   }
 
-  function restoreOverlayHeaderFocus() {
-    if (!(overlayHeader instanceof HTMLElement)
-        || !(internalHeader instanceof HTMLElement)
-        || !overlayHeader.contains(document.activeElement)) return;
-
-    const activeElement = document.activeElement;
-    if (!(activeElement instanceof Element)) return;
-    const overlayTargets = [...overlayHeader.querySelectorAll('a, button')];
-    const sourceTargets = [...internalHeader.querySelectorAll('a, button')];
-    const activeTarget = activeElement.closest('a, button');
-    const targetIndex = overlayTargets.indexOf(activeTarget);
-    sourceTargets[targetIndex]?.focus({ preventScroll: true });
+  function stopHeaderCoverTracking() {
+    window.cancelAnimationFrame(headerCoverFrame);
+    headerCoverFrame = 0;
   }
 
-  function removeOverlayHeader() {
-    restoreOverlayHeaderFocus();
-    overlayHeader?.remove();
-    overlayHeader = null;
-    footer.classList.remove('storefront-footer--header-overlay');
-  }
+  function trackHeaderCover() {
+    stopHeaderCoverTracking();
 
-  function syncHeaderInteractivity(isAnimating = false) {
-    if (!(internalHeader instanceof HTMLElement) || !(overlayHeader instanceof HTMLElement)) return;
-    const overlayIsActive = open && !isAnimating;
-    if (!overlayIsActive) restoreOverlayHeaderFocus();
-    internalHeader.inert = overlayIsActive ? true : internalHeaderWasInert;
-    overlayHeader.inert = !overlayIsActive;
+    function renderCover() {
+      updateHeaderCover();
+      if (root.classList.contains('storefront-footer-snap-moving')) {
+        headerCoverFrame = window.requestAnimationFrame(renderCover);
+      } else {
+        headerCoverFrame = 0;
+      }
+    }
+
+    headerCoverFrame = window.requestAnimationFrame(renderCover);
   }
 
   function finishMotion() {
     window.clearTimeout(motionEndTimer);
     root.classList.remove('storefront-footer-snap-moving');
-    syncHeaderInteractivity();
+    stopHeaderCoverTracking();
+    updateHeaderCover();
     dispatchSnapEvent();
   }
 
@@ -948,7 +940,7 @@ function enhanceFooterSnap() {
     footer.inert = !open;
     footer.setAttribute('aria-hidden', String(!open));
     pageSurface.inert = open;
-    syncHeaderInteractivity(shouldAnimate);
+    trackHeaderCover();
 
     if (open && updateHistory && window.location.hash !== '#footer-contact') {
       window.history.pushState(window.history.state, '', '#footer-contact');
@@ -1076,7 +1068,6 @@ function enhanceFooterSnap() {
       || (isHome && window.scrollY >= window.innerHeight / 2);
     enabled = true;
     open = !initiallyOpen;
-    createOverlayHeader();
     root.classList.add('storefront-footer-snap');
     if (isHome) window.scrollTo(0, 0);
     setOpen(initiallyOpen, { animate: false });
@@ -1088,6 +1079,7 @@ function enhanceFooterSnap() {
     enabled = false;
     window.clearTimeout(wheelEndTimer);
     window.clearTimeout(motionEndTimer);
+    stopHeaderCoverTracking();
     resetWheelGesture();
     root.classList.remove(
       'storefront-footer-snap',
@@ -1097,8 +1089,7 @@ function enhanceFooterSnap() {
     );
     footer.inert = footerWasInert;
     pageSurface.inert = pageSurfaceWasInert;
-    if (internalHeader instanceof HTMLElement) internalHeader.inert = internalHeaderWasInert;
-    removeOverlayHeader();
+    headerSurfaces.forEach((surface) => surface.style.removeProperty('--_footer-cover-inset'));
     if (originalFooterAriaHidden === null) footer.removeAttribute('aria-hidden');
     else footer.setAttribute('aria-hidden', originalFooterAriaHidden);
     if (isHome) {

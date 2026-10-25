@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import StyleDictionary from 'style-dictionary';
+import { mergeTokenSources } from './lib/token-source-merge.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tokenSourceDir = path.join(repoRoot, 'tokens', 'source');
@@ -32,18 +33,6 @@ function assertKnown(value, allowed, label) {
   }
 }
 
-function isObject(value) {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function isToken(value) {
-  return isObject(value) && Object.prototype.hasOwnProperty.call(value, '$value');
-}
-
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
@@ -57,32 +46,6 @@ function tokenFiles(layer) {
     .map((file) => path.join(dir, file));
 }
 
-function mergeTokens(target, source) {
-  for (const [key, value] of Object.entries(source)) {
-    if (key.startsWith('$')) {
-      continue;
-    }
-
-    if (isToken(value)) {
-      target[key] = clone(value);
-      continue;
-    }
-
-    if (isObject(value)) {
-      if (!isObject(target[key]) || isToken(target[key])) {
-        target[key] = {};
-      }
-
-      mergeTokens(target[key], value);
-      continue;
-    }
-
-    target[key] = clone(value);
-  }
-
-  return target;
-}
-
 function buildMatrixTokens(theme, viewport) {
   const files = [
     ...tokenFiles('primitives'),
@@ -94,7 +57,7 @@ function buildMatrixTokens(theme, viewport) {
 
   return {
     files,
-    tokens: files.reduce((merged, file) => mergeTokens(merged, readJson(file)), {})
+    tokens: files.reduce((merged, file) => mergeTokenSources(merged, readJson(file)), {})
   };
 }
 

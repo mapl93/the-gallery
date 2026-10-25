@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isUnsafeTokenSourceKey } from './lib/token-source-merge.js';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tokenSourceDir = path.join(repoRoot, 'tokens', 'source');
@@ -230,6 +231,11 @@ function visitNode(node, file, pathParts = []) {
 
   Object.entries(node).forEach(([key, value]) => {
     if (key.startsWith('$')) {
+      return;
+    }
+
+    if (isUnsafeTokenSourceKey(key)) {
+      addError(file, [...pathParts, key].join('.'), `unsafe token source key "${key}"`);
       return;
     }
 
